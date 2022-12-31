@@ -1,6 +1,7 @@
 {
     "manifest_version": 1,
     "name": "Apple Music-like lyrics",
+    "author": "SteveXMH",
     "version": "0.1.0",
     "injects": {
         "Main": [
