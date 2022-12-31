@@ -1,0 +1,332 @@
+/* 歌词页面 */
+
+.am-lyric-bg
+    background-color: black; 
+    transition: all 0.5s; 
+    background-position: center !important; 
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    height: 100vh; 
+    &::after
+        content: ""; 
+        position: absolute; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        width: 100%; 
+        height: 100%;
+    
+    &.am-lyric-use-pingfang-font *
+        font-family: 'PingFang SC' !important;
+    
+    &.am-lyric-bg-blur::after
+        backdrop-filter: blur(2rem);
+    &.am-lyric-bg-darken::after
+        backdrop-filter: brightness(0.4);
+    &.am-lyric-bg-blur.am-lyric-bg-darken::after
+        backdrop-filter: blur(2rem) brightness(0.4);
+
+#applemusic-like-lyrics-view
+    overflow: hidden;
+    flex: 1.2;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column
+    
+    .am-lyric-options
+        opacity: 0;
+        transition: opacity  0.75s cubic-bezier(0.65, 0, 0.35, 1);
+        
+        button
+            margin: 0.5rem;
+            background-color: transparent;
+            padding: 3px;
+            border: solid 1px white;
+            border-radius: 3px;
+            &.toggled
+                background-color: white
+                color: black
+    
+    .am-lyric-view
+        overflow: hidden scroll;
+        position: relative;
+        max-height: 100%;
+        -webkit-mask-image: linear-gradient(#0000, #000 10%, #000 80%, #0000 90%, #0000);
+        > *
+            padding: 50vh 0;
+            position: relative;
+            padding-left: 2rem;
+            padding-right: @css { min(30%, 5vw, 600px) };
+        &.editing
+            -webkit-mask-image: unset;
+            > *
+                padding: 0;
+                padding-bottom: 128px;
+                padding-right: @css { min(30%, 5vw, 600px) };
+    
+    .am-lyric-line-edit
+        display: flex;
+        align-content: center;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        
+        >.edit-time
+            padding: 0 1rem;
+        
+        >.edit-arrow
+            padding: 0 1rem;
+        
+        >.edit-area
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            input
+                flex-basis: 100%;
+                border-radius: 2px;
+                max-width: 100%;
+                line-height: 16px;
+                margin: 4px 0;
+                padding: 4px 16px;
+                border: solid 1px #FFF7;
+                background: transparent;
+                color: white;
+    
+    // 鼠标悬浮时显示所有歌词
+    &:hover .am-lyric-line
+        filter: blur(0) !important;
+        opacity: 1 !important;
+    &:hover .am-lyric-options
+        opacity: 1;
+
+    // 歌词缩放效果
+    &.lyric-scale-effect // lyricScaleEffect
+        .am-lyric-line
+            transform: scale(0.66666);
+            
+            &.am-lyric-line-o0,
+            &.am-lyric-line-selected
+                transform: scale(1);
+                
+        .am-lyric-dots
+            transform: scale(0.66666);
+            &.am-lyric-dots-selected
+                transform: scale(1);
+
+    // 已播放歌词隐藏效果
+    &.lyric-hide-passed
+        .am-lyric-line
+            opacity: 0.5;
+            &.am-lyric-line-before
+                opacity: 0;
+            &.am-lyric-line-selected
+                opacity: 1;
+
+    // 歌词模糊效果
+    &.lyric-blur-effect
+        .am-lyric-line
+            filter: blur(4px);
+            &.am-lyric-line-after
+                filter: blur(4px);
+            &.am-lyric-line-o1
+                filter: blur(1px);
+            &.am-lyric-line-o2
+                filter: blur(2px);
+            &.am-lyric-line-o3
+                filter: blur(3px);
+    
+    // 未播放歌词淡入效果
+    &.lyric-blur-fade-in-effect
+        .am-lyric-line
+            &.am-lyric-line-after
+                opacity: 0.05;
+            &.am-lyric-line-o1
+                opacity: 0.5;
+            &.am-lyric-line-o2
+                opacity: 0.35;
+            &.am-lyric-line-o3
+                opacity: 0.20;
+                
+    // 自适应歌词字体大小
+    &.lyric-auto-font-size
+        .am-lyric-line
+            font-size: @css { max(32px, 4vh) };
+    
+    &.use-ping-fang-font *
+        font-family: 'PingFang SC' !important;
+    
+    .am-lyric-line
+        font-weight: bold;
+        font-size: @css { var(--applemusic-like-lyrics-lyric-font-size) };
+        margin: @css { max(32px, 2vh) } 0;
+        transform-origin: left;
+        color: #FFF;
+        transition: all 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+        line-break: loose;
+        word-break: break-word;
+        
+        > .am-lyric-line-translated,
+        > .am-lyric-line-roman
+            opacity: 0.5;
+        
+        &:hover::before
+            content: " ";
+            position: absolute;
+            width: calc(100% + 4rem);
+            left: -2rem;
+            height: calc(100% + 2rem);
+            top: -1rem;
+            border-radius: 1rem;
+            background-color: #FFF4;
+        
+        &.am-lyric-line-o0,
+        &.am-lyric-line-selected
+            filter: blur(0px);
+            opacity: 1;
+            
+    .am-lyric-dots
+        height: 4rem;
+        transition: all 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        transform-origin: left;
+        
+        opacity: 0;
+        
+        > *
+            display: inline-block;
+            margin-right: 1.5rem;
+            width: 2rem;
+            height: 2rem;
+            background-color: white;
+            box-shadow: 0 2px 5px #0008;
+            border-radius: 1rem;
+        
+        &.am-lyric-dots-selected
+            opacity: 1;
+
+/* 修正专辑图片的缩放方式 */
+.n-single .cdimg img {
+    object-fit: cover;
+}
+
+/* 去掉专辑图片下面的不可见元素，以免歌曲名称无法选中 */
+.newtrytxt.j-fflag {
+    display: none;
+}
+
+/* 歌名后标签的对齐和样式 */
+.tag-wrap {
+    position: unset !important;
+}
+
+.tag-wrap > * {
+    margin: 0 4px;
+}
+
+.tag-wrap svg, .tag-wrap svg * {
+    fill: #FFF;
+}
+
+.n-single {
+    position: unset;
+    height: calc(100%) !important;
+    padding-bottom: 100px !important;
+    max-height: 100%;
+}
+.g-single-track .content {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    max-width: unset;
+}
+
+/* 歌曲信息 */
+.n-single .head {
+    height: unset;
+}
+.n-single .head .playfrom {
+    flex-direction: row;
+    max-width: unset;
+    line-height: unset;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.n-single .head .playfrom > li, .n-single .head .playfrom > li * {
+    font-size: large;
+    max-width: 10vw;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.n-single .head .playfrom > li > a.artist {
+    white-space: nowrap;
+}
+.n-single .head .playfrom li.spacer {
+    margin: 0 0.5rem;
+}
+.n-single .head .title {
+    padding-top: 1rem;
+    user-select: all;
+    height: unset;
+    font-size: large;
+    font-weight: 1200;
+}
+.n-single .head .title h1 {
+    display: block;
+    max-width: unset;
+    line-height: unset;
+    margin-right: unset;
+    font-size: large;
+    font-weight: 900;
+}
+.n-single .head h2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: large;
+    font-weight: bold;
+    max-width: unset;
+    line-height: unset;
+}
+
+.n-single .sd .sd-wrap {
+    width: @css { min(50vh, 35vw) };
+}
+
+.g-single-track .g-singlec-ct .n-single .sd {
+    flex: 1;
+    margin-bottom: unset;
+    margin-left: 1vw;
+    margin-top: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 让歌名的单词正确换行 */
+.n-single .head .title h1 .name {
+    word-wrap: break-word;
+}
+.g-singlec-comment-detail.z-show {
+    display: none;
+}
+
+/* 自动隐藏播放栏和控制栏 */
+.mq-playing .g-hd,
+.m-winctrl,
+#main-player,
+.m-pinfo {
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.mq-playing .g-hd.hide,
+.m-winctrl.hide,
+#main-player.hide,
+.m-pinfo.hide {
+    opacity: 0 !important;
+}
+
+.cdbox, .cdin, .cdrun.j-flag {
+    display: none;
+}

@@ -1,0 +1,21 @@
+{
+    "manifest_version": 1,
+    "name": "Apple Music-like lyrics",
+    "version": "0.1.0",
+    "injects": {
+        "Main": [
+            {
+                "file": "index.js"
+            }
+        ]
+    },
+    "hijacks": {
+        ">= 2.10.4 <= 2.10.6": {
+            "orpheus://orpheus/pub/core.": {
+                "type": "replace",
+                "from": "=Function.prototype;",
+                "to": "=FakeFunction;"
+            }
+        }
+    }
+}

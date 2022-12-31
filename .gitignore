@@ -1,0 +1,8 @@
+node_modules/
+*.lock
+*.log
+*.map
+*.plugin
+/index.js
+/index.css
+/startup_script.js
