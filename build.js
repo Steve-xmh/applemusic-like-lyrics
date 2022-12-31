@@ -45,6 +45,6 @@ build({
     });
     output.pipe(fs.createWriteStream('Apple Music-like lyrics.plugin'))
     fs.copyFileSync('manifest.json', 'dist/manifest.json')
-    fs.copyFileSync('assets/thumbnail.svg', 'dist/manifest.json')
+    fs.copyFileSync('assets/thumbnail.svg', 'dist/thumbnail.svg')
   }
 });
