@@ -8,7 +8,7 @@ build({
   bundle: true,
   sourcemap: process.argv.includes("--dev") ? "inline" : false,
   minify: !process.argv.includes("--dev"),
-  outdir: ".",
+  outdir: process.argv.includes("--dist") ? "dist" : ".",
   define: {
     DEBUG: process.argv.includes("--dev").toString(),
   },
@@ -44,5 +44,6 @@ build({
       },
     });
     output.pipe(fs.createWriteStream('Apple Music-like lyrics.plugin'))
+    fs.copyFileSync('assets/thumbnail.svg', 'dist/preview.svg')
   }
 });
