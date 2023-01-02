@@ -12,6 +12,8 @@ import { render } from "react-dom";
 import * as React from "react";
 import { log } from "./logger";
 import { LyricView } from "./lyric-view";
+import { tryFindEapiRequestFuncName } from "./api";
+import { GLOBAL_EVENTS } from "./global-events";
 
 const settingPrefix = "applemusic-like-lyrics:";
 
@@ -125,6 +127,9 @@ plugin.onLoad(() => {
 	window.addEventListener("mousemove", () => {
 		const autoEnabled =
 			localStorage.getItem(`${settingPrefix}autoHideControlBar`) !== "true";
+		const hideDuration = Number(
+			localStorage.getItem(`${settingPrefix}autoHideDuration`),
+		);
 		if (hideTimer !== 0) {
 			clearTimeout(hideTimer);
 			hideTimer = 0;
@@ -163,7 +168,7 @@ plugin.onLoad(() => {
 				if (pInfoEl) {
 					pInfoEl.classList.add("hide");
 				}
-			}, 5000);
+			}, (hideDuration || 5) * 1000);
 		}
 	});
 
@@ -273,15 +278,53 @@ plugin.onLoad(() => {
 	lyricPageObserver.observe(document.body, {
 		childList: true,
 	});
-	setInterval(async () => {
-		const curStyle = await betterncm.fs.readFileText(
-			`${plugin.pluginPath}/index.css`,
-		);
-		if (cssContent !== curStyle) {
-			cssContent = curStyle;
-			reloadStylesheet(cssContent);
+	const lyricPageOpenObserver = new MutationObserver((m) => {
+		for (const a of m) {
+			a.addedNodes.forEach((el) => {
+				if (el.nodeType === Node.ELEMENT_NODE) {
+					const element = el as HTMLElement;
+					const albumImageElement = element.querySelector(".cdimg > img");
+					const lyricViewDiv = element.querySelector(
+						"#applemusic-like-lyrics-view",
+					);
+					if (albumImageElement && lyricViewDiv) {
+						GLOBAL_EVENTS.dispatchEvent(
+							new Event("lyric-page-open", undefined),
+						);
+					}
+				}
+			});
+
+			a.removedNodes.forEach((el) => {
+				if (el.nodeType === Node.ELEMENT_NODE) {
+					const element = el as HTMLElement;
+					const albumImageElement = element.querySelector(".cdimg > img");
+					const lyricViewDiv = element.querySelector(
+						"#applemusic-like-lyrics-view",
+					);
+					if (albumImageElement && lyricViewDiv) {
+						GLOBAL_EVENTS.dispatchEvent(
+							new Event("lyric-page-hide", undefined),
+						);
+					}
+				}
+			});
 		}
-	}, 1000);
+	});
+	lyricPageOpenObserver.observe(document.body, {
+		childList: true,
+	});
+	if (DEBUG) {
+		setInterval(async () => {
+			const curStyle = await betterncm.fs.readFileText(
+				`${plugin.pluginPath}/index.css`,
+			);
+			if (cssContent !== curStyle) {
+				cssContent = curStyle;
+				reloadStylesheet(cssContent);
+			}
+		}, 1000);
+	}
 });
 
 window.addEventListener(
@@ -399,7 +442,7 @@ const ConfigComponent: React.FC = () => {
 	}, [eapiRequestFuncName]);
 
 	return (
-		<>
+		<div className="am-lyrics-settings">
 			<FormGroup>
 				<Typography variant="h5">歌词样式设置</Typography>
 				<CheckBoxComponent settingKey="lyricBlurEffect" label="歌词模糊效果" />
@@ -430,7 +473,7 @@ const ConfigComponent: React.FC = () => {
 					min={8}
 					max={64}
 					settingKey="lyricFontSize"
-					label="字体大小"
+					label="字体大小（像素）"
 				/>
 			</FormGroup>
 			<FormGroup>
@@ -439,21 +482,38 @@ const ConfigComponent: React.FC = () => {
 					settingKey="autoHideControlBar"
 					label="鼠标静止时自动隐藏播放栏和标题栏"
 				/>
+				<SliderComponent
+					step={0.5}
+					min={1}
+					max={30}
+					settingKey="autoHideDuration"
+					label="鼠标静止隐藏间隔（秒）"
+				/>
 				<CheckBoxComponent
 					settingKey="usePingFangFont"
 					label="全局使用苹方字体（需要系统安装）"
 				/>
+				<Button
+					variant="outlined"
+					onClick={() => {
+						betterncm.ncm.openUrl("https://github.com/paraself/PingFang-Fonts");
+					}}
+				>
+					你可以在此下载安装苹方字体
+				</Button>
 			</FormGroup>
 			<FormGroup>
-				<Typography variant="h5">歌词来源设置</Typography>
-				<Typography variant="body1">
+				<Typography paragraph variant="h5">
+					歌词来源设置
+				</Typography>
+				<Typography paragraph variant="body1">
 					如果歌词无法正确显示，有可能是无法获取网易云请求函数，请确认此处的函数名称是对应你所使用的网易云版本的请求函数。
 				</Typography>
-				<Typography variant="body1">
+				<Typography paragraph variant="body1">
 					具体可以前往插件 Github 仓库查询或在 BetterNCM 讨论群内询问作者
 					SteveXMH。
 				</Typography>
-				<Typography variant="body1">
+				<Typography paragraph variant="body1" style={{ userSelect: "text" }}>
 					当前网易云 core.js 版本：{ncmPackageVersion}
 				</Typography>
 				<Typography gutterBottom>网易云请求函数名称</Typography>
@@ -463,21 +523,24 @@ const ConfigComponent: React.FC = () => {
 						setEapiRequestFuncName(evt.target.value);
 					}}
 				/>
-				<Typography variant="body1">
+				<Typography paragraph variant="body1" className="am-lyric-func-body">
 					{eapiRequestFuncBody === ""
 						? "无法找到该函数，歌词将无法工作"
 						: `已找到函数：${eapiRequestFuncBody}`}
 				</Typography>
+				<Button
+					variant="outlined"
+					onClick={() => {
+						const funcName = tryFindEapiRequestFuncName();
+						setEapiRequestFuncName(funcName || "");
+					}}
+				>
+					尝试搜索请求函数
+				</Button>
 			</FormGroup>
-			<Button
-				variant="outlined"
-				onClick={() => {
-					betterncm.ncm.openUrl("https://github.com/paraself/PingFang-Fonts");
-				}}
-			>
-				你可以在此下载安装苹方字体
-			</Button>
-			<Typography variant="h5">关于</Typography>
+			<Typography paragraph variant="h5">
+				关于
+			</Typography>
 			<Typography variant="body1">Apple Music-like lyrics</Typography>
 			<Typography variant="body1">1.0.0</Typography>
 			<Typography variant="body1">By SteveXMH</Typography>
@@ -491,7 +554,7 @@ const ConfigComponent: React.FC = () => {
 			>
 				Github
 			</Button>
-		</>
+		</div>
 	);
 };
 

@@ -1,5 +1,6 @@
 import {
 	classname,
+	genAudioPlayerCommand,
 	getLyric,
 	getPlayingSong,
 	PlayState,
@@ -11,6 +12,7 @@ import { LyricLine, parseLyric } from "./lyric-parser";
 import { Tween, Easing } from "./tweenjs";
 import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
+import { GLOBAL_EVENTS } from "./global-events";
 
 // 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
 function guessTextReadDuration(text: string): number {
@@ -43,6 +45,7 @@ const LyricLineView: React.FC<{
 	translated: boolean;
 	roman: boolean;
 	edit: boolean;
+	onClickLyric?: (line: LyricLine) => void;
 	onUpdateLyric?: (newLine: LyricLine) => void;
 	onInsertLyric?: () => void;
 }> = (props) => {
@@ -96,7 +99,11 @@ const LyricLineView: React.FC<{
 		);
 	} else {
 		return (
+			// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 			<div
+				onClick={() => {
+					if (props.onClickLyric) props.onClickLyric(props.line);
+				}}
 				className={classname("am-lyric-line", {
 					"am-lyric-line-before": props.offset < 0,
 					"am-lyric-line-after": props.offset > 0,
@@ -108,8 +115,10 @@ const LyricLineView: React.FC<{
 				props.line.dynamicLyric &&
 				props.line.dynamicLyricTime ? (
 					<div className="am-lyric-line-dynamic">
-						{props.line.dynamicLyric.map((word) => (
+						{props.line.dynamicLyric.map((word, i) => (
 							<span
+								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								key={i}
 								style={{
 									animationDelay: `${
 										word.time - (props.line.dynamicLyricTime || 0)
@@ -139,7 +148,9 @@ const LyricLineView: React.FC<{
 
 export const LyricView: React.FC = () => {
 	const [currentAudioId, setCurrentAudioId] = React.useState("");
+	const [currentAudioDuration, setAudioDuration] = React.useState(0);
 	const [lyricEditMode, setLyricEditMode] = React.useState(false);
+	const [error, setError] = React.useState<Error | null>(null);
 	const [playState, setPlayState] = React.useState(getPlayingSong().state);
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
 		null,
@@ -191,25 +202,30 @@ export const LyricView: React.FC = () => {
 	}, []);
 
 	React.useEffect(() => {
-		let cancled = false;
+		let canceled = false;
 		(async () => {
-			const lyric = await loadLyric(getPlayingSong().data.id);
-			log("已获取到歌词", lyric);
-			const parsed = parseLyric(
-				lyric?.lrc?.lyric || "",
-				lyric?.tlyric?.lyric || "",
-				lyric?.romalrc?.lyric || "",
-				lyric?.yrc?.lyric || "",
-			);
-			log(lyric, parsed);
-			if (!cancled) {
-				setCurrentLyrics(parsed);
-				setCurrentLyricIndex(-1);
-				keepSelectLyrics.current.clear();
+			setError(null);
+			try {
+				const lyric = await loadLyric(getPlayingSong().data.id);
+				log("已获取到歌词", lyric);
+				const parsed = parseLyric(
+					lyric?.lrc?.lyric || "",
+					lyric?.tlyric?.lyric || "",
+					lyric?.romalrc?.lyric || "",
+					lyric?.yrc?.lyric || "",
+				);
+				log(lyric, parsed);
+				if (!canceled) {
+					setCurrentLyrics(parsed);
+					setCurrentLyricIndex(-1);
+					keepSelectLyrics.current.clear();
+				}
+			} catch (err) {
+				setError(err);
 			}
 		})();
 		return () => {
-			cancled = true;
+			canceled = true;
 			// 滚动到顶部
 			lyricListElement.current?.parentElement?.scrollTo(0, 0);
 			// 载入新歌词
@@ -278,28 +294,58 @@ export const LyricView: React.FC = () => {
 		}
 	}, [currentLyricIndex]);
 
+	const onSeekToLyric = React.useCallback(
+		(line: LyricLine) => {
+			if (!lyricEditMode) {
+				if (currentLyrics) {
+					const index = currentLyrics.findIndex((v) => v === line);
+					keepSelectLyrics.current.clear();
+					keepSelectLyrics.current.add(index);
+					setCurrentLyricIndex(index);
+					scrollToLyric();
+				}
+				if (configDynamicLyric) {
+					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
+					channel.call("audioplayer.seek", () => {}, [
+						currentAudioId,
+						genAudioPlayerCommand(currentAudioId, "seek"),
+						(line?.dynamicLyricTime || line.time) / 1000,
+					]);
+				} else {
+					log("正在跳转到歌词时间", line.time);
+					channel.call("audioplayer.seek", () => {}, [
+						currentAudioId,
+						genAudioPlayerCommand(currentAudioId, "seek"),
+						line.time / 1000,
+					]);
+				}
+			}
+		},
+		[currentAudioId, lyricEditMode, configDynamicLyric],
+	);
+
 	React.useEffect(() => {
 		const btn = document.querySelector(".m-pinfo .cover .f-cp");
 		const onWindowSizeChanged = () => {
 			setTimeout(() => {
-				setCurrentLyricIndex(-1); // 触发歌词更新重新定位
+				scrollToLyric(); // 触发歌词更新重新定位
 			}, 750);
 		};
-		const onClick = () => {
+		const onLyricOpened = () => {
+			log("歌词页面被打开！");
 			setTimeout(() => {
-				setCurrentLyricIndex(-1); // 触发歌词更新重新定位
+				log("正在重新滚动歌词");
+				scrollToLyric(); // 触发歌词更新重新定位
 			}, 1500);
 		};
 
-		log("正在挂载按钮事件", btn);
-
-		btn?.addEventListener("click", onClick);
+		GLOBAL_EVENTS.addEventListener("lyric-page-open", onLyricOpened);
 		window.addEventListener("resize", onWindowSizeChanged);
 		return () => {
-			btn?.removeEventListener("click", onClick);
+			GLOBAL_EVENTS.removeEventListener("lyric-page-open", onLyricOpened);
 			window.removeEventListener("resize", onWindowSizeChanged);
 		};
-	}, []);
+	}, [scrollToLyric]);
 
 	const lastUpdateTime = React.useRef(Date.now());
 	const lastIndex = React.useRef(-1);
@@ -365,6 +411,13 @@ export const LyricView: React.FC = () => {
 	]);
 
 	React.useEffect(() => {
+		if (!lyricEditMode) {
+			checkIfTooFast(currentLyricIndex);
+			scrollToLyric();
+		}
+	}, []);
+
+	React.useEffect(() => {
 		const onPlayProgress = (
 			audioId: string,
 			progress: number,
@@ -402,6 +455,28 @@ export const LyricView: React.FC = () => {
 			setPlayState(playState);
 		};
 
+		interface AudioLoadInfo {
+			activeCode: number;
+			code: number;
+			duration: number; // 单位秒
+			errorCode: number;
+			errorString: number;
+		}
+
+		interface AudioEndInfo {
+			code: number;
+			from: string; // switch
+		}
+
+		const onLoad = (audioId: string, info: AudioLoadInfo) => {
+			setAudioDuration(info?.duration || 0);
+			setCurrentAudioId(audioId);
+		};
+
+		const onEnd = (audioId: string, _info: AudioEndInfo) => {
+			setCurrentAudioId(audioId);
+		};
+
 		legacyNativeCmder.appendRegisterCall(
 			"PlayProgress",
 			"audioplayer",
@@ -412,6 +487,8 @@ export const LyricView: React.FC = () => {
 			"audioplayer",
 			onPlayStateChange,
 		);
+		legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
+		legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
 
 		return () => {
 			legacyNativeCmder.removeRegisterCall(
@@ -424,6 +501,8 @@ export const LyricView: React.FC = () => {
 				"audioplayer",
 				onPlayStateChange,
 			);
+			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
+			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
 		};
 	}, [currentLyrics, configDynamicLyric]);
 
@@ -434,12 +513,14 @@ export const LyricView: React.FC = () => {
 				const offset = index - currentLyricIndex;
 				return (
 					<LyricLineView
+						key={index}
 						selected={index === currentLyricIndex || isTooFast}
 						line={line}
 						translated={configTranslatedLyric === "true"}
 						dynamic={configDynamicLyric === "true"}
 						roman={configRomanLyric === "true"}
 						offset={offset}
+						onClickLyric={onSeekToLyric}
 						edit={lyricEditMode}
 					/>
 				);
@@ -456,6 +537,7 @@ export const LyricView: React.FC = () => {
 				}
 				return (
 					<LyricDots
+						key={index}
 						selected={index === currentLyricIndex}
 						time={line.time}
 						duration={duration}
@@ -464,6 +546,7 @@ export const LyricView: React.FC = () => {
 			}
 		},
 		[
+			onSeekToLyric,
 			lyricEditMode,
 			currentLyrics,
 			currentLyricIndex,
@@ -539,7 +622,13 @@ export const LyricView: React.FC = () => {
 					歌词编辑模式
 				</button>
 			</div>
-			{currentLyrics ? (
+			{error ? (
+				<div className="am-lyric-view-error">
+					<div>歌词加载失败：</div>
+					<div>{error.message}</div>
+					<div>{error.stack}</div>
+				</div>
+			) : currentLyrics ? (
 				currentLyrics.length > 0 ? (
 					<div
 						className={classname("am-lyric-view", {
@@ -552,13 +641,12 @@ export const LyricView: React.FC = () => {
 					</div>
 				) : (
 					<div className="am-lyric-view-no-lyric">
-						没有可用歌词，但是你可以手动指定一个有歌词的音乐来使用它的歌词。
+						没有可用歌词，但是你可以手动指定一个有歌词的音乐来使用它的歌词。（以后会实现的）
 					</div>
 				)
 			) : (
 				<div className="am-lyric-view-loading">
 					<CircularProgress />
-					正在加载歌词
 				</div>
 			)}
 		</>

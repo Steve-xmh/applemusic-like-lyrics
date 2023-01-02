@@ -1,4 +1,5 @@
 import * as React from "react";
+import { log } from "./logger";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export enum PlayState {
@@ -28,13 +29,43 @@ export interface EAPIRequestConfig {
  * @todo 确认兼容版本范围内的函数名是否可用
  */
 export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	// 参考 orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:5158
-	// 参考 orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:5158
-	// Ee
-	return callCachedSearchFunction(
-		plugin.getConfig("eapiRequestFuncName", "Ee"),
-		[url, config],
-	); // 经测试 2.10.6 可用
+	let funcName = plugin.getConfig("eapiRequestFuncName", "");
+	const ncmPackageVersion = plugin.getConfig("ncmPackageVersion", "");
+	if (ncmPackageVersion !== APP_CONF.packageVersion) {
+		funcName = "";
+		plugin.setConfig("ncmPackageVersion", APP_CONF.packageVersion);
+	}
+	if (funcName === "") {
+		funcName = tryFindEapiRequestFuncName() || "";
+		plugin.setConfig("eapiRequestFuncName", funcName);
+	}
+	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
+}
+
+export function tryFindEapiRequestFuncName(): string | null {
+	const result = betterncm.ncm.findApiFunction((v) =>
+		v.toString().includes("_bindTokenRequest yidun getToken undefined"),
+	);
+	if (result) {
+		for (const key in result[1]) {
+			if (result[1][key] === result[0]) {
+				log("查找到原始请求函数：", key, result);
+				const originalFuncName = key;
+				for (const key in result[1]) {
+					if (
+						result[1][key]?.originalFunc
+							?.toString()
+							?.includes(`.${originalFuncName}(`)
+					) {
+						log("查找到绑定请求函数：", key, result);
+						return key;
+					}
+				}
+			}
+		}
+	}
+	log("查找请求函数失败");
+	return null;
 }
 
 // rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
@@ -186,6 +217,19 @@ export function usePlayState() {
 	}, []);
 
 	return playState;
+}
+
+function genRandomString(length: number) {
+	const words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	const result: string[] = [];
+	for (let i = 0; i < length; i++) {
+		result.push(words.charAt(Math.floor(Math.random() * words.length)));
+	}
+	return result.join("");
+}
+
+export function genAudioPlayerCommand(audioId: string, command: string) {
+	return `${audioId}|${command}|${genRandomString(6)}`;
 }
 
 export function classname(

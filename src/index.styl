@@ -26,6 +26,13 @@
     &.am-lyric-bg-blur.am-lyric-bg-darken::after
         backdrop-filter: blur(2rem) brightness(0.4);
 
+.am-lyrics-settings
+    margin: 0 0 auto 0;
+    max-width: 35rem;
+    .am-lyric-func-body
+        user-select: text;
+        margin: 1rem 0;
+
 #applemusic-like-lyrics-view
     overflow: hidden;
     flex: 1.2;
@@ -165,7 +172,7 @@
     
     .am-lyric-line
         font-weight: bold;
-        font-size: @css { var(--applemusic-like-lyrics-lyric-font-size) };
+        font-size: @css { max(8px, var(--applemusic-like-lyrics-lyric-font-size)) };
         margin: @css { max(32px, 2vh) } 0;
         transform-origin: left;
         color: #FFF;
