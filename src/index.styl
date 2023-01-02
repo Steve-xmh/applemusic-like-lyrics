@@ -64,6 +64,14 @@
                 padding-bottom: 128px;
                 padding-right: @css { min(30%, 5vw, 600px) };
     
+    .am-lyric-view-no-lyric
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        > *
+            padding: 50vh 0;
+            position: relative;
+    
     .am-lyric-line-edit
         display: flex;
         align-content: center;
@@ -139,13 +147,13 @@
     &.lyric-blur-fade-in-effect
         .am-lyric-line
             &.am-lyric-line-after
-                opacity: 0.05;
+                opacity: 0.1;
             &.am-lyric-line-o1
-                opacity: 0.5;
+                opacity: 0.4;
             &.am-lyric-line-o2
-                opacity: 0.35;
+                opacity: 0.3;
             &.am-lyric-line-o3
-                opacity: 0.20;
+                opacity: 0.2;
                 
     // 自适应歌词字体大小
     &.lyric-auto-font-size
@@ -169,6 +177,11 @@
         > .am-lyric-line-roman
             opacity: 0.5;
         
+        > .am-lyric-line-dynamic > *
+            animation-name: am-lyric-word-animation;
+            animation-fill-mode: both;
+            animation-play-state: paused;
+            
         &:hover::before
             content: " ";
             position: absolute;
@@ -183,7 +196,18 @@
         &.am-lyric-line-selected
             filter: blur(0px);
             opacity: 1;
-            
+            > .am-lyric-line-dynamic
+                > *
+                    animation-play-state: running;
+        @keyframes am-lyric-word-animation {
+            from {
+                opacity: 0.5;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
     .am-lyric-dots
         height: 4rem;
         transition: all 0.5s cubic-bezier(0.65, 0, 0.35, 1);

@@ -1,6 +1,11 @@
 import * as React from "react";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
+export enum PlayState {
+	Playing = 1,
+	Pausing = 2,
+}
+
 export interface EAPIRequestConfig {
 	/**
 	 * 返回响应的数据类型，绝大部分情况下都是 `json`
@@ -133,6 +138,54 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  */
 export function getPlayingSong() {
 	return callCachedSearchFunction("getPlaying", []);
+}
+
+export function usePlayState() {
+	const [playState, setPlayState] = React.useState(getPlayingSong().state);
+
+	React.useEffect(() => {
+		const onPlayProgress = (
+			audioId: string,
+			progress: number,
+			playState: PlayState,
+		) => {
+			setPlayState(playState);
+		};
+
+		const onPlayStateChange = (
+			audioId: string,
+			state: string,
+			playState: PlayState,
+		) => {
+			setPlayState(playState);
+		};
+
+		legacyNativeCmder.appendRegisterCall(
+			"PlayProgress",
+			"audioplayer",
+			onPlayProgress,
+		);
+		legacyNativeCmder.appendRegisterCall(
+			"PlayState",
+			"audioplayer",
+			onPlayStateChange,
+		);
+
+		return () => {
+			legacyNativeCmder.removeRegisterCall(
+				"PlayProgress",
+				"audioplayer",
+				onPlayProgress,
+			);
+			legacyNativeCmder.removeRegisterCall(
+				"PlayState",
+				"audioplayer",
+				onPlayStateChange,
+			);
+		};
+	}, []);
+
+	return playState;
 }
 
 export function classname(

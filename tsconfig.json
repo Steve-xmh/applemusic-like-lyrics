@@ -15,6 +15,7 @@
         // "jsxFactory": "h",
         // "jsxFragmentFactory": "f",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "strictNullChecks": true,
         "allowJs": false
     }

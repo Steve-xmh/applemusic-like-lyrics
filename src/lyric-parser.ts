@@ -1,13 +1,19 @@
+import { log } from "./logger";
+
 export interface DynamicLyricWord {
 	time: number;
+	duration: number;
+	flag: number;
 	word: string;
 }
 
 export interface LyricLine {
 	time: number;
+	duration: number;
 	originalLyric: string;
 	translatedLyric?: string;
 	romanLyric?: string;
+	dynamicLyricTime?: number;
 	dynamicLyric?: DynamicLyricWord[];
 }
 
@@ -20,6 +26,7 @@ export function parseLyric(
 	original: string,
 	translated: string,
 	roman: string,
+	dynamic: string,
 ): LyricLine[] {
 	const result: LyricLine[] = parsePureLyric(original).map((v) => ({
 		time: v.time,
@@ -43,9 +50,72 @@ export function parseLyric(
 
 	result.sort((a, b) => a.time - b.time);
 
-	return processLyric(result);
+	const processed = processLyric(result);
+
+	if (dynamic.trim().length > 0) {
+		// 解析逐词歌词
+		for (const line of dynamic.trim().split("\n")) {
+			let tmp = line.trim();
+			const lineMatches = tmp.match(yrcLineRegexp);
+			if (lineMatches) {
+				const time = parseInt(lineMatches.groups?.time || "0");
+				const duration = parseInt(lineMatches.groups?.duration || "0");
+				tmp = lineMatches.groups?.line || "";
+				const words: DynamicLyricWord[] = [];
+				while (tmp.length > 0) {
+					const wordMatches = tmp.match(yrcWordTimeRegexp);
+					if (wordMatches) {
+						const wordTime = parseInt(wordMatches.groups?.time || "0");
+						const wordDuration = parseInt(wordMatches.groups?.duration || "0");
+						const flag = parseInt(wordMatches.groups?.flag || "0");
+						const word = wordMatches.groups?.word;
+						if (word) {
+							words.push({
+								time: wordTime,
+								duration: wordDuration,
+								flag,
+								word,
+							});
+						}
+						tmp = tmp.slice(wordMatches.index || 0 + wordMatches[0].length);
+					} else {
+						break;
+					}
+				}
+				let nearestLine: LyricLine | null = null;
+				for (const line of processed) {
+					if (nearestLine) {
+						if (
+							Math.abs(nearestLine.time - time) > Math.abs(line.time - time)
+						) {
+							nearestLine = line;
+						}
+					} else {
+						nearestLine = line;
+					}
+				}
+				if (nearestLine) {
+					nearestLine.dynamicLyric = words;
+					nearestLine.dynamicLyricTime = time;
+					nearestLine.duration = duration;
+					log(nearestLine);
+				}
+			}
+		}
+	} else {
+		for (let i = 0; i < processed.length; i++) {
+			if (i < processed.length - 1) {
+				processed[i].duration = processed[i + 1].time - processed[i].time;
+			}
+		}
+	}
+
+	return processed;
 }
 
+const yrcLineRegexp = /^\[(?<time>[0-9]+),(?<duration>[0-9]+)\](?<line>.*)/;
+const yrcWordTimeRegexp =
+	/^\((?<time>[0-9]+),(?<duration>[0-9]+),(?<flag>[0-9]+)\)(?<word>[^\(]*)/;
 const timeRegexp = /^\[((?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)\]/;
 function parsePureLyric(lyric: string): LyricPureLine[] {
 	const result: LyricPureLine[] = [];
@@ -131,6 +201,7 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 	if (result[0]?.time > 5000) {
 		result.unshift({
 			time: 500,
+			duration: result[0]?.time - 500,
 			originalLyric: "",
 		});
 	}

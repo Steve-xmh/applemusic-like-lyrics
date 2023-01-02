@@ -4,7 +4,12 @@ const JSZip = require("jszip");
 const fs = require("fs");
 
 build({
-  entryPoints: ["src/index.tsx", "src/startup_script.ts", "src/index.styl"],
+  entryPoints: [
+    "src/index.tsx",
+    "src/startup_script.ts",
+    "src/index.styl",
+    "src/lyric-test.ts",
+  ],
   bundle: true,
   sourcemap: process.argv.includes("--dev") ? "inline" : false,
   minify: !process.argv.includes("--dev"),
@@ -43,8 +48,8 @@ build({
         level: 9,
       },
     });
-    output.pipe(fs.createWriteStream('Apple Music-like lyrics.plugin'))
-    fs.copyFileSync('manifest.json', 'dist/manifest.json')
-    fs.copyFileSync('assets/thumbnail.svg', 'dist/thumbnail.svg')
+    output.pipe(fs.createWriteStream("Apple Music-like lyrics.plugin"));
+    fs.copyFileSync("manifest.json", "dist/manifest.json");
+    fs.copyFileSync("assets/thumbnail.svg", "dist/thumbnail.svg");
   }
 });

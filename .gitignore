@@ -3,6 +3,8 @@ node_modules/
 *.log
 *.map
 *.plugin
+lyrics/
 /index.js
+/lyric-test.js
 /index.css
 /startup_script.js
