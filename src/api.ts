@@ -42,7 +42,9 @@ export function eapiRequest(url: string, config: EAPIRequestConfig) {
 	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
 }
 
-export function tryFindEapiRequestFuncName(): string | null {
+export function tryFindEapiRequestFuncName(
+	unsafe: boolean = false,
+): string | null {
 	const result = betterncm.ncm.findApiFunction((v) =>
 		v.toString().includes("_bindTokenRequest yidun getToken undefined"),
 	);
@@ -51,6 +53,7 @@ export function tryFindEapiRequestFuncName(): string | null {
 			if (result[1][key] === result[0]) {
 				log("查找到原始请求函数：", key, result);
 				const originalFuncName = key;
+				if (unsafe) return originalFuncName;
 				for (const key in result[1]) {
 					if (
 						result[1][key]?.originalFunc

@@ -166,7 +166,7 @@ export const LyricView: React.FC = () => {
 	);
 	const [configDynamicLyric, setConfigDynamicLyric] = useConfig(
 		"dynamic-lyric",
-		"true",
+		"false",
 	);
 	const [configRomanLyric, setConfigRomanLyric] = useConfig(
 		"roman-lyric",
@@ -240,59 +240,88 @@ export const LyricView: React.FC = () => {
 		  }
 		| undefined
 	>(undefined);
-	const scrollToLyric = React.useCallback(() => {
-		if (lyricListElement.current) {
-			const lyricView = lyricListElement.current.parentElement;
-			let scrollToIndex = currentLyricIndex;
-			for (const i of keepSelectLyrics.current) {
-				if (scrollToIndex > i) {
-					scrollToIndex = i;
+	const scrollToLyric = React.useCallback(
+		(mustScroll: boolean = false) => {
+			if (lyricListElement.current) {
+				const lyricView = lyricListElement.current.parentElement;
+				let scrollToIndex = currentLyricIndex;
+				for (const i of keepSelectLyrics.current) {
+					if (scrollToIndex > i) {
+						scrollToIndex = i;
+					}
 				}
-			}
-			let lyricElement: Element | null =
-				lyricListElement.current.children.item(scrollToIndex);
-			if (lyricElement && lyricView) {
-				// log(lyricElement, scrollTween.current?.lyricElement);
-				if (lyricElement !== scrollTween.current?.lyricElement) {
-					const listRect = lyricView.getBoundingClientRect();
-					const lineRect = lyricElement.getBoundingClientRect();
-					const lineHeight = lineRect.bottom - lineRect.top;
-					const scrollDelta =
-						lineRect.top -
-						listRect.top +
-						30 +
-						37.333 +
-						16 * 2 -
-						(listRect.height - lineHeight) / 2;
-					const prevScrollTop = lyricView.scrollTop;
-					const obj = { scrollTop: prevScrollTop };
-					const tween = new Tween(obj)
-						.to({ scrollTop: prevScrollTop + scrollDelta }, 750)
-						.easing(Easing.Cubic.InOut)
-						.onUpdate(() => {
-							lyricView.scrollTo(0, obj.scrollTop);
-						})
-						.start();
-					const onFrameUpdate = (time: number) => {
-						if (scrollTween.current?.tween === tween) {
-							scrollTween.current?.tween?.update(time);
-							requestAnimationFrame(onFrameUpdate);
+				let lyricElement: Element | null =
+					lyricListElement.current.children.item(scrollToIndex);
+				if (lyricElement && lyricView) {
+					// log(lyricElement, scrollTween.current?.lyricElement);
+					if (mustScroll) {
+						scrollTween.current = undefined;
+					}
+					if (lyricElement !== scrollTween.current?.lyricElement) {
+						const listRect = lyricView.getBoundingClientRect();
+						const lineRect = lyricElement.getBoundingClientRect();
+						const lineHeight = lineRect.bottom - lineRect.top;
+						const scrollDelta =
+							lineRect.top -
+							listRect.top +
+							30 +
+							16 * 2 -
+							(listRect.height - lineHeight) / 2;
+						const prevScrollTop = lyricView.scrollTop;
+						const obj = { scrollTop: prevScrollTop };
+
+						if (mustScroll) {
+							const onFrame = () => {
+								if (lyricElement) {
+									const listRect = lyricView.getBoundingClientRect();
+									const lineRect = lyricElement.getBoundingClientRect();
+									const lineHeight = lineRect.bottom - lineRect.top;
+									const scrollDelta =
+										lineRect.top -
+										listRect.top +
+										30 +
+										16 * 2 -
+										(listRect.height - lineHeight) / 2;
+									log("正在强制滚动", scrollDelta);
+									if (Math.round(scrollDelta) !== 0) {
+										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
+										requestAnimationFrame(onFrame);
+									}
+								}
+							};
+
+							requestAnimationFrame(onFrame);
 						} else {
-							// log("动画被替换，旧动画已停止");
-							scrollTween.current?.tween?.stop();
+							const tween = new Tween(obj)
+								.to({ scrollTop: prevScrollTop + scrollDelta }, 750)
+								.easing(Easing.Cubic.InOut)
+								.onUpdate(() => {
+									lyricView.scrollTo(0, obj.scrollTop);
+								})
+								.start();
+							const onFrameUpdate = (time: number) => {
+								if (scrollTween.current?.tween === tween) {
+									scrollTween.current?.tween?.update(time);
+									requestAnimationFrame(onFrameUpdate);
+								} else {
+									// log("动画被替换，旧动画已停止");
+									scrollTween.current?.tween?.stop();
+								}
+							};
+							scrollTween.current = {
+								lyricElement,
+								tween,
+							};
+							requestAnimationFrame(onFrameUpdate);
 						}
-					};
-					scrollTween.current = {
-						lyricElement,
-						tween,
-					};
-					requestAnimationFrame(onFrameUpdate);
-				} else {
-					// log("触发相同动画播放");
+					} else {
+						// log("触发相同动画播放");
+					}
 				}
 			}
-		}
-	}, [currentLyricIndex]);
+		},
+		[currentLyricIndex],
+	);
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine) => {
@@ -300,9 +329,7 @@ export const LyricView: React.FC = () => {
 				if (currentLyrics) {
 					const index = currentLyrics.findIndex((v) => v === line);
 					keepSelectLyrics.current.clear();
-					keepSelectLyrics.current.add(index);
 					setCurrentLyricIndex(index);
-					scrollToLyric();
 				}
 				if (configDynamicLyric) {
 					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
@@ -325,7 +352,7 @@ export const LyricView: React.FC = () => {
 	);
 
 	React.useEffect(() => {
-		const btn = document.querySelector(".m-pinfo .cover .f-cp");
+		const btn = document.querySelector("a[data-action='max']");
 		const onWindowSizeChanged = () => {
 			setTimeout(() => {
 				scrollToLyric(); // 触发歌词更新重新定位
@@ -333,19 +360,20 @@ export const LyricView: React.FC = () => {
 		};
 		const onLyricOpened = () => {
 			log("歌词页面被打开！");
-			setTimeout(() => {
-				log("正在重新滚动歌词");
-				scrollToLyric(); // 触发歌词更新重新定位
-			}, 1500);
+			keepSelectLyrics.current.clear();
+			keepSelectLyrics.current.add(currentLyricIndex);
+			scrollToLyric(true); // 触发歌词更新重新定位
 		};
 
 		GLOBAL_EVENTS.addEventListener("lyric-page-open", onLyricOpened);
+		btn?.addEventListener("click", onLyricOpened);
 		window.addEventListener("resize", onWindowSizeChanged);
 		return () => {
 			GLOBAL_EVENTS.removeEventListener("lyric-page-open", onLyricOpened);
+			btn?.removeEventListener("click", onLyricOpened);
 			window.removeEventListener("resize", onWindowSizeChanged);
 		};
-	}, [scrollToLyric]);
+	}, [scrollToLyric, currentLyricIndex]);
 
 	const lastUpdateTime = React.useRef(Date.now());
 	const lastIndex = React.useRef(-1);
@@ -610,17 +638,21 @@ export const LyricView: React.FC = () => {
 				) : (
 					<></>
 				)}
-				<button
-					onClick={() => {
-						setLyricEditMode(!lyricEditMode);
-					}}
-					className={classname({
-						toggled: lyricEditMode,
-					})}
-					type="button"
-				>
-					歌词编辑模式
-				</button>
+				{DEBUG ? (
+					<button
+						onClick={() => {
+							setLyricEditMode(!lyricEditMode);
+						}}
+						className={classname({
+							toggled: lyricEditMode,
+						})}
+						type="button"
+					>
+						歌词编辑模式
+					</button>
+				) : (
+					<></>
+				)}
 			</div>
 			{error ? (
 				<div className="am-lyric-view-error">

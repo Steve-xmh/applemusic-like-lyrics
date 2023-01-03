@@ -289,6 +289,7 @@ declare namespace channel {
 declare var APP_CONF: any;
 declare var pluginPath: string;
 declare var plugin: import("plugin").NCMInjectPlugin;
+declare var loadedPlugins: { [pluginId: string]: import("plugin").NCMInjectPlugin | undefined };
 declare const betterncm: typeof import("betterncm-api/index").default;
 // declare const React: typeof import("react");
 // declare var h: typeof React.createElement;

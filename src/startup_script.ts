@@ -8,7 +8,7 @@ channel.call = function AppleMusicLikeLyricCallHook(
 	...args: any[]
 ) {
 	if (cmd === "storage.downloadscanner") {
-		console.log(cmd, ...args, new Error().stack);
+		log(cmd, ...args, new Error().stack);
 	} else {
 		return hookCall(cmd, ...args);
 	}
@@ -71,9 +71,9 @@ let setList = [bindAppend, bindPrepend, bindEffect];
 
 			if (hook) {
 				Function.prototype[prop] = hook;
-				console.log("已 Hook 函数", prop, value, "到", hook);
+				log("已 Hook 函数", prop, value, "到", hook);
 			} else {
-				console.warn("警告：没有可用函数可以用于 Hook", prop, value);
+				warn("警告：没有可用函数可以用于 Hook", prop, value);
 				Function.prototype[prop] = value;
 			}
 

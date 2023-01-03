@@ -48,10 +48,11 @@
             margin: 0.5rem;
             background-color: transparent;
             padding: 3px;
-            border: solid 1px white;
+            border: @css { solid 1px var(--applemusic-like-lyrics-font-color, white) };
+            color: @css { var(--applemusic-like-lyrics-font-color, white) };
             border-radius: 3px;
             &.toggled
-                background-color: white
+                background-color: @css { var(--applemusic-like-lyrics-font-color, white) };
                 color: black
     
     .am-lyric-view
@@ -175,7 +176,7 @@
         font-size: @css { max(8px, var(--applemusic-like-lyrics-lyric-font-size)) };
         margin: @css { max(32px, 2vh) } 0;
         transform-origin: left;
-        color: #FFF;
+        color: @css { var(--applemusic-like-lyrics-font-color, white) };
         transition: all 0.75s cubic-bezier(0.65, 0, 0.35, 1);
         line-break: loose;
         word-break: break-word;
@@ -216,7 +217,7 @@
         }
 
     .am-lyric-dots
-        height: 4rem;
+        height: 0px;
         transition: all 0.5s cubic-bezier(0.65, 0, 0.35, 1);
         transform-origin: left;
         
@@ -227,11 +228,12 @@
             margin-right: 1.5rem;
             width: 2rem;
             height: 2rem;
-            background-color: white;
+            background-color: @css { var(--applemusic-like-lyrics-font-color, white) };
             box-shadow: 0 2px 5px #0008;
             border-radius: 1rem;
         
         &.am-lyric-dots-selected
+            height: 32px;
             opacity: 1;
 
 /* 修正专辑图片的缩放方式 */
@@ -254,7 +256,7 @@
 }
 
 .tag-wrap svg, .tag-wrap svg * {
-    fill: #FFF;
+    fill: @css { var(--applemusic-like-lyrics-font-color, white) };
 }
 
 .n-single {
@@ -285,6 +287,7 @@
     font-size: large;
     max-width: 10vw;
     text-overflow: ellipsis;
+    color: @css { var(--applemusic-like-lyrics-font-color, white) };
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -301,6 +304,7 @@
     height: unset;
     font-size: large;
     font-weight: 1200;
+    color: @css { var(--applemusic-like-lyrics-font-color, white) };
 }
 .n-single .head .title h1 {
     display: block;
@@ -309,12 +313,14 @@
     margin-right: unset;
     font-size: large;
     font-weight: 900;
+    color: @css { var(--applemusic-like-lyrics-font-color, white) };
 }
 .n-single .head h2 {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     font-size: large;
     font-weight: bold;
+    color: @css { var(--applemusic-like-lyrics-font-color, white) };
     max-width: unset;
     line-height: unset;
 }
@@ -323,11 +329,29 @@
     width: @css { min(50vh, 35vw) };
 }
 
+.n-single .cdbg {
+    display: none;
+}
+
+.n-single .cd.z-play .cdwrap {
+    -webkit-animation: unset;
+    box-shadow: 0 2px 30px #0004;
+}
+
+.n-single .cdin, .n-single .cdimg {
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 2%;
+}
+
 .g-single-track .g-singlec-ct .n-single .sd {
     flex: 1;
     margin-bottom: unset;
     margin-left: 1vw;
     margin-top: unset;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -360,4 +384,12 @@
 
 .cdbox, .cdin, .cdrun.j-flag {
     display: none;
+}
+
+.n-single .head .title h2 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-wrap: normal;
+    color: @css { var(--applemusic-like-lyrics-font-color, white) };
+    opacity: 0.5;
 }

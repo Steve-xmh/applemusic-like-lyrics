@@ -38,10 +38,17 @@ build({
       if (fs.existsSync(filename))
         plugin.file(filename, fs.readFileSync(filename));
     }
-    addIfExist("manifest.json");
-    addIfExist("index.js");
-    addIfExist("index.css");
-    addIfExist("startup_script.js");
+    if (process.argv.includes("--dev")) {
+      addIfExist("manifest.json");
+      addIfExist("index.js");
+      addIfExist("index.css");
+      addIfExist("startup_script.js");
+    } else {
+      addIfExist("dist/manifest.json");
+      addIfExist("dist/index.js");
+      addIfExist("dist/index.css");
+      addIfExist("dist/startup_script.js");
+    }
     const output = plugin.generateNodeStream({
       compression: "DEFLATE",
       compressionOptions: {

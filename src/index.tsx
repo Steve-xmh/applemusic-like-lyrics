@@ -1,6 +1,8 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Switch from "@mui/material/Switch";
+import TextField, { TextFieldProps } from "@mui/material/TextField";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,12 +10,15 @@ import Typography from "@mui/material/Typography";
 import Input from "@mui/material/Input";
 import FormGroup from "@mui/material/FormGroup";
 import Slider from "@mui/material/Slider";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import { render } from "react-dom";
 import * as React from "react";
 import { log } from "./logger";
 import { LyricView } from "./lyric-view";
-import { tryFindEapiRequestFuncName } from "./api";
+import { tryFindEapiRequestFuncName, useConfig } from "./api";
 import { GLOBAL_EVENTS } from "./global-events";
+import { incompatible, version } from "../manifest.json";
 
 const settingPrefix = "applemusic-like-lyrics:";
 
@@ -123,7 +128,7 @@ function reloadStylesheet(content: string) {
 }
 
 let hideTimer: number = 0;
-plugin.onLoad(() => {
+plugin.onLoad((plugin) => {
 	window.addEventListener("mousemove", () => {
 		const autoEnabled =
 			localStorage.getItem(`${settingPrefix}autoHideControlBar`) !== "true";
@@ -367,6 +372,37 @@ const CheckBoxComponent: React.FC<{
 	);
 };
 
+const TextConfigComponent: React.FC<
+	{
+		settingKey: string;
+		onChange?: (value: string) => void;
+		defaultValue: string;
+	} & Omit<TextFieldProps, "onChange">
+> = (props) => {
+	const [settingValue, setSettingValue] = React.useState(
+		localStorage.getItem(`${settingPrefix}${props.settingKey}`) ||
+			props.defaultValue,
+	);
+	React.useEffect(() => {
+		localStorage.setItem(
+			`${settingPrefix}${props.settingKey}`,
+			String(settingValue),
+		);
+		reloadStylesheet(cssContent);
+	}, [settingValue]);
+	const { onChange, ...otherProps } = props;
+	return (
+		<TextField
+			value={settingValue}
+			onChange={(evt) => {
+				onChange?.(evt.target.value);
+				setSettingValue(evt.target.value);
+			}}
+			{...otherProps}
+		/>
+	);
+};
+
 const SliderComponent: React.FC<{
 	settingKey: string;
 	min?: number;
@@ -419,8 +455,14 @@ const ConfigComponent: React.FC = () => {
 		() => APP_CONF.packageVersion as string,
 		[],
 	);
+	const incompatiblePlugins = React.useMemo(() => {
+		const plugins = Object.keys(loadedPlugins);
+		return plugins.filter((id) => incompatible.includes(id));
+	}, []);
 
-	const [eapiRequestFuncName, setEapiRequestFuncName] = React.useState("Ee");
+	const [eapiRequestFuncName, setEapiRequestFuncName] = React.useState(
+		plugin.getConfig("eapiRequestFuncName", ""),
+	);
 	const [eapiRequestFuncBody, setEapiRequestFuncBody] = React.useState("");
 
 	React.useEffect(() => {
@@ -443,6 +485,17 @@ const ConfigComponent: React.FC = () => {
 
 	return (
 		<div className="am-lyrics-settings">
+			{incompatiblePlugins.length === 0 ? (
+				<></>
+			) : (
+				<Alert severity="error">
+					<AlertTitle>错误：检测到不兼容的插件</AlertTitle>
+					检测到与本插件冲突的其它插件，请卸载以下插件，否则本插件有可能不能正常工作：
+					{incompatible.map((id) => (
+						<span key={id}>{id} </span>
+					))}
+				</Alert>
+			)}
 			<FormGroup>
 				<Typography variant="h5">歌词样式设置</Typography>
 				<CheckBoxComponent settingKey="lyricBlurEffect" label="歌词模糊效果" />
@@ -463,6 +516,11 @@ const ConfigComponent: React.FC = () => {
 				<CheckBoxComponent
 					settingKey="lyricBackgroundDarkenEffect"
 					label="歌词背景变暗效果"
+				/>
+				<TextConfigComponent
+					label="字体颜色"
+					settingKey="fontColor"
+					defaultValue="rgba(255, 255, 255, 1)"
 				/>
 				<CheckBoxComponent
 					settingKey="lyricAutoFontSize"
@@ -491,7 +549,7 @@ const ConfigComponent: React.FC = () => {
 				/>
 				<CheckBoxComponent
 					settingKey="usePingFangFont"
-					label="全局使用苹方字体（需要系统安装）"
+					label="播放页面使用苹方字体（需要系统安装）"
 				/>
 				<Button
 					variant="outlined"
@@ -507,7 +565,7 @@ const ConfigComponent: React.FC = () => {
 					歌词来源设置
 				</Typography>
 				<Typography paragraph variant="body1">
-					如果歌词无法正确显示，有可能是无法获取网易云请求函数，请确认此处的函数名称是对应你所使用的网易云版本的请求函数。
+					如果歌词无法正确显示，有可能是无法获取网易云请求函数，或者找到的函数并不是网易云请求函数，请确认此处的函数名称是对应你所使用的网易云版本的请求函数。
 				</Typography>
 				<Typography paragraph variant="body1">
 					具体可以前往插件 Github 仓库查询或在 BetterNCM 讨论群内询问作者
@@ -516,8 +574,9 @@ const ConfigComponent: React.FC = () => {
 				<Typography paragraph variant="body1" style={{ userSelect: "text" }}>
 					当前网易云 core.js 版本：{ncmPackageVersion}
 				</Typography>
-				<Typography gutterBottom>网易云请求函数名称</Typography>
-				<Input
+				<TextField
+					variant="outlined"
+					label="网易云请求函数名称"
 					value={eapiRequestFuncName}
 					onChange={(evt) => {
 						setEapiRequestFuncName(evt.target.value);
@@ -526,23 +585,32 @@ const ConfigComponent: React.FC = () => {
 				<Typography paragraph variant="body1" className="am-lyric-func-body">
 					{eapiRequestFuncBody === ""
 						? "无法找到该函数，歌词将无法工作"
-						: `已找到函数：${eapiRequestFuncBody}`}
+						: `已找到函数，请自行确定是否是网易云请求函数：\n${eapiRequestFuncBody}`}
 				</Typography>
-				<Button
-					variant="outlined"
-					onClick={() => {
-						const funcName = tryFindEapiRequestFuncName();
-						setEapiRequestFuncName(funcName || "");
-					}}
-				>
-					尝试搜索请求函数
-				</Button>
+				<ButtonGroup variant="outlined">
+					<Button
+						onClick={() => {
+							const funcName = tryFindEapiRequestFuncName();
+							setEapiRequestFuncName(funcName || "");
+						}}
+					>
+						尝试搜索请求函数
+					</Button>
+					<Button
+						onClick={() => {
+							const funcName = tryFindEapiRequestFuncName(true);
+							setEapiRequestFuncName(funcName || "");
+						}}
+					>
+						尝试搜索请求函数（不安全方式）
+					</Button>
+				</ButtonGroup>
 			</FormGroup>
 			<Typography paragraph variant="h5">
 				关于
 			</Typography>
 			<Typography variant="body1">Apple Music-like lyrics</Typography>
-			<Typography variant="body1">1.0.0</Typography>
+			<Typography variant="body1">{version}</Typography>
 			<Typography variant="body1">By SteveXMH</Typography>
 			<Button
 				variant="outlined"
