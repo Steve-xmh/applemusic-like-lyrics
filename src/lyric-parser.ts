@@ -95,9 +95,24 @@ export function parseLyric(
 					}
 				}
 				if (nearestLine) {
-					nearestLine.dynamicLyric = words;
-					nearestLine.dynamicLyricTime = time;
-					nearestLine.duration = duration;
+					if (
+						nearestLine.dynamicLyric &&
+						nearestLine.dynamicLyricTime &&
+						nearestLine.duration &&
+						time - nearestLine.dynamicLyricTime >= 0
+					) {
+						const innerDuration = time - nearestLine.dynamicLyricTime;
+						nearestLine.duration =
+							time - nearestLine.dynamicLyricTime + duration;
+						nearestLine.dynamicLyric = [
+							...nearestLine.dynamicLyric,
+							...words,
+						];
+					} else {
+						nearestLine.dynamicLyric = words;
+						nearestLine.dynamicLyricTime = time;
+						nearestLine.duration = duration;
+					}
 					log(nearestLine);
 				}
 			}
