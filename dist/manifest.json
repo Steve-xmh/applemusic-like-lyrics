@@ -5,7 +5,7 @@
     "author_links": ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"],
     "description": "一个基于 BetterNCM 的类 Apple Music 歌词显示插件",
     "preview": "preview.svg",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "type": "extension",
     "requirements": [],
     "incompatible": ["RefinedNowPlaying"],

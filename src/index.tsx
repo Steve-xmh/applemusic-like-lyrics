@@ -14,7 +14,6 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { render } from "react-dom";
 import * as React from "react";
-import { log } from "./logger";
 import { LyricView } from "./lyric-view";
 import { tryFindEapiRequestFuncName, useConfig } from "./api";
 import { GLOBAL_EVENTS } from "./global-events";
@@ -329,6 +328,15 @@ plugin.onLoad((plugin) => {
 				reloadStylesheet(cssContent);
 			}
 		}, 1000);
+	} else {
+		betterncm.fs
+			.readFileText(`${plugin.pluginPath}/index.css`)
+			.then((curStyle) => {
+				if (cssContent !== curStyle) {
+					cssContent = curStyle;
+					reloadStylesheet(cssContent);
+				}
+			});
 	}
 });
 
