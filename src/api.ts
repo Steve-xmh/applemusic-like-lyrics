@@ -1,4 +1,5 @@
 import * as React from "react";
+import { settingPrefix } from ".";
 import { log } from "./logger";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
@@ -29,15 +30,19 @@ export interface EAPIRequestConfig {
  * @todo 确认兼容版本范围内的函数名是否可用
  */
 export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	let funcName = plugin.getConfig("eapiRequestFuncName", "");
-	const ncmPackageVersion = plugin.getConfig("ncmPackageVersion", "");
+	let funcName = localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "";
+	log('加密请求函数', funcName)
+	const ncmPackageVersion = localStorage.getItem(`${settingPrefix}ncmPackageVersion`) || "";
 	if (ncmPackageVersion !== APP_CONF.packageVersion) {
 		funcName = "";
-		plugin.setConfig("ncmPackageVersion", APP_CONF.packageVersion);
+		localStorage.setItem(`${settingPrefix}ncmPackageVersion`, APP_CONF.packageVersion);
 	}
 	if (funcName === "") {
 		funcName = tryFindEapiRequestFuncName() || "";
-		plugin.setConfig("eapiRequestFuncName", funcName);
+		if (funcName === "") {
+			funcName = tryFindEapiRequestFuncName(true) || "";
+		}
+		localStorage.setItem(`${settingPrefix}eapiRequestFuncName`, funcName);
 	}
 	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
 }

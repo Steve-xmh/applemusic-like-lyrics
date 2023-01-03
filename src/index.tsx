@@ -19,7 +19,7 @@ import { tryFindEapiRequestFuncName, useConfig } from "./api";
 import { GLOBAL_EVENTS } from "./global-events";
 import { incompatible, version } from "../manifest.json";
 
-const settingPrefix = "applemusic-like-lyrics:";
+export const settingPrefix = "applemusic-like-lyrics:";
 
 let cssContent = "";
 
@@ -469,7 +469,7 @@ const ConfigComponent: React.FC = () => {
 	}, []);
 
 	const [eapiRequestFuncName, setEapiRequestFuncName] = React.useState(
-		plugin.getConfig("eapiRequestFuncName", ""),
+		localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "",
 	);
 	const [eapiRequestFuncBody, setEapiRequestFuncBody] = React.useState("");
 
@@ -480,7 +480,6 @@ const ConfigComponent: React.FC = () => {
 				setEapiRequestFuncBody("");
 			} else {
 				if ("originalFunc" in func[0]) {
-					plugin.setConfig("eapiRequestFuncName", eapiRequestFuncName);
 					setEapiRequestFuncBody((func[0].originalFunc as Function).toString());
 				} else {
 					setEapiRequestFuncBody(func.toString());
@@ -489,6 +488,7 @@ const ConfigComponent: React.FC = () => {
 		} else {
 			setEapiRequestFuncBody("");
 		}
+		localStorage.setItem(`${settingPrefix}eapiRequestFuncName`, eapiRequestFuncName);
 	}, [eapiRequestFuncName]);
 
 	return (
@@ -585,6 +585,7 @@ const ConfigComponent: React.FC = () => {
 				<TextField
 					variant="outlined"
 					label="网易云请求函数名称"
+					defaultValue={eapiRequestFuncName}
 					value={eapiRequestFuncName}
 					onChange={(evt) => {
 						setEapiRequestFuncName(evt.target.value);
@@ -602,7 +603,7 @@ const ConfigComponent: React.FC = () => {
 							setEapiRequestFuncName(funcName || "");
 						}}
 					>
-						尝试搜索请求函数
+						尝试搜索请求函数（方式一）
 					</Button>
 					<Button
 						onClick={() => {
@@ -610,7 +611,7 @@ const ConfigComponent: React.FC = () => {
 							setEapiRequestFuncName(funcName || "");
 						}}
 					>
-						尝试搜索请求函数（不安全方式）
+						尝试搜索请求函数（方式二）
 					</Button>
 				</ButtonGroup>
 			</FormGroup>
