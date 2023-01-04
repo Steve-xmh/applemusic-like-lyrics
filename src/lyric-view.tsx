@@ -155,6 +155,29 @@ export const LyricView: React.FC = () => {
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
 		null,
 	);
+	const albumImageUrl = React.useMemo(() => {
+		const songData = getPlayingSong();
+		return (
+			songData?.data?.album?.picUrl ||
+			`orpheus://localmusic/pic?${encodeURIComponent(songData?.from?.playFile)}`
+		);
+	}, [currentAudioId]);
+	const album = React.useMemo(
+		() => getPlayingSong()?.data?.album || {},
+		[currentAudioId],
+	);
+	const songName: string = React.useMemo(
+		() => getPlayingSong()?.data?.name || "未知歌名",
+		[currentAudioId],
+	);
+	const songAliasName: string[] = React.useMemo(
+		() => getPlayingSong()?.data?.alias || [],
+		[currentAudioId],
+	);
+	const songArtists = React.useMemo(
+		() => getPlayingSong()?.data?.artists || [],
+		[currentAudioId],
+	);
 	const [currentLyricIndex, setCurrentLyricIndex] = React.useState<number>(-1);
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
 	const keepSelectLyrics = React.useRef<Set<number>>(new Set());
@@ -240,6 +263,7 @@ export const LyricView: React.FC = () => {
 		  }
 		| undefined
 	>(undefined);
+	const forceScrollId = React.useRef(0);
 	const scrollToLyric = React.useCallback(
 		(mustScroll: boolean = false) => {
 			if (lyricListElement.current) {
@@ -260,7 +284,7 @@ export const LyricView: React.FC = () => {
 					if (lyricElement !== scrollTween.current?.lyricElement) {
 						const listRect = lyricView.getBoundingClientRect();
 						const lineRect = lyricElement.getBoundingClientRect();
-						const lineHeight = lineRect.bottom - lineRect.top;
+						const lineHeight = lineRect.height;
 						const scrollDelta =
 							lineRect.top -
 							listRect.top +
@@ -271,19 +295,24 @@ export const LyricView: React.FC = () => {
 						const obj = { scrollTop: prevScrollTop };
 
 						if (mustScroll) {
+							const id = ++forceScrollId.current;
 							const onFrame = () => {
-								if (lyricElement) {
+								if (
+									lyricElement &&
+									!scrollTween.current &&
+									id === forceScrollId.current
+								) {
 									const listRect = lyricView.getBoundingClientRect();
 									const lineRect = lyricElement.getBoundingClientRect();
-									const lineHeight = lineRect.bottom - lineRect.top;
+									const prevScrollTop = lyricView.scrollTop;
+									const lineHeight = lineRect.height;
 									const scrollDelta =
 										lineRect.top -
 										listRect.top +
 										30 +
 										16 * 2 -
 										(listRect.height - lineHeight) / 2;
-									log("正在强制滚动", scrollDelta);
-									if (Math.round(scrollDelta) !== 0) {
+									if (Math.abs(scrollDelta) > 10) {
 										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
 										requestAnimationFrame(onFrame);
 									}
@@ -331,14 +360,19 @@ export const LyricView: React.FC = () => {
 					keepSelectLyrics.current.clear();
 					setCurrentLyricIndex(index);
 				}
-				if (configDynamicLyric) {
+				if (
+					configDynamicLyric &&
+					(line.dynamicLyricTime ||
+						currentAudioDuration < currentAudioDuration) &&
+					(line.dynamicLyricTime || -1) >= 0
+				) {
 					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
 					channel.call("audioplayer.seek", () => {}, [
 						currentAudioId,
 						genAudioPlayerCommand(currentAudioId, "seek"),
 						(line?.dynamicLyricTime || line.time) / 1000,
 					]);
-				} else {
+				} else if (line.time < currentAudioDuration && line.time >= 0) {
 					log("正在跳转到歌词时间", line.time);
 					channel.call("audioplayer.seek", () => {}, [
 						currentAudioId,
@@ -348,15 +382,13 @@ export const LyricView: React.FC = () => {
 				}
 			}
 		},
-		[currentAudioId, lyricEditMode, configDynamicLyric],
+		[currentAudioId, lyricEditMode, configDynamicLyric, currentAudioDuration],
 	);
 
 	React.useEffect(() => {
 		const btn = document.querySelector("a[data-action='max']");
 		const onWindowSizeChanged = () => {
-			setTimeout(() => {
-				scrollToLyric(); // 触发歌词更新重新定位
-			}, 750);
+			scrollToLyric(true); // 触发歌词更新重新定位
 		};
 		const onLyricOpened = () => {
 			log("歌词页面被打开！");
@@ -451,7 +483,7 @@ export const LyricView: React.FC = () => {
 			progress: number,
 			playState: PlayState,
 		) => {
-			const time = Math.floor(progress * 1000);
+			const time = (progress * 1000) | 0;
 			if (!currentLyrics) return setPlayState(playState);
 			let curLyricIndex = -1;
 			for (let i = currentLyrics.length - 1; i >= 0; i--) {
@@ -497,7 +529,7 @@ export const LyricView: React.FC = () => {
 		}
 
 		const onLoad = (audioId: string, info: AudioLoadInfo) => {
-			setAudioDuration(info?.duration || 0);
+			setAudioDuration(((info?.duration || 0) * 1000) | 0);
 			setCurrentAudioId(audioId);
 		};
 
@@ -586,101 +618,140 @@ export const LyricView: React.FC = () => {
 
 	return (
 		<>
-			<div
-				className={classname("am-lyric-options", {
-					editing: lyricEditMode,
-				})}
-			>
-				{!lyricEditMode ? (
-					<>
-						<button
-							onClick={() => {
-								log("已切换翻译歌词");
-								setConfigTranslatedLyric(
-									String(!(configTranslatedLyric === "true")),
-								);
-								forceUpdate();
-							}}
-							className={classname({
-								toggled: configTranslatedLyric === "true",
-							})}
-							type="button"
-						>
-							译
-						</button>
-						<button
-							onClick={() => {
-								log("已切换音译歌词");
-								setConfigRomanLyric(String(!(configRomanLyric === "true")));
-								forceUpdate();
-							}}
-							className={classname({
-								toggled: configRomanLyric === "true",
-							})}
-							type="button"
-						>
-							音
-						</button>
-						<button
-							onClick={() => {
-								log("已切换逐词歌词");
-								setConfigDynamicLyric(String(!(configDynamicLyric === "true")));
-								forceUpdate();
-							}}
-							className={classname({
-								toggled: configDynamicLyric === "true",
-							})}
-							type="button"
-						>
-							逐词歌词（实验性）
-						</button>
-					</>
-				) : (
-					<></>
-				)}
-				{DEBUG ? (
-					<button
-						onClick={() => {
-							setLyricEditMode(!lyricEditMode);
-						}}
-						className={classname({
-							toggled: lyricEditMode,
-						})}
-						type="button"
-					>
-						歌词编辑模式
-					</button>
-				) : (
-					<></>
-				)}
-			</div>
-			{error ? (
-				<div className="am-lyric-view-error">
-					<div>歌词加载失败：</div>
-					<div>{error.message}</div>
-					<div>{error.stack}</div>
-				</div>
-			) : currentLyrics ? (
-				currentLyrics.length > 0 ? (
-					<div
-						className={classname("am-lyric-view", {
-							editing: lyricEditMode,
-						})}
-					>
-						<div ref={lyricListElement}>
-							{currentLyrics.map(mapCurrentLyrics)}
+			<div className="am-music-info">
+				<div>
+					<div className="am-album-image">
+						<div>
+							<img alt="专辑图片" src={albumImageUrl} />
 						</div>
 					</div>
-				) : (
-					<div className="am-lyric-view-no-lyric">
-						没有可用歌词，但是你可以手动指定一个有歌词的音乐来使用它的歌词。（以后会实现的）
+					<div className="am-music-name">{songName}</div>
+					<div className="am-music-alias">
+						{songAliasName.map((alia, index) => (
+							<div key={index}>{alia}</div>
+						))}
 					</div>
-				)
-			) : (
-				<div className="am-lyric-view-loading">
-					<CircularProgress />
+					<div className="am-music-artists">
+						<div className="am-artists-label">歌手：</div>
+						<div className="am-artists">
+							{songArtists.map((artist, index) => (
+								<a href={`#/m/artist/?id=${artist.id}`} key={artist.id}>
+									{artist.name}
+								</a>
+							))}
+						</div>
+					</div>
+					{album ? (
+						<div className="am-music-album">
+							<div className="am-album-label">专辑：</div>
+							<div className="am-album">
+								<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
+							</div>
+						</div>
+					) : (
+						<></>
+					)}
 				</div>
-			)}
+			</div>
+			<div className="am-lyric">
+				<div
+					className={classname("am-lyric-options", {
+						editing: lyricEditMode,
+					})}
+				>
+					{!lyricEditMode ? (
+						<>
+							<button
+								onClick={() => {
+									log("已切换翻译歌词");
+									setConfigTranslatedLyric(
+										String(!(configTranslatedLyric === "true")),
+									);
+									forceUpdate();
+								}}
+								className={classname({
+									toggled: configTranslatedLyric === "true",
+								})}
+								type="button"
+							>
+								译
+							</button>
+							<button
+								onClick={() => {
+									log("已切换音译歌词");
+									setConfigRomanLyric(String(!(configRomanLyric === "true")));
+									forceUpdate();
+								}}
+								className={classname({
+									toggled: configRomanLyric === "true",
+								})}
+								type="button"
+							>
+								音
+							</button>
+							<button
+								onClick={() => {
+									log("已切换逐词歌词");
+									setConfigDynamicLyric(
+										String(!(configDynamicLyric === "true")),
+									);
+									forceUpdate();
+								}}
+								className={classname({
+									toggled: configDynamicLyric === "true",
+								})}
+								type="button"
+							>
+								逐词歌词（实验性）
+							</button>
+						</>
+					) : (
+						<></>
+					)}
+					{DEBUG ? (
+						<button
+							onClick={() => {
+								setLyricEditMode(!lyricEditMode);
+							}}
+							className={classname({
+								toggled: lyricEditMode,
+							})}
+							type="button"
+						>
+							歌词编辑模式
+						</button>
+					) : (
+						<></>
+					)}
+				</div>
+				{error ? (
+					<div className="am-lyric-view-error">
+						<div>歌词加载失败：</div>
+						<div>{error.message}</div>
+						<div>{error.stack}</div>
+					</div>
+				) : currentLyrics ? (
+					currentLyrics.length > 0 ? (
+						<div
+							className={classname("am-lyric-view", {
+								editing: lyricEditMode,
+							})}
+						>
+							<div ref={lyricListElement}>
+								{currentLyrics.map(mapCurrentLyrics)}
+							</div>
+						</div>
+					) : (
+						<div className="am-lyric-view-no-lyric">
+							没有可用歌词，但是你可以手动指定一个有歌词的音乐来使用它的歌词。（以后会实现的）
+						</div>
+					)
+				) : (
+					<div className="am-lyric-view-loading">
+						<CircularProgress />
+					</div>
+				)}
+			</div>
 		</>
 	);
 };

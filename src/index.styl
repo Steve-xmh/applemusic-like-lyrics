@@ -1,30 +1,4 @@
-/* 歌词页面 */
 
-.am-lyric-bg
-    background-color: black; 
-    transition: all 0.5s; 
-    background-position: center !important; 
-    background-repeat: no-repeat !important;
-    background-size: cover !important;
-    height: 100vh; 
-    &::after
-        content: ""; 
-        position: absolute; 
-        top: 0; 
-        left: 0; 
-        right: 0; 
-        width: 100%; 
-        height: 100%;
-    
-    &.am-lyric-use-pingfang-font *
-        font-family: 'PingFang SC' !important;
-    
-    &.am-lyric-bg-blur::after
-        backdrop-filter: blur(2rem);
-    &.am-lyric-bg-darken::after
-        backdrop-filter: brightness(0.4);
-    &.am-lyric-bg-blur.am-lyric-bg-darken::after
-        backdrop-filter: blur(2rem) brightness(0.4);
 
 .am-lyrics-settings
     margin: 0 0 auto 0;
@@ -35,14 +9,125 @@
 
 #applemusic-like-lyrics-view
     overflow: hidden;
-    flex: 1.2;
-    max-height: 100%;
+    z-index: 1;
+    -webkit-font-smoothing: antialiased;
+    *
+        z-index: 1;
+    padding: 30px;
+    height: "calc(100% - %s)" % (@padding * 2);
+    max-height: "calc(100% - %s)" % (@padding * 2);
+    max-width: "calc(100% - %s)" % (@padding * 2);
+    width: "calc(100% - %s)" % (@padding * 2);
     display: flex;
-    flex-direction: column
+    flex-direction: row
+    
+    .am-lyric-view-loading
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: @css { var(--applemusic-like-lyrics-font-color, white) };
+    
+    .am-music-info
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        > *
+            display: flex;
+            flex-direction: column;
+            color: @css { var(--applemusic-like-lyrics-font-color, white) };
+            a
+                color: @css { var(--applemusic-like-lyrics-font-color, white) };
+                &:hover
+                    opacity: 0.5;
+            .am-album-image
+                display: flex;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+                > *
+                    > img
+                        border-radius: 5%;
+                        box-shadow: 0 1rem 1rem #0004;
+                        overflow: hidden;
+                        height: @css { min(50vh, 30vw) };
+                        width: @css { min(50vh, 30vw) };
+                        object-fit: cover;
+            
+            .am-music-name
+                font-size: 1.5rem;
+                line-height: normal;
+                margin: 1rem 0 0.25rem 0;
+                cursor: text;
+                user-select: text;
+                text-align: center;
+                filter: drop-shadow(0 0 4px #0006);
+            .am-music-alias
+                font-size: 1.2rem;
+                line-height: normal;
+                margin: 1rem 0;
+                opacity: 0.75;
+                cursor: text;
+                text-align: center;
+                user-select: text;
+                filter: drop-shadow(0 0 4px #0004);
+            .am-music-artists
+                font-size: 1rem;
+                line-height: normal;
+                margin: 0.25rem 0;
+                filter: drop-shadow(0 0 4px #0004);
+                display: flex;
+                align-items: baseline;
+                justify-content: center;
+                .am-artists-label
+                    line-height: normal;
+                    white-space: nowrap;
+                .am-artists
+                    a
+                        line-height: normal;
+                        opacity: 0.8;
+                        user-select: text;
+                        text-overflow: ellipsis;
+                        // margin-right: 1rem;
+                        &::after
+                            content: @css { var(--applemusic-like-lyrics-music-artists-separator, " - ") };
+                            opacity: 0.5;
+                        &:last-child::after
+                            content: "";
+                        
+            .am-music-album
+                font-size: 1rem;
+                line-height: normal;
+                margin: 0.25rem 0;
+                filter: drop-shadow(0 0 4px #0004);
+                display: flex;
+                align-items: baseline;
+                justify-content: center;
+                .am-album-label
+                    white-space: nowrap;
+                a
+                    opacity: 0.8;
+                    user-select: text;
+
+    .am-lyric
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        // 鼠标悬浮时显示所有歌词
+        &:hover .am-lyric-line
+            filter: blur(0) !important;
+            opacity: 1 !important;
+            > .am-lyric-line-dynamic > *
+                opacity: 1 !important;
+        &:hover .am-lyric-options
+            opacity: 1;
     
     .am-lyric-options
         opacity: 0;
         transition: opacity  0.75s cubic-bezier(0.65, 0, 0.35, 1);
+        padding-top: 60px;
         
         button
             margin: 0.5rem;
@@ -56,9 +141,9 @@
                 color: black
     
     .am-lyric-view
+        flex: 1;
         overflow: hidden scroll;
         position: relative;
-        max-height: 100%;
         -webkit-mask-image: linear-gradient(#0000, #000 10%, #000 80%, #0000 90%, #0000);
         > *
             padding: 50vh 0;
@@ -75,7 +160,12 @@
     .am-lyric-view-no-lyric
         height: 100%;
         overflow: hidden;
-        position: relative;
+        flex: 1;
+        display: flex;
+        flex-wrap: nowrap;
+        align-content: center;
+        justify-content: center;
+        align-items: center;
         > *
             padding: 50vh 0;
             position: relative;
@@ -107,13 +197,6 @@
                 border: solid 1px #FFF7;
                 background: transparent;
                 color: white;
-    
-    // 鼠标悬浮时显示所有歌词
-    &:hover .am-lyric-line
-        filter: blur(0) !important;
-        opacity: 1 !important;
-    &:hover .am-lyric-options
-        opacity: 1;
 
     // 歌词缩放效果
     &.lyric-scale-effect // lyricScaleEffect
@@ -166,10 +249,34 @@
     // 自适应歌词字体大小
     &.lyric-auto-font-size
         .am-lyric-line
-            font-size: @css { max(32px, 4vh) };
+            font-size: @css { clamp(32px, 3vw, 4vh) };
     
     &.use-ping-fang-font *
         font-family: 'PingFang SC' !important;
+
+    // 歌名居左
+    &.align-left-music-name .am-music-name
+        text-align: left;
+
+    // 歌曲别名居左
+    &.align-left-music-alias .am-music-alias
+        text-align: left;
+
+    // 歌手名居左
+    &.align-left-music-artists .am-music-artists
+        justify-content: left;
+
+    // 专辑名居左
+    &.align-left-music-album .am-music-album
+        justify-content: left;
+
+    // 隐藏歌手名标签
+    &.hide-left-music-artists-label .am-artists-label
+        display: none;
+
+    // 隐藏专辑名标签
+    &.hide-left-music-album-label .am-album-label
+        display: none;
     
     .am-lyric-line
         font-weight: bold;
@@ -200,8 +307,20 @@
             border-radius: 1rem;
             background-color: #FFF4;
         
+        &.am-lyric-line-after
+            > .am-lyric-line-dynamic > *
+                opacity: 0.5;
+                animation-name: unset;
+                animation-fill-mode: unset;
+                animation-play-state: unset;
+        
         &.am-lyric-line-before
             opacity: 0.5;
+            > .am-lyric-line-dynamic > *
+                opacity: 1;
+                animation-name: unset;
+                animation-fill-mode: unset;
+                animation-play-state: unset;
         
         &.am-lyric-line-o0,
         &.am-lyric-line-selected
@@ -239,140 +358,11 @@
             height: 32px;
             opacity: 1;
 
-/* 修正专辑图片的缩放方式 */
-.n-single .cdimg img {
-    object-fit: cover;
-}
-
-/* 去掉专辑图片下面的不可见元素，以免歌曲名称无法选中 */
-.newtrytxt.j-fflag {
-    display: none;
-}
-
-/* 歌名后标签的对齐和样式 */
-.tag-wrap {
-    position: unset !important;
-}
-
-.tag-wrap > * {
-    margin: 0 4px;
-}
-
-.tag-wrap svg, .tag-wrap svg * {
-    fill: @css { var(--applemusic-like-lyrics-font-color, white) };
-}
-
-.n-single {
-    position: unset;
-    height: calc(100%) !important;
-    padding-bottom: 100px !important;
-    max-height: 100%;
-}
-.g-single-track .content {
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    max-width: unset;
-}
-
-/* 歌曲信息 */
-.n-single .head {
-    height: unset;
-}
-.n-single .head .playfrom {
-    flex-direction: row;
-    max-width: unset;
-    line-height: unset;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.n-single .head .playfrom > li, .n-single .head .playfrom > li * {
-    font-size: large;
-    max-width: 10vw;
-    text-overflow: ellipsis;
-    color: @css { var(--applemusic-like-lyrics-font-color, white) };
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-.n-single .head .playfrom > li > a.artist {
-    white-space: nowrap;
-}
-.n-single .head .playfrom li.spacer {
-    margin: 0 0.5rem;
-}
-.n-single .head .title {
-    padding-top: 1rem;
-    user-select: all;
-    height: unset;
-    font-size: large;
-    font-weight: 1200;
-    color: @css { var(--applemusic-like-lyrics-font-color, white) };
-}
-.n-single .head .title h1 {
-    display: block;
-    max-width: unset;
-    line-height: unset;
-    margin-right: unset;
-    font-size: large;
-    font-weight: 900;
-    color: @css { var(--applemusic-like-lyrics-font-color, white) };
-}
-.n-single .head h2 {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    font-size: large;
-    font-weight: bold;
-    color: @css { var(--applemusic-like-lyrics-font-color, white) };
-    max-width: unset;
-    line-height: unset;
-}
-
-.n-single .sd .sd-wrap {
-    width: @css { min(50vh, 35vw) };
-}
-
-.n-single .cdbg {
-    display: none;
-}
-
-.n-single .cd.z-play .cdwrap {
-    -webkit-animation: unset;
-    box-shadow: 0 2px 30px #0004;
-}
-
-.n-single .cdin, .n-single .cdimg {
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border-radius: 2%;
-}
-
-.g-single-track .g-singlec-ct .n-single .sd {
-    flex: 1;
-    margin-bottom: unset;
-    margin-left: 1vw;
-    margin-top: unset;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 让歌名的单词正确换行 */
-.n-single .head .title h1 .name {
-    word-wrap: break-word;
-}
-.g-singlec-comment-detail.z-show {
-    display: none;
-}
-
 /* 自动隐藏播放栏和控制栏 */
 .mq-playing .g-hd,
 .m-winctrl,
-#main-player,
+#main-player
+.g-singlec-comment-detail.z-show,
 .m-pinfo {
     opacity: 1;
     transition: opacity 0.5s;
@@ -381,18 +371,12 @@
 .mq-playing .g-hd.hide,
 .m-winctrl.hide,
 #main-player.hide,
+.g-singlec-comment-detail.z-show.hide,
 .m-pinfo.hide {
     opacity: 0 !important;
 }
 
-.cdbox, .cdin, .cdrun.j-flag {
-    display: none;
-}
-
-.n-single .head .title h2 {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    overflow-wrap: normal;
-    color: @css { var(--applemusic-like-lyrics-font-color, white) };
-    opacity: 0.5;
-}
+.g-singlec-ct
+    top: 0;
+.g-single
+    bottom: 0;

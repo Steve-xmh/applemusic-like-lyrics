@@ -1,7 +1,8 @@
 import * as React from "react";
-import { settingPrefix } from ".";
 import { log } from "./logger";
 const cachedFunctionMap: Map<string, Function> = new Map();
+
+export const settingPrefix = "applemusic-like-lyrics:";
 
 export enum PlayState {
 	Playing = 1,
@@ -30,12 +31,17 @@ export interface EAPIRequestConfig {
  * @todo 确认兼容版本范围内的函数名是否可用
  */
 export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	let funcName = localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "";
-	log('加密请求函数', funcName)
-	const ncmPackageVersion = localStorage.getItem(`${settingPrefix}ncmPackageVersion`) || "";
+	let funcName =
+		localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "";
+	log("加密请求函数", funcName);
+	const ncmPackageVersion =
+		localStorage.getItem(`${settingPrefix}ncmPackageVersion`) || "";
 	if (ncmPackageVersion !== APP_CONF.packageVersion) {
 		funcName = "";
-		localStorage.setItem(`${settingPrefix}ncmPackageVersion`, APP_CONF.packageVersion);
+		localStorage.setItem(
+			`${settingPrefix}ncmPackageVersion`,
+			APP_CONF.packageVersion,
+		);
 	}
 	if (funcName === "") {
 		funcName = tryFindEapiRequestFuncName() || "";
@@ -45,6 +51,11 @@ export function eapiRequest(url: string, config: EAPIRequestConfig) {
 		localStorage.setItem(`${settingPrefix}eapiRequestFuncName`, funcName);
 	}
 	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
+}
+
+if (DEBUG) {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	(window as any).eapiRequest = eapiRequest;
 }
 
 export function tryFindEapiRequestFuncName(
@@ -177,54 +188,6 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  */
 export function getPlayingSong() {
 	return callCachedSearchFunction("getPlaying", []);
-}
-
-export function usePlayState() {
-	const [playState, setPlayState] = React.useState(getPlayingSong().state);
-
-	React.useEffect(() => {
-		const onPlayProgress = (
-			audioId: string,
-			progress: number,
-			playState: PlayState,
-		) => {
-			setPlayState(playState);
-		};
-
-		const onPlayStateChange = (
-			audioId: string,
-			state: string,
-			playState: PlayState,
-		) => {
-			setPlayState(playState);
-		};
-
-		legacyNativeCmder.appendRegisterCall(
-			"PlayProgress",
-			"audioplayer",
-			onPlayProgress,
-		);
-		legacyNativeCmder.appendRegisterCall(
-			"PlayState",
-			"audioplayer",
-			onPlayStateChange,
-		);
-
-		return () => {
-			legacyNativeCmder.removeRegisterCall(
-				"PlayProgress",
-				"audioplayer",
-				onPlayProgress,
-			);
-			legacyNativeCmder.removeRegisterCall(
-				"PlayState",
-				"audioplayer",
-				onPlayStateChange,
-			);
-		};
-	}, []);
-
-	return playState;
 }
 
 function genRandomString(length: number) {

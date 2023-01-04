@@ -50,7 +50,11 @@ export function parseLyric(
 
 	result.sort((a, b) => a.time - b.time);
 
+	log("原始歌词解析", JSON.parse(JSON.stringify(result)));
+
 	const processed = processLyric(result);
+
+	log("处理完成歌词解析", JSON.parse(JSON.stringify(processed)));
 
 	if (dynamic.trim().length > 0) {
 		// 解析逐词歌词
@@ -83,22 +87,24 @@ export function parseLyric(
 					}
 				}
 				let nearestLine: LyricLine | null = null;
+				log("逐词歌词", time, duration, words.map((v) => v.word).join(""));
 				for (const line of processed) {
 					if (nearestLine) {
 						if (
+							line.originalLyric.trim().length > 0 &&
 							Math.abs(nearestLine.time - time) > Math.abs(line.time - time)
 						) {
 							nearestLine = line;
 						}
-					} else {
+					} else if (line.originalLyric.trim().length > 0) {
 						nearestLine = line;
 					}
 				}
 				if (nearestLine) {
 					if (
-						nearestLine.dynamicLyric &&
-						nearestLine.dynamicLyricTime &&
-						nearestLine.duration &&
+						nearestLine.dynamicLyric !== undefined &&
+						nearestLine.dynamicLyricTime !== undefined &&
+						nearestLine.duration !== undefined &&
 						time - nearestLine.dynamicLyricTime >= 0
 					) {
 						const innerDuration = time - nearestLine.dynamicLyricTime;
@@ -106,6 +112,12 @@ export function parseLyric(
 							time - nearestLine.dynamicLyricTime + duration;
 						nearestLine.dynamicLyric = [
 							...nearestLine.dynamicLyric,
+							{
+								time: time,
+								duration: 0,
+								flag: 0,
+								word: " ",
+							},
 							...words,
 						];
 					} else {
@@ -113,7 +125,7 @@ export function parseLyric(
 						nearestLine.dynamicLyricTime = time;
 						nearestLine.duration = duration;
 					}
-					log(nearestLine);
+					// log(nearestLine);
 				}
 			}
 		}
@@ -169,31 +181,6 @@ function parsePureLyric(lyric: string): LyricPureLine[] {
 // 处理歌词，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
 export function processLyric(lyric: LyricLine[]): LyricLine[] {
 	const result: LyricLine[] = [];
-
-	// 过滤开头结尾的部分音乐信息
-	const keywords = [" : ", "：", "-"];
-	let removed = true;
-	while (removed) {
-		removed = false;
-		for (const keyword of keywords) {
-			if (lyric[0]?.originalLyric?.includes(keyword)) {
-				lyric.shift();
-				removed = true;
-				break;
-			}
-		}
-	}
-	removed = true;
-	while (removed) {
-		removed = false;
-		for (const keyword of keywords) {
-			if (lyric[lyric.length - 1]?.originalLyric?.includes(keyword)) {
-				lyric.pop();
-				removed = true;
-				break;
-			}
-		}
-	}
 
 	let isSpace = false;
 	lyric.forEach((thisLyric, i, lyric) => {

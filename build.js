@@ -3,13 +3,19 @@ const { stylusLoader } = require("esbuild-stylus-loader");
 const JSZip = require("jszip");
 const fs = require("fs");
 
+let entryPoints = [
+  "src/index.tsx",
+  "src/startup_script.ts",
+  "src/index.styl",
+  "src/lyric-test.ts",
+];
+
+if (process.argv.includes("--style-only")) {
+  entryPoints = ["src/index.styl"];
+}
+
 build({
-  entryPoints: [
-    "src/index.tsx",
-    "src/startup_script.ts",
-    "src/index.styl",
-    "src/lyric-test.ts",
-  ],
+  entryPoints,
   bundle: true,
   sourcemap: process.argv.includes("--dev") ? "inline" : false,
   minify: !process.argv.includes("--dev"),
