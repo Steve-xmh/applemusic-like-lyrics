@@ -201,11 +201,12 @@ plugin.onLoad((plugin) => {
 								const target = a.target as HTMLImageElement;
 								const curValue = target.getAttribute("src") || "";
 								// 专辑封面高清化
-								if (curValue.includes("&thumbnail=315y315")) {
+								const thumbnailRegexp = /\&thumbnail\=[0-9]+y[0-9]+/
+								if (thumbnailRegexp.test(curValue)) {
 									skipOnce = true;
 									target.setAttribute(
 										"src",
-										curValue.replace("&thumbnail=315y315", ""),
+										curValue.replace(thumbnailRegexp, ""),
 									);
 									target.addEventListener(
 										"error",
