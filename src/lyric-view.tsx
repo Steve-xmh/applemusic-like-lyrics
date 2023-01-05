@@ -472,10 +472,9 @@ export const LyricView: React.FC = () => {
 
 	React.useEffect(() => {
 		if (!lyricEditMode) {
-			checkIfTooFast(currentLyricIndex);
-			scrollToLyric();
+			scrollToLyric(true);
 		}
-	}, []);
+	}, [configTranslatedLyric, configDynamicLyric, configRomanLyric, currentLyrics]);
 
 	React.useEffect(() => {
 		const onPlayProgress = (
