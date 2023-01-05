@@ -2,17 +2,19 @@ import {
 	classname,
 	genAudioPlayerCommand,
 	getLyric,
+	getNCMImageUrl,
 	getPlayingSong,
 	PlayState,
 	useConfig,
 } from "./api";
+import { ThemeProvider } from ".";
 import { log, warn } from "./logger";
 import { LyricDots } from "./lyric-dots";
 import { LyricLine, parseLyric } from "./lyric-parser";
 import { Tween, Easing } from "./tweenjs";
-import CircularProgress from "@mui/material/CircularProgress";
 import * as React from "react";
 import { GLOBAL_EVENTS } from "./global-events";
+import { Loader, Center, LoadingOverlay } from "@mantine/core";
 
 // 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
 function guessTextReadDuration(text: string): number {
@@ -155,29 +157,50 @@ export const LyricView: React.FC = () => {
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
 		null,
 	);
-	const albumImageUrl = React.useMemo(() => {
-		const songData = getPlayingSong();
-		return (
-			songData?.data?.album?.picUrl ||
-			`orpheus://localmusic/pic?${encodeURIComponent(songData?.from?.playFile)}`
-		);
-	}, [currentAudioId]);
+
+	const musicId = React.useMemo(
+		() => getPlayingSong()?.data?.id || 0,
+		[currentAudioId],
+	);
 	const album = React.useMemo(
 		() => getPlayingSong()?.data?.album || {},
-		[currentAudioId],
+		[musicId],
 	);
 	const songName: string = React.useMemo(
 		() => getPlayingSong()?.data?.name || "未知歌名",
-		[currentAudioId],
+		[musicId],
 	);
 	const songAliasName: string[] = React.useMemo(
 		() => getPlayingSong()?.data?.alias || [],
-		[currentAudioId],
+		[musicId],
 	);
 	const songArtists = React.useMemo(
 		() => getPlayingSong()?.data?.artists || [],
-		[currentAudioId],
+		[musicId],
 	);
+	const albumImageUrl = React.useMemo(() => {
+		//
+		const songData = getPlayingSong();
+		const urls: string[] = [];
+		const playFile = songData?.from?.playFile;
+		if (playFile) {
+			urls.push(`orpheus://localmusic/pic?${encodeURIComponent(playFile)}`);
+		}
+		const picUrl = songData?.data?.album?.picUrl;
+		if (picUrl) {
+			urls.push(picUrl);
+		}
+		urls.push(`orpheus://cache/?${getNCMImageUrl("16601526067802346")}`);
+		return urls;
+	}, [musicId]);
+	const [albumImageLoaded, setAlbumImageLoaded] = React.useState(false);
+	const [albumImageUrlIndex, setAlbumImageUrlIndex] = React.useState(0);
+
+	React.useEffect(() => {
+		setAlbumImageUrlIndex(0);
+		setAlbumImageLoaded(false);
+	}, [albumImageUrl]);
+
 	const [currentLyricIndex, setCurrentLyricIndex] = React.useState<number>(-1);
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
 	const keepSelectLyrics = React.useRef<Set<number>>(new Set());
@@ -195,6 +218,29 @@ export const LyricView: React.FC = () => {
 		"roman-lyric",
 		"true",
 	);
+	const [fullscreen, setFullscreen] = React.useState(
+		document.webkitIsFullScreen as boolean,
+	);
+
+	React.useEffect(() => {
+		if (document.webkitIsFullScreen !== fullscreen) {
+			if (fullscreen) {
+				document.body.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+			} else {
+				document.exitFullscreen();
+			}
+		}
+	}, [fullscreen]);
+
+	React.useEffect(() => {
+		const onFullscreenChanged = () => {
+			setFullscreen(document.webkitIsFullScreen as boolean);
+		};
+		document.addEventListener("fullscreenchange", onFullscreenChanged);
+		return () => {
+			document.removeEventListener("fullscreenchange", onFullscreenChanged);
+		};
+	}, []);
 
 	const loadLyric = React.useCallback(async (id: number) => {
 		const lyricsPath = `${plugin.pluginPath}/lyrics`;
@@ -228,8 +274,9 @@ export const LyricView: React.FC = () => {
 		let canceled = false;
 		(async () => {
 			setError(null);
+			setCurrentLyrics(null);
 			try {
-				const lyric = await loadLyric(getPlayingSong().data.id);
+				const lyric = await loadLyric(musicId);
 				log("已获取到歌词", lyric);
 				const parsed = parseLyric(
 					lyric?.lrc?.lyric || "",
@@ -254,7 +301,7 @@ export const LyricView: React.FC = () => {
 			// 载入新歌词
 			setCurrentLyrics(null);
 		};
-	}, [currentAudioId]);
+	}, [musicId]);
 
 	const scrollTween = React.useRef<
 		| {
@@ -474,7 +521,12 @@ export const LyricView: React.FC = () => {
 		if (!lyricEditMode) {
 			scrollToLyric(true);
 		}
-	}, [configTranslatedLyric, configDynamicLyric, configRomanLyric, currentLyrics]);
+	}, [
+		configTranslatedLyric,
+		configDynamicLyric,
+		configRomanLyric,
+		currentLyrics,
+	]);
 
 	React.useEffect(() => {
 		const onPlayProgress = (
@@ -616,18 +668,45 @@ export const LyricView: React.FC = () => {
 	);
 
 	return (
-		<>
+		<ThemeProvider>
 			<div className="am-music-info">
 				<div>
-					<div className="am-album-image">
-						<div>
-							<img alt="专辑图片" src={albumImageUrl} />
+					{albumImageUrl[albumImageUrlIndex] ? (
+						<div className="am-album-image">
+							<div>
+								<LoadingOverlay
+									loader={
+										<Loader
+											size={50}
+											style={{ width: "50px", height: "50px" }}
+										/>
+									}
+									sx={{
+										borderRadius: "5%",
+									}}
+									visible={!albumImageLoaded}
+								/>
+								<img
+									alt="专辑图片"
+									src={albumImageUrl[albumImageUrlIndex]}
+									onLoad={() => {
+										setAlbumImageLoaded(true);
+									}}
+									onError={() => {
+										albumImageUrlIndex <= albumImageUrl.length &&
+											setAlbumImageUrlIndex((v) => v + 1);
+									}}
+								/>
+							</div>
 						</div>
-					</div>
+					) : (
+						<></>
+					)}
 					<div className="am-music-name">{songName}</div>
 					{songAliasName.length > 0 ? (
 						<div className="am-music-alias">
 							{songAliasName.map((alia, index) => (
+								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 								<div key={index}>{alia}</div>
 							))}
 						</div>
@@ -707,6 +786,19 @@ export const LyricView: React.FC = () => {
 							>
 								逐词歌词（实验性）
 							</button>
+							<button
+								onClick={() => {
+									log("已切换全屏模式");
+									setFullscreen(!fullscreen);
+									scrollToLyric(true);
+								}}
+								className={classname({
+									toggled: fullscreen,
+								})}
+								type="button"
+							>
+								全屏
+							</button>
 						</>
 					) : (
 						<></>
@@ -750,11 +842,11 @@ export const LyricView: React.FC = () => {
 						</div>
 					)
 				) : (
-					<div className="am-lyric-view-loading">
-						<CircularProgress />
-					</div>
+					<Center className="am-lyric-view-loading">
+						<Loader size={50} style={{ width: "50px", height: "50px" }} />
+					</Center>
 				)}
 			</div>
-		</>
+		</ThemeProvider>
 	);
 };

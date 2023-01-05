@@ -10,6 +10,19 @@ export enum PlayState {
 	Pausing = 2,
 }
 
+export const NCM_IMAGE_CDNS = [
+	"https://p3.music.126.net/",
+	"https://p4.music.126.net/",
+];
+let selectIndex = 0;
+export function getNCMImageUrl(id: number | string) {
+	selectIndex++;
+	selectIndex %= NCM_IMAGE_CDNS.length;
+	return `${NCM_IMAGE_CDNS[selectIndex]}${channel.encryptId(
+		id.toString(),
+	)}/${id}.jpg`;
+}
+
 export interface EAPIRequestConfig {
 	/**
 	 * 返回响应的数据类型，绝大部分情况下都是 `json`
@@ -52,6 +65,8 @@ export function eapiRequest(url: string, config: EAPIRequestConfig) {
 if (DEBUG) {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	(window as any).eapiRequest = eapiRequest;
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	(window as any).getNCMImageUrl = getNCMImageUrl;
 }
 
 export function tryFindEapiRequestFuncName(
@@ -252,7 +267,7 @@ export function useConfig(
 	React.useEffect(() => {
 		const onConfigUpdate = () => {
 			const newValue = plugin.getConfig(key, defaultValue) || defaultValue;
-			if (value !== newValue) setValue(newValue);
+			setValue(newValue);
 		};
 		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
 		return () => {

@@ -1,11 +1,14 @@
 
 
 .am-lyrics-settings
-    margin: 0 0 auto 0;
-    max-width: 35rem;
+    min-height: 100%;
+    max-width: @css { min(100%, 700px) };
     .am-lyric-func-body
         user-select: text;
-        margin: 1rem 0;
+        overflow-wrap: break-word;
+        word-break: normal;
+        white-space: break-spaces;
+        text-overflow: ellipsis;
 
 #applemusic-like-lyrics-view
     overflow: hidden;
@@ -23,10 +26,6 @@
     
     .am-lyric-view-loading
         flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: @css { var(--applemusic-like-lyrics-font-color, white) };
     
     .am-music-info
         flex: 1;
@@ -47,11 +46,18 @@
                 align-content: center;
                 justify-content: center;
                 align-items: center;
+                position: relative;
                 > *
+                    border-radius: 5%;
+                    overflow hidden;
+                    box-shadow: 0 0 1rem #0004;
                     > img
                         border-radius: 5%;
-                        box-shadow: 0 1rem 1rem #0004;
                         overflow: hidden;
+                        min-height: @css { min(50vh, 30vw) };
+                        min-width: @css { min(50vh, 30vw) };
+                        max-height: @css { min(50vh, 30vw) };
+                        max-width: @css { min(50vh, 30vw) };
                         height: @css { min(50vh, 30vw) };
                         width: @css { min(50vh, 30vw) };
                         object-fit: cover;
@@ -115,6 +121,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        filter: drop-shadow(0 0 4px #0004);
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
             filter: blur(0) !important;
@@ -123,6 +130,12 @@
                 opacity: 1 !important;
         &:hover .am-lyric-options
             opacity: 1;
+    
+    .am-lyric-view-error
+        flex: 1;
+        *
+            overflow-wrap: break-word;
+            margin-bottom: 1rem;
     
     .am-lyric-options
         opacity: 0;

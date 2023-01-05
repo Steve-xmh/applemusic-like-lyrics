@@ -285,6 +285,7 @@ interface EAPILyricResponse extends EAPIResponse {
 
 declare namespace channel {
 	export function call(command: string, callback: Function, args: any[]);
+	export function encryptId(data: string): string;
 }
 
 declare var APP_CONF: any;

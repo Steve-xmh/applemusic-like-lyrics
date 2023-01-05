@@ -3,6 +3,8 @@ import { render } from "react-dom";
 import { LyricView } from "./lyric-view";
 import { GLOBAL_EVENTS } from "./global-events";
 import { getFullConfig, settingPrefix } from "./api";
+import * as React from "react";
+import { MantineProvider } from "@mantine/core";
 
 export let cssContent = "";
 
@@ -12,7 +14,7 @@ const camelToSnakeCase = (str: string) =>
 export let mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "applemusic-like-lyrics-view";
 
-function processStylesheet(content: string) {
+function buildVariableStylesheet() {
 	const variableTable: Map<string, string> = new Map();
 	const result: string[] = [];
 	mainViewElement.setAttribute("class", "");
@@ -41,22 +43,36 @@ function processStylesheet(content: string) {
 		result.push(";\n");
 	}
 	result.push("}\n");
-	result.push(content);
 	return result.join("");
 }
 
 export function reloadStylesheet(content: string) {
-	let processed = processStylesheet(content);
+	let varContent = buildVariableStylesheet();
+	const existingVarStyle = document.getElementById(
+		"apple-music-like-lyrics-var-style",
+	);
+	if (existingVarStyle) {
+		if (existingVarStyle.innerHTML !== varContent) {
+			existingVarStyle.innerHTML = varContent;
+		}
+	} else {
+		let style = document.createElement("style") as HTMLStyleElement;
+		style.id = "apple-music-like-lyrics-var-style";
+		style.innerHTML = varContent;
+		document.head.appendChild(style);
+	}
 
 	const existingStyle = document.getElementById(
 		"apple-music-like-lyrics-style",
 	);
 	if (existingStyle) {
-		existingStyle.innerHTML = processed;
+		if (existingStyle.innerHTML !== content) {
+			existingStyle.innerHTML = content;
+		}
 	} else {
 		let style = document.createElement("style") as HTMLStyleElement;
 		style.id = "apple-music-like-lyrics-style";
-		style.innerHTML = processed;
+		style.innerHTML = content;
 		document.head.appendChild(style);
 	}
 }
@@ -158,7 +174,7 @@ plugin.onLoad(() => {
 	});
 	if (DEBUG) {
 		setInterval(async () => {
-			const curStyle = await betterncm.fs.readFileText(
+			const curStyle = await betterncm_native.fs.readFileText(
 				`${plugin.pluginPath}/index.css`,
 			);
 			if (cssContent !== curStyle) {
@@ -189,3 +205,21 @@ window.addEventListener(
 );
 
 reloadStylesheet(cssContent);
+
+export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
+	return (
+		<MantineProvider
+			// withGlobalStyles
+			withNormalizeCSS
+			theme={{
+				colorScheme: "dark",
+				fontFamily: "PingFang SC, 微软雅黑, sans-serif",
+				headings: {
+					fontFamily: "PingFang SC, 微软雅黑, sans-serif",
+				},
+			}}
+		>
+			{props.children}
+		</MantineProvider>
+	);
+};
