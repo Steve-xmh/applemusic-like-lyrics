@@ -1,4 +1,4 @@
-import { debug, log, warn } from "./logger";
+import { log, warn } from "./logger";
 
 const hookCall = channel.call;
 
@@ -81,41 +81,3 @@ let setList = [bindAppend, bindPrepend, bindEffect];
 		},
 	},
 );
-
-function modifyTemplate(
-	id: string,
-	modifierFunction: (root: Document) => void,
-) {
-	const moduleElement = document.getElementById(id);
-	if (moduleElement) {
-		const doc = new DOMParser().parseFromString(
-			moduleElement.innerText,
-			"text/html",
-		);
-
-		modifierFunction(doc);
-
-		const textContent = doc.body.innerHTML;
-		if (textContent) {
-			debug(textContent);
-			moduleElement.innerText = textContent;
-			log("布局", id, "修改完成");
-		} else {
-			warn("布局修改失败：找不到根节点的 innerHTML", id);
-		}
-	} else {
-		warn("布局修改失败：找不到指定 ID 的模板布局元素", id);
-	}
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-	// 在这里修改歌词页面的布局，具体是变更 #m-fdtt-module 元素下的内容
-	modifyTemplate("m-fdtt-module", (doc) => {
-		// 直接隐藏原歌词和音乐信息，全部用自己的
-		const nowPlayingFrame = doc.querySelector('.n-single')
-		const appleLyricDiv = document.createElement("div");
-		appleLyricDiv.id = "applemusic-like-lyrics-view";
-		nowPlayingFrame?.parentNode?.prepend(appleLyricDiv);
-		nowPlayingFrame?.setAttribute("style", "display:none;");
-	});
-});

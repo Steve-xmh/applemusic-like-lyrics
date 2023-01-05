@@ -9,7 +9,7 @@
 
 你可以前往本仓库的 Release 下载对应的插件包，也可以通过 BetterNCM 的插件商店安装本插件。
 
-请不要将本插件与其它同功能用途的插件混用，**作者不会为其做兼容工作**！以下是不兼容的插件清单：
+请不要将本插件与其它同功能用途的插件混用，**作者不会为其做兼容工作**！以下是不兼容或有功能影响的插件清单：
 
 - [RefinedNowPlaying - 一个美化网易云音乐播放界面的 BetterNCM 插件](https://github.com/solstice23/refined-now-playing-netease)
 

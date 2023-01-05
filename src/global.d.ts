@@ -222,6 +222,7 @@ declare module "plugin" {
 	export interface PluginManifest {
 		manifest_version: number;
 		name: string;
+		slug?: string;
 		version: string;
 		injects: {
 			[pageType: string]: InjectFile;
@@ -259,7 +260,7 @@ declare module "plugin" {
 				evt: CustomEvent,
 			) => void,
 		): void;
-		getConfig<T>(key: string, defaultValue: T): T;
+		getConfig<T>(key: string, defaultValue: T): string;
 		setConfig<T>(key: string, value: T): void;
 		_getConfigElement(): HTMLElement | null;
 	}
@@ -283,13 +284,15 @@ interface EAPILyricResponse extends EAPIResponse {
 }
 
 declare namespace channel {
-	export function call(command: string, callback: Function, args: any[])
+	export function call(command: string, callback: Function, args: any[]);
 }
 
 declare var APP_CONF: any;
 declare var pluginPath: string;
 declare var plugin: import("plugin").NCMInjectPlugin;
-declare var loadedPlugins: { [pluginId: string]: import("plugin").NCMInjectPlugin | undefined };
+declare var loadedPlugins: {
+	[pluginId: string]: import("plugin").NCMInjectPlugin | undefined;
+};
 declare const betterncm: typeof import("betterncm-api/index").default;
 // declare const React: typeof import("react");
 // declare var h: typeof React.createElement;

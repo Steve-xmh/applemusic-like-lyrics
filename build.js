@@ -40,20 +40,19 @@ build({
   console.log("Build success");
   if (process.argv.includes("--dist")) {
     const plugin = new JSZip();
-    function addIfExist(filename) {
-      if (fs.existsSync(filename))
-        plugin.file(filename, fs.readFileSync(filename));
+    function addIfExist(filename, name = filename) {
+      if (fs.existsSync(filename)) plugin.file(name, fs.readFileSync(filename));
     }
-    if (process.argv.includes("--dev")) {
+    if (process.argv.includes("--dist")) {
+      addIfExist("dist/manifest.json", "manifest.json");
+      addIfExist("dist/index.js", "index.js");
+      addIfExist("dist/index.css", "index.css");
+      addIfExist("dist/startup_script.js", "startup_script.js");
+    } else {
       addIfExist("manifest.json");
       addIfExist("index.js");
       addIfExist("index.css");
       addIfExist("startup_script.js");
-    } else {
-      addIfExist("dist/manifest.json");
-      addIfExist("dist/index.js");
-      addIfExist("dist/index.css");
-      addIfExist("dist/startup_script.js");
     }
     const output = plugin.generateNodeStream({
       compression: "DEFLATE",

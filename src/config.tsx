@@ -3,7 +3,6 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Switch from "@mui/material/Switch";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
@@ -13,24 +12,23 @@ import Slider from "@mui/material/Slider";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import * as React from "react";
-import { settingPrefix, tryFindEapiRequestFuncName, useConfig } from "./api";
+import { tryFindEapiRequestFuncName, useConfig } from "./api";
 import { incompatible, version } from "../manifest.json";
 import { cssContent, reloadStylesheet } from ".";
 import { render } from "react-dom";
 
-const CheckBoxComponent: React.FC<{
+const SwitchConfigComponent: React.FC<{
 	settingKey: string;
+	defaultValue?: boolean;
 	label: string;
 	disabled?: boolean;
 }> = (props) => {
-	const [settingValue, setSettingValue] = React.useState(
-		localStorage.getItem(`${settingPrefix}${props.settingKey}`) === "true",
+	const [rawValue, setSettingValue] = useConfig(
+		props.settingKey,
+		String(!!props.defaultValue),
 	);
+	const settingValue = React.useMemo(() => rawValue === "true", [rawValue]);
 	React.useEffect(() => {
-		localStorage.setItem(
-			`${settingPrefix}${props.settingKey}`,
-			String(settingValue),
-		);
 		reloadStylesheet(cssContent);
 	}, [settingValue]);
 	return (
@@ -38,7 +36,7 @@ const CheckBoxComponent: React.FC<{
 			control={
 				<Switch
 					checked={settingValue}
-					onChange={() => setSettingValue(!settingValue)}
+					onChange={() => setSettingValue(String(!settingValue))}
 				/>
 			}
 			label={props.label}
@@ -53,15 +51,11 @@ const TextConfigComponent: React.FC<
 		defaultValue: string;
 	} & Omit<TextFieldProps, "onChange">
 > = (props) => {
-	const [settingValue, setSettingValue] = React.useState(
-		localStorage.getItem(`${settingPrefix}${props.settingKey}`) ||
-			props.defaultValue,
+	const [settingValue, setSettingValue] = useConfig(
+		props.settingKey,
+		props.defaultValue,
 	);
 	React.useEffect(() => {
-		localStorage.setItem(
-			`${settingPrefix}${props.settingKey}`,
-			String(settingValue),
-		);
 		reloadStylesheet(cssContent);
 	}, [settingValue]);
 	const { onChange, ...otherProps } = props;
@@ -77,21 +71,21 @@ const TextConfigComponent: React.FC<
 	);
 };
 
-const SliderComponent: React.FC<{
+const SliderConfigComponent: React.FC<{
 	settingKey: string;
 	min?: number;
 	max?: number;
+	defaultValue?: number;
 	step?: number;
 	label: string;
+	disabled?: boolean;
 }> = (props) => {
-	const [settingValue, setSettingValue] = React.useState(
-		Number(localStorage.getItem(`${settingPrefix}${props.settingKey}`)),
+	const [rawValue, setSettingValue] = useConfig(props.settingKey);
+	const settingValue = React.useMemo(
+		() => Number(rawValue) || props.defaultValue,
+		[rawValue, props.defaultValue],
 	);
 	React.useEffect(() => {
-		localStorage.setItem(
-			`${settingPrefix}${props.settingKey}`,
-			String(settingValue),
-		);
 		reloadStylesheet(cssContent);
 	}, [settingValue]);
 	return (
@@ -101,20 +95,24 @@ const SliderComponent: React.FC<{
 				<Grid item />
 				<Grid item xs>
 					<Slider
+						disabled={props.disabled}
 						step={props.step}
 						min={props.min}
 						max={props.max}
 						value={settingValue}
-						onChange={(evt, v) => typeof v === "number" && setSettingValue(v)}
+						onChange={(_evt, v) =>
+							typeof v === "number" && setSettingValue(String(v))
+						}
 					/>
 				</Grid>
 				<Grid item>
 					<Input
 						size="small"
+						disabled={props.disabled}
 						value={settingValue}
 						onChange={(evt) =>
 							setSettingValue(
-								evt.target.value === "" ? 0 : Number(evt.target.value),
+								String(evt.target.value === "" ? 0 : Number(evt.target.value)),
 							)
 						}
 					/>
@@ -138,30 +136,26 @@ const ConfigComponent: React.FC = () => {
 		[],
 	);
 
-	const [eapiRequestFuncName, setEapiRequestFuncName] = React.useState(
-		localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "",
+	const [lyricAutoFontSize] = useConfig("lyricAutoFontSize", "false");
+	const [eapiRequestFuncName, setEapiRequestFuncName] = useConfig(
+		"eapiRequestFuncName",
+		"",
 	);
-	const [eapiRequestFuncBody, setEapiRequestFuncBody] = React.useState("");
-
-	React.useEffect(() => {
+	const eapiRequestFuncBody = React.useMemo(() => {
 		if (eapiRequestFuncName !== "") {
 			const func = betterncm.ncm.findApiFunction(eapiRequestFuncName);
 			if (func === null) {
-				setEapiRequestFuncBody("");
+				return "";
 			} else {
 				if ("originalFunc" in func[0]) {
-					setEapiRequestFuncBody((func[0].originalFunc as Function).toString());
+					return (func[0].originalFunc as Function).toString();
 				} else {
-					setEapiRequestFuncBody(func.toString());
+					return func.toString();
 				}
 			}
 		} else {
-			setEapiRequestFuncBody("");
+			return "";
 		}
-		localStorage.setItem(
-			`${settingPrefix}eapiRequestFuncName`,
-			eapiRequestFuncName,
-		);
 	}, [eapiRequestFuncName]);
 
 	return (
@@ -188,14 +182,36 @@ const ConfigComponent: React.FC = () => {
 				<></>
 			)}
 			<FormGroup>
+				<Typography variant="h5">歌词设置</Typography>
+				<SwitchConfigComponent
+					settingKey="translated-lyric"
+					label="显示翻译歌词"
+					defaultValue={false}
+				/>
+				<SwitchConfigComponent
+					settingKey="roman-lyric"
+					label="显示音译歌词"
+					defaultValue={false}
+				/>
+				<SwitchConfigComponent
+					settingKey="dynamic-lyric"
+					label="显示逐词歌词（实验性）"
+					defaultValue={false}
+				/>
 				<Typography variant="h5">歌词样式设置</Typography>
-				<CheckBoxComponent settingKey="lyricBlurEffect" label="歌词模糊效果" />
-				<CheckBoxComponent settingKey="lyricScaleEffect" label="歌词缩放效果" />
-				<CheckBoxComponent
+				<SwitchConfigComponent
+					settingKey="lyricBlurEffect"
+					label="歌词模糊效果"
+				/>
+				<SwitchConfigComponent
+					settingKey="lyricScaleEffect"
+					label="歌词缩放效果"
+				/>
+				<SwitchConfigComponent
 					settingKey="lyricHidePassed"
 					label="已播放歌词隐藏效果"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="lyricBlurFadeInEffect"
 					label="未播放歌词淡入效果"
 				/>
@@ -204,38 +220,44 @@ const ConfigComponent: React.FC = () => {
 					settingKey="fontColor"
 					defaultValue="rgba(255, 255, 255, 1)"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="lyricAutoFontSize"
-					label="自适应歌词字体大小"
+					defaultValue={true}
+					label="自适应歌词字体大小（关闭以自定义歌词字体大小）"
 				/>
-				<SliderComponent
+				<SliderConfigComponent
 					step={1}
 					min={8}
 					max={64}
+					defaultValue={16}
+					disabled={lyricAutoFontSize === "true"}
 					settingKey="lyricFontSize"
 					label="字体大小（像素）"
 				/>
 			</FormGroup>
 			<FormGroup>
 				<Typography variant="h5">歌曲信息样式设置</Typography>
-				<CheckBoxComponent settingKey="alignLeftMusicName" label="歌名居左" />
-				<CheckBoxComponent
+				<SwitchConfigComponent
+					settingKey="alignLeftMusicName"
+					label="歌名居左"
+				/>
+				<SwitchConfigComponent
 					settingKey="alignLeftMusicAlias"
 					label="歌曲别名居左"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="alignLeftMusicArtists"
 					label="歌手名居左"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="alignLeftMusicAlbum"
 					label="专辑名居左"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="hideLeftMusicArtistsLabel"
 					label="隐藏歌手名标签"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="hideLeftMusicAlbumLabel"
 					label="隐藏专辑名标签"
 				/>
@@ -247,18 +269,18 @@ const ConfigComponent: React.FC = () => {
 			</FormGroup>
 			<FormGroup>
 				<Typography variant="h5">其它样式</Typography>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="autoHideControlBar"
 					label="鼠标静止时自动隐藏播放栏和标题栏"
 				/>
-				<SliderComponent
+				<SliderConfigComponent
 					step={0.5}
 					min={1}
 					max={30}
 					settingKey="autoHideDuration"
 					label="鼠标静止隐藏间隔（秒）"
 				/>
-				<CheckBoxComponent
+				<SwitchConfigComponent
 					settingKey="usePingFangFont"
 					label="播放页面使用苹方字体（需要系统安装）"
 				/>

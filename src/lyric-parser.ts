@@ -129,6 +129,29 @@ export function parseLyric(
 				}
 			}
 		}
+		// 插入空行
+		for (let i = 0; i < processed.length; i++) {
+			const thisLine = processed[i];
+			const nextLine = processed[i + 1];
+			if (
+				thisLine &&
+				nextLine &&
+				thisLine.originalLyric.trim().length > 0 &&
+				nextLine.originalLyric.trim().length > 0 &&
+				thisLine.duration > 0
+			) {
+				const thisLineEndTime =
+					(thisLine?.dynamicLyricTime || thisLine.time) + thisLine.duration;
+				const nextLineStartTime = nextLine?.dynamicLyricTime || nextLine.time;
+				if (nextLineStartTime - thisLineEndTime >= 5000) {
+					processed.splice(i + 1, 0, {
+						time: thisLineEndTime,
+						originalLyric: "",
+						duration: nextLineStartTime - thisLineEndTime,
+					});
+				}
+			}
+		}
 	} else {
 		for (let i = 0; i < processed.length; i++) {
 			if (i < processed.length - 1) {

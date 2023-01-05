@@ -1,4 +1,5 @@
 import * as React from "react";
+import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
@@ -31,24 +32,19 @@ export interface EAPIRequestConfig {
  * @todo 确认兼容版本范围内的函数名是否可用
  */
 export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	let funcName =
-		localStorage.getItem(`${settingPrefix}eapiRequestFuncName`) || "";
+	let funcName = plugin.getConfig("eapiRequestFuncName", "");
 	log("加密请求函数", funcName);
-	const ncmPackageVersion =
-		localStorage.getItem(`${settingPrefix}ncmPackageVersion`) || "";
+	const ncmPackageVersion = plugin.getConfig("ncmPackageVersion", "");
 	if (ncmPackageVersion !== APP_CONF.packageVersion) {
 		funcName = "";
-		localStorage.setItem(
-			`${settingPrefix}ncmPackageVersion`,
-			APP_CONF.packageVersion,
-		);
+		plugin.setConfig("ncmPackageVersion", APP_CONF.packageVersion);
 	}
 	if (funcName === "") {
 		funcName = tryFindEapiRequestFuncName() || "";
 		if (funcName === "") {
 			funcName = tryFindEapiRequestFuncName(true) || "";
 		}
-		localStorage.setItem(`${settingPrefix}eapiRequestFuncName`, funcName);
+		plugin.setConfig("eapiRequestFuncName", funcName);
 	}
 	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
 }
@@ -223,6 +219,16 @@ export function classname(
 	return result.join(" ");
 }
 
+export function getFullConfig(): { [key: string]: string | undefined } {
+	try {
+		return JSON.parse(
+			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
+		);
+	} catch {
+		return {};
+	}
+}
+
 export function useConfig(
 	key: string,
 	defaultValue: string,
@@ -238,8 +244,20 @@ export function useConfig(
 	const [value, setValue] = React.useState(
 		plugin.getConfig(key, defaultValue) || defaultValue,
 	);
+	const eventKey = React.useMemo(() => `config-changed-${key}`, [key]);
 	React.useEffect(() => {
 		plugin.setConfig(key, value);
+		GLOBAL_EVENTS.dispatchEvent(new Event(eventKey));
 	}, [value]);
+	React.useEffect(() => {
+		const onConfigUpdate = () => {
+			const newValue = plugin.getConfig(key, defaultValue) || defaultValue;
+			if (value !== newValue) setValue(newValue);
+		};
+		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
+		return () => {
+			GLOBAL_EVENTS.removeEventListener(eventKey, onConfigUpdate);
+		};
+	}, [key, defaultValue, eventKey]);
 	return [value, setValue];
 }

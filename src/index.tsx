@@ -2,7 +2,7 @@ import "./config";
 import { render } from "react-dom";
 import { LyricView } from "./lyric-view";
 import { GLOBAL_EVENTS } from "./global-events";
-import { settingPrefix } from "./api";
+import { getFullConfig, settingPrefix } from "./api";
 
 export let cssContent = "";
 
@@ -10,7 +10,7 @@ const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
 export let mainViewElement: HTMLDivElement = document.createElement("div");
-export let lyricPageElement: HTMLElement = document.createElement("section");
+mainViewElement.id = "applemusic-like-lyrics-view";
 
 function processStylesheet(content: string) {
 	const variableTable: Map<string, string> = new Map();
@@ -19,77 +19,29 @@ function processStylesheet(content: string) {
 	// 收集自己的变量
 	// 构造成全局变量选择器
 	result.push(":root {\n");
-	for (let i = 0; i < localStorage.length; i++) {
-		const key = localStorage.key(i);
-		if (key?.startsWith(settingPrefix)) {
-			const trimedKey = key.substring(settingPrefix.length);
-			const snakeKey = camelToSnakeCase(trimedKey);
-			const value = localStorage.getItem(key) || "";
-			if (value === "true") {
-				mainViewElement.classList.add(snakeKey);
-			} else {
-				mainViewElement.classList.remove(snakeKey);
-			}
-			variableTable.set(trimedKey, value);
-			variableTable.set(snakeKey, value);
-			result.push("    --applemusic-like-lyrics-");
-			result.push(snakeKey);
-			result.push(":");
-			if (String(Number(value)) === value) {
-				result.push(`${value}px`);
-			} else {
-				result.push(value);
-			}
-			result.push(";\n");
+	const fullConfig = getFullConfig();
+	for (const key in fullConfig) {
+		const snakeKey = camelToSnakeCase(key);
+		const value = fullConfig[key] || "";
+		if (value === "true") {
+			mainViewElement.classList.add(snakeKey);
+		} else {
+			mainViewElement.classList.remove(snakeKey);
 		}
-	}
-	if (variableTable.get("lyricBackground") === "true") {
-		lyricPageElement.classList.add("am-lyric-bg");
-	} else {
-		lyricPageElement.classList.remove("am-lyric-bg");
-	}
-	if (variableTable.get("lyricBackgroundBlurEffect") === "true") {
-		lyricPageElement.classList.add("am-lyric-bg-blur");
-	} else {
-		lyricPageElement.classList.remove("am-lyric-bg-blur");
-	}
-	if (variableTable.get("lyricBackgroundDarkenEffect") === "true") {
-		lyricPageElement.classList.add("am-lyric-bg-darken");
-	} else {
-		lyricPageElement.classList.remove("am-lyric-bg-darken");
-	}
-	if (variableTable.get("usePingFangFont") === "true") {
-		lyricPageElement.classList.add("am-lyric-use-pingfang-font");
-	} else {
-		lyricPageElement.classList.remove("am-lyric-use-pingfang-font");
+		variableTable.set(key, value);
+		variableTable.set(snakeKey, value);
+		result.push("    --applemusic-like-lyrics-");
+		result.push(snakeKey);
+		result.push(":");
+		if (String(Number(value)) === value) {
+			result.push(`${value}px`);
+		} else {
+			result.push(value);
+		}
+		result.push(";\n");
 	}
 	result.push("}\n");
-	for (const line of content.split("\n")) {
-		const ifExp = /\/\* if: (\!)?([a-z\-]+)(\?)? \*\//gi;
-		const ifResult = line.trim().matchAll(ifExp);
-		let shouldAdd = true;
-
-		for (const subIfResult of ifResult) {
-			const negative = !!subIfResult[1];
-			const optional = !!subIfResult[3];
-			if (negative) {
-				if (variableTable[subIfResult[2].trim()] === "true" && !optional) {
-					shouldAdd = false;
-					break;
-				}
-			} else {
-				if (variableTable[subIfResult[2].trim()] !== "true" && !optional) {
-					shouldAdd = false;
-					break;
-				}
-			}
-		}
-
-		if (shouldAdd) {
-			result.push(line);
-			result.push("\n");
-		}
-	}
+	result.push(content);
 	return result.join("");
 }
 
@@ -110,13 +62,11 @@ export function reloadStylesheet(content: string) {
 }
 
 let hideTimer: number = 0;
-plugin.onLoad((plugin) => {
+plugin.onLoad(() => {
 	window.addEventListener("mousemove", () => {
 		const autoEnabled =
-			localStorage.getItem(`${settingPrefix}autoHideControlBar`) !== "true";
-		const hideDuration = Number(
-			localStorage.getItem(`${settingPrefix}autoHideDuration`),
-		);
+			plugin.getConfig("autoHideControlBar", "false") !== "true";
+		const hideDuration = Number(plugin.getConfig("autoHideDuration", "5000"));
 		if (hideTimer !== 0) {
 			clearTimeout(hideTimer);
 			hideTimer = 0;
@@ -155,14 +105,12 @@ plugin.onLoad((plugin) => {
 				if (el.nodeType === Node.ELEMENT_NODE) {
 					const element = el as HTMLElement;
 					const albumImageElement = element.querySelector(".cdimg > img");
-					const lyricViewDiv = element.querySelector(
-						"#applemusic-like-lyrics-view",
-					);
-					if (albumImageElement && lyricViewDiv) {
-						lyricPageElement = element;
-						mainViewElement = lyricViewDiv as HTMLDivElement;
+					const nowPlayingFrame = element.querySelector(".n-single");
+					if (albumImageElement && nowPlayingFrame) {
 						reloadStylesheet(cssContent);
-						render(<LyricView />, lyricViewDiv);
+						render(<LyricView />, mainViewElement);
+						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
+						nowPlayingFrame?.setAttribute("style", "display:none;");
 						lyricPageObserver.disconnect();
 					}
 				}

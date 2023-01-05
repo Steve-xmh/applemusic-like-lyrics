@@ -626,11 +626,15 @@ export const LyricView: React.FC = () => {
 						</div>
 					</div>
 					<div className="am-music-name">{songName}</div>
-					<div className="am-music-alias">
-						{songAliasName.map((alia, index) => (
-							<div key={index}>{alia}</div>
-						))}
-					</div>
+					{songAliasName.length > 0 ? (
+						<div className="am-music-alias">
+							{songAliasName.map((alia, index) => (
+								<div key={index}>{alia}</div>
+							))}
+						</div>
+					) : (
+						<></>
+					)}
 					<div className="am-music-artists">
 						<div className="am-artists-label">歌手：</div>
 						<div className="am-artists">
