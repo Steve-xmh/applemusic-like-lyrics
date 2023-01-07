@@ -105,6 +105,56 @@ export function getSongDetail(...songIds: number[]) {
 	});
 }
 
+export interface ListenTogetherStatus {
+	code: number;
+	data: {
+		inRoom: false;
+		roomInfo: {
+			creatorId: number;
+			roomId: string;
+			effectiveDurationMs: number;
+			waitMs: number;
+			roomCreateTime: number;
+			chatRoomId: string;
+			agoraChannelId: string;
+			roomUsers: {
+				userId: number;
+				nickname: string;
+				avatarUrl: string;
+				identityIcon?: string;
+				identityName?: string;
+			}[];
+			roomRTCType: number;
+			roomType: "FRIEND" | string;
+			matchedReason: string | null;
+			alg: string | null;
+			unlockIdentityNeededMs: number | null;
+			unlockedIdentity: string | null;
+			unlockTextChatNeededMs: number | null;
+			ltType: number | null;
+			openHeartRcmd: boolean | null;
+			roomVipAbGroup: {};
+		} | null;
+		status: "NOT_CONNECTED" | "CONNECTED" | null;
+		anotherDeviceInfo: {
+			antherUserId: number;
+			osType: string;
+			appVersion: string;
+		} | null;
+	};
+	message: string;
+}
+
+export function getListenTogetherStatus() {
+	return new Promise<ListenTogetherStatus>((resolve, reject) => {
+		eapiRequest(`${APP_CONF.domain}/api/listen/together/status/get`, {
+			type: "json",
+			onload: resolve,
+			onerror: reject,
+		});
+	});
+}
+
 export function tryFindEapiRequestFuncName(
 	unsafe: boolean = false,
 ): string | null {
