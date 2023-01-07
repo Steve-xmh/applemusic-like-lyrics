@@ -9,13 +9,22 @@ import { LyricStyleSettings } from "./lyric-style";
 import { SongInfoStyleSettings } from "./song-info-style";
 import { OtherStyleSettings } from "./other-style";
 import { LyricSourceSettings } from "./lyric-source";
+import { CustomCSSSettings } from "./custom-css";
+import { version } from "../../manifest.json";
+import { useGithubLatestVersion } from "../api";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
-	return <Container fluid>{props.children}<Space h="xl" /></Container>;
+	return (
+		<Container fluid>
+			{props.children}
+			<Space h="xl" />
+		</Container>
+	);
 };
 
 const ConfigComponent: React.FC = () => {
 	const hasWarnings = useHasWarnings();
+	const latestVersion = useGithubLatestVersion();
 
 	return (
 		<Tabs
@@ -25,21 +34,28 @@ const ConfigComponent: React.FC = () => {
 			orientation="vertical"
 		>
 			<Tabs.List>
-				{hasWarnings ? (
+				{hasWarnings && (
 					<Tabs.Tab value="warnings">
 						<Indicator offset={-3} size={6} color="yellow">
 							插件警告
 						</Indicator>
 					</Tabs.Tab>
-				) : (
-					<></>
 				)}
 				<Tabs.Tab value="lyric">歌词设置</Tabs.Tab>
 				<Tabs.Tab value="lyric-style">歌词样式设置</Tabs.Tab>
 				<Tabs.Tab value="song-info-style">歌曲信息样式设置</Tabs.Tab>
 				<Tabs.Tab value="other-style">其它样式设置</Tabs.Tab>
 				<Tabs.Tab value="lyric-source">歌词来源设置</Tabs.Tab>
-				<Tabs.Tab value="about">关于</Tabs.Tab>
+				<Tabs.Tab value="custom-css">自定义 CSS 设置</Tabs.Tab>
+				<Tabs.Tab value="about">
+					{latestVersion !== "" && latestVersion !== version ? (
+						<Indicator offset={-3} size={6} color="yellow">
+							关于
+						</Indicator>
+					) : (
+						<>关于</>
+					)}
+				</Tabs.Tab>
 			</Tabs.List>
 
 			<Tabs.Panel value="warnings">
@@ -72,6 +88,11 @@ const ConfigComponent: React.FC = () => {
 					<LyricSourceSettings />
 				</PanelWrapper>
 			</Tabs.Panel>
+			<Tabs.Panel value="custom-css">
+				<PanelWrapper>
+					<CustomCSSSettings />
+				</PanelWrapper>
+			</Tabs.Panel>
 			<Tabs.Panel value="about">
 				<PanelWrapper>
 					<AboutPage />
@@ -83,7 +104,7 @@ const ConfigComponent: React.FC = () => {
 
 plugin.onConfig(() => {
 	const root = document.createElement("div");
-	
+
 	root.style.height = "100%";
 
 	render(

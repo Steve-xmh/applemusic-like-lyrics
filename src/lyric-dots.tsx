@@ -7,6 +7,7 @@ export const LyricDots: React.FC<{
 	selected: boolean;
 	time: number;
 	duration: number;
+	offset: number;
 }> = (props) => {
 	const dot0 = React.useRef<HTMLDivElement>(null);
 	const dot1 = React.useRef<HTMLDivElement>(null);
@@ -24,9 +25,9 @@ export const LyricDots: React.FC<{
 			const cdot0 = dot0.current;
 			const cdot1 = dot1.current;
 			const cdot2 = dot2.current;
-            cdot0.style.opacity = '0.5';
-            cdot1.style.opacity = '0.5';
-            cdot2.style.opacity = '0.5';
+			cdot0.style.opacity = "0.5";
+			cdot1.style.opacity = "0.5";
+			cdot2.style.opacity = "0.5";
 			const newGroup = new Group();
 			const onFrame = (time: number) => {
 				if (tween.current) {
@@ -36,17 +37,20 @@ export const LyricDots: React.FC<{
 					newGroup.removeAll();
 				}
 			};
+			const dotDuration = props.duration - 750; // 减去原歌词动画的动画时长
+
 			new Tween(
 				{
 					o: 0.5,
 				},
 				newGroup,
 			)
+				.delay(750)
 				.to(
 					{
 						o: 1,
 					},
-					props.duration / 3,
+					dotDuration / 3,
 				)
 				.onStart((o) => {
 					cdot0.style.opacity = o.o.toString();
@@ -61,12 +65,12 @@ export const LyricDots: React.FC<{
 				},
 				newGroup,
 			)
-				.delay(props.duration / 3)
+				.delay(750 + dotDuration / 3)
 				.to(
 					{
 						o: 1,
 					},
-					props.duration / 3,
+					dotDuration / 3,
 				)
 				.onStart((o) => {
 					cdot1.style.opacity = o.o.toString();
@@ -81,12 +85,12 @@ export const LyricDots: React.FC<{
 				},
 				newGroup,
 			)
-				.delay((props.duration / 3) * 2)
+				.delay(750 + (dotDuration / 3) * 2)
 				.to(
 					{
 						o: 1,
 					},
-					props.duration / 3,
+					dotDuration / 3,
 				)
 				.onStart((o) => {
 					cdot2.style.opacity = o.o.toString();
@@ -115,6 +119,10 @@ export const LyricDots: React.FC<{
 		<div
 			className={classname("am-lyric-dots", {
 				"am-lyric-dots-selected": props.selected && props.duration !== 0,
+				"am-lyric-line-before": props.offset < 0,
+				"am-lyric-line-after": props.offset > 0,
+				"am-lyric-line-selected": props.selected,
+				[`am-lyric-line-o${props.offset}`]: Math.abs(props.offset) < 5,
 			})}
 		>
 			<div ref={dot0} />

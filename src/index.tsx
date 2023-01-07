@@ -2,9 +2,10 @@ import "./config";
 import { render } from "react-dom";
 import { LyricView } from "./lyric-view";
 import { GLOBAL_EVENTS } from "./global-events";
-import { getFullConfig, settingPrefix } from "./api";
 import * as React from "react";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, createStyles } from "@mantine/core";
+import { debug, log } from "./logger";
+import { getConfig, getFullConfig } from "./config/core";
 
 export let cssContent = "";
 
@@ -14,7 +15,7 @@ const camelToSnakeCase = (str: string) =>
 export let mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "applemusic-like-lyrics-view";
 
-function buildVariableStylesheet() {
+function buildStylesheetFromConfig() {
 	const variableTable: Map<string, string> = new Map();
 	const result: string[] = [];
 	mainViewElement.setAttribute("class", "");
@@ -44,6 +45,10 @@ function buildVariableStylesheet() {
 	}
 	result.push("}\n");
 	return result.join("");
+}
+
+function buildVariableStylesheet() {
+	return buildStylesheetFromConfig() + "\n" + getConfig("customCssContent", "");
 }
 
 export function reloadStylesheet(content: string) {
@@ -79,18 +84,11 @@ export function reloadStylesheet(content: string) {
 
 let hideTimer: number = 0;
 plugin.onLoad(() => {
-	window.addEventListener("mousemove", () => {
-		const autoEnabled =
-			plugin.getConfig("autoHideControlBar", "false") !== "true";
-		const hideDuration = Number(plugin.getConfig("autoHideDuration", "5000"));
-		if (hideTimer !== 0) {
-			clearTimeout(hideTimer);
-			hideTimer = 0;
-		}
-		if (autoEnabled) {
-			return;
-		}
-		const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
+	try {
+		checkEapiRequestFuncName(); // 触发一次检查请求函数名字
+	} catch {}
+
+	const setControlsVisibility = (visible: boolean) => {
 		const headerEl = document.querySelector("header");
 		const windowCtlEl = document.querySelector(".m-winctrl");
 		const commentDetailEl = document.querySelector(
@@ -98,20 +96,54 @@ plugin.onLoad(() => {
 		);
 		const pInfoEl = document.querySelector(".m-pinfo");
 		const playerEl = document.querySelector("#main-player");
-		headerEl?.classList?.remove("hide");
-		windowCtlEl?.classList?.remove("hide");
-		playerEl?.classList?.remove("hide");
-		commentDetailEl?.classList?.remove("hide");
-		pInfoEl?.classList?.remove("hide");
-		if (lyricPageOpened) {
-			hideTimer = setTimeout(() => {
-				headerEl?.classList?.add("hide");
-				windowCtlEl?.classList?.add("hide");
-				playerEl?.classList?.add("hide");
-				commentDetailEl?.classList?.add("hide");
-				pInfoEl?.classList?.add("hide");
-			}, (hideDuration || 5) * 1000);
+		if (visible) {
+			headerEl?.classList?.remove("hide");
+			windowCtlEl?.classList?.remove("hide");
+			playerEl?.classList?.remove("hide");
+			commentDetailEl?.classList?.remove("hide");
+			pInfoEl?.classList?.remove("hide");
+		} else {
+			headerEl?.classList?.add("hide");
+			windowCtlEl?.classList?.add("hide");
+			playerEl?.classList?.add("hide");
+			commentDetailEl?.classList?.add("hide");
+			pInfoEl?.classList?.add("hide");
 		}
+	};
+
+	const onCheckHide = () => {
+		const autoEnabled = getConfig("autoHideControlBar", "false") !== "true";
+		const hideDuration = Number(getConfig("autoHideDuration", "5000"));
+		if (hideTimer !== 0) {
+			clearTimeout(hideTimer);
+			hideTimer = 0;
+		}
+		if (autoEnabled) {
+			return;
+		}
+		setControlsVisibility(true);
+		hideTimer = setTimeout(() => {
+			const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
+			if (lyricPageOpened) {
+				setControlsVisibility(false);
+			}
+		}, (hideDuration || 5) * 1000);
+	};
+
+	GLOBAL_EVENTS.addEventListener("lyric-page-open", () => {
+		const autoEnabled = getConfig("autoHideControlBar", "false") === "true";
+		if (autoEnabled) {
+			window.addEventListener("mousemove", onCheckHide);
+		}
+	});
+
+	GLOBAL_EVENTS.addEventListener("lyric-page-hide", () => {
+		if (hideTimer !== 0) {
+			clearTimeout(hideTimer);
+			hideTimer = 0;
+		}
+		window.removeEventListener("mousemove", onCheckHide);
+		setControlsVisibility(true);
 	});
 
 	// 监听歌词页面出现，然后添加功能
@@ -128,6 +160,9 @@ plugin.onLoad(() => {
 						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
 						nowPlayingFrame?.setAttribute("style", "display:none;");
 						lyricPageObserver.disconnect();
+						GLOBAL_EVENTS.dispatchEvent(
+							new Event("lyric-page-open", undefined),
+						);
 					}
 				}
 			});
@@ -136,6 +171,7 @@ plugin.onLoad(() => {
 	lyricPageObserver.observe(document.body, {
 		childList: true,
 	});
+	let nowPlayingElement: HTMLElement;
 	const lyricPageOpenObserver = new MutationObserver((m) => {
 		for (const a of m) {
 			a.addedNodes.forEach((el) => {
@@ -146,6 +182,7 @@ plugin.onLoad(() => {
 						"#applemusic-like-lyrics-view",
 					);
 					if (albumImageElement && lyricViewDiv) {
+						nowPlayingElement = element;
 						GLOBAL_EVENTS.dispatchEvent(
 							new Event("lyric-page-open", undefined),
 						);
@@ -156,11 +193,7 @@ plugin.onLoad(() => {
 			a.removedNodes.forEach((el) => {
 				if (el.nodeType === Node.ELEMENT_NODE) {
 					const element = el as HTMLElement;
-					const albumImageElement = element.querySelector(".cdimg > img");
-					const lyricViewDiv = element.querySelector(
-						"#applemusic-like-lyrics-view",
-					);
-					if (albumImageElement && lyricViewDiv) {
+					if (nowPlayingElement === element) {
 						GLOBAL_EVENTS.dispatchEvent(
 							new Event("lyric-page-hide", undefined),
 						);
@@ -172,8 +205,11 @@ plugin.onLoad(() => {
 	lyricPageOpenObserver.observe(document.body, {
 		childList: true,
 	});
+	GLOBAL_EVENTS.addEventListener("config-saved", () =>
+		reloadStylesheet(cssContent),
+	);
 	if (DEBUG) {
-		setInterval(async () => {
+		setInterval(async function refreshStyle() {
 			const curStyle = await betterncm_native.fs.readFileText(
 				`${plugin.pluginPath}/index.css`,
 			);
@@ -181,7 +217,7 @@ plugin.onLoad(() => {
 				cssContent = curStyle;
 				reloadStylesheet(cssContent);
 			}
-		}, 1000);
+		}, 3000);
 	} else {
 		betterncm.fs
 			.readFileText(`${plugin.pluginPath}/index.css`)
@@ -204,7 +240,18 @@ window.addEventListener(
 	},
 );
 
+if (OPEN_PAGE_DIRECTLY) {
+	window.addEventListener("load", () => {
+		const btn = document.querySelector<HTMLAnchorElement>(
+			"a[data-action='max']",
+		);
+		btn?.click();
+	});
+}
+
 reloadStylesheet(cssContent);
+
+export const useStyles = createStyles;
 
 export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 	return (
@@ -223,3 +270,17 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 		</MantineProvider>
 	);
 };
+
+import * as APIs from "./api";
+import * as Utils from "./utils";
+import { checkEapiRequestFuncName } from "./api";
+if (DEBUG) {
+	for (const key in APIs) {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		(window as any)[key] = APIs[key];
+	}
+	for (const key in Utils) {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		(window as any)[key] = APIs[key];
+	}
+}

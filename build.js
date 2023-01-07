@@ -22,6 +22,9 @@ build({
   outdir: process.argv.includes("--dist") ? "dist" : ".",
   define: {
     DEBUG: process.argv.includes("--dev").toString(),
+    OPEN_PAGE_DIRECTLY: process.argv
+      .includes("--open-page-directly")
+      .toString(),
   },
   watch: process.argv.includes("--watch")
     ? {
@@ -35,7 +38,14 @@ build({
         },
       }
     : undefined,
-  plugins: [stylusLoader()],
+  plugins: [
+    stylusLoader({
+      stylusOptions: {
+        include: ["node_modules"],
+        includeCss: true,
+      },
+    }),
+  ],
 }).then((result) => {
   console.log("Build success");
   if (process.argv.includes("--dist")) {

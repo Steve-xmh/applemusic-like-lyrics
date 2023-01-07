@@ -1,6 +1,8 @@
 import * as React from "react";
+import { getConfig, setConfig } from "./config/core";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
+import { version } from "../manifest.json";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export const settingPrefix = "applemusic-like-lyrics:";
@@ -45,28 +47,62 @@ export interface EAPIRequestConfig {
  * @todo 确认兼容版本范围内的函数名是否可用
  */
 export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	let funcName = plugin.getConfig("eapiRequestFuncName", "");
+	return callCachedSearchFunction(checkEapiRequestFuncName(), [url, config]); // 经测试 2.10.6 可用
+}
+
+export function checkEapiRequestFuncName(): string {
+	let funcName = getConfig("eapiRequestFuncName", "");
 	log("加密请求函数", funcName);
-	const ncmPackageVersion = plugin.getConfig("ncmPackageVersion", "");
+	const ncmPackageVersion = getConfig("ncmPackageVersion", "");
 	if (ncmPackageVersion !== APP_CONF.packageVersion) {
 		funcName = "";
-		plugin.setConfig("ncmPackageVersion", APP_CONF.packageVersion);
+		setConfig("ncmPackageVersion", APP_CONF.packageVersion);
 	}
 	if (funcName === "") {
 		funcName = tryFindEapiRequestFuncName() || "";
 		if (funcName === "") {
 			funcName = tryFindEapiRequestFuncName(true) || "";
 		}
-		plugin.setConfig("eapiRequestFuncName", funcName);
+		setConfig("eapiRequestFuncName", funcName);
+		GLOBAL_EVENTS.dispatchEvent(
+			new Event("config-changed-eapiRequestFuncName"),
+		);
 	}
-	return callCachedSearchFunction(funcName, [url, config]); // 经测试 2.10.6 可用
+	return funcName;
 }
 
-if (DEBUG) {
-	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-	(window as any).eapiRequest = eapiRequest;
-	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-	(window as any).getNCMImageUrl = getNCMImageUrl;
+try {
+	checkEapiRequestFuncName(); // 触发一次检查请求函数名字
+} catch {}
+
+export interface SongDetailResponse {
+	songs: {
+		al: {
+			id: number;
+			name: string;
+			pic: number;
+			picUrl: string;
+			pic_str: string;
+		};
+		ar: {
+			id: number;
+			name: string;
+		}[];
+		name: string;
+	}[];
+}
+
+export function getSongDetail(...songIds: number[]) {
+	return new Promise<SongDetailResponse>((resolve, reject) => {
+		eapiRequest(`${APP_CONF.domain}/api/v3/song/detail`, {
+			type: "json",
+			data: {
+				c: JSON.stringify(songIds.map((id) => ({ id }))),
+			},
+			onload: resolve,
+			onerror: reject,
+		});
+	});
 }
 
 export function tryFindEapiRequestFuncName(
@@ -234,16 +270,6 @@ export function classname(
 	return result.join(" ");
 }
 
-export function getFullConfig(): { [key: string]: string | undefined } {
-	try {
-		return JSON.parse(
-			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
-		);
-	} catch {
-		return {};
-	}
-}
-
 export function useConfig(
 	key: string,
 	defaultValue: string,
@@ -257,16 +283,16 @@ export function useConfig(
 	defaultValue?: string,
 ): [string | undefined, React.Dispatch<string | undefined>] {
 	const [value, setValue] = React.useState(
-		plugin.getConfig(key, defaultValue) || defaultValue,
+		getConfig(key, defaultValue) || defaultValue,
 	);
 	const eventKey = React.useMemo(() => `config-changed-${key}`, [key]);
 	React.useEffect(() => {
-		plugin.setConfig(key, value);
+		setConfig(key, value);
 		GLOBAL_EVENTS.dispatchEvent(new Event(eventKey));
 	}, [value]);
 	React.useEffect(() => {
 		const onConfigUpdate = () => {
-			const newValue = plugin.getConfig(key, defaultValue) || defaultValue;
+			const newValue = getConfig(key, defaultValue) || defaultValue;
 			setValue(newValue);
 		};
 		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
@@ -275,4 +301,99 @@ export function useConfig(
 		};
 	}, [key, defaultValue, eventKey]);
 	return [value, setValue];
+}
+
+export function useNowPlayingOpened(): boolean {
+	const [value, setValue] = React.useState(
+		!!document.getElementById("applemusic-like-lyrics-view"),
+	);
+	React.useEffect(() => {
+		setValue(!!document.getElementById("applemusic-like-lyrics-view"));
+		log(
+			"applemusic-like-lyrics-view",
+			value,
+			!!document.getElementById("applemusic-like-lyrics-view"),
+		);
+		const onLyricPageOpen = () => {
+			log("歌词页面已显示");
+			setValue(true);
+		};
+		const onLyricPageHide = () => {
+			log("歌词页面已隐藏");
+			setValue(false);
+		};
+		GLOBAL_EVENTS.addEventListener("lyric-page-open", onLyricPageOpen);
+		GLOBAL_EVENTS.addEventListener("lyric-page-hide", onLyricPageHide);
+		return () => {
+			GLOBAL_EVENTS.removeEventListener("lyric-page-open", onLyricPageOpen);
+			GLOBAL_EVENTS.removeEventListener("lyric-page-hide", onLyricPageHide);
+		};
+	}, []);
+
+	return value;
+}
+
+let cachedLatestVersion: string | undefined;
+
+export async function checkGithubLatestVersion(force = false): Promise<string> {
+	// https://ghproxy.com/https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
+	// https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
+
+	if (force) {
+		cachedLatestVersion = undefined;
+	}
+
+	if (cachedLatestVersion !== undefined) {
+		return cachedLatestVersion;
+	}
+
+	const GITHUB_DIST_MANIFEST_URL =
+		"https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json";
+
+	try {
+		const manifest = (await (
+			await fetch(`https://ghproxy.com/${GITHUB_DIST_MANIFEST_URL}`)
+		).json()) as typeof import("../dist/manifest.json");
+		if (cachedLatestVersion !== manifest.version) {
+			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
+		}
+		cachedLatestVersion = manifest.version;
+		return cachedLatestVersion;
+	} catch {}
+
+	try {
+		const manifest = (await (
+			await fetch(GITHUB_DIST_MANIFEST_URL)
+		).json()) as typeof import("../dist/manifest.json");
+		if (cachedLatestVersion !== manifest.version) {
+			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
+		}
+		cachedLatestVersion = manifest.version;
+		return cachedLatestVersion;
+	} catch {}
+
+	return cachedLatestVersion || "";
+}
+
+export function useGithubLatestVersion(): string {
+	const [version, setVersion] = React.useState("");
+
+	React.useEffect(() => {
+		const checkUpdate = () => checkGithubLatestVersion().then(setVersion);
+		checkUpdate();
+		GLOBAL_EVENTS.addEventListener("latest-version-updated", checkUpdate);
+		return () => {
+			GLOBAL_EVENTS.removeEventListener("latest-version-updated", checkUpdate);
+		};
+	}, []);
+
+	return version;
+}
+
+export function useHasUpdates(): boolean {
+	const githubVersion = useGithubLatestVersion();
+	return React.useMemo(
+		() => githubVersion !== "" && githubVersion !== version,
+		[githubVersion],
+	);
 }

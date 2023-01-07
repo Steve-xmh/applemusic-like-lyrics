@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useConfig } from "../api";
-import { cssContent, reloadStylesheet } from "..";
 import {
 	ColorInput,
 	Slider,
@@ -21,9 +20,6 @@ export const SwitchConfigComponent: React.FC<{
 		String(!!props.defaultValue),
 	);
 	const settingValue = React.useMemo(() => rawValue === "true", [rawValue]);
-	React.useEffect(() => {
-		reloadStylesheet(cssContent);
-	}, [settingValue]);
 	return (
 		<Switch
 			sx={{ margin: "16px 0" }}
@@ -44,9 +40,6 @@ export const TextConfigComponent: React.FC<
 		props.settingKey,
 		props.defaultValue,
 	);
-	React.useEffect(() => {
-		reloadStylesheet(cssContent);
-	}, [settingValue]);
 	const { onChange, settingKey, defaultValue, ...otherProps } = props;
 	return (
 		<TextInput
@@ -69,9 +62,6 @@ export const ColorConfigComponent: React.FC<
 		settingKey,
 		props.defaultValue,
 	);
-	React.useEffect(() => {
-		reloadStylesheet(cssContent);
-	}, [settingValue]);
 	return (
 		<ColorInput
 			sx={{ margin: "8px 0" }}
@@ -99,9 +89,6 @@ export const SliderConfigComponent: React.FC<{
 		() => Number(rawValue) || props.defaultValue,
 		[rawValue, props.defaultValue],
 	);
-	React.useEffect(() => {
-		reloadStylesheet(cssContent);
-	}, [settingValue]);
 	return (
 		<>
 			<Text sx={{ margin: "8px 0" }} fz="md">

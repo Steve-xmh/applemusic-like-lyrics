@@ -4,17 +4,40 @@ import {
 	getLyric,
 	getNCMImageUrl,
 	getPlayingSong,
+	getSongDetail,
 	PlayState,
+	SongDetailResponse,
 	useConfig,
+	useNowPlayingOpened,
 } from "./api";
 import { ThemeProvider } from ".";
 import { log, warn } from "./logger";
 import { LyricDots } from "./lyric-dots";
-import { LyricLine, parseLyric } from "./lyric-parser";
+import {
+	LyricLine,
+	parseLyric,
+	PURE_MUSIC_LYRIC_DATA,
+	PURE_MUSIC_LYRIC_LINE,
+} from "./lyric-parser";
 import { Tween, Easing } from "./tweenjs";
 import * as React from "react";
 import { GLOBAL_EVENTS } from "./global-events";
-import { Loader, Center, LoadingOverlay } from "@mantine/core";
+import {
+	Loader,
+	Center,
+	Text,
+	Button,
+	LoadingOverlay,
+	Space,
+	Modal,
+	NumberInput,
+	FileInput,
+	Card,
+	Image,
+	Flex,
+	Box,
+} from "@mantine/core";
+import { useDebouncedState } from "@mantine/hooks";
 
 // 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
 function guessTextReadDuration(text: string): number {
@@ -39,6 +62,73 @@ const useForceUpdate = (): [{}, () => void] => {
 	return [updateState, forceUpdate];
 };
 
+const SongView: React.FC<{ id?: number }> = (props) => {
+	const [songRes, setSongRes] = React.useState<SongDetailResponse>();
+	const songInfo = React.useMemo(
+		() => (songRes === undefined ? undefined : songRes?.songs[0] || null),
+		[songRes],
+	);
+	React.useEffect(() => {
+		setSongRes(undefined);
+		let canceled = false;
+		(async () => {
+			if (props.id) {
+				const info = await getSongDetail(props.id);
+				if (!canceled) {
+					setSongRes(info);
+				}
+			}
+		})();
+		return () => {
+			canceled = true;
+		};
+	}, [props.id]);
+
+	return (
+		<Card>
+			<Flex
+				justify="flex-start"
+				align={songInfo ? "flex-start" : "center"}
+				direction="row"
+				wrap="nowrap"
+				gap="md"
+			>
+				<Image
+					src={
+						songInfo
+							? songInfo.al.picUrl
+							: `orpheus://cache/?${getNCMImageUrl("16601526067802346")}`
+					}
+					radius="md"
+					height={64}
+					width={64}
+				/>
+				<Box>
+					<Text size="md">
+						{props.id
+							? songInfo === undefined
+								? "正在加载"
+								: songInfo === null
+								? "无此歌曲"
+								: songInfo.name
+							: "未知音乐"}
+					</Text>
+					<Text lineClamp={1}>
+						{props.id
+							? songInfo
+								? songInfo.ar.map((v) => v.name).join(" / ")
+								: ""
+							: "未知歌手"}
+					</Text>
+					<Text lineClamp={1}>
+						{props.id ? (songInfo ? songInfo.al.name : "") : "未知专辑"}
+					</Text>
+				</Box>
+			</Flex>
+		</Card>
+	);
+};
+
 const LyricLineView: React.FC<{
 	offset: number;
 	selected: boolean;
@@ -46,112 +136,57 @@ const LyricLineView: React.FC<{
 	dynamic: boolean;
 	translated: boolean;
 	roman: boolean;
-	edit: boolean;
 	onClickLyric?: (line: LyricLine) => void;
-	onUpdateLyric?: (newLine: LyricLine) => void;
-	onInsertLyric?: () => void;
 }> = (props) => {
-	const [editingLine, setEditingLine] = React.useState(props.line);
-	const timeFormated = React.useMemo(() => {
-		const t = props.line.time / 1000;
-		const s = t % 60;
-		const m = Math.floor((t - s) / 60);
-		const ss = s.toFixed(3);
-		const mm = m.toString();
-		return `${"0".repeat(Math.max(0, 2 - mm.length))}${mm}:${"0".repeat(
-			Math.max(0, 6 - ss.length),
-		)}${ss}`;
-	}, [props.line.time]);
-
-	React.useEffect(() => {
-		setEditingLine(props.line);
-	}, [props.line]);
-
-	React.useEffect(() => {
-		setEditingLine(props.line);
-	}, [props.edit, props.selected]);
-
-	if (props.edit) {
-		return (
-			<div
-				className={classname("am-lyric-line-edit", {
-					"am-lyric-line-selected": props.selected,
-				})}
-			>
-				<div className="edit-time">{timeFormated}</div>
-				<div className="edit-area">
-					<input
-						type='text'
-						value={editingLine.originalLyric}
-						placeholder="原文歌词"
-					/>
-					<input
-						type='text'
-						value={editingLine.translatedLyric}
-						placeholder="翻译歌词"
-					/>
-					<input
-						type='text'
-						value={editingLine.romanLyric}
-						placeholder="翻译歌词"
-					/>
+	return (
+		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+		<div
+			onClick={() => {
+				if (props.onClickLyric) props.onClickLyric(props.line);
+			}}
+			className={classname("am-lyric-line", {
+				"am-lyric-line-before": props.offset < 0,
+				"am-lyric-line-after": props.offset > 0,
+				"am-lyric-line-selected": props.selected,
+				[`am-lyric-line-o${props.offset}`]: Math.abs(props.offset) < 5,
+			})}
+		>
+			{props.dynamic &&
+			props.line.dynamicLyric &&
+			props.line.dynamicLyricTime ? (
+				<div className="am-lyric-line-dynamic">
+					{props.line.dynamicLyric.map((word, i) => (
+						<span
+							// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+							key={i}
+							style={{
+								animationDelay: `${
+									word.time - (props.line.dynamicLyricTime || 0)
+								}ms`,
+								animationDuration: `${word.duration}ms`,
+							}}
+						>
+							{word.word}
+						</span>
+					))}
 				</div>
-				<div className="edit-arrow">◀</div>
+			) : (
+				<div className="am-lyric-line-original">{props.line.originalLyric}</div>
+			)}
+			<div className="am-lyric-line-translated">
+				{props.translated ? props.line.translatedLyric : ""}
 			</div>
-		);
-	} else {
-		return (
-			// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-			<div
-				onClick={() => {
-					if (props.onClickLyric) props.onClickLyric(props.line);
-				}}
-				className={classname("am-lyric-line", {
-					"am-lyric-line-before": props.offset < 0,
-					"am-lyric-line-after": props.offset > 0,
-					"am-lyric-line-selected": props.selected,
-					[`am-lyric-line-o${props.offset}`]: Math.abs(props.offset) < 5,
-				})}
-			>
-				{props.dynamic &&
-				props.line.dynamicLyric &&
-				props.line.dynamicLyricTime ? (
-					<div className="am-lyric-line-dynamic">
-						{props.line.dynamicLyric.map((word, i) => (
-							<span
-								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								key={i}
-								style={{
-									animationDelay: `${
-										word.time - (props.line.dynamicLyricTime || 0)
-									}ms`,
-									animationDuration: `${word.duration}ms`,
-								}}
-							>
-								{word.word}
-							</span>
-						))}
-					</div>
-				) : (
-					<div className="am-lyric-line-original">
-						{props.line.originalLyric}
-					</div>
-				)}
-				<div className="am-lyric-line-translated">
-					{props.translated ? props.line.translatedLyric : ""}
-				</div>
-				<div className="am-lyric-line-roman">
-					{props.roman ? props.line.romanLyric : ""}
-				</div>
+			<div className="am-lyric-line-roman">
+				{props.roman ? props.line.romanLyric : ""}
 			</div>
-		);
-	}
+		</div>
+	);
 };
 
 export const LyricView: React.FC = () => {
+	const isLyricPageOpening = useNowPlayingOpened();
 	const [currentAudioId, setCurrentAudioId] = React.useState("");
 	const [currentAudioDuration, setAudioDuration] = React.useState(0);
-	const [lyricEditMode, setLyricEditMode] = React.useState(false);
 	const [error, setError] = React.useState<Error | null>(null);
 	const [playState, setPlayState] = React.useState(getPlayingSong().state);
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
@@ -160,7 +195,7 @@ export const LyricView: React.FC = () => {
 
 	const musicId = React.useMemo(
 		() => getPlayingSong()?.data?.id || 0,
-		[currentAudioId],
+		[currentAudioId, isLyricPageOpening],
 	);
 	const album = React.useMemo(
 		() => getPlayingSong()?.data?.album || {},
@@ -179,16 +214,19 @@ export const LyricView: React.FC = () => {
 		[musicId],
 	);
 	const albumImageUrl = React.useMemo(() => {
-		//
 		const songData = getPlayingSong();
 		const urls: string[] = [];
-		const playFile = songData?.from?.playFile;
-		if (playFile) {
-			urls.push(`orpheus://localmusic/pic?${encodeURIComponent(playFile)}`);
+		const radioIntervenePic = songData?.data?.radio?.intervenePicUrl;
+		if (radioIntervenePic) {
+			urls.push(`orpheus://cache/?${radioIntervenePic}`);
 		}
 		const picUrl = songData?.data?.album?.picUrl;
 		if (picUrl) {
-			urls.push(picUrl);
+			urls.push(`orpheus://cache/?${picUrl}`);
+		}
+		const playFile = songData?.from?.playFile;
+		if (playFile) {
+			urls.push(`orpheus://localmusic/pic?${encodeURIComponent(playFile)}`);
 		}
 		urls.push(`orpheus://cache/?${getNCMImageUrl("16601526067802346")}`);
 		return urls;
@@ -218,6 +256,7 @@ export const LyricView: React.FC = () => {
 		"roman-lyric",
 		"true",
 	);
+	const [alignTopSelectedLyric] = useConfig("alignTopSelectedLyric", "false");
 	const [fullscreen, setFullscreen] = React.useState(
 		document.webkitIsFullScreen as boolean,
 	);
@@ -242,7 +281,7 @@ export const LyricView: React.FC = () => {
 		};
 	}, []);
 
-	const loadLyric = React.useCallback(async (id: number) => {
+	const loadLyric = React.useCallback(async (id: string | number) => {
 		const lyricsPath = `${plugin.pluginPath}/lyrics`;
 		const cachedLyricPath = `${lyricsPath}/${id}.json`;
 		try {
@@ -255,53 +294,95 @@ export const LyricView: React.FC = () => {
 		} catch (err) {
 			warn("警告：加载已缓存歌词失败", err);
 		}
-		const data = await getLyric(id);
-		try {
-			if (!(await betterncm.fs.exists(lyricsPath))) {
-				betterncm.fs.mkdir(lyricsPath);
+		if (typeof id === "number") {
+			const data = await getLyric(id);
+			try {
+				if (!(await betterncm.fs.exists(lyricsPath))) {
+					betterncm.fs.mkdir(lyricsPath);
+				}
+				await betterncm.fs.writeFile(
+					cachedLyricPath,
+					JSON.stringify(data, null, 4),
+				);
+			} catch (err) {
+				warn("警告：缓存歌词失败", err);
 			}
-			await betterncm.fs.writeFile(
-				cachedLyricPath,
-				JSON.stringify(data, null, 4),
-			);
-		} catch (err) {
-			warn("警告：缓存歌词失败", err);
+			return data;
+		} else {
+			// 如果是摘要字符串的话，那就是本地文件
+			return {};
 		}
-		return data;
 	}, []);
 
-	React.useEffect(() => {
-		let canceled = false;
-		(async () => {
-			setError(null);
-			setCurrentLyrics(null);
-			try {
-				const lyric = await loadLyric(musicId);
-				log("已获取到歌词", lyric);
-				const parsed = parseLyric(
-					lyric?.lrc?.lyric || "",
-					lyric?.tlyric?.lyric || "",
-					lyric?.romalrc?.lyric || "",
-					lyric?.yrc?.lyric || "",
-				);
-				log(lyric, parsed);
-				if (!canceled) {
-					setCurrentLyrics(parsed);
-					setCurrentLyricIndex(-1);
-					keepSelectLyrics.current.clear();
-				}
-			} catch (err) {
-				setError(err);
-			}
-		})();
-		return () => {
-			canceled = true;
-			// 滚动到顶部
-			lyricListElement.current?.parentElement?.scrollTo(0, 0);
-			// 载入新歌词
-			setCurrentLyrics(null);
-		};
+	const [selectMusicIdModalOpened, setSelectMusicIdModalOpened] =
+		React.useState(false);
+
+	const [selectMusicIdModalLoading, setSelectMusicIdModalLoading] =
+		React.useState(false);
+
+	const [selectLocalLyricModalOpened, setLocalLyricModalOpened] =
+		React.useState(false);
+
+	const [selectLocalLyricModalLoading, setLocalLyricModalLoading] =
+		React.useState(false);
+
+	const reloadLyricByCurrentAudioId = React.useCallback(async () => {
+		setError(null);
+		setCurrentLyrics(null);
+		try {
+			const lyric = await loadLyric(musicId);
+			log("已获取到歌词", lyric);
+			const parsed = parseLyric(
+				lyric?.lrc?.lyric || "",
+				lyric?.tlyric?.lyric || "",
+				lyric?.romalrc?.lyric || "",
+				lyric?.yrc?.lyric || "",
+			);
+			log(lyric, parsed);
+			setCurrentLyrics(parsed);
+			setCurrentLyricIndex(-1);
+			keepSelectLyrics.current.clear();
+		} catch (err) {
+			setError(err);
+		}
 	}, [musicId]);
+
+	React.useEffect(() => {
+		if (isLyricPageOpening) {
+			setSelectMusicIdModalOpened(false);
+			setLocalLyricModalOpened(false);
+			let canceled = false;
+			(async () => {
+				setError(null);
+				setCurrentLyrics(null);
+				try {
+					const lyric = await loadLyric(musicId);
+					log("已获取到歌词", lyric);
+					const parsed = parseLyric(
+						lyric?.lrc?.lyric || "",
+						lyric?.tlyric?.lyric || "",
+						lyric?.romalrc?.lyric || "",
+						lyric?.yrc?.lyric || "",
+					);
+					log(lyric, parsed);
+					if (!canceled) {
+						setCurrentLyrics(parsed);
+						setCurrentLyricIndex(-1);
+						keepSelectLyrics.current.clear();
+					}
+				} catch (err) {
+					setError(err);
+				}
+			})();
+			return () => {
+				canceled = true;
+				// 滚动到顶部
+				lyricListElement.current?.parentElement?.scrollTo(0, 0);
+				// 载入新歌词
+				setCurrentLyrics(null);
+			};
+		}
+	}, [musicId, isLyricPageOpening]);
 
 	const scrollTween = React.useRef<
 		| {
@@ -321,8 +402,8 @@ export const LyricView: React.FC = () => {
 						scrollToIndex = i;
 					}
 				}
-				let lyricElement: Element | null =
-					lyricListElement.current.children.item(scrollToIndex);
+				let lyricElement: HTMLElement | null =
+					lyricListElement.current.children.item(scrollToIndex) as HTMLElement;
 				if (lyricElement && lyricView) {
 					// log(lyricElement, scrollTween.current?.lyricElement);
 					if (mustScroll) {
@@ -332,12 +413,14 @@ export const LyricView: React.FC = () => {
 						const listRect = lyricView.getBoundingClientRect();
 						const lineRect = lyricElement.getBoundingClientRect();
 						const lineHeight = lineRect.height;
-						const scrollDelta =
-							lineRect.top -
-							listRect.top +
-							30 +
-							16 * 2 -
-							(listRect.height - lineHeight) / 2;
+						let scrollDelta = lineRect.top - listRect.top;
+						if (alignTopSelectedLyric !== "true") {
+							scrollDelta += 30 + 16 * 2 - (listRect.height - lineHeight) / 2;
+						} else if (lyricElement.innerText.trim().length > 0) {
+							scrollDelta -= lineHeight / 2;
+						} else {
+							scrollDelta -= 50;
+						}
 						const prevScrollTop = lyricView.scrollTop;
 						const obj = { scrollTop: prevScrollTop };
 
@@ -353,12 +436,15 @@ export const LyricView: React.FC = () => {
 									const lineRect = lyricElement.getBoundingClientRect();
 									const prevScrollTop = lyricView.scrollTop;
 									const lineHeight = lineRect.height;
-									const scrollDelta =
-										lineRect.top -
-										listRect.top +
-										30 +
-										16 * 2 -
-										(listRect.height - lineHeight) / 2;
+									let scrollDelta = lineRect.top - listRect.top - 30 - 16 * 2;
+									if (alignTopSelectedLyric !== "true") {
+										scrollDelta +=
+											30 + 16 * 2 - (listRect.height - lineHeight) / 2;
+									} else if (lyricElement.innerText.trim().length > 0) {
+										scrollDelta -= lineHeight / 2;
+									} else {
+										scrollDelta -= 50;
+									}
 									if (Math.abs(scrollDelta) > 10) {
 										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
 										requestAnimationFrame(onFrame);
@@ -396,40 +482,38 @@ export const LyricView: React.FC = () => {
 				}
 			}
 		},
-		[currentLyricIndex],
+		[currentLyricIndex, alignTopSelectedLyric],
 	);
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine) => {
-			if (!lyricEditMode) {
-				if (currentLyrics) {
-					const index = currentLyrics.findIndex((v) => v === line);
-					keepSelectLyrics.current.clear();
-					setCurrentLyricIndex(index);
-				}
-				if (
-					configDynamicLyric &&
-					(line.dynamicLyricTime ||
-						currentAudioDuration < currentAudioDuration) &&
-					(line.dynamicLyricTime || -1) >= 0
-				) {
-					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
-					channel.call("audioplayer.seek", () => {}, [
-						currentAudioId,
-						genAudioPlayerCommand(currentAudioId, "seek"),
-						(line?.dynamicLyricTime || line.time) / 1000,
-					]);
-				} else if (line.time < currentAudioDuration && line.time >= 0) {
-					log("正在跳转到歌词时间", line.time);
-					channel.call("audioplayer.seek", () => {}, [
-						currentAudioId,
-						genAudioPlayerCommand(currentAudioId, "seek"),
-						line.time / 1000,
-					]);
-				}
+			if (currentLyrics) {
+				const index = currentLyrics.findIndex((v) => v === line);
+				keepSelectLyrics.current.clear();
+				setCurrentLyricIndex(index);
+			}
+			if (
+				configDynamicLyric &&
+				(line.dynamicLyricTime ||
+					currentAudioDuration < currentAudioDuration) &&
+				(line.dynamicLyricTime || -1) >= 0
+			) {
+				log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
+				channel.call("audioplayer.seek", () => {}, [
+					currentAudioId,
+					genAudioPlayerCommand(currentAudioId, "seek"),
+					(line?.dynamicLyricTime || line.time) / 1000,
+				]);
+			} else if (line.time < currentAudioDuration && line.time >= 0) {
+				log("正在跳转到歌词时间", line.time);
+				channel.call("audioplayer.seek", () => {}, [
+					currentAudioId,
+					genAudioPlayerCommand(currentAudioId, "seek"),
+					line.time / 1000,
+				]);
 			}
 		},
-		[currentAudioId, lyricEditMode, configDynamicLyric, currentAudioDuration],
+		[currentAudioId, configDynamicLyric, currentAudioDuration],
 	);
 
 	React.useEffect(() => {
@@ -505,22 +589,12 @@ export const LyricView: React.FC = () => {
 	}, [currentLyricIndex]);
 
 	React.useEffect(() => {
-		if (!lyricEditMode) {
-			checkIfTooFast(currentLyricIndex);
-			scrollToLyric();
-		}
-	}, [
-		scrollToLyric,
-		checkIfTooFast,
-		lyricEditMode,
-		currentLyrics,
-		currentLyricIndex,
-	]);
+		checkIfTooFast(currentLyricIndex);
+		scrollToLyric();
+	}, [scrollToLyric, checkIfTooFast, currentLyrics, currentLyricIndex]);
 
 	React.useEffect(() => {
-		if (!lyricEditMode) {
-			scrollToLyric(true);
-		}
+		scrollToLyric(true);
 	}, [
 		configTranslatedLyric,
 		configDynamicLyric,
@@ -529,99 +603,108 @@ export const LyricView: React.FC = () => {
 	]);
 
 	React.useEffect(() => {
-		const onPlayProgress = (
-			audioId: string,
-			progress: number,
-			playState: PlayState,
-		) => {
-			const time = (progress * 1000) | 0;
-			if (!currentLyrics) return setPlayState(playState);
-			let curLyricIndex = -1;
-			for (let i = currentLyrics.length - 1; i >= 0; i--) {
-				if (configDynamicLyric) {
-					if (
-						time >
-						(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
-					) {
-						curLyricIndex = i;
-						break;
-					}
-				} else {
-					if (time > currentLyrics[i]?.time) {
-						curLyricIndex = i;
-						break;
+		if (isLyricPageOpening) {
+			const onPlayProgress = (
+				audioId: string,
+				progress: number,
+				playState: PlayState,
+			) => {
+				const time = (progress * 1000) | 0;
+				if (!currentLyrics) return setPlayState(playState);
+				let curLyricIndex: number | null = null;
+				for (let i = currentLyrics.length - 1; i >= 0; i--) {
+					if (configDynamicLyric) {
+						if (
+							time >
+							(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
+						) {
+							curLyricIndex = i;
+							break;
+						}
+					} else {
+						if (time > currentLyrics[i]?.time) {
+							curLyricIndex = i;
+							break;
+						}
 					}
 				}
+				if (
+					curLyricIndex !== null &&
+					time <
+						currentLyrics[curLyricIndex].time +
+							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
+				) {
+					setCurrentLyricIndex(curLyricIndex);
+				}
+				setPlayState(playState);
+			};
+
+			const onPlayStateChange = (
+				audioId: string,
+				state: string,
+				playState: PlayState,
+			) => {
+				setCurrentAudioId(audioId);
+				setPlayState(playState);
+			};
+
+			interface AudioLoadInfo {
+				activeCode: number;
+				code: number;
+				duration: number; // 单位秒
+				errorCode: number;
+				errorString: number;
 			}
-			setCurrentLyricIndex(curLyricIndex);
-			setPlayState(playState);
-		};
 
-		const onPlayStateChange = (
-			audioId: string,
-			state: string,
-			playState: PlayState,
-		) => {
-			setCurrentAudioId(audioId);
-			setPlayState(playState);
-		};
+			interface AudioEndInfo {
+				code: number;
+				from: string; // switch
+			}
 
-		interface AudioLoadInfo {
-			activeCode: number;
-			code: number;
-			duration: number; // 单位秒
-			errorCode: number;
-			errorString: number;
-		}
+			const onLoad = (audioId: string, info: AudioLoadInfo) => {
+				setAudioDuration(((info?.duration || 0) * 1000) | 0);
+				setCurrentAudioId(audioId);
+			};
 
-		interface AudioEndInfo {
-			code: number;
-			from: string; // switch
-		}
+			const onEnd = (audioId: string, _info: AudioEndInfo) => {
+				setCurrentAudioId(audioId);
+			};
 
-		const onLoad = (audioId: string, info: AudioLoadInfo) => {
-			setAudioDuration(((info?.duration || 0) * 1000) | 0);
-			setCurrentAudioId(audioId);
-		};
-
-		const onEnd = (audioId: string, _info: AudioEndInfo) => {
-			setCurrentAudioId(audioId);
-		};
-
-		legacyNativeCmder.appendRegisterCall(
-			"PlayProgress",
-			"audioplayer",
-			onPlayProgress,
-		);
-		legacyNativeCmder.appendRegisterCall(
-			"PlayState",
-			"audioplayer",
-			onPlayStateChange,
-		);
-		legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
-		legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
-
-		return () => {
-			legacyNativeCmder.removeRegisterCall(
+			legacyNativeCmder.appendRegisterCall(
 				"PlayProgress",
 				"audioplayer",
 				onPlayProgress,
 			);
-			legacyNativeCmder.removeRegisterCall(
+			legacyNativeCmder.appendRegisterCall(
 				"PlayState",
 				"audioplayer",
 				onPlayStateChange,
 			);
-			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
-			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
-		};
-	}, [currentLyrics, configDynamicLyric]);
+			legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
+			legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
+
+			return () => {
+				legacyNativeCmder.removeRegisterCall(
+					"PlayProgress",
+					"audioplayer",
+					onPlayProgress,
+				);
+				legacyNativeCmder.removeRegisterCall(
+					"PlayState",
+					"audioplayer",
+					onPlayStateChange,
+				);
+				legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
+				legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
+			};
+		}
+	}, [currentLyrics, configDynamicLyric, isLyricPageOpening]);
 
 	const mapCurrentLyrics = React.useCallback(
 		(line: LyricLine, index: number, lines: LyricLine[]) => {
 			let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
-			if (line.originalLyric.trim().length > 0 || lyricEditMode) {
-				const offset = index - currentLyricIndex;
+			const offset = index - currentLyricIndex;
+			if (line.originalLyric.trim().length > 0) {
 				return (
 					<LyricLineView
 						key={index}
@@ -632,33 +715,22 @@ export const LyricView: React.FC = () => {
 						roman={configRomanLyric === "true"}
 						offset={offset}
 						onClickLyric={onSeekToLyric}
-						edit={lyricEditMode}
 					/>
 				);
 			} else {
-				let duration = 0;
-				if (lines[index + 1]) {
-					if (configDynamicLyric) {
-						duration =
-							(lines[index + 1].dynamicLyricTime || lines[index + 1].time) -
-							line.time;
-					} else {
-						duration = lines[index + 1].time - line.time;
-					}
-				}
 				return (
 					<LyricDots
 						key={index}
 						selected={index === currentLyricIndex}
 						time={line.time}
-						duration={duration}
+						offset={offset}
+						duration={line.duration}
 					/>
 				);
 			}
 		},
 		[
 			onSeekToLyric,
-			lyricEditMode,
 			currentLyrics,
 			currentLyricIndex,
 			configDynamicLyric,
@@ -667,157 +739,150 @@ export const LyricView: React.FC = () => {
 		],
 	);
 
+	const [hideAlbumImage] = useConfig("hideAlbumImage", "false");
+	const [hideMusicName] = useConfig("hideMusicName", "false");
+	const [hideMusicAlias] = useConfig("hideMusicAlias", "false");
+	const [hideMusicArtists] = useConfig("hideMusicArtists", "false");
+	const [hideMusicAlbum] = useConfig("hideMusicAlbum", "false");
+	const [selectMusicId, setSelectMusicId] = React.useState(0);
+	const [originalLyricFile, setOriginalLyricFile] = React.useState<File | null>(
+		null,
+	);
+	const [translatedLyricFile, setTranslatedLyricFile] =
+		React.useState<File | null>(null);
+	const [romanLyricFile, setRomanLyricFile] = React.useState<File | null>(null);
+	const [dynamicLyricFile, setDynamicLyricFile] = React.useState<File | null>(
+		null,
+	);
+
 	return (
 		<ThemeProvider>
-			<div className="am-music-info">
-				<div>
-					{albumImageUrl[albumImageUrlIndex] ? (
-						<div className="am-album-image">
-							<div>
-								<LoadingOverlay
-									loader={
-										<Loader
-											size={50}
-											style={{ width: "50px", height: "50px" }}
-										/>
-									}
-									sx={{
-										borderRadius: "5%",
-									}}
-									visible={!albumImageLoaded}
-								/>
-								<img
-									alt="专辑图片"
-									src={albumImageUrl[albumImageUrlIndex]}
-									onLoad={() => {
-										setAlbumImageLoaded(true);
-									}}
-									onError={() => {
-										albumImageUrlIndex <= albumImageUrl.length &&
-											setAlbumImageUrlIndex((v) => v + 1);
-									}}
-								/>
+			{(hideAlbumImage === "false" ||
+				hideMusicName === "false" ||
+				hideMusicAlias === "false" ||
+				hideMusicArtists === "false" ||
+				hideMusicAlbum === "false") && (
+				<div className="am-music-info">
+					<div>
+						{hideAlbumImage !== "true" && albumImageUrl[albumImageUrlIndex] && (
+							<div className="am-album-image">
+								<div>
+									<LoadingOverlay
+										loader={
+											<Loader
+												size={50}
+												style={{ width: "50px", height: "50px" }}
+											/>
+										}
+										sx={{
+											borderRadius: "5%",
+										}}
+										visible={!albumImageLoaded}
+									/>
+									<img
+										alt="专辑图片"
+										src={albumImageUrl[albumImageUrlIndex]}
+										onLoad={() => {
+											setAlbumImageLoaded(true);
+										}}
+										onError={() => {
+											albumImageUrlIndex <= albumImageUrl.length &&
+												setAlbumImageUrlIndex((v) => v + 1);
+										}}
+									/>
+								</div>
 							</div>
-						</div>
-					) : (
-						<></>
-					)}
-					<div className="am-music-name">{songName}</div>
-					{songAliasName.length > 0 ? (
-						<div className="am-music-alias">
-							{songAliasName.map((alia, index) => (
-								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								<div key={index}>{alia}</div>
-							))}
-						</div>
-					) : (
-						<></>
-					)}
-					<div className="am-music-artists">
-						<div className="am-artists-label">歌手：</div>
-						<div className="am-artists">
-							{songArtists.map((artist, index) => (
-								<a href={`#/m/artist/?id=${artist.id}`} key={artist.id}>
-									{artist.name}
-								</a>
-							))}
-						</div>
+						)}
+						{hideMusicName !== "true" && (
+							<div className="am-music-name">{songName}</div>
+						)}
+						{hideMusicAlias !== "true" && songAliasName.length > 0 && (
+							<div className="am-music-alias">
+								{songAliasName.map((alia, index) => (
+									// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+									<div key={index}>{alia}</div>
+								))}
+							</div>
+						)}
+						{hideMusicArtists !== "true" && (
+							<div className="am-music-artists">
+								<div className="am-artists-label">歌手：</div>
+								<div className="am-artists">
+									{songArtists.map((artist, index) => (
+										<a href={`#/m/artist/?id=${artist.id}`} key={artist.id}>
+											{artist.name}
+										</a>
+									))}
+								</div>
+							</div>
+						)}
+						{hideMusicAlbum !== "true" && album && (
+							<div className="am-music-album">
+								<div className="am-album-label">专辑：</div>
+								<div className="am-album">
+									<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
+								</div>
+							</div>
+						)}
 					</div>
-					{album ? (
-						<div className="am-music-album">
-							<div className="am-album-label">专辑：</div>
-							<div className="am-album">
-								<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
-							</div>
-						</div>
-					) : (
-						<></>
-					)}
 				</div>
-			</div>
+			)}
 			<div className="am-lyric">
-				<div
-					className={classname("am-lyric-options", {
-						editing: lyricEditMode,
-					})}
-				>
-					{!lyricEditMode ? (
-						<>
-							<button
-								onClick={() => {
-									log("已切换翻译歌词");
-									setConfigTranslatedLyric(
-										String(!(configTranslatedLyric === "true")),
-									);
-									forceUpdate();
-								}}
-								className={classname({
-									toggled: configTranslatedLyric === "true",
-								})}
-								type="button"
-							>
-								译
-							</button>
-							<button
-								onClick={() => {
-									log("已切换音译歌词");
-									setConfigRomanLyric(String(!(configRomanLyric === "true")));
-									forceUpdate();
-								}}
-								className={classname({
-									toggled: configRomanLyric === "true",
-								})}
-								type="button"
-							>
-								音
-							</button>
-							<button
-								onClick={() => {
-									log("已切换逐词歌词");
-									setConfigDynamicLyric(
-										String(!(configDynamicLyric === "true")),
-									);
-									forceUpdate();
-								}}
-								className={classname({
-									toggled: configDynamicLyric === "true",
-								})}
-								type="button"
-							>
-								逐词歌词（实验性）
-							</button>
-							<button
-								onClick={() => {
-									log("已切换全屏模式");
-									setFullscreen(!fullscreen);
-									scrollToLyric(true);
-								}}
-								className={classname({
-									toggled: fullscreen,
-								})}
-								type="button"
-							>
-								全屏
-							</button>
-						</>
-					) : (
-						<></>
-					)}
-					{DEBUG ? (
-						<button
-							onClick={() => {
-								setLyricEditMode(!lyricEditMode);
-							}}
-							className={classname({
-								toggled: lyricEditMode,
-							})}
-							type="button"
-						>
-							歌词编辑模式
-						</button>
-					) : (
-						<></>
-					)}
+				<div className="am-lyric-options">
+					<button
+						onClick={() => {
+							log("已切换翻译歌词");
+							setConfigTranslatedLyric(
+								String(!(configTranslatedLyric === "true")),
+							);
+							forceUpdate();
+						}}
+						className={classname({
+							toggled: configTranslatedLyric === "true",
+						})}
+						type="button"
+					>
+						译
+					</button>
+					<button
+						onClick={() => {
+							log("已切换音译歌词");
+							setConfigRomanLyric(String(!(configRomanLyric === "true")));
+							forceUpdate();
+						}}
+						className={classname({
+							toggled: configRomanLyric === "true",
+						})}
+						type="button"
+					>
+						音
+					</button>
+					<button
+						onClick={() => {
+							log("已切换逐词歌词");
+							setConfigDynamicLyric(String(!(configDynamicLyric === "true")));
+							forceUpdate();
+						}}
+						className={classname({
+							toggled: configDynamicLyric === "true",
+						})}
+						type="button"
+					>
+						逐词歌词（实验性）
+					</button>
+					<button
+						onClick={() => {
+							log("已切换全屏模式");
+							setFullscreen(!fullscreen);
+							scrollToLyric(true);
+						}}
+						className={classname({
+							toggled: fullscreen,
+						})}
+						type="button"
+					>
+						全屏
+					</button>
 				</div>
 				{error ? (
 					<div className="am-lyric-view-error">
@@ -827,18 +892,206 @@ export const LyricView: React.FC = () => {
 					</div>
 				) : currentLyrics ? (
 					currentLyrics.length > 0 ? (
-						<div
-							className={classname("am-lyric-view", {
-								editing: lyricEditMode,
-							})}
-						>
+						<div className="am-lyric-view">
 							<div ref={lyricListElement}>
 								{currentLyrics.map(mapCurrentLyrics)}
 							</div>
 						</div>
 					) : (
 						<div className="am-lyric-view-no-lyric">
-							没有可用歌词，但是你可以手动指定一个有歌词的音乐来使用它的歌词。（以后会实现的）
+							<Text fz="md">
+								没有可用歌词，但是你可以手动指定需要使用的歌词：
+							</Text>
+							<Space h="xl" />
+							<Modal
+								title="输入音乐 ID 以加载对应的歌词"
+								opened={selectMusicIdModalOpened}
+								onClose={() => setSelectMusicIdModalOpened(false)}
+								closeOnClickOutside={!selectMusicIdModalLoading}
+								centered
+								zIndex={151}
+							>
+								<LoadingOverlay
+									visible={selectMusicIdModalLoading}
+									radius="sm"
+									zIndex={153}
+									size={50}
+									loaderProps={{ style: { width: "50px", height: "50px" } }}
+								/>
+								<SongView id={selectMusicId} />
+								<NumberInput
+									label="音乐 ID"
+									hideControls
+									value={selectMusicId}
+									onChange={setSelectMusicId}
+								/>
+								<Space h="xl" />
+								<Button
+									onClick={async () => {
+										if (selectMusicId) {
+											setSelectMusicIdModalLoading(true);
+											try {
+												const data = await loadLyric(selectMusicId);
+												const lyricsPath = `${plugin.pluginPath}/lyrics`;
+												const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
+												if (!(await betterncm.fs.exists(lyricsPath))) {
+													betterncm.fs.mkdir(lyricsPath);
+												}
+												await betterncm.fs.writeFile(
+													cachedLyricPath,
+													JSON.stringify(data),
+												);
+												await reloadLyricByCurrentAudioId();
+												setSelectMusicIdModalOpened(false);
+											} catch (err) {
+												warn("警告：歌词加载失败", err);
+											}
+											setSelectMusicIdModalLoading(false);
+										}
+									}}
+								>
+									使用该音乐
+								</Button>
+							</Modal>
+							<Button
+								variant="outline"
+								onClick={() => setSelectMusicIdModalOpened(true)}
+							>
+								使用指定网易云已有音乐歌词
+							</Button>
+							<Space h="xl" />
+
+							<Modal
+								title="导入歌词文件"
+								opened={selectLocalLyricModalOpened}
+								closeOnClickOutside={!selectLocalLyricModalLoading}
+								onClose={() => setLocalLyricModalOpened(false)}
+								centered
+								zIndex={151}
+							>
+								<LoadingOverlay
+									visible={selectLocalLyricModalLoading}
+									radius="sm"
+									zIndex={153}
+									size={50}
+									loaderProps={{ style: { width: "50px", height: "50px" } }}
+								/>
+								<FileInput
+									label="原文歌词文件"
+									value={originalLyricFile}
+									onChange={setOriginalLyricFile}
+								/>
+								<Space h="md" />
+								<FileInput
+									label="翻译歌词文件"
+									value={translatedLyricFile}
+									onChange={setTranslatedLyricFile}
+								/>
+								<Space h="md" />
+								<FileInput
+									label="音译歌词文件"
+									value={romanLyricFile}
+									onChange={setRomanLyricFile}
+								/>
+								<Space h="md" />
+								<FileInput
+									label="逐词歌词文件"
+									value={dynamicLyricFile}
+									onChange={setDynamicLyricFile}
+								/>
+								<Space h="xl" />
+								<Button
+									disabled={!originalLyricFile}
+									onClick={async () => {
+										if (originalLyricFile) {
+											setLocalLyricModalLoading(true);
+											try {
+												const lyricsPath = `${plugin.pluginPath}/lyrics`;
+												const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
+												if (!(await betterncm.fs.exists(lyricsPath))) {
+													betterncm.fs.mkdir(lyricsPath);
+												}
+												const lrc = await originalLyricFile.text();
+												const tlyric =
+													(await translatedLyricFile?.text()) || "";
+												const romalrc = (await romanLyricFile?.text()) || "";
+												const yrc = (await dynamicLyricFile?.text()) || "";
+												await betterncm.fs.writeFile(
+													cachedLyricPath,
+													JSON.stringify({
+														sgc: false,
+														sfy: false,
+														qfy: false,
+														lyricUser: {
+															id: 0,
+															status: 0,
+															demand: 0,
+															userid: 0,
+															nickname: "手动添加的歌词",
+															uptime: Date.now(),
+														},
+														lrc: {
+															version: 0,
+															lyric: lrc,
+														},
+														klyric: {
+															version: 0,
+															lyric: "",
+														},
+														tlyric: {
+															version: 0,
+															lyric: tlyric,
+														},
+														romalrc: {
+															version: 0,
+															lyric: romalrc,
+														},
+														yrc: {
+															version: 0,
+															lyric: yrc,
+														},
+														code: 200,
+													}),
+												);
+												await reloadLyricByCurrentAudioId();
+												setLocalLyricModalOpened(false);
+											} catch (err) {
+												warn("警告：歌词转换失败", err);
+											}
+											setLocalLyricModalLoading(false);
+										}
+									}}
+								>
+									使用该歌词
+								</Button>
+							</Modal>
+							<Button
+								variant="outline"
+								onClick={() => setLocalLyricModalOpened(true)}
+							>
+								使用本地歌词文件
+							</Button>
+							<Space h="xl" />
+
+							<Button
+								variant="outline"
+								onClick={async () => {
+									const lyricsPath = `${plugin.pluginPath}/lyrics`;
+									const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
+									setCurrentLyrics(PURE_MUSIC_LYRIC_LINE);
+									try {
+										if (!(await betterncm.fs.exists(lyricsPath))) {
+											betterncm.fs.mkdir(lyricsPath);
+										}
+										await betterncm.fs.writeFile(
+											cachedLyricPath,
+											JSON.stringify(PURE_MUSIC_LYRIC_DATA, null, 4),
+										);
+									} catch {}
+								}}
+							>
+								这是纯音乐
+							</Button>
 						</div>
 					)
 				) : (

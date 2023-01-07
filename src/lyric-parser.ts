@@ -22,113 +22,147 @@ export interface LyricPureLine {
 	lyric: string;
 }
 
+export const PURE_MUSIC_LYRIC_LINE = [
+	{
+		time: 0,
+		duration: 5940000,
+		originalLyric: "纯音乐，请欣赏",
+	},
+];
+
+export const PURE_MUSIC_LYRIC_DATA = {
+	sgc: false,
+	sfy: false,
+	qfy: false,
+	needDesc: true,
+	lrc: {
+		version: 1,
+		lyric: "[99:00.00]纯音乐，请欣赏\n",
+	},
+	code: 200,
+	briefDesc: null,
+};
+
 export function parseLyric(
 	original: string,
 	translated: string,
 	roman: string,
 	dynamic: string,
 ): LyricLine[] {
-	const result: LyricLine[] = parsePureLyric(original).map((v) => ({
-		time: v.time,
-		originalLyric: v.lyric,
-		duration: 0,
-	}));
+	if (dynamic.trim().length === 0) {
+		const result: LyricLine[] = parsePureLyric(original).map((v) => ({
+			time: v.time,
+			originalLyric: v.lyric,
+			duration: 0,
+		}));
 
-	parsePureLyric(translated).forEach((line) => {
-		const target = result.find((v) => v.time === line.time);
-		if (target) {
-			target.translatedLyric = line.lyric;
+		parsePureLyric(translated).forEach((line) => {
+			const target = result.find((v) => v.time === line.time);
+			if (target) {
+				target.translatedLyric = line.lyric;
+			}
+		});
+
+		parsePureLyric(roman).forEach((line) => {
+			const target = result.find((v) => v.time === line.time);
+			if (target) {
+				target.romanLyric = line.lyric;
+			}
+		});
+
+		result.sort((a, b) => a.time - b.time);
+
+		log("原始歌词解析", JSON.parse(JSON.stringify(result)));
+
+		const processed = processLyric(result);
+
+		log("处理完成歌词解析", JSON.parse(JSON.stringify(processed)));
+
+		for (let i = 0; i < processed.length; i++) {
+			if (i < processed.length - 1) {
+				processed[i].duration = processed[i + 1].time - processed[i].time;
+			}
 		}
-	});
 
-	parsePureLyric(roman).forEach((line) => {
-		const target = result.find((v) => v.time === line.time);
-		if (target) {
-			target.romanLyric = line.lyric;
-		}
-	});
+		return processLyric(result);
+	} else {
+		const processed = parsePureDynamicLyric(dynamic);
 
-	result.sort((a, b) => a.time - b.time);
-
-	log("原始歌词解析", JSON.parse(JSON.stringify(result)));
-
-	const processed = processLyric(result);
-
-	log("处理完成歌词解析", JSON.parse(JSON.stringify(processed)));
-
-	if (dynamic.trim().length > 0) {
-		// 解析逐词歌词
-		for (const line of dynamic.trim().split("\n")) {
-			let tmp = line.trim();
-			const lineMatches = tmp.match(yrcLineRegexp);
-			if (lineMatches) {
-				const time = parseInt(lineMatches.groups?.time || "0");
-				const duration = parseInt(lineMatches.groups?.duration || "0");
-				tmp = lineMatches.groups?.line || "";
-				const words: DynamicLyricWord[] = [];
-				while (tmp.length > 0) {
-					const wordMatches = tmp.match(yrcWordTimeRegexp);
-					if (wordMatches) {
-						const wordTime = parseInt(wordMatches.groups?.time || "0");
-						const wordDuration = parseInt(wordMatches.groups?.duration || "0");
-						const flag = parseInt(wordMatches.groups?.flag || "0");
-						const word = wordMatches.groups?.word;
-						if (word) {
-							words.push({
-								time: wordTime,
-								duration: wordDuration,
-								flag,
-								word,
-							});
-						}
-						tmp = tmp.slice(wordMatches.index || 0 + wordMatches[0].length);
-					} else {
-						break;
-					}
-				}
-				let nearestLine: LyricLine | null = null;
-				log("逐词歌词", time, duration, words.map((v) => v.word).join(""));
-				for (const line of processed) {
-					if (nearestLine) {
-						if (
-							line.originalLyric.trim().length > 0 &&
-							Math.abs(nearestLine.time - time) > Math.abs(line.time - time)
-						) {
-							nearestLine = line;
-						}
-					} else if (line.originalLyric.trim().length > 0) {
-						nearestLine = line;
-					}
-				}
-				if (nearestLine) {
+		parsePureLyric(translated).forEach((line) => {
+			// rome-ignore lint/suspicious/noExplicitAny: TypeScript 的类型解析不允许我写成 LyricLine | null，希望有大佬能帮我看看是为什么
+			let target: any = null;
+			processed.forEach((v) => {
+				if (target) {
 					if (
-						nearestLine.dynamicLyric !== undefined &&
-						nearestLine.dynamicLyricTime !== undefined &&
-						nearestLine.duration !== undefined &&
-						time - nearestLine.dynamicLyricTime >= 0
+						Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
 					) {
-						const innerDuration = time - nearestLine.dynamicLyricTime;
-						nearestLine.duration =
-							time - nearestLine.dynamicLyricTime + duration;
-						nearestLine.dynamicLyric = [
-							...nearestLine.dynamicLyric,
-							{
-								time: time,
-								duration: 0,
-								flag: 0,
-								word: " ",
-							},
-							...words,
-						];
-					} else {
-						nearestLine.dynamicLyric = words;
-						nearestLine.dynamicLyricTime = time;
-						nearestLine.duration = duration;
+						target = v;
 					}
-					// log(nearestLine);
+				} else {
+					target = v;
+				}
+			});
+			if (target) {
+				target.translatedLyric = target.translatedLyric || "";
+				if (target.translatedLyric.length > 0) {
+					target.translatedLyric += " ";
+				}
+				target.translatedLyric += line.lyric;
+			}
+		});
+
+		parsePureLyric(roman).forEach((line) => {
+			// rome-ignore lint/suspicious/noExplicitAny: TypeScript 的类型解析不允许我写成 LyricLine | null，希望有大佬能帮我看看是为什么
+			let target: any = null;
+			processed.forEach((v) => {
+				if (target) {
+					if (
+						Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
+					) {
+						target = v;
+					}
+				} else {
+					target = v;
+				}
+			});
+			if (target) {
+				target.romanLyric = target.romanLyric || "";
+				if (target.romanLyric.length > 0) {
+					target.romanLyric += " ";
+				}
+				target.romanLyric += line.lyric;
+			}
+		});
+
+		// 合并没有译文的歌词
+		if (translated.trim().length + roman.trim().length > 0) {
+			let i = 0;
+			while (processed[i]) {
+				if (
+					i &&
+					((translated.trim().length > 0 &&
+						processed[i].translatedLyric === undefined) ||
+						(roman.trim().length > 0 && processed[i].romanLyric === undefined))
+				) {
+					const mergeLine = processed.splice(i, 1)[0];
+					const dynamicLyric = mergeLine.dynamicLyric || [];
+					processed[i - 1].dynamicLyric?.push(
+						{
+							word: " ",
+							time: processed[i - 1].time + processed[i - 1].duration,
+							duration: 0,
+							flag: 0,
+						},
+						...dynamicLyric,
+					);
+					processed[i - 1].duration =
+						mergeLine.duration + mergeLine.time - processed[i - 1].time;
+				} else {
+					i++;
 				}
 			}
 		}
+
 		// 插入空行
 		for (let i = 0; i < processed.length; i++) {
 			const thisLine = processed[i];
@@ -142,7 +176,13 @@ export function parseLyric(
 			) {
 				const thisLineEndTime =
 					(thisLine?.dynamicLyricTime || thisLine.time) + thisLine.duration;
-				const nextLineStartTime = nextLine?.dynamicLyricTime || nextLine.time;
+				let nextLineStartTime = nextLine.time;
+				if (
+					nextLine.dynamicLyricTime &&
+					nextLineStartTime > nextLine.dynamicLyricTime
+				) {
+					nextLineStartTime = nextLine.dynamicLyricTime;
+				}
 				if (nextLineStartTime - thisLineEndTime >= 5000) {
 					processed.splice(i + 1, 0, {
 						time: thisLineEndTime,
@@ -152,15 +192,8 @@ export function parseLyric(
 				}
 			}
 		}
-	} else {
-		for (let i = 0; i < processed.length; i++) {
-			if (i < processed.length - 1) {
-				processed[i].duration = processed[i + 1].time - processed[i].time;
-			}
-		}
+		return processLyric(processed);
 	}
-
-	return processed;
 }
 
 const yrcLineRegexp = /^\[(?<time>[0-9]+),(?<duration>[0-9]+)\](?<line>.*)/;
@@ -201,8 +234,62 @@ function parsePureLyric(lyric: string): LyricPureLine[] {
 	return result;
 }
 
+export function parsePureDynamicLyric(lyric: string): LyricLine[] {
+	const result: LyricLine[] = [];
+	// 解析逐词歌词
+	for (const line of lyric.trim().split("\n")) {
+		let tmp = line.trim();
+		const lineMatches = tmp.match(yrcLineRegexp);
+		if (lineMatches) {
+			const time = parseInt(lineMatches.groups?.time || "0");
+			const duration = parseInt(lineMatches.groups?.duration || "0");
+			tmp = lineMatches.groups?.line || "";
+			const words: DynamicLyricWord[] = [];
+			while (tmp.length > 0) {
+				const wordMatches = tmp.match(yrcWordTimeRegexp);
+				if (wordMatches) {
+					const wordTime = parseInt(wordMatches.groups?.time || "0");
+					const wordDuration = parseInt(wordMatches.groups?.duration || "0");
+					const flag = parseInt(wordMatches.groups?.flag || "0");
+					const word = wordMatches.groups?.word;
+					if (word) {
+						words.push({
+							time: wordTime,
+							duration: wordDuration,
+							flag,
+							word,
+						});
+					}
+					tmp = tmp.slice(wordMatches.index || 0 + wordMatches[0].length);
+				} else {
+					break;
+				}
+			}
+			const line: LyricLine = {
+				time,
+				duration,
+				originalLyric: words.map((v) => v.word).join(""),
+				dynamicLyric: words,
+				dynamicLyricTime: time,
+			};
+			result.push(line);
+			log("逐词歌词", time, duration, line.originalLyric);
+		}
+	}
+	return result;
+}
+
 // 处理歌词，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
 export function processLyric(lyric: LyricLine[]): LyricLine[] {
+	if (
+		lyric.length > 0 &&
+		lyric[lyric.length - 1].time === 5940000 &&
+		lyric[lyric.length - 1].duration === 0
+	) {
+		// 纯音乐，请欣赏
+		return PURE_MUSIC_LYRIC_LINE;
+	}
+
 	const result: LyricLine[] = [];
 
 	let isSpace = false;

@@ -295,9 +295,11 @@ declare var loadedPlugins: {
 	[pluginId: string]: import("plugin").NCMInjectPlugin | undefined;
 };
 declare const betterncm: typeof import("betterncm-api/index").default;
+declare const betterncm_native: typeof import("betterncm-api/index").default;
 // declare const React: typeof import("react");
 // declare var h: typeof React.createElement;
 // declare var f: typeof React.Fragment;
 // declare const ReactDOM: typeof import("react-dom");
 declare const legacyNativeCmder: any;
 declare const DEBUG: boolean;
+declare const OPEN_PAGE_DIRECTLY: boolean;
