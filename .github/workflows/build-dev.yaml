@@ -11,6 +11,8 @@ jobs:
     name: 调试开发构建
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        name: 克隆仓库
       - name: 构建插件包
         run: |
           yarn
