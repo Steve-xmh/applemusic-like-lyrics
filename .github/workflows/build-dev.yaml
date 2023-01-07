@@ -4,7 +4,7 @@ name: "调试开发构建"
 on:
   push:
     branches:
-      - "master"
+      - main
 
 jobs:
   pre-release:
