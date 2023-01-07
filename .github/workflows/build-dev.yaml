@@ -1,0 +1,26 @@
+---
+name: "调试开发构建"
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  pre-release:
+    name: 调试开发构建
+    runs-on: ubuntu-latest
+    steps:
+      - name: 构建插件包
+        run: |
+          yarn
+          yarn dist --dev
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        name: 发布到 Github Release
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "dev-nightly"
+          prerelease: true
+          title: "最新开发调试构建"
+          files: Apple Music-like lyrics.plugin

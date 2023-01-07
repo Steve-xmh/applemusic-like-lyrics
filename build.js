@@ -5,6 +5,7 @@ const fs = require("fs");
 
 let entryPoints = [
   "src/index.tsx",
+  "src/worker_script.ts",
   "src/startup_script.ts",
   "src/index.styl",
   "src/lyric-test.ts",
@@ -57,10 +58,12 @@ build({
       addIfExist("dist/manifest.json", "manifest.json");
       addIfExist("dist/index.js", "index.js");
       addIfExist("dist/index.css", "index.css");
+      addIfExist("dist/worker_script.js", "worker_script.js");
       addIfExist("dist/startup_script.js", "startup_script.js");
     } else {
       addIfExist("manifest.json");
       addIfExist("index.js");
+      addIfExist("worker_script.js");
       addIfExist("index.css");
       addIfExist("startup_script.js");
     }

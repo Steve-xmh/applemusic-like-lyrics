@@ -10,6 +10,7 @@
     "compilerOptions": {
         "target": "ESNext",
         "lib": ["ESNext", "DOM"],
+        "module": "ESNext",
         "types": [],
         "jsx": "react-jsx",
         // "jsxFactory": "h",

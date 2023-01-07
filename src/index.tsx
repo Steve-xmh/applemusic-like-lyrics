@@ -4,10 +4,10 @@ import { LyricView } from "./lyric-view";
 import { GLOBAL_EVENTS } from "./global-events";
 import * as React from "react";
 import { MantineProvider, createStyles } from "@mantine/core";
-import { debug, log } from "./logger";
 import { getConfig, getFullConfig } from "./config/core";
 
 export let cssContent = "";
+export let worker: Worker
 
 const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -208,6 +208,17 @@ plugin.onLoad(() => {
 	GLOBAL_EVENTS.addEventListener("config-saved", () =>
 		reloadStylesheet(cssContent),
 	);
+	betterncm.fs.readFileText(
+		`${plugin.pluginPath}/worker_script.js`,
+	).then((workerScript) => {
+		const workerBlob = URL.createObjectURL(new Blob([workerScript], {
+			type: 'application/javascript'
+		}));
+		worker = new Worker(workerBlob, {
+			name: 'AMLL Worker',
+			type: 'classic'
+		})
+	}).catch(warn);
 	if (DEBUG) {
 		setInterval(async function refreshStyle() {
 			const curStyle = await betterncm_native.fs.readFileText(
@@ -246,6 +257,8 @@ if (OPEN_PAGE_DIRECTLY) {
 			"a[data-action='max']",
 		);
 		btn?.click();
+	}, {
+		once: true
 	});
 }
 
@@ -274,6 +287,7 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 import * as APIs from "./api";
 import * as Utils from "./utils";
 import { checkEapiRequestFuncName } from "./api";
+import { warn } from "./logger";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

@@ -10,7 +10,7 @@ channel.call = function AppleMusicLikeLyricCallHook(
 	if (cmd === "storage.downloadscanner") {
 		log(cmd, ...args, new Error().stack);
 	} else {
-		return hookCall(cmd, ...args);
+		return hookCall.apply(hookCall, [cmd, ...args]);
 	}
 };
 
