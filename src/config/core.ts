@@ -12,13 +12,14 @@ export interface Config {
 	[key: string]: string | undefined;
 }
 
+const PLUGIN_CONFIG_KEY = `config.betterncm.${
+	plugin.manifest.slug || plugin.manifest.name
+}`;
 export let GLOBAL_CONFIG: Config = loadConfig();
 
 export function loadConfig(): Config {
 	try {
-		return JSON.parse(
-			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
-		);
+		return JSON.parse(localStorage.getItem(PLUGIN_CONFIG_KEY) || "{}");
 	} catch (err) {
 		warn("警告：AMLL 插件配置读取失败", err);
 		return {};
@@ -31,10 +32,7 @@ export function getFullConfig(): { [key: string]: string | undefined } {
 
 export const saveConfig = debounce(function saveConfig() {
 	try {
-		localStorage.setItem(
-			`config.betterncm.${plugin.manifest.slug || plugin.manifest.name}`,
-			JSON.stringify(GLOBAL_CONFIG),
-		);
+		localStorage.setItem(PLUGIN_CONFIG_KEY, JSON.stringify(GLOBAL_CONFIG));
 	} catch (err) {
 		warn("警告：AMLL 插件配置保存失败", err);
 	}
