@@ -286,7 +286,10 @@ export const LyricView: React.FC = () => {
 		}
 	}, [fullscreen]);
 
+	const scrollDelayRef = React.useRef(0);
+
 	React.useEffect(() => {
+		setPlayState(getPlayingSong().state);
 		const onFullscreenChanged = () => {
 			setFullscreen(document.webkitIsFullScreen as boolean);
 		};
@@ -295,6 +298,17 @@ export const LyricView: React.FC = () => {
 			document.removeEventListener("fullscreenchange", onFullscreenChanged);
 		};
 	}, []);
+
+	React.useEffect(() => {
+		const onScroll = (evt: Event) => {
+			scrollDelayRef.current = Date.now();
+			log("滚动事件", evt);
+		};
+		window.addEventListener("wheel", onScroll);
+		return () => {
+			window.removeEventListener("wheel", onScroll);
+		};
+	});
 
 	const loadLyric = React.useCallback(async (id: string | number) => {
 		const lyricsPath = `${plugin.pluginPath}/lyrics`;
@@ -352,7 +366,9 @@ export const LyricView: React.FC = () => {
 				(lyric?.yrc?.lyric
 					? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
 					: lyric?.tlyric?.lyric) || "",
-				lyric?.romalrc?.lyric || "",
+				(lyric?.yrc?.lyric
+					? lyric?.yromalrc?.lyric || lyric?.romalrc?.lyric
+					: lyric?.romalrc?.lyric) || "",
 				lyric?.yrc?.lyric || "",
 			);
 			log(lyric, parsed);
@@ -380,7 +396,9 @@ export const LyricView: React.FC = () => {
 						(lyric?.yrc?.lyric
 							? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
 							: lyric?.tlyric?.lyric) || "",
-						lyric?.romalrc?.lyric || "",
+						(lyric?.yrc?.lyric
+							? lyric?.yromalrc?.lyric || lyric?.romalrc?.lyric
+							: lyric?.romalrc?.lyric) || "",
 						lyric?.yrc?.lyric || "",
 					);
 					log(lyric, parsed);
@@ -610,7 +628,10 @@ export const LyricView: React.FC = () => {
 	}, [currentLyricIndex]);
 
 	React.useEffect(() => {
-		if (playState === PlayState.Playing) {
+		if (
+			playState === PlayState.Playing &&
+			Date.now() - scrollDelayRef.current > 2000
+		) {
 			log("触发滚动");
 			checkIfTooFast(currentLyricIndex);
 			scrollToLyric();
