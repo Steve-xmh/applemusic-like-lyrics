@@ -395,6 +395,7 @@ export const LyricView: React.FC = () => {
 	const scrollToLyric = React.useCallback(
 		(mustScroll: boolean = false) => {
 			if (lyricListElement.current) {
+				performance.mark("amll-scrollToLyric-locateElementBegin");
 				const lyricView = lyricListElement.current.parentElement;
 				let scrollToIndex = currentLyricIndex;
 				for (const i of keepSelectLyrics.current) {
@@ -424,6 +425,12 @@ export const LyricView: React.FC = () => {
 						const prevScrollTop = lyricView.scrollTop;
 						const obj = { scrollTop: prevScrollTop };
 
+						performance.mark("amll-scrollToLyric-locateElementEnd");
+						performance.measure(
+							"amll-scrollToLyric-locateElement",
+							"amll-scrollToLyric-locateElementBegin",
+							"amll-scrollToLyric-locateElementEnd",
+						);
 						if (mustScroll) {
 							const id = ++forceScrollId.current;
 							const onFrame = () => {
@@ -432,6 +439,7 @@ export const LyricView: React.FC = () => {
 									!scrollTween.current &&
 									id === forceScrollId.current
 								) {
+									performance.mark("amll-scrollToLyricBegin");
 									const listRect = lyricView.getBoundingClientRect();
 									const lineRect = lyricElement.getBoundingClientRect();
 									const prevScrollTop = lyricView.scrollTop;
@@ -449,6 +457,12 @@ export const LyricView: React.FC = () => {
 										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
 										requestAnimationFrame(onFrame);
 									}
+									performance.mark("amll-scrollToLyricEnd");
+									performance.measure(
+										"amll-scrollToLyric",
+										"amll-scrollToLyricBegin",
+										"amll-scrollToLyricEnd",
+									);
 								}
 							};
 
@@ -462,6 +476,7 @@ export const LyricView: React.FC = () => {
 								})
 								.start();
 							const onFrameUpdate = (time: number) => {
+								performance.mark("amll-scrollToLyricBegin");
 								if (scrollTween.current?.tween === tween) {
 									scrollTween.current?.tween?.update(time);
 									requestAnimationFrame(onFrameUpdate);
@@ -469,6 +484,12 @@ export const LyricView: React.FC = () => {
 									// log("动画被替换，旧动画已停止");
 									scrollTween.current?.tween?.stop();
 								}
+								performance.mark("amll-scrollToLyricEnd");
+								performance.measure(
+									"amll-scrollToLyric",
+									"amll-scrollToLyricBegin",
+									"amll-scrollToLyricEnd",
+								);
 							};
 							scrollTween.current = {
 								lyricElement,
@@ -478,7 +499,20 @@ export const LyricView: React.FC = () => {
 						}
 					} else {
 						// log("触发相同动画播放");
+						performance.mark("amll-scrollToLyric-locateElementEnd");
+						performance.measure(
+							"amll-scrollToLyric-locateElement",
+							"amll-scrollToLyric-locateElementBegin",
+							"amll-scrollToLyric-locateElementEnd",
+						);
 					}
+				} else {
+					performance.mark("amll-scrollToLyric-locateElementEnd");
+					performance.measure(
+						"amll-scrollToLyric-locateElement",
+						"amll-scrollToLyric-locateElementBegin",
+						"amll-scrollToLyric-locateElementEnd",
+					);
 				}
 			}
 		},

@@ -5,6 +5,7 @@
  */
 
 import { GLOBAL_EVENTS } from "../global-events";
+import { warn } from "../logger";
 import { debounce } from "../utils";
 
 export interface Config {
@@ -28,16 +29,21 @@ export function getFullConfig(): { [key: string]: string | undefined } {
 		return JSON.parse(
 			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
 		);
-	} catch {
+	} catch (err) {
+		warn("警告：AMLL 插件配置加载失败", err);
 		return {};
 	}
 }
 
 export const saveConfig = debounce(function saveConfig() {
-	localStorage.setItem(
-		`config.betterncm.${plugin.manifest.slug || plugin.manifest.name}`,
-		JSON.stringify(GLOBAL_CONFIG),
-	);
+	try {
+		localStorage.setItem(
+			`config.betterncm.${plugin.manifest.slug || plugin.manifest.name}`,
+			JSON.stringify(GLOBAL_CONFIG),
+		);
+	} catch (err) {
+		warn("警告：AMLL 插件配置保存失败", err);
+	}
 	GLOBAL_EVENTS.dispatchEvent(new Event("config-saved"));
 }, 2000);
 
