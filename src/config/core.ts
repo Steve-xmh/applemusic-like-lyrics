@@ -19,20 +19,14 @@ export function loadConfig(): Config {
 		return JSON.parse(
 			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
 		);
-	} catch {
+	} catch (err) {
+		warn("警告：AMLL 插件配置读取失败", err);
 		return {};
 	}
 }
 
 export function getFullConfig(): { [key: string]: string | undefined } {
-	try {
-		return JSON.parse(
-			localStorage.getItem(`config.betterncm.${plugin.manifest.slug}`) || "{}",
-		);
-	} catch (err) {
-		warn("警告：AMLL 插件配置加载失败", err);
-		return {};
-	}
+	return GLOBAL_CONFIG || {};
 }
 
 export const saveConfig = debounce(function saveConfig() {
