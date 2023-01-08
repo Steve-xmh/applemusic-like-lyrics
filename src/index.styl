@@ -238,12 +238,10 @@
             filter: blur(4px);
             &.am-lyric-line-after
                 filter: blur(4px);
-            &.am-lyric-line-o1
-                filter: blur(1px);
-            &.am-lyric-line-o2
-                filter: blur(2px);
-            &.am-lyric-line-o3
-                filter: blur(3px);
+            for i in (-5..5)
+                if i != 0
+                    &.am-lyric-line-o{i}
+                        filter: blur(abs(i) * 1px);
     
     // 未播放歌词淡入效果
     &.lyric-blur-fade-in-effect
