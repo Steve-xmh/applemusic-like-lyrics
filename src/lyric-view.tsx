@@ -156,17 +156,33 @@ const LyricLineView: React.FC<{
 			props.line.dynamicLyricTime ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
-						<span
-							// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-							key={i}
-							style={{
-								animationDelay: `${
-									word.time - (props.line.dynamicLyricTime || 0)
-								}ms`,
-								animationDuration: `${word.duration}ms`,
-							}}
-						>
-							{word.word}
+						<span>
+							<span
+								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								key={i}
+								style={{
+									animationDelay: `${
+										word.time - (props.line.dynamicLyricTime || 0)
+									}ms`,
+									animationDuration: `${word.duration}ms`,
+								}}
+								className="am-lyric-real-word"
+							>
+								{word.word}
+							</span>
+							<span
+								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								key={i}
+								style={{
+									animationDelay: `${
+										word.time - (props.line.dynamicLyricTime || 0)
+									}ms`,
+									animationDuration: `${word.duration}ms`,
+								}}
+								className="am-lyric-fake-word"
+							>
+								{word.word}
+							</span>
 						</span>
 					))}
 				</div>

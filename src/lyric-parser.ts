@@ -1,3 +1,4 @@
+import { getConfig } from "./config/core";
 import { log } from "./logger";
 
 export interface DynamicLyricWord {
@@ -135,30 +136,33 @@ export function parseLyric(
 		});
 
 		// 合并没有译文的歌词
-		if (translated.trim().length + roman.trim().length > 0) {
-			let i = 0;
-			while (processed[i]) {
-				if (
-					i &&
-					((translated.trim().length > 0 &&
-						processed[i].translatedLyric === undefined) ||
-						(roman.trim().length > 0 && processed[i].romanLyric === undefined))
-				) {
-					const mergeLine = processed.splice(i, 1)[0];
-					const dynamicLyric = mergeLine.dynamicLyric || [];
-					processed[i - 1].dynamicLyric?.push(
-						{
-							word: " ",
-							time: processed[i - 1].time + processed[i - 1].duration,
-							duration: 0,
-							flag: 0,
-						},
-						...dynamicLyric,
-					);
-					processed[i - 1].duration =
-						mergeLine.duration + mergeLine.time - processed[i - 1].time;
-				} else {
-					i++;
+		if (getConfig("mergeOriginalOnlyLine", "false") === "true") {
+			if (translated.trim().length + roman.trim().length > 0) {
+				let i = 0;
+				while (processed[i]) {
+					if (
+						i &&
+						((translated.trim().length > 0 &&
+							processed[i].translatedLyric === undefined) ||
+							(roman.trim().length > 0 &&
+								processed[i].romanLyric === undefined))
+					) {
+						const mergeLine = processed.splice(i, 1)[0];
+						const dynamicLyric = mergeLine.dynamicLyric || [];
+						processed[i - 1].dynamicLyric?.push(
+							{
+								word: " ",
+								time: processed[i - 1].time + processed[i - 1].duration,
+								duration: 0,
+								flag: 0,
+							},
+							...dynamicLyric,
+						);
+						processed[i - 1].duration =
+							mergeLine.duration + mergeLine.time - processed[i - 1].time;
+					} else {
+						i++;
+					}
 				}
 			}
 		}

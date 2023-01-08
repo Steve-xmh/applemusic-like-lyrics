@@ -7,7 +7,7 @@ import { MantineProvider, createStyles } from "@mantine/core";
 import { getConfig, getFullConfig } from "./config/core";
 
 export let cssContent = "";
-export let worker: Worker
+export let worker: Worker | undefined;
 
 const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -208,17 +208,27 @@ plugin.onLoad(() => {
 	GLOBAL_EVENTS.addEventListener("config-saved", () =>
 		reloadStylesheet(cssContent),
 	);
-	betterncm.fs.readFileText(
-		`${plugin.pluginPath}/worker_script.js`,
-	).then((workerScript) => {
-		const workerBlob = URL.createObjectURL(new Blob([workerScript], {
-			type: 'application/javascript'
-		}));
-		worker = new Worker(workerBlob, {
-			name: 'AMLL Worker',
-			type: 'classic'
+	let currentWorkerScript = "";
+	let workerBlob: string | undefined;
+	betterncm.fs
+		.readFileText(`${plugin.pluginPath}/worker_script.js`)
+		.then((workerScript) => {
+			currentWorkerScript = workerScript;
+			if (workerBlob) {
+				URL.revokeObjectURL(workerBlob);
+			}
+			workerBlob = URL.createObjectURL(
+				new Blob([workerScript], {
+					type: "application/javascript",
+				}),
+			);
+			worker?.terminate();
+			worker = new Worker(workerBlob, {
+				name: "AMLL Worker",
+				type: "classic",
+			});
 		})
-	}).catch(warn);
+		.catch(warn);
 	if (DEBUG) {
 		setInterval(async function refreshStyle() {
 			const curStyle = await betterncm_native.fs.readFileText(
@@ -227,6 +237,29 @@ plugin.onLoad(() => {
 			if (cssContent !== curStyle) {
 				cssContent = curStyle;
 				reloadStylesheet(cssContent);
+			}
+		}, 3000);
+
+		setInterval(async function refreshStyle() {
+			const workerScript = await betterncm_native.fs.readFileText(
+				`${plugin.pluginPath}/worker_script.js`,
+			);
+			if (currentWorkerScript !== workerScript) {
+				currentWorkerScript = workerScript;
+				worker?.terminate();
+				if (workerBlob) {
+					URL.revokeObjectURL(workerBlob);
+				}
+				workerBlob = URL.createObjectURL(
+					new Blob([workerScript], {
+						type: "application/javascript",
+					}),
+				);
+				worker?.terminate();
+				worker = new Worker(workerBlob, {
+					name: "AMLL Worker",
+					type: "classic",
+				});
 			}
 		}, 3000);
 	} else {
@@ -251,15 +284,38 @@ window.addEventListener(
 	},
 );
 
+// window.addEventListener(
+// 	"load",
+// 	() => {
+// 		// 把所有被 Corona 遥测过的函数还原
+// 		for (const key in window) {
+// 			if (typeof window[key] === "function") {
+// 				if ("__corona__" in window[key] && "__orig__" in window[key]) {
+// 					// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// 					window[key] = (window[key] as any).__orig__;
+// 					log("已还原被遥测函数", `window.${key}`);
+// 				}
+// 			}
+// 		}
+// 	},
+// 	{
+// 		once: true,
+// 	},
+// );
+
 if (OPEN_PAGE_DIRECTLY) {
-	window.addEventListener("load", () => {
-		const btn = document.querySelector<HTMLAnchorElement>(
-			"a[data-action='max']",
-		);
-		btn?.click();
-	}, {
-		once: true
-	});
+	window.addEventListener(
+		"load",
+		() => {
+			const btn = document.querySelector<HTMLAnchorElement>(
+				"a[data-action='max']",
+			);
+			btn?.click();
+		},
+		{
+			once: true,
+		},
+	);
 }
 
 reloadStylesheet(cssContent);
@@ -287,7 +343,7 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 import * as APIs from "./api";
 import * as Utils from "./utils";
 import { checkEapiRequestFuncName } from "./api";
-import { warn } from "./logger";
+import { log, warn } from "./logger";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

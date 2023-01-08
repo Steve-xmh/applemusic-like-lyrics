@@ -25,3 +25,8 @@ yarn build:dev # 开发构建，包含 Source Map 方便查错
 yarn build # 发行构建，会压缩代码，不包含 Source Map
 yarn dist # 在发行构建的基础上打包 .plugin 插件文件
 ```
+
+## 鸣谢
+
+- [MicroCBer/BetterNCM](https://github.com/MicroCBer/BetterNCM)
+- [Barba828/color-quantize](https://github.com/Barba828/color-quantize)

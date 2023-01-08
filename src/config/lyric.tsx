@@ -1,4 +1,4 @@
-import { Title } from "@mantine/core";
+import { Text, Title } from "@mantine/core";
 import { SwitchConfigComponent } from "./config-components";
 
 export const LyricSettings: React.FC = () => {
@@ -18,6 +18,11 @@ export const LyricSettings: React.FC = () => {
 			<SwitchConfigComponent
 				settingKey="dynamic-lyric"
 				label="显示逐词歌词（实验性）"
+				defaultValue={false}
+			/>
+			<SwitchConfigComponent
+				settingKey="mergeOriginalOnlyLine"
+				label="合并没有译文的歌词"
 				defaultValue={false}
 			/>
 		</>

@@ -302,9 +302,18 @@
             opacity: 0.5;
         
         > .am-lyric-line-dynamic > *
-            animation-name: am-lyric-word-animation;
-            animation-fill-mode: both;
-            animation-play-state: paused;
+            position: relative;
+            > .am-lyric-fake-word
+                animation-name: am-lyric-word-animation;
+                animation-timing-function: linear;
+                animation-fill-mode: both;
+                width: 0%;
+                right: 0%;
+                position: absolute;
+                white-space: nowrap;
+                overflow: hidden;
+            > .am-lyric-real-word
+                opacity: 0.5;
             
         &:hover::before
             content: " ";
@@ -317,7 +326,7 @@
             background-color: #FFF4;
         
         &.am-lyric-line-after
-            > .am-lyric-line-dynamic > *
+            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
                 opacity: 0.5;
                 animation-name: unset;
                 animation-fill-mode: unset;
@@ -325,8 +334,9 @@
         
         &.am-lyric-line-before
             opacity: 0.5;
-            > .am-lyric-line-dynamic > *
+            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
                 opacity: 1;
+                width: 100%;
                 animation-name: unset;
                 animation-fill-mode: unset;
                 animation-play-state: unset;
@@ -336,14 +346,16 @@
             filter: blur(0px);
             opacity: 1;
             > .am-lyric-line-dynamic
-                > *
+                > * > .am-lyric-real-word
                     animation-play-state: running;
         @keyframes am-lyric-word-animation {
             from {
-                opacity: 0.5;
+                width: 0%;
+                right: 100%;
             }
             to {
-                opacity: 1;
+                width: 100%;
+                right: 0%;
             }
         }
 
