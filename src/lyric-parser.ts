@@ -90,19 +90,20 @@ export function parseLyric(
 		const processed = parsePureDynamicLyric(dynamic);
 
 		parsePureLyric(translated).forEach((line) => {
-			// rome-ignore lint/suspicious/noExplicitAny: TypeScript 的类型解析不允许我写成 LyricLine | null，希望有大佬能帮我看看是为什么
-			let target: any = null;
-			processed.forEach((v) => {
-				if (target) {
-					if (
-						Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
-					) {
+			let target = processed.find((v) => v.time === line.time);
+			if (!target) {
+				processed.forEach((v) => {
+					if (target) {
+						if (
+							Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
+						) {
+							target = v;
+						}
+					} else {
 						target = v;
 					}
-				} else {
-					target = v;
-				}
-			});
+				});
+			}
 			if (target) {
 				target.translatedLyric = target.translatedLyric || "";
 				if (target.translatedLyric.length > 0) {

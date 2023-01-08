@@ -156,10 +156,9 @@ const LyricLineView: React.FC<{
 			props.line.dynamicLyricTime ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
-						<span>
+						// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<span key={i}>
 							<span
-								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								key={i}
 								style={{
 									animationDelay: `${
 										word.time - (props.line.dynamicLyricTime || 0)
@@ -171,8 +170,6 @@ const LyricLineView: React.FC<{
 								{word.word}
 							</span>
 							<span
-								// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								key={i}
 								style={{
 									animationDelay: `${
 										word.time - (props.line.dynamicLyricTime || 0)
@@ -204,7 +201,9 @@ export const LyricView: React.FC = () => {
 	const [currentAudioId, setCurrentAudioId] = React.useState("");
 	const [currentAudioDuration, setAudioDuration] = React.useState(0);
 	const [error, setError] = React.useState<Error | null>(null);
-	const [playState, setPlayState] = React.useState(getPlayingSong().state);
+	const [playState, setPlayState] = React.useState<PlayState>(
+		getPlayingSong().state,
+	);
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
 		null,
 	);
@@ -350,7 +349,9 @@ export const LyricView: React.FC = () => {
 			log("已获取到歌词", lyric);
 			const parsed = parseLyric(
 				lyric?.lrc?.lyric || "",
-				lyric?.tlyric?.lyric || "",
+				(lyric?.yrc?.lyric
+					? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
+					: lyric?.tlyric?.lyric) || "",
 				lyric?.romalrc?.lyric || "",
 				lyric?.yrc?.lyric || "",
 			);
@@ -376,7 +377,9 @@ export const LyricView: React.FC = () => {
 					log("已获取到歌词", lyric);
 					const parsed = parseLyric(
 						lyric?.lrc?.lyric || "",
-						lyric?.tlyric?.lyric || "",
+						(lyric?.yrc?.lyric
+							? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
+							: lyric?.tlyric?.lyric) || "",
 						lyric?.romalrc?.lyric || "",
 						lyric?.yrc?.lyric || "",
 					);
@@ -411,7 +414,6 @@ export const LyricView: React.FC = () => {
 	const scrollToLyric = React.useCallback(
 		(mustScroll: boolean = false) => {
 			if (lyricListElement.current) {
-				performance.mark("amll-scrollToLyric-locateElementBegin");
 				const lyricView = lyricListElement.current.parentElement;
 				let scrollToIndex = currentLyricIndex;
 				for (const i of keepSelectLyrics.current) {
@@ -432,21 +434,16 @@ export const LyricView: React.FC = () => {
 						const lineHeight = lineRect.height;
 						let scrollDelta = lineRect.top - listRect.top;
 						if (alignTopSelectedLyric !== "true") {
-							scrollDelta += 30 + 16 * 2 - (listRect.height - lineHeight) / 2;
+							scrollDelta -=
+								(window.innerHeight - lineHeight) / 2 - listRect.top;
 						} else if (lyricElement.innerText.trim().length > 0) {
-							scrollDelta -= lineHeight / 2;
+							scrollDelta -= listRect.height * 0.1;
 						} else {
-							scrollDelta -= 50;
+							scrollDelta -= window.innerHeight * 0.06 + listRect.height * 0.1;
 						}
 						const prevScrollTop = lyricView.scrollTop;
 						const obj = { scrollTop: prevScrollTop };
 
-						performance.mark("amll-scrollToLyric-locateElementEnd");
-						performance.measure(
-							"amll-scrollToLyric-locateElement",
-							"amll-scrollToLyric-locateElementBegin",
-							"amll-scrollToLyric-locateElementEnd",
-						);
 						if (mustScroll) {
 							const id = ++forceScrollId.current;
 							const onFrame = () => {
@@ -455,30 +452,24 @@ export const LyricView: React.FC = () => {
 									!scrollTween.current &&
 									id === forceScrollId.current
 								) {
-									performance.mark("amll-scrollToLyricBegin");
 									const listRect = lyricView.getBoundingClientRect();
 									const lineRect = lyricElement.getBoundingClientRect();
 									const prevScrollTop = lyricView.scrollTop;
 									const lineHeight = lineRect.height;
-									let scrollDelta = lineRect.top - listRect.top - 30 - 16 * 2;
+									let scrollDelta = lineRect.top - listRect.top;
 									if (alignTopSelectedLyric !== "true") {
-										scrollDelta +=
-											30 + 16 * 2 - (listRect.height - lineHeight) / 2;
+										scrollDelta -=
+											(window.innerHeight - lineHeight) / 2 - listRect.top;
 									} else if (lyricElement.innerText.trim().length > 0) {
-										scrollDelta -= lineHeight / 2;
+										scrollDelta -= listRect.height * 0.1;
 									} else {
-										scrollDelta -= 50;
+										scrollDelta -=
+											window.innerHeight * 0.06 + listRect.height * 0.1;
 									}
 									if (Math.abs(scrollDelta) > 10) {
 										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
 										requestAnimationFrame(onFrame);
 									}
-									performance.mark("amll-scrollToLyricEnd");
-									performance.measure(
-										"amll-scrollToLyric",
-										"amll-scrollToLyricBegin",
-										"amll-scrollToLyricEnd",
-									);
 								}
 							};
 
@@ -492,7 +483,6 @@ export const LyricView: React.FC = () => {
 								})
 								.start();
 							const onFrameUpdate = (time: number) => {
-								performance.mark("amll-scrollToLyricBegin");
 								if (scrollTween.current?.tween === tween) {
 									scrollTween.current?.tween?.update(time);
 									requestAnimationFrame(onFrameUpdate);
@@ -500,12 +490,6 @@ export const LyricView: React.FC = () => {
 									// log("动画被替换，旧动画已停止");
 									scrollTween.current?.tween?.stop();
 								}
-								performance.mark("amll-scrollToLyricEnd");
-								performance.measure(
-									"amll-scrollToLyric",
-									"amll-scrollToLyricBegin",
-									"amll-scrollToLyricEnd",
-								);
 							};
 							scrollTween.current = {
 								lyricElement,
@@ -515,20 +499,8 @@ export const LyricView: React.FC = () => {
 						}
 					} else {
 						// log("触发相同动画播放");
-						performance.mark("amll-scrollToLyric-locateElementEnd");
-						performance.measure(
-							"amll-scrollToLyric-locateElement",
-							"amll-scrollToLyric-locateElementBegin",
-							"amll-scrollToLyric-locateElementEnd",
-						);
 					}
 				} else {
-					performance.mark("amll-scrollToLyric-locateElementEnd");
-					performance.measure(
-						"amll-scrollToLyric-locateElement",
-						"amll-scrollToLyric-locateElementBegin",
-						"amll-scrollToLyric-locateElementEnd",
-					);
 				}
 			}
 		},
@@ -611,8 +583,7 @@ export const LyricView: React.FC = () => {
 			);
 			if (
 				lastLine &&
-				changeTime - lastUpdateTime.current <= guessedLineReadTime &&
-				playState === PlayState.Playing
+				changeTime - lastUpdateTime.current <= guessedLineReadTime
 			) {
 				if (keepSelectLyrics.current.size < 3) {
 					keepSelectLyrics.current.add(lastLyricIndex);
@@ -629,7 +600,7 @@ export const LyricView: React.FC = () => {
 				keepSelectLyrics.current.clear();
 			}
 		},
-		[currentLyrics, playState],
+		[currentLyrics],
 	);
 
 	React.useEffect(() => {
@@ -639,9 +610,20 @@ export const LyricView: React.FC = () => {
 	}, [currentLyricIndex]);
 
 	React.useEffect(() => {
-		checkIfTooFast(currentLyricIndex);
-		scrollToLyric();
-	}, [scrollToLyric, checkIfTooFast, currentLyrics, currentLyricIndex]);
+		if (playState === PlayState.Playing) {
+			log("触发滚动");
+			checkIfTooFast(currentLyricIndex);
+			scrollToLyric();
+		} else {
+			lastIndex.current = currentLyricIndex;
+		}
+	}, [
+		scrollToLyric,
+		checkIfTooFast,
+		currentLyrics,
+		currentLyricIndex,
+		playState,
+	]);
 
 	React.useEffect(() => {
 		scrollToLyric(true);
@@ -659,34 +641,35 @@ export const LyricView: React.FC = () => {
 				progress: number,
 				playState: PlayState,
 			) => {
+				if (playState !== PlayState.Playing) return;
 				const time = (progress * 1000) | 0;
-				if (!currentLyrics) return setPlayState(playState);
 				let curLyricIndex: number | null = null;
-				for (let i = currentLyrics.length - 1; i >= 0; i--) {
-					if (configDynamicLyric) {
-						if (
-							time >
-							(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
-						) {
-							curLyricIndex = i;
-							break;
-						}
-					} else {
-						if (time > currentLyrics[i]?.time) {
-							curLyricIndex = i;
-							break;
+				if (currentLyrics) {
+					for (let i = currentLyrics.length - 1; i >= 0; i--) {
+						if (configDynamicLyric) {
+							if (
+								time >
+								(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
+							) {
+								curLyricIndex = i;
+								break;
+							}
+						} else {
+							if (time > currentLyrics[i]?.time) {
+								curLyricIndex = i;
+								break;
+							}
 						}
 					}
+					if (
+						curLyricIndex !== null &&
+						time <
+							currentLyrics[curLyricIndex].time +
+								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
+					) {
+						setCurrentLyricIndex(curLyricIndex);
+					}
 				}
-				if (
-					curLyricIndex !== null &&
-					time <
-						currentLyrics[curLyricIndex].time +
-							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
-				) {
-					setCurrentLyricIndex(curLyricIndex);
-				}
-				setPlayState(playState);
 			};
 
 			const onPlayStateChange = (
@@ -694,7 +677,6 @@ export const LyricView: React.FC = () => {
 				state: string,
 				playState: PlayState,
 			) => {
-				setCurrentAudioId(audioId);
 				setPlayState(playState);
 			};
 

@@ -214,15 +214,18 @@ export function getLyric(songId: number): Promise<EAPILyricResponse> {
 	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27946
 	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27424
 	return new Promise((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/song/lyric?os=pc`, {
+		eapiRequest(`${APP_CONF.domain}/api/song/lyric/v1`, {
 			type: "json",
 			query: {
 				id: songId,
-				lv: -1,
-				kv: -1,
-				tv: -1,
-				rv: -1,
-				yv: 1,
+				cp: false,
+				tv: 0,
+				lv: 0,
+				rv: 0,
+				kv: 0,
+				yv: 0,
+				ytv: 0,
+				yrv: 0,
 			},
 			onload: resolve,
 			onerror: reject,
