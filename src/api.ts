@@ -1,8 +1,6 @@
-import * as React from "react";
 import { getConfig, setConfig } from "./config/core";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
-import { version } from "../manifest.json";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export const settingPrefix = "applemusic-like-lyrics:";
@@ -290,7 +288,7 @@ export function getPlayingSong() {
 	return callCachedSearchFunction("getPlaying", []);
 }
 
-function genRandomString(length: number) {
+export function genRandomString(length: number) {
 	const words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
 	const result: string[] = [];
 	for (let i = 0; i < length; i++) {
@@ -323,130 +321,16 @@ export function classname(
 	return result.join(" ");
 }
 
-export function useConfig(
-	key: string,
-	defaultValue: string,
-): [string, React.Dispatch<string>];
-export function useConfig(
-	key: string,
-	defaultValue?: string,
-): [string | undefined, React.Dispatch<string | undefined>];
-export function useConfig(
-	key: string,
-	defaultValue?: string,
-): [string | undefined, React.Dispatch<string | undefined>] {
-	const [value, setValue] = React.useState(
-		getConfig(key, defaultValue) || defaultValue,
-	);
-	const eventKey = React.useMemo(() => `config-changed-${key}`, [key]);
-	React.useEffect(() => {
-		setConfig(key, value);
-		GLOBAL_EVENTS.dispatchEvent(new Event(eventKey));
-	}, [value]);
-	React.useEffect(() => {
-		const onConfigUpdate = () => {
-			const newValue = getConfig(key, defaultValue) || defaultValue;
-			setValue(newValue);
-		};
-		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
-		return () => {
-			GLOBAL_EVENTS.removeEventListener(eventKey, onConfigUpdate);
-		};
-	}, [key, defaultValue, eventKey]);
-	return [value, setValue];
-}
-
-export function useNowPlayingOpened(): boolean {
-	const [value, setValue] = React.useState(
-		!!document.getElementById("applemusic-like-lyrics-view"),
-	);
-	React.useEffect(() => {
-		setValue(!!document.getElementById("applemusic-like-lyrics-view"));
-		log(
-			"applemusic-like-lyrics-view",
-			value,
-			!!document.getElementById("applemusic-like-lyrics-view"),
-		);
-		const onLyricPageOpen = () => {
-			log("歌词页面已显示");
-			setValue(true);
-		};
-		const onLyricPageHide = () => {
-			log("歌词页面已隐藏");
-			setValue(false);
-		};
-		GLOBAL_EVENTS.addEventListener("lyric-page-open", onLyricPageOpen);
-		GLOBAL_EVENTS.addEventListener("lyric-page-hide", onLyricPageHide);
-		return () => {
-			GLOBAL_EVENTS.removeEventListener("lyric-page-open", onLyricPageOpen);
-			GLOBAL_EVENTS.removeEventListener("lyric-page-hide", onLyricPageHide);
-		};
-	}, []);
-
-	return value;
-}
-
-let cachedLatestVersion: string | undefined;
-
-export async function checkGithubLatestVersion(force = false): Promise<string> {
-	// https://ghproxy.com/https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
-	// https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
-
-	if (force) {
-		cachedLatestVersion = undefined;
+export async function genBitmapImage(imageUrl: string) {
+	const img = new Image();
+	img.src = imageUrl;
+	await img.decode();
+	const canvas = new OffscreenCanvas(img.width, img.height);
+	const ctx: OffscreenCanvasRenderingContext2D = canvas.getContext(
+		"2d",
+	) as unknown as OffscreenCanvasRenderingContext2D;
+	if (ctx) {
+		ctx.drawImage(img, 0, 0);
+		return canvas.transferToImageBitmap();
 	}
-
-	if (cachedLatestVersion !== undefined) {
-		return cachedLatestVersion;
-	}
-
-	const GITHUB_DIST_MANIFEST_URL =
-		"https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json";
-
-	try {
-		const manifest = (await (
-			await fetch(`https://ghproxy.com/${GITHUB_DIST_MANIFEST_URL}`)
-		).json()) as typeof import("../dist/manifest.json");
-		if (cachedLatestVersion !== manifest.version) {
-			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
-		}
-		cachedLatestVersion = manifest.version;
-		return cachedLatestVersion;
-	} catch {}
-
-	try {
-		const manifest = (await (
-			await fetch(GITHUB_DIST_MANIFEST_URL)
-		).json()) as typeof import("../dist/manifest.json");
-		if (cachedLatestVersion !== manifest.version) {
-			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
-		}
-		cachedLatestVersion = manifest.version;
-		return cachedLatestVersion;
-	} catch {}
-
-	return cachedLatestVersion || "";
-}
-
-export function useGithubLatestVersion(): string {
-	const [version, setVersion] = React.useState("");
-
-	React.useEffect(() => {
-		const checkUpdate = () => checkGithubLatestVersion().then(setVersion);
-		checkUpdate();
-		GLOBAL_EVENTS.addEventListener("latest-version-updated", checkUpdate);
-		return () => {
-			GLOBAL_EVENTS.removeEventListener("latest-version-updated", checkUpdate);
-		};
-	}, []);
-
-	return version;
-}
-
-export function useHasUpdates(): boolean {
-	const githubVersion = useGithubLatestVersion();
-	return React.useMemo(
-		() => githubVersion !== "" && githubVersion !== version,
-		[githubVersion],
-	);
 }

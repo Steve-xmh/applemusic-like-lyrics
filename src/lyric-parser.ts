@@ -73,11 +73,11 @@ export function parseLyric(
 
 		result.sort((a, b) => a.time - b.time);
 
-		log("原始歌词解析", JSON.parse(JSON.stringify(result)));
+		// log("原始歌词解析", JSON.parse(JSON.stringify(result)));
 
 		const processed = processLyric(result);
 
-		log("处理完成歌词解析", JSON.parse(JSON.stringify(processed)));
+		// log("处理完成歌词解析", JSON.parse(JSON.stringify(processed)));
 
 		for (let i = 0; i < processed.length; i++) {
 			if (i < processed.length - 1) {
@@ -256,13 +256,53 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 					const wordTime = parseInt(wordMatches.groups?.time || "0");
 					const wordDuration = parseInt(wordMatches.groups?.duration || "0");
 					const flag = parseInt(wordMatches.groups?.flag || "0");
-					const word = wordMatches.groups?.word;
-					if (word) {
-						words.push({
-							time: wordTime,
-							duration: wordDuration,
-							flag,
-							word,
+					const word = wordMatches.groups?.word.trimStart();
+					const splitedWords = word
+						?.split(/\s+/)
+						.filter((v) => v.trim().length > 0); // 有些歌词一个单词还是一个句子的就离谱
+					if (splitedWords) {
+						const splitedDuration = wordDuration / splitedWords.length;
+						splitedWords.forEach((subWord, i) => {
+							if (i === splitedWords.length - 1) {
+								if (word?.endsWith(" ")) {
+									words.push({
+										time: wordTime + i * splitedDuration,
+										duration: splitedDuration,
+										flag,
+										word: `${subWord.trimStart()} `,
+									});
+								} else {
+									words.push({
+										time: wordTime + i * splitedDuration,
+										duration: splitedDuration,
+										flag,
+										word: subWord.trimStart(),
+									});
+								}
+							} else if (i === 0) {
+								if (word?.startsWith(" ")) {
+									words.push({
+										time: wordTime + i * splitedDuration,
+										duration: splitedDuration,
+										flag,
+										word: ` ${subWord.trimStart()}`,
+									});
+								} else {
+									words.push({
+										time: wordTime + i * splitedDuration,
+										duration: splitedDuration,
+										flag,
+										word: subWord.trimStart(),
+									});
+								}
+							} else {
+								words.push({
+									time: wordTime + i * splitedDuration,
+									duration: splitedDuration,
+									flag,
+									word: `${subWord.trimStart()} `,
+								});
+							}
 						});
 					}
 					tmp = tmp.slice(wordMatches.index || 0 + wordMatches[0].length);
@@ -278,7 +318,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 				dynamicLyricTime: time,
 			};
 			result.push(line);
-			log("逐词歌词", time, duration, line.originalLyric);
+			// log("逐词歌词", time, duration, line.originalLyric);
 		}
 	}
 	return result;

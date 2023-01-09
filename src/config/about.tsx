@@ -1,6 +1,6 @@
 import { Title, Button, Text } from "@mantine/core";
 import { version } from "../../manifest.json";
-import { useGithubLatestVersion, useHasUpdates } from "../api";
+import { useGithubLatestVersion, useHasUpdates } from "../react-api";
 
 export const AboutPage: React.FC = () => {
 	const latestVersion = useGithubLatestVersion();

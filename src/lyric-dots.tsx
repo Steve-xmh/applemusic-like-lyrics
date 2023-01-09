@@ -1,6 +1,5 @@
 import { classname } from "./api";
-import { log } from "./logger";
-import { Group, Tween, update } from "./tweenjs";
+import { Group, Tween } from "./tweenjs";
 import * as React from "react";
 
 export const LyricDots: React.FC<{

@@ -11,7 +11,7 @@ import { OtherStyleSettings } from "./other-style";
 import { LyricSourceSettings } from "./lyric-source";
 import { CustomCSSSettings } from "./custom-css";
 import { version } from "../../manifest.json";
-import { useGithubLatestVersion } from "../api";
+import { useGithubLatestVersion } from "../react-api";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 	return (

@@ -426,11 +426,20 @@
     opacity: 0 !important;
 }
 
+.m-winctrl.disable
+    display: none;
+
 .g-singlec-ct
     top: 0;
 .g-single
     bottom: 0;
 
+// MoTheme 会修改播放页面的大小，导致歌词页面不能正确居中
+.g-sd, .g-mn, .g-bds-fix, .g-single
+    bottom: 0 !important;
+
 // 隐藏全屏纯享
-div > div.m-leftbox > div.m-tool > div:nth-child(7)
+#m-playfullscreen-root ~ *,
+#m-playfullscreen-root + *,
+#m-playfullscreen-root
     display: none;

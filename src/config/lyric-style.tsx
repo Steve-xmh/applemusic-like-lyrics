@@ -1,5 +1,5 @@
 import { Title } from "@mantine/core";
-import { useConfig } from "../api";
+import { useConfig } from "../react-api";
 import {
 	ColorConfigComponent,
 	SliderConfigComponent,

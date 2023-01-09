@@ -1,4 +1,7 @@
-import { tryFindEapiRequestFuncName, useConfig } from "../api";
+import { tryFindEapiRequestFuncName } from "../api";
+import {
+	useConfig,
+} from "../react-api";
 import { TextConfigComponent } from "./config-components";
 import * as React from "react";
 import { Title, Button, Code, Text } from "@mantine/core";

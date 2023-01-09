@@ -5,9 +5,9 @@ import { GLOBAL_EVENTS } from "./global-events";
 import * as React from "react";
 import { MantineProvider, createStyles } from "@mantine/core";
 import { getConfig, getFullConfig } from "./config/core";
+import { currentWorkerScript, restartWorker } from "./worker";
 
 export let cssContent = "";
-export let worker: Worker | undefined;
 
 const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -208,27 +208,12 @@ plugin.onLoad(() => {
 	GLOBAL_EVENTS.addEventListener("config-saved", () =>
 		reloadStylesheet(cssContent),
 	);
-	let currentWorkerScript = "";
-	let workerBlob: string | undefined;
-	betterncm.fs
-		.readFileText(`${plugin.pluginPath}/worker_script.js`)
-		.then((workerScript) => {
-			currentWorkerScript = workerScript;
-			if (workerBlob) {
-				URL.revokeObjectURL(workerBlob);
-			}
-			workerBlob = URL.createObjectURL(
-				new Blob([workerScript], {
-					type: "application/javascript",
-				}),
-			);
-			worker?.terminate();
-			worker = new Worker(workerBlob, {
-				name: "AMLL Worker",
-				type: "classic",
-			});
-		})
-		.catch(warn);
+	(async () => {
+		const workerScript = await betterncm_native.fs.readFileText(
+			`${plugin.pluginPath}/worker_script.js`,
+		);
+		restartWorker(workerScript);
+	})();
 	if (DEBUG) {
 		setInterval(async function refreshStyle() {
 			const curStyle = await betterncm_native.fs.readFileText(
@@ -245,21 +230,7 @@ plugin.onLoad(() => {
 				`${plugin.pluginPath}/worker_script.js`,
 			);
 			if (currentWorkerScript !== workerScript) {
-				currentWorkerScript = workerScript;
-				worker?.terminate();
-				if (workerBlob) {
-					URL.revokeObjectURL(workerBlob);
-				}
-				workerBlob = URL.createObjectURL(
-					new Blob([workerScript], {
-						type: "application/javascript",
-					}),
-				);
-				worker?.terminate();
-				worker = new Worker(workerBlob, {
-					name: "AMLL Worker",
-					type: "classic",
-				});
+				restartWorker(workerScript);
 			}
 		}, 3000);
 	} else {
@@ -342,8 +313,10 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 
 import * as APIs from "./api";
 import * as Utils from "./utils";
+import * as WorkerAPIs from "./worker";
 import { checkEapiRequestFuncName } from "./api";
 import { log, warn } from "./logger";
+import { onMainMessage } from "./worker";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -352,5 +325,9 @@ if (DEBUG) {
 	for (const key in Utils) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 		(window as any)[key] = APIs[key];
+	}
+	for (const key in WorkerAPIs) {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		(window as any)[key] = WorkerAPIs[key];
 	}
 }

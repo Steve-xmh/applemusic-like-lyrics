@@ -7,13 +7,16 @@
 import { GLOBAL_EVENTS } from "../global-events";
 import { warn } from "../logger";
 import { debounce } from "../utils";
+import { slug } from "../../manifest.json";
 
 export interface Config {
 	[key: string]: string | undefined;
 }
 
 const PLUGIN_CONFIG_KEY = `config.betterncm.${
-	plugin.manifest.slug || plugin.manifest.name
+	"plugin" in globalThis
+		? plugin?.manifest?.slug || plugin?.manifest?.name || slug
+		: slug
 }`;
 export let GLOBAL_CONFIG: Config = loadConfig();
 

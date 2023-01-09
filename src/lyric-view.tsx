@@ -7,9 +7,8 @@ import {
 	getSongDetail,
 	PlayState,
 	SongDetailResponse,
-	useConfig,
-	useNowPlayingOpened,
 } from "./api";
+import { useAlbumImageUrl, useConfig, useNowPlayingOpened } from "./react-api";
 import { ThemeProvider } from ".";
 import { log, warn } from "./logger";
 import { LyricDots } from "./lyric-dots";
@@ -38,6 +37,7 @@ import {
 	Box,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
+import { LyricBackground } from "./lyric-background";
 
 // 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
 function guessTextReadDuration(text: string): number {
@@ -208,7 +208,7 @@ export const LyricView: React.FC = () => {
 		null,
 	);
 
-	const musicId = React.useMemo(
+	const musicId: number | string = React.useMemo(
 		() => getPlayingSong()?.data?.id || 0,
 		[currentAudioId, isLyricPageOpening],
 	);
@@ -228,31 +228,8 @@ export const LyricView: React.FC = () => {
 		() => getPlayingSong()?.data?.artists || [],
 		[musicId],
 	);
-	const albumImageUrl = React.useMemo(() => {
-		const songData = getPlayingSong();
-		const urls: string[] = [];
-		const radioIntervenePic = songData?.data?.radio?.intervenePicUrl;
-		if (radioIntervenePic) {
-			urls.push(`orpheus://cache/?${radioIntervenePic}`);
-		}
-		const picUrl = songData?.data?.album?.picUrl;
-		if (picUrl) {
-			urls.push(`orpheus://cache/?${picUrl}`);
-		}
-		const playFile = songData?.from?.playFile;
-		if (playFile) {
-			urls.push(`orpheus://localmusic/pic?${encodeURIComponent(playFile)}`);
-		}
-		urls.push(`orpheus://cache/?${getNCMImageUrl("16601526067802346")}`);
-		return urls;
-	}, [musicId]);
-	const [albumImageLoaded, setAlbumImageLoaded] = React.useState(false);
-	const [albumImageUrlIndex, setAlbumImageUrlIndex] = React.useState(0);
 
-	React.useEffect(() => {
-		setAlbumImageUrlIndex(0);
-		setAlbumImageLoaded(false);
-	}, [albumImageUrl]);
+	const albumImageUrl = useAlbumImageUrl(musicId);
 
 	const [currentLyricIndex, setCurrentLyricIndex] = React.useState<number>(-1);
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
@@ -372,6 +349,7 @@ export const LyricView: React.FC = () => {
 				lyric?.yrc?.lyric || "",
 			);
 			log(lyric, parsed);
+			scrollDelayRef.current = 0;
 			setCurrentLyrics(parsed);
 			setCurrentLyricIndex(-1);
 			keepSelectLyrics.current.clear();
@@ -403,6 +381,7 @@ export const LyricView: React.FC = () => {
 					);
 					log(lyric, parsed);
 					if (!canceled) {
+						scrollDelayRef.current = 0;
 						setCurrentLyrics(parsed);
 						setCurrentLyricIndex(-1);
 						keepSelectLyrics.current.clear();
@@ -527,6 +506,7 @@ export const LyricView: React.FC = () => {
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine) => {
+			scrollDelayRef.current = 0;
 			if (currentLyrics) {
 				const index = currentLyrics.findIndex((v) => v === line);
 				keepSelectLyrics.current.clear();
@@ -662,6 +642,7 @@ export const LyricView: React.FC = () => {
 				progress: number,
 				playState: PlayState,
 			) => {
+				setPlayState(playState);
 				if (playState !== PlayState.Playing) return;
 				const time = (progress * 1000) | 0;
 				let curLyricIndex: number | null = null;
@@ -792,6 +773,27 @@ export const LyricView: React.FC = () => {
 		],
 	);
 
+	React.useEffect(() => {
+		if (fullscreen && isLyricPageOpening) {
+			if ("RoundCornerNCM" in loadedPlugins) {
+				betterncm.app.setRoundedCorner(false);
+			}
+			document.querySelector(".m-winctrl")?.classList.add("disabled");
+		} else {
+			if ("RoundCornerNCM" in loadedPlugins) {
+				betterncm.app.setRoundedCorner(true);
+			}
+			document.querySelector(".m-winctrl")?.classList.remove("disabled");
+		}
+	}, [fullscreen, isLyricPageOpening]);
+
+	React.useEffect(() => {
+		() => {
+			document.querySelector(".m-winctrl")?.classList.remove("disabled");
+		};
+	}, []);
+
+	const [showBackground] = useConfig("showBackground", "true");
 	const [hideAlbumImage] = useConfig("hideAlbumImage", "false");
 	const [hideMusicName] = useConfig("hideMusicName", "false");
 	const [hideMusicAlias] = useConfig("hideMusicAlias", "false");
@@ -810,6 +812,7 @@ export const LyricView: React.FC = () => {
 
 	return (
 		<ThemeProvider>
+			{showBackground === "true" && <LyricBackground musicId={musicId} />}
 			{(hideAlbumImage === "false" ||
 				hideMusicName === "false" ||
 				hideMusicAlias === "false" ||
@@ -817,7 +820,7 @@ export const LyricView: React.FC = () => {
 				hideMusicAlbum === "false") && (
 				<div className="am-music-info">
 					<div>
-						{hideAlbumImage !== "true" && albumImageUrl[albumImageUrlIndex] && (
+						{hideAlbumImage !== "true" && (
 							<div className="am-album-image">
 								<div>
 									<LoadingOverlay
@@ -830,17 +833,13 @@ export const LyricView: React.FC = () => {
 										sx={{
 											borderRadius: "5%",
 										}}
-										visible={!albumImageLoaded}
+										visible={albumImageUrl.length === 0}
 									/>
 									<img
 										alt="专辑图片"
-										src={albumImageUrl[albumImageUrlIndex]}
-										onLoad={() => {
-											setAlbumImageLoaded(true);
-										}}
-										onError={() => {
-											albumImageUrlIndex <= albumImageUrl.length &&
-												setAlbumImageUrlIndex((v) => v + 1);
+										src={albumImageUrl}
+										style={{
+											opacity: albumImageUrl.length > 0 ? 1 : 0,
 										}}
 									/>
 								</div>
