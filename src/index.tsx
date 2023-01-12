@@ -96,7 +96,9 @@ plugin.onLoad(() => {
 		);
 		const pInfoEl = document.querySelector(".m-pinfo");
 		const playerEl = document.querySelector("#main-player");
-		if (visible) {
+		const inDefaultFullscreenMode = !document.querySelector("#m-playfullscreen-root.f-dn")
+		
+		if (visible || inDefaultFullscreenMode) {
 			headerEl?.classList?.remove("hide");
 			windowCtlEl?.classList?.remove("hide");
 			playerEl?.classList?.remove("hide");

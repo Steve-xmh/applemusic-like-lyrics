@@ -82,15 +82,55 @@ const defaultRenderFunc = (
 		const duration = 500;
 		const delta = Date.now() - data.i;
 		ctx.save();
-		ctx.filter = `blur(${(width / data.lastImg.width) * 16}px)`;
+		ctx.filter = "";
+		ctx.globalAlpha = 1;
+		const lastImgBlurRadius = (width / data.lastImg.width) * 16;
+		try {
+			drawImageProp(
+				ctx,
+				data.lastImg,
+				-lastImgBlurRadius,
+				-lastImgBlurRadius,
+				ctx.canvas.width + 2 * lastImgBlurRadius,
+				ctx.canvas.height + 2 * lastImgBlurRadius,
+			);
+		} catch {}
+		ctx.filter = `blur(${lastImgBlurRadius}px)`;
 		ctx.globalAlpha = 1;
 		try {
-			drawImageProp(ctx, data.lastImg);
+			drawImageProp(
+				ctx,
+				data.lastImg,
+				-lastImgBlurRadius,
+				-lastImgBlurRadius,
+				ctx.canvas.width + 2 * lastImgBlurRadius,
+				ctx.canvas.height + 2 * lastImgBlurRadius,
+			);
 		} catch {}
-		ctx.filter = `blur(${(width / albumImage.width) * 16}px)`;
+		ctx.filter = "";
+		ctx.globalAlpha = delta / duration;
+		const albumImageBlurRadius = (width / albumImage.width) * 16;
+		try {
+			drawImageProp(
+				ctx,
+				albumImage,
+				-albumImageBlurRadius,
+				-albumImageBlurRadius,
+				ctx.canvas.width + 2 * albumImageBlurRadius,
+				ctx.canvas.height + 2 * albumImageBlurRadius,
+			);
+		} catch {}
+		ctx.filter = `blur(${albumImageBlurRadius}px)`;
 		ctx.globalAlpha = delta / duration;
 		try {
-			drawImageProp(ctx, albumImage);
+			drawImageProp(
+				ctx,
+				albumImage,
+				-albumImageBlurRadius,
+				-albumImageBlurRadius,
+				ctx.canvas.width + 2 * albumImageBlurRadius,
+				ctx.canvas.height + 2 * albumImageBlurRadius,
+			);
 		} catch {}
 		ctx.restore();
 		ctx.fillStyle = "#00000088";

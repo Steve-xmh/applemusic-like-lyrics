@@ -179,35 +179,7 @@
         flex-direction: column;
         flex-wrap: nowrap;
         justify-content: center;
-        align-items: stretch;
-    
-    .am-lyric-line-edit
-        display: flex;
-        align-content: center;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        
-        >.edit-time
-            padding: 0 1rem;
-        
-        >.edit-arrow
-            padding: 0 1rem;
-        
-        >.edit-area
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            input
-                flex-basis: 100%;
-                border-radius: 2px;
-                max-width: 100%;
-                line-height: 16px;
-                margin: 4px 0;
-                padding: 4px 16px;
-                border: solid 1px #FFF7;
-                background: transparent;
-                color: white;
+        align-items: baseline;
 
     // 歌词缩放效果
     &.lyric-scale-effect // lyricScaleEffect
@@ -315,7 +287,8 @@
                 white-space: nowrap;
                 overflow: hidden;
             > .am-lyric-real-word
-                opacity: 0.5;
+                opacity: 1;
+                transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1);
             
         &:hover::before
             content: " ";
@@ -350,6 +323,7 @@
             > .am-lyric-line-dynamic
                 > * > .am-lyric-real-word
                     animation-play-state: running;
+                    opacity: 0.5;
         @keyframes am-lyric-word-animation {
             from {
                 width: 0%;
@@ -408,23 +382,21 @@
             }
         }
 
-/* 自动隐藏播放栏和控制栏 */
+// 自动隐藏播放栏和控制栏
 .mq-playing .g-hd,
 .m-winctrl,
 #main-player
 .g-singlec-comment-detail.z-show,
-.m-pinfo {
+.m-pinfo 
     opacity: 1;
     transition: opacity 0.5s;
-}
 
 .mq-playing .g-hd.hide,
 .m-winctrl.hide,
 #main-player.hide,
 .g-singlec-comment-detail.z-show.hide,
-.m-pinfo.hide {
+.m-pinfo.hide
     opacity: 0 !important;
-}
 
 .m-winctrl.disabled
     display: none;
@@ -434,12 +406,12 @@
 .g-single
     bottom: 0;
 
-// MoTheme 会修改播放页面的大小，导致歌词页面不能正确居中
-.g-sd, .g-mn, .g-bds-fix, .g-single
-    bottom: 0 !important;
+// 将被压下去的评论页面按钮恢复正确位置
+.g-singlec-comment,
+.g-singlec-comment-detail,
+.g-singlec-comment-top
+    bottom: 20px + 60px;
 
-// 隐藏全屏纯享
-#m-playfullscreen-root ~ *,
-#m-playfullscreen-root + *,
-#m-playfullscreen-root
-    display: none;
+// MoTheme 会修改播放页面的大小，导致歌词页面不能正确居中
+.g-bds-fix, .g-single
+    bottom: 0 !important;

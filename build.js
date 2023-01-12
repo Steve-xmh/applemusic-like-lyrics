@@ -2,6 +2,8 @@ const { build } = require("esbuild");
 const { stylusLoader } = require("esbuild-stylus-loader");
 const JSZip = require("jszip");
 const fs = require("fs");
+const path = require("path");
+const manifest = require("./manifest.json");
 
 let entryPoints = [
   "src/index.tsx",
@@ -15,12 +17,27 @@ if (process.argv.includes("--style-only")) {
   entryPoints = ["src/index.styl"];
 }
 
+const betterncmUserPath = process.env["BETTERNCM_PROFILE"] || "C:/betterncm";
+const devPath = path.resolve(
+  betterncmUserPath,
+  "plugins_dev",
+  manifest.slug || manifest.name
+);
+
+if (!process.argv.includes("--dist")) {
+  if (!fs.existsSync(devPath)) {
+    fs.mkdirSync(devPath, { recursive: true });
+  }
+
+  fs.copyFileSync("manifest.json", path.resolve(devPath, "manifest.json"));
+}
+
 build({
   entryPoints,
   bundle: true,
   sourcemap: process.argv.includes("--dev") ? "inline" : false,
   minify: !process.argv.includes("--dev"),
-  outdir: process.argv.includes("--dist") ? "dist" : ".",
+  outdir: process.argv.includes("--dist") ? "dist" : devPath,
   define: {
     DEBUG: process.argv.includes("--dev").toString(),
     OPEN_PAGE_DIRECTLY: process.argv
@@ -58,12 +75,10 @@ build({
       addIfExist("dist/manifest.json", "manifest.json");
       addIfExist("dist/index.js", "index.js");
       addIfExist("dist/index.css", "index.css");
-      addIfExist("dist/worker_script.js", "worker_script.js");
       addIfExist("dist/startup_script.js", "startup_script.js");
     } else {
       addIfExist("manifest.json");
       addIfExist("index.js");
-      addIfExist("worker_script.js");
       addIfExist("index.css");
       addIfExist("startup_script.js");
     }

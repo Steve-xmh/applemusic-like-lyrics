@@ -201,9 +201,10 @@ export const LyricView: React.FC = () => {
 	const [currentAudioId, setCurrentAudioId] = React.useState("");
 	const [currentAudioDuration, setAudioDuration] = React.useState(0);
 	const [error, setError] = React.useState<Error | null>(null);
-	const [playState, setPlayState] = React.useState<PlayState>(
-		getPlayingSong().state,
-	);
+	const [playState, setPlayState] = React.useState<PlayState>(() => {
+		log("当前播放状态", getPlayingSong().state);
+		return getPlayingSong().state;
+	});
 	const [currentLyrics, setCurrentLyrics] = React.useState<LyricLine[] | null>(
 		null,
 	);
@@ -602,17 +603,23 @@ export const LyricView: React.FC = () => {
 	);
 
 	React.useEffect(() => {
+		log("当前歌词已更新", currentLyricIndex);
 		return () => {
 			lastIndex.current = currentLyricIndex;
 		};
 	}, [currentLyricIndex]);
 
 	React.useEffect(() => {
+		log(
+			"scrollDelayRef.current",
+			scrollDelayRef.current,
+			"playState",
+			playState,
+		);
 		if (
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
 		) {
-			log("触发滚动");
 			checkIfTooFast(currentLyricIndex);
 			scrollToLyric();
 		} else {
@@ -640,10 +647,8 @@ export const LyricView: React.FC = () => {
 			const onPlayProgress = (
 				audioId: string,
 				progress: number,
-				playState: PlayState,
+				loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			) => {
-				setPlayState(playState);
-				if (playState !== PlayState.Playing) return;
 				const time = (progress * 1000) | 0;
 				let curLyricIndex: number | null = null;
 				if (currentLyrics) {
@@ -669,7 +674,23 @@ export const LyricView: React.FC = () => {
 							currentLyrics[curLyricIndex].time +
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
 					) {
+						// log("回调已设置歌词位置为", curLyricIndex);
 						setCurrentLyricIndex(curLyricIndex);
+					} else if (
+						currentLyrics[currentLyrics.length - 1] &&
+						(configDynamicLyric
+							? time >
+							  (currentLyrics[currentLyrics.length - 1]?.dynamicLyricTime ||
+									currentLyrics[currentLyrics.length - 1].time) +
+									currentLyrics[currentLyrics.length - 1].duration +
+									750
+							: time >
+							  currentLyrics[currentLyrics.length - 1].time +
+									currentLyrics[currentLyrics.length - 1].duration +
+									750)
+					) {
+						// log("回调已设置歌词位置为", currentLyrics.length);
+						setCurrentLyricIndex(currentLyrics.length);
 					}
 				}
 			};
@@ -677,9 +698,9 @@ export const LyricView: React.FC = () => {
 			const onPlayStateChange = (
 				audioId: string,
 				state: string,
-				playState: PlayState,
+				loadProgress: PlayState,
 			) => {
-				setPlayState(playState);
+				setPlayState(loadProgress);
 			};
 
 			interface AudioLoadInfo {
@@ -732,7 +753,7 @@ export const LyricView: React.FC = () => {
 				legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
 			};
 		}
-	}, [currentLyrics, configDynamicLyric, isLyricPageOpening]);
+	}, [currentLyrics, isLyricPageOpening]);
 
 	const mapCurrentLyrics = React.useCallback(
 		(line: LyricLine, index: number, lines: LyricLine[]) => {
@@ -955,6 +976,39 @@ export const LyricView: React.FC = () => {
 								没有可用歌词，但是你可以手动指定需要使用的歌词：
 							</Text>
 							<Space h="xl" />
+							<Button.Group orientation="vertical">
+								<Button
+									variant="outline"
+									onClick={() => setSelectMusicIdModalOpened(true)}
+								>
+									使用指定网易云已有音乐歌词
+								</Button>
+								<Button
+									variant="outline"
+									onClick={() => setLocalLyricModalOpened(true)}
+								>
+									使用本地歌词文件
+								</Button>
+								<Button
+									variant="outline"
+									onClick={async () => {
+										const lyricsPath = `${plugin.pluginPath}/lyrics`;
+										const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
+										setCurrentLyrics(PURE_MUSIC_LYRIC_LINE);
+										try {
+											if (!(await betterncm.fs.exists(lyricsPath))) {
+												betterncm.fs.mkdir(lyricsPath);
+											}
+											await betterncm.fs.writeFile(
+												cachedLyricPath,
+												JSON.stringify(PURE_MUSIC_LYRIC_DATA, null, 4),
+											);
+										} catch {}
+									}}
+								>
+									这是纯音乐
+								</Button>
+							</Button.Group>
 							<Modal
 								title="输入音乐 ID 以加载对应的歌词"
 								opened={selectMusicIdModalOpened}
@@ -1005,14 +1059,6 @@ export const LyricView: React.FC = () => {
 									使用该音乐
 								</Button>
 							</Modal>
-							<Button
-								variant="outline"
-								onClick={() => setSelectMusicIdModalOpened(true)}
-							>
-								使用指定网易云已有音乐歌词
-							</Button>
-							<Space h="xl" />
-
 							<Modal
 								title="导入歌词文件"
 								opened={selectLocalLyricModalOpened}
@@ -1117,33 +1163,6 @@ export const LyricView: React.FC = () => {
 									使用该歌词
 								</Button>
 							</Modal>
-							<Button
-								variant="outline"
-								onClick={() => setLocalLyricModalOpened(true)}
-							>
-								使用本地歌词文件
-							</Button>
-							<Space h="xl" />
-
-							<Button
-								variant="outline"
-								onClick={async () => {
-									const lyricsPath = `${plugin.pluginPath}/lyrics`;
-									const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
-									setCurrentLyrics(PURE_MUSIC_LYRIC_LINE);
-									try {
-										if (!(await betterncm.fs.exists(lyricsPath))) {
-											betterncm.fs.mkdir(lyricsPath);
-										}
-										await betterncm.fs.writeFile(
-											cachedLyricPath,
-											JSON.stringify(PURE_MUSIC_LYRIC_DATA, null, 4),
-										);
-									} catch {}
-								}}
-							>
-								这是纯音乐
-							</Button>
 						</div>
 					)
 				) : (
