@@ -2,6 +2,9 @@
 
 一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM) 的类 Apple Music 歌词显示插件
 
+
+https://user-images.githubusercontent.com/39523898/212098052-86421fa1-558a-481f-b433-b2d1b3ccf3e4.mp4
+
 ![](./assets/demo0.png)
 ![](./assets/demo1.png)
 
