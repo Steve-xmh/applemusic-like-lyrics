@@ -277,16 +277,10 @@ export const LyricView: React.FC = () => {
 		};
 	}, []);
 
-	React.useEffect(() => {
-		const onScroll = (evt: Event) => {
-			scrollDelayRef.current = Date.now();
-			log("滚动事件", evt);
-		};
-		window.addEventListener("wheel", onScroll);
-		return () => {
-			window.removeEventListener("wheel", onScroll);
-		};
-	});
+	const onLyricScroll = (evt: Event) => {
+		scrollDelayRef.current = Date.now();
+		log("滚动事件", evt);
+	};
 
 	const loadLyric = React.useCallback(async (id: string | number) => {
 		const lyricsPath = `${plugin.pluginPath}/lyrics`;
@@ -965,7 +959,7 @@ export const LyricView: React.FC = () => {
 					</div>
 				) : currentLyrics ? (
 					currentLyrics.length > 0 ? (
-						<div className="am-lyric-view">
+						<div className="am-lyric-view" onWheel={onLyricScroll}>
 							<div ref={lyricListElement}>
 								{currentLyrics.map(mapCurrentLyrics)}
 							</div>
