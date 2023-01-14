@@ -1,4 +1,4 @@
-import { Button, Title, Space, Text, ScrollArea } from "@mantine/core";
+import { Button, Title, Space, Text, ScrollArea, Alert } from "@mantine/core";
 import Editor from "react-simple-code-editor";
 import {
 	SliderConfigComponent,
@@ -9,16 +9,31 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-regex";
 import "prismjs/components/prism-javascript";
-import { useConfig } from "../react-api";
+import { useConfig, useLFPSupported } from "../react-api";
 
 export const OtherStyleSettings: React.FC = () => {
 	const [customBackgroundRenderFunc, setCustomBackgroundRenderFunc] = useConfig(
 		"customBackgroundRenderFunc",
 		"",
 	);
+	const [showBackground] = useConfig("showBackground", "true");
+	const [isLFPSupported, isLFPEnabled] = useLFPSupported();
 
 	return (
 		<>
+			{isLFPSupported && (
+				<Alert
+					sx={{ margin: "16px 0" }}
+					color={isLFPEnabled ? "green" : "yellow"}
+					title="检测到 LibFrontendPlay 插件"
+				>
+					{isLFPEnabled ? (
+						<div>现在可以使用音频可视化的背景效果了</div>
+					) : (
+						<div>但是 LibFrontendPlay 并没有启用，无法使用可视化背景效果</div>
+					)}
+				</Alert>
+			)}
 			<Title order={2}>其它样式设置</Title>
 			<SwitchConfigComponent
 				settingKey="autoHideControlBar"
@@ -52,6 +67,14 @@ export const OtherStyleSettings: React.FC = () => {
 				label="显示背景"
 				defaultValue={true}
 			/>
+			{isLFPSupported && (
+				<SwitchConfigComponent
+					disabled={!isLFPEnabled || showBackground === "false"}
+					settingKey="backgroundAudioVisualizerEffect"
+					label="启用音频可视化背景（感谢 LibFrontendPlay 插件）（高性能消耗警告！）"
+					defaultValue={false}
+				/>
+			)}
 			<Space h="xl" />
 			<Text fz="md">自定义背景绘制函数</Text>
 			<Space h="md" />
@@ -60,6 +83,7 @@ export const OtherStyleSettings: React.FC = () => {
 			</Text>
 			<Space h="md" />
 			<Text fz="md">具体如何编写可以参考本插件的源代码（关于页面有）。</Text>
+			<Space h="md" />
 			<Space h="md" />
 			<Text fz="md">留空则使用默认绘制方式。</Text>
 			<ScrollArea

@@ -1,1 +1,1 @@
-export const GLOBAL_EVENTS = new EventTarget()
+export const GLOBAL_EVENTS = new EventTarget();

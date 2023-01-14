@@ -1,6 +1,7 @@
 import { getConfig, setConfig } from "./config/core";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
+import { genRandomString } from "./utils";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export const settingPrefix = "applemusic-like-lyrics:";
@@ -156,8 +157,10 @@ export function getListenTogetherStatus() {
 export function tryFindEapiRequestFuncName(
 	unsafe: boolean = false,
 ): string | null {
-	const result = betterncm.ncm.findApiFunction((v) =>
-		v.toString().includes("_bindTokenRequest yidun getToken undefined"),
+	const result = betterncm.ncm.findApiFunction(
+		(v) =>
+			v.toString().includes("_bindTokenRequest yidun getToken undefined") &&
+			v !== tryFindEapiRequestFuncName,
 	);
 	if (result) {
 		for (const key in result[1]) {
@@ -286,15 +289,6 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  */
 export function getPlayingSong() {
 	return callCachedSearchFunction("getPlaying", []);
-}
-
-export function genRandomString(length: number) {
-	const words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	const result: string[] = [];
-	for (let i = 0; i < length; i++) {
-		result.push(words.charAt(Math.floor(Math.random() * words.length)));
-	}
-	return result.join("");
 }
 
 export function genAudioPlayerCommand(audioId: string, command: string) {

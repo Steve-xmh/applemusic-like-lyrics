@@ -132,3 +132,81 @@ export const normalizePath = (p: string) => {
 
 	return path;
 };
+
+export function genRandomString(length: number) {
+	const words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+	const result: string[] = [];
+	for (let i = 0; i < length; i++) {
+		result.push(words.charAt(Math.floor(Math.random() * words.length)));
+	}
+	return result.join("");
+}
+
+// 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
+export function guessTextReadDuration(text: string): number {
+	const wordRegexp = /^([A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\-]+)$/;
+	let wordCount = 0;
+	// 以空格和各种标点符号分隔
+	for (const word of text.split(
+		/[ 　,，.。·、…？?"“”*&\^%\$#@!！\(\)（）\=\+_【】\[\]\{\}\/|]+/,
+	)) {
+		if (wordRegexp.test(word)) {
+			wordCount++;
+		} else {
+			wordCount += word.length;
+		}
+	}
+	return (wordCount / 400) * 60 * 1000;
+}
+
+export function drawImageProp(
+	ctx: CanvasRenderingContext2D,
+	img: HTMLImageElement | OffscreenCanvas,
+	x = 0,
+	y = 0,
+	w = ctx.canvas.width,
+	h = ctx.canvas.height,
+	offsetX = 0.5,
+	offsetY = 0.5,
+) {
+	offsetX = typeof offsetX === "number" ? offsetX : 0.5;
+	offsetY = typeof offsetY === "number" ? offsetY : 0.5;
+
+	if (offsetX < 0) offsetX = 0;
+	if (offsetY < 0) offsetY = 0;
+	if (offsetX > 1) offsetX = 1;
+	if (offsetY > 1) offsetY = 1;
+
+	var iw = img.width;
+	var ih = img.height;
+	var r = Math.min(w / iw, h / ih);
+	var nw = iw * r;
+	var nh = ih * r;
+	var cx: number;
+	var cy: number;
+	var cw: number;
+	var ch: number;
+	var ar = 1;
+
+	if (nw < w) ar = w / nw;
+	if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh; // updated
+	nw *= ar;
+	nh *= ar;
+
+	cw = iw / (nw / w);
+	ch = ih / (nh / h);
+
+	cx = (iw - cw) * offsetX;
+	cy = (ih - ch) * offsetY;
+
+	if (cx < 0) cx = 0;
+	if (cy < 0) cy = 0;
+	if (cw > iw) cw = iw;
+	if (ch > ih) ch = ih;
+
+	// fill image in dest. rectangle
+	ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+}
+
+export const IS_WORKER =
+	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

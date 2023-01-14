@@ -9,7 +9,7 @@
     ],
     "compilerOptions": {
         "target": "ESNext",
-        "lib": ["ESNext", "DOM"],
+        "lib": ["ESNext", "DOM", "WebWorker"],
         "module": "ESNext",
         "types": [],
         "jsx": "react-jsx",

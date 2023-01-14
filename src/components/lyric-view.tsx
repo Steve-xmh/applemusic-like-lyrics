@@ -7,20 +7,26 @@ import {
 	getSongDetail,
 	PlayState,
 	SongDetailResponse,
-} from "./api";
-import { useAlbumImageUrl, useConfig, useNowPlayingOpened } from "./react-api";
-import { ThemeProvider } from ".";
-import { log, warn } from "./logger";
+} from "../api";
+import {
+	useAlbumImageUrl,
+	useConfig,
+	useFMOpened,
+	useForceUpdate,
+	useNowPlayingOpened,
+} from "../react-api";
+import { ThemeProvider } from "..";
+import { log, warn } from "../logger";
 import { LyricDots } from "./lyric-dots";
 import {
 	LyricLine,
 	parseLyric,
 	PURE_MUSIC_LYRIC_DATA,
 	PURE_MUSIC_LYRIC_LINE,
-} from "./lyric-parser";
-import { Tween, Easing } from "./tweenjs";
+} from "../lyric-parser";
+import { Tween, Easing } from "../tweenjs";
 import * as React from "react";
-import { GLOBAL_EVENTS } from "./global-events";
+import { GLOBAL_EVENTS } from "../global-events";
 import {
 	Loader,
 	Center,
@@ -35,31 +41,51 @@ import {
 	Image,
 	Flex,
 	Box,
+	ActionIcon,
 } from "@mantine/core";
 import { useDebouncedState } from "@mantine/hooks";
 import { LyricBackground } from "./lyric-background";
+import { LyricLineView } from "./lyric-line";
+import { guessTextReadDuration } from "../utils";
+import {
+	IconDots,
+	IconHeart,
+	IconHeartBroken,
+	IconPlayerPlay,
+	IconPlayerSkipBack,
+	IconPlayerSkipForward,
+	IconTrash,
+} from "@tabler/icons";
 
-// 猜测歌词的阅读时间，大概根据中日英文简单计算，返回单位毫秒的阅读时间
-function guessTextReadDuration(text: string): number {
-	const wordRegexp = /^([A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\-]+)$/;
-	let wordCount = 0;
-	// 以空格和各种标点符号分隔
-	for (const word of text.split(
-		/[ 　,，.。·、…？?"“”*&\^%\$#@!！\(\)（）\=\+_【】\[\]\{\}\/|]+/,
-	)) {
-		if (wordRegexp.test(word)) {
-			wordCount++;
-		} else {
-			wordCount += word.length;
+const loadLyric = async (id: string | number) => {
+	const lyricsPath = `${plugin.pluginPath}/lyrics`;
+	const cachedLyricPath = `${lyricsPath}/${id}.json`;
+	try {
+		if (await betterncm.fs.exists(cachedLyricPath)) {
+			const cachedLyricData = await betterncm.fs.readFileText(cachedLyricPath);
+			return JSON.parse(cachedLyricData);
 		}
+	} catch (err) {
+		warn("警告：加载已缓存歌词失败", err);
 	}
-	return (wordCount / 400) * 60 * 1000;
-}
-
-const useForceUpdate = (): [{}, () => void] => {
-	const [updateState, setUpdateState] = React.useState({});
-	const forceUpdate = React.useCallback(() => setUpdateState({}), []);
-	return [updateState, forceUpdate];
+	if (typeof id === "number") {
+		const data = await getLyric(id);
+		try {
+			if (!(await betterncm.fs.exists(lyricsPath))) {
+				betterncm.fs.mkdir(lyricsPath);
+			}
+			await betterncm.fs.writeFile(
+				cachedLyricPath,
+				JSON.stringify(data, null, 4),
+			);
+		} catch (err) {
+			warn("警告：缓存歌词失败", err);
+		}
+		return data;
+	} else {
+		// 如果是摘要字符串的话，那就是本地文件
+		return {};
+	}
 };
 
 const SongView: React.FC<{ id?: number }> = (props) => {
@@ -129,75 +155,22 @@ const SongView: React.FC<{ id?: number }> = (props) => {
 	);
 };
 
-const LyricLineView: React.FC<{
-	offset: number;
-	selected: boolean;
-	line: LyricLine;
-	dynamic: boolean;
-	translated: boolean;
-	roman: boolean;
-	onClickLyric?: (line: LyricLine) => void;
-}> = (props) => {
-	return (
-		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-		<div
-			onClick={() => {
-				if (props.onClickLyric) props.onClickLyric(props.line);
-			}}
-			className={classname("am-lyric-line", {
-				"am-lyric-line-before": props.offset < 0,
-				"am-lyric-line-after": props.offset > 0,
-				"am-lyric-line-selected": props.selected,
-				[`am-lyric-line-o${props.offset}`]: Math.abs(props.offset) < 5,
-			})}
-		>
-			{props.dynamic &&
-			props.line.dynamicLyric &&
-			props.line.dynamicLyricTime ? (
-				<div className="am-lyric-line-dynamic">
-					{props.line.dynamicLyric.map((word, i) => (
-						// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						<span key={i}>
-							<span
-								style={{
-									animationDelay: `${
-										word.time - (props.line.dynamicLyricTime || 0)
-									}ms`,
-									animationDuration: `${word.duration}ms`,
-								}}
-								className="am-lyric-real-word"
-							>
-								{word.word}
-							</span>
-							<span
-								style={{
-									animationDelay: `${
-										word.time - (props.line.dynamicLyricTime || 0)
-									}ms`,
-									animationDuration: `${word.duration}ms`,
-								}}
-								className="am-lyric-fake-word"
-							>
-								{word.word}
-							</span>
-						</span>
-					))}
-				</div>
-			) : (
-				<div className="am-lyric-line-original">{props.line.originalLyric}</div>
-			)}
-			<div className="am-lyric-line-translated">
-				{props.translated ? props.line.translatedLyric : ""}
-			</div>
-			<div className="am-lyric-line-roman">
-				{props.roman ? props.line.romanLyric : ""}
-			</div>
-		</div>
-	);
-};
+const getMusicId = (): number =>
+	getPlayingSong()?.originFromTrack?.lrcid ||
+	getPlayingSong()?.originFromTrack?.track?.tid ||
+	getPlayingSong()?.data?.id ||
+	0;
 
-export const LyricView: React.FC = () => {
-	const isLyricPageOpening = useNowPlayingOpened();
+export const LyricView: React.FC<{
+	isFM?: boolean;
+}> = (props) => {
+	const isNowPlayingOpened = useNowPlayingOpened();
+	const isFMOpened = useFMOpened();
+	const isLyricPageOpening = React.useMemo(() => {
+		const o = props.isFM ? isFMOpened : isNowPlayingOpened;
+		log("是否打开", props.isFM, o);
+		return o;
+	}, [props.isFM, isNowPlayingOpened, isFMOpened]);
 	const [currentAudioId, setCurrentAudioId] = React.useState("");
 	const [currentAudioDuration, setAudioDuration] = React.useState(0);
 	const [error, setError] = React.useState<Error | null>(null);
@@ -210,7 +183,7 @@ export const LyricView: React.FC = () => {
 	);
 
 	const musicId: number | string = React.useMemo(
-		() => getPlayingSong()?.data?.id || 0,
+		() => getMusicId(),
 		[currentAudioId, isLyricPageOpening],
 	);
 	const album = React.useMemo(
@@ -230,7 +203,7 @@ export const LyricView: React.FC = () => {
 		[musicId],
 	);
 
-	const albumImageUrl = useAlbumImageUrl(musicId);
+	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 
 	const [currentLyricIndex, setCurrentLyricIndex] = React.useState<number>(-1);
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
@@ -257,7 +230,7 @@ export const LyricView: React.FC = () => {
 	React.useEffect(() => {
 		if (document.webkitIsFullScreen !== fullscreen) {
 			if (fullscreen) {
-				document.body.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+				document.body.webkitRequestFullScreen(Element["ALLOW_KEYBOARD_INPUT"]);
 			} else {
 				document.exitFullscreen();
 			}
@@ -597,19 +570,19 @@ export const LyricView: React.FC = () => {
 	);
 
 	React.useEffect(() => {
-		log("当前歌词已更新", currentLyricIndex);
+		// log("当前歌词已更新", currentLyricIndex);
 		return () => {
 			lastIndex.current = currentLyricIndex;
 		};
 	}, [currentLyricIndex]);
 
 	React.useEffect(() => {
-		log(
-			"scrollDelayRef.current",
-			scrollDelayRef.current,
-			"playState",
-			playState,
-		);
+		// log(
+		// 	"scrollDelayRef.current",
+		// 	scrollDelayRef.current,
+		// 	"playState",
+		// 	playState,
+		// );
 		if (
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
@@ -691,10 +664,15 @@ export const LyricView: React.FC = () => {
 
 			const onPlayStateChange = (
 				audioId: string,
-				state: string,
+				stateId: string,
 				loadProgress: PlayState,
 			) => {
-				setPlayState(loadProgress);
+				const state = stateId.split("|")[1];
+				if (state === "pause") {
+					setPlayState(PlayState.Pausing);
+				} else if (state === "resume") {
+					setPlayState(PlayState.Playing);
+				}
 			};
 
 			interface AudioLoadInfo {
@@ -717,6 +695,9 @@ export const LyricView: React.FC = () => {
 
 			const onEnd = (audioId: string, _info: AudioEndInfo) => {
 				setCurrentAudioId(audioId);
+				setTimeout(() => {
+					setCurrentAudioId(getMusicId().toString());
+				}, 200);
 			};
 
 			legacyNativeCmder.appendRegisterCall(
@@ -825,6 +806,30 @@ export const LyricView: React.FC = () => {
 		null,
 	);
 
+	const [likeOrUnlike, setLikeOrUnlike] = React.useState<boolean | null>(
+		document.querySelector<HTMLButtonElement>(".m-fm .btn_pc_like")?.dataset
+			?.action === "like",
+	);
+
+	React.useEffect(() => {
+		if (props.isFM) {
+			const likeBtn =
+				document.querySelector<HTMLButtonElement>(".m-fm .btn_pc_like");
+			if (likeBtn) {
+				const btnObs = new MutationObserver(() => {
+					setLikeOrUnlike(likeBtn?.dataset?.action === "like");
+				});
+				btnObs.observe(likeBtn, {
+					attributes: true,
+					attributeFilter: ["data-action"],
+				});
+				return () => {
+					btnObs.disconnect();
+				};
+			}
+		}
+	}, [props.isFM]);
+
 	return (
 		<ThemeProvider>
 			{showBackground === "true" && <LyricBackground musicId={musicId} />}
@@ -889,6 +894,62 @@ export const LyricView: React.FC = () => {
 								<div className="am-album">
 									<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
 								</div>
+							</div>
+						)}
+						{props.isFM && (
+							<div className="am-fm-player-ctl">
+								<ActionIcon
+									size="xl"
+									loading={likeOrUnlike === null}
+									onClick={() => {
+										setLikeOrUnlike(null);
+										document
+											.querySelector<HTMLButtonElement>(".m-fm .btn_pc_like")
+											?.click();
+									}}
+								>
+									{likeOrUnlike ? (
+										<IconHeart size={34} />
+									) : (
+										<IconHeartBroken size={34} />
+									)}
+								</ActionIcon>
+								<ActionIcon
+									size="xl"
+									onClick={() => {
+										document
+											.querySelector<HTMLButtonElement>(
+												".m-fm [data-action=hate]",
+											)
+											?.click();
+									}}
+								>
+									<IconTrash size={34} />
+								</ActionIcon>
+								<ActionIcon
+									size="xl"
+									onClick={() => {
+										document
+											.querySelector<HTMLButtonElement>(
+												".m-fm [data-action=next]",
+											)
+											?.click();
+									}}
+								>
+									<IconPlayerSkipForward size={34} />
+								</ActionIcon>
+								<ActionIcon
+									size="xl"
+									onClick={() => {
+										document
+											.querySelector<HTMLButtonElement>(
+												".m-fm [data-action=more]",
+											)
+											?.click();
+									}}
+								>
+									<IconDots size={34} />
+								</ActionIcon>
 							</div>
 						)}
 					</div>

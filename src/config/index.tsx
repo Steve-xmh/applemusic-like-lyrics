@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ThemeProvider } from "..";
-import { render } from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Tabs, Container, Indicator, Space } from "@mantine/core";
 import { AboutPage } from "./about";
 import { useHasWarnings, WarningsList } from "./warnings";
@@ -107,11 +107,10 @@ plugin.onConfig(() => {
 
 	root.style.height = "100%";
 
-	render(
+	createRoot(root).render(
 		<ThemeProvider>
 			<ConfigComponent />
 		</ThemeProvider>,
-		root,
 	);
 
 	return root;

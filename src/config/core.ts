@@ -6,8 +6,9 @@
 
 import { GLOBAL_EVENTS } from "../global-events";
 import { warn } from "../logger";
-import { debounce } from "../utils";
+import { debounce, IS_WORKER } from "../utils";
 import { slug } from "../../manifest.json";
+import { setConfigFromMain } from "../worker";
 
 export interface Config {
 	[key: string]: string | undefined;
@@ -21,6 +22,9 @@ const PLUGIN_CONFIG_KEY = `config.betterncm.${
 export let GLOBAL_CONFIG: Config = loadConfig();
 
 export function loadConfig(): Config {
+	if (IS_WORKER) {
+		return {};
+	}
 	try {
 		return JSON.parse(localStorage.getItem(PLUGIN_CONFIG_KEY) || "{}");
 	} catch (err) {
@@ -34,6 +38,10 @@ export function getFullConfig(): { [key: string]: string | undefined } {
 }
 
 export const saveConfig = debounce(function saveConfig() {
+	if (IS_WORKER) {
+		GLOBAL_EVENTS.dispatchEvent(new Event("config-saved"));
+		return;
+	}
 	try {
 		localStorage.setItem(PLUGIN_CONFIG_KEY, JSON.stringify(GLOBAL_CONFIG));
 	} catch (err) {
@@ -43,6 +51,7 @@ export const saveConfig = debounce(function saveConfig() {
 }, 2000);
 
 export function setConfig(key: string, value?: string) {
+	if (!IS_WORKER) setConfigFromMain({ [key]: value });
 	if (value === undefined) {
 		// rome-ignore lint/performance/noDelete: 防止 JSON 还把其写入配置中
 		delete GLOBAL_CONFIG[key];

@@ -22,6 +22,7 @@ export const SwitchConfigComponent: React.FC<{
 	const settingValue = React.useMemo(() => rawValue === "true", [rawValue]);
 	return (
 		<Switch
+			disabled={props.disabled}
 			sx={{ margin: "16px 0" }}
 			checked={settingValue}
 			onChange={() => setSettingValue(String(!settingValue))}

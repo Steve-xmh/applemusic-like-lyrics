@@ -1,5 +1,6 @@
-import { genRandomString } from "../api";
+import { Config, GLOBAL_CONFIG, setConfig } from "../config/core";
 import { log, warn } from "../logger";
+import { IS_WORKER, genRandomString } from "../utils";
 import { quantize } from "./color-quantize";
 import { Pixel } from "./color-quantize/utils";
 export let worker: Worker | undefined;
@@ -22,6 +23,7 @@ export function restartWorker(workerScript = currentWorkerScript) {
 		name: "AMLL Worker",
 		type: "classic",
 	});
+	setConfigFromMain(GLOBAL_CONFIG);
 	worker.addEventListener("message", onMainMessage);
 }
 
@@ -33,7 +35,7 @@ export const definedFunctions: {
 } = {};
 const callbacks = new Map<string, [Function, Function]>();
 
-export function defineWorkerFunction<Args extends any[], Ret = any>(
+export function defineWorkerFunction<Args extends any[], Ret>(
 	funcName: string,
 	funcBody: (...args: Args) => Ret,
 	transferArgIndexes: number[] = [],
@@ -42,10 +44,11 @@ export function defineWorkerFunction<Args extends any[], Ret = any>(
 		funcName,
 		funcBody,
 	};
+	let callId = 0;
 	return (...args: Args) => {
 		if (worker) {
 			return new Promise((resolve, reject) => {
-				const id = genRandomString(16) + Date.now();
+				const id = `${genRandomString(4)} - ${funcName} - ${callId++}`;
 				callbacks.set(id, [resolve, reject]);
 				worker!!.postMessage(
 					{
@@ -104,6 +107,18 @@ export const grabImageColors = defineWorkerFunction(
 			return colors;
 		} else {
 			return [];
+		}
+	},
+);
+
+export const setConfigFromMain = defineWorkerFunction(
+	"setConfigFromMain",
+	(config: Partial<Config>) => {
+		if (IS_WORKER) {
+			for (const key in config) {
+				setConfig(key, config[key]);
+			}
+			log("已从主线程同步配置", ...Object.keys(config));
 		}
 	},
 );

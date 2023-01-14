@@ -1,60 +1,8 @@
-@require "prismjs/themes/prism.css"
-@require "./main-view.styl"
 
-.am-lyrics-settings
-    min-height: 100%;
-    max-width: @css { min(100%, 700px) };
-    .am-lyric-func-body
-        user-select: text;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        white-space: break-spaces;
-        text-overflow: ellipsis;
-.m-fm
-    width: 100%;
-    .fmcmt
-        width: 820px;
-        margin-left: auto;
-        margin-right: auto;
-
-#applemusic-like-lyrics-view-fm
-    applemusic-like-lyrics-view-style()
-    .am-album-hide-sidebar
-        width: 12px;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: stretch;
-        > *
-            height: 10vh;
-            background-color: black;
-    .am-fm-player-ctl
-        margin-top: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-    .am-lyric-background
-        z-index: -1;
-    > *
-        height: 100%;
-        display: flex;
-        flex-direction: row;
-
-#applemusic-like-lyrics-view
-    applemusic-like-lyrics-view-style()
-    overflow: hidden;
-    z-index: 1;
-    -webkit-font-smoothing: antialiased;
-    *
-        z-index: 1;
-    margin: 30px;
-    height: "calc(100% - %s)" % (@margin * 2);
-    max-height: "calc(100% - %s)" % (@margin * 2);
-    max-width: "calc(100% - %s)" % (@margin * 2);
-    width: "calc(100% - %s)" % (@margin * 2);
-    display: flex;
-    flex-direction: row
+applemusic-like-lyrics-view-style()
+    svg
+        width: unset;
+        height: unset;
     
     .am-lyric-view-loading
         flex: 1;
@@ -240,8 +188,10 @@
     &.lyric-blur-effect
         .am-lyric-line
             filter: blur(4px);
-            &.am-lyric-line-after
+            &.am-lyric-line-after, &.am-lyric-line-before
                 filter: blur(4px);
+                &.am-lyric-line-selected
+                    filter: blur(0px);
             for i in (-5..5)
                 if i != 0
                     &.am-lyric-line-o{i}
@@ -258,6 +208,9 @@
                 opacity: 0.3;
             &.am-lyric-line-o3
                 opacity: 0.2;
+            > .am-lyric-line-dynamic > *
+                > .am-lyric-real-word
+                    opacity: 1;
                 
     // 自定义歌词字体大小
     &.lyric-fixed-font-size
@@ -284,11 +237,11 @@
         justify-content: left;
 
     // 隐藏歌手名标签
-    &.hide-left-music-artists-label .am-artists-label
+    &.hide-music-artists-label .am-artists-label
         display: none;
 
     // 隐藏专辑名标签
-    &.hide-left-music-album-label .am-album-label
+    &.hide-music-album-label .am-album-label
         display: none;
     
     .am-lyric-line
@@ -318,9 +271,8 @@
                 position: absolute;
                 white-space: nowrap;
                 overflow: hidden;
-                height: 200%;
             > .am-lyric-real-word
-                opacity: 1;
+                opacity: 0.75;
                 transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1);
             
         &:hover::before
@@ -334,6 +286,7 @@
             background-color: #FFF4;
         
         &.am-lyric-line-after
+            opacity: 0.5;
             > .am-lyric-line-dynamic > * > .am-lyric-fake-word
                 opacity: 0.5;
                 animation-name: unset;
@@ -415,36 +368,3 @@
             }
         }
 
-// 自动隐藏播放栏和控制栏
-.mq-playing .g-hd,
-.m-winctrl,
-#main-player
-.g-singlec-comment-detail.z-show,
-.m-pinfo 
-    opacity: 1;
-    transition: opacity 0.5s;
-
-.mq-playing .g-hd.hide,
-.m-winctrl.hide,
-#main-player.hide,
-.g-singlec-comment-detail.z-show.hide,
-.m-pinfo.hide
-    opacity: 0 !important;
-
-.m-winctrl.disabled
-    display: none;
-
-.g-singlec-ct
-    top: 0;
-.g-single
-    bottom: 0;
-
-// 将被压下去的评论页面按钮恢复正确位置
-.g-singlec-comment,
-.g-singlec-comment-detail,
-.g-singlec-comment-top
-    bottom: 20px + 60px;
-
-// MoTheme 会修改播放页面的大小，导致歌词页面不能正确居中
-.g-bds-fix, .g-single
-    bottom: 0 !important;

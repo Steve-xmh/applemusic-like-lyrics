@@ -1,3 +1,3 @@
-import Group from './Group'
+import Group from "./Group";
 
-export const mainGroup = new Group()
+export const mainGroup = new Group();
