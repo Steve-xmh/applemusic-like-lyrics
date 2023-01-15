@@ -57,7 +57,22 @@ import {
 	IconTrash,
 } from "@tabler/icons";
 
-const loadLyric = async (id: string | number) => {
+interface LyricFileEntry {
+	version: number;
+	lyric: string;
+}
+
+interface LyricFile {
+	lrc?: LyricFileEntry;
+	klyric?: LyricFileEntry;
+	tlyric?: LyricFileEntry;
+	romalrc?: LyricFileEntry;
+	yrc?: LyricFileEntry;
+	yromalrc?: LyricFileEntry;
+	ytlrc?: LyricFileEntry;
+}
+
+const loadLyric = async (id: string | number): Promise<LyricFile> => {
 	const lyricsPath = `${plugin.pluginPath}/lyrics`;
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
 	try {
@@ -255,39 +270,6 @@ export const LyricView: React.FC<{
 		log("滚动事件", evt);
 	};
 
-	const loadLyric = React.useCallback(async (id: string | number) => {
-		const lyricsPath = `${plugin.pluginPath}/lyrics`;
-		const cachedLyricPath = `${lyricsPath}/${id}.json`;
-		try {
-			if (await betterncm.fs.exists(cachedLyricPath)) {
-				const cachedLyricData = await betterncm.fs.readFileText(
-					cachedLyricPath,
-				);
-				return JSON.parse(cachedLyricData);
-			}
-		} catch (err) {
-			warn("警告：加载已缓存歌词失败", err);
-		}
-		if (typeof id === "number") {
-			const data = await getLyric(id);
-			try {
-				if (!(await betterncm.fs.exists(lyricsPath))) {
-					betterncm.fs.mkdir(lyricsPath);
-				}
-				await betterncm.fs.writeFile(
-					cachedLyricPath,
-					JSON.stringify(data, null, 4),
-				);
-			} catch (err) {
-				warn("警告：缓存歌词失败", err);
-			}
-			return data;
-		} else {
-			// 如果是摘要字符串的话，那就是本地文件
-			return {};
-		}
-	}, []);
-
 	const [selectMusicIdModalOpened, setSelectMusicIdModalOpened] =
 		React.useState(false);
 
@@ -300,31 +282,58 @@ export const LyricView: React.FC<{
 	const [selectLocalLyricModalLoading, setLocalLyricModalLoading] =
 		React.useState(false);
 
+	const [currentRawLyricResp, setCurrentRawLyricResp] =
+		React.useState<LyricFile>({});
+
 	const reloadLyricByCurrentAudioId = React.useCallback(async () => {
 		setError(null);
 		setCurrentLyrics(null);
 		try {
 			const lyric = await loadLyric(musicId);
 			log("已获取到歌词", lyric);
-			const parsed = parseLyric(
-				lyric?.lrc?.lyric || "",
-				(lyric?.yrc?.lyric
-					? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
-					: lyric?.tlyric?.lyric) || "",
-				(lyric?.yrc?.lyric
-					? lyric?.yromalrc?.lyric || lyric?.romalrc?.lyric
-					: lyric?.romalrc?.lyric) || "",
-				lyric?.yrc?.lyric || "",
-			);
-			log(lyric, parsed);
-			scrollDelayRef.current = 0;
-			setCurrentLyrics(parsed);
-			setCurrentLyricIndex(-1);
-			keepSelectLyrics.current.clear();
+			setCurrentRawLyricResp(lyric);
 		} catch (err) {
 			setError(err);
 		}
 	}, [musicId]);
+
+	React.useEffect(() => {
+		let parsed: LyricLine[] = [];
+		let canUseDynamicLyric = !(
+			!currentRawLyricResp?.yrc?.lyric ||
+			(configTranslatedLyric === "true" &&
+				(currentRawLyricResp?.tlyric?.lyric?.length ?? 0) > 0 &&
+				!currentRawLyricResp.ytlrc) ||
+			(configRomanLyric === "true" &&
+				(currentRawLyricResp?.romalrc?.lyric?.length ?? 0) > 0 &&
+				!currentRawLyricResp.yromalrc)
+		);
+		if (configDynamicLyric === "true" && canUseDynamicLyric) {
+			parsed = parseLyric(
+				currentRawLyricResp?.yrc?.lyric || "",
+				currentRawLyricResp?.ytlrc?.lyric || "",
+				currentRawLyricResp?.yromalrc?.lyric || "",
+				currentRawLyricResp?.yrc?.lyric || "",
+			);
+		} else {
+			parsed = parseLyric(
+				currentRawLyricResp?.lrc?.lyric || "",
+				currentRawLyricResp?.tlyric?.lyric || "",
+				currentRawLyricResp?.romalrc?.lyric || "",
+				"",
+			);
+		}
+		log(currentRawLyricResp, parsed);
+		scrollDelayRef.current = 0;
+		setCurrentLyrics(parsed);
+		setCurrentLyricIndex(-1);
+		keepSelectLyrics.current.clear();
+	}, [
+		currentRawLyricResp,
+		configDynamicLyric,
+		configRomanLyric,
+		configTranslatedLyric,
+	]);
 
 	React.useEffect(() => {
 		if (isLyricPageOpening) {
@@ -336,23 +345,8 @@ export const LyricView: React.FC<{
 				setCurrentLyrics(null);
 				try {
 					const lyric = await loadLyric(musicId);
-					log("已获取到歌词", lyric);
-					const parsed = parseLyric(
-						lyric?.lrc?.lyric || "",
-						(lyric?.yrc?.lyric
-							? lyric?.ytlrc?.lyric || lyric?.tlyric?.lyric
-							: lyric?.tlyric?.lyric) || "",
-						(lyric?.yrc?.lyric
-							? lyric?.yromalrc?.lyric || lyric?.romalrc?.lyric
-							: lyric?.romalrc?.lyric) || "",
-						lyric?.yrc?.lyric || "",
-					);
-					log(lyric, parsed);
 					if (!canceled) {
-						scrollDelayRef.current = 0;
-						setCurrentLyrics(parsed);
-						setCurrentLyricIndex(-1);
-						keepSelectLyrics.current.clear();
+						setCurrentRawLyricResp(lyric);
 					}
 				} catch (err) {
 					setError(err);
@@ -611,11 +605,17 @@ export const LyricView: React.FC<{
 
 	React.useEffect(() => {
 		if (isLyricPageOpening) {
+			let lastProgressTime = Date.now();
 			const onPlayProgress = (
 				audioId: string,
 				progress: number,
 				loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			) => {
+				let curTime = Date.now();
+				if (curTime - lastProgressTime < 30) {
+					lastProgressTime = curTime;
+					setPlayState(PlayState.Playing);
+				}
 				const time = (progress * 1000) | 0;
 				let curLyricIndex: number | null = null;
 				if (currentLyrics) {
@@ -996,7 +996,7 @@ export const LyricView: React.FC<{
 						})}
 						type="button"
 					>
-						逐词歌词（实验性）
+						逐词歌词
 					</button>
 					<button
 						onClick={() => {
