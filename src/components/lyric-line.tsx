@@ -25,7 +25,8 @@ export const LyricLineView: React.FC<{
 		>
 			{props.dynamic &&
 			props.line.dynamicLyric &&
-			props.line.dynamicLyricTime ? (
+			props.line.dynamicLyricTime &&
+			(props.selected || Math.abs(props.offset) === 1) ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
 						// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>

@@ -41,14 +41,9 @@ export const WarningsList: React.FC = () => {
 				<Alert
 					sx={{ margin: "16px 0" }}
 					color="yellow"
-					title="警告：检测到 RefinedNowPlaying 插件"
+					title="错误：检测到不兼容的 RefinedNowPlaying 插件"
 				>
-					<div>
-						本插件将会全部替换 RefinedNowPlaying
-						的歌词、专辑图、音乐信息等样式，RefinedNowPlaying
-						中的设置选项将会失效。
-					</div>
-					<div>（说白了就是人家有的我也有，没必要装两个）</div>
+					<div>说吧你是怎么装上去的</div>
 				</Alert>
 			) : (
 				<></>

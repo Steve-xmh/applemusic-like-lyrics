@@ -19,9 +19,16 @@ let selectIndex = 0;
 export function getNCMImageUrl(id: number | string) {
 	selectIndex++;
 	selectIndex %= NCM_IMAGE_CDNS.length;
-	return `${NCM_IMAGE_CDNS[selectIndex]}${channel.encryptId(
-		id.toString(),
-	)}/${id}.jpg`;
+	if (APP_CONF.isOSX) {
+		return `${NCM_IMAGE_CDNS[selectIndex]}${callCachedSearchFunction(
+			"R$nameDo",
+			["encryptId", id.toString()],
+		)}/${id}.jpg`;
+	} else {
+		return `${NCM_IMAGE_CDNS[selectIndex]}${channel.encryptId(
+			id.toString(),
+		)}/${id}.jpg`;
+	}
 }
 
 export interface EAPIRequestConfig {
@@ -159,7 +166,8 @@ export function tryFindEapiRequestFuncName(
 ): string | null {
 	const result = betterncm.ncm.findApiFunction(
 		(v) =>
-			v.toString().includes("_bindTokenRequest yidun getToken undefined") &&
+			(v.toString().includes("_bindTokenRequest yidun getToken undefined") ||
+				v.toString().includes("/api/register/anonimous")) &&
 			v !== tryFindEapiRequestFuncName,
 	);
 	if (result) {
@@ -288,7 +296,7 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  * @returns 当前歌曲的播放信息
  */
 export function getPlayingSong() {
-	return callCachedSearchFunction("getPlaying", []);
+	return callCachedSearchFunction("baJ", []);
 }
 
 export function genAudioPlayerCommand(audioId: string, command: string) {

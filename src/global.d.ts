@@ -52,6 +52,7 @@ declare const betterncm: typeof import("betterncm-api/index").default;
 declare const legacyNativeCmder: any;
 declare const DEBUG: boolean;
 declare const OPEN_PAGE_DIRECTLY: boolean;
+declare const isOSX: boolean;
 interface Document {
 	webkitIsFullScreen: boolean;
 }

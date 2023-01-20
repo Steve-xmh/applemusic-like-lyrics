@@ -61,7 +61,8 @@ export function defineWorkerFunction<Args extends any[], Ret>(
 			});
 		} else {
 			// Worker 尚未运行，在本地线程执行
-			warn("AMLL Worker 尚未运行，正在本地线程执行函数", funcName, args);
+			if (!APP_CONF.isOSX)
+				warn("AMLL Worker 尚未运行，正在本地线程执行函数", funcName, args);
 			try {
 				const result = funcBody(...args);
 				return Promise.resolve(result);

@@ -3,6 +3,7 @@ const { stylusLoader } = require("esbuild-stylus-loader");
 const JSZip = require("jszip");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const manifest = require("./manifest.json");
 
 let entryPoints = [
@@ -17,7 +18,17 @@ if (process.argv.includes("--style-only")) {
 	entryPoints = ["src/index.styl"];
 }
 
-const betterncmUserPath = process.env["BETTERNCM_PROFILE"] || "C:/betterncm";
+function getDefaultBetterNCMPath() {
+	if (os.type() === "Windows_NT") {
+		return "C:/betterncm";
+	} else if (os.type() === "Darwin") {
+		return path.resolve(os.userInfo().homedir, ".betterncm");
+	}
+	return "./betterncm";
+}
+
+const betterncmUserPath =
+	process.env["BETTERNCM_PROFILE"] || getDefaultBetterNCMPath();
 const devPath = path.resolve(
 	betterncmUserPath,
 	"plugins_dev",
@@ -37,6 +48,7 @@ build({
 	sourcemap: process.argv.includes("--dev") ? "inline" : false,
 	minify: !process.argv.includes("--dev"),
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
+	target: "safari11",
 	define: {
 		DEBUG: process.argv.includes("--dev").toString(),
 		OPEN_PAGE_DIRECTLY: process.argv

@@ -216,6 +216,14 @@ applemusic-like-lyrics-view-style()
     &.lyric-fixed-font-size
         .am-lyric-line
             font-size: @css { max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) };
+        .am-lyric-dots
+            &.am-lyric-dots-selected
+                height: @css { calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5) };
+            > *
+                margin-right: @css { calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333) };
+                width: @css { calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25) };
+                height: @css { calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25) };
+            
     
     &.use-ping-fang-font *
         font-family: 'PingFang SC' !important;
