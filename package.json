@@ -1,8 +1,9 @@
 {
   "name": "applemusic-like-lyrics",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "main": "index.js",
-  "license": "MIT",
+  "private": true,
+  "license": "GPL-3.0",
   "scripts": {
     "dist": "node build.js --dist",
     "build": "node build.js",
@@ -21,6 +22,7 @@
     "color-quantize": "^0.1.1",
     "esbuild": "^0.16.1",
     "esbuild-stylus-loader": "^0.4.2",
+    "jotai": "^1.13.1",
     "jszip": "^3.10.1",
     "node-vibrant": "^3.2.1-alpha.1",
     "prismjs": "^1.29.0",

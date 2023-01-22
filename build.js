@@ -49,6 +49,7 @@ build({
 	minify: !process.argv.includes("--dev"),
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
+	charset: "utf8",
 	define: {
 		DEBUG: process.argv.includes("--dev").toString(),
 		OPEN_PAGE_DIRECTLY: process.argv

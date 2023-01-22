@@ -1,5 +1,5 @@
 import { classname } from "../api";
-import { LyricLine } from "../lyric-parser";
+import { LyricLine } from "../core/lyric-parser";
 
 export const LyricLineView: React.FC<{
 	offset: number;

@@ -1,10 +1,14 @@
 import * as React from "react";
-import { getConfig, setConfig } from "./config/core";
-import { version } from "../manifest.json";
-import { GLOBAL_EVENTS } from "./global-events";
-import { log, warn } from "./logger";
-import { getNCMImageUrl, getPlayingSong } from "./api";
-import { lfpPluginEnabled, lfpPluginSupported } from "./lib-frontend-play";
+import { getConfig, setConfig } from "../config/core";
+import { version } from "../../manifest.json";
+import { GLOBAL_EVENTS } from "../utils/global-events";
+import { log, warn } from "../utils/logger";
+import { getNCMImageUrl, getPlayingSong } from ".";
+import {
+	lfpPluginEnabled,
+	lfpPluginSupported,
+} from "../bindings/lib-frontend-play";
+import { useAtomValue } from "jotai";
 
 export function useConfig(
 	key: string,
@@ -65,27 +69,8 @@ export function useNowPlayingOpened(): boolean {
 }
 
 export function useLFPSupported(): [boolean, boolean] {
-	const [supported, setSupported] = React.useState(lfpPluginSupported);
-	const [enabled, setEnabled] = React.useState(lfpPluginEnabled);
-	React.useEffect(() => {
-		GLOBAL_EVENTS.addEventListener(
-			"lfp-supported",
-			() => {
-				setSupported(true);
-			},
-			{
-				once: true,
-			},
-		);
-
-		GLOBAL_EVENTS.addEventListener("lfp-enabled", () => {
-			setEnabled(true);
-		});
-
-		GLOBAL_EVENTS.addEventListener("lfp-disabled", () => {
-			setEnabled(false);
-		});
-	}, []);
+	const supported = useAtomValue(lfpPluginSupported);
+	const enabled = useAtomValue(lfpPluginEnabled);
 
 	return [supported, enabled];
 }
@@ -125,7 +110,7 @@ export async function checkGithubLatestVersion(force = false): Promise<string> {
 	try {
 		const manifest = (await (
 			await fetch(`https://ghproxy.com/${GITHUB_DIST_MANIFEST_URL}`)
-		).json()) as typeof import("../dist/manifest.json");
+		).json()) as typeof import("../../dist/manifest.json");
 		if (cachedLatestVersion !== manifest.version) {
 			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
 		}
@@ -136,7 +121,7 @@ export async function checkGithubLatestVersion(force = false): Promise<string> {
 	try {
 		const manifest = (await (
 			await fetch(GITHUB_DIST_MANIFEST_URL)
-		).json()) as typeof import("../dist/manifest.json");
+		).json()) as typeof import("../../dist/manifest.json");
 		if (cachedLatestVersion !== manifest.version) {
 			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
 		}

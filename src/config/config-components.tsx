@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useConfig } from "../react-api";
+import { useConfig } from "../api/react";
 import {
 	ColorInput,
 	Slider,

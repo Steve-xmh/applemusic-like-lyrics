@@ -1,5 +1,4 @@
-import { getConfig } from "./config/core";
-import { log } from "./logger";
+import { getConfig } from "../config/core";
 
 export interface DynamicLyricWord {
 	time: number;

@@ -1,4 +1,4 @@
-import { log } from "./logger";
+import { log } from "./utils/logger";
 
 const hookCall = channel.call;
 

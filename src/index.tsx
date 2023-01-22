@@ -1,10 +1,10 @@
-/// <reference types="./global" />
+/// <reference types="./types/global" />
 import "./config";
 import { createRoot } from "react-dom/client";
-import { LyricView } from "./components/lyric-view";
-import { GLOBAL_EVENTS } from "./global-events";
+import { LyricView } from "./components/lyric-player";
+import { GLOBAL_EVENTS } from "./utils/global-events";
 import * as React from "react";
-import { MantineProvider, createStyles } from "@mantine/core";
+import { MantineProvider, createStyles, Title } from "@mantine/core";
 import { getConfig, getFullConfig } from "./config/core";
 import { currentWorkerScript, restartWorker } from "./worker";
 
@@ -17,6 +17,46 @@ export let mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "applemusic-like-lyrics-view";
 export let fmViewElement: HTMLDivElement = document.createElement("div");
 fmViewElement.id = "applemusic-like-lyrics-view-fm";
+
+class ErrorBoundary extends React.Component<
+	{
+		children: React.ReactNode;
+	},
+	{
+		hasError: boolean;
+		error?: Error;
+	}
+> {
+	constructor(props) {
+		super(props);
+		this.state = { hasError: false };
+	}
+
+	static getDerivedStateFromError(error: Error) {
+		return { hasError: true, error: error };
+	}
+
+	componentDidCatch(error, errorInfo) {
+		warn(error, errorInfo);
+	}
+
+	render() {
+		if (this.state.hasError) {
+			// You can render any custom fallback UI
+			return (
+				<div>
+					<Title order={2}>哦不，出大事情了</Title>
+					<div>发生了不可恢复的错误，给作者送 Issue 吧（</div>
+					<pre>{this.state.error?.name}</pre>
+					<pre>{this.state.error?.message}</pre>
+					<pre>{this.state.error?.stack}</pre>
+				</div>
+			);
+		}
+
+		return this.props.children;
+	}
+}
 
 const FMPlayerWrapper: React.FC = () => {
 	const [height, setHeight] = React.useState(0);
@@ -52,7 +92,9 @@ const FMPlayerWrapper: React.FC = () => {
 				height,
 			}}
 		>
-			<LyricView isFM />
+			<ErrorBoundary>
+				<LyricView isFM />
+			</ErrorBoundary>
 		</div>
 	);
 };
@@ -218,7 +260,11 @@ plugin.onLoad(() => {
 					const nowPlayingFrame = element.querySelector(".n-single");
 					if (albumImageElement && nowPlayingFrame) {
 						reloadStylesheet(cssContent);
-						createRoot(mainViewElement).render(<LyricView />);
+						createRoot(mainViewElement).render(
+							<ErrorBoundary>
+								<LyricView />
+							</ErrorBoundary>,
+						);
 						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
 						nowPlayingFrame?.setAttribute("style", "display:none;");
 						lyricPageObserver.disconnect();
@@ -384,19 +430,16 @@ plugin.onLoad(() => {
 
 			const checkFileOrReloadFunc = {};
 
-			await betterncm?.fs?.watchDirectory(
-				plugin.pluginPath,
-				(dirPath, filename) => {
-					const normalizedDirPath = Utils.normalizePath(dirPath);
-					const fullPath = Utils.normalizePath(`${dirPath}/${filename}`);
-					const relPath = fullPath.replace(normalizedDirPath, "");
-					checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
-						() => checkFileOrReload(relPath),
-						1000,
-					);
-					checkFileOrReloadFunc[relPath]();
-				},
-			);
+			betterncm?.fs?.watchDirectory(plugin.pluginPath, (dirPath, filename) => {
+				const normalizedDirPath = Utils.normalizePath(dirPath);
+				const fullPath = Utils.normalizePath(`${dirPath}/${filename}`);
+				const relPath = fullPath.replace(normalizedDirPath, "");
+				checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
+					() => checkFileOrReload(relPath),
+					1000,
+				);
+				checkFileOrReloadFunc[relPath]();
+			});
 		})();
 	}
 	betterncm.fs
@@ -485,9 +528,9 @@ import * as APIs from "./api";
 import * as Utils from "./utils";
 import * as WorkerAPIs from "./worker";
 import { checkEapiRequestFuncName } from "./api";
-import { log, warn } from "./logger";
+import { log, warn } from "./utils/logger";
 import { onMainMessage } from "./worker";
-import { checkLibFrontendPlaySupport } from "./lib-frontend-play";
+import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

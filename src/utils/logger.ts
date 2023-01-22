@@ -1,4 +1,4 @@
-import { IS_WORKER } from "./utils";
+import { IS_WORKER } from "../utils";
 
 const noop = () => {};
 

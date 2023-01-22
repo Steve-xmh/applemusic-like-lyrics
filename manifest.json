@@ -12,7 +12,7 @@
     "version": "1.6.3",
     "type": "extension",
     "noDevReload": true,
-    "requirements": [],
+    "requirements": ["LibSongInfo", "LibLyric"],
     "incompatible": [],
     "betterncm_version": ">=1.0.0",
     "injects": {

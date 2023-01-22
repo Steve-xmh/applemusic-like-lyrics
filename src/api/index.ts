@@ -1,7 +1,7 @@
-import { getConfig, setConfig } from "./config/core";
-import { GLOBAL_EVENTS } from "./global-events";
-import { log } from "./logger";
-import { genRandomString } from "./utils";
+import { getConfig, setConfig } from "../config/core";
+import { GLOBAL_EVENTS } from "../utils/global-events";
+import { log } from "../utils/logger";
+import { genRandomString } from "../utils";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export const settingPrefix = "applemusic-like-lyrics:";
@@ -164,10 +164,13 @@ export function getListenTogetherStatus() {
 export function tryFindEapiRequestFuncName(
 	unsafe: boolean = false,
 ): string | null {
+	// 为了避免自身被搜索到，就把字符串拆开来组合了
+	const keyword1 = ["_bindTokenRequest", "yidun", "getToken", "undefined"];
+	const keyword2 = ["/api", "register", "anonimous"];
 	const result = betterncm.ncm.findApiFunction(
 		(v) =>
-			(v.toString().includes("_bindTokenRequest yidun getToken undefined") ||
-				v.toString().includes("/api/register/anonimous")) &&
+			(v.toString().includes(keyword1.join(" ")) ||
+				v.toString().includes(keyword2.join("/"))) &&
 			v !== tryFindEapiRequestFuncName,
 	);
 	if (result) {
@@ -194,22 +197,22 @@ export function tryFindEapiRequestFuncName(
 }
 
 // rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
-function callCachedSearchFunction<F extends (...args: any[]) => any>(
-	searchFunctionName: string,
+export function callCachedSearchFunction<F extends (...args: any[]) => any>(
+	searchFunctionName: string | ((func: Function) => boolean),
 	args: Parameters<F>,
 ): ReturnType<F> {
-	if (!cachedFunctionMap.has(searchFunctionName)) {
+	if (!cachedFunctionMap.has(searchFunctionName.toString())) {
 		const findResult = betterncm.ncm.findApiFunction(searchFunctionName);
 		if (findResult) {
 			const [func, funcRoot] = findResult;
-			cachedFunctionMap.set(searchFunctionName, func.bind(funcRoot));
+			cachedFunctionMap.set(searchFunctionName.toString(), func.bind(funcRoot));
 		}
 	}
-	const cachedFunc = cachedFunctionMap.get(searchFunctionName);
+	const cachedFunc = cachedFunctionMap.get(searchFunctionName.toString());
 	if (cachedFunc) {
 		return cachedFunc.apply(null, args);
 	} else {
-		throw new TypeError(`函数 ${searchFunctionName} 未找到`);
+		throw new TypeError(`函数 ${searchFunctionName.toString()} 未找到`);
 	}
 }
 
@@ -296,7 +299,7 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  * @returns 当前歌曲的播放信息
  */
 export function getPlayingSong() {
-	return callCachedSearchFunction("baJ", []);
+	return loadedPlugins.libsonginfo.getPlaying();
 }
 
 export function genAudioPlayerCommand(audioId: string, command: string) {

@@ -4,8 +4,8 @@
  * 配置会先读取然后缓存，写入的时候会做防抖后再写入
  */
 
-import { GLOBAL_EVENTS } from "../global-events";
-import { warn } from "../logger";
+import { GLOBAL_EVENTS } from "../utils/global-events";
+import { warn } from "../utils/logger";
 import { debounce, IS_WORKER } from "../utils";
 import { slug } from "../../manifest.json";
 import { setConfigFromMain } from "../worker";

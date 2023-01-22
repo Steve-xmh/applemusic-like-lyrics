@@ -9,7 +9,7 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-regex";
 import "prismjs/components/prism-javascript";
-import { useConfig, useLFPSupported } from "../react-api";
+import { useConfig, useLFPSupported } from "../api/react";
 
 export const OtherStyleSettings: React.FC = () => {
 	const [customBackgroundRenderFunc, setCustomBackgroundRenderFunc] = useConfig(

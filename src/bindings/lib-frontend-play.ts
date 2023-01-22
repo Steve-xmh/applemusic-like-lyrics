@@ -3,16 +3,19 @@
  * 和 LibFrontendPlay 插件的扩展支持库
  */
 
-import { GLOBAL_EVENTS } from "./global-events";
-import { warn } from "./logger";
+import { GLOBAL_EVENTS } from "../utils/global-events";
+import { warn } from "../utils/logger";
+import { atom, useSetAtom } from "jotai";
 
-export let lfpPluginSupported = false;
-export let lfpPluginEnabled = false;
+export const lfpPluginSupported = atom(false);
+export const lfpPluginEnabled = atom(false);
 
 export function checkLibFrontendPlaySupport() {
 	const lfpPlugin = loadedPlugins.LibFrontendPlay;
+	const setLfpPluginSupported = useSetAtom(lfpPluginSupported);
+	const setLfpPluginEnabled = useSetAtom(lfpPluginEnabled);
 	if (lfpPlugin) {
-		lfpPluginEnabled = lfpPlugin.enabled;
+		setLfpPluginEnabled(lfpPlugin.enabled);
 		try {
 			// 借用其可视化效果
 			lfpPlugin.addEventListener(
@@ -24,19 +27,16 @@ export function checkLibFrontendPlaySupport() {
 			lfpPlugin.addEventListener(
 				"pluginEnabled",
 				(evt: CustomEvent<HTMLAudioElement>) => {
-					lfpPluginEnabled = true;
-					GLOBAL_EVENTS.dispatchEvent(new CustomEvent("lfp-enabled"));
+					setLfpPluginSupported(true);
 				},
 			);
 			lfpPlugin.addEventListener(
 				"pluginDisabled",
 				(evt: CustomEvent<HTMLAudioElement>) => {
-					lfpPluginEnabled = false;
-					GLOBAL_EVENTS.dispatchEvent(new CustomEvent("lfp-disabled"));
+					setLfpPluginSupported(false);
 				},
 			);
-			lfpPluginSupported = true;
-			GLOBAL_EVENTS.dispatchEvent(new CustomEvent("lfp-supported"));
+			setLfpPluginSupported(true);
 		} catch (err) {
 			warn("与 LibFrontendPlay 插件扩展支持失败", err);
 		}

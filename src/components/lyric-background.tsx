@@ -1,11 +1,11 @@
 import { useViewportSize } from "@mantine/hooks";
 import * as React from "react";
-import { log, warn } from "../logger";
-import { useAlbumImageUrl, useConfig, useLFPSupported } from "../react-api";
+import { log, warn } from "../utils/logger";
+import { useAlbumImageUrl, useConfig, useLFPSupported } from "../api/react";
 import { grabImageColors as workerGrabImageColors } from "../worker";
 import { genBitmapImage as apiGenBitmapImage } from "../api";
 import { drawImageProp } from "../utils";
-import { GLOBAL_EVENTS } from "../global-events";
+import { GLOBAL_EVENTS } from "../utils/global-events";
 import { getConfig } from "../config/core";
 
 interface RenderData {

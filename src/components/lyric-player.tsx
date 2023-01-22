@@ -14,19 +14,19 @@ import {
 	useFMOpened,
 	useForceUpdate,
 	useNowPlayingOpened,
-} from "../react-api";
+} from "../api/react";
 import { ThemeProvider } from "..";
-import { log, warn } from "../logger";
+import { log, warn } from "../utils/logger";
 import { LyricDots } from "./lyric-dots";
 import {
 	LyricLine,
 	parseLyric,
 	PURE_MUSIC_LYRIC_DATA,
 	PURE_MUSIC_LYRIC_LINE,
-} from "../lyric-parser";
+} from "../core/lyric-parser";
 import { Tween, Easing } from "../tweenjs";
 import * as React from "react";
-import { GLOBAL_EVENTS } from "../global-events";
+import { GLOBAL_EVENTS } from "../utils/global-events";
 import {
 	Loader,
 	Center,
@@ -265,7 +265,7 @@ export const LyricView: React.FC<{
 		};
 	}, []);
 
-	const onLyricScroll = (evt: Event) => {
+	const onLyricScroll = (evt: React.MouseEvent) => {
 		scrollDelayRef.current = Date.now();
 		log("滚动事件", evt);
 	};
@@ -481,18 +481,26 @@ export const LyricView: React.FC<{
 				(line.dynamicLyricTime || -1) >= 0
 			) {
 				log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
-				channel.call("audioplayer.seek", () => {}, [
-					currentAudioId,
-					genAudioPlayerCommand(currentAudioId, "seek"),
-					(line?.dynamicLyricTime || line.time) / 1000,
-				]);
+				legacyNativeCmder._envAdapter.callAdapter(
+					"audioplayer.seek",
+					[
+						currentAudioId,
+						genAudioPlayerCommand(currentAudioId, "seek"),
+						(line?.dynamicLyricTime || line.time) / 1000,
+					],
+					() => {},
+				);
 			} else if (line.time < currentAudioDuration && line.time >= 0) {
 				log("正在跳转到歌词时间", line.time);
-				channel.call("audioplayer.seek", () => {}, [
-					currentAudioId,
-					genAudioPlayerCommand(currentAudioId, "seek"),
-					line.time / 1000,
-				]);
+				legacyNativeCmder._envAdapter.callAdapter(
+					"audioplayer.seek",
+					[
+						currentAudioId,
+						genAudioPlayerCommand(currentAudioId, "seek"),
+						line.time / 1000,
+					],
+					() => {},
+				);
 			}
 		},
 		[currentAudioId, configDynamicLyric, currentAudioDuration],
@@ -606,6 +614,8 @@ export const LyricView: React.FC<{
 	React.useEffect(() => {
 		if (isLyricPageOpening) {
 			let lastProgressTime = Date.now();
+
+			let tweenId = 0;
 			const onPlayProgress = (
 				audioId: string,
 				progress: number,
@@ -615,6 +625,20 @@ export const LyricView: React.FC<{
 				if (curTime - lastProgressTime < 30) {
 					lastProgressTime = curTime;
 					setPlayState(PlayState.Playing);
+				}
+				if (playState === PlayState.Playing && APP_CONF.isOSX) {
+					// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
+					// 我们自己要做一个时间补偿
+					let originalProgress = progress;
+					const curTweenId = tweenId++;
+					const tweenPlayProgress = (delta: number) => {
+						if (playState === PlayState.Playing && curTweenId === tweenId) {
+							originalProgress += delta / 1000;
+							onPlayProgress(audioId, originalProgress, loadProgress);
+							requestAnimationFrame(tweenPlayProgress);
+						}
+					};
+					requestAnimationFrame(tweenPlayProgress);
 				}
 				const time = (progress * 1000) | 0;
 				let curLyricIndex: number | null = null;

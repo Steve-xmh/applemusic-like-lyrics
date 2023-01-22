@@ -1,6 +1,6 @@
 import { Title, Text, Space, ScrollArea } from "@mantine/core";
 import Editor from "react-simple-code-editor";
-import { useConfig } from "../react-api";
+import { useConfig } from "../api/react";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-css";
 

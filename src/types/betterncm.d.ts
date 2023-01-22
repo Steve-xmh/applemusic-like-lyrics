@@ -132,6 +132,10 @@ declare module "betterncm-api/fs" {
 		 * @param path 指定的文件或文件夹路径
 		 */
 		function remove(path: string): Promise<boolean>;
+		function watchDirectory(
+			watchDirPath: string,
+			callback: (dirPath: string, filename: string) => void,
+		): void;
 	}
 }
 declare module "betterncm-api/app" {
