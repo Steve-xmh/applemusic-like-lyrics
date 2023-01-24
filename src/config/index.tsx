@@ -12,6 +12,7 @@ import { LyricSourceSettings } from "./lyric-source";
 import { CustomCSSSettings } from "./custom-css";
 import { version } from "../../manifest.json";
 import { useGithubLatestVersion } from "../api/react";
+import { Provider } from "jotai";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 	return (
@@ -108,9 +109,11 @@ plugin.onConfig(() => {
 	root.style.height = "100%";
 
 	createRoot(root).render(
-		<ThemeProvider>
-			<ConfigComponent />
-		</ThemeProvider>,
+		<Provider>
+			<ThemeProvider>
+				<ConfigComponent />
+			</ThemeProvider>
+		</Provider>,
 	);
 
 	return root;

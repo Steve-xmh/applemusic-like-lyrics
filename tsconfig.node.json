@@ -1,0 +1,20 @@
+{
+    "include": [
+        "./build.mjs"
+    ],
+    "files": [
+        "./build.mjs"
+    ],
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": [
+            "ESNext"
+        ],
+        "module": "NodeNext",
+        "types": [],
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strictNullChecks": true,
+        "allowJs": false
+    }
+}

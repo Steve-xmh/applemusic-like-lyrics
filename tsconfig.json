@@ -1,11 +1,11 @@
 {
     "include": [
         "./src/**/*.ts",
-        "./src/**/*.tsx",
-        "./*.css"
+        "./src/**/*.tsx"
     ],
     "exclude": [
-        "./node_modules/@types/node/**/*.ts"
+        "./node_modules/@types/node/**/*.ts",
+        "./build.mjs"
     ],
     "compilerOptions": {
         "target": "ESNext",

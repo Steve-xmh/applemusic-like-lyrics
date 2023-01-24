@@ -87,15 +87,17 @@ const FMPlayerWrapper: React.FC = () => {
 	}, []);
 
 	return (
-		<div
-			style={{
-				height,
-			}}
-		>
-			<ErrorBoundary>
-				<LyricView isFM />
-			</ErrorBoundary>
-		</div>
+		<Provider>
+			<div
+				style={{
+					height,
+				}}
+			>
+				<ErrorBoundary>
+					<LyricView isFM />
+				</ErrorBoundary>
+			</div>
+		</Provider>
 	);
 };
 
@@ -261,9 +263,11 @@ plugin.onLoad(() => {
 					if (albumImageElement && nowPlayingFrame) {
 						reloadStylesheet(cssContent);
 						createRoot(mainViewElement).render(
-							<ErrorBoundary>
-								<LyricView />
-							</ErrorBoundary>,
+							<Provider>
+								<ErrorBoundary>
+									<LyricView />
+								</ErrorBoundary>
+							</Provider>,
 						);
 						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
 						nowPlayingFrame?.setAttribute("style", "display:none;");
@@ -513,8 +517,6 @@ export const useStyles = createStyles;
 export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 	return (
 		<MantineProvider
-			// withGlobalStyles
-			withNormalizeCSS
 			theme={{
 				colorScheme: "dark",
 			}}
@@ -531,6 +533,7 @@ import { checkEapiRequestFuncName } from "./api";
 import { log, warn } from "./utils/logger";
 import { onMainMessage } from "./worker";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
+import { Provider } from "jotai";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

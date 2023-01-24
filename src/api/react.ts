@@ -4,11 +4,7 @@ import { version } from "../../manifest.json";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
 import { getNCMImageUrl, getPlayingSong } from ".";
-import {
-	lfpPluginEnabled,
-	lfpPluginSupported,
-} from "../bindings/lib-frontend-play";
-import { useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 
 export function useConfig(
 	key: string,
@@ -68,9 +64,32 @@ export function useNowPlayingOpened(): boolean {
 	return value;
 }
 
+const lfpPluginSupported = atom(!!loadedPlugins.LibFrontendPlay);
+const lfpPluginEnabled = atom(false);
 export function useLFPSupported(): [boolean, boolean] {
-	const supported = useAtomValue(lfpPluginSupported);
-	const enabled = useAtomValue(lfpPluginEnabled);
+	const [supported, setSupported] = useAtom(lfpPluginSupported);
+	const [enabled, setEnabled] = useAtom(lfpPluginEnabled);
+
+	React.useEffect(() => {
+		if (loadedPlugins.LibFrontendPlay) {
+			setSupported(true);
+		}
+	}, []);
+
+	React.useEffect(() => {
+		const lfpPlugin = loadedPlugins.LibFrontendPlay;
+		if (lfpPlugin && supported) {
+			const onEnabled = () => setSupported(true);
+			const onDisabled = () => setSupported(false);
+			lfpPlugin.addEventListener("pluginEnabled", onEnabled);
+			lfpPlugin.addEventListener("pluginDisabled", onDisabled);
+			setEnabled(lfpPlugin.enabled);
+			return () => {
+				lfpPlugin.removeEventListener("pluginEnabled", onEnabled);
+				lfpPlugin.removeEventListener("pluginDisabled", onDisabled);
+			};
+		}
+	}, [supported]);
 
 	return [supported, enabled];
 }
@@ -246,6 +265,23 @@ export function useAlbumImageUrl(
 			}
 		};
 		const onError = (evt: ErrorEvent) => {
+			if (selected % 2 === 1 && shouldLowQuality) {
+				// 重试
+				let url = albumImageUrls[selected];
+				if (url.lastIndexOf("?") !== -1) {
+					url += `&t=${Date.now()}`;
+				} else {
+					url += `?t=${Date.now()}`;
+				}
+				imageLoader.current.src = url;
+				imageLoader.current.addEventListener("load", onLoad, {
+					once: true,
+				});
+				imageLoader.current.addEventListener("error", onError, {
+					once: true,
+				});
+				return;
+			}
 			selected += 2;
 			if (albumImageUrls[selected]) {
 				warn(

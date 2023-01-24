@@ -43,7 +43,6 @@ import {
 	Box,
 	ActionIcon,
 } from "@mantine/core";
-import { useDebouncedState } from "@mantine/hooks";
 import { LyricBackground } from "./lyric-background";
 import { LyricLineView } from "./lyric-line";
 import { guessTextReadDuration } from "../utils";
@@ -51,11 +50,10 @@ import {
 	IconDots,
 	IconHeart,
 	IconHeartBroken,
-	IconPlayerPlay,
-	IconPlayerSkipBack,
 	IconPlayerSkipForward,
 	IconTrash,
 } from "@tabler/icons";
+import { getMusicId } from "../core/states";
 
 interface LyricFileEntry {
 	version: number;
@@ -170,12 +168,6 @@ const SongView: React.FC<{ id?: number }> = (props) => {
 	);
 };
 
-const getMusicId = (): number =>
-	getPlayingSong()?.originFromTrack?.lrcid ||
-	getPlayingSong()?.originFromTrack?.track?.tid ||
-	getPlayingSong()?.data?.id ||
-	0;
-
 export const LyricView: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
@@ -244,11 +236,15 @@ export const LyricView: React.FC<{
 
 	React.useEffect(() => {
 		if (document.webkitIsFullScreen !== fullscreen) {
-			if (fullscreen) {
-				document.body.webkitRequestFullScreen(Element["ALLOW_KEYBOARD_INPUT"]);
-			} else {
-				document.exitFullscreen();
-			}
+			try {
+				if (fullscreen) {
+					document?.body?.webkitRequestFullScreen(
+						Element?.["ALLOW_KEYBOARD_INPUT"],
+					);
+				} else {
+					document?.exitFullscreen();
+				}
+			} catch {}
 		}
 	}, [fullscreen]);
 
@@ -483,23 +479,23 @@ export const LyricView: React.FC<{
 				log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
 				legacyNativeCmder._envAdapter.callAdapter(
 					"audioplayer.seek",
+					() => {},
 					[
 						currentAudioId,
 						genAudioPlayerCommand(currentAudioId, "seek"),
 						(line?.dynamicLyricTime || line.time) / 1000,
 					],
-					() => {},
 				);
 			} else if (line.time < currentAudioDuration && line.time >= 0) {
 				log("正在跳转到歌词时间", line.time);
 				legacyNativeCmder._envAdapter.callAdapter(
 					"audioplayer.seek",
+					() => {},
 					[
 						currentAudioId,
 						genAudioPlayerCommand(currentAudioId, "seek"),
 						line.time / 1000,
 					],
-					() => {},
 				);
 			}
 		},
@@ -761,7 +757,7 @@ export const LyricView: React.FC<{
 			if (line.originalLyric.trim().length > 0) {
 				return (
 					<LyricLineView
-						key={index}
+						key={`${index}-${line.time}-${line.originalLyric}`}
 						selected={index === currentLyricIndex || isTooFast}
 						line={line}
 						translated={configTranslatedLyric === "true"}
@@ -774,7 +770,7 @@ export const LyricView: React.FC<{
 			} else {
 				return (
 					<LyricDots
-						key={index}
+						key={`${index}-dots`}
 						selected={index === currentLyricIndex}
 						time={line.time}
 						offset={offset}
@@ -895,8 +891,7 @@ export const LyricView: React.FC<{
 						{hideMusicAlias !== "true" && songAliasName.length > 0 && (
 							<div className="am-music-alias">
 								{songAliasName.map((alia, index) => (
-									// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-									<div key={index}>{alia}</div>
+									<div key={`${alia}-${index}`}>{alia}</div>
 								))}
 							</div>
 						)}
@@ -905,7 +900,10 @@ export const LyricView: React.FC<{
 								<div className="am-artists-label">歌手：</div>
 								<div className="am-artists">
 									{songArtists.map((artist, index) => (
-										<a href={`#/m/artist/?id=${artist.id}`} key={artist.id}>
+										<a
+											href={`#/m/artist/?id=${artist.id}`}
+											key={`${artist.id}-${artist.name}-${index}`}
+										>
 											{artist.name}
 										</a>
 									))}

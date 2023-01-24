@@ -5,10 +5,10 @@
   "private": true,
   "license": "GPL-3.0",
   "scripts": {
-    "dist": "node build.js --dist",
-    "build": "node build.js",
-    "fmt": "rome format --write ./src ./build.js",
-    "build:dev": "node build.js --dev",
+    "dist": "node build.mjs --dist",
+    "build": "node build.mjs",
+    "fmt": "rome format --write ./src ./build.mjs",
+    "build:dev": "node build.mjs --dev",
     "build:dry": "esbuild ./src/index.tsx ./src/startup_script.ts ./src/index.css --define:DEBUG=false --minify --bundle --sourcemap --outdir=./out --target=chrome91"
   },
   "dependencies": {
@@ -24,7 +24,6 @@
     "esbuild-stylus-loader": "^0.4.2",
     "jotai": "^1.13.1",
     "jszip": "^3.10.1",
-    "node-vibrant": "^3.2.1-alpha.1",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

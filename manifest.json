@@ -12,8 +12,18 @@
     "version": "1.6.3",
     "type": "extension",
     "noDevReload": true,
-    "requirements": ["LibSongInfo", "LibLyric"],
-    "incompatible": [],
+    "requirements": [
+        "LibSongInfo",
+        "LibLyric"
+    ],
+    "loadAfter": [
+        "LibSongInfo",
+        "LibLyric",
+        "LibFrontendPlay"
+    ],
+    "incompatible": [
+        "RefinedNowPlaying"
+    ],
     "betterncm_version": ">=1.0.0",
     "injects": {
         "Main": [
