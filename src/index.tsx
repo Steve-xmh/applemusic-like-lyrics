@@ -88,6 +88,7 @@ const FMPlayerWrapper: React.FC = () => {
 
 	return (
 		<Provider>
+			<NCMEnvWrapper />
 			<div
 				style={{
 					height,
@@ -262,13 +263,6 @@ plugin.onLoad(() => {
 					const nowPlayingFrame = element.querySelector(".n-single");
 					if (albumImageElement && nowPlayingFrame) {
 						reloadStylesheet(cssContent);
-						createRoot(mainViewElement).render(
-							<Provider>
-								<ErrorBoundary>
-									<LyricView />
-								</ErrorBoundary>
-							</Provider>,
-						);
 						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
 						nowPlayingFrame?.setAttribute("style", "display:none;");
 						lyricPageObserver.disconnect();
@@ -291,13 +285,13 @@ plugin.onLoad(() => {
 		if (location.hash === "#/m/fm/") {
 			if (!injected) {
 				log("正在插入私人 FM 歌词显示");
-				fmLyricPageObserver = new MutationObserver((m) => {
+				const check = () => {
 					const element = document;
 					const fmPageEl = element.querySelector(".m-fm");
-					const playViewEl = element.querySelector(".g-play");
+					const playViewEl = element.querySelector(".g-play") ?? fmPageEl;
+					log("搜索 FM 歌词组件", fmPageEl, playViewEl);
 					if (fmPageEl && playViewEl) {
 						reloadStylesheet(cssContent);
-						createRoot(fmViewElement).render(<FMPlayerWrapper />);
 						playViewEl?.parentNode?.prepend(fmViewElement);
 						playViewEl?.setAttribute("style", "display:none;");
 						fmLyricPageObserver?.disconnect();
@@ -305,11 +299,13 @@ plugin.onLoad(() => {
 							new Event("fm-lyric-page-open", undefined),
 						);
 					}
-				});
+				};
+				fmLyricPageObserver = new MutationObserver(check);
 				fmLyricPageObserver.observe(document.body, {
 					childList: true,
 					subtree: true,
 				});
+				check();
 			}
 		} else {
 			GLOBAL_EVENTS.dispatchEvent(new Event("fm-lyric-page-hide", undefined));
@@ -476,24 +472,36 @@ window.addEventListener(
 	},
 );
 
-// window.addEventListener(
-// 	"load",
-// 	() => {
-// 		// 把所有被 Corona 遥测过的函数还原
-// 		for (const key in window) {
-// 			if (typeof window[key] === "function") {
-// 				if ("__corona__" in window[key] && "__orig__" in window[key]) {
-// 					// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-// 					window[key] = (window[key] as any).__orig__;
-// 					log("已还原被遥测函数", `window.${key}`);
-// 				}
-// 			}
-// 		}
-// 	},
-// 	{
-// 		once: true,
-// 	},
-// );
+window.addEventListener("load", () => {
+	createRoot(mainViewElement).render(
+		<Provider>
+			<ErrorBoundary>
+				<NCMEnvWrapper />
+				<LyricView />
+			</ErrorBoundary>
+		</Provider>,
+	);
+	createRoot(fmViewElement).render(<FMPlayerWrapper />);
+});
+
+window.addEventListener(
+	"load",
+	() => {
+		// 把所有被 Corona 遥测过的函数还原
+		for (const key in window) {
+			if (typeof window[key] === "function") {
+				if ("__corona__" in window[key] && "__orig__" in window[key]) {
+					// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+					window[key] = (window[key] as any).__orig__;
+					log("已还原被遥测函数", `window.${key}`);
+				}
+			}
+		}
+	},
+	{
+		once: true,
+	},
+);
 
 if (OPEN_PAGE_DIRECTLY) {
 	window.addEventListener(
@@ -534,6 +542,7 @@ import { log, warn } from "./utils/logger";
 import { onMainMessage } from "./worker";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 import { Provider } from "jotai";
+import { NCMEnvWrapper } from "./components/netease-api-wrapper";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

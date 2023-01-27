@@ -19,7 +19,7 @@ export function useConfig(
 	defaultValue?: string,
 ): [string | undefined, React.Dispatch<string | undefined>] {
 	const [value, setValue] = React.useState(
-		getConfig(key, defaultValue) || defaultValue,
+		getConfig(key, defaultValue) ?? defaultValue,
 	);
 	const eventKey = React.useMemo(() => `config-changed-${key}`, [key]);
 	React.useEffect(() => {
@@ -28,7 +28,7 @@ export function useConfig(
 	}, [value]);
 	React.useEffect(() => {
 		const onConfigUpdate = () => {
-			const newValue = getConfig(key, defaultValue) || defaultValue;
+			const newValue = getConfig(key, defaultValue) ?? defaultValue;
 			setValue(newValue);
 		};
 		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
@@ -37,6 +37,51 @@ export function useConfig(
 		};
 	}, [key, defaultValue, eventKey]);
 	return [value, setValue];
+}
+
+export function useConfigBoolean(
+	key: string,
+	defaultValue = false,
+): [boolean, React.Dispatch<boolean>] {
+	const [rawValue, setRawValue] = useConfig(key, defaultValue.toString());
+	const value = React.useMemo(() => rawValue !== "false", [rawValue]);
+	const setValue = (v: boolean) => setRawValue(v.toString());
+	return [value, setValue];
+}
+
+export function useConfigValue(key: string, defaultValue: string): string;
+export function useConfigValue(
+	key: string,
+	defaultValue?: string,
+): string | undefined;
+export function useConfigValue(
+	key: string,
+	defaultValue?: string,
+): string | undefined {
+	const [value, setValue] = React.useState(
+		getConfig(key, defaultValue) ?? defaultValue,
+	);
+	const eventKey = React.useMemo(() => `config-changed-${key}`, [key]);
+	React.useEffect(() => {
+		const onConfigUpdate = () => {
+			const newValue = getConfig(key, defaultValue) ?? defaultValue;
+			setValue(newValue);
+		};
+		GLOBAL_EVENTS.addEventListener(eventKey, onConfigUpdate);
+		return () => {
+			GLOBAL_EVENTS.removeEventListener(eventKey, onConfigUpdate);
+		};
+	}, [key, defaultValue, eventKey]);
+	return value;
+}
+
+export function useConfigValueBoolean(
+	key: string,
+	defaultValue = false,
+): boolean {
+	const rawValue = useConfigValue(key, defaultValue.toString());
+	const value = React.useMemo(() => rawValue !== "false", [rawValue]);
+	return value;
 }
 
 export function useNowPlayingOpened(): boolean {

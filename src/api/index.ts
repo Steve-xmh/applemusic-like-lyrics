@@ -1,6 +1,6 @@
 import { getConfig, setConfig } from "../config/core";
 import { GLOBAL_EVENTS } from "../utils/global-events";
-import { log } from "../utils/logger";
+import { log, warn } from "../utils/logger";
 import { genRandomString } from "../utils";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
@@ -301,6 +301,52 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
 export function getPlayingSong() {
 	return loadedPlugins.libsonginfo.getPlaying();
 }
+
+export interface LyricFileEntry {
+	version: number;
+	lyric: string;
+}
+
+export interface LyricFile {
+	lrc?: LyricFileEntry;
+	klyric?: LyricFileEntry;
+	tlyric?: LyricFileEntry;
+	romalrc?: LyricFileEntry;
+	yrc?: LyricFileEntry;
+	yromalrc?: LyricFileEntry;
+	ytlrc?: LyricFileEntry;
+}
+
+export const loadLyric = async (id: string | number): Promise<LyricFile> => {
+	const lyricsPath = `${plugin.pluginPath}/lyrics`;
+	const cachedLyricPath = `${lyricsPath}/${id}.json`;
+	try {
+		if (await betterncm.fs.exists(cachedLyricPath)) {
+			const cachedLyricData = await betterncm.fs.readFileText(cachedLyricPath);
+			return JSON.parse(cachedLyricData);
+		}
+	} catch (err) {
+		warn("警告：加载已缓存歌词失败", err);
+	}
+	if (typeof id === "number") {
+		const data = await getLyric(id);
+		try {
+			if (!(await betterncm.fs.exists(lyricsPath))) {
+				betterncm.fs.mkdir(lyricsPath);
+			}
+			await betterncm.fs.writeFile(
+				cachedLyricPath,
+				JSON.stringify(data, null, 4),
+			);
+		} catch (err) {
+			warn("警告：缓存歌词失败", err);
+		}
+		return data;
+	} else {
+		// 如果是摘要字符串的话，那就是本地文件
+		return {};
+	}
+};
 
 export function genAudioPlayerCommand(audioId: string, command: string) {
 	return `${audioId}|${command}|${genRandomString(6)}`;
