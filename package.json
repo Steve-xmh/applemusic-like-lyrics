@@ -24,6 +24,7 @@
     "esbuild-stylus-loader": "^0.4.2",
     "jotai": "^1.13.1",
     "jszip": "^3.10.1",
+    "pangu": "^4.0.7",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

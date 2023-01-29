@@ -16,7 +16,7 @@ https://user-images.githubusercontent.com/39523898/212098052-86421fa1-558a-481f-
 
 - [RefinedNowPlaying - 一个美化网易云音乐播放界面的 BetterNCM 插件](https://github.com/solstice23/refined-now-playing-netease)
 
-主题插件作者推荐使用 MoTheme 或 Material You，其它主题插件作者没有使用过，可能需要你做一定的设置调整才能契合主题。
+主题插件作者推荐使用 MoTheme 或 [Material You](https://github.com/solstice23/material-you-theme-netease)，其它主题插件作者没有使用过，可能需要你做一定的设置调整才能契合主题。
 
 ## 开发/构建/打包流程
 

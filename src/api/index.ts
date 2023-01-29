@@ -7,8 +7,28 @@ const cachedFunctionMap: Map<string, Function> = new Map();
 export const settingPrefix = "applemusic-like-lyrics:";
 
 export enum PlayState {
-	Playing = 1,
-	Pausing = 2,
+	Playing = "playing",
+	Pausing = "pausing",
+}
+
+export function toPlayState(enumId: number): PlayState {
+	if (APP_CONF.isOSX) {
+		if (enumId === 1) {
+			return PlayState.Pausing;
+		} else if (enumId === 2) {
+			return PlayState.Playing;
+		} else {
+			throw new TypeError(`未知的播放状态值 ${enumId}`);
+		}
+	} else {
+		if (enumId === 1) {
+			return PlayState.Playing;
+		} else if (enumId === 2) {
+			return PlayState.Pausing;
+		} else {
+			throw new TypeError(`未知的播放状态值 ${enumId}`);
+		}
+	}
 }
 
 export const NCM_IMAGE_CDNS = [

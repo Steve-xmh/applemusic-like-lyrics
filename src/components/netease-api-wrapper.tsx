@@ -6,8 +6,8 @@
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
-import { getPlayingSong, loadLyric, PlayState } from "../api";
-import { useNowPlayingOpened, useConfigValueBoolean } from "../api/react";
+import { getPlayingSong, loadLyric, PlayState, toPlayState } from "../api";
+import { useNowPlayingOpened, useConfigValueBoolean, useFMOpened } from "../api/react";
 import { LyricLine, parseLyric } from "../core/lyric-parser";
 import {
 	currentAudioDurationAtom,
@@ -30,6 +30,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
+	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
 
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
@@ -41,7 +42,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	);
 
 	React.useEffect(() => {
-		if (isLyricPageOpening) {
+		if (isLyricPageOpening || isFMPageOpening) {
 			let canceled = false;
 			(async () => {
 				setCurrentLyrics(null);
@@ -59,7 +60,7 @@ export const NCMEnvWrapper: React.FC = () => {
 				setCurrentLyrics(null);
 			};
 		}
-	}, [musicId, isLyricPageOpening]);
+	}, [musicId, isLyricPageOpening, isFMPageOpening]);
 
 	React.useEffect(() => {
 		let parsed: LyricLine[] = [];
@@ -98,148 +99,145 @@ export const NCMEnvWrapper: React.FC = () => {
 	]);
 
 	React.useEffect(() => {
-		const currentPlayState = getPlayingSong().state;
-		log("当前播放状态", currentPlayState);
-		if (playState !== currentPlayState) {
-			setPlayState(currentPlayState);
-		}
+		setPlayState(getPlayingSong().state);
 	}, [isLyricPageOpening]);
 
 	React.useEffect(() => {
-		if (isLyricPageOpening) {
-			let lastProgressTime = Date.now();
+		log("当前播放状态", playState);
+	}, [playState]);
 
-			let tweenId = 0;
-			const onPlayProgress = (
-				audioId: string,
-				progress: number,
-				loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
-			) => {
-				let curTime = Date.now();
-				if (curTime - lastProgressTime < 30) {
-					lastProgressTime = curTime;
-					setPlayState(PlayState.Playing);
-				}
-				if (playState === PlayState.Playing && APP_CONF.isOSX) {
-					// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
-					// 我们自己要做一个时间补偿
-					let originalProgress = progress;
-					const curTweenId = tweenId++;
-					const tweenPlayProgress = (delta: number) => {
-						if (playState === PlayState.Playing && curTweenId === tweenId) {
-							originalProgress += delta / 1000;
-							onPlayProgress(audioId, originalProgress, loadProgress);
-							requestAnimationFrame(tweenPlayProgress);
-						}
-					};
-					requestAnimationFrame(tweenPlayProgress);
-				}
-				setCurrentAudioId(audioId);
-				const time = (progress * 1000) | 0;
-				let curLyricIndex: number | null = null;
-				if (currentLyrics) {
-					for (let i = currentLyrics.length - 1; i >= 0; i--) {
-						if (
-							time >
-							(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
-						) {
-							curLyricIndex = i;
-							break;
-						}
+	React.useEffect(() => {
+		let tweenId = 0;
+		const onPlayProgress = (
+			audioId: string,
+			progress: number,
+			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
+			isTween = false,
+		) => {
+			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
+				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
+				// 我们自己要做一个时间补偿
+				let originalProgress = progress;
+				const curTweenId = tweenId++;
+				const tweenPlayProgress = (delta: number) => {
+					if (playState === PlayState.Playing && curTweenId === tweenId) {
+						originalProgress += delta / 1000;
+						onPlayProgress(audioId, originalProgress, loadProgress, true);
+						requestAnimationFrame(tweenPlayProgress);
 					}
+				};
+				requestAnimationFrame(tweenPlayProgress);
+			}
+			setPlayState(toPlayState(getPlayingSong().state));
+			setCurrentAudioId(audioId);
+			const time = (progress * 1000) | 0;
+			let curLyricIndex: number | null = null;
+			if (currentLyrics) {
+				for (let i = currentLyrics.length - 1; i >= 0; i--) {
 					if (
-						curLyricIndex !== null &&
-						time <
-							currentLyrics[curLyricIndex].time +
-								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
-					) {
-						// log("回调已设置歌词位置为", curLyricIndex);
-						setCurrentLyricsIndex(curLyricIndex);
-					} else if (
-						currentLyrics[currentLyrics.length - 1] &&
 						time >
-							(currentLyrics[currentLyrics.length - 1]?.dynamicLyricTime ||
-								currentLyrics[currentLyrics.length - 1].time) +
-								currentLyrics[currentLyrics.length - 1].duration +
-								750
+						(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
 					) {
-						// log("回调已设置歌词位置为", currentLyrics.length);
-						setCurrentLyricsIndex(currentLyrics.length);
+						curLyricIndex = i;
+						break;
 					}
 				}
-			};
-
-			const onPlayStateChange = (
-				audioId: string,
-				stateId: string,
-				loadProgress: PlayState,
-			) => {
-				const state = stateId.split("|")[1];
-				setCurrentAudioId(audioId);
-				if (state === "pause") {
-					setPlayState(PlayState.Pausing);
-				} else if (state === "resume") {
-					setPlayState(PlayState.Playing);
+				if (
+					curLyricIndex !== null &&
+					time <
+						currentLyrics[curLyricIndex].time +
+							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
+				) {
+					// log("回调已设置歌词位置为", curLyricIndex);
+					setCurrentLyricsIndex(curLyricIndex);
+				} else if (
+					currentLyrics[currentLyrics.length - 1] &&
+					time >
+						(currentLyrics[currentLyrics.length - 1]?.dynamicLyricTime ||
+							currentLyrics[currentLyrics.length - 1].time) +
+							currentLyrics[currentLyrics.length - 1].duration +
+							750
+				) {
+					// log("回调已设置歌词位置为", currentLyrics.length);
+					setCurrentLyricsIndex(currentLyrics.length);
 				}
-			};
-
-			interface AudioLoadInfo {
-				activeCode: number;
-				code: number;
-				duration: number; // 单位秒
-				errorCode: number;
-				errorString: number;
 			}
+		};
 
-			interface AudioEndInfo {
-				code: number;
-				from: string; // switch
+		const onPlayStateChange = (
+			audioId: string,
+			stateId: string,
+			loadProgress: PlayState,
+		) => {
+			const state = stateId.split("|")[1];
+			setCurrentAudioId(audioId);
+			if (state === "pause") {
+				setPlayState(PlayState.Pausing);
+			} else if (state === "resume") {
+				setPlayState(PlayState.Playing);
 			}
+		};
 
-			const onLoad = (audioId: string, info: AudioLoadInfo) => {
-				setCurrentAudioDuration(((info?.duration || 0) * 1000) | 0);
-				setCurrentAudioId(audioId);
+		interface AudioLoadInfo {
+			activeCode: number;
+			code: number;
+			duration: number; // 单位秒
+			errorCode: number;
+			errorString: number;
+		}
+
+		interface AudioEndInfo {
+			code: number;
+			from: string; // switch
+		}
+
+		const onLoad = (audioId: string, info: AudioLoadInfo) => {
+			setCurrentAudioDuration(((info?.duration || 0) * 1000) | 0);
+			setCurrentAudioId(audioId);
+			setPlayingSongData(getPlayingSong());
+			setPlayState(toPlayState(getPlayingSong().state));
+		};
+
+		const onEnd = (audioId: string, _info: AudioEndInfo) => {
+			setCurrentAudioId(audioId);
+			setPlayingSongData(getPlayingSong());
+			setPlayState(toPlayState(getPlayingSong().state));
+			setTimeout(() => {
+				setCurrentAudioId(getMusicId().toString());
 				setPlayingSongData(getPlayingSong());
-			};
+			}, 200);
+		};
 
-			const onEnd = (audioId: string, _info: AudioEndInfo) => {
-				setCurrentAudioId(audioId);
-				setPlayingSongData(getPlayingSong());
-				setTimeout(() => {
-					setCurrentAudioId(getMusicId().toString());
-					setPlayingSongData(getPlayingSong());
-				}, 200);
-			};
+		legacyNativeCmder.appendRegisterCall(
+			"PlayProgress",
+			"audioplayer",
+			onPlayProgress,
+		);
+		legacyNativeCmder.appendRegisterCall(
+			"PlayState",
+			"audioplayer",
+			onPlayStateChange,
+		);
+		legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
+		legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
 
-			legacyNativeCmder.appendRegisterCall(
+		log("歌词页面已打开，已挂载进度事件");
+		return () => {
+			legacyNativeCmder.removeRegisterCall(
 				"PlayProgress",
 				"audioplayer",
 				onPlayProgress,
 			);
-			legacyNativeCmder.appendRegisterCall(
+			legacyNativeCmder.removeRegisterCall(
 				"PlayState",
 				"audioplayer",
 				onPlayStateChange,
 			);
-			legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
-			legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
-
-			return () => {
-				legacyNativeCmder.removeRegisterCall(
-					"PlayProgress",
-					"audioplayer",
-					onPlayProgress,
-				);
-				legacyNativeCmder.removeRegisterCall(
-					"PlayState",
-					"audioplayer",
-					onPlayStateChange,
-				);
-				legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
-				legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
-			};
-		}
-	}, [currentLyrics, playState, isLyricPageOpening]);
+			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
+			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
+			log("进度事件已解除挂载");
+		};
+	}, [currentLyrics, playState]);
 
 	return <></>;
 };
