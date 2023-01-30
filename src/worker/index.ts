@@ -35,6 +35,7 @@ export const definedFunctions: {
 } = {};
 const callbacks = new Map<string, [Function, Function]>();
 
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 export function defineWorkerFunction<Args extends any[], Ret>(
 	funcName: string,
 	funcBody: (...args: Args) => Ret,

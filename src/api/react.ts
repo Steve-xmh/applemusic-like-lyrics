@@ -4,7 +4,7 @@ import { version } from "../../manifest.json";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
 import { getNCMImageUrl, getPlayingSong } from ".";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtom } from "jotai";
 
 export function useConfig(
 	key: string,

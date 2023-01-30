@@ -35,6 +35,7 @@ export class Tween<T extends UnknownProps> {
 	private _easingFunction: EasingFunction = Easing.Linear.None;
 	private _interpolationFunction: InterpolationFunction = Interpolation.Linear;
 	// eslint-disable-next-line
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private _chainedTweens: Array<Tween<any>> = [];
 	private _onStartCallback?: (object: T) => void;
 	private _onStartCallbackFired = false;
@@ -86,7 +87,8 @@ export class Tween<T extends UnknownProps> {
 		}
 
 		// eslint-disable-next-line
-		this._group && this._group.add(this as any);
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		this._group?.add(this as any);
 
 		this._repeat = this._initialRepeat;
 
@@ -219,7 +221,8 @@ export class Tween<T extends UnknownProps> {
 		}
 
 		// eslint-disable-next-line
-		this._group && this._group.remove(this as any);
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		this._group?.remove(this as any);
 
 		this._isPlaying = false;
 
@@ -248,13 +251,14 @@ export class Tween<T extends UnknownProps> {
 		this._pauseStart = time;
 
 		// eslint-disable-next-line
-		this._group && this._group.remove(this as any);
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		this._group?.remove(this as any);
 
 		return this;
 	}
 
 	resume(time: number = now()): this {
-		if (!this._isPaused || !this._isPlaying) {
+		if (!(this._isPaused && this._isPlaying)) {
 			return this;
 		}
 
@@ -265,7 +269,8 @@ export class Tween<T extends UnknownProps> {
 		this._pauseStart = 0;
 
 		// eslint-disable-next-line
-		this._group && this._group.add(this as any);
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		this._group?.add(this as any);
 
 		return this;
 	}
@@ -320,6 +325,7 @@ export class Tween<T extends UnknownProps> {
 	}
 
 	// eslint-disable-next-line
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	chain(...tweens: Array<Tween<any>>): this {
 		this._chainedTweens = tweens;
 		return this;
@@ -370,7 +376,7 @@ export class Tween<T extends UnknownProps> {
 
 		const endTime = this._startTime + this._duration;
 
-		if (!this._goToEnd && !this._isPlaying) {
+		if (!(this._goToEnd || this._isPlaying)) {
 			if (time > endTime) return false;
 			if (autoStart) this.start(time);
 		}
@@ -550,6 +556,7 @@ export class Tween<T extends UnknownProps> {
 }
 
 // eslint-disable-next-line
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type UnknownProps = Record<string, any>;
 
 export default Tween;

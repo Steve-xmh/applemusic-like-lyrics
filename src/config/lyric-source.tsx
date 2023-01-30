@@ -40,7 +40,8 @@ export const LyricSourceSettings: React.FC = () => {
 				SteveXMH。
 			</Text>
 			<Text fz="md" sx={{ margin: "6px 0" }}>
-				当前网易云 core.js 版本：{ncmPackageVersion}
+				当前网易云 core.js 版本：
+				{ncmPackageVersion}
 			</Text>
 			<TextConfigComponent
 				label="网易云请求函数名称"

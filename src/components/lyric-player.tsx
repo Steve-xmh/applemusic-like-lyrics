@@ -1,6 +1,5 @@
-import { genAudioPlayerCommand, loadLyric, PlayState } from "../api";
+import { genAudioPlayerCommand, PlayState } from "../api";
 import {
-	useAlbumImageUrl,
 	useConfigBoolean,
 	useConfigValueBoolean,
 	useFMOpened,
@@ -9,31 +8,26 @@ import {
 } from "../api/react";
 import { log } from "../utils/logger";
 import { LyricDots } from "./lyric-dom-renderer/lyric-dots";
-import { LyricLine, parseLyric } from "../core/lyric-parser";
+import { LyricLine } from "../core/lyric-parser";
 import { Tween, Easing } from "../tweenjs";
 import * as React from "react";
 import { GLOBAL_EVENTS } from "../utils/global-events";
-import { Loader, Center, LoadingOverlay } from "@mantine/core";
+import { Loader, Center } from "@mantine/core";
 import { LyricBackground } from "./lyric-background";
 import { LyricLineView } from "./lyric-dom-renderer/lyric-line";
 import { guessTextReadDuration } from "../utils";
 import {
-	albumAtom,
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
 	currentLyricsAtom,
 	currentLyricsIndexAtom,
-	currentRawLyricRespAtom,
 	musicIdAtom,
 	playStateAtom,
-	songAliasNameAtom,
-	songArtistsAtom,
-	songNameAtom,
 } from "../core/states";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { LyricPlayerTopBar } from "./lyric-player-topbar";
-import { LyricPlayerFMControls } from "./lyric-player-fm-controls";
 import { NoLyricOptions } from "./no-lyric-options";
+import { PlayerSongInfo } from "./song-info";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
@@ -44,10 +38,6 @@ export const LyricView: React.FC<{
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
 	const playState = useAtomValue(playStateAtom);
 	const musicId = useAtomValue(musicIdAtom);
-	const album = useAtomValue(albumAtom);
-	const songName: string = useAtomValue(songNameAtom);
-	const songAliasName: string[] = useAtomValue(songAliasNameAtom);
-	const songArtists = useAtomValue(songArtistsAtom);
 
 	const [error, setError] = React.useState<Error | null>(null);
 	const currentLyrics = useAtomValue(currentLyricsAtom);
@@ -55,8 +45,6 @@ export const LyricView: React.FC<{
 		const o = props.isFM ? isFMOpened : isNowPlayingOpened;
 		return o;
 	}, [props.isFM, isNowPlayingOpened, isFMOpened]);
-
-	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 
 	const [currentLyricIndex, setCurrentLyricIndex] = useAtom(
 		currentLyricsIndexAtom,
@@ -145,7 +133,9 @@ export const LyricView: React.FC<{
 							scrollDelta -= window.innerHeight * 0.06 + listRect.height * 0.1;
 						}
 						const prevScrollTop = lyricView.scrollTop;
-						const obj = { scrollTop: prevScrollTop };
+						const obj = {
+							scrollTop: prevScrollTop,
+						};
 
 						if (mustScroll) {
 							const id = ++forceScrollId.current;
@@ -179,7 +169,12 @@ export const LyricView: React.FC<{
 							requestAnimationFrame(onFrame);
 						} else {
 							const tween = new Tween(obj)
-								.to({ scrollTop: prevScrollTop + scrollDelta }, 750)
+								.to(
+									{
+										scrollTop: prevScrollTop + scrollDelta,
+									},
+									750,
+								)
 								.easing(Easing.Cubic.InOut)
 								.onUpdate(() => {
 									lyricView.scrollTo(0, obj.scrollTop);
@@ -351,7 +346,7 @@ export const LyricView: React.FC<{
 	]);
 
 	const mapCurrentLyrics = React.useCallback(
-		(line: LyricLine, index: number, lines: LyricLine[]) => {
+		(line: LyricLine, index: number, _lines: LyricLine[]) => {
 			let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
 			const offset = index - currentLyricIndex;
 			if (line.originalLyric.trim().length > 0) {
@@ -410,84 +405,11 @@ export const LyricView: React.FC<{
 	}, []);
 
 	const [showBackground] = useConfigBoolean("showBackground", true);
-	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
-	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
-	const [hideMusicAlias] = useConfigBoolean("hideMusicAlias", false);
-	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
-	const [hideMusicAlbum] = useConfigBoolean("hideMusicAlbum", false);
 
 	return (
 		<>
 			{showBackground && <LyricBackground musicId={musicId} />}
-			{!(
-				hideAlbumImage &&
-				hideMusicName &&
-				hideMusicAlias &&
-				hideMusicArtists &&
-				hideMusicAlbum
-			) && (
-				<div className="am-music-info">
-					<div>
-						{!hideAlbumImage && (
-							<div className="am-album-image">
-								<div>
-									<LoadingOverlay
-										loader={
-											<Loader
-												size={50}
-												style={{ width: "50px", height: "50px" }}
-											/>
-										}
-										sx={{
-											borderRadius: "5%",
-										}}
-										visible={albumImageUrl.length === 0}
-									/>
-									<img
-										alt="专辑图片"
-										src={albumImageUrl}
-										style={{
-											opacity: albumImageUrl.length > 0 ? 1 : 0,
-										}}
-									/>
-								</div>
-							</div>
-						)}
-						{!hideMusicName && <div className="am-music-name">{songName}</div>}
-						{!hideMusicAlias && songAliasName.length > 0 && (
-							<div className="am-music-alias">
-								{songAliasName.map((alia, index) => (
-									<div key={`${alia}-${index}`}>{alia}</div>
-								))}
-							</div>
-						)}
-						{!hideMusicArtists && (
-							<div className="am-music-artists">
-								<div className="am-artists-label">歌手：</div>
-								<div className="am-artists">
-									{songArtists.map((artist, index) => (
-										<a
-											href={`#/m/artist/?id=${artist.id}`}
-											key={`${artist.id}-${artist.name}-${index}`}
-										>
-											{artist.name}
-										</a>
-									))}
-								</div>
-							</div>
-						)}
-						{!hideMusicAlbum && album && (
-							<div className="am-music-album">
-								<div className="am-album-label">专辑：</div>
-								<div className="am-album">
-									<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
-								</div>
-							</div>
-						)}
-						{props.isFM && <LyricPlayerFMControls />}
-					</div>
-				</div>
-			)}
+			<PlayerSongInfo isFM={props.isFM} />
 			<div className="am-lyric">
 				<LyricPlayerTopBar
 					isFullScreen={fullscreen}
@@ -511,7 +433,13 @@ export const LyricView: React.FC<{
 					)
 				) : (
 					<Center className="am-lyric-view-loading">
-						<Loader size={50} style={{ width: "50px", height: "50px" }} />
+						<Loader
+							size={50}
+							style={{
+								width: "50px",
+								height: "50px",
+							}}
+						/>
 					</Center>
 				)}
 			</div>

@@ -10,6 +10,7 @@ interface EAPILyric {
 	lyric: string;
 }
 
+// rome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
@@ -18,6 +19,7 @@ interface EAPILyricResponse extends EAPIResponse {
 }
 
 declare namespace channel {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	export function call(command: string, callback: Function, args: any[]);
 	export function encryptId(data: string): string;
 }
@@ -41,6 +43,7 @@ interface LFPNCMPlugin extends NCMInjectPlugin {
 	};
 }
 
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 declare var APP_CONF: any;
 declare var pluginPath: string;
 declare var plugin: import("plugin").NCMInjectPlugin;
@@ -49,14 +52,17 @@ declare var loadedPlugins: {
 	[pluginId: string]: import("plugin").NCMInjectPlugin | undefined;
 };
 declare const betterncm: typeof import("betterncm-api/index").default;
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 declare const legacyNativeCmder: any;
 declare const DEBUG: boolean;
 declare const OPEN_PAGE_DIRECTLY: boolean;
 declare const isOSX: boolean;
+// rome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface Document {
 	webkitIsFullScreen: boolean;
 }
 
+// rome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface HTMLElement {
 	webkitRequestFullScreen: Function;
 }

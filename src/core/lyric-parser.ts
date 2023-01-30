@@ -1,4 +1,5 @@
 import { getConfig } from "../config/core";
+import pangu from "pangu/dist/browser/pangu.min.js";
 
 export interface DynamicLyricWord {
 	time: number;
@@ -345,6 +346,7 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 				isSpace = true;
 			}
 		} else {
+			thisLyric.originalLyric = pangu.spacing(thisLyric.originalLyric);
 			isSpace = false;
 			result.push(thisLyric);
 		}

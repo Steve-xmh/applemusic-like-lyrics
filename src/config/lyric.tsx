@@ -1,4 +1,4 @@
-import { Text, Title } from "@mantine/core";
+import { Title } from "@mantine/core";
 import { SwitchConfigComponent } from "./config-components";
 
 export const LyricSettings: React.FC = () => {

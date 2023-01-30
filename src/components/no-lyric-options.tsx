@@ -191,7 +191,12 @@ export const NoLyricOptions: React.FC<{
 					radius="sm"
 					zIndex={153}
 					size={50}
-					loaderProps={{ style: { width: "50px", height: "50px" } }}
+					loaderProps={{
+						style: {
+							width: "50px",
+							height: "50px",
+						},
+					}}
 				/>
 				<SongView id={selectMusicId} />
 				<NumberInput
@@ -241,7 +246,12 @@ export const NoLyricOptions: React.FC<{
 					radius="sm"
 					zIndex={153}
 					size={50}
-					loaderProps={{ style: { width: "50px", height: "50px" } }}
+					loaderProps={{
+						style: {
+							width: "50px",
+							height: "50px",
+						},
+					}}
 				/>
 				<FileInput
 					label="原文歌词文件"

@@ -1,6 +1,6 @@
 /// <reference types="./types/global" />
 import "./config";
-import { createRoot } from "react-dom/client";
+import { createRoot, Root } from "react-dom/client";
 import { LyricView } from "./components/lyric-player";
 import { GLOBAL_EVENTS } from "./utils/global-events";
 import * as React from "react";
@@ -15,8 +15,10 @@ const camelToSnakeCase = (str: string) =>
 
 export let mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "applemusic-like-lyrics-view";
+let mainViewRoot: Root;
 export let fmViewElement: HTMLDivElement = document.createElement("div");
 fmViewElement.id = "applemusic-like-lyrics-view-fm";
+let fmViewRoot: Root;
 
 class ErrorBoundary extends React.Component<
 	{
@@ -291,6 +293,10 @@ plugin.onLoad(() => {
 					const playViewEl = element.querySelector(".g-play") ?? fmPageEl;
 					log("搜索 FM 歌词组件", fmPageEl, playViewEl);
 					if (fmPageEl && playViewEl) {
+						if (!fmViewRoot) {
+							fmViewRoot = createRoot(fmViewElement);
+							fmViewRoot.render(<FMPlayerWrapper />);
+						}
 						reloadStylesheet(cssContent);
 						playViewEl?.parentNode?.prepend(fmViewElement);
 						playViewEl?.setAttribute("style", "display:none;");
@@ -323,6 +329,17 @@ plugin.onLoad(() => {
 						"#applemusic-like-lyrics-view",
 					);
 					if (albumImageElement && lyricViewDiv) {
+						if (!mainViewRoot) {
+							mainViewRoot = createRoot(mainViewElement);
+							mainViewRoot.render(
+								<Provider>
+									<ErrorBoundary>
+										<NCMEnvWrapper />
+										<LyricView />
+									</ErrorBoundary>
+								</Provider>,
+							);
+						}
 						nowPlayingElement = element;
 						GLOBAL_EVENTS.dispatchEvent(
 							new Event("lyric-page-open", undefined),
@@ -430,16 +447,19 @@ plugin.onLoad(() => {
 
 			const checkFileOrReloadFunc = {};
 
-			betterncm?.fs?.watchDirectory(plugin.pluginPath, (dirPath, filename) => {
-				const normalizedDirPath = Utils.normalizePath(dirPath);
-				const fullPath = Utils.normalizePath(`${dirPath}/${filename}`);
-				const relPath = fullPath.replace(normalizedDirPath, "");
-				checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
-					() => checkFileOrReload(relPath),
-					1000,
-				);
-				checkFileOrReloadFunc[relPath]();
-			});
+			betterncm_native?.fs?.watchDirectory(
+				plugin.pluginPath,
+				(dirPath, filename) => {
+					const normalizedDirPath = Utils.normalizePath(dirPath);
+					const fullPath = Utils.normalizePath(`${dirPath}/${filename}`);
+					const relPath = fullPath.replace(normalizedDirPath, "");
+					checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
+						() => checkFileOrReload(relPath),
+						1000,
+					);
+					checkFileOrReloadFunc[relPath]();
+				},
+			);
 		})();
 	}
 	betterncm.fs
@@ -471,18 +491,6 @@ window.addEventListener(
 		once: true,
 	},
 );
-
-window.addEventListener("load", () => {
-	createRoot(mainViewElement).render(
-		<Provider>
-			<ErrorBoundary>
-				<NCMEnvWrapper />
-				<LyricView />
-			</ErrorBoundary>
-		</Provider>,
-	);
-	createRoot(fmViewElement).render(<FMPlayerWrapper />);
-});
 
 window.addEventListener(
 	"load",
@@ -539,7 +547,6 @@ import * as Utils from "./utils";
 import * as WorkerAPIs from "./worker";
 import { checkEapiRequestFuncName } from "./api";
 import { log, warn } from "./utils/logger";
-import { onMainMessage } from "./worker";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 import { Provider } from "jotai";
 import { NCMEnvWrapper } from "./components/netease-api-wrapper";

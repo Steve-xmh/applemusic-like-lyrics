@@ -7,7 +7,11 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
 import { getPlayingSong, loadLyric, PlayState, toPlayState } from "../api";
-import { useNowPlayingOpened, useConfigValueBoolean, useFMOpened } from "../api/react";
+import {
+	useNowPlayingOpened,
+	useConfigValueBoolean,
+	useFMOpened,
+} from "../api/react";
 import { LyricLine, parseLyric } from "../core/lyric-parser";
 import {
 	currentAudioDurationAtom,
@@ -103,8 +107,8 @@ export const NCMEnvWrapper: React.FC = () => {
 	}, [isLyricPageOpening]);
 
 	React.useEffect(() => {
-		log("当前播放状态", playState);
-	}, [playState]);
+		setPlayingSongData(getPlayingSong());
+	}, []);
 
 	React.useEffect(() => {
 		let tweenId = 0;
@@ -167,7 +171,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		const onPlayStateChange = (
 			audioId: string,
 			stateId: string,
-			loadProgress: PlayState,
+			_loadProgress: PlayState,
 		) => {
 			const state = stateId.split("|")[1];
 			setCurrentAudioId(audioId);

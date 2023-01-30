@@ -13,7 +13,7 @@ export function checkLibFrontendPlaySupport() {
 			// 借用其可视化效果
 			lfpPlugin.addEventListener(
 				"updateCurrentAudioPlayer",
-				(evt: CustomEvent<HTMLAudioElement>) => {
+				(_evt: CustomEvent<HTMLAudioElement>) => {
 					GLOBAL_EVENTS.dispatchEvent(new CustomEvent("lfp-audio-updated"));
 				},
 			);

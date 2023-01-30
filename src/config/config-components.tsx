@@ -41,7 +41,12 @@ export const TextConfigComponent: React.FC<
 		props.settingKey,
 		props.defaultValue,
 	);
-	const { onChange, settingKey, defaultValue, ...otherProps } = props;
+	const {
+		onChange: _onChange,
+		settingKey: _settingKey,
+		defaultValue: _defaultValue,
+		...otherProps
+	} = props;
 	return (
 		<TextInput
 			sx={{ margin: "8px 0" }}

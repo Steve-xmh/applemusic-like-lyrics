@@ -32,8 +32,8 @@ export default class Group {
 	}
 
 	remove(tween: Tween<UnknownProps>): void {
-		delete this._tweens[tween.getId()];
-		delete this._tweensAddedDuringUpdate[tween.getId()];
+		this._tweens[tween.getId()] = undefined;
+		this._tweensAddedDuringUpdate[tween.getId()] = undefined;
 	}
 
 	update(time: number = now(), preserve = false): boolean {
@@ -56,7 +56,7 @@ export default class Group {
 				const autoStart = !preserve;
 
 				if (tween && tween.update(time, autoStart) === false && !preserve) {
-					delete this._tweens[tweenIds[i]];
+					this._tweens[tweenIds[i]] = undefined;
 				}
 			}
 

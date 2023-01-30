@@ -40,8 +40,8 @@ const defaultRenderFunc = (
 	albumImage: HTMLImageElement,
 	width: number,
 	height: number,
-	grabImageColors: typeof workerGrabImageColors,
-	genBitmapImage: typeof apiGenBitmapImage,
+	_grabImageColors: typeof workerGrabImageColors,
+	_genBitmapImage: typeof apiGenBitmapImage,
 	requestFrame: () => void,
 	data: RenderData,
 	lfpAudio?: HTMLAudioElement,
@@ -132,7 +132,7 @@ const defaultRenderFunc = (
 						lfpAudioData.freqData,
 					);
 					const barWidth = canvas.width / lfpAudioData.freqData.length;
-					const border = 4;
+					const _border = 4;
 					const gradient = ctx.createLinearGradient(
 						0,
 						canvas.height,

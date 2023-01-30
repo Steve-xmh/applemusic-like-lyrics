@@ -71,7 +71,10 @@ export class CMap {
 	 * @returns
 	 */
 	nearest = (color: Pixel) => {
-		let i, d1, d2, pColor;
+		let i;
+		let d1;
+		let d2;
+		let pColor;
 		for (i = 0; i < this.vboxes.size(); i++) {
 			d2 = Math.sqrt(
 				Math.pow(color[0] - this.vboxes.peek(i).color[0], 2) +
@@ -101,8 +104,8 @@ export class CMap {
 			this.vboxes[0].color = [0, 0, 0];
 
 		// force lightest color to white if everything > 251
-		const idx = this.vboxes.length - 1,
-			highest = this.vboxes[idx].color;
+		const idx = this.vboxes.length - 1;
+		const highest = this.vboxes[idx].color;
 		if (highest[0] > 251 && highest[1] > 251 && highest[2] > 251)
 			this.vboxes[idx].color = [255, 255, 255];
 

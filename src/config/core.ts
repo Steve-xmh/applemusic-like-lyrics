@@ -33,7 +33,9 @@ export function loadConfig(): Config {
 	}
 }
 
-export function getFullConfig(): { [key: string]: string | undefined } {
+export function getFullConfig(): {
+	[key: string]: string | undefined;
+} {
 	return GLOBAL_CONFIG || {};
 }
 

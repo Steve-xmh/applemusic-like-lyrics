@@ -49,7 +49,9 @@ if (process.argv.includes("--lyric-test")) {
 
 if (!process.argv.includes("--dist")) {
 	if (!fs.existsSync(devPath)) {
-		fs.mkdirSync(devPath, { recursive: true });
+		fs.mkdirSync(devPath, {
+			recursive: true,
+		});
 	}
 	fs.copyFileSync("manifest.json", path.resolve(devPath, "manifest.json"));
 }

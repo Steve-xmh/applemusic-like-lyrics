@@ -12,22 +12,12 @@ export enum PlayState {
 }
 
 export function toPlayState(enumId: number): PlayState {
-	if (APP_CONF.isOSX) {
-		if (enumId === 1) {
-			return PlayState.Pausing;
-		} else if (enumId === 2) {
-			return PlayState.Playing;
-		} else {
-			throw new TypeError(`未知的播放状态值 ${enumId}`);
-		}
+	if (enumId === 1) {
+		return PlayState.Pausing;
+	} else if (enumId === 2) {
+		return PlayState.Playing;
 	} else {
-		if (enumId === 1) {
-			return PlayState.Playing;
-		} else if (enumId === 2) {
-			return PlayState.Pausing;
-		} else {
-			throw new TypeError(`未知的播放状态值 ${enumId}`);
-		}
+		throw new TypeError(`未知的播放状态值 ${enumId}`);
 	}
 }
 
@@ -217,7 +207,7 @@ export function tryFindEapiRequestFuncName(
 }
 
 // rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
-export function callCachedSearchFunction<F extends (...args: any[]) => any>(
+export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
 	searchFunctionName: string | ((func: Function) => boolean),
 	args: Parameters<F>,
 ): ReturnType<F> {
@@ -319,7 +309,11 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  * @returns 当前歌曲的播放信息
  */
 export function getPlayingSong() {
-	return loadedPlugins.libsonginfo.getPlaying();
+	if (APP_CONF.isOSX) {
+		return callCachedSearchFunction("baJ", []);
+	} else {
+		return callCachedSearchFunction("getPlaying", []);
+	}
 }
 
 export interface LyricFileEntry {

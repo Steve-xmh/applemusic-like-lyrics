@@ -1,0 +1,17 @@
+{
+    "$schema": "./node_modules/rome/configuration_schema.json",
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "tab",
+        "lineWidth": 80
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "correctness": {
+                "noUnusedVariables": "warn"
+            }
+        }
+    }
+}
