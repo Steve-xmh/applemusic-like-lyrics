@@ -368,8 +368,8 @@ export function useAlbumImageUrl(
 	return selectedUrl;
 }
 
-export function useForceUpdate(): [{}, () => void] {
-	const [updateState, setUpdateState] = React.useState({});
+export function useForceUpdate(): () => void {
+	const [_updateState, setUpdateState] = React.useState({});
 	const forceUpdate = React.useCallback(() => setUpdateState({}), []);
-	return [updateState, forceUpdate];
+	return forceUpdate;
 }
