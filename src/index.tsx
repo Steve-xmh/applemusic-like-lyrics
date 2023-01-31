@@ -474,12 +474,6 @@ plugin.onLoad(() => {
 });
 
 plugin.onAllPluginsLoaded(() => {
-	if ("RefinedNowPlaying" in loadedPlugins) {
-		plugin.loadError = new TypeError(
-			"Apple Music-like Lyric 与 RefinedNowPlaying 不兼容，请卸载其中一个插件以继续使用。",
-		);
-		throw plugin.loadError;
-	}
 	checkLibFrontendPlaySupport();
 });
 

@@ -43,7 +43,7 @@ export const WarningsList: React.FC = () => {
 					color="yellow"
 					title="错误：检测到不兼容的 RefinedNowPlaying 插件"
 				>
-					<div>说吧你是怎么装上去的</div>
+					<div>AMLL 插件不会主动兼容 RNP 插件，效果和稳定性不做保证</div>
 				</Alert>
 			) : (
 				<></>
