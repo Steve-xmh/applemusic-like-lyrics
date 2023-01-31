@@ -3,7 +3,13 @@
 
 .am-lyrics-settings
     min-height: 100%;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+    *
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
     max-width: @css { min(100%, 700px) };
+    svg
+        width: unset;
+        height: unset;
     .am-lyric-func-body
         user-select: text;
         overflow-wrap: break-word;
@@ -101,7 +107,6 @@
                 cursor: text;
                 user-select: text;
                 text-align: center;
-                filter: drop-shadow(0 0 4px #0006);
             .am-music-alias
                 font-size: 1.2rem;
                 line-height: normal;
@@ -110,12 +115,10 @@
                 cursor: text;
                 text-align: center;
                 user-select: text;
-                filter: drop-shadow(0 0 4px #0004);
             .am-music-artists
                 font-size: 1rem;
                 line-height: normal;
                 margin: 0.25rem 0;
-                filter: drop-shadow(0 0 4px #0004);
                 display: flex;
                 align-items: baseline;
                 justify-content: center;
@@ -153,7 +156,6 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        filter: drop-shadow(0 0 4px #0004);
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
             filter: blur(0) !important;
@@ -259,6 +261,17 @@
             &.am-lyric-line-o3
                 opacity: 0.2;
                 
+    // 字体阴影
+    &.font-shadow // fontShadow
+        .am-music-name
+            filter: drop-shadow(0 0 4px #0006);
+        .am-music-alias
+            filter: drop-shadow(0 0 4px #0004);
+        .am-music-artists
+            filter: drop-shadow(0 0 4px #0004);
+        .am-lyric
+            filter: drop-shadow(0 0 4px #0004);
+
     // 自定义歌词字体大小
     &.lyric-fixed-font-size
         .am-lyric-line

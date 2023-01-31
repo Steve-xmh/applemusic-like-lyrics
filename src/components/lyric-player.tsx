@@ -1,4 +1,5 @@
 import {
+	useConfig,
 	useConfigBoolean,
 	useFMOpened,
 	useNowPlayingOpened,
@@ -29,6 +30,7 @@ export const LyricView: React.FC<{
 	const [fullscreen, setFullscreen] = React.useState(
 		document.webkitIsFullScreen as boolean,
 	);
+	const [rendererBackend] = useConfig("rendererBackend", RendererBackend.DOM);
 
 	React.useEffect(() => {
 		if (document.webkitIsFullScreen !== fullscreen) {
@@ -87,7 +89,7 @@ export const LyricView: React.FC<{
 					</div>
 				) : currentLyrics ? (
 					currentLyrics.length > 0 ? (
-						<LyricRenderer backend={RendererBackend.DOM} />
+						<LyricRenderer backend={rendererBackend as RendererBackend} />
 					) : (
 						<NoLyricOptions onSetError={setError} />
 					)

@@ -109,23 +109,20 @@ export function useNowPlayingOpened(): boolean {
 	return value;
 }
 
-const lfpPluginSupported = atom(!!loadedPlugins.LibFrontendPlay);
-const lfpPluginEnabled = atom(false);
 export function useLFPSupported(): [boolean, boolean] {
-	const [supported, setSupported] = useAtom(lfpPluginSupported);
-	const [enabled, setEnabled] = useAtom(lfpPluginEnabled);
-
-	React.useEffect(() => {
-		if (loadedPlugins.LibFrontendPlay) {
-			setSupported(true);
-		}
-	}, []);
+	const [supported, setSupported] = React.useState(
+		!!loadedPlugins.LibFrontendPlay,
+	);
+	const [enabled, setEnabled] = React.useState(
+		!!loadedPlugins.LibFrontendPlay?.enabled,
+	);
 
 	React.useEffect(() => {
 		const lfpPlugin = loadedPlugins.LibFrontendPlay;
-		if (lfpPlugin && supported) {
-			const onEnabled = () => setSupported(true);
-			const onDisabled = () => setSupported(false);
+		setSupported(!!lfpPlugin);
+		if (lfpPlugin) {
+			const onEnabled = () => setEnabled(true);
+			const onDisabled = () => setEnabled(false);
 			lfpPlugin.addEventListener("pluginEnabled", onEnabled);
 			lfpPlugin.addEventListener("pluginDisabled", onDisabled);
 			setEnabled(lfpPlugin.enabled);
@@ -134,7 +131,7 @@ export function useLFPSupported(): [boolean, boolean] {
 				lfpPlugin.removeEventListener("pluginDisabled", onDisabled);
 			};
 		}
-	}, [supported]);
+	}, []);
 
 	return [supported, enabled];
 }

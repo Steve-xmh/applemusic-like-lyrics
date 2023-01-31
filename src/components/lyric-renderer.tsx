@@ -1,5 +1,7 @@
 import { PlayState } from "../api";
+import { useConfig } from "../api/react";
 import { LyricLine } from "../core/lyric-parser";
+import { LyricCanvasRenderer } from "./lyric-canvas-renderer";
 import { LyricDOMRenderer } from "./lyric-dom-renderer";
 
 export interface LyricRendererProps {
@@ -24,6 +26,8 @@ export const LyricRenderer: React.FC<{
 	switch (props.backend) {
 		case RendererBackend.DOM:
 			return <LyricDOMRenderer />;
+		case RendererBackend.Canvas:
+			return <LyricCanvasRenderer />;
 		default:
 			return (
 				<div className="am-lyric-view">

@@ -9,7 +9,7 @@ import {
 	currentLyricsIndexAtom,
 	playStateAtom,
 } from "../../core/states";
-import { Tween, Easing } from "../../tweenjs";
+import { Tween, Easing } from "../../libs/tweenjs";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
 import { log } from "../../utils/logger";
 import { LyricLine } from "../../core/lyric-parser";
@@ -172,43 +172,74 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, [scrollToLyric, currentLyricIndex]);
 
 	const onSeekToLyric = React.useCallback(
-		(line: LyricLine) => {
-			scrollDelayRef.current = 0;
-			if (currentLyrics) {
-				const index = currentLyrics.findIndex((v) => v === line);
-				keepSelectLyrics.current.clear();
-				setCurrentLyricIndex(index);
-			}
-			if (
-				configDynamicLyric &&
-				(line.dynamicLyricTime ||
-					currentAudioDuration < currentAudioDuration) &&
-				(line.dynamicLyricTime || -1) >= 0
-			) {
-				log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
+		(line: LyricLine, evt: React.MouseEvent) => {
+			console.log(evt.button);
+			if (evt.button === 0) {
+				// 鼠标主键点击，跳转到歌词
+				scrollDelayRef.current = 0;
+				if (currentLyrics) {
+					const index = currentLyrics.findIndex((v) => v === line);
+					keepSelectLyrics.current.clear();
+					setCurrentLyricIndex(index);
+				}
+				if (
+					configDynamicLyric &&
+					(line.dynamicLyricTime ||
+						currentAudioDuration < currentAudioDuration) &&
+					(line.dynamicLyricTime || -1) >= 0
+				) {
+					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
+					legacyNativeCmder._envAdapter.callAdapter(
+						"audioplayer.seek",
+						() => {},
+						[
+							currentAudioId,
+							genAudioPlayerCommand(currentAudioId, "seek"),
+							(line?.dynamicLyricTime || line.time) / 1000,
+						],
+					);
+				} else if (line.time < currentAudioDuration && line.time >= 0) {
+					log("正在跳转到歌词时间", line.time);
+					legacyNativeCmder._envAdapter.callAdapter(
+						"audioplayer.seek",
+						() => {},
+						[
+							currentAudioId,
+							genAudioPlayerCommand(currentAudioId, "seek"),
+							line.time / 1000,
+						],
+					);
+				}
+			} else if (evt.button === 2) {
+				// 鼠标副键点击，复制歌词
+				let text = "";
+				if (configDynamicLyric && line.dynamicLyric) {
+					text += line.dynamicLyric.map((v) => v.word).join("");
+				} else {
+					text += line.originalLyric;
+				}
+				if (configTranslatedLyric && line.translatedLyric) {
+					text += "\n";
+					text += line.translatedLyric;
+				}
+				if (configRomanLyric && line.romanLyric) {
+					text += "\n";
+					text += line.romanLyric;
+				}
 				legacyNativeCmder._envAdapter.callAdapter(
-					"audioplayer.seek",
+					"winhelper.setClipBoardData",
 					() => {},
-					[
-						currentAudioId,
-						genAudioPlayerCommand(currentAudioId, "seek"),
-						(line?.dynamicLyricTime || line.time) / 1000,
-					],
-				);
-			} else if (line.time < currentAudioDuration && line.time >= 0) {
-				log("正在跳转到歌词时间", line.time);
-				legacyNativeCmder._envAdapter.callAdapter(
-					"audioplayer.seek",
-					() => {},
-					[
-						currentAudioId,
-						genAudioPlayerCommand(currentAudioId, "seek"),
-						line.time / 1000,
-					],
+					[text.trim()],
 				);
 			}
 		},
-		[currentAudioId, configDynamicLyric, currentAudioDuration],
+		[
+			currentAudioId,
+			configTranslatedLyric,
+			configRomanLyric,
+			configDynamicLyric,
+			currentAudioDuration,
+		],
 	);
 
 	const lastUpdateTime = React.useRef(Date.now());

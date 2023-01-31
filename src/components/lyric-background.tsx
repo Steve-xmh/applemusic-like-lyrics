@@ -115,8 +115,16 @@ const defaultRenderFunc = (
 			);
 		} catch {}
 		ctx.restore();
-		ctx.fillStyle = "#00000088";
-		ctx.fillRect(0, 0, width, height);
+		const bgLightness = Number(getConfig("backgroundLightness", "1"));
+		if (bgLightness >= 0 && bgLightness <= 2) {
+			if (bgLightness < 1) {
+				ctx.fillStyle = `rgba(0, 0, 0, ${1 - bgLightness})`;
+				ctx.fillRect(0, 0, width, height);
+			} else if (bgLightness > 1) {
+				ctx.fillStyle = `rgba(255, 255, 255, ${bgLightness - 1})`;
+				ctx.fillRect(0, 0, width, height);
+			}
+		}
 		if (getConfig("backgroundAudioVisualizerEffect", "false") === "true") {
 			ctx.save();
 			if (lfpAudio && lfpAudioData.audio === lfpAudio) {
@@ -217,6 +225,7 @@ export const LyricBackground: React.FC<{
 		"customBackgroundRenderFunc",
 		"",
 	);
+	const [backgroundLightness] = useConfig("backgroundLightness", "1");
 
 	const backgroundRenderFunc = React.useMemo(() => {
 		renderDataRef.current.audioAnalyser?.disconnect();
@@ -241,7 +250,6 @@ export const LyricBackground: React.FC<{
 		return defaultRenderFunc;
 	}, [customBackgroundRenderFunc]);
 
-	React.useEffect(() => {}, [backgroundRenderFunc]);
 	React.useEffect(() => {
 		if (albumImageUrl.length > 0) albumImage.current.src = albumImageUrl;
 		const width = canvasRef.current?.width || 0;
@@ -277,7 +285,14 @@ export const LyricBackground: React.FC<{
 				GLOBAL_EVENTS.removeEventListener("lfp-audio-updated", onAudioUpdated);
 			};
 		}
-	}, [albumImageUrl, size.width, size.height, isLFPSupported, isLFPEnabled]);
+	}, [
+		albumImageUrl,
+		size.width,
+		size.height,
+		isLFPSupported,
+		isLFPEnabled,
+		backgroundLightness,
+	]);
 
 	return (
 		<canvas

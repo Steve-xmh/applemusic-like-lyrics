@@ -3,6 +3,7 @@ import "./config";
 import { createRoot, Root } from "react-dom/client";
 import { LyricView } from "./components/lyric-player";
 import { GLOBAL_EVENTS } from "./utils/global-events";
+import { clearCache } from "canvas-hypertxt";
 import * as React from "react";
 import { MantineProvider, createStyles, Title } from "@mantine/core";
 import { getConfig, getFullConfig } from "./config/core";
@@ -486,6 +487,13 @@ window.addEventListener(
 	"DOMContentLoaded",
 	() => {
 		reloadStylesheet(cssContent);
+		async function clearCacheOnLoad() {
+			if (document?.fonts?.ready === undefined) return;
+			await document.fonts.ready;
+			clearCache();
+		}
+
+		void clearCacheOnLoad();
 	},
 	{
 		once: true,

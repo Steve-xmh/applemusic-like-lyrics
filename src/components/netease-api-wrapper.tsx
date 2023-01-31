@@ -11,6 +11,7 @@ import {
 	useNowPlayingOpened,
 	useConfigValueBoolean,
 	useFMOpened,
+	useConfigValue,
 } from "../api/react";
 import { LyricLine, parseLyric } from "../core/lyric-parser";
 import {
@@ -40,6 +41,9 @@ export const NCMEnvWrapper: React.FC = () => {
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const configGlobalTimeStampOffset = Number(
+		useConfigValue("globalTimeStampOffset", "0"),
+	);
 
 	const [currentRawLyricResp, setCurrentRawLyricResp] = useAtom(
 		currentRawLyricRespAtom,
@@ -112,12 +116,21 @@ export const NCMEnvWrapper: React.FC = () => {
 
 	React.useEffect(() => {
 		let tweenId = 0;
+		let onIntervalGettingSongData = 0;
+		const setIntervalGetSongData = () => {
+			onIntervalGettingSongData = setInterval(() => {
+				setCurrentAudioId(getMusicId().toString());
+				setPlayingSongData(getPlayingSong());
+			}, 200);
+		};
+
 		const onPlayProgress = (
 			audioId: string,
 			progress: number,
 			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			isTween = false,
 		) => {
+			progress += configGlobalTimeStampOffset;
 			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
 				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
 				// 我们自己要做一个时间补偿
@@ -133,6 +146,7 @@ export const NCMEnvWrapper: React.FC = () => {
 				requestAnimationFrame(tweenPlayProgress);
 			}
 			setPlayState(toPlayState(getPlayingSong().state));
+			clearInterval(onIntervalGettingSongData);
 			setCurrentAudioId(audioId);
 			const time = (progress * 1000) | 0;
 			let curLyricIndex: number | null = null;
@@ -200,18 +214,17 @@ export const NCMEnvWrapper: React.FC = () => {
 			setCurrentAudioId(audioId);
 			setPlayingSongData(getPlayingSong());
 			setPlayState(toPlayState(getPlayingSong().state));
+			clearInterval(onIntervalGettingSongData);
 		};
 
 		const onEnd = (audioId: string, _info: AudioEndInfo) => {
 			setCurrentAudioId(audioId);
 			setPlayingSongData(getPlayingSong());
 			setPlayState(toPlayState(getPlayingSong().state));
-			setTimeout(() => {
-				setCurrentAudioId(getMusicId().toString());
-				setPlayingSongData(getPlayingSong());
-			}, 200);
+			setIntervalGetSongData();
 		};
 
+		setIntervalGetSongData();
 		legacyNativeCmder.appendRegisterCall(
 			"PlayProgress",
 			"audioplayer",
@@ -239,9 +252,10 @@ export const NCMEnvWrapper: React.FC = () => {
 			);
 			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
 			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
+			clearInterval(onIntervalGettingSongData);
 			log("进度事件已解除挂载");
 		};
-	}, [currentLyrics, playState]);
+	}, [currentLyrics, playState, configGlobalTimeStampOffset]);
 
 	return <></>;
 };

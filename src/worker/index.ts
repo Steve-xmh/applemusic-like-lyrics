@@ -1,8 +1,8 @@
 import { Config, GLOBAL_CONFIG, setConfig } from "../config/core";
 import { log, warn } from "../utils/logger";
 import { IS_WORKER, genRandomString } from "../utils";
-import { quantize } from "./color-quantize";
-import { Pixel } from "./color-quantize/utils";
+import { quantize } from "../libs/color-quantize";
+import { Pixel } from "../libs/color-quantize/utils";
 export let worker: Worker | undefined;
 
 export let currentWorkerScript = "";

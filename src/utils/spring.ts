@@ -7,8 +7,8 @@
 
 export class Spring {
 	private _startTime = this.curTime;
-	private _damper = 0.95;
-	private _speed = 1;
+	private _damper = 0.9;
+	private _speed = 0.7;
 	private _target = 0;
 	private _position = 0;
 	private _velocity = 0;

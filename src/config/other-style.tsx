@@ -43,6 +43,7 @@ export const OtherStyleSettings: React.FC = () => {
 				step={0.5}
 				min={1}
 				max={30}
+				formatLabel={(v: number) => `${v} 秒`}
 				settingKey="autoHideDuration"
 				label="鼠标静止隐藏间隔（秒）"
 			/>
@@ -75,6 +76,36 @@ export const OtherStyleSettings: React.FC = () => {
 					defaultValue={false}
 				/>
 			)}
+			<Space h="xl" />
+			<Text fz="md">默认背景设置</Text>
+			<Space h="md" />
+
+			<SliderConfigComponent
+				settingKey="backgroundLightness"
+				label="背景亮度"
+				min={0}
+				max={2}
+				step={0.01}
+				defaultValue={1}
+				formatLabel={(v: number) => {
+					if (v === 1) {
+						return "不调整";
+					} else if (v < 1) {
+						if (v <= 0) {
+							return "全黑";
+						} else {
+							return `调暗 ${Math.round(100 - v * 100)}%`;
+						}
+					} else {
+						if (v >= 2) {
+							return "全白";
+						} else {
+							return `调亮 ${Math.round(v * 100 - 100)}%`;
+						}
+					}
+				}}
+			/>
+
 			<Space h="xl" />
 			<Text fz="md">自定义背景绘制函数</Text>
 			<Space h="md" />

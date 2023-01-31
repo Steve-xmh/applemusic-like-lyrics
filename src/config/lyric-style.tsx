@@ -28,6 +28,11 @@ export const LyricStyleSettings: React.FC = () => {
 				label="未播放歌词淡入效果"
 			/>
 			<SwitchConfigComponent
+				settingKey="fontShadow"
+				label="文字阴影"
+				defaultValue={false}
+			/>
+			<SwitchConfigComponent
 				settingKey="alignTopSelectedLyric"
 				label="歌词滚动位置向上对齐"
 			/>

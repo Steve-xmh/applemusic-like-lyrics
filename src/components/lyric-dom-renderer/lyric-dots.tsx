@@ -1,5 +1,5 @@
 import { classname } from "../../api";
-import { Group, Tween } from "../../tweenjs";
+import { Group, Tween } from "../../libs/tweenjs";
 import * as React from "react";
 
 export const LyricDots: React.FC<{

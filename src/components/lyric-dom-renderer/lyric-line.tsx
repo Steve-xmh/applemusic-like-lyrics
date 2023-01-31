@@ -1,5 +1,7 @@
-import { classname } from "../../api";
+import { useAtomValue } from "jotai";
+import { classname, PlayState } from "../../api";
 import { LyricLine } from "../../core/lyric-parser";
+import { playStateAtom } from "../../core/states";
 
 export const LyricLineView: React.FC<{
 	offset: number;
@@ -8,13 +10,18 @@ export const LyricLineView: React.FC<{
 	dynamic: boolean;
 	translated: boolean;
 	roman: boolean;
-	onClickLyric?: (line: LyricLine) => void;
+	onClickLyric?: (line: LyricLine, evt: React.MouseEvent) => void;
 }> = (props) => {
+	const playState = useAtomValue(playStateAtom);
 	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
-			onClick={() => {
-				if (props.onClickLyric) props.onClickLyric(props.line);
+			onClick={(evt) => {
+				if (props.onClickLyric) props.onClickLyric(props.line, evt);
+			}}
+			onContextMenu={(evt) => {
+				if (props.onClickLyric) props.onClickLyric(props.line, evt);
+				evt.preventDefault();
 			}}
 			className={classname("am-lyric-line", {
 				"am-lyric-line-before": props.offset < 0,
@@ -29,14 +36,15 @@ export const LyricLineView: React.FC<{
 			(props.selected || Math.abs(props.offset) === 1) ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
-						// rome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						<span key={i}>
+						<span key={`dynamic-word-${word.word}-${i}`}>
 							<span
 								style={{
 									animationDelay: `${
 										word.time - (props.line.dynamicLyricTime || 0)
 									}ms`,
 									animationDuration: `${word.duration}ms`,
+									animationPlayState:
+										playState === PlayState.Pausing ? "paused" : undefined,
 								}}
 								className="am-lyric-real-word"
 							>
@@ -48,6 +56,8 @@ export const LyricLineView: React.FC<{
 										word.time - (props.line.dynamicLyricTime || 0)
 									}ms`,
 									animationDuration: `${word.duration}ms`,
+									animationPlayState:
+										playState === PlayState.Pausing ? "paused" : undefined,
 								}}
 								className="am-lyric-fake-word"
 							>
@@ -57,7 +67,12 @@ export const LyricLineView: React.FC<{
 					))}
 				</div>
 			) : (
-				<div className="am-lyric-line-original">{props.line.originalLyric}</div>
+				<div className="am-lyric-line-original">
+					{props.line.dynamicLyric
+						?.map((v) => v.word)
+						.join("")
+						.trim() || props.line.originalLyric}
+				</div>
 			)}
 			<div className="am-lyric-line-translated">
 				{props.translated ? props.line.translatedLyric : ""}

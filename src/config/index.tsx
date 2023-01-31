@@ -46,7 +46,7 @@ const ConfigComponent: React.FC = () => {
 				<Tabs.Tab value="lyric-style">歌词样式设置</Tabs.Tab>
 				<Tabs.Tab value="song-info-style">歌曲信息样式设置</Tabs.Tab>
 				<Tabs.Tab value="other-style">其它样式设置</Tabs.Tab>
-				<Tabs.Tab value="lyric-source">歌词来源设置</Tabs.Tab>
+				<Tabs.Tab value="lyric-source">EAPI 函数设置</Tabs.Tab>
 				<Tabs.Tab value="custom-css">自定义 CSS 设置</Tabs.Tab>
 				<Tabs.Tab value="about">
 					{latestVersion !== "" && latestVersion !== version ? (

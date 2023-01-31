@@ -2,7 +2,7 @@ import { IS_WORKER } from "../utils";
 
 const noop = () => {};
 
-export const dbg = (obj) => {
+export const dbg = <T>(obj: T): T => {
 	if (DEBUG) {
 		if (IS_WORKER) {
 			console.debug("[AMLL-Worker]", obj);
