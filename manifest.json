@@ -13,8 +13,8 @@
     "type": "extension",
     "noDevReload": true,
     "requirements": [
-        "LibSongInfo",
-        "LibLyric"
+        "libsonginfo",
+        "liblyric"
     ],
     "loadAfter": [
         "LibSongInfo",
