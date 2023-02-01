@@ -10,9 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
-      - uses: webfactory/ssh-agent@v0.5.4
+      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
             ssh-private-key: ${{ secrets.AMLL_PUSH_KEY }}
+            ssh-host: gitcode.net
       - name: 强制推送至 GitCode
         run: |
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
