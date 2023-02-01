@@ -17,5 +17,6 @@ jobs:
       - name: 强制推送至 GitCode
         run: |
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
+          git fetch --unshallow origin
           git push --force -u gitcode --all
           git push --force -u gitcode --tags
