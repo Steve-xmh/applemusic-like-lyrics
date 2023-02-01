@@ -16,7 +16,9 @@ jobs:
             ssh-host: gitcode.net
       - name: 强制推送至 GitCode
         run: |
+          git branch -r | grep -v '\->' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
+          git fetch --all --unshallow origin
+          git pull --all --unshallow origin
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
-          git fetch --unshallow origin
           git push --force -u gitcode --all
           git push --force -u gitcode --tags
