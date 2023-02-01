@@ -22,6 +22,7 @@
     "canvas-hypertxt": "^1.0.1",
     "color-quantize": "^0.1.1",
     "esbuild": "^0.16.1",
+    "esbuild-plugin-glsl": "^1.1.0",
     "esbuild-stylus-loader": "^0.4.2",
     "jotai": "^1.13.1",
     "jszip": "^3.10.1",

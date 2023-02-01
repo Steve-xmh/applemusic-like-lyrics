@@ -1,6 +1,6 @@
 import { VBox, VBoxRangeKey } from "./v-box";
 
-export type Pixel = number[]; // [red ,green, blue] 像素数组
+export type Pixel = [number, number, number]; // [red ,green, blue] 像素数组
 export type Histo = number[]; // 记录像素数量数组（下标根据 rgb 数值运算得）
 
 export const sigbits = 5;

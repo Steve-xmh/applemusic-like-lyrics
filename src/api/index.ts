@@ -386,16 +386,22 @@ export function classname(
 	return result.join(" ");
 }
 
-export async function genBitmapImage(imageUrl: string) {
+export async function genBitmapImage(
+	imageUrl: string,
+	width?: number,
+	height?: number,
+) {
 	const img = new Image();
 	img.src = imageUrl;
 	await img.decode();
-	const canvas = new OffscreenCanvas(img.width, img.height);
+	const canvas = new OffscreenCanvas(width ?? img.width, height ?? img.height);
 	const ctx: OffscreenCanvasRenderingContext2D = canvas.getContext(
 		"2d",
 	) as unknown as OffscreenCanvasRenderingContext2D;
 	if (ctx) {
-		ctx.drawImage(img, 0, 0);
+		ctx.drawImage(img, 0, 0, width ?? img.width, height ?? img.height);
 		return canvas.transferToImageBitmap();
+	} else {
+		throw new TypeError("无法获取离屏画板上下文，无法生成位图");
 	}
 }

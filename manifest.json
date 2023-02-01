@@ -36,11 +36,13 @@
         ">= 2.10.4 <= 2.10.6": {
             "orpheus://orpheus/pub/core.": {
                 "type": "replace",
+                "id": "core-js-fake-function",
                 "from": "=Function.prototype;",
                 "to": "=window.FakeFunction||Function.prototype;"
             },
             "orpheus://orpheus/pub/app.html": {
                 "type": "replace",
+                "id": "csp-worker",
                 "from": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src ",
                 "to": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src data: blob: "
             }

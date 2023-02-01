@@ -4,6 +4,7 @@ import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { glsl } from "esbuild-plugin-glsl";
 import manifest from "./manifest.json" assert { type: "json" };
 
 let entryPoints = [
@@ -13,12 +14,17 @@ let entryPoints = [
 	"src/index.styl",
 ];
 
+const IS_DEV = process.argv.includes("--dev");
+
 const plugins = [
 	stylusLoader({
 		stylusOptions: {
 			include: ["node_modules"],
 			includeCss: true,
 		},
+	}),
+	glsl({
+		minify: !IS_DEV,
 	}),
 ];
 
@@ -60,13 +66,13 @@ if (!process.argv.includes("--dist")) {
 const buildOption = {
 	entryPoints,
 	bundle: true,
-	sourcemap: process.argv.includes("--dev") ? "inline" : false,
-	minify: !process.argv.includes("--dev"),
+	sourcemap: IS_DEV ? "inline" : false,
+	minify: !IS_DEV,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
 	charset: "utf8",
 	define: {
-		DEBUG: process.argv.includes("--dev").toString(),
+		DEBUG: IS_DEV.toString(),
 		OPEN_PAGE_DIRECTLY: process.argv
 			.includes("--open-page-directly")
 			.toString(),
@@ -88,7 +94,7 @@ const buildOption = {
 
 console.log("Building plugin to", buildOption.outdir);
 
-if (process.argv.includes("--dev") && process.argv.includes("--lyric-test")) {
+if (IS_DEV && process.argv.includes("--lyric-test")) {
 	serve({}, buildOption).then((result) => {
 		console.log(`Dev Server is listening on ${result.host}:${result.port}`);
 	});
@@ -104,6 +110,7 @@ if (process.argv.includes("--dev") && process.argv.includes("--lyric-test")) {
 			if (process.argv.includes("--dist")) {
 				addIfExist("dist/manifest.json", "manifest.json");
 				addIfExist("dist/index.js", "index.js");
+				addIfExist("dist/worker_script.js", "worker_script.js");
 				addIfExist("dist/index.css", "index.css");
 				addIfExist("dist/startup_script.js", "startup_script.js");
 			} else {
@@ -111,6 +118,7 @@ if (process.argv.includes("--dev") && process.argv.includes("--lyric-test")) {
 				addIfExist("index.js");
 				addIfExist("index.css");
 				addIfExist("startup_script.js");
+				addIfExist("worker_script.js");
 			}
 			const output = plugin.generateNodeStream({
 				compression: "DEFLATE",

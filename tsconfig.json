@@ -2,7 +2,7 @@
     "include": [
         "./src/**/*.ts",
         "./src/**/*.tsx"
-    ],
+, "src/components/lyric-background/index copy.tsx.lock", "src/components/lyric-background/index copy.tsx.lock"    ],
     "exclude": [
         "./node_modules/@types/node/**/*.ts",
         "./build.mjs"

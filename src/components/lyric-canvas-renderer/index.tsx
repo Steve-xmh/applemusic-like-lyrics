@@ -1,14 +1,6 @@
-import { genAudioPlayerCommand, PlayState } from "../../api";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import * as React from "react";
-import { useConfigValueBoolean, useForceUpdate } from "../../api/react";
-import {
-	currentAudioDurationAtom,
-	currentAudioIdAtom,
-	currentLyricsAtom,
-	currentLyricsIndexAtom,
-	playStateAtom,
-} from "../../core/states";
+import { currentLyricsAtom, currentLyricsIndexAtom } from "../../core/states";
 import { CanvasLyricRender } from "./render";
 
 export const LyricCanvasRenderer: React.FC = () => {

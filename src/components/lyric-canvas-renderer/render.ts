@@ -1,6 +1,5 @@
 import { LyricLine } from "../../core/lyric-parser";
 import { Spring } from "../../utils/spring";
-import { log } from "../../utils/logger";
 import { splitMultilineText } from "../../libs/canvas-hypertext";
 
 type LyricLineState = LyricLine & {
@@ -199,10 +198,6 @@ export class CanvasLyricRender {
 		ctx.fillStyle = "white";
 		ctx.clearRect(0, 0, width, height);
 
-		// ctx.strokeStyle = "green";
-		// ctx.strokeRect(0, height / 2, width, 1);
-
-		// ctx.strokeStyle = "red";
 		for (let i = 0; i < this.currentLyrics.length; i++) {
 			const line = this.currentLyrics[i];
 

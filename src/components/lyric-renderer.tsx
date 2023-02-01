@@ -1,5 +1,4 @@
 import { PlayState } from "../api";
-import { useConfig } from "../api/react";
 import { LyricLine } from "../core/lyric-parser";
 import { LyricCanvasRenderer } from "./lyric-canvas-renderer";
 import { LyricDOMRenderer } from "./lyric-dom-renderer";
