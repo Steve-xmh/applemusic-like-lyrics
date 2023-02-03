@@ -87,11 +87,21 @@ export interface WorkerResultMessage {
 }
 export const grabImageColors = defineWorkerFunction(
 	"grabImageColors",
-	async (img: ImageBitmap, maxColors = 16) => {
-		const canvas = new OffscreenCanvas(img.width, img.height);
-		const ctx: OffscreenCanvasRenderingContext2D = canvas.getContext(
-			"2d",
-		) as unknown as OffscreenCanvasRenderingContext2D;
+	(img: ImageBitmap, maxColors = 16) => {
+		let canvas: HTMLCanvasElement | OffscreenCanvas;
+		let ctx:
+			| CanvasRenderingContext2D
+			| OffscreenCanvasRenderingContext2D
+			| null;
+		if (IS_WORKER || !APP_CONF.isOSX) {
+			canvas = new OffscreenCanvas(img.width, img.height);
+			ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+		} else {
+			canvas = document.createElement("canvas");
+			canvas.width = img.width;
+			canvas.height = img.height;
+			ctx = canvas.getContext("2d");
+		}
 		if (ctx) {
 			ctx.drawImage(img, 0, 0);
 			const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
