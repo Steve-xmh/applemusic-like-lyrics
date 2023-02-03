@@ -70,8 +70,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						const lineHeight = lineRect.height;
 						let scrollDelta = lineRect.top - listRect.top;
 						if (!alignTopSelectedLyric) {
-							scrollDelta -=
-								(window.innerHeight - lineHeight) / 2 - listRect.top;
+							scrollDelta -= (window.innerHeight - lineHeight) / 2;
 						} else if (lyricElement.innerText.trim().length > 0) {
 							scrollDelta -= listRect.height * 0.1;
 						} else {

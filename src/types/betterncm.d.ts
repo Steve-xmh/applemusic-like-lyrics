@@ -322,7 +322,7 @@ declare module "betterncm-api/index" {
 	/**
 	 * 包含加载动画的重载
 	 */
-	function reload(): void;
+	function reload(): never;
 	const BetterNCM: {
 		fs: typeof fs;
 		app: typeof app;
@@ -498,5 +498,6 @@ declare namespace betterncm_native {
 
 	export namespace app {
 		export function version(): string;
+		export function restart(): never;
 	}
 }

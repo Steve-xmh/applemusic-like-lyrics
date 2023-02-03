@@ -143,7 +143,9 @@ export const NoLyricOptions: React.FC<{
 
 	return (
 		<div className="am-lyric-view-no-lyric">
-			<Text fz="md">没有可用歌词，但是你可以手动指定需要使用的歌词：</Text>
+			<Text fz="md">
+				没有可用歌词，但是你可以通过右上角的菜单手动指定需要使用的歌词。
+			</Text>
 			<Space h="xl" />
 			<Button.Group orientation="vertical">
 				<Button

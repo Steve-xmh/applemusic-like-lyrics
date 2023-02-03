@@ -6,15 +6,24 @@
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
-import { getPlayingSong, loadLyric, PlayState, toPlayState } from "../api";
+import {
+	genBitmapImage,
+	getPlayingSong,
+	loadLyric,
+	PlayState,
+	toPlayState,
+} from "../api";
+import { grabImageColors as workerGrabImageColors } from "../worker";
 import {
 	useNowPlayingOpened,
 	useConfigValueBoolean,
 	useFMOpened,
 	useConfigValue,
+	useAlbumImage,
 } from "../api/react";
 import { LyricLine, parseLyric } from "../core/lyric-parser";
 import {
+	albumImageMainColorsAtom,
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
 	currentLyricsAtom,
@@ -25,7 +34,7 @@ import {
 	playingSongDataAtom,
 	playStateAtom,
 } from "../core/states";
-import { error, log } from "../utils/logger";
+import { error, log, warn } from "../utils/logger";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
@@ -34,9 +43,11 @@ export const NCMEnvWrapper: React.FC = () => {
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
 	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
+	const setAlbumImageMainColors = useSetAtom(albumImageMainColorsAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
 	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
+	const [albumImageLoaded, albumImage] = useAlbumImage(musicId, 128, 128);
 
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
@@ -48,6 +59,37 @@ export const NCMEnvWrapper: React.FC = () => {
 	const [currentRawLyricResp, setCurrentRawLyricResp] = useAtom(
 		currentRawLyricRespAtom,
 	);
+
+	React.useEffect(() => {
+		const img = new Image();
+		let canceled = false;
+		img.addEventListener(
+			"load",
+			() => {
+				if (!canceled) {
+					(async () => {
+						const bm = await genBitmapImage(albumImage, 128, 128);
+						if (bm) {
+							const colors = await workerGrabImageColors(bm, 16);
+							setAlbumImageMainColors(colors);
+						} else {
+							warn("缩放图片失败", albumImage.src);
+						}
+					})();
+				}
+			},
+			{
+				once: true,
+			},
+		);
+		img.addEventListener("error", (evt) => {
+			warn("用于更新背景颜色板的图片", albumImage.src, "加载失败：", evt.error);
+		});
+		img.src = albumImage.src;
+		return () => {
+			canceled = true;
+		};
+	}, [albumImageLoaded]);
 
 	React.useEffect(() => {
 		if (isLyricPageOpening || isFMPageOpening) {

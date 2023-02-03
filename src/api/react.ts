@@ -223,11 +223,11 @@ const genEmptyImage = () => {
 	return img;
 };
 
-export function useAlbumImageUrl(
+export function useAlbumImage(
 	musicId: number | string,
 	lowWidth?: number,
 	lowHeight?: number,
-): string {
+): [boolean, HTMLImageElement, string] {
 	const imageLoader = React.useRef(genEmptyImage());
 	const [shouldLowQuality, setShouldLowQuality] = React.useState(
 		lowWidth && lowHeight && lowWidth * lowHeight > 0,
@@ -360,6 +360,16 @@ export function useAlbumImageUrl(
 			imageLoader.current.removeEventListener("error", onError);
 		};
 	}, [albumImageUrls, shouldLowQuality]);
+
+	return [selectedUrl.length > 0, imageLoader.current, selectedUrl];
+}
+
+export function useAlbumImageUrl(
+	musicId: number | string,
+	lowWidth?: number,
+	lowHeight?: number,
+): string {
+	const [, , selectedUrl] = useAlbumImage(musicId, lowWidth, lowHeight);
 
 	return selectedUrl;
 }

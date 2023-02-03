@@ -23,7 +23,7 @@
     "color-quantize": "^0.1.1",
     "esbuild": "^0.16.1",
     "esbuild-plugin-glsl": "^1.1.0",
-    "esbuild-stylus-loader": "^0.4.2",
+    "esbuild-sass-plugin": "^2.4.5",
     "jotai": "^1.13.1",
     "jszip": "^3.10.1",
     "pangu": "^4.0.7",
@@ -32,7 +32,6 @@
     "react-dom": "^18.2.0",
     "react-simple-code-editor": "^0.13.1",
     "semver-compare": "^1.0.0",
-    "stylus": "^0.59.0",
     "typescript": "^4.9.4"
   },
   "devDependencies": {

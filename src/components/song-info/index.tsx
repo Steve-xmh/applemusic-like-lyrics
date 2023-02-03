@@ -35,36 +35,37 @@ export const PlayerSongInfo: React.FC<{
 				hideMusicArtists &&
 				hideMusicAlbum
 			) && (
-				<div className="am-music-info">
-					<div>
-						{!hideAlbumImage && (
-							<div className="am-album-image">
-								<div>
-									<LoadingOverlay
-										loader={
-											<Loader
-												size={50}
-												style={{
-													width: "50px",
-													height: "50px",
-												}}
-											/>
-										}
-										sx={{
-											borderRadius: "5%",
-										}}
-										visible={albumImageUrl.length === 0}
-									/>
-									<img
-										alt="专辑图片"
-										src={albumImageUrl}
-										style={{
-											opacity: albumImageUrl.length > 0 ? 1 : 0,
-										}}
-									/>
-								</div>
+				<div className="am-player-song-info">
+					<div className="am-music-info-spacer" />
+					{!hideAlbumImage && (
+						<div className="am-album-image">
+							<div>
+								<LoadingOverlay
+									loader={
+										<Loader
+											size={50}
+											style={{
+												width: "50px",
+												height: "50px",
+											}}
+										/>
+									}
+									sx={{
+										borderRadius: "3%",
+									}}
+									visible={albumImageUrl.length === 0}
+								/>
+								<img
+									alt="专辑图片"
+									src={albumImageUrl}
+									style={{
+										opacity: albumImageUrl.length > 0 ? 1 : 0,
+									}}
+								/>
 							</div>
-						)}
+						</div>
+					)}
+					<div className="am-music-info">
 						{!hideMusicName && <div className="am-music-name">{songName}</div>}
 						{!hideMusicAlias && songAliasName.length > 0 && (
 							<div className="am-music-alias">

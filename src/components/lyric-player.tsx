@@ -7,7 +7,7 @@ import {
 import * as React from "react";
 import { Loader, Center } from "@mantine/core";
 import { LyricBackground } from "./lyric-background";
-import { currentLyricsAtom, musicIdAtom } from "../core/states";
+import { currentLyricsAtom } from "../core/states";
 import { useAtomValue } from "jotai";
 import { LyricPlayerTopBar } from "./lyric-player-topbar";
 import { NoLyricOptions } from "./no-lyric-options";
@@ -19,7 +19,6 @@ export const LyricView: React.FC<{
 }> = (props) => {
 	const isNowPlayingOpened = useNowPlayingOpened();
 	const isFMOpened = useFMOpened();
-	const musicId = useAtomValue(musicIdAtom);
 
 	const [error, setError] = React.useState<Error | null>(null);
 	const currentLyrics = useAtomValue(currentLyricsAtom);
@@ -74,7 +73,7 @@ export const LyricView: React.FC<{
 
 	return (
 		<>
-			{showBackground && <LyricBackground musicId={musicId} />}
+			{showBackground && <LyricBackground />}
 			<PlayerSongInfo isFM={props.isFM} />
 			<div className="am-lyric">
 				<LyricPlayerTopBar

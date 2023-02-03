@@ -131,8 +131,10 @@ function buildStylesheetFromConfig() {
 		result.push(":");
 		if (String(Number(value)) === value) {
 			result.push(`${value}px`);
-		} else {
+		} else if (!value.includes("\n")) {
 			result.push(value);
+		} else {
+			("true");
 		}
 		result.push(";\n");
 	}
@@ -241,6 +243,7 @@ plugin.onLoad(() => {
 	};
 
 	GLOBAL_EVENTS.addEventListener("lyric-page-open", () => {
+		document.body.classList.add("amll-lyric-page-open");
 		const autoEnabled = getConfig("autoHideControlBar", "false") === "true";
 		if (autoEnabled) {
 			window.addEventListener("mousemove", onCheckHide);
@@ -248,6 +251,7 @@ plugin.onLoad(() => {
 	});
 
 	GLOBAL_EVENTS.addEventListener("lyric-page-hide", () => {
+		document.body.classList.remove("amll-lyric-page-open");
 		if (hideTimer !== 0) {
 			clearTimeout(hideTimer);
 			hideTimer = 0;
@@ -375,7 +379,10 @@ plugin.onLoad(() => {
 	})();
 	if (DEBUG) {
 		(async () => {
-			const debounceReload = betterncm.utils.debounce(betterncm.reload, 1000);
+			const debounceReload = betterncm.utils.debounce(
+				() => (betterncm_native?.app?.restart ?? betterncm.reload)(),
+				1000,
+			);
 
 			const debounceRefreshStyle = async function () {
 				const curStyle = await betterncm.fs.readFileText(

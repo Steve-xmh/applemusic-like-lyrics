@@ -386,13 +386,21 @@ export function classname(
 	return result.join(" ");
 }
 
-export async function genBitmapImage(
+export async function genBitmapImageFromURL(
 	imageUrl: string,
 	width?: number,
 	height?: number,
 ) {
 	const img = new Image();
 	img.src = imageUrl;
+	return await genBitmapImage(img, width, height);
+}
+
+export async function genBitmapImage(
+	img: HTMLImageElement,
+	width?: number,
+	height?: number,
+) {
 	await img.decode();
 	const canvas = new OffscreenCanvas(width ?? img.width, height ?? img.height);
 	const ctx: OffscreenCanvasRenderingContext2D = canvas.getContext(

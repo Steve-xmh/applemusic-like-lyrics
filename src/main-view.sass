@@ -1,0 +1,388 @@
+
+@mixin text-overflow-ellipsis()
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
+@mixin applemusic-like-lyrics-view-style()
+    display: flex
+    height: 100%
+    width: 80%
+    margin: 0 10%
+    z-index: 1
+
+    svg
+        width: unset
+        height: unset
+
+    .am-lyric-background
+        z-index: -1
+
+    .am-lyric-view-loading
+        flex: 1
+
+    .am-player-song-info
+        flex: 1
+        display: flex
+        flex-direction: column
+        overflow: hidden
+        align-items: center
+        justify-content: center
+        > .am-music-info-spacer
+            flex: 1
+        > .am-album-image
+            width: 70%
+            aspect-ratio: 1 / 1
+            flex: 0
+            position: relative
+            > *
+                width: 100%
+                height: 100%
+                aspect-ratio: 1 / 1
+            img
+                border-radius: 3%
+                box-shadow: 0 0 1rem #0004
+                width: 100%
+                height: 100%
+                aspect-ratio: 1 / 1
+                object-fit: cover
+        > .am-music-info
+            flex: 1
+            width: 100%
+
+            .am-music-name
+                @include text-overflow-ellipsis
+                font-size: 1.5rem
+                line-height: normal
+                margin: 1rem 0 0.25rem 0
+                cursor: text
+                user-select: text
+                text-align: center
+            .am-music-alias
+                @include text-overflow-ellipsis
+                font-size: 1.2rem
+                line-height: normal
+                margin-top: 0.1rem
+                opacity: 0.75
+                cursor: text
+                text-align: center
+                user-select: text
+                white-space: nowrap
+                text-overflow: ellipsis
+            .am-music-artists
+                width: 100%
+                font-size: 1rem
+                line-height: normal
+                margin: 0.25rem 0
+                display: flex
+                align-items: baseline
+                flex-wrap: nowrap
+                justify-content: center
+                .am-artists-label
+                    line-height: normal
+                    white-space: nowrap
+                .am-artists
+                    @include text-overflow-ellipsis
+                    max-width: 100%
+                    overflow: hidden
+                    white-space: nowrap
+                    text-overflow: ellipsis
+                    text-align: center
+                    a
+                        line-height: normal
+                        opacity: 0.8
+                        user-select: text
+                        &::after
+                            content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+                            opacity: 0.5
+                        &:last-child::after
+                            content: ""
+
+            .am-music-album
+                max-width: 100%
+                font-size: 1rem
+                line-height: normal
+                margin: 0.25rem 0
+                display: flex
+                align-items: baseline
+                justify-content: center
+                .am-album-label
+                    white-space: nowrap
+                .am-album
+                    @include text-overflow-ellipsis
+                    max-width: 100%
+                a
+                    opacity: 0.8
+                    user-select: text
+
+    .am-lyric
+        flex: 1
+        display: flex
+        flex-direction: column
+        // 鼠标悬浮时显示所有歌词
+        &:hover .am-lyric-line
+            filter: blur(0) !important
+            opacity: 1 !important
+            > .am-lyric-line-original
+                opacity: 0.75
+            > .am-lyric-line-dynamic > *
+                opacity: 0.75
+            &.am-lyric-line-o0,
+            &.am-lyric-line-selected
+                opacity: 1
+                > .am-lyric-line-dynamic > *
+                    opacity: 1
+        &:hover .am-lyric-options
+            opacity: 1
+
+    .am-lyric-view-error
+        flex: 1
+        *
+            overflow-wrap: break-word
+            white-space: pre-wrap
+            margin-bottom: 1rem
+
+    .am-lyric-options
+        opacity: 0
+        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        position: absolute
+        right: 10%
+        top: 100px
+        z-index: 1
+
+    .am-lyric-view
+        flex: 1
+        overflow: hidden scroll
+        position: relative
+        -webkit-mask-image: linear-gradient(#0000, #000 10%, #000 80%, #0000 90%, #0000)
+        &::-webkit-scrollbar
+            display: none
+        > *
+            padding: 50vh 0
+            position: absolute
+            padding-left: 2rem
+            padding-right: min(30%, 5vw, 600px)
+
+    .am-lyric-view-no-lyric
+        height: 100%
+        overflow: hidden
+        flex: 1
+        display: flex
+        flex-direction: column
+        flex-wrap: nowrap
+        justify-content: center
+        align-items: baseline
+
+    // 歌词缩放效果
+    &.lyric-scale-effect // lyricScaleEffect
+        .am-lyric-line
+            transform: scale(0.85)
+
+            &.am-lyric-line-o0,
+            &.am-lyric-line-selected
+                transform: scale(1)
+
+        // .am-lyric-dots
+        //     transform: scale(0.66666)
+        //     &.am-lyric-dots-selected
+        //         transform: scale(1)
+
+    // 已播放歌词隐藏效果
+    &.lyric-hide-passed
+        .am-lyric-line
+            opacity: 0.5
+            &.am-lyric-line-before
+                opacity: 0
+            &.am-lyric-line-selected
+                opacity: 1
+
+    // 歌词模糊效果
+    &.lyric-blur-effect
+        .am-lyric-line
+            filter: blur(4px)
+            &.am-lyric-line-after, &.am-lyric-line-before
+                filter: blur(4px)
+                &.am-lyric-line-selected
+                    filter: blur(0px)
+            @for $i from -5 through 5
+                @if $i != 0
+                    &.am-lyric-line-o#{$i}
+                        filter: blur(abs($i) * 1px)
+
+    // 未播放歌词淡入效果
+    &.lyric-blur-fade-in-effect
+        .am-lyric-line
+            &.am-lyric-line-after
+                opacity: 0.1
+            &.am-lyric-line-o1
+                opacity: 0.4
+            &.am-lyric-line-o2
+                opacity: 0.3
+            &.am-lyric-line-o3
+                opacity: 0.2
+            > .am-lyric-line-dynamic > *
+                > .am-lyric-real-word
+                    opacity: 1
+
+    // 自定义歌词字体大小
+    &.lyric-fixed-font-size
+        .am-lyric-line
+            font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
+        .am-lyric-dots
+            &.am-lyric-dots-selected
+                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5)
+            > *
+                margin-right: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333)
+                width: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
+                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
+
+    &.use-ping-fang-font *
+        font-family: 'PingFang SC' !important
+
+    // 歌名居左
+    &.align-left-music-name .am-music-name
+        text-align: left
+
+    // 歌曲别名居左
+    &.align-left-music-alias .am-music-alias
+        text-align: left
+
+    // 歌手名居左
+    &.align-left-music-artists .am-music-artists
+        justify-content: left
+
+    // 专辑名居左
+    &.align-left-music-album .am-music-album
+        justify-content: left
+
+    // 隐藏歌手名标签
+    &.hide-music-artists-label .am-artists-label
+        display: none
+
+    // 隐藏专辑名标签
+    &.hide-music-album-label .am-album-label
+        display: none
+
+    // 歌词滚动位置向上对齐
+    &.align-top-selected-lyric
+        .am-lyric-view > *
+            padding-bottom: 100vh
+
+    &.font-shadow
+        .am-lyric-view, .am-music-info
+            filter: drop-shadow(0 0 2px #7774)
+
+    .am-lyric-line
+        font-weight: bold
+        font-size: clamp(32px, 3vw, 4vh)
+        padding: max(1rem, 1vh) 0
+        transform-origin: left
+        color: var(--applemusic-like-lyrics-font-color, unset)
+        transition: all 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        line-break: loose
+        word-break: break-word
+
+        > .am-lyric-line-translated,
+        > .am-lyric-line-roman
+            opacity: 0.5
+            margin-top: 0.5rem
+
+        > .am-lyric-line-dynamic > *
+            position: relative
+            display: inline-block
+            white-space: break-spaces
+            > .am-lyric-fake-word
+                animation-name: am-lyric-word-animation
+                animation-timing-function: linear
+                animation-fill-mode: both
+                width: 0%
+                right: 0%
+                position: absolute
+                white-space: nowrap
+                overflow: hidden
+            > .am-lyric-real-word
+                opacity: 0.75
+                transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+
+        &:hover
+            opacity: 1 !important
+            > .am-lyric-line-original
+                opacity: 1 !important
+            > .am-lyric-line-dynamic > *
+                opacity: 1 !important
+
+        &.am-lyric-line-after
+            opacity: 0.5
+            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
+                opacity: 0.5
+                animation-name: unset
+                animation-fill-mode: unset
+                animation-play-state: unset
+
+        &.am-lyric-line-before
+            opacity: 0.5
+            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
+                opacity: 1
+                width: 100%
+                animation-name: unset
+                animation-fill-mode: unset
+                animation-play-state: unset
+
+        &.am-lyric-line-o0,
+        &.am-lyric-line-selected
+            filter: blur(0px)
+            opacity: 1
+            > .am-lyric-line-dynamic
+                > * > .am-lyric-real-word
+                    animation-play-state: running
+                    opacity: 0.5
+        @keyframes am-lyric-word-animation
+            from
+                width: 0%
+                right: 100%
+
+            to
+                width: 100%
+                right: 0%
+
+    .am-lyric-dots
+        height: 0px
+        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1), height 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        transform-origin: left
+        opacity: 0
+
+        > *
+            display: inline-block
+            margin-right: 2vh
+            width: 3vh
+            height: 3vh
+            background-color: var(--applemusic-like-lyrics-font-color, white)
+            box-shadow: 0 2px 5px #0008
+            border-radius: 50%
+
+        &.am-lyric-dots-selected
+            height: 6vh
+            opacity: 1
+            animation-name: am-lyric-dot-show-animation
+            animation-fill-mode: both
+            animation-delay: 0.75s
+            animation-duration: 1.5s
+
+        &.am-lyric-line-before
+            opacity: 0
+            animation-name: am-lyric-dot-hide-animation
+            animation-fill-mode: both
+            animation-duration: 0.25s
+
+        @keyframes am-lyric-dot-show-animation
+            from
+                opacity: 0
+
+            to
+                opacity: 1
+
+        @keyframes am-lyric-dot-hide-animation
+            from
+                opacity: 1
+
+            to
+                opacity: 0
