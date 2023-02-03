@@ -402,14 +402,9 @@ export async function genBitmapImage(
 	height?: number,
 ) {
 	await img.decode();
-	const canvas = new OffscreenCanvas(width ?? img.width, height ?? img.height);
-	const ctx: OffscreenCanvasRenderingContext2D = canvas.getContext(
-		"2d",
-	) as unknown as OffscreenCanvasRenderingContext2D;
-	if (ctx) {
-		ctx.drawImage(img, 0, 0, width ?? img.width, height ?? img.height);
-		return canvas.transferToImageBitmap();
-	} else {
-		throw new TypeError("无法获取离屏画板上下文，无法生成位图");
-	}
+	return createImageBitmap(img, 0, 0, img.width, img.height, {
+		resizeWidth: width ?? img.width,
+		resizeHeight: height ?? img.height,
+		resizeQuality: "pixelated",
+	});
 }
