@@ -1,5 +1,3 @@
-import { Pixel } from "../libs/color-quantize/utils";
-
 export function debounce<T extends Function>(callback: T, waitTime: number): T {
 	let timer = 0;
 	return function debounceClosure() {
@@ -209,21 +207,6 @@ export function drawImageProp(
 	// fill image in dest. rectangle
 	ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
 }
-
-/**
- * 根据底色计算出最适合观察的对比色，通常用于彩色背景的文字显示上
- * @param color 颜色
- * @returns 最适合观察的对比色
- */
-export const getContrastYiq = (color: Pixel): Pixel => {
-	const [r, g, b] = color.map((v) => v / 0xff);
-	const yiq = (255 * (r * 299 + g * 587 + b * 114)) / 1000;
-	if (yiq >= 128) {
-		return [0, 0, 0];
-	} else {
-		return [0xff, 0xff, 0xff];
-	}
-};
 
 export const IS_WORKER =
 	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

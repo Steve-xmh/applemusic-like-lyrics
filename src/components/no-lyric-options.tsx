@@ -204,6 +204,7 @@ export const NoLyricOptions: React.FC<{
 				<NumberInput
 					label="音乐 ID"
 					hideControls
+					data-autofocus
 					value={selectMusicId}
 					onChange={setSelectMusicId}
 				/>
@@ -259,24 +260,28 @@ export const NoLyricOptions: React.FC<{
 					label="原文歌词文件"
 					value={originalLyricFile}
 					onChange={setOriginalLyricFile}
+					accept=".lrc"
 				/>
 				<Space h="md" />
 				<FileInput
 					label="翻译歌词文件"
 					value={translatedLyricFile}
 					onChange={setTranslatedLyricFile}
+					accept=".lrc"
 				/>
 				<Space h="md" />
 				<FileInput
 					label="音译歌词文件"
 					value={romanLyricFile}
 					onChange={setRomanLyricFile}
+					accept=".lrc"
 				/>
 				<Space h="md" />
 				<FileInput
 					label="逐词歌词文件"
 					value={dynamicLyricFile}
 					onChange={setDynamicLyricFile}
+					accept=".yrc,.lrc"
 				/>
 				<Space h="xl" />
 				<Button

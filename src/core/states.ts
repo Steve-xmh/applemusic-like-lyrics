@@ -13,6 +13,7 @@ export const currentLyricsAtom = atom<LyricLine[] | null>(null);
 export const currentLyricsIndexAtom = atom(-1);
 export const playingSongDataAtom = atom(getPlayingSong());
 export const albumImageMainColorsAtom = atom<Pixel[]>([[0, 0, 0]]);
+export const rightClickedLyricAtom = atom<LyricLine | null>(null);
 
 export const musicIdAtom: Atom<string | number> = selectAtom(
 	playingSongDataAtom,
@@ -39,7 +40,8 @@ export const songAliasNameAtom = selectAtom(
 );
 export const songArtistsAtom = selectAtom(
 	playingSongDataAtom,
-	(playing) => playing?.data?.artists || [],
+	(playing): { name: string; id: number | string }[] =>
+		playing?.data?.artists || [],
 );
 export const getMusicId = (): number | string =>
 	getPlayingSong()?.originFromTrack?.lrcid ||

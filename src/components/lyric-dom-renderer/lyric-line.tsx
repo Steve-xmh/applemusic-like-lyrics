@@ -1,7 +1,7 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { classname, PlayState } from "../../api";
 import { LyricLine } from "../../core/lyric-parser";
-import { playStateAtom } from "../../core/states";
+import { playStateAtom, rightClickedLyricAtom } from "../../core/states";
 
 export const LyricLineView: React.FC<{
 	offset: number;
@@ -13,6 +13,7 @@ export const LyricLineView: React.FC<{
 	onClickLyric?: (line: LyricLine, evt: React.MouseEvent) => void;
 }> = (props) => {
 	const playState = useAtomValue(playStateAtom);
+	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
@@ -20,7 +21,7 @@ export const LyricLineView: React.FC<{
 				if (props.onClickLyric) props.onClickLyric(props.line, evt);
 			}}
 			onContextMenu={(evt) => {
-				if (props.onClickLyric) props.onClickLyric(props.line, evt);
+				setRightClickedLyric(props.line);
 				evt.preventDefault();
 			}}
 			className={classname("am-lyric-line", {

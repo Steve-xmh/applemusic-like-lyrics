@@ -16,7 +16,6 @@ export const OtherStyleSettings: React.FC = () => {
 		"customBackgroundRenderFunc",
 		"",
 	);
-	const [showBackground] = useConfig("showBackground", "true");
 	const [isLFPSupported, isLFPEnabled] = useLFPSupported();
 
 	return (
@@ -28,7 +27,7 @@ export const OtherStyleSettings: React.FC = () => {
 					title="检测到 LibFrontendPlay 插件"
 				>
 					{isLFPEnabled ? (
-						<div>现在可以使用音频可视化的背景效果了</div>
+						<div>现在可以使用带音频可视化的背景渲染效果了</div>
 					) : (
 						<div>但是 LibFrontendPlay 并没有启用，无法使用可视化背景效果</div>
 					)}
@@ -68,14 +67,6 @@ export const OtherStyleSettings: React.FC = () => {
 				label="显示背景"
 				defaultValue={true}
 			/>
-			{isLFPSupported && (
-				<SwitchConfigComponent
-					disabled={!isLFPEnabled || showBackground === "false"}
-					settingKey="backgroundAudioVisualizerEffect"
-					label="启用音频可视化背景（感谢 LibFrontendPlay 插件）（高性能消耗警告！）"
-					defaultValue={false}
-				/>
-			)}
 			<Space h="xl" />
 			<Text fz="md">默认背景设置</Text>
 			<Space h="md" />

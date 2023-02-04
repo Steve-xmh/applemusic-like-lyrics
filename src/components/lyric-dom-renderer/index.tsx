@@ -76,6 +76,13 @@ export const LyricDOMRenderer: React.FC = () => {
 						} else {
 							scrollDelta -= window.innerHeight * 0.06 + listRect.height * 0.1;
 						}
+						// 三点动画补偿
+						const lastLyricLine = lyricListElement.current.children.item(
+							lastIndex.current,
+						) as HTMLElement;
+						if (lastLyricLine?.classList.contains("am-lyric-dots")) {
+							scrollDelta -= lastLyricLine.getBoundingClientRect().height;
+						}
 						const prevScrollTop = lyricView.scrollTop;
 						const obj = {
 							scrollTop: prevScrollTop,

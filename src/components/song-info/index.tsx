@@ -1,5 +1,6 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { useAtomValue } from "jotai";
+import * as React from "react";
 import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
 import {
 	albumAtom,
@@ -8,6 +9,7 @@ import {
 	songArtistsAtom,
 	songNameAtom,
 } from "../../core/states";
+import { Menu, MenuItem } from "../appkit/menu";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
 export const PlayerSongInfo: React.FC<{
@@ -19,6 +21,7 @@ export const PlayerSongInfo: React.FC<{
 	const songAliasName: string[] = useAtomValue(songAliasNameAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
+	const [songInfoMenu, setSongInfoMenu] = React.useState(false);
 
 	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
 	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
@@ -28,6 +31,23 @@ export const PlayerSongInfo: React.FC<{
 
 	return (
 		<>
+			<Menu onClose={() => setSongInfoMenu(false)} opened={songInfoMenu}>
+				<MenuItem label={`复制音乐 ID：${musicId}`} />
+				<MenuItem label="复制专辑图片链接" />
+				<MenuItem label="保存专辑图片" />
+				<MenuItem label="复制音乐名称" />
+				{songArtists.length === 1 && (
+					<MenuItem label={`查看歌手：${songArtists[0].name}`} />
+				)}
+				{songArtists.length > 1 && (
+					<MenuItem label="查看歌手...">
+						{songArtists.map((a) => (
+							<MenuItem label={a.name} key={`song-artist-${a.id}`} />
+						))}
+					</MenuItem>
+				)}
+				{album && <MenuItem label={`查看专辑：${album.name}`} />}
+			</Menu>
 			{!(
 				hideAlbumImage &&
 				hideMusicName &&
@@ -35,7 +55,13 @@ export const PlayerSongInfo: React.FC<{
 				hideMusicArtists &&
 				hideMusicAlbum
 			) && (
-				<div className="am-player-song-info">
+				<div
+					className="am-player-song-info"
+					onContextMenu={(evt) => {
+						setSongInfoMenu(true);
+						evt.preventDefault();
+					}}
+				>
 					<div className="am-music-info-spacer" />
 					{!hideAlbumImage && (
 						<div className="am-album-image">

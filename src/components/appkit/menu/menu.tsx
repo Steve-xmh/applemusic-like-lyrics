@@ -19,14 +19,14 @@ export const Menu: React.FC<
 			const box = menu.getBoundingClientRect();
 			let { x, y } = mouse;
 			if (
-				x + box.width >= window.innerWidth / window.devicePixelRatio ||
-				x > window.innerWidth / window.devicePixelRatio / 2
+				x > box.width &&
+				(x + box.width >= window.innerWidth || x > window.innerWidth / 2)
 			) {
 				x -= box.width;
 			}
 			if (
-				y + box.height >= window.innerHeight / window.devicePixelRatio ||
-				y > window.innerHeight / window.devicePixelRatio / 2
+				(y > box.height && y + box.height >= window.innerHeight) ||
+				y > window.innerHeight / 2
 			) {
 				y -= box.height;
 			}
@@ -37,6 +37,7 @@ export const Menu: React.FC<
 	}, [props.opened, menuRef.current]);
 
 	return createPortal(
+		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
 			style={{
 				display: props.opened ? "block" : "none",
@@ -49,7 +50,11 @@ export const Menu: React.FC<
 				backgroundColor: "transparent",
 			}}
 			className="amll-menu-wrapper"
-			onClickCapture={props.onClose}
+			onClick={(evt) => {
+				if (evt.target === evt.currentTarget) {
+					props.onClose();
+				}
+			}}
 		>
 			{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 			<div

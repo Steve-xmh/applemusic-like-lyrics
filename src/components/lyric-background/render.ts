@@ -1,6 +1,6 @@
 import { Pixel } from "../../libs/color-quantize/utils";
 import { log } from "../../utils/logger";
-import fbmWaveShader from "./fbm-wave-shader.frag";
+import { FBMWaveMethod } from "./fbm-wave";
 
 const DEFAULT_VERTEX_SHADER =
 	"attribute vec4 a_position;" +
@@ -27,11 +27,33 @@ const shuffleArray = <T>(array: T[]) => {
 
 	return array;
 };
+
+/**
+ * 一种背景渲染方式管线结构
+ */
+export interface BackgroundRenderMethod {
+	fragmentShaderCode: string;
+	beforeDrawArray?: (this: CanvasBackgroundRender) => void;
+	afterDrawArray?: (this: CanvasBackgroundRender) => void;
+	name: string;
+	id: string;
+	description?: string;
+	configs?: {
+		name: string;
+		min: number;
+		max: number;
+		step?: number;
+	}[];
+}
+
 export class CanvasBackgroundRender {
 	private disposed = false;
 	private gl: WebGLRenderingContext;
 	private frameId = 0;
 	private createTime = Date.now();
+	skipFrameRate = 0;
+	private _skipFrameRate = 0;
+	private currentRenderMethod: BackgroundRenderMethod;
 	private get time() {
 		return Date.now() - this.createTime;
 	}
@@ -39,9 +61,12 @@ export class CanvasBackgroundRender {
 		const gl = canvas.getContext("webgl");
 		if (gl) {
 			this.gl = gl;
+			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 			this.resize();
 			this.rebuildVertex();
-			this.rebuildShader(fbmWaveShader);
+			this.setRenderMethod(FBMWaveMethod);
 			this.rebuildProgram();
 			this.setAlbumColorMap([[0, 0, 0]]);
 		} else {
@@ -50,6 +75,10 @@ export class CanvasBackgroundRender {
 			);
 		}
 	}
+	setRenderMethod(renderMethod: BackgroundRenderMethod) {
+		this.rebuildShader(renderMethod.fragmentShaderCode);
+		this.currentRenderMethod = renderMethod;
+	}
 	resize(width = this.canvas.width, height = this.canvas.height) {
 		const canvas = this.canvas;
 		canvas.width = width;
@@ -57,14 +86,15 @@ export class CanvasBackgroundRender {
 		this.gl.viewport(0, 0, canvas.width, canvas.height);
 	}
 	onUpdateAndDraw() {
-		this.frameId = 0;
 		this.updateUniforms();
 
+		this.currentRenderMethod?.beforeDrawArray?.call(this);
+
 		const gl = this.gl;
-		gl.clear(gl.COLOR_BUFFER_BIT);
+		// gl.clearColor(0, 0, 0, 0);
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-		this.shouldRedraw();
+		this.currentRenderMethod?.afterDrawArray?.call(this);
 	}
 	shouldRedraw() {
 		if (!this.frameId) {
@@ -80,7 +110,14 @@ export class CanvasBackgroundRender {
 	}
 	private readonly onFrame = () => {
 		if (!this.disposed) {
-			this.onUpdateAndDraw();
+			this.frameId = 0;
+			if (this._skipFrameRate > 0) {
+				this._skipFrameRate--;
+				this.shouldRedraw();
+			} else {
+				this._skipFrameRate = this.skipFrameRate;
+				this.onUpdateAndDraw();
+			}
 		}
 	};
 	private vertexBuffer: WebGLBuffer;
@@ -197,6 +234,7 @@ export class CanvasBackgroundRender {
 			new Uint8Array(pixelsData),
 			this.albumColorMapTex,
 		);
+		this.updateAllUniforms();
 	}
 	private albumImageSize = [0, 0];
 	private albumImageTex: WebGLTexture;
@@ -207,6 +245,7 @@ export class CanvasBackgroundRender {
 			image,
 			this.albumImageTex,
 		);
+		this.updateAllUniforms();
 	}
 	private rebuildTextureFromImage(
 		id: GLenum,
@@ -251,6 +290,20 @@ export class CanvasBackgroundRender {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		return tex;
 	}
+	private updateAllUniforms() {
+		this.updateUniforms();
+		const gl = this.gl;
+		// 从专辑图片中取色得出的特征色表图
+		{
+			const loc = gl.getUniformLocation(this.program, "albumColorMap");
+			if (loc) gl.uniform1i(loc, 1);
+		}
+		// 专辑图片
+		{
+			const loc = gl.getUniformLocation(this.program, "albumImage");
+			if (loc) gl.uniform1i(loc, 0);
+		}
+	}
 	private updateUniforms() {
 		const gl = this.gl;
 		// 着色器开始运行到现在的时间，单位秒
@@ -263,21 +316,11 @@ export class CanvasBackgroundRender {
 			const loc = gl.getUniformLocation(this.program, "resolution");
 			if (loc) gl.uniform2f(loc, this.canvas.width, this.canvas.height);
 		}
-		// 从专辑图片中取色得出的特征色表图
-		{
-			const loc = gl.getUniformLocation(this.program, "albumColorMap");
-			if (loc) gl.uniform1i(loc, 1);
-		}
 		// 特征色表图的分辨率，单位像素
 		{
 			const loc = gl.getUniformLocation(this.program, "albumColorMapRes");
 			if (loc)
 				gl.uniform2f(loc, this.albumColorMapSize, this.albumColorMapSize);
-		}
-		// 专辑图片
-		{
-			const loc = gl.getUniformLocation(this.program, "albumImage");
-			if (loc) gl.uniform1i(loc, 0);
 		}
 		// 专辑图片的大小，单位像素
 		{

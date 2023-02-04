@@ -98,7 +98,9 @@ const FMPlayerWrapper: React.FC = () => {
 				}}
 			>
 				<ErrorBoundary>
-					<LyricView isFM />
+					<ThemeProvider>
+						<LyricView isFM />
+					</ThemeProvider>
 				</ErrorBoundary>
 			</div>
 		</Provider>
@@ -126,13 +128,11 @@ function buildStylesheetFromConfig() {
 		}
 		variableTable.set(key, value);
 		variableTable.set(snakeKey, value);
-		result.push("    --applemusic-like-lyrics-");
-		result.push(snakeKey);
-		result.push(":");
+		const varkey = `--applemusic-like-lyrics-${snakeKey}`;
 		if (String(Number(value)) === value) {
-			result.push(`${value}px`);
+			document.body.style.setProperty(varkey, `${value}px`);
 		} else if (!value.includes("\n")) {
-			result.push(value);
+			document.body.style.setProperty(varkey, value);
 		} else {
 			("true");
 		}
@@ -339,8 +339,10 @@ plugin.onLoad(() => {
 							mainViewRoot.render(
 								<Provider>
 									<ErrorBoundary>
-										<NCMEnvWrapper />
-										<LyricView />
+										<ThemeProvider>
+											<NCMEnvWrapper />
+											<LyricView />
+										</ThemeProvider>
 									</ErrorBoundary>
 								</Provider>,
 							);

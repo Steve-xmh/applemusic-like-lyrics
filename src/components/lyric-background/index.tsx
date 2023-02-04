@@ -5,26 +5,33 @@ import { CanvasBackgroundRender } from "./render";
 import { albumImageMainColorsAtom, musicIdAtom } from "../../core/states";
 import { useAtomValue } from "jotai";
 import { Pixel } from "../../libs/color-quantize/utils";
+import { normalizeColor } from "../../utils/color";
 
 export const LyricBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const renderRef = React.useRef<CanvasBackgroundRender | null>(null);
 	const albumImageMainColors = useAtomValue(albumImageMainColorsAtom);
 	const backgroundLightness = useConfigValue("backgroundLightness", "1");
+	const backgroundRenderScale = useConfigValue("backgroundRenderScale", "1");
+	const backgroundRenderSkipFrames = useConfigValue(
+		"backgroundRenderSkipFrames",
+		"0",
+	);
 	const musicId = useAtomValue(musicIdAtom);
 	const [albumImageLoaded, albumImage] = useAlbumImage(musicId);
 
 	const obsRef = React.useRef(
 		new ResizeObserver((entries) => {
 			const entry = entries[0];
+			const renderScale = Math.max(0.01, Number(backgroundRenderScale) || 1);
 			if (entry) {
 				const canvas = entry.target as HTMLCanvasElement;
 				if (canvas) {
 					const render = renderRef.current;
 					if (render && render.canvas === canvas) {
 						render.resize(
-							entry.contentRect.width * 0.1,
-							entry.contentRect.height * 0.1,
+							entry.contentRect.width * renderScale,
+							entry.contentRect.height * renderScale,
 						);
 						render.shouldRedraw();
 					}
@@ -32,6 +39,15 @@ export const LyricBackground: React.FC = () => {
 			}
 		}),
 	);
+
+	React.useEffect(() => {
+		let f = Number(backgroundLightness);
+		const render = renderRef.current;
+		if (render) {
+			render.skipFrameRate = f;
+			render.shouldRedraw();
+		}
+	}, [backgroundRenderSkipFrames]);
 
 	React.useEffect(() => {
 		const canvas = canvasRef.current;
@@ -47,7 +63,7 @@ export const LyricBackground: React.FC = () => {
 	}, []);
 
 	React.useEffect(() => {
-		const colors = albumImageMainColors.slice(0, 2).map<Pixel>((v) => [...v]);
+		const colors = albumImageMainColors.slice(0, 2).map<Pixel>(normalizeColor);
 		colors.reverse();
 		let l = Number(backgroundLightness);
 		if (Number.isNaN(l)) l = 1;
@@ -64,9 +80,9 @@ export const LyricBackground: React.FC = () => {
 				c[2] = Math.round(c[2] * l);
 			}
 		});
-		const mainColor = colors[0];
-		for (let i = 0; i < 4; i++) {
-			colors.push(mainColor);
+		const c = [...colors];
+		for (let i = 0; i < 30; i++) {
+			colors.push(...c);
 		}
 		const render = renderRef.current;
 		if (render) {

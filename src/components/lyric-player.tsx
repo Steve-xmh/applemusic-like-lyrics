@@ -7,12 +7,13 @@ import {
 import * as React from "react";
 import { Loader, Center } from "@mantine/core";
 import { LyricBackground } from "./lyric-background";
-import { currentLyricsAtom } from "../core/states";
-import { useAtomValue } from "jotai";
+import { currentLyricsAtom, rightClickedLyricAtom } from "../core/states";
+import { useAtom, useAtomValue } from "jotai";
 import { LyricPlayerTopBar } from "./lyric-player-topbar";
 import { NoLyricOptions } from "./no-lyric-options";
 import { PlayerSongInfo } from "./song-info";
 import { LyricRenderer, RendererBackend } from "./lyric-renderer";
+import { Menu, MenuDevider, MenuItem } from "./appkit/menu";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
@@ -104,6 +105,74 @@ export const LyricView: React.FC<{
 					</Center>
 				)}
 			</div>
+			<RightClickLyricMenu />
 		</>
+	);
+};
+
+const RightClickLyricMenu: React.FC = () => {
+	const [configTranslatedLyric] = useConfigBoolean("translated-lyric", false);
+	const [configRomanLyric] = useConfigBoolean("roman-lyric", false);
+	const [configDynamicLyric] = useConfigBoolean("dynamic-lyric", false);
+	const [rightClickedLyric, setRightClickedLyric] = useAtom(
+		rightClickedLyricAtom,
+	);
+	return (
+		<Menu
+			opened={!!rightClickedLyric}
+			onClose={() => setRightClickedLyric(null)}
+		>
+			<MenuItem
+				label={
+					rightClickedLyric
+						? configDynamicLyric
+							? rightClickedLyric.dynamicLyric?.map((v) => v.word)?.join("") ||
+							  rightClickedLyric.originalLyric
+							: rightClickedLyric.originalLyric
+						: "未右键选中歌词"
+				}
+				labelOnly
+			/>
+			{configTranslatedLyric &&
+				rightClickedLyric &&
+				rightClickedLyric.translatedLyric && (
+					<MenuItem label={rightClickedLyric.translatedLyric} labelOnly />
+				)}
+			{configRomanLyric &&
+				rightClickedLyric &&
+				rightClickedLyric.romanLyric && (
+					<MenuItem label={rightClickedLyric.romanLyric} labelOnly />
+				)}
+			<MenuDevider />
+			<MenuItem
+				label="复制歌词"
+				onClick={() => {
+					if (rightClickedLyric) {
+						let text = "";
+						if (configDynamicLyric && rightClickedLyric.dynamicLyric) {
+							text += rightClickedLyric.dynamicLyric
+								.map((v) => v.word)
+								.join("");
+						} else {
+							text += rightClickedLyric.originalLyric;
+						}
+						if (configTranslatedLyric && rightClickedLyric.translatedLyric) {
+							text += "\n";
+							text += rightClickedLyric.translatedLyric;
+						}
+						if (configRomanLyric && rightClickedLyric.romanLyric) {
+							text += "\n";
+							text += rightClickedLyric.romanLyric;
+						}
+						legacyNativeCmder._envAdapter.callAdapter(
+							"winhelper.setClipBoardData",
+							() => {},
+							[text.trim()],
+						);
+					}
+					setRightClickedLyric(null);
+				}}
+			/>
+		</Menu>
 	);
 };

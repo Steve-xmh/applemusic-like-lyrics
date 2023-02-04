@@ -93,6 +93,7 @@ export const LyricPlayerTopBar: React.FC<{
 								`.better-ncm-manager .loaded-plugins-list .plugin-btn[data-plugin-slug='${plugin.manifest.slug}']`,
 							)
 							?.click();
+						setMenuOpened(false);
 					}}
 				/>
 			</Menu>

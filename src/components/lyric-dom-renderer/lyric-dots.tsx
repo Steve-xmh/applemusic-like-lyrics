@@ -31,7 +31,7 @@ export const LyricDots: React.FC<{
 			const onFrame = (time: number) => {
 				if (tween.current) {
 					newGroup.update(time);
-					requestAnimationFrame(onFrame);
+					setTimeout(onFrame, 100);
 				} else {
 					newGroup.removeAll();
 				}
@@ -99,7 +99,7 @@ export const LyricDots: React.FC<{
 				})
 				.start();
 			tween.current = newGroup;
-			requestAnimationFrame(onFrame);
+			setTimeout(onFrame, 100);
 		} else if (tween.current) {
 			tween.current.removeAll();
 			tween.current = null;
