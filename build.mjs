@@ -54,7 +54,7 @@ const buildOption = {
 	bundle: true,
 	sourcemap: IS_DEV ? "inline" : false,
 	legalComments: "external",
-	minify: !IS_DEV,
+	minify: !IS_DEV || process.argv.includes("--dist"),
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
 	logOverride: {
@@ -69,15 +69,15 @@ const buildOption = {
 	},
 	watch: process.argv.includes("--watch")
 		? {
-				onRebuild(err, result) {
-					console.log("Rebuilding");
-					if (err) {
-						console.warn(err.message);
-					} else if (result) {
-						console.log("Build success");
-					}
-				},
-		  }
+			onRebuild(err, result) {
+				console.log("Rebuilding");
+				if (err) {
+					console.warn(err.message);
+				} else if (result) {
+					console.log("Build success");
+				}
+			},
+		}
 		: undefined,
 	plugins,
 };

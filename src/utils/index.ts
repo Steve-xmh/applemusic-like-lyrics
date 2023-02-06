@@ -208,5 +208,29 @@ export function drawImageProp(
 	ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
 }
 
+export function resizeImage(
+	img: HTMLImageElement,
+	width: number,
+	height: number,
+): ImageData {
+	let canvas: HTMLCanvasElement | OffscreenCanvas;
+	let ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+	if (IS_WORKER || !APP_CONF.isOSX) {
+		canvas = new OffscreenCanvas(width, height);
+		ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+	} else {
+		canvas = document.createElement("canvas");
+		canvas.width = width;
+		canvas.height = height;
+		ctx = canvas.getContext("2d");
+	}
+	if (ctx) {
+		ctx.drawImage(img, 0, 0, width, height);
+		return ctx.getImageData(0, 0, width, height);
+	} else {
+		return new ImageData(1, 1);
+	}
+}
+
 export const IS_WORKER =
 	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

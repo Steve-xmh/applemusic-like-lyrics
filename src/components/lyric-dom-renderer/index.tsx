@@ -9,13 +9,13 @@ import {
 	currentLyricsIndexAtom,
 	playStateAtom,
 } from "../../core/states";
-import { Easing } from "../../libs/tweenjs";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
 import { log } from "../../utils/logger";
 import { LyricLine } from "../../core/lyric-parser";
 import { guessTextReadDuration } from "../../utils";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
+import BezierEasing from "../../libs/bezier-easing";
 
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
@@ -114,7 +114,8 @@ export const LyricDOMRenderer: React.FC = () => {
 							const scrollDelta = calculateScrollDelta();
 
 							const duration = 750;
-							const easing = (n: number) => Easing.Exponential.InOut(n);
+							const e = BezierEasing(0.65, 0, 0.35, 1);
+							const easing = (n: number) => e(n);
 							const tweenArray: number[] = [];
 
 							const amount = Math.floor((duration / 1000) * 60);

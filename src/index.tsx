@@ -184,48 +184,19 @@ plugin.onLoad(() => {
 	} catch {}
 
 	const setControlsVisibility = (visible: boolean) => {
-		const headerEl = document.querySelector("header");
-		const windowCtlEl = document.querySelector(".m-winctrl");
-		const commentDetailEl = document.querySelector(
-			".g-singlec-comment-detail.z-show",
-		);
-		const pInfoEl = document.querySelector(".m-pinfo");
-		const playerEl = document.querySelector("#main-player");
-		const inDefaultFullscreenMode = !document.querySelector(
-			"#m-playfullscreen-root.f-dn",
-		);
-
-		const sideBarEl = document.querySelector(".g-sd");
-		const mainPageEl = document.querySelector(".g-mn");
-
-		if (sideBarEl && mainPageEl) {
-			if (visible) {
-				sideBarEl?.classList?.remove("hide");
-				mainPageEl?.classList?.remove("hide");
-			} else {
-				sideBarEl?.classList?.add("hide");
-				mainPageEl?.classList?.add("hide");
-			}
-		}
-
-		if (visible || inDefaultFullscreenMode) {
-			headerEl?.classList?.remove("hide");
-			windowCtlEl?.classList?.remove("hide");
-			playerEl?.classList?.remove("hide");
-			commentDetailEl?.classList?.remove("hide");
-			pInfoEl?.classList?.remove("hide");
+		if (visible) {
+			document.body.classList.remove("amll-hide-controls");
+			// log("已显示控制按钮")
 		} else {
-			headerEl?.classList?.add("hide");
-			windowCtlEl?.classList?.add("hide");
-			playerEl?.classList?.add("hide");
-			commentDetailEl?.classList?.add("hide");
-			pInfoEl?.classList?.add("hide");
+			document.body.classList.add("amll-hide-controls");
+			// log("已隐藏控制按钮")
 		}
 	};
 
 	const onCheckHide = () => {
 		const autoEnabled = getConfig("autoHideControlBar", "false") !== "true";
 		const hideDuration = Number(getConfig("autoHideDuration", "5000"));
+		// log("正在检查移动", autoEnabled, hideDuration)
 		if (hideTimer !== 0) {
 			clearTimeout(hideTimer);
 			hideTimer = 0;
@@ -235,10 +206,10 @@ plugin.onLoad(() => {
 		}
 		setControlsVisibility(true);
 		hideTimer = setTimeout(() => {
-			const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
-			if (lyricPageOpened) {
-				setControlsVisibility(false);
-			}
+			// const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
+			// if (lyricPageOpened) {
+			setControlsVisibility(false);
+			// }
 		}, (hideDuration || 5) * 1000);
 	};
 
@@ -544,6 +515,7 @@ export const useStyles = createStyles;
 export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 	return (
 		<MantineProvider
+			withNormalizeCSS
 			theme={{
 				colorScheme: "dark",
 			}}

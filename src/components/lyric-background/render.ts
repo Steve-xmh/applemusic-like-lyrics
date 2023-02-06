@@ -2,6 +2,7 @@ import { Pixel } from "../../libs/color-quantize/utils";
 import { log } from "../../utils/logger";
 import { FBMWaveMethod } from "./fbm-wave";
 import { BlurAlbumMethod } from "./blur-album";
+import { resizeImage } from "../../utils";
 
 const DEFAULT_VERTEX_SHADER =
 	"attribute vec4 a_position;" +
@@ -70,7 +71,6 @@ export class CanvasBackgroundRender {
 			this.resize();
 			this.rebuildVertex();
 			this.setRenderMethod(FBMWaveMethod);
-			this.rebuildProgram();
 			this.setAlbumColorMap([[0, 0, 0]]);
 		} else {
 			throw new TypeError(
@@ -80,6 +80,7 @@ export class CanvasBackgroundRender {
 	}
 	setRenderMethod(renderMethod: BackgroundRenderMethod) {
 		this.rebuildShader(renderMethod.fragmentShaderCode);
+		this.rebuildProgram();
 		this.currentRenderMethod = renderMethod;
 	}
 	resize(width = this.canvas.width, height = this.canvas.height) {
@@ -243,9 +244,26 @@ export class CanvasBackgroundRender {
 	private albumImageTex: WebGLTexture;
 	setAlbumImage(image: HTMLImageElement) {
 		this.albumImageSize = [image.width, image.height];
-		this.albumImageTex = this.rebuildTextureFromImage(
+		const fitImageSize = Math.min(
+			this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE),
+			Math.pow(2, Math.round(Math.log2(Math.max(image.width, image.height)))),
+		);
+		const resized = resizeImage(image, fitImageSize, fitImageSize);
+		log(
+			"设置了大小为",
+			image.width,
+			"x",
+			image.height,
+			"->",
+			resized.width,
+			"x",
+			resized.height,
+			"的专辑图片",
+		);
+		this.albumImageTex = this.rebuildTextureFromPixels(
 			this.gl.TEXTURE2,
-			image,
+			fitImageSize,
+			resized.data,
 			this.albumImageTex,
 		);
 		this.updateAllUniforms();
@@ -267,7 +285,7 @@ export class CanvasBackgroundRender {
 	private rebuildTextureFromPixels(
 		id: GLenum,
 		size: number,
-		pixelsData: Uint8Array,
+		pixelsData: Uint8Array | Uint8ClampedArray,
 		existTexture?: WebGLTexture,
 	) {
 		if (!Number.isInteger(Math.log2(size)))
@@ -304,7 +322,7 @@ export class CanvasBackgroundRender {
 		// 专辑图片
 		{
 			const loc = gl.getUniformLocation(this.program, "albumImage");
-			if (loc) gl.uniform1i(loc, 0);
+			if (loc) gl.uniform1i(loc, 2);
 		}
 	}
 	private updateUniforms() {

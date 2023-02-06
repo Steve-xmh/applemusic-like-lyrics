@@ -65,31 +65,39 @@
     backdrop-filter: blur(4px)
 
 // 自动隐藏播放栏和控制栏
-.mq-playing .g-hd,
-.m-winctrl,
-#main-player,
-.g-singlec-comment-detail.z-show,
-.m-pinfo
-    opacity: 1
-    transition: opacity 0.5s
+$hide-selectors: ".mq-playing .g-hd"
+$hide-selectors: $hide-selectors + ", .m-winctrl"
+$hide-selectors: $hide-selectors + ", #main-player"
+$hide-selectors: $hide-selectors + ", .g-singlec-comment-detail.z-show"
+$hide-selectors: $hide-selectors + ", .m-pinfo"
+$hide-selectors: $hide-selectors + ", .m-topbox"
+$hide-selectors: $hide-selectors + ", .m-tool"
+    
+body
+    #{$hide-selectors}
+        opacity: 1
+        transition: opacity 0.5s
 
-.mq-playing .g-hd.hide,
-.m-winctrl.hide,
-#main-player.hide,
-.g-singlec-comment-detail.z-show.hide,
-.m-pinfo.hide
-    opacity: 0 !important
+    &.amll-hide-controls
+        #{$hide-selectors}
+            opacity: 0 !important
 
 .m-winctrl.disabled
     display: none
 
+// 隐藏 Mac 版网易云的专辑元素
+.m-singlebg
+    display: none
+    
 // 使正在播放的歌词页面布局上全屏，以便歌词组件大小是窗口大小
 .g-singlec-ct
     top: 0
-.g-single
+.g-single, #id-single
     bottom: 0
-.g-single-track .g-bd2
-    margin-bottom: 60px
+    height: 100vh
+    top: 0
+    .g-bd2
+        margin-bottom: 60px
 
 // 将被压下去的评论页面按钮恢复正确位置
 .g-singlec-comment, .g-singlec-comment-detail, .g-singlec-comment-top

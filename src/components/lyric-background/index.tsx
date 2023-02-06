@@ -1,6 +1,10 @@
 import * as React from "react";
-import { useAlbumImage, useConfigValue } from "../../api/react";
-import { warn } from "../../utils/logger";
+import {
+	useAlbumImage,
+	useConfigValue,
+	useNowPlayingOpened,
+} from "../../api/react";
+import { log, warn } from "../../utils/logger";
 import { BUILDIN_RENDER_METHODS, CanvasBackgroundRender } from "./render";
 import { albumImageMainColorsAtom, musicIdAtom } from "../../core/states";
 import { useAtomValue } from "jotai";
@@ -10,10 +14,11 @@ import { BlurAlbumMethod } from "./blur-album";
 
 export const LyricBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
-	const renderRef = React.useRef<CanvasBackgroundRender | null>(null);
+	const rendererRef = React.useRef<CanvasBackgroundRender | null>(null);
 	const albumImageMainColors = useAtomValue(albumImageMainColorsAtom);
 	const backgroundLightness = useConfigValue("backgroundLightness", "1");
 	const backgroundRenderScale = useConfigValue("backgroundRenderScale", "1");
+	const lyricPageOpened = useNowPlayingOpened();
 	const backgroundRenderMethod = useConfigValue(
 		"backgroundRenderMethod",
 		BlurAlbumMethod.value,
@@ -23,7 +28,7 @@ export const LyricBackground: React.FC = () => {
 		"0",
 	);
 	const musicId = useAtomValue(musicIdAtom);
-	const [albumImageLoaded, albumImage] = useAlbumImage(musicId);
+	const [albumImageLoaded, albumImage, albumImageUrl] = useAlbumImage(musicId);
 
 	const obsRef = React.useRef(
 		new ResizeObserver((entries) => {
@@ -32,13 +37,13 @@ export const LyricBackground: React.FC = () => {
 			if (entry) {
 				const canvas = entry.target as HTMLCanvasElement;
 				if (canvas) {
-					const render = renderRef.current;
-					if (render && render.canvas === canvas) {
-						render.resize(
+					const renderer = rendererRef.current;
+					if (renderer && renderer.canvas === canvas) {
+						renderer.resize(
 							entry.contentRect.width * renderScale,
 							entry.contentRect.height * renderScale,
 						);
-						render.shouldRedraw();
+						renderer.shouldRedraw();
 					}
 				}
 			}
@@ -47,35 +52,36 @@ export const LyricBackground: React.FC = () => {
 
 	React.useEffect(() => {
 		let f = Number(backgroundRenderSkipFrames);
-		const render = renderRef.current;
-		if (render) {
-			render.skipFrameRate = f;
-			render.shouldRedraw();
+		const renderer = rendererRef.current;
+		if (renderer) {
+			renderer.skipFrameRate = f;
+			renderer.shouldRedraw();
 		}
 	}, [backgroundRenderSkipFrames]);
 
 	React.useEffect(() => {
-		const render = renderRef.current;
+		const renderer = rendererRef.current;
 		const canvas = canvasRef.current;
-		if (render && canvas) {
+		if (renderer && canvas && lyricPageOpened) {
 			const renderScale = Math.max(0.01, Number(backgroundRenderScale) || 1);
-			render.resize(
+			renderer.resize(
 				canvas.clientWidth * renderScale,
 				canvas.clientHeight * renderScale,
 			);
-			render.shouldRedraw();
+			renderer.shouldRedraw();
 		}
-	}, [backgroundRenderScale]);
+	}, [backgroundRenderScale, lyricPageOpened]);
 
 	React.useEffect(() => {
-		const render = renderRef.current;
-		if (render) {
+		const renderer = rendererRef.current;
+		if (renderer) {
 			const m = BUILDIN_RENDER_METHODS.find(
 				(v) => v.value === backgroundRenderMethod,
 			);
 			if (m) {
-				render.setRenderMethod(m);
-				render.shouldRedraw();
+				log("已切换背景渲染方式为", backgroundRenderMethod);
+				renderer.setRenderMethod(m);
+				renderer.shouldRedraw();
 			}
 		}
 	}, [backgroundRenderMethod]);
@@ -85,7 +91,14 @@ export const LyricBackground: React.FC = () => {
 		if (canvas) {
 			obsRef.current.observe(canvas);
 			const renderer = new CanvasBackgroundRender(canvas);
-			renderRef.current = renderer;
+			const m = BUILDIN_RENDER_METHODS.find(
+				(v) => v.value === backgroundRenderMethod,
+			);
+			if (m) {
+				log("已切换背景渲染方式为", backgroundRenderMethod);
+				renderer.setRenderMethod(m);
+			}
+			rendererRef.current = renderer;
 			return () => {
 				obsRef.current.unobserve(canvas);
 				renderer.dispose();
@@ -115,20 +128,31 @@ export const LyricBackground: React.FC = () => {
 		for (let i = 0; i < 30; i++) {
 			colors.push(...c);
 		}
-		const render = renderRef.current;
-		if (render) {
-			render.setAlbumColorMap(colors);
-			render.shouldRedraw();
+		const renderer = rendererRef.current;
+		if (renderer) {
+			renderer.setAlbumColorMap(colors);
+			renderer.shouldRedraw();
 		} else {
 			warn("错误：渲染器对象不存在");
 		}
 	}, [albumImageMainColors, backgroundLightness]);
 
 	React.useEffect(() => {
-		if (albumImageLoaded && albumImage) {
-			// albumImage.width
-		}
-	}, [albumImageLoaded, albumImage]);
+		let canceled = false;
+		(async () => {
+			if (albumImageLoaded && albumImage) {
+				await albumImage.decode();
+				const renderer = rendererRef.current;
+				if (renderer && !canceled) {
+					renderer.setAlbumImage(albumImage);
+					renderer.shouldRedraw();
+				}
+			}
+		})();
+		return () => {
+			canceled = true;
+		};
+	}, [albumImageLoaded, albumImage, albumImageUrl]);
 
 	return (
 		<canvas

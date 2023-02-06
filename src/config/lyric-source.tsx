@@ -57,13 +57,6 @@ export const LyricSourceSettings: React.FC = () => {
 					? "无法找到该函数，歌词将无法工作"
 					: "已找到函数，请自行确定是否是网易云请求函数："}
 			</Text>
-			{eapiRequestFuncBody.length > 0 ? (
-				<Code block sx={{ margin: "8px 0" }} className="am-lyric-func-body">
-					{eapiRequestFuncBody}
-				</Code>
-			) : (
-				<></>
-			)}
 			<Button.Group sx={{ margin: "8px 0" }} orientation="vertical">
 				<Button
 					variant="outline"
@@ -84,6 +77,13 @@ export const LyricSourceSettings: React.FC = () => {
 					尝试搜索请求函数（方式二）
 				</Button>
 			</Button.Group>
+			{eapiRequestFuncBody.length > 0 ? (
+				<Code block sx={{ margin: "8px 0" }} className="am-lyric-func-body">
+					{eapiRequestFuncBody}
+				</Code>
+			) : (
+				<></>
+			)}
 		</>
 	);
 };
