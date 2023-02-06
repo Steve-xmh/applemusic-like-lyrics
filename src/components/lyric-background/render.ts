@@ -1,6 +1,7 @@
 import { Pixel } from "../../libs/color-quantize/utils";
 import { log } from "../../utils/logger";
 import { FBMWaveMethod } from "./fbm-wave";
+import { BlurAlbumMethod } from "./blur-album";
 
 const DEFAULT_VERTEX_SHADER =
 	"attribute vec4 a_position;" +
@@ -28,6 +29,8 @@ const shuffleArray = <T>(array: T[]) => {
 	return array;
 };
 
+export const BUILDIN_RENDER_METHODS = [BlurAlbumMethod, FBMWaveMethod];
+
 /**
  * 一种背景渲染方式管线结构
  */
@@ -35,8 +38,8 @@ export interface BackgroundRenderMethod {
 	fragmentShaderCode: string;
 	beforeDrawArray?: (this: CanvasBackgroundRender) => void;
 	afterDrawArray?: (this: CanvasBackgroundRender) => void;
-	name: string;
-	id: string;
+	label: string;
+	value: string;
 	description?: string;
 	configs?: {
 		name: string;

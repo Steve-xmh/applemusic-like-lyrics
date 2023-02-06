@@ -3,7 +3,14 @@ import { getConfig, setConfig } from "../config/core";
 import { version } from "../../manifest.json";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
-import { getNCMImageUrl, getPlayingSong } from ".";
+import { getNCMImageUrl, getPlayingSong, loadLyric } from ".";
+import { useAtomValue, useSetAtom } from "jotai";
+import {
+	currentLyricsAtom,
+	currentRawLyricRespAtom,
+	lyricErrorAtom,
+	musicIdAtom,
+} from "../core/states";
 
 export function useConfig(
 	key: string,
@@ -378,4 +385,23 @@ export function useForceUpdate(): () => void {
 	const [_updateState, setUpdateState] = React.useState({});
 	const forceUpdate = React.useCallback(() => setUpdateState({}), []);
 	return forceUpdate;
+}
+
+export function useReloadLyricByCurrentAudioId() {
+	const musicId = useAtomValue(musicIdAtom);
+	const setCurrentRawLyricResp = useSetAtom(currentRawLyricRespAtom);
+	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
+	const setLyricError = useSetAtom(lyricErrorAtom);
+
+	return React.useCallback(async () => {
+		setLyricError(null);
+		setCurrentLyrics(null);
+		try {
+			const lyric = await loadLyric(musicId);
+			log("已获取到歌词", lyric);
+			setCurrentRawLyricResp(lyric);
+		} catch (err) {
+			setLyricError(err);
+		}
+	}, [musicId]);
 }

@@ -329,13 +329,21 @@ export interface LyricFile {
 	yrc?: LyricFileEntry;
 	yromalrc?: LyricFileEntry;
 	ytlrc?: LyricFileEntry;
+
+	// AMLL 特供
+	lyricOffset?: number;
+	albumImageUrl?: string;
 }
 
-export const loadLyric = async (id: string | number): Promise<LyricFile> => {
+export const loadLyric = async (
+	id: string | number,
+	ignoreCache = false,
+): Promise<LyricFile> => {
 	const lyricsPath = `${plugin.pluginPath}/lyrics`;
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
 	try {
-		if (await betterncm.fs.exists(cachedLyricPath)) {
+		if (!ignoreCache && (await betterncm.fs.exists(cachedLyricPath))) {
+			log("发现歌词缓存，正在加载缓存", cachedLyricPath);
 			const cachedLyricData = await betterncm.fs.readFileText(cachedLyricPath);
 			return JSON.parse(cachedLyricData);
 		}
@@ -407,4 +415,12 @@ export async function genBitmapImage(
 		resizeHeight: height ?? img.height,
 		resizeQuality: "pixelated",
 	});
+}
+
+export function setClipboardData(data: string) {
+	legacyNativeCmder._envAdapter.callAdapter(
+		"winhelper.setClipBoardData",
+		() => {},
+		[data],
+	);
 }

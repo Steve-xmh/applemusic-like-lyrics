@@ -1,11 +1,12 @@
 import * as React from "react";
 import { useAlbumImage, useConfigValue } from "../../api/react";
 import { warn } from "../../utils/logger";
-import { CanvasBackgroundRender } from "./render";
+import { BUILDIN_RENDER_METHODS, CanvasBackgroundRender } from "./render";
 import { albumImageMainColorsAtom, musicIdAtom } from "../../core/states";
 import { useAtomValue } from "jotai";
 import { Pixel } from "../../libs/color-quantize/utils";
 import { normalizeColor } from "../../utils/color";
+import { BlurAlbumMethod } from "./blur-album";
 
 export const LyricBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -13,6 +14,10 @@ export const LyricBackground: React.FC = () => {
 	const albumImageMainColors = useAtomValue(albumImageMainColorsAtom);
 	const backgroundLightness = useConfigValue("backgroundLightness", "1");
 	const backgroundRenderScale = useConfigValue("backgroundRenderScale", "1");
+	const backgroundRenderMethod = useConfigValue(
+		"backgroundRenderMethod",
+		BlurAlbumMethod.value,
+	);
 	const backgroundRenderSkipFrames = useConfigValue(
 		"backgroundRenderSkipFrames",
 		"0",
@@ -41,13 +46,39 @@ export const LyricBackground: React.FC = () => {
 	);
 
 	React.useEffect(() => {
-		let f = Number(backgroundLightness);
+		let f = Number(backgroundRenderSkipFrames);
 		const render = renderRef.current;
 		if (render) {
 			render.skipFrameRate = f;
 			render.shouldRedraw();
 		}
 	}, [backgroundRenderSkipFrames]);
+
+	React.useEffect(() => {
+		const render = renderRef.current;
+		const canvas = canvasRef.current;
+		if (render && canvas) {
+			const renderScale = Math.max(0.01, Number(backgroundRenderScale) || 1);
+			render.resize(
+				canvas.clientWidth * renderScale,
+				canvas.clientHeight * renderScale,
+			);
+			render.shouldRedraw();
+		}
+	}, [backgroundRenderScale]);
+
+	React.useEffect(() => {
+		const render = renderRef.current;
+		if (render) {
+			const m = BUILDIN_RENDER_METHODS.find(
+				(v) => v.value === backgroundRenderMethod,
+			);
+			if (m) {
+				render.setRenderMethod(m);
+				render.shouldRedraw();
+			}
+		}
+	}, [backgroundRenderMethod]);
 
 	React.useEffect(() => {
 		const canvas = canvasRef.current;
@@ -87,6 +118,7 @@ export const LyricBackground: React.FC = () => {
 		const render = renderRef.current;
 		if (render) {
 			render.setAlbumColorMap(colors);
+			render.shouldRedraw();
 		} else {
 			warn("错误：渲染器对象不存在");
 		}

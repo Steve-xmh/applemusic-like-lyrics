@@ -1,6 +1,5 @@
 import { useMouse } from "@mantine/hooks";
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 export const Menu: React.FC<
 	React.PropsWithChildren<{
@@ -36,7 +35,7 @@ export const Menu: React.FC<
 		}
 	}, [props.opened, menuRef.current]);
 
-	return createPortal(
+	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
 			style={{
@@ -73,7 +72,6 @@ export const Menu: React.FC<
 			>
 				<div>{props.children}</div>
 			</div>
-		</div>,
-		document.body,
+		</div>
 	);
 };

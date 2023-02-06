@@ -1,6 +1,7 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { useAtomValue } from "jotai";
 import * as React from "react";
+import { setClipboardData } from "../../api";
 import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
 import {
 	albumAtom,
@@ -8,9 +9,90 @@ import {
 	songAliasNameAtom,
 	songArtistsAtom,
 	songNameAtom,
+	albumImageUrlAtom,
 } from "../../core/states";
 import { Menu, MenuItem } from "../appkit/menu";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
+
+export const PlayerSongInfoMenuContent: React.FC<{
+	onCloseMenu: () => void;
+}> = (props) => {
+	const musicId = useAtomValue(musicIdAtom);
+	const album = useAtomValue(albumAtom);
+	const songArtists = useAtomValue(songArtistsAtom);
+	const songName: string = useAtomValue(songNameAtom);
+	const albumImageUrl = useAtomValue(albumImageUrlAtom);
+	return (
+		<>
+			<MenuItem
+				label={`复制音乐 ID：${musicId}`}
+				onClick={() => setClipboardData(String(musicId))}
+			/>
+			<MenuItem label={`复制音乐名称：${songName}`} />
+			{songArtists.length === 1 && (
+				<MenuItem
+					label={`查看歌手：${songArtists[0].name}`}
+					onClick={() => {
+						location.hash = `#/m/artist/?id=${songArtists[0].id}`;
+						props.onCloseMenu();
+					}}
+				/>
+			)}
+			{songArtists.length > 1 && (
+				<MenuItem label="查看歌手...">
+					{songArtists.map((a) => (
+						<MenuItem
+							label={a.name}
+							key={`song-artist-${a.id}`}
+							onClick={() => {
+								location.hash = `#/m/artist/?id=${a.id}`;
+								props.onCloseMenu();
+							}}
+						/>
+					))}
+				</MenuItem>
+			)}
+			{album && (
+				<MenuItem
+					label={`查看专辑：${album.name}`}
+					onClick={() => {
+						location.hash = `#/m/album/?id=${album?.id}`;
+						props.onCloseMenu();
+					}}
+				/>
+			)}
+			<MenuItem
+				label="复制专辑图片链接"
+				labelOnly={albumImageUrl === null}
+				onClick={() => {
+					// 去除缓存链接头
+					let t = albumImageUrl;
+					if (t) {
+						if (t.startsWith("orpheus://cache/?")) {
+							t = t.slice(17);
+						}
+						setClipboardData(t);
+						props.onCloseMenu();
+					}
+				}}
+			/>
+			<MenuItem
+				label="在浏览器打开专辑图片"
+				labelOnly={albumImageUrl === null}
+				onClick={() => {
+					let t = albumImageUrl;
+					if (t) {
+						if (t.startsWith("orpheus://cache/?")) {
+							t = t.slice(17);
+						}
+						betterncm.ncm.openUrl(t);
+						props.onCloseMenu();
+					}
+				}}
+			/>
+		</>
+	);
+};
 
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
@@ -32,21 +114,7 @@ export const PlayerSongInfo: React.FC<{
 	return (
 		<>
 			<Menu onClose={() => setSongInfoMenu(false)} opened={songInfoMenu}>
-				<MenuItem label={`复制音乐 ID：${musicId}`} />
-				<MenuItem label="复制专辑图片链接" />
-				<MenuItem label="保存专辑图片" />
-				<MenuItem label="复制音乐名称" />
-				{songArtists.length === 1 && (
-					<MenuItem label={`查看歌手：${songArtists[0].name}`} />
-				)}
-				{songArtists.length > 1 && (
-					<MenuItem label="查看歌手...">
-						{songArtists.map((a) => (
-							<MenuItem label={a.name} key={`song-artist-${a.id}`} />
-						))}
-					</MenuItem>
-				)}
-				{album && <MenuItem label={`查看专辑：${album.name}`} />}
+				<PlayerSongInfoMenuContent onCloseMenu={() => setSongInfoMenu(false)} />
 			</Menu>
 			{!(
 				hideAlbumImage &&

@@ -4,6 +4,7 @@ import { getPlayingSong, LyricFile, PlayState } from "../api";
 import { Pixel } from "../libs/color-quantize/utils";
 import { LyricLine } from "./lyric-parser";
 
+export const topbarMenuOpenedAtom = atom(false);
 export const isLyricPageOpeningAtom = atom(false);
 export const currentAudioIdAtom = atom("");
 export const currentAudioDurationAtom = atom(0);
@@ -12,8 +13,11 @@ export const playStateAtom = atom(PlayState.Pausing);
 export const currentLyricsAtom = atom<LyricLine[] | null>(null);
 export const currentLyricsIndexAtom = atom(-1);
 export const playingSongDataAtom = atom(getPlayingSong());
+export const albumImageUrlAtom = atom<string | null>(null);
 export const albumImageMainColorsAtom = atom<Pixel[]>([[0, 0, 0]]);
 export const rightClickedLyricAtom = atom<LyricLine | null>(null);
+
+export const lyricErrorAtom = atom<Error | null>(null);
 
 export const musicIdAtom: Atom<string | number> = selectAtom(
 	playingSongDataAtom,
@@ -26,6 +30,19 @@ export const musicIdAtom: Atom<string | number> = selectAtom(
 		);
 	},
 );
+
+export const lyricOffsetAtom = atom(
+	(get) => {
+		return get(currentRawLyricRespAtom).lyricOffset || 0;
+	},
+	(_get, set, newValue: number | undefined) => {
+		set(currentRawLyricRespAtom, (res) => ({
+			...res,
+			lyricOffset: newValue,
+		}));
+	},
+);
+
 export const albumAtom = selectAtom(
 	playingSongDataAtom,
 	(playing) => playing?.data?.album || {},
@@ -48,3 +65,8 @@ export const getMusicId = (): number | string =>
 	getPlayingSong()?.originFromTrack?.track?.tid ||
 	getPlayingSong()?.data?.id ||
 	0;
+
+export const selectMusicIdModalOpenedAtom = atom(false);
+export const selectInternetLyricModalOpenedAtom = atom(false);
+export const selectLocalLyricModalOpenedAtom = atom(false);
+export const adjustLyricOffsetModalOpenedAtom = atom(false);

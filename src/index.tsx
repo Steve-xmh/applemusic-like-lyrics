@@ -64,7 +64,7 @@ class ErrorBoundary extends React.Component<
 const FMPlayerWrapper: React.FC = () => {
 	const [height, setHeight] = React.useState(0);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const mnView: HTMLElement | null = document.querySelector(".g-mn");
 		if (mnView) {
 			setHeight(mnView.getBoundingClientRect().height);

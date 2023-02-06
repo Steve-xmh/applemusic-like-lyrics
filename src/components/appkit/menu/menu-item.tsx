@@ -1,5 +1,4 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
 import { classname } from "../../../api";
 
 const MenuLevelProvider = React.createContext(0);
@@ -20,7 +19,7 @@ export const MenuItem: React.FC<
 	const [subMenuHover, setSubMenuHover] = React.useState(false);
 	const [pos, setPos] = React.useState([0, 0]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const menuItem = menuItemRef.current;
 		const subMenu = subMenuRef.current;
 		if (menuItem && subMenu) {
@@ -63,26 +62,24 @@ export const MenuItem: React.FC<
 			onMouseEnter={() => setButtonHover(true)}
 			onMouseLeave={() => setButtonHover(false)}
 		>
-			{props.children &&
-				createPortal(
-					<MenuLevelProvider.Provider value={zindex + 1}>
-						<div
-							ref={subMenuRef}
-							className={"appkit-menu is-submenu"}
-							style={{
-								left: pos[0],
-								top: pos[1],
-								zIndex: zindex + 1,
-								visibility: buttonHover || subMenuHover ? undefined : "hidden",
-							}}
-							onMouseEnter={() => setSubMenuHover(true)}
-							onMouseLeave={() => setSubMenuHover(false)}
-						>
-							<div>{props.children}</div>
-						</div>
-					</MenuLevelProvider.Provider>,
-					document.body,
-				)}
+			{props.children && (
+				<MenuLevelProvider.Provider value={zindex + 1}>
+					<div
+						ref={subMenuRef}
+						className={"appkit-menu is-submenu"}
+						style={{
+							left: pos[0],
+							top: pos[1],
+							zIndex: zindex + 1,
+							visibility: buttonHover || subMenuHover ? undefined : "hidden",
+						}}
+						onMouseEnter={() => setSubMenuHover(true)}
+						onMouseLeave={() => setSubMenuHover(false)}
+					>
+						<div>{props.children}</div>
+					</div>
+				</MenuLevelProvider.Provider>
+			)}
 			{props.label}
 		</button>
 	);

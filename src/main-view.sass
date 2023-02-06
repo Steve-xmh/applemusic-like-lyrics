@@ -1,3 +1,5 @@
+$tween-animation-duration: 750ms
+$tween-animation-timing: cubic-bezier(0.87, 0, 0.13, 1)
 
 @mixin text-overflow-ellipsis()
     overflow: hidden
@@ -33,6 +35,7 @@
         > .am-album-image
             width: 70%
             aspect-ratio: 1 / 1
+            max-height: 45vh
             flex: 0
             position: relative
             > *
@@ -124,6 +127,7 @@
         &:hover .am-lyric-line
             filter: blur(0) !important
             opacity: 1 !important
+            visibility: visible !important
             > .am-lyric-line-original
                 opacity: 0.75
             > .am-lyric-line-dynamic > *
@@ -145,7 +149,7 @@
 
     .am-lyric-options
         opacity: 0
-        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        transition: opacity $tween-animation-duration $tween-animation-timing
         position: absolute
         right: 10%
         top: 100px
@@ -155,7 +159,7 @@
         flex: 1
         overflow: hidden scroll
         position: relative
-        -webkit-mask-image: linear-gradient(#0000, #000 10%, #000 80%, #0000 90%, #0000)
+        -webkit-mask-image: linear-gradient(#0000, #0000 5%, #000 10%, #000 90%, #0000 95%, #0000)
         &::-webkit-scrollbar
             display: none
         > *
@@ -189,6 +193,11 @@
             opacity: 0.5
             &.am-lyric-line-before
                 opacity: 0
+                visibility: hidden
+                @for $i from -5 through 5
+                    @if $i != 0
+                        &.am-lyric-line-o#{$i}
+                            visibility: visible
             &.am-lyric-line-selected
                 opacity: 1
 
@@ -274,7 +283,7 @@
         padding: max(1rem, 1vh) 0
         transform-origin: left
         color: var(--applemusic-like-lyrics-font-color, unset)
-        transition: all 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        transition: all $tween-animation-duration $tween-animation-timing
         line-break: loose
         word-break: break-word
 
@@ -298,7 +307,7 @@
                 overflow: hidden
             > .am-lyric-real-word
                 opacity: 0.75
-                transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+                transition: opacity $tween-animation-duration $tween-animation-timing
 
         &:hover
             opacity: 1 !important
@@ -332,6 +341,7 @@
                 > * > .am-lyric-real-word
                     animation-play-state: running
                     opacity: 0.5
+
         @keyframes am-lyric-word-animation
             from
                 width: 0%
@@ -343,7 +353,7 @@
 
     .am-lyric-dots
         height: 0px
-        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1), height 0.75s cubic-bezier(0.65, 0, 0.35, 1)
+        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1), height 0.75s $tween-animation-timing
         transform-origin: left
         opacity: 0
 

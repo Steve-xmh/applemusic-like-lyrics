@@ -16,7 +16,7 @@ import { Provider } from "jotai";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 	return (
-		<Container fluid>
+		<Container fluid style={{ paddingLeft: "16px" }}>
 			{props.children}
 			<Space h="xl" />
 		</Container>

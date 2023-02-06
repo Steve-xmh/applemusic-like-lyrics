@@ -1,5 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { classname, PlayState } from "../../api";
+import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
 import { playStateAtom, rightClickedLyricAtom } from "../../core/states";
 
@@ -14,6 +15,7 @@ export const LyricLineView: React.FC<{
 }> = (props) => {
 	const playState = useAtomValue(playStateAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
+	const forceDynamic = useConfigValueBoolean("forceDynamicLyric", false);
 	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
@@ -34,7 +36,7 @@ export const LyricLineView: React.FC<{
 			{props.dynamic &&
 			props.line.dynamicLyric &&
 			props.line.dynamicLyricTime &&
-			(props.selected || Math.abs(props.offset) === 1) ? (
+			(props.selected || forceDynamic || Math.abs(props.offset) < 5) ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
 						<span key={`dynamic-word-${word.word}-${i}`}>

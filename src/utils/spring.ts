@@ -84,6 +84,15 @@ export class Spring {
 		this.resetTime();
 	}
 
+	get damper() {
+		return this._damper;
+	}
+
+	set damper(v: number) {
+		this._damper = v;
+		this.resetTime();
+	}
+
 	get velocity() {
 		const [pos, vel] = this.positionVelocity();
 		this._position = pos;

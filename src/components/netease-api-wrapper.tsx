@@ -24,26 +24,30 @@ import {
 import { LyricLine, parseLyric } from "../core/lyric-parser";
 import {
 	albumImageMainColorsAtom,
+	albumImageUrlAtom,
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
 	currentLyricsAtom,
 	currentLyricsIndexAtom,
 	currentRawLyricRespAtom,
 	getMusicId,
+	lyricOffsetAtom,
 	musicIdAtom,
 	playingSongDataAtom,
 	playStateAtom,
 } from "../core/states";
-import { error, log, warn } from "../utils/logger";
+import { error, warn } from "../utils/logger";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
 	const musicId = useAtomValue(musicIdAtom);
+	const curLyricOffset = useAtomValue(lyricOffsetAtom);
 	const setCurrentAudioId = useSetAtom(currentAudioIdAtom);
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
 	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
 	const setAlbumImageMainColors = useSetAtom(albumImageMainColorsAtom);
+	const setAlbumImageUrlAtom = useSetAtom(albumImageUrlAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
 	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
@@ -63,6 +67,9 @@ export const NCMEnvWrapper: React.FC = () => {
 	React.useEffect(() => {
 		const img = new Image();
 		let canceled = false;
+		if (albumImageLoaded) {
+			setAlbumImageUrlAtom(albumImage.src);
+		}
 		img.addEventListener(
 			"load",
 			() => {
@@ -88,6 +95,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		img.src = albumImage.src;
 		return () => {
 			canceled = true;
+			setAlbumImageUrlAtom(null);
 		};
 	}, [albumImageLoaded]);
 
@@ -138,7 +146,7 @@ export const NCMEnvWrapper: React.FC = () => {
 				"",
 			);
 		}
-		log(currentRawLyricResp, parsed);
+		// log(currentRawLyricResp, parsed);
 		setCurrentLyrics(parsed);
 		setCurrentLyricsIndex(-1);
 	}, [
@@ -172,7 +180,8 @@ export const NCMEnvWrapper: React.FC = () => {
 			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			isTween = false,
 		) => {
-			progress += configGlobalTimeStampOffset;
+			progress += configGlobalTimeStampOffset; // 全局位移
+			progress += curLyricOffset; // 当前歌曲位移
 			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
 				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
 				// 我们自己要做一个时间补偿
@@ -280,7 +289,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
 		legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
 
-		log("歌词页面已打开，已挂载进度事件");
+		// log("歌词页面已打开，已挂载进度事件");
 		return () => {
 			legacyNativeCmder.removeRegisterCall(
 				"PlayProgress",
@@ -295,9 +304,9 @@ export const NCMEnvWrapper: React.FC = () => {
 			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
 			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
 			clearInterval(onIntervalGettingSongData);
-			log("进度事件已解除挂载");
+			// log("进度事件已解除挂载");
 		};
-	}, [currentLyrics, playState, configGlobalTimeStampOffset]);
+	}, [currentLyrics, playState, configGlobalTimeStampOffset, curLyricOffset]);
 
 	return <></>;
 };

@@ -1,38 +1,67 @@
-import { Button, Title, Space, Text, ScrollArea, Alert } from "@mantine/core";
-import Editor from "react-simple-code-editor";
+import {
+	Button,
+	Title,
+	Space,
+	Text,
+	Select,
+	SelectItem,
+	ThemeIcon,
+	Group,
+} from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
 } from "./config-components";
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-regex";
-import "prismjs/components/prism-javascript";
-import { useConfig, useLFPSupported } from "../api/react";
+import { useConfig, useConfigValueBoolean } from "../api/react";
+import { FBMWaveMethod } from "../components/lyric-background/fbm-wave";
+import { IconDisc, IconRipple } from "@tabler/icons";
+import { BlurAlbumMethod } from "../components/lyric-background/blur-album";
+import { BackgroundRenderMethod } from "../components/lyric-background/render";
+import * as React from "react";
+
+type BGRendererMethodData = BackgroundRenderMethod &
+	SelectItem & {
+		icon: () => JSX.Element;
+	};
+
+const BG_RENDERER_METHOD_DATA: BGRendererMethodData[] = [
+	{
+		icon: () => <IconDisc />,
+		...BlurAlbumMethod,
+	},
+	{
+		icon: () => <IconRipple />,
+		...FBMWaveMethod,
+	},
+];
+
+const BGRendererMethodItem = React.forwardRef<
+	HTMLDivElement,
+	React.ComponentPropsWithoutRef<"div"> & BGRendererMethodData
+>(({ label, icon, description, ...others }, ref) => (
+	<div ref={ref} {...others}>
+		<Group noWrap>
+			<ThemeIcon size="xl">{icon()}</ThemeIcon>
+
+			<div>
+				<Text size="sm">{label}</Text>
+				<Text size="xs" opacity={0.65}>
+					{description}
+				</Text>
+			</div>
+		</Group>
+	</div>
+));
 
 export const OtherStyleSettings: React.FC = () => {
-	const [customBackgroundRenderFunc, setCustomBackgroundRenderFunc] = useConfig(
-		"customBackgroundRenderFunc",
-		"",
+	const showBackground = useConfigValueBoolean("showBackground", true);
+	const [bgRenderMethod, setBGRenderMethod] = useConfig(
+		"backgroundRenderMethod",
+		BlurAlbumMethod.value,
 	);
-	const [isLFPSupported, isLFPEnabled] = useLFPSupported();
 
 	return (
 		<>
-			{isLFPSupported && (
-				<Alert
-					sx={{ margin: "16px 0" }}
-					color={isLFPEnabled ? "green" : "yellow"}
-					title="检测到 LibFrontendPlay 插件"
-				>
-					{isLFPEnabled ? (
-						<div>现在可以使用带音频可视化的背景渲染效果了</div>
-					) : (
-						<div>但是 LibFrontendPlay 并没有启用，无法使用可视化背景效果</div>
-					)}
-				</Alert>
-			)}
 			<Title order={2}>其它样式设置</Title>
 			<SwitchConfigComponent
 				settingKey="autoHideControlBar"
@@ -67,13 +96,37 @@ export const OtherStyleSettings: React.FC = () => {
 				label="显示背景"
 				defaultValue={true}
 			/>
-			<Space h="xl" />
-			<Text fz="md">默认背景设置</Text>
-			<Space h="md" />
-
+			<Select
+				label="歌词渲染方式"
+				itemComponent={BGRendererMethodItem}
+				data={BG_RENDERER_METHOD_DATA}
+				onChange={setBGRenderMethod}
+				value={bgRenderMethod}
+			/>
+			<SliderConfigComponent
+				step={0.05}
+				min={0.05}
+				max={2}
+				defaultValue={1}
+				disabled={!showBackground}
+				formatLabel={(v: number) => v.toFixed(1)}
+				settingKey="backgroundRenderScale"
+				label="背景渲染分辨率比率"
+			/>
+			<SliderConfigComponent
+				step={1}
+				min={0}
+				max={60}
+				defaultValue={0}
+				disabled={!showBackground}
+				formatLabel={(v: number) => (v === 0 ? "不跳帧" : `跳过 ${v} 帧`)}
+				settingKey="backgroundRenderSkipFrames"
+				label="背景渲染跳帧"
+			/>
 			<SliderConfigComponent
 				settingKey="backgroundLightness"
-				label="背景亮度"
+				label="背景专辑图采样色亮度"
+				disabled={!showBackground}
 				min={0}
 				max={2}
 				step={0.01}
@@ -96,39 +149,6 @@ export const OtherStyleSettings: React.FC = () => {
 					}
 				}}
 			/>
-
-			<Space h="xl" />
-			<Text fz="md">自定义背景绘制函数</Text>
-			<Space h="md" />
-			<Text fz="md">
-				如果觉得默认背景不好看，可以尝试自己实现一个绘制方式。
-			</Text>
-			<Space h="md" />
-			<Text fz="md">具体如何编写可以参考本插件的源代码（关于页面有）。</Text>
-			<Space h="md" />
-			<Space h="md" />
-			<Text fz="md">留空则使用默认绘制方式。</Text>
-			<ScrollArea
-				type="auto"
-				offsetScrollbars
-				style={{
-					background: "#0d1117",
-					border: "solid 1px #30363d",
-					maxHeight: "512px",
-					borderRadius: "4px",
-					fontFamily:
-						'"Fira Code Regular", "Microsoft Yahei Mono", Consolas, "Courier New", "PingFang SC", monospace',
-					fontSize: 14,
-				}}
-			>
-				<Editor
-					value={customBackgroundRenderFunc}
-					onValueChange={(code) => setCustomBackgroundRenderFunc(code)}
-					highlight={(code) => highlight(code, languages.javascript)}
-					textareaClassName="mantine-Textarea-input"
-					padding={8}
-				/>
-			</ScrollArea>
 		</>
 	);
 };

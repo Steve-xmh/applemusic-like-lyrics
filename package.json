@@ -19,13 +19,14 @@
     "@tabler/icons": "^1.119.0",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
+    "bezier-easing": "^2.1.0",
     "canvas-hypertxt": "^1.0.1",
     "color-convert": "^2.0.1",
     "color-quantize": "^0.1.1",
     "esbuild": "^0.16.1",
     "esbuild-plugin-glsl": "^1.1.0",
     "esbuild-sass-plugin": "^2.4.5",
-    "jotai": "^1.13.1",
+    "jotai": "^2.0.0",
     "jszip": "^3.10.1",
     "pangu": "^4.0.7",
     "prismjs": "^1.29.0",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/color-convert": "^2.0.0",
     "@types/prismjs": "^1.26.0",
+    "@types/react-virtualized": "^9.21.21",
     "acron": "^1.0.5",
     "rome": "^11.0.0"
   }

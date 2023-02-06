@@ -26,7 +26,7 @@ export const LyricCanvasRenderer: React.FC = () => {
 	const currentLyrics = useAtomValue(currentLyricsAtom);
 	const currentLyricIndex = useAtomValue(currentLyricsIndexAtom);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const canvas = canvasRef.current;
 		if (canvas) {
 			obsRef.current.observe(canvas);
@@ -40,7 +40,7 @@ export const LyricCanvasRenderer: React.FC = () => {
 		}
 	}, []);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const renderer = renderRef.current;
 		if (renderer) {
 			if (currentLyrics) renderer.setLyric(currentLyrics);
@@ -48,7 +48,7 @@ export const LyricCanvasRenderer: React.FC = () => {
 		}
 	}, [currentLyrics]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const renderer = renderRef.current;
 		if (renderer) {
 			if (currentLyrics) renderer.setCurrentLyricIndex(currentLyricIndex);

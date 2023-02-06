@@ -13,7 +13,7 @@ export const LyricDots: React.FC<{
 	const dot2 = React.useRef<HTMLDivElement>(null);
 	const tween = React.useRef<Group | null>(null);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (
 			dot0.current &&
 			dot1.current &&
