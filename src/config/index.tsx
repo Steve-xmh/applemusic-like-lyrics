@@ -13,6 +13,7 @@ import { CustomCSSSettings } from "./custom-css";
 import { version } from "../../manifest.json";
 import { useGithubLatestVersion } from "../api/react";
 import { Provider } from "jotai";
+import { BackgroundSettings } from "./background";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 	return (
@@ -45,6 +46,7 @@ const ConfigComponent: React.FC = () => {
 				<Tabs.Tab value="lyric">歌词设置</Tabs.Tab>
 				<Tabs.Tab value="lyric-style">歌词样式设置</Tabs.Tab>
 				<Tabs.Tab value="song-info-style">歌曲信息样式设置</Tabs.Tab>
+				<Tabs.Tab value="background">背景设置</Tabs.Tab>
 				<Tabs.Tab value="other-style">其它样式设置</Tabs.Tab>
 				<Tabs.Tab value="lyric-source">EAPI 函数设置</Tabs.Tab>
 				<Tabs.Tab value="custom-css">自定义 CSS 设置</Tabs.Tab>
@@ -77,6 +79,11 @@ const ConfigComponent: React.FC = () => {
 			<Tabs.Panel value="song-info-style">
 				<PanelWrapper>
 					<SongInfoStyleSettings />
+				</PanelWrapper>
+			</Tabs.Panel>
+			<Tabs.Panel value="background">
+				<PanelWrapper>
+					<BackgroundSettings />
 				</PanelWrapper>
 			</Tabs.Panel>
 			<Tabs.Panel value="other-style">

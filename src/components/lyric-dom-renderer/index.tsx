@@ -113,9 +113,70 @@ export const LyricDOMRenderer: React.FC = () => {
 							const id = Symbol("scroll-symbol");
 							const scrollDelta = calculateScrollDelta();
 
-							const duration = 750;
 							const e = BezierEasing(0.65, 0, 0.35, 1);
 							const easing = (n: number) => e(n);
+
+							const duration = 750;
+
+							if (scrollDelta > 0) {
+								let springElementIndex = scrollToIndex;
+								let affected = 1;
+								while (true) {
+									const s = lyricListElement.current.children.item(
+										++springElementIndex,
+									);
+									if (!s) break;
+									// log("弹簧元素", affected, springElementIndex, s);
+									if (s.classList.contains("am-lyric-line")) {
+										const subDuration = duration + affected * 100;
+										const offset = Math.sqrt(scrollDelta);
+										if (Math.abs(offset) < 1) {
+											break;
+										}
+										const animation: Keyframe[] = [
+											{
+												transform: "translateY(0px)",
+												offset: 0.0,
+												composite: "add",
+											},
+										];
+
+										const totalFrame = (subDuration / 1000) * 60;
+										const halfFrame = totalFrame / 2;
+										for (let i = 0; i < halfFrame; i++) {
+											animation.push({
+												transform: `translateY(${
+													easing(i / halfFrame) * offset
+												}px)`,
+												composite: "add",
+											});
+										}
+
+										animation.push({
+											transform: `translateY(${offset}px)`,
+											composite: "add",
+										});
+
+										for (let i = 0; i < halfFrame; i++) {
+											animation.push({
+												transform: `translateY(${
+													offset - easing(i / halfFrame) * offset
+												}px)`,
+												composite: "add",
+											});
+										}
+
+										animation.push({
+											transform: "translateY(0px)",
+											composite: "add",
+										});
+
+										s.animate(animation, subDuration);
+										affected++;
+									}
+								}
+							}
+
 							const tweenArray: number[] = [];
 
 							const amount = Math.floor((duration / 1000) * 60);

@@ -3,12 +3,10 @@ import { log } from "../../utils/logger";
 import { FBMWaveMethod } from "./fbm-wave";
 import { BlurAlbumMethod } from "./blur-album";
 import { resizeImage } from "../../utils";
+import { MontereyWannaBe } from "./monterey-wannabe";
 
 const DEFAULT_VERTEX_SHADER =
-	"attribute vec4 a_position;" +
-	"void main(){" +
-	"gl_Position = a_position;" +
-	"}";
+	"attribute vec4 a_pos;" + "void main(){" + "gl_Position=a_pos;" + "}";
 
 const EMPTY_128_F32_ARRAY = new Float32Array(128);
 
@@ -30,7 +28,19 @@ const shuffleArray = <T>(array: T[]) => {
 	return array;
 };
 
-export const BUILDIN_RENDER_METHODS = [BlurAlbumMethod, FBMWaveMethod];
+export const BUILDIN_RENDER_METHODS = [
+	BlurAlbumMethod,
+	FBMWaveMethod,
+	MontereyWannaBe,
+];
+
+/**
+ * 对于渲染管线结构
+ */
+export enum DefineType {
+	Float,
+	Int,
+}
 
 /**
  * 一种背景渲染方式管线结构
@@ -44,6 +54,7 @@ export interface BackgroundRenderMethod {
 	description?: string;
 	configs?: {
 		name: string;
+		defineType: DefineType;
 		min: number;
 		max: number;
 		step?: number;
@@ -70,7 +81,7 @@ export class CanvasBackgroundRender {
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 			this.resize();
 			this.rebuildVertex();
-			this.setRenderMethod(FBMWaveMethod);
+			this.setRenderMethod(BlurAlbumMethod);
 			this.setAlbumColorMap([[0, 0, 0]]);
 		} else {
 			throw new TypeError(
@@ -190,11 +201,17 @@ export class CanvasBackgroundRender {
 		gl.attachShader(program, this.vshader);
 		gl.attachShader(program, this.fshader);
 		gl.linkProgram(program);
+
+		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+			const info = gl.getProgramInfoLog(program) || "未知链接错误";
+			throw new TypeError(`渲染管线程序链接错误：${info}`);
+		}
+
 		gl.useProgram(program);
 
-		const posLoc = gl.getAttribLocation(program, "a_position");
+		const posLoc = gl.getAttribLocation(program, "a_pos");
 		if (posLoc === -1)
-			throw new TypeError("无法找到渲染程序顶点着色器中的 a_position 属性！");
+			throw new TypeError("无法找到渲染程序顶点着色器中的 a_pos 属性！");
 		gl.enableVertexAttribArray(posLoc);
 		gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
@@ -203,7 +220,6 @@ export class CanvasBackgroundRender {
 	private albumColorMapSize = 0;
 	private albumColorMapTex: WebGLTexture;
 	setAlbumColorMap(colorMap: Pixel[]) {
-		this.createTime -= 600 * 1000;
 		const tmp = [...colorMap];
 		shuffleArray(tmp);
 		const size = Math.pow(2, smallestPowOfTwo(tmp.length));
@@ -313,17 +329,6 @@ export class CanvasBackgroundRender {
 	}
 	private updateAllUniforms() {
 		this.updateUniforms();
-		const gl = this.gl;
-		// 从专辑图片中取色得出的特征色表图
-		{
-			const loc = gl.getUniformLocation(this.program, "albumColorMap");
-			if (loc) gl.uniform1i(loc, 1);
-		}
-		// 专辑图片
-		{
-			const loc = gl.getUniformLocation(this.program, "albumImage");
-			if (loc) gl.uniform1i(loc, 2);
-		}
 	}
 	private updateUniforms() {
 		const gl = this.gl;
@@ -348,6 +353,16 @@ export class CanvasBackgroundRender {
 			const loc = gl.getUniformLocation(this.program, "albumImageRes");
 			if (loc)
 				gl.uniform2f(loc, this.albumImageSize[0], this.albumImageSize[1]);
+		}
+		// 从专辑图片中取色得出的特征色表图
+		{
+			const loc = gl.getUniformLocation(this.program, "albumColorMap");
+			if (loc) gl.uniform1i(loc, 1);
+		}
+		// 专辑图片
+		{
+			const loc = gl.getUniformLocation(this.program, "albumImage");
+			if (loc) gl.uniform1i(loc, 2);
 		}
 		// TODO: 当前音频的波形数据缓冲区
 		{

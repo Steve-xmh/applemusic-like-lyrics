@@ -11,6 +11,7 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
     *
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+    > *
         max-width: min(100%, 700px)
     svg
         width: unset
@@ -72,6 +73,8 @@ $hide-selectors: $hide-selectors + ", .g-singlec-comment-detail.z-show"
 $hide-selectors: $hide-selectors + ", .m-pinfo"
 $hide-selectors: $hide-selectors + ", .m-topbox"
 $hide-selectors: $hide-selectors + ", .m-tool"
+$hide-selectors: $hide-selectors + ", header .m-zoom svg"
+$hide-selectors: $hide-selectors + ", .m-leftbox::after"
     
 body
     #{$hide-selectors}

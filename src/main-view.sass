@@ -16,6 +16,13 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         width: unset
         height: unset
 
+    .amll-error-boundary
+        margin: 60px 0
+        *
+            white-space: pre-wrap
+            user-select: text
+        
+    
     .am-lyric-background
         z-index: -1
 
@@ -242,7 +249,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
 
     &.use-ping-fang-font *
-        font-family: 'PingFang SC' !important
+        font-family: 'San Francisco', 'Helvetica', 'PingFang SC' !important
 
     // 歌名居左
     &.align-left-music-name .am-music-name
@@ -275,7 +282,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     &.font-shadow
         .am-lyric-view, .am-music-info
-            filter: drop-shadow(0 0 2px #7774)
+            filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #7774)
 
     .am-lyric-line
         font-weight: bold
@@ -290,6 +297,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         > .am-lyric-line-translated,
         > .am-lyric-line-roman
             opacity: 0.5
+            font-size: max(16px, 65%)
             margin-top: 0.5rem
 
         > .am-lyric-line-dynamic > *

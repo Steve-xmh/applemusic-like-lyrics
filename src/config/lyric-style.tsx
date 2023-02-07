@@ -1,5 +1,5 @@
 import { Title } from "@mantine/core";
-import { useConfig } from "../api/react";
+import { useConfigValueBoolean } from "../api/react";
 import {
 	ColorConfigComponent,
 	SliderConfigComponent,
@@ -7,7 +7,8 @@ import {
 } from "./config-components";
 
 export const LyricStyleSettings: React.FC = () => {
-	const [lyricFixedFontSize] = useConfig("lyricFixedFontSize", "false");
+	const lyricFixedFontSize = useConfigValueBoolean("lyricFixedFontSize", false);
+	const fontShadow = useConfigValueBoolean("fontShadow");
 	return (
 		<>
 			<Title order={2}>歌词样式设置</Title>
@@ -32,6 +33,16 @@ export const LyricStyleSettings: React.FC = () => {
 				label="文字阴影"
 				defaultValue={false}
 			/>
+			<SliderConfigComponent
+				settingKey="fontShadowSize"
+				label="文字阴影大小"
+				disabled={!fontShadow}
+				formatLabel={(v: number) => `${v}px`}
+				min={0}
+				step={1}
+				defaultValue={0}
+				max={100}
+			/>
 			<SwitchConfigComponent
 				settingKey="alignTopSelectedLyric"
 				label="歌词滚动位置向上对齐"
@@ -43,7 +54,7 @@ export const LyricStyleSettings: React.FC = () => {
 			/>
 			<SwitchConfigComponent
 				settingKey="lyricFixedFontSize"
-				defaultValue={lyricFixedFontSize === "true"}
+				defaultValue={lyricFixedFontSize}
 				label="自定义字体大小（关闭以使用自适应字体大小）"
 			/>
 			<SliderConfigComponent
@@ -51,7 +62,7 @@ export const LyricStyleSettings: React.FC = () => {
 				min={8}
 				max={64}
 				defaultValue={16}
-				disabled={lyricFixedFontSize !== "true"}
+				disabled={!lyricFixedFontSize}
 				settingKey="lyricFontSize"
 				formatLabel={(v: number) => `${v}px`}
 				label="歌词字体大小（像素）"

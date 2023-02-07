@@ -47,7 +47,7 @@ class ErrorBoundary extends React.Component<
 		if (this.state.hasError) {
 			// You can render any custom fallback UI
 			return (
-				<div>
+				<div className="amll-error-boundary">
 					<Title order={2}>哦不，出大事情了</Title>
 					<div>发生了不可恢复的错误，给作者送 Issue 吧（</div>
 					<pre>{this.state.error?.name}</pre>

@@ -69,15 +69,15 @@ const buildOption = {
 	},
 	watch: process.argv.includes("--watch")
 		? {
-			onRebuild(err, result) {
-				console.log("Rebuilding");
-				if (err) {
-					console.warn(err.message);
-				} else if (result) {
-					console.log("Build success");
-				}
-			},
-		}
+				onRebuild(err, result) {
+					console.log("Rebuilding");
+					if (err) {
+						console.warn(err.message);
+					} else if (result) {
+						console.log("Build success");
+					}
+				},
+		  }
 		: undefined,
 	plugins,
 };
