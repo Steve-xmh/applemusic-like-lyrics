@@ -13,6 +13,10 @@ export const SongInfoStyleSettings: React.FC = () => {
 			<SwitchConfigComponent settingKey="hideMusicAlias" label="隐藏歌曲别名" />
 			<SwitchConfigComponent settingKey="hideMusicArtists" label="隐藏歌手名" />
 			<SwitchConfigComponent settingKey="hideMusicAlbum" label="隐藏专辑名" />
+			<SwitchConfigComponent
+				settingKey="alignLeftAlbumImage"
+				label="专辑图居左"
+			/>
 			<SwitchConfigComponent settingKey="alignLeftMusicName" label="歌名居左" />
 			<SwitchConfigComponent
 				settingKey="alignLeftMusicAlias"

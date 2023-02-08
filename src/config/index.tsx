@@ -10,8 +10,7 @@ import { SongInfoStyleSettings } from "./song-info-style";
 import { OtherStyleSettings } from "./other-style";
 import { LyricSourceSettings } from "./lyric-source";
 import { CustomCSSSettings } from "./custom-css";
-import { version } from "../../manifest.json";
-import { useGithubLatestVersion } from "../api/react";
+import { useHasUpdates } from "../api/react";
 import { Provider } from "jotai";
 import { BackgroundSettings } from "./background";
 
@@ -26,7 +25,7 @@ const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 
 const ConfigComponent: React.FC = () => {
 	const hasWarnings = useHasWarnings();
-	const latestVersion = useGithubLatestVersion();
+	const hasUpdates = useHasUpdates();
 
 	return (
 		<Tabs
@@ -51,7 +50,7 @@ const ConfigComponent: React.FC = () => {
 				<Tabs.Tab value="lyric-source">EAPI 函数设置</Tabs.Tab>
 				<Tabs.Tab value="custom-css">自定义 CSS 设置</Tabs.Tab>
 				<Tabs.Tab value="about">
-					{latestVersion !== "" && latestVersion !== version ? (
+					{hasUpdates ? (
 						<Indicator offset={-3} size={6} color="yellow">
 							关于
 						</Indicator>

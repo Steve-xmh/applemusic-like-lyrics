@@ -515,7 +515,6 @@ export const useStyles = createStyles;
 export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 	return (
 		<MantineProvider
-			withNormalizeCSS
 			theme={{
 				colorScheme: "dark",
 			}}

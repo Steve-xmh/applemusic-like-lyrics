@@ -251,21 +251,25 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
     &.use-ping-fang-font *
         font-family: 'San Francisco', 'Helvetica', 'PingFang SC' !important
 
+    // 专辑图居左
+    &.align-left-album-image .am-album-image
+        align-self: flex-start !important
+    
     // 歌名居左
     &.align-left-music-name .am-music-name
-        text-align: left
+        text-align: left !important
 
     // 歌曲别名居左
     &.align-left-music-alias .am-music-alias
-        text-align: left
+        text-align: left !important
 
     // 歌手名居左
     &.align-left-music-artists .am-music-artists
-        justify-content: left
+        justify-content: left !important
 
     // 专辑名居左
     &.align-left-music-album .am-music-album
-        justify-content: left
+        justify-content: left !important
 
     // 隐藏歌手名标签
     &.hide-music-artists-label .am-artists-label

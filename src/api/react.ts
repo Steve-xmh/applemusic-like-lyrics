@@ -11,6 +11,7 @@ import {
 	lyricErrorAtom,
 	musicIdAtom,
 } from "../core/states";
+import semverGt from "semver/functions/gt";
 
 export function useConfig(
 	key: string,
@@ -217,7 +218,7 @@ export function useGithubLatestVersion(): string {
 export function useHasUpdates(): boolean {
 	const githubVersion = useGithubLatestVersion();
 	return React.useMemo(
-		() => githubVersion !== "" && githubVersion !== version,
+		() => githubVersion !== "" && semverGt(githubVersion, version),
 		[githubVersion],
 	);
 }
