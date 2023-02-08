@@ -179,32 +179,36 @@ export const LyricBackground: React.FC = () => {
 		};
 	}, [albumImageLoaded, albumImage, albumImageUrl]);
 
-	return canvasError.length ? (
-		<div
-			className="am-lyric-background am-lyric-bg-error"
-			style={{
-				position: "fixed",
-				left: "0",
-				top: "0",
-				width: "100%",
-				height: "100%",
-			}}
-		>
-			<Text>背景渲染发生错误，请检查插件设置中的背景设置</Text>
-			<Text>错误信息：</Text>
-			<pre>{canvasError}</pre>
-		</div>
-	) : (
-		<canvas
-			ref={canvasRef}
-			className="am-lyric-background"
-			style={{
-				position: "fixed",
-				left: "0",
-				top: "0",
-				width: "100%",
-				height: "100%",
-			}}
-		/>
+	return (
+		<>
+			<canvas
+				ref={canvasRef}
+				className="am-lyric-background"
+				style={{
+					position: "fixed",
+					left: "0",
+					top: "0",
+					width: "100%",
+					height: "100%",
+					color: "yellow",
+				}}
+			/>
+			{canvasError.length > 0 && (
+				<div
+					className="am-lyric-background am-lyric-bg-error"
+					style={{
+						position: "fixed",
+						left: "0",
+						top: "0",
+						width: "100%",
+						height: "100%",
+					}}
+				>
+					<Text>背景渲染发生错误，请检查插件设置中的背景设置</Text>
+					<Text>错误信息：</Text>
+					<pre>{canvasError}</pre>
+				</div>
+			)}
+		</>
 	);
 };

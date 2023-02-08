@@ -20,6 +20,24 @@ uniform vec2 albumImageRes; // 专辑图片的大小，单位像素
 
 #define KSIZE ((SIZE - 1) / 2)
 
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+// License: WTFPL, author: sam hocevar, found: https://stackoverflow.com/a/17897228/418488
+const vec4 hsv2rgb_K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www);
+    return c.z * mix(hsv2rgb_K.xxx, clamp(p - hsv2rgb_K.xxx, 0.0, 1.0), c.y);
+}
+
 float normpdf(in float x, in float sigma) {
     return 0.39894 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
 }
@@ -83,6 +101,14 @@ void main() {
             resultColor += kernel[ksize + j] * kernel[ksize + i] * texture2D(albumImage, uv + vec2(float(i * STEP), float(j * STEP)) / resolution).rgb;
         }
     }
+    
+    resultColor /= Z * Z;
+    
+    resultColor = rgb2hsv(resultColor);
+    
+    resultColor.z = resultColor.z * 0.7;
+    
+    resultColor = hsv2rgb(resultColor);
 
-    gl_FragColor = vec4(resultColor / (Z * Z), 1.0);
+    gl_FragColor = vec4(resultColor, 1.0);
 }
