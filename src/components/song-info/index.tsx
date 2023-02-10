@@ -193,6 +193,7 @@ export const PlayerSongInfo: React.FC<{
 						)}
 						{props.isFM && <LyricPlayerFMControls />}
 					</div>
+					<div className="am-music-info-bottom-spacer" />
 				</div>
 			)}
 		</>

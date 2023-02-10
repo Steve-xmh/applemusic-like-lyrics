@@ -21,8 +21,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         *
             white-space: pre-wrap
             user-select: text
-        
-    
+
     .am-lyric-background
         z-index: -1
 
@@ -31,6 +30,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     .am-player-song-info
         flex: 1
+        height: 100%
         z-index: 2
         display: flex
         flex-direction: column
@@ -39,6 +39,9 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         justify-content: center
         > .am-music-info-spacer
             flex: 1
+        > .am-music-info-bottom-spacer
+            flex: 1
+            transition: flex 0.5s ease-out
         > .am-album-image
             width: 70%
             aspect-ratio: 1 / 1
@@ -57,7 +60,8 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 aspect-ratio: 1 / 1
                 object-fit: cover
         > .am-music-info
-            flex: 1
+            flex: 0
+            transition: flex 0.5s ease-out
             width: 100%
 
             .am-music-name
@@ -249,12 +253,12 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
 
     &.use-ping-fang-font *
-        font-family: 'San Francisco', 'Helvetica', 'PingFang SC' !important
+        font-family: 'PingFang SC' !important
 
     // 专辑图居左
     &.align-left-album-image .am-album-image
         align-self: flex-start !important
-    
+
     // 歌名居左
     &.align-left-music-name .am-music-name
         text-align: left !important
@@ -312,13 +316,16 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 animation-name: am-lyric-word-animation
                 animation-timing-function: linear
                 animation-fill-mode: both
-                width: 0%
+                width: 100%
                 right: 0%
                 position: absolute
                 white-space: nowrap
                 overflow: hidden
             > .am-lyric-real-word
                 opacity: 0.75
+                animation-name: am-lyric-float-animation
+                animation-timing-function: linear
+                animation-fill-mode: both
                 transition: opacity $tween-animation-duration $tween-animation-timing
 
         &:hover
@@ -354,14 +361,28 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                     animation-play-state: running
                     opacity: 0.5
 
-        @keyframes am-lyric-word-animation
-            from
-                width: 0%
-                right: 100%
+        // @keyframes am-lyric-word-animation
+        //     from
+        //         width: 0%
+        //         right: 100%
 
+        //     to
+        //         width: 100%
+        //         right: 0%
+
+        @keyframes am-lyric-float-animation
+            from
+                transform: translateY(0px)
             to
-                width: 100%
-                right: 0%
+                transform: translateY(-50px)
+
+        @keyframes am-lyric-word-animation
+            $fade-width: 20
+            @for $i from -$fade-width through 100
+                #{calc(($i + $fade-width) / (100 + $fade-width)) * 100}%
+                    $mask-img: linear-gradient(to right, #000 $i * 1%, #0000 ($i + $fade-width) * 1%)
+                    -webkit-mask-image: $mask-img
+                    mask-image: $mask-img
 
     .am-lyric-dots
         height: 0px

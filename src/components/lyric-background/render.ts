@@ -94,7 +94,7 @@ export class CanvasBackgroundRender {
 		this.rebuildProgram();
 		this.currentRenderMethod = renderMethod;
 	}
-	resize(width = this.canvas.width, height = this.canvas.height) {
+	resize(width = this.canvas.width, height = this.canvas.height, renderScale = 1) {
 		const canvas = this.canvas;
 		canvas.width = width;
 		canvas.height = height;
