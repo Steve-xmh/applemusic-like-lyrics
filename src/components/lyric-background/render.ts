@@ -69,6 +69,7 @@ export class CanvasBackgroundRender {
 	skipFrameRate = 0;
 	private _skipFrameRate = 0;
 	private currentRenderMethod: BackgroundRenderMethod;
+	private _displaySize = [0, 0];
 	private get time() {
 		return Date.now() - this.createTime;
 	}
@@ -79,6 +80,7 @@ export class CanvasBackgroundRender {
 			gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+			this._displaySize = [canvas.clientWidth, canvas.clientHeight];
 			this.resize();
 			this.rebuildVertex();
 			this.setRenderMethod(BlurAlbumMethod);
@@ -94,10 +96,15 @@ export class CanvasBackgroundRender {
 		this.rebuildProgram();
 		this.currentRenderMethod = renderMethod;
 	}
-	resize(width = this.canvas.width, height = this.canvas.height, renderScale = 1) {
+	resize(
+		width = this.canvas.width,
+		height = this.canvas.height,
+		renderScale = 1,
+	) {
 		const canvas = this.canvas;
-		canvas.width = width;
-		canvas.height = height;
+		canvas.width = width * renderScale;
+		canvas.height = height * renderScale;
+		this._displaySize = [width, height];
 		this.gl.viewport(0, 0, canvas.width, canvas.height);
 	}
 	onUpdateAndDraw() {
@@ -340,7 +347,7 @@ export class CanvasBackgroundRender {
 		// 绘制画板的大小，单位像素
 		{
 			const loc = gl.getUniformLocation(this.program, "resolution");
-			if (loc) gl.uniform2f(loc, this.canvas.width, this.canvas.height);
+			if (loc) gl.uniform2f(loc, this._displaySize[0], this._displaySize[1]);
 		}
 		// 特征色表图的分辨率，单位像素
 		{
