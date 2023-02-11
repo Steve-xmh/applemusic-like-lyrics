@@ -113,12 +113,10 @@ export const SelectMusicIdModal: React.FC = () => {
 			onClose={() => setSelectMusicIdModalOpened(false)}
 			closeOnClickOutside={!selectMusicIdModalLoading}
 			centered
-			zIndex={151}
 		>
 			<LoadingOverlay
 				visible={selectMusicIdModalLoading}
 				radius="sm"
-				zIndex={153}
 				size={50}
 				loaderProps={{
 					style: {

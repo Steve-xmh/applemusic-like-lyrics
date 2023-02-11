@@ -7,6 +7,7 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
 import {
+	AudioQualityType,
 	genBitmapImage,
 	getPlayingSong,
 	loadLyric,
@@ -27,6 +28,7 @@ import {
 	albumImageUrlAtom,
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
+	currentAudioQualityTypeAtom,
 	currentLyricsAtom,
 	currentLyricsIndexAtom,
 	currentRawLyricRespAtom,
@@ -34,7 +36,9 @@ import {
 	lyricOffsetAtom,
 	musicIdAtom,
 	playingSongDataAtom,
+	playProgressAtom,
 	playStateAtom,
+	playVolumeAtom,
 } from "../core/states";
 import { error, warn } from "../utils/logger";
 
@@ -42,15 +46,18 @@ export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const curLyricOffset = useAtomValue(lyricOffsetAtom);
-	const setCurrentAudioId = useSetAtom(currentAudioIdAtom);
+	const setPlayProgress = useSetAtom(playProgressAtom);
+	const setPlayVolume = useSetAtom(playVolumeAtom);
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
 	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
+	const setCurrentAudioQualityType = useSetAtom(currentAudioQualityTypeAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
 	const setAlbumImageMainColors = useSetAtom(albumImageMainColorsAtom);
 	const setAlbumImageUrlAtom = useSetAtom(albumImageUrlAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
 	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
+	const [currentAudioId, setCurrentAudioId] = useAtom(currentAudioIdAtom);
 	const [albumImageLoaded, albumImage] = useAlbumImage(musicId, 128, 128);
 
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
@@ -64,7 +71,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		currentRawLyricRespAtom,
 	);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		const img = new Image();
 		let canceled = false;
 		if (albumImageLoaded) {
@@ -99,7 +106,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		};
 	}, [albumImageLoaded]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (isLyricPageOpening || isFMPageOpening) {
 			let canceled = false;
 			(async () => {
@@ -120,7 +127,27 @@ export const NCMEnvWrapper: React.FC = () => {
 		}
 	}, [musicId, isLyricPageOpening, isFMPageOpening]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
+		const bitrate: number | undefined =
+			getPlayingSong()?.from?.lastPlayInfo?.bitrate;
+		const envSound: string | undefined =
+			getPlayingSong()?.from?.lastPlayInfo?.envSound;
+		if (envSound === "dolby") {
+			setCurrentAudioQualityType(AudioQualityType.DolbyAtmos);
+		} else if (bitrate === undefined) {
+			setCurrentAudioQualityType(AudioQualityType.Local);
+		} else if (bitrate <= 192) {
+			setCurrentAudioQualityType(AudioQualityType.Normal);
+		} else if (bitrate <= 320) {
+			setCurrentAudioQualityType(AudioQualityType.High);
+		} else if (bitrate <= 999) {
+			setCurrentAudioQualityType(AudioQualityType.Lossless);
+		} else if (bitrate <= 1999) {
+			setCurrentAudioQualityType(AudioQualityType.HiRes);
+		}
+	}, [currentAudioId]);
+
+	React.useLayoutEffect(() => {
 		let parsed: LyricLine[] = [];
 		let canUseDynamicLyric = !(
 			!currentRawLyricResp?.yrc?.lyric ||
@@ -156,15 +183,64 @@ export const NCMEnvWrapper: React.FC = () => {
 		configTranslatedLyric,
 	]);
 
-	React.useEffect(() => {
-		setPlayState(getPlayingSong().state);
+	React.useLayoutEffect(() => {
+		setPlayState(toPlayState(getPlayingSong().state));
 	}, [isLyricPageOpening]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		setPlayingSongData(getPlayingSong());
+
+		const onVolumeChanged = (
+			_audioId: string,
+			_unknownArg0: number,
+			_unknownArg1: number,
+			volume: number, // [0.0-1.0]
+		) => {
+			setPlayVolume(volume);
+		};
+
+		legacyNativeCmder.appendRegisterCall(
+			"Volume",
+			"audioplayer",
+			onVolumeChanged,
+		);
+		// legacyNativeCmder._envAdapter.callAdapter("audioplayer.setVolume", () => {}, [])
+		try {
+			const nmSettings = JSON.parse(
+				localStorage.getItem("NM_SETTING_PLAYER") ?? "{}",
+			);
+			setPlayVolume(nmSettings?.volume ?? 0.5);
+		} catch {}
+
+		let duration = 0;
+
+		try {
+			duration = getPlayingSong()?.data?.duration || 0;
+			setCurrentAudioDuration(duration);
+		} catch {}
+
+		try {
+			const nmSettings = JSON.parse(
+				localStorage.getItem("NM_SETTING_USER") ?? "{}",
+			);
+			setPlayState(
+				nmSettings?.pauseStatus ? PlayState.Pausing : PlayState.Playing,
+			);
+			setPlayProgress(
+				(((nmSettings?.lastPlaying?.playPostion || 0) * duration) / 1000) | 0,
+			);
+		} catch {}
+
+		return () => {
+			legacyNativeCmder.removeRegisterCall(
+				"Volume",
+				"audioplayer",
+				onVolumeChanged,
+			);
+		};
 	}, []);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		let tweenId = 0;
 		let onIntervalGettingSongData = 0;
 		const setIntervalGetSongData = () => {
@@ -180,6 +256,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			isTween = false,
 		) => {
+			setPlayProgress(progress);
 			progress += configGlobalTimeStampOffset; // 全局位移
 			progress += curLyricOffset; // 当前歌曲位移
 			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
@@ -196,7 +273,7 @@ export const NCMEnvWrapper: React.FC = () => {
 				};
 				requestAnimationFrame(tweenPlayProgress);
 			}
-			setPlayState(toPlayState(getPlayingSong().state));
+			// setPlayState(toPlayState(getPlayingSong().state));
 			clearInterval(onIntervalGettingSongData);
 			setCurrentAudioId(audioId);
 			const time = (progress * 1000) | 0;

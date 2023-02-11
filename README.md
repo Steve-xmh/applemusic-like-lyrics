@@ -1,3 +1,5 @@
+算我求你们了，插件没人用又没人给我提多少建议，
+
 # Apple Music-like Lyrics
 
 一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM) 的类 Apple Music 歌词显示插件

@@ -11,6 +11,19 @@ export enum PlayState {
 	Pausing = "pausing",
 }
 
+export enum AudioQualityType {
+	// 128
+	Normal = "normal",
+	// 320
+	High = "high",
+	// 999
+	Lossless = "lossless",
+	// 1999
+	HiRes = "hires",
+	DolbyAtmos = "dolbyatmos",
+	Local = "local",
+}
+
 export function toPlayState(enumId: number): PlayState {
 	if (enumId === 1) {
 		return PlayState.Pausing;

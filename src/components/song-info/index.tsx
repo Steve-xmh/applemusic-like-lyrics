@@ -1,15 +1,20 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
+import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
 import { useAtomValue } from "jotai";
 import * as React from "react";
-import { setClipboardData } from "../../api";
+import { AudioQualityType, PlayState, setClipboardData } from "../../api";
 import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
 import {
 	albumAtom,
 	musicIdAtom,
-	songAliasNameAtom,
 	songArtistsAtom,
 	songNameAtom,
 	albumImageUrlAtom,
+	playProgressAtom,
+	currentAudioDurationAtom,
+	playVolumeAtom,
+	playStateAtom,
+	currentAudioQualityTypeAtom,
 } from "../../core/states";
 import { Menu, MenuItem } from "../appkit/menu";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
@@ -94,14 +99,37 @@ export const PlayerSongInfoMenuContent: React.FC<{
 	);
 };
 
+import IconPause from "../../assets/icon_pause.svg";
+import IconRewind from "../../assets/icon_rewind.svg";
+import IconForward from "../../assets/icon_forward.svg";
+import IconShuffle from "../../assets/icon_shuffle.svg";
+import IconRepeat from "../../assets/icon_repeat.svg";
+import IconPlay from "../../assets/icon_play.svg";
+import IconLossless from "../../assets/icon_lossless.svg";
+import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
+
+function toDuration(duration: number) {
+	const isRemainTime = duration < 0;
+
+	const d = Math.abs(duration | 0);
+	const sec = d % 60;
+	const min = Math.floor((d - sec) / 60);
+	const secText = "0".repeat(2 - sec.toString().length) + sec;
+
+	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
+}
+
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
+	const currentAudioQualityType = useAtomValue(currentAudioQualityTypeAtom);
 	const musicId = useAtomValue(musicIdAtom);
-	const album = useAtomValue(albumAtom);
 	const songName: string = useAtomValue(songNameAtom);
-	const songAliasName: string[] = useAtomValue(songAliasNameAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
+	const currentAudioDuration = useAtomValue(currentAudioDurationAtom) / 1000;
+	const playProgress = useAtomValue(playProgressAtom);
+	const playVolume = useAtomValue(playVolumeAtom);
+	const playState = useAtomValue(playStateAtom);
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 	const [songInfoMenu, setSongInfoMenu] = React.useState(false);
 
@@ -110,6 +138,9 @@ export const PlayerSongInfo: React.FC<{
 	const [hideMusicAlias] = useConfigBoolean("hideMusicAlias", false);
 	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
 	const [hideMusicAlbum] = useConfigBoolean("hideMusicAlbum", false);
+
+	const playProgressText = toDuration(playProgress);
+	const remainText = toDuration(playProgress - currentAudioDuration);
 
 	return (
 		<>
@@ -159,40 +190,125 @@ export const PlayerSongInfo: React.FC<{
 							</div>
 						</div>
 					)}
-					<div className="am-music-info">
-						{!hideMusicName && <div className="am-music-name">{songName}</div>}
-						{!hideMusicAlias && songAliasName.length > 0 && (
-							<div className="am-music-alias">
-								{songAliasName.map((alia, index) => (
-									<div key={`${alia}-${index}`}>{alia}</div>
-								))}
-							</div>
-						)}
-						{!hideMusicArtists && (
-							<div className="am-music-artists">
-								<div className="am-artists-label">歌手：</div>
-								<div className="am-artists">
-									{songArtists.map((artist, index) => (
-										<a
-											href={`#/m/artist/?id=${artist.id}`}
-											key={`${artist.id}-${artist.name}-${index}`}
-										>
-											{artist.name}
-										</a>
-									))}
+					<div className="am-music-sub-widget">
+						<div className="am-music-quality">
+							{currentAudioQualityType === AudioQualityType.Lossless && (
+								<div className="am-music-quality-tag">
+									<IconLossless />
+									无损
+								</div>
+							)}
+							{currentAudioQualityType === AudioQualityType.HiRes && (
+								<div className="am-music-quality-tag">
+									<IconLossless />
+									高解析度无损
+								</div>
+							)}
+							{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
+								<div>
+									<IconDolbyAtmos />
+								</div>
+							)}
+						</div>
+						<div className="am-music-info-with-menu">
+							<div className="am-music-info">
+								<div className="am-music-name">{songName}</div>
+								<div className="am-music-artists">
+									<div className="am-artists">
+										{songArtists.map((artist, index) => (
+											<a
+												href={`#/m/artist/?id=${artist.id}`}
+												key={`${artist.id}-${artist.name}-${index}`}
+											>
+												{artist.name}
+											</a>
+										))}
+									</div>
 								</div>
 							</div>
-						)}
-						{!hideMusicAlbum && album && (
-							<div className="am-music-album">
-								<div className="am-album-label">专辑：</div>
-								<div className="am-album">
-									<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
-								</div>
+							<button
+								className="am-music-main-menu"
+								onClick={() => setSongInfoMenu(true)}
+							>
+								<IconDots color="#FFFFFF" />
+							</button>
+							{props.isFM && <LyricPlayerFMControls />}
+						</div>
+
+						<div className="am-music-progress-control">
+							<div className="am-music-progress-bar">
+								<div
+									style={{
+										width: `${(playProgress / currentAudioDuration) * 100}%`,
+									}}
+								/>
 							</div>
-						)}
-						{props.isFM && <LyricPlayerFMControls />}
+							<div className="am-music-progress-tips">
+								<div>{playProgressText}</div>
+								<div>{remainText}</div>
+							</div>
+						</div>
 					</div>
+
+					<div className="am-music-controls">
+						<button className="am-music-track-shuffle">
+							<IconShuffle color="#FFFFFF" />
+						</button>
+						<button
+							className="am-music-track-prev"
+							onClick={() => {
+								document
+									.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
+									?.click();
+							}}
+						>
+							<IconRewind color="#FFFFFF" />
+						</button>
+						<button
+							className="am-music-play"
+							onClick={() => {
+								if (playState === PlayState.Playing) {
+									document
+										.querySelector<HTMLButtonElement>(
+											"#main-player .btnp-pause",
+										)
+										?.click();
+								} else {
+									document
+										.querySelector<HTMLButtonElement>("#main-player .btnp-play")
+										?.click();
+								}
+							}}
+						>
+							{playState === PlayState.Playing ? (
+								<IconPause color="#FFFFFF" />
+							) : (
+								<IconPlay color="#FFFFFF" />
+							)}
+						</button>
+						<button
+							className="am-music-track-next"
+							onClick={() => {
+								document
+									.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
+									?.click();
+							}}
+						>
+							<IconForward color="#FFFFFF" />
+						</button>
+						<button className="am-music-track-repeat">
+							<IconRepeat color="#FFFFFF" />
+						</button>
+					</div>
+
+					<div className="am-music-volume-controls">
+						<IconVolume2 color="#FFFFFF" />
+						<div className="am-music-volume-bar">
+							<div style={{ width: `${playVolume * 100}%` }} />
+						</div>
+						<IconVolume color="#FFFFFF" />
+					</div>
+
 					<div className="am-music-info-bottom-spacer" />
 				</div>
 			)}

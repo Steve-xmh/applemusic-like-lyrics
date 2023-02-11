@@ -1,6 +1,7 @@
 import { build, serve } from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
 import { glsl } from "esbuild-plugin-glsl";
+import svgrPlugin from "esbuild-plugin-svgr";
 import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
@@ -18,6 +19,7 @@ const IS_DEV = process.argv.includes("--dev");
 
 const plugins = [
 	sassPlugin(),
+	svgrPlugin(),
 	glsl({
 		minify: !IS_DEV,
 	}),

@@ -75,7 +75,7 @@ $hide-selectors: $hide-selectors + ", .m-topbox"
 $hide-selectors: $hide-selectors + ", .m-tool"
 $hide-selectors: $hide-selectors + ", header .m-zoom svg"
 $hide-selectors: $hide-selectors + ", .m-leftbox::after"
-    
+
 body
     #{$hide-selectors}
         opacity: 1
@@ -84,12 +84,16 @@ body
     &.amll-hide-controls
         #{$hide-selectors}
             opacity: 0 !important
-        #applemusic-like-lyrics-view
-            .am-player-song-info
-                > .am-music-info-bottom-spacer
-                    flex: 0
-                > .am-music-info
-                    flex: 1
+        // #applemusic-like-lyrics-view
+        //     .am-player-song-info
+        //         > .am-music-info-bottom-spacer
+        //             flex: 0
+        //         > .am-music-info
+        //             flex: 1
+
+// 显示模态对话框时不让标题栏被覆盖
+header, .m-winctrl
+    z-index: 999 !important
 
 .m-winctrl.disabled
     display: none
@@ -97,7 +101,7 @@ body
 // 隐藏 Mac 版网易云的专辑元素
 .m-singlebg
     display: none
-    
+
 // 使正在播放的歌词页面布局上全屏，以便歌词组件大小是窗口大小
 .g-singlec-ct
     top: 0
@@ -111,7 +115,7 @@ body
 // 修复播放页面歌曲标题在歌词下方的问题
 .g-singlec-hd
     z-index: 3
-        
+
 // 将被压下去的评论页面按钮恢复正确位置
 .g-singlec-comment, .g-singlec-comment-detail, .g-singlec-comment-top
     bottom: 20px + 60px
@@ -120,8 +124,16 @@ body
 .g-bds-fix, .g-single
     bottom: 0 !important
 
-// 在显示歌词页面的时候隐藏主页面，减轻渲染压力
+#main-player, .m-pinfo
+    transition: transform 1s
+    transform: translateY(0%)
+
 body.amll-lyric-page-open
+    // 隐藏播放控制栏
+    #main-player, .m-pinfo
+        transform: translateY(100%)
+
+    // 在显示歌词页面的时候隐藏主页面，减轻渲染压力
     #x-g-mn
         > .g-sd,
         > .g-mn

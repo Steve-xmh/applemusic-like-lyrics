@@ -8,8 +8,8 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 @mixin applemusic-like-lyrics-view-style()
     display: flex
     height: 100%
-    width: 80%
-    margin: 0 10%
+    width: 90%
+    margin: 0 5%
     z-index: 1
 
     svg
@@ -29,24 +29,28 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         flex: 1
 
     .am-player-song-info
-        flex: 1
+        flex: 0.6
         height: 100%
+        padding-right: 5vw
         z-index: 2
         display: flex
         flex-direction: column
-        overflow: hidden
         align-items: center
-        justify-content: center
+        justify-content: space-around
+        > *
+            width: min(50vh, 40vw)
+            align-self: center
         > .am-music-info-spacer
-            flex: 1
+            flex: 0.2
         > .am-music-info-bottom-spacer
-            flex: 1
+            flex: 0.2
             transition: flex 0.5s ease-out
         > .am-album-image
-            width: 70%
             aspect-ratio: 1 / 1
-            max-height: 45vh
+            height: min(50vh, 40vw)
+            width: min(50vh, 40vw)
             flex: 0
+            align-self: center
             position: relative
             > *
                 width: 100%
@@ -59,76 +63,129 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 height: 100%
                 aspect-ratio: 1 / 1
                 object-fit: cover
-        > .am-music-info
+        > .am-music-sub-widget
             flex: 0
-            transition: flex 0.5s ease-out
-            width: 100%
-
-            .am-music-name
-                @include text-overflow-ellipsis
-                font-size: 1.5rem
-                line-height: normal
-                margin: 1rem 0 0.25rem 0
-                cursor: text
-                user-select: text
-                text-align: center
-            .am-music-alias
-                @include text-overflow-ellipsis
-                font-size: 1.2rem
-                line-height: normal
-                margin-top: 0.1rem
-                opacity: 0.75
-                cursor: text
-                text-align: center
-                user-select: text
-                white-space: nowrap
-                text-overflow: ellipsis
-            .am-music-artists
-                width: 100%
-                font-size: 1rem
-                line-height: normal
-                margin: 0.25rem 0
+            > .am-music-quality
                 display: flex
-                align-items: baseline
-                flex-wrap: nowrap
+                flex-direction: row
                 justify-content: center
-                .am-artists-label
-                    line-height: normal
-                    white-space: nowrap
-                .am-artists
-                    @include text-overflow-ellipsis
-                    max-width: 100%
-                    overflow: hidden
-                    white-space: nowrap
-                    text-overflow: ellipsis
-                    text-align: center
-                    a
+                > .am-music-quality-tag
+                    border: solid 1px #FFF7
+                    padding: 2px 6px
+                    border-radius: 4px
+                    align-self: center
+                    justify-self: center
+            > .am-music-info-with-menu
+                font-size: 200%
+                font-weight: 1000
+                flex: 0
+                display: flex
+                align-self: stretch
+                flex-direction: row
+                > .am-music-main-menu
+                    aspect-ratio: 1 / 1
+                    display: inline-block
+                    position: relative
+                    border: none
+                    background: #FFF3
+                    width: 40px
+                    margin-left: 20px
+                    border-radius: 50%
+                    align-self: center
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                > .am-music-info
+                    flex: 1
+                    transition: flex 0.5s ease-out
+                    mix-blend-mode: screen
+                    width: calc(100% - 50px)
+                    height: fit-content
+                    min-width: 0
+                    display: flex
+                    flex-direction: column
+                    .am-music-name
+                        @include text-overflow-ellipsis
                         line-height: normal
-                        opacity: 0.8
+                        cursor: text
                         user-select: text
-                        &::after
-                            content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
-                            opacity: 0.5
-                        &:last-child::after
-                            content: ""
-
-            .am-music-album
-                max-width: 100%
-                font-size: 1rem
-                line-height: normal
-                margin: 0.25rem 0
+                        min-width: 0
+                    .am-music-artists
+                        width: 100%
+                        line-height: normal
+                        display: flex
+                        align-items: baseline
+                        flex-wrap: nowrap
+                        justify-content: flex-start
+                        min-width: 0
+                        .am-artists
+                            @include text-overflow-ellipsis
+                            max-width: 100%
+                            overflow: hidden
+                            white-space: nowrap
+                            text-overflow: ellipsis
+                            text-align: center
+                            a
+                                line-height: normal
+                                opacity: 0.8
+                                user-select: text
+                                &::after
+                                    content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+                                    opacity: 0.5
+                                &:last-child::after
+                                    content: ""
+            > .am-music-progress-control
+                mix-blend-mode: screen
                 display: flex
-                align-items: baseline
-                justify-content: center
-                .am-album-label
-                    white-space: nowrap
-                .am-album
-                    @include text-overflow-ellipsis
-                    max-width: 100%
-                a
-                    opacity: 0.8
-                    user-select: text
-
+                flex-direction: column
+                margin-top: 16px
+                > .am-music-progress-bar
+                    height: 8px
+                    background: #FFF7
+                    border-radius: 4px
+                    overflow: hidden
+                    > *
+                        background: white
+                        height: 100%
+                > .am-music-progress-tips
+                    margin-top: 16px
+                    font-weight: 1000
+                    opacity: 0.5
+                    display: flex
+                    justify-content: space-between
+                    font-size: 12px
+        > .am-music-controls
+            display: flex
+            justify-content: space-between
+            mix-blend-mode: screen
+            > .am-music-track-shuffle,
+            > .am-music-track-repeat
+                opacity: 0.5
+            > .am-music-track-prev,
+            > .am-music-play,
+            > .am-music-track-next
+                > *
+                    height: 5vh
+                    width: 5vh
+                
+            > *
+                border: none
+                background: transparent
+        > .am-music-volume-controls
+            display: flex
+            align-items: center
+            flex-direction: row
+            > *
+                margin: 8px
+            > .am-music-volume-bar
+                flex: 1
+                height: 8px
+                background: #FFF7
+                border-radius: 4px
+                overflow: hidden
+                > *
+                    background: white
+                    height: 100%
     .am-lyric
         flex: 1
         z-index: 2
@@ -246,11 +303,11 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
         .am-lyric-dots
             &.am-lyric-dots-selected
-                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5)
+                height: min(30px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5))
             > *
-                margin-right: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333)
-                width: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
-                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
+                margin-right: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333))
+                width: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
+                height: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
 
     &.use-ping-fang-font *
         font-family: 'PingFang SC' !important
@@ -286,6 +343,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
     // 歌词滚动位置向上对齐
     &.align-top-selected-lyric
         .am-lyric-view > *
+            padding-top: 10vh
             padding-bottom: 100vh
 
     &.font-shadow
@@ -294,7 +352,8 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     .am-lyric-line
         font-weight: bold
-        font-size: clamp(32px, 3vw, 4vh)
+        mix-blend-mode: screen
+        font-size: 5vh
         padding: max(1rem, 1vh) 0
         transform-origin: left
         color: var(--applemusic-like-lyrics-font-color, unset)

@@ -1,6 +1,6 @@
 {
   "name": "applemusic-like-lyrics",
-  "version": "1.8.2",
+  "version": "2.0.0",
   "main": "index.js",
   "private": true,
   "license": "GPL-3.0",
@@ -41,6 +41,7 @@
     "@types/prismjs": "^1.26.0",
     "@types/react-virtualized": "^9.21.21",
     "acron": "^1.0.5",
+    "esbuild-plugin-svgr": "^1.0.1",
     "rome": "^11.0.0"
   }
 }

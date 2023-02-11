@@ -33,12 +33,10 @@ export const SelectLocalLyricModal: React.FC = () => {
 			closeOnClickOutside={!selectLocalLyricModalLoading}
 			onClose={() => setLocalLyricModalOpened(false)}
 			centered
-			zIndex={151}
 		>
 			<LoadingOverlay
 				visible={selectLocalLyricModalLoading}
 				radius="sm"
-				zIndex={153}
 				size={50}
 				loaderProps={{
 					style: {
