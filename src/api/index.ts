@@ -1,7 +1,7 @@
 import { getConfig, setConfig } from "../config/core";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
-import { genRandomString } from "../utils";
+import { genRandomString, normalizePath } from "../utils";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export const settingPrefix = "applemusic-like-lyrics:";
@@ -339,7 +339,9 @@ export const loadLyric = async (
 	id: string | number,
 	ignoreCache = false,
 ): Promise<LyricFile> => {
-	const lyricsPath = `${plugin.pluginPath}/lyrics`;
+	const lyricsPath = normalizePath(
+		`${plugin.pluginPath}/../../amll-data/lyrics`,
+	);
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
 	try {
 		if (!ignoreCache && (await betterncm.fs.exists(cachedLyricPath))) {
