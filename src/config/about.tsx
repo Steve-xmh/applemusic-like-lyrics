@@ -1,7 +1,7 @@
 import { Title, Button, Text, Alert, Select } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
-import { version } from "../../manifest.json";
+import { version, commit } from "../../manifest.json";
 import { useConfig, useConfigValueBoolean } from "../api/react";
 import {
 	installLatestBranchVersion,
@@ -23,7 +23,7 @@ export const AboutPage: React.FC = () => {
 			<Title order={2}>关于</Title>
 			<Text>Apple Music-like lyrics</Text>
 			{enableUpdateBranch && <Text>当前分支：{updateBranch}</Text>}
-			<Text>当前版本：{version}</Text>
+			<Text>当前版本：{version} ({commit})</Text>
 			{hasUpdates ? (
 				<Text>Github 有可用更新：{latestVersion}</Text>
 			) : (
