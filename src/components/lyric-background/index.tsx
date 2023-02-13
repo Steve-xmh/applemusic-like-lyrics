@@ -162,7 +162,11 @@ export const LyricBackground: React.FC = () => {
 		(async () => {
 			try {
 				if (albumImageLoaded && albumImage) {
-					await albumImage.decode();
+					try {
+						await albumImage.decode();
+					} catch (err) {
+						warn("图片解码失败，将直接设置", err);
+					}
 					const renderer = rendererRef.current;
 					if (renderer && !canceled) {
 						renderer.setAlbumImage(albumImage);

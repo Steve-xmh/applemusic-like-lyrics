@@ -1,8 +1,13 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import * as React from "react";
-import { AudioQualityType, PlayState, setClipboardData } from "../../api";
+import {
+	AudioQualityType,
+	genAudioPlayerCommand,
+	PlayState,
+	setClipboardData,
+} from "../../api";
 import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
 import {
 	albumAtom,
@@ -15,6 +20,8 @@ import {
 	playVolumeAtom,
 	playStateAtom,
 	currentAudioQualityTypeAtom,
+	currentPlayModeAtom,
+	currentAudioIdAtom,
 } from "../../core/states";
 import { Menu, MenuItem } from "../appkit/menu";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
@@ -103,10 +110,13 @@ import IconPause from "../../assets/icon_pause.svg";
 import IconRewind from "../../assets/icon_rewind.svg";
 import IconForward from "../../assets/icon_forward.svg";
 import IconShuffle from "../../assets/icon_shuffle.svg";
+import IconShuffleOn from "../../assets/icon_shuffle_on.svg";
 import IconRepeat from "../../assets/icon_repeat.svg";
+import IconRepeatOn from "../../assets/icon_repeat_on.svg";
 import IconPlay from "../../assets/icon_play.svg";
 import IconLossless from "../../assets/icon_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
+import { PlayMode, switchPlayMode } from "../../utils";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -122,7 +132,9 @@ function toDuration(duration: number) {
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
+	const [currentPlayMode, setCurrentPlayMode] = useAtom(currentPlayModeAtom);
 	const currentAudioQualityType = useAtomValue(currentAudioQualityTypeAtom);
+	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const songName: string = useAtomValue(songNameAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
@@ -236,7 +248,23 @@ export const PlayerSongInfo: React.FC<{
 						</div>
 
 						<div className="am-music-progress-control">
-							<div className="am-music-progress-bar">
+							{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+							<div
+								className="am-music-progress-bar"
+								onClick={(evt) => {
+									const rect = evt.currentTarget.getBoundingClientRect();
+									const pos = (evt.clientX - rect.left) / rect.width;
+									legacyNativeCmder._envAdapter.callAdapter(
+										"audioplayer.seek",
+										() => {},
+										[
+											currentAudioId,
+											genAudioPlayerCommand(currentAudioId, "seek"),
+											pos * currentAudioDuration,
+										],
+									);
+								}}
+							>
 								<div
 									style={{
 										width: `${(playProgress / currentAudioDuration) * 100}%`,
@@ -251,8 +279,23 @@ export const PlayerSongInfo: React.FC<{
 					</div>
 
 					<div className="am-music-controls">
-						<button className="am-music-track-shuffle">
-							<IconShuffle color="#FFFFFF" />
+						<button
+							className="am-music-track-shuffle"
+							onClick={() => {
+								if (currentPlayMode === PlayMode.Random) {
+									switchPlayMode(PlayMode.Order);
+									setCurrentPlayMode(PlayMode.Order);
+								} else {
+									switchPlayMode(PlayMode.Random);
+									setCurrentPlayMode(PlayMode.Random);
+								}
+							}}
+						>
+							{currentPlayMode === PlayMode.Random ? (
+								<IconShuffleOn color="#FFFFFF" />
+							) : (
+								<IconShuffle color="#FFFFFF" />
+							)}
 						</button>
 						<button
 							className="am-music-track-prev"
@@ -296,14 +339,41 @@ export const PlayerSongInfo: React.FC<{
 						>
 							<IconForward color="#FFFFFF" />
 						</button>
-						<button className="am-music-track-repeat">
-							<IconRepeat color="#FFFFFF" />
+						<button
+							className="am-music-track-repeat"
+							onClick={() => {
+								if (currentPlayMode === PlayMode.Repeat) {
+									switchPlayMode(PlayMode.Order);
+									setCurrentPlayMode(PlayMode.Order);
+								} else {
+									switchPlayMode(PlayMode.Repeat);
+									setCurrentPlayMode(PlayMode.Repeat);
+								}
+							}}
+						>
+							{currentPlayMode === PlayMode.Repeat ? (
+								<IconRepeatOn color="#FFFFFF" />
+							) : (
+								<IconRepeat color="#FFFFFF" />
+							)}
 						</button>
 					</div>
 
 					<div className="am-music-volume-controls">
 						<IconVolume2 color="#FFFFFF" />
-						<div className="am-music-volume-bar">
+						{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+						<div
+							className="am-music-volume-bar"
+							onClick={(evt) => {
+								const rect = evt.currentTarget.getBoundingClientRect();
+								const pos = (evt.clientX - rect.left) / rect.width;
+								legacyNativeCmder._envAdapter.callAdapter(
+									"audioplayer.setVolume",
+									() => {},
+									["", "", pos],
+								);
+							}}
+						>
 							<div style={{ width: `${playVolume * 100}%` }} />
 						</div>
 						<IconVolume color="#FFFFFF" />

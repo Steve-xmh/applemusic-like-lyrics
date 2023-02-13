@@ -116,7 +116,7 @@ export const LyricDOMRenderer: React.FC = () => {
 							const e = BezierEasing(0.65, 0, 0.35, 1);
 							const easing = (n: number) => e(n);
 
-							const duration = 750;
+							const duration = 500;
 
 							if (scrollDelta > 0) {
 								let springElementIndex = scrollToIndex;
@@ -125,7 +125,7 @@ export const LyricDOMRenderer: React.FC = () => {
 									const s = lyricListElement.current.children.item(
 										++springElementIndex,
 									);
-									if (!s) break;
+									if (!s || affected > 10) break;
 									// log("弹簧元素", affected, springElementIndex, s);
 									if (s.classList.contains("am-lyric-line")) {
 										const subDuration = duration + affected * 100;

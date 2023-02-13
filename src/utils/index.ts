@@ -232,5 +232,43 @@ export function resizeImage(
 	}
 }
 
+export enum PlayMode {
+	Order = "type-order", // playonce
+	Repeat = "type-repeat", // playorder
+	One = "type-one", // playcycle
+	Random = "type-random", // playrandom
+}
+
+export function switchPlayMode(playMode: PlayMode) {
+	const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
+	while (playModeBtn) {
+		if (playModeBtn.classList.contains(playMode)) {
+			return;
+		}
+		playModeBtn.click();
+	}
+}
+
+export function getCurrentPlayMode(): PlayMode | undefined {
+	try {
+		const setting = JSON.parse(
+			localStorage.getItem("NM_SETTING_PLAYER") || "{}",
+		);
+
+		switch (setting?.mode) {
+			case "playonce":
+				return PlayMode.Order;
+			case "playorder":
+				return PlayMode.Repeat;
+			case "playcycle":
+				return PlayMode.One;
+			case "playrandom":
+				return PlayMode.Random;
+			default:
+		}
+	} catch {}
+	return undefined;
+}
+
 export const IS_WORKER =
 	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

@@ -39,33 +39,18 @@ export const LyricLineView: React.FC<{
 			(props.selected || forceDynamic || Math.abs(props.offset) < 5) ? (
 				<div className="am-lyric-line-dynamic">
 					{props.line.dynamicLyric.map((word, i) => (
-						<span key={`dynamic-word-${word.word}-${i}`}>
-							<span
-								style={{
-									animationDelay: `${
-										word.time - (props.line.dynamicLyricTime || 0)
-									}ms`,
-									animationDuration: `${word.duration}ms`,
-									animationPlayState:
-										playState === PlayState.Pausing ? "paused" : undefined,
-								}}
-								className="am-lyric-real-word"
-							>
-								{word.word}
-							</span>
-							<span
-								style={{
-									animationDelay: `${
-										word.time - (props.line.dynamicLyricTime || 0)
-									}ms`,
-									animationDuration: `${word.duration}ms`,
-									animationPlayState:
-										playState === PlayState.Pausing ? "paused" : undefined,
-								}}
-								className="am-lyric-fake-word"
-							>
-								{word.word}
-							</span>
+						<span
+							key={`am-lyric-real-word dynamic-word-${word.word}-${i}`}
+							style={{
+								animationDelay: `${
+									word.time - (props.line.dynamicLyricTime || 0)
+								}ms`,
+								animationDuration: `${word.duration}ms`,
+								animationPlayState:
+									playState === PlayState.Pausing ? "paused" : undefined,
+							}}
+						>
+							{word.word}
 						</span>
 					))}
 				</div>

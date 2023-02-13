@@ -2,15 +2,18 @@ import { Atom, atom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { AudioQualityType, getPlayingSong, LyricFile, PlayState } from "../api";
 import { Pixel } from "../libs/color-quantize/utils";
+import { getCurrentPlayMode, PlayMode } from "../utils";
 import { LyricLine } from "./lyric-parser";
 
 export const topbarMenuOpenedAtom = atom(false);
 export const isLyricPageOpeningAtom = atom(false);
+export const lyricEditorConnectedAtom = atom(false);
 export const currentAudioIdAtom = atom("");
 export const currentAudioDurationAtom = atom(0);
 export const currentRawLyricRespAtom = atom<LyricFile>({});
 export const currentAudioQualityTypeAtom = atom(AudioQualityType.Normal);
 export const playStateAtom = atom(PlayState.Pausing);
+export const currentPlayModeAtom = atom(getCurrentPlayMode() || PlayMode.One);
 export const currentLyricsAtom = atom<LyricLine[] | null>(null);
 export const currentLyricsIndexAtom = atom(-1);
 export const playingSongDataAtom = atom(getPlayingSong());

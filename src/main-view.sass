@@ -1,6 +1,29 @@
-$tween-animation-duration: 750ms
+$tween-animation-duration: 500ms
 $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
+@mixin slide-bar()
+    height: 8px
+    background: #FFF7
+    border-radius: 4px
+    overflow: hidden
+    cursor: pointer
+    &:hover::after
+        content: " "
+        display: inline-block
+        background: white
+        position: absolute
+        vertical-align: top
+        width: 6px
+        height: 16px
+        margin-top: -4px
+        margin-left: -3px
+        border-radius: 3px
+        box-shadow: 0 0 3px #0008
+    > *
+        display: inline-block
+        vertical-align: top
+        background: white
+        height: 8px
 @mixin text-overflow-ellipsis()
     overflow: hidden
     white-space: nowrap
@@ -29,7 +52,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         flex: 1
 
     .am-player-song-info
-        flex: 0.6
+        flex: 0.75
         height: 100%
         padding-right: 5vw
         z-index: 2
@@ -140,13 +163,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 flex-direction: column
                 margin-top: 16px
                 > .am-music-progress-bar
-                    height: 8px
-                    background: #FFF7
-                    border-radius: 4px
-                    overflow: hidden
-                    > *
-                        background: white
-                        height: 100%
+                    @include slide-bar()
                 > .am-music-progress-tips
                     margin-top: 16px
                     font-weight: 1000
@@ -167,7 +184,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 > *
                     height: 5vh
                     width: 5vh
-                
+
             > *
                 border: none
                 background: transparent
@@ -179,13 +196,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 margin: 8px
             > .am-music-volume-bar
                 flex: 1
-                height: 8px
-                background: #FFF7
-                border-radius: 4px
-                overflow: hidden
-                > *
-                    background: white
-                    height: 100%
+                @include slide-bar()
     .am-lyric
         flex: 1
         z-index: 2
@@ -294,8 +305,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             &.am-lyric-line-o3
                 opacity: 0.2
             > .am-lyric-line-dynamic > *
-                > .am-lyric-real-word
-                    opacity: 1
+                opacity: 0.5
 
     // 自定义歌词字体大小
     &.lyric-fixed-font-size
@@ -360,32 +370,27 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         transition: all $tween-animation-duration $tween-animation-timing
         line-break: loose
         word-break: break-word
-
+        > .am-lyric-line-original
+            opacity: 0.5
+            transition: opacity $tween-animation-duration $tween-animation-timing
         > .am-lyric-line-translated,
         > .am-lyric-line-roman
-            opacity: 0.5
+            opacity: 0.35
             font-size: max(16px, 65%)
             margin-top: 0.5rem
 
-        > .am-lyric-line-dynamic > *
+        > .am-lyric-line-dynamic
             position: relative
             display: inline-block
             white-space: break-spaces
-            > .am-lyric-fake-word
-                animation-name: am-lyric-word-animation
+            > *
+                opacity: calc(7 / 15)
+                display: inline-block
+                transition: transform $tween-animation-duration $tween-animation-timing
+                animation-play-state: paused
                 animation-timing-function: linear
                 animation-fill-mode: both
-                width: 100%
-                right: 0%
-                position: absolute
-                white-space: nowrap
-                overflow: hidden
-            > .am-lyric-real-word
-                opacity: 0.75
-                animation-name: am-lyric-float-animation
-                animation-timing-function: linear
-                animation-fill-mode: both
-                transition: opacity $tween-animation-duration $tween-animation-timing
+                // transition: opacity $tween-animation-duration $tween-animation-timing
 
         &:hover
             opacity: 1 !important
@@ -396,38 +401,23 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
         &.am-lyric-line-after
             opacity: 0.5
-            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
-                opacity: 0.5
-                animation-name: unset
-                animation-fill-mode: unset
-                animation-play-state: unset
 
         &.am-lyric-line-before
             opacity: 0.5
-            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
+            > .am-lyric-line-dynamic > *
                 opacity: 1
-                width: 100%
-                animation-name: unset
-                animation-fill-mode: unset
-                animation-play-state: unset
-
+        &.am-lyric-line-o0
+            > .am-lyric-line-dynamic > *
+                animation-name: am-lyric-word-animation
+                animation-play-state: running
         &.am-lyric-line-o0,
         &.am-lyric-line-selected
             filter: blur(0px)
             opacity: 1
-            > .am-lyric-line-dynamic
-                > * > .am-lyric-real-word
-                    animation-play-state: running
-                    opacity: 0.5
-
-        // @keyframes am-lyric-word-animation
-        //     from
-        //         width: 0%
-        //         right: 100%
-
-        //     to
-        //         width: 100%
-        //         right: 0%
+            > .am-lyric-line-original
+                opacity: 1
+            > .am-lyric-line-dynamic > *
+                opacity: 1
 
         @keyframes am-lyric-float-animation
             from
@@ -439,9 +429,10 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             $fade-width: 20
             @for $i from -$fade-width through 100
                 #{calc(($i + $fade-width) / (100 + $fade-width)) * 100}%
-                    $mask-img: linear-gradient(to right, #000 $i * 1%, #0000 ($i + $fade-width) * 1%)
+                    $mask-img: linear-gradient(to right, #000 $i * 1%, rgba(0, 0, 0, 0.5) ($i + $fade-width) * 1%)
                     -webkit-mask-image: $mask-img
                     mask-image: $mask-img
+                    transform: translateY(calc(-2px * ($i + $fade-width) / (100 + $fade-width)))
 
     .am-lyric-dots
         height: 0px

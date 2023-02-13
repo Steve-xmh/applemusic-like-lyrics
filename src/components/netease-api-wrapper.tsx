@@ -31,8 +31,10 @@ import {
 	currentAudioQualityTypeAtom,
 	currentLyricsAtom,
 	currentLyricsIndexAtom,
+	currentPlayModeAtom,
 	currentRawLyricRespAtom,
 	getMusicId,
+	lyricEditorConnectedAtom,
 	lyricOffsetAtom,
 	musicIdAtom,
 	playingSongDataAtom,
@@ -40,7 +42,9 @@ import {
 	playStateAtom,
 	playVolumeAtom,
 } from "../core/states";
-import { error, warn } from "../utils/logger";
+import { error, log, warn } from "../utils/logger";
+import { LyricEditorWSClient } from "../core/editor-client";
+import { getCurrentPlayMode, PlayMode } from "../utils";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
@@ -51,9 +55,11 @@ export const NCMEnvWrapper: React.FC = () => {
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
 	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
 	const setCurrentAudioQualityType = useSetAtom(currentAudioQualityTypeAtom);
+	const setLyricEditorConnected = useSetAtom(lyricEditorConnectedAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
 	const setAlbumImageMainColors = useSetAtom(albumImageMainColorsAtom);
-	const setAlbumImageUrlAtom = useSetAtom(albumImageUrlAtom);
+	const setAlbumImageUrl = useSetAtom(albumImageUrlAtom);
+	const setCurrentPlayMode = useSetAtom(currentPlayModeAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
 	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
@@ -63,6 +69,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const enableEditor = useConfigValueBoolean("enableEditor", false);
 	const configGlobalTimeStampOffset = Number(
 		useConfigValue("globalTimeStampOffset", "0"),
 	);
@@ -71,11 +78,48 @@ export const NCMEnvWrapper: React.FC = () => {
 		currentRawLyricRespAtom,
 	);
 
+	const [reconnectCounter, setReconnectCounter] = React.useState(Symbol());
+	const editorWSClient = React.useRef<LyricEditorWSClient>();
+	React.useEffect(() => {
+		if (enableEditor) {
+			let client = new LyricEditorWSClient();
+			log("正在连接到歌词编辑器！", client.url);
+
+			client.addEventListener("message", (msg) => {
+				log("歌词编辑器返回信息！", msg);
+			});
+
+			client.addEventListener("open", () => {
+				log("歌词编辑器已连接！");
+				setLyricEditorConnected(true);
+			});
+
+			client.addEventListener("error", (msg) => {
+				warn("歌词编辑器连接出错：", msg);
+				setReconnectCounter(Symbol());
+			});
+
+			client.addEventListener("close", () => {
+				log("歌词编辑器已断开连接！");
+				setReconnectCounter(Symbol());
+			});
+
+			editorWSClient.current = client;
+
+			return () => {
+				log("歌词编辑器接口已关闭！");
+				client.dispose();
+				setLyricEditorConnected(false);
+				editorWSClient.current = undefined;
+			};
+		}
+	}, [reconnectCounter, enableEditor]);
+
 	React.useLayoutEffect(() => {
 		const img = new Image();
 		let canceled = false;
 		if (albumImageLoaded) {
-			setAlbumImageUrlAtom(albumImage.src);
+			setAlbumImageUrl(albumImage.src);
 		}
 		img.addEventListener(
 			"load",
@@ -102,7 +146,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		img.src = albumImage.src;
 		return () => {
 			canceled = true;
-			setAlbumImageUrlAtom(null);
+			setAlbumImageUrl(null);
 		};
 	}, [albumImageLoaded]);
 
@@ -183,8 +227,60 @@ export const NCMEnvWrapper: React.FC = () => {
 		configTranslatedLyric,
 	]);
 
+	React.useEffect(() => {
+		const client = editorWSClient.current;
+
+		if (client) {
+			const onMessage = (msg: MessageEvent) => {
+				if (msg.data.type === "pullLyric") {
+					editorWSClient.current?.send(
+						JSON.stringify({
+							type: "updateLyric",
+							value:
+								currentLyrics?.map((v) => [
+									v.originalLyric,
+									v.translatedLyric,
+									v.romanLyric,
+								]) ?? [],
+						}),
+					);
+				}
+			};
+
+			client.addEventListener("data", onMessage);
+
+			return () => {
+				client.removeEventListener("data", onMessage);
+			};
+		}
+	}, [reconnectCounter, currentLyrics]);
+
+	React.useEffect(() => {
+		const client = editorWSClient.current;
+
+		if (client) {
+			const onMessage = (msg: MessageEvent) => {
+				if (msg.data.type === "pullMusicID") {
+					editorWSClient.current?.send(
+						JSON.stringify({
+							type: "updateMusicID",
+							value: String(musicId),
+						}),
+					);
+				}
+			};
+
+			client.addEventListener("data", onMessage);
+
+			return () => {
+				client.removeEventListener("data", onMessage);
+			};
+		}
+	}, [reconnectCounter, musicId]);
+
 	React.useLayoutEffect(() => {
 		setPlayState(toPlayState(getPlayingSong().state));
+		setCurrentPlayMode(getCurrentPlayMode() || PlayMode.One);
 	}, [isLyricPageOpening]);
 
 	React.useLayoutEffect(() => {
@@ -256,6 +352,11 @@ export const NCMEnvWrapper: React.FC = () => {
 			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			isTween = false,
 		) => {
+			editorWSClient.current?.send(
+				`{\"type\":\"syncTime\",\"value\":[${
+					(progress * 1000) | 0
+				},${Date.now()}]}`,
+			);
 			setPlayProgress(progress);
 			progress += configGlobalTimeStampOffset; // 全局位移
 			progress += curLyricOffset; // 当前歌曲位移

@@ -100,6 +100,11 @@ export const LyricSettings: React.FC = () => {
 				defaultValue={0}
 				max={10}
 			/>
+			<SwitchConfigComponent
+				settingKey="enableEditor"
+				label="启用歌词编辑器连接（请勿开启）"
+				defaultValue={false}
+			/>
 		</>
 	);
 };
