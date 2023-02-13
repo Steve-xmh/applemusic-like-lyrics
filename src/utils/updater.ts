@@ -117,6 +117,7 @@ export async function installLatestBranchVersion(branchName: string) {
 		.then((v) => v.map(normalizePath))) {
 		const pluginName = pluginPath.substring(pluginPath.lastIndexOf("/") + 1);
 		if (
+			pluginName.startsWith("Apple.Music-like.lyrics") ||
 			pluginName.startsWith(plugin.mainPlugin.manifest.slug) ||
 			pluginName.startsWith(plugin.mainPlugin.manifest.name)
 		) {
