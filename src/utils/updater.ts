@@ -4,6 +4,7 @@ import { normalizePath } from ".";
 import { useConfigValue, useConfigValueBoolean } from "../api/react";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
+import JSZip from "jszip";
 
 interface RepoTreeEntry {
 	id: string;
@@ -77,7 +78,7 @@ export async function installLatestBranchVersion(branchName: string) {
 		entries.map(async (entry) => {
 			if (entry.type === "blob") {
 				const downloadLink = `https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${branchName}/${entry.path}?inline=false`;
-				console.log("正在下载更新文件", entry.path);
+				log("正在下载更新文件", entry.path);
 				const data = await fetch(downloadLink).then((v) => v.blob());
 				return {
 					name: entry.name,
@@ -87,13 +88,16 @@ export async function installLatestBranchVersion(branchName: string) {
 		}),
 	);
 
+	const zip = new JSZip();
+
 	await Promise.all(
 		files.map(async (file) => {
 			if (file) {
 				const destPath = normalizePath(
 					`${plugin.mainPlugin.pluginPath}/${file.name}`,
 				);
-				console.log("正在写入更新文件", destPath);
+				log("正在写入更新文件", destPath);
+				zip.file(file.name, file.data);
 				return betterncm.fs
 					.writeFile(destPath, file.data)
 					.then((v) => (v ? Promise.resolve() : Promise.reject()));
@@ -102,6 +106,34 @@ export async function installLatestBranchVersion(branchName: string) {
 			}
 		}),
 	);
+
+	log("正在删除旧插件文件");
+	const pluginsPath = normalizePath(
+		`${plugin.mainPlugin.pluginPath}/../../plugins`,
+	);
+
+	for (const pluginPath of await betterncm.fs
+		.readDir(pluginsPath)
+		.then((v) => v.map(normalizePath))) {
+		const pluginName = pluginPath.substring(pluginPath.lastIndexOf("/") + 1);
+		if (
+			pluginName.startsWith(plugin.mainPlugin.manifest.slug) ||
+			pluginName.startsWith(plugin.mainPlugin.manifest.name)
+		) {
+			await betterncm.fs.remove(pluginPath);
+		}
+	}
+
+	const outputPluginPath = normalizePath(
+		`${pluginsPath}/${plugin.mainPlugin.manifest.slug}.plugin`,
+	);
+	log("正在写入更新文件", outputPluginPath);
+	const data: Blob = await zip.generateAsync({
+		type: "blob",
+		compression: "STORE",
+	});
+
+	await betterncm.fs.writeFile(outputPluginPath, data);
 }
 
 let cachedLatestVersion: string | undefined;

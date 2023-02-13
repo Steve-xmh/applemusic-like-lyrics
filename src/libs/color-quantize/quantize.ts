@@ -52,7 +52,7 @@ export const quantize = (pixels: Pixel[], maxcolors: number) => {
 			const [vbox1, vbox2] = medianCutApply(histo, vbox);
 
 			if (!vbox1) {
-				// console.log("vbox1 not defined; shouldn't happen!");
+				// log("vbox1 not defined; shouldn't happen!");
 				return;
 			}
 			vboxQueue.push(vbox1);

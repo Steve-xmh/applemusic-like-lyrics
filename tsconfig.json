@@ -18,6 +18,7 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
         "allowJs": false
     }
 }

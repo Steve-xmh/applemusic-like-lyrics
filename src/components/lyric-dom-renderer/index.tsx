@@ -251,7 +251,6 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine, evt: React.MouseEvent) => {
-			console.log(evt.button);
 			if (evt.button === 0) {
 				// 鼠标主键点击，跳转到歌词
 				scrollDelayRef.current = 0;
