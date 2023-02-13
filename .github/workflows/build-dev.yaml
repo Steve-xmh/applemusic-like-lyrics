@@ -15,6 +15,7 @@ jobs:
         name: 克隆仓库
       - name: 构建插件包
         run: |
+          yarn global add sass
           yarn
           yarn dist --dev
 

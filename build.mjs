@@ -159,7 +159,10 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 					},
 				});
 				output.pipe(fs.createWriteStream("Apple Music-like lyrics.plugin"));
-				fs.copyFileSync("manifest.json", "dist/manifest.json");
+				fs.writeFileSync(
+					"dist/manifest.json",
+					JSON.stringify(manifest, null, "\t"),
+				);
 				fs.copyFileSync("assets/thumbnail.svg", "dist/thumbnail.svg");
 			}
 		})
