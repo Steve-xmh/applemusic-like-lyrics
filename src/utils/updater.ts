@@ -77,7 +77,7 @@ export async function installLatestBranchVersion(branchName: string) {
 	const files = await Promise.all(
 		entries.map(async (entry) => {
 			if (entry.type === "blob") {
-				const downloadLink = `https://gitcode.net/sn/applemusic-like-lyrics/-/raw/main/${entry.path}?inline=false`;
+				const downloadLink = `https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${branchName}/${entry.path}?inline=false`;
 				console.log("正在下载更新文件", entry.path);
 				const data = await fetch(downloadLink).then((v) => v.blob());
 				return {
@@ -135,21 +135,17 @@ async function checkLatestVersion(
 		} catch {}
 	} else {
 		// 根据 Commit Hash 检查开发分支版本
+		const GITHUB_DIST_MANIFEST_URL = `https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${branch}/dist/manifest.json?inline=false`;
 
 		try {
-			const branches: RepoBranch[] = await fetch(
-				"https://gitcode.net/api/v4/projects/228337/repository/branches",
+			const manifest: typeof import("../../manifest.json") = await fetch(
+				GITHUB_DIST_MANIFEST_URL,
 			).then((v) => v.json());
-			const latestBranch: RepoBranch | undefined = branches.find(
-				(v) => v.name === branch,
-			);
-			if (latestBranch) {
-				if (cachedLatestVersion !== latestBranch.name) {
-					GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
-				}
-				cachedLatestVersion = latestBranch.commit.id;
-				return cachedLatestVersion;
+			if (cachedLatestVersion !== manifest.commit) {
+				GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
 			}
+			cachedLatestVersion = manifest.commit;
+			return cachedLatestVersion;
 		} catch {}
 	}
 
