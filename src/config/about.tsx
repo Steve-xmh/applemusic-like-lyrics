@@ -1,7 +1,6 @@
 import { Title, Button, Text, Alert, Select } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
-import { version } from "../../manifest.json";
 import { useConfig, useConfigValueBoolean } from "../api/react";
 import {
 	installLatestBranchVersion,
@@ -23,7 +22,10 @@ export const AboutPage: React.FC = () => {
 			<Title order={2}>关于</Title>
 			<Text>Apple Music-like lyrics</Text>
 			{enableUpdateBranch && <Text>当前分支：{updateBranch}</Text>}
-			<Text>当前版本：{version}</Text>
+			<Text>
+				当前版本：{plugin.mainPlugin.manifest.version} (
+				{plugin.mainPlugin.manifest.commit})
+			</Text>
 			{hasUpdates ? (
 				<Text>Github 有可用更新：{latestVersion}</Text>
 			) : (
@@ -65,6 +67,7 @@ export const AboutPage: React.FC = () => {
 										"完成安装后会自动重启网易云，请不要手动关闭网易云音乐！",
 									disallowClose: true,
 									loading: true,
+									autoClose: false,
 								});
 
 								await installLatestBranchVersion(updateBranch);
