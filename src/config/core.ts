@@ -5,8 +5,8 @@
  */
 
 import { GLOBAL_EVENTS } from "../utils/global-events";
-import { warn } from "../utils/logger";
-import { debounce, IS_WORKER } from "../utils";
+import { log, warn } from "../utils/logger";
+import { debounce, IS_WORKER, normalizePath } from "../utils";
 import { setConfigFromMain } from "../worker";
 
 export interface Config {
@@ -15,26 +15,29 @@ export interface Config {
 
 export let GLOBAL_CONFIG: Config = {};
 
+const getConfigPath = () =>
+	normalizePath(`${plugin.mainPlugin.pluginPath}/../../amll-data`);
+
+const getConfigFilePath = () =>
+	normalizePath(`${getConfigPath()}/amll-settings.json`);
+
 export async function loadConfig(): Promise<Config> {
 	if (IS_WORKER) {
 		return {};
 	}
 	try {
 		return JSON.parse(
-			await (
-				await betterncm.fs.readFile(
-					`${plugin.mainPlugin.pluginPath}/amll-settings.json`,
-				)
-			).text(),
+			await (await betterncm.fs.readFile(getConfigFilePath())).text(),
 		);
 	} catch (err) {
 		warn("警告：AMLL 插件配置读取失败", err);
-		return {};
 	}
+	return {};
 }
 
 export async function initConfig() {
 	GLOBAL_CONFIG = await loadConfig();
+	log("AMLL 插件配置初始化完毕");
 }
 
 export function getFullConfig(): {
@@ -53,17 +56,21 @@ export async function forceSaveConfig() {
 		return;
 	}
 	try {
+		if (!(await betterncm.fs.exists(getConfigPath()))) {
+			await betterncm.fs.mkdir(getConfigPath());
+		}
 		await betterncm.fs.writeFile(
-			`${plugin.mainPlugin.pluginPath}/amll-settings.json`,
+			getConfigFilePath(),
 			JSON.stringify(GLOBAL_CONFIG),
 		);
+		log("AMLL 插件配置保存成功");
 	} catch (err) {
 		warn("警告：AMLL 插件配置保存失败", err);
 	}
 	GLOBAL_EVENTS.dispatchEvent(new Event("config-saved"));
 }
 
-export const saveConfig = debounce(forceSaveConfig, 250);
+export const saveConfig = debounce(forceSaveConfig, 500);
 
 export function setConfig(key: string, value?: string) {
 	if (!IS_WORKER) setConfigFromMain({ [key]: value });

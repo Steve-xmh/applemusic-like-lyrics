@@ -492,6 +492,7 @@ declare namespace betterncm_native {
 		): void;
 
 		export function readFileText(filePath: string): string;
+		export function writeFileText(filePath: string, text: string);
 
 		export function readDir(filePath: string): string[];
 
