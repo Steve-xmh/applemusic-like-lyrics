@@ -1,52 +1,52 @@
 {
-    "manifest_version": 1,
-    "name": "Apple Music-like lyrics",
-    "slug": "Apple-Musiclike-lyrics",
-    "author": "SteveXMH",
-    "author_links": [
-        "https://github.com/Steve-xmh",
-        "https://github.com/Steve-xmh/applemusic-like-lyrics"
-    ],
-    "description": "一个基于 BetterNCM 的类 Apple Music 歌词显示插件",
-    "preview": "preview.svg",
-    "version": "2.0.0",
-    "commit": "!SET_BY_BUILD_SCRIPT!",
-    "type": "extension",
-    "noDevReload": true,
-    "requirements": [
-        "libsonginfo",
-        "liblyric"
-    ],
-    "loadAfter": [
-        "LibSongInfo",
-        "LibLyric",
-        "LibFrontendPlay"
-    ],
-    "incompatible": [
-        "RefinedNowPlaying"
-    ],
-    "betterncm_version": ">=1.0.0",
-    "injects": {
-        "Main": [
-            {
-                "file": "index.js"
-            }
-        ]
-    },
-    "hijacks": {
-        ">= 2.10.4 <= 2.10.6": {
-            "orpheus://orpheus/pub/core.": {
-                "type": "replace",
-                "id": "core-js-fake-function",
-                "from": "=Function.prototype;",
-                "to": "=window.FakeFunction||Function.prototype;"
-            },
-            "orpheus://orpheus/pub/app.html": {
-                "type": "replace",
-                "id": "csp-worker",
-                "from": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src ",
-                "to": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src data: blob: "
-            }
-        }
-    }
+	"manifest_version": 1,
+	"name": "Apple Music-like lyrics",
+	"slug": "Apple-Musiclike-lyrics",
+	"author": "SteveXMH",
+	"author_links": [
+		"https://github.com/Steve-xmh",
+		"https://github.com/Steve-xmh/applemusic-like-lyrics"
+	],
+	"description": "一个基于 BetterNCM 的类 Apple Music 歌词显示插件",
+	"preview": "preview.svg",
+	"version": "2.0.0",
+	"commit": "c24dfa4de3b293cfdb1ffebee4276c71db697bc5",
+	"type": "extension",
+	"noDevReload": true,
+	"requirements": [
+		"libsonginfo",
+		"liblyric"
+	],
+	"loadAfter": [
+		"LibSongInfo",
+		"LibLyric",
+		"LibFrontendPlay"
+	],
+	"incompatible": [
+		"RefinedNowPlaying"
+	],
+	"betterncm_version": ">=1.0.0",
+	"injects": {
+		"Main": [
+			{
+				"file": "index.js"
+			}
+		]
+	},
+	"hijacks": {
+		">= 2.10.4 <= 2.10.6": {
+			"orpheus://orpheus/pub/core.": {
+				"type": "replace",
+				"id": "core-js-fake-function",
+				"from": "=Function.prototype;",
+				"to": "=window.FakeFunction||Function.prototype;"
+			},
+			"orpheus://orpheus/pub/app.html": {
+				"type": "replace",
+				"id": "csp-worker",
+				"from": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src ",
+				"to": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src data: blob: "
+			}
+		}
+	}
 }
