@@ -1,7 +1,6 @@
 import * as React from "react";
 import semverGt from "semver/functions/gt";
 import { normalizePath } from ".";
-import { version, commit } from "../../manifest.json";
 import { useConfigValue, useConfigValueBoolean } from "../api/react";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";
@@ -203,10 +202,10 @@ export function useHasUpdates(): boolean {
 		if (latestVersion !== "") {
 			if (branch === "main" || !enableUpdateBranch) {
 				try {
-					return semverGt(latestVersion, version);
+					return semverGt(latestVersion, plugin.mainPlugin.manifest.version);
 				} catch {}
 			}
-			return latestVersion !== commit;
+			return latestVersion !== plugin.mainPlugin.manifest.commit;
 		} else {
 			return false;
 		}
