@@ -1,6 +1,5 @@
 import * as React from "react";
 import { getConfig, setConfig } from "../config/core";
-import { version } from "../../manifest.json";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
 import { getNCMImageUrl, getPlayingSong, loadLyric } from ".";
@@ -11,7 +10,6 @@ import {
 	lyricErrorAtom,
 	musicIdAtom,
 } from "../core/states";
-import semverGt from "semver/functions/gt";
 
 export function useConfig(
 	key: string,
@@ -156,71 +154,6 @@ export function useFMOpened(): boolean {
 	}, []);
 
 	return value;
-}
-
-let cachedLatestVersion: string | undefined;
-
-export async function checkGithubLatestVersion(force = false): Promise<string> {
-	// https://ghproxy.com/https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
-	// https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json
-
-	if (force) {
-		cachedLatestVersion = undefined;
-	}
-
-	if (cachedLatestVersion !== undefined) {
-		return cachedLatestVersion;
-	}
-
-	const GITHUB_DIST_MANIFEST_URL =
-		"https://raw.githubusercontent.com/Steve-xmh/applemusic-like-lyrics/main/dist/manifest.json";
-
-	try {
-		const manifest = (await (
-			await fetch(`https://ghproxy.com/${GITHUB_DIST_MANIFEST_URL}`)
-		).json()) as typeof import("../../dist/manifest.json");
-		if (cachedLatestVersion !== manifest.version) {
-			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
-		}
-		cachedLatestVersion = manifest.version;
-		return cachedLatestVersion;
-	} catch {}
-
-	try {
-		const manifest = (await (
-			await fetch(GITHUB_DIST_MANIFEST_URL)
-		).json()) as typeof import("../../dist/manifest.json");
-		if (cachedLatestVersion !== manifest.version) {
-			GLOBAL_EVENTS.dispatchEvent(new Event("latest-version-updated"));
-		}
-		cachedLatestVersion = manifest.version;
-		return cachedLatestVersion;
-	} catch {}
-
-	return cachedLatestVersion || "";
-}
-
-export function useGithubLatestVersion(): string {
-	const [version, setVersion] = React.useState("");
-
-	React.useEffect(() => {
-		const checkUpdate = () => checkGithubLatestVersion().then(setVersion);
-		checkUpdate();
-		GLOBAL_EVENTS.addEventListener("latest-version-updated", checkUpdate);
-		return () => {
-			GLOBAL_EVENTS.removeEventListener("latest-version-updated", checkUpdate);
-		};
-	}, []);
-
-	return version;
-}
-
-export function useHasUpdates(): boolean {
-	const githubVersion = useGithubLatestVersion();
-	return React.useMemo(
-		() => githubVersion !== "" && semverGt(githubVersion, version),
-		[githubVersion],
-	);
 }
 
 export const EMPTY_IMAGE_URL =

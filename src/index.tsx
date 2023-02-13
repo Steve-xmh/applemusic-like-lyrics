@@ -6,7 +6,7 @@ import { GLOBAL_EVENTS } from "./utils/global-events";
 import { clearCache } from "canvas-hypertxt";
 import * as React from "react";
 import { MantineProvider, createStyles, Title } from "@mantine/core";
-import { getConfig, getFullConfig } from "./config/core";
+import { getConfig, getFullConfig, initConfig } from "./config/core";
 import { currentWorkerScript, restartWorker } from "./worker";
 
 export let cssContent = "";
@@ -178,7 +178,9 @@ export function reloadStylesheet(content: string) {
 }
 
 let hideTimer: number = 0;
-plugin.onLoad(() => {
+plugin.onLoad(async () => {
+	// 加载配置
+	await initConfig();
 	try {
 		checkEapiRequestFuncName(); // 触发一次检查请求函数名字
 	} catch {}

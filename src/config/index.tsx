@@ -2,6 +2,7 @@ import * as React from "react";
 import { ThemeProvider } from "..";
 import { createRoot } from "react-dom/client";
 import { Tabs, Container, Indicator, Space } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
 import { AboutPage } from "./about";
 import { useHasWarnings, WarningsList } from "./warnings";
 import { LyricSettings } from "./lyric";
@@ -10,9 +11,11 @@ import { SongInfoStyleSettings } from "./song-info-style";
 import { OtherStyleSettings } from "./other-style";
 import { LyricSourceSettings } from "./lyric-source";
 import { CustomCSSSettings } from "./custom-css";
-import { useHasUpdates } from "../api/react";
+import { useHasUpdates } from "../utils/updater";
 import { Provider } from "jotai";
+import { showNotification } from "@mantine/notifications";
 import { BackgroundSettings } from "./background";
+import { getConfig } from "./core";
 
 const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 	return (
@@ -26,6 +29,21 @@ const PanelWrapper: React.FC<React.PropsWithChildren> = (props) => {
 const ConfigComponent: React.FC = () => {
 	const hasWarnings = useHasWarnings();
 	const hasUpdates = useHasUpdates();
+	const [checkedUpdate, setCheckedUpdate] = React.useState(false);
+
+	React.useEffect(() => {
+		if (
+			!checkedUpdate &&
+			hasUpdates &&
+			getConfig("enableAutoCheckUpdate", "true") === "true"
+		) {
+			setCheckedUpdate(true);
+			showNotification({
+				title: "AMLL 有可用更新！",
+				message: "前往 AMLL 插件设置 - 关于页面 以更新插件！",
+			});
+		}
+	}, [checkedUpdate, hasUpdates]);
 
 	return (
 		<Tabs
@@ -117,7 +135,9 @@ plugin.onConfig(() => {
 	createRoot(root).render(
 		<Provider>
 			<ThemeProvider>
-				<ConfigComponent />
+				<NotificationsProvider className="amll-notifications-provider">
+					<ConfigComponent />
+				</NotificationsProvider>
 			</ThemeProvider>
 		</Provider>,
 	);
