@@ -7,30 +7,34 @@
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { warn } from "../utils/logger";
 import { debounce, IS_WORKER } from "../utils";
-import { slug } from "../../manifest.json";
 import { setConfigFromMain } from "../worker";
 
 export interface Config {
 	[key: string]: string | undefined;
 }
 
-const PLUGIN_CONFIG_KEY = `config.betterncm.${
-	"plugin" in globalThis
-		? plugin?.manifest?.slug || plugin?.manifest?.name || slug
-		: slug
-}`;
-export let GLOBAL_CONFIG: Config = loadConfig();
+export let GLOBAL_CONFIG: Config = {};
 
-export function loadConfig(): Config {
+export async function loadConfig(): Promise<Config> {
 	if (IS_WORKER) {
 		return {};
 	}
 	try {
-		return JSON.parse(localStorage.getItem(PLUGIN_CONFIG_KEY) || "{}");
+		return JSON.parse(
+			await (
+				await betterncm.fs.readFile(
+					`${plugin.mainPlugin.pluginPath}/amll-settings.json`,
+				)
+			).text(),
+		);
 	} catch (err) {
 		warn("警告：AMLL 插件配置读取失败", err);
 		return {};
 	}
+}
+
+export async function initConfig() {
+	GLOBAL_CONFIG = await loadConfig();
 }
 
 export function getFullConfig(): {
@@ -39,18 +43,27 @@ export function getFullConfig(): {
 	return GLOBAL_CONFIG || {};
 }
 
-export const saveConfig = debounce(function saveConfig() {
+if (!IS_WORKER) {
+	window.addEventListener("unload", forceSaveConfig);
+}
+
+export async function forceSaveConfig() {
 	if (IS_WORKER) {
 		GLOBAL_EVENTS.dispatchEvent(new Event("config-saved"));
 		return;
 	}
 	try {
-		localStorage.setItem(PLUGIN_CONFIG_KEY, JSON.stringify(GLOBAL_CONFIG));
+		await betterncm.fs.writeFile(
+			`${plugin.mainPlugin.pluginPath}/amll-settings.json`,
+			JSON.stringify(GLOBAL_CONFIG),
+		);
 	} catch (err) {
 		warn("警告：AMLL 插件配置保存失败", err);
 	}
 	GLOBAL_EVENTS.dispatchEvent(new Event("config-saved"));
-}, 2000);
+}
+
+export const saveConfig = debounce(forceSaveConfig, 250);
 
 export function setConfig(key: string, value?: string) {
 	if (!IS_WORKER) setConfigFromMain({ [key]: value });

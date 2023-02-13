@@ -5,6 +5,7 @@ import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { execSync } from "child_process";
 import manifest from "./manifest.json" assert { type: "json" };
 
 let entryPoints = [
@@ -16,6 +17,20 @@ let entryPoints = [
 
 const IS_DEV = process.argv.includes("--dev");
 
+function getCommitHash() {
+	try {
+		return execSync("git rev-parse HEAD", { stdio: "pipe" })
+			.toString("utf8")
+			.trim();
+	} catch (err) {
+		console.warn("警告：获取 Git Commit Hash 失败", err);
+		return "";
+	}
+}
+
+manifest.commit = getCommitHash();
+
+/** @type {any[]} */
 const plugins = [
 	sassPlugin(),
 	glsl({
@@ -103,21 +118,18 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 						recursive: true,
 					});
 				}
-				let shouldCopyManifest = true;
+				let shouldOverwriteManifest = true;
+				const curData = JSON.stringify(manifest, null, "\t");
 				if (fs.existsSync(path.resolve(devPath, "manifest.json"))) {
-					const curData = fs.readFileSync("manifest.json", {
-						encoding: "utf8",
-					});
 					const data = fs.readFileSync(path.resolve(devPath, "manifest.json"), {
 						encoding: "utf8",
 					});
-					shouldCopyManifest = curData !== data;
+					shouldOverwriteManifest = curData !== data;
 				}
-				if (shouldCopyManifest) {
-					fs.copyFileSync(
-						"manifest.json",
-						path.resolve(devPath, "manifest.json"),
-					);
+				if (shouldOverwriteManifest) {
+					fs.writeFileSync(path.resolve(devPath, "manifest.json"), curData, {
+						encoding: "utf8",
+					});
 				}
 			}
 
