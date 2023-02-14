@@ -7,4 +7,5 @@ export const BlurAlbumMethod: BackgroundRenderMethod = {
 	value: "blur-album",
 	fragmentShaderCode,
 	afterDrawArray() {},
+	configurableUniforms: [""],
 };

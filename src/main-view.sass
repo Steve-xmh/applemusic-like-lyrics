@@ -47,6 +47,12 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     .am-lyric-background
         z-index: -1
+        &.am-lyric-bg-album-image::after
+            position: absolute
+            width: 100%
+            height: 100%
+            content: " "
+            backdrop-filter: blur(20vh) brightness(70%)
 
     .am-lyric-view-loading
         flex: 1
@@ -358,7 +364,7 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     &.font-shadow
         .am-lyric-view, .am-music-info
-            filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #7774)
+            filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
 
     .am-lyric-line
         font-weight: bold

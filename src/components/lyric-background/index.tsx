@@ -14,7 +14,7 @@ import { normalizeColor } from "../../utils/color";
 import { BlurAlbumMethod } from "./blur-album";
 import { getConfig } from "../../config/core";
 
-export const LyricBackground: React.FC = () => {
+const LyricCanvasBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const rendererRef = React.useRef<CanvasBackgroundRender | null>(null);
 	const albumImageMainColors = useAtomValue(albumImageMainColorsAtom);
@@ -215,4 +215,60 @@ export const LyricBackground: React.FC = () => {
 			)}
 		</>
 	);
+};
+
+const LyricAlbumImageBackground: React.FC = () => {
+	const musicId = useAtomValue(musicIdAtom);
+	const [albumImageLoaded, albumImage, albumImageUrl] = useAlbumImage(musicId);
+	const [currentBG, setCurrentBG] = React.useState("");
+
+	React.useEffect(() => {
+		let canceled = false;
+		(async () => {
+			try {
+				if (albumImageLoaded && albumImage) {
+					try {
+						await albumImage.decode();
+					} catch (err) {
+						warn("图片解码失败，将直接设置", err);
+					}
+					setCurrentBG(albumImageUrl);
+				}
+			} catch (err) {
+				warn("更新专辑图片到背景时发生错误", err);
+			}
+		})();
+		return () => {
+			canceled = true;
+		};
+	}, [albumImageLoaded, albumImage, albumImageUrl]);
+	return (
+		<div
+			className="am-lyric-background am-lyric-bg-album-image"
+			style={{
+				position: "fixed",
+				left: "0",
+				top: "0",
+				width: "100%",
+				height: "100%",
+				color: "yellow",
+				backgroundImage: `url(${currentBG})`,
+				backgroundPosition: "center",
+				backgroundSize: "cover",
+			}}
+		/>
+	);
+};
+
+export const LyricBackground: React.FC = () => {
+	const backgroundRenderMethod = useConfigValue(
+		"backgroundRenderMethod",
+		BlurAlbumMethod.value,
+	);
+
+	if (backgroundRenderMethod === "blur-album") {
+		return <LyricAlbumImageBackground />;
+	} else {
+		return <LyricCanvasBackground />;
+	}
 };

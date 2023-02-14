@@ -9,7 +9,6 @@ import { LyricSettings } from "./lyric";
 import { LyricStyleSettings } from "./lyric-style";
 import { SongInfoStyleSettings } from "./song-info-style";
 import { OtherStyleSettings } from "./other-style";
-import { LyricSourceSettings } from "./lyric-source";
 import { CustomCSSSettings } from "./custom-css";
 import { useHasUpdates } from "../utils/updater";
 import { Provider } from "jotai";
@@ -65,7 +64,6 @@ const ConfigComponent: React.FC = () => {
 				<Tabs.Tab value="song-info-style">歌曲信息样式设置</Tabs.Tab>
 				<Tabs.Tab value="background">背景设置</Tabs.Tab>
 				<Tabs.Tab value="other-style">其它样式设置</Tabs.Tab>
-				<Tabs.Tab value="lyric-source">EAPI 函数设置</Tabs.Tab>
 				<Tabs.Tab value="custom-css">自定义 CSS 设置</Tabs.Tab>
 				<Tabs.Tab value="about">
 					{hasUpdates ? (
@@ -106,11 +104,6 @@ const ConfigComponent: React.FC = () => {
 			<Tabs.Panel value="other-style">
 				<PanelWrapper>
 					<OtherStyleSettings />
-				</PanelWrapper>
-			</Tabs.Panel>
-			<Tabs.Panel value="lyric-source">
-				<PanelWrapper>
-					<LyricSourceSettings />
 				</PanelWrapper>
 			</Tabs.Panel>
 			<Tabs.Panel value="custom-css">

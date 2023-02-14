@@ -52,13 +52,7 @@ export interface BackgroundRenderMethod {
 	label: string;
 	value: string;
 	description?: string;
-	configs?: {
-		name: string;
-		defineType: DefineType;
-		min: number;
-		max: number;
-		step?: number;
-	}[];
+	configurableUniforms?: string[];
 }
 
 export class CanvasBackgroundRender {
@@ -92,9 +86,13 @@ export class CanvasBackgroundRender {
 		}
 	}
 	setRenderMethod(renderMethod: BackgroundRenderMethod) {
+		this.resetTime();
 		this.rebuildShader(renderMethod.fragmentShaderCode);
 		this.rebuildProgram();
 		this.currentRenderMethod = renderMethod;
+	}
+	resetTime() {
+		this.createTime = Date.now();
 	}
 	resize(
 		width = this.canvas.width,

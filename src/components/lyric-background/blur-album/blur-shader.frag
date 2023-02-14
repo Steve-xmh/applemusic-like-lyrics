@@ -20,8 +20,7 @@ uniform vec2 albumImageRes; // 专辑图片的大小，单位像素
 
 #define KSIZE ((SIZE - 1) / 2)
 
-vec3 rgb2hsv(vec3 c)
-{
+vec3 rgb2hsv(vec3 c) {
     vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
     vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
     vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
@@ -38,16 +37,35 @@ vec3 hsv2rgb(vec3 c) {
     return c.z * mix(hsv2rgb_K.xxx, clamp(p - hsv2rgb_K.xxx, 0.0, 1.0), c.y);
 }
 
-float normpdf(in float x, in float sigma) {
-    return 0.39894 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
+vec4 blur(int blurRadius, sampler2D sampler, float width, float height, vec2 pos) {
+    const float PI = 3.14159265;
+    const int maxBlur = 100;
+
+    int center = blurRadius;
+    int MatrixR = 2 * blurRadius + 1;
+    float sita = pow(float(blurRadius) / 6.0, 2.0);
+    float sum = 0.0;
+    vec4 sumVec4 = vec4(0.0);
+
+    for(int i = 0; i < maxBlur; i++) if(i < MatrixR) {
+
+            for(int j = 0; j < maxBlur; j++) if(j < MatrixR) {
+                    float x = float(i - center);
+                    float y = float(j - center);
+
+                    float weight = 0.5 / PI / sita * exp(-(pow(x, 2.0) + pow(y, 2.0)) / sita / 2.0);
+                    sum += weight;
+                    vec4 v = texture2D(sampler, vec2(pos.x + x / width, pos.y + y / height), 64.);
+                    sumVec4 += v * weight;
+                }
+        }
+    return vec4(sumVec4.r / sum, sumVec4.g / sum, sumVec4.b / sum, sumVec4.a / sum);
 }
 
 void main() {
-    const int size = SIZE; // 模糊大小（像素）
-    const int ksize = KSIZE;
-    
+
     vec2 uv = gl_FragCoord.xy / resolution.xy;
-    
+
     // TODO: 矫正大小并使其居中
     float w = resolution.x;
     float h = resolution.y;
@@ -57,12 +75,14 @@ void main() {
     float nw = iw * r;
     float nh = ih * r;
     float ar = 1.0;
-    
-    if (nw < w) ar = w / nw;
-    if (abs(ar - 1.0) < 0.00000000000001 && nh < h) ar = h / nh;
+
+    if(nw < w)
+        ar = w / nw;
+    if(abs(ar - 1.0) < 0.00000000000001 && nh < h)
+        ar = h / nh;
     nw *= ar;
     nh *= ar;
-    
+
     float cw = max(0.0, iw / (nw / w));
     float ch = max(0.0, ih / (nh / h));
     float cx = min(iw, iw - cw);
@@ -71,43 +91,22 @@ void main() {
     uv = gl_FragCoord.xy / resolution.xy;
     uv.x = (uv.x + 1.0) / 2.0;
     uv.y = (-uv.y + 1.0) / 2.0;
-    
+
     uv.x *= cw / iw;
     uv.x += (iw - cw) / 2.0 / iw;
-    
+
     uv.y *= ch / ih;
     uv.y += (ih - ch) / 2.0 / ih;
-    
+
     uv.x = (uv.x) * 2.0 - 1.0;
     uv.y = (uv.y) * 2.0 - 1.0;
-    
 
-    float kernel[size];
-    vec3 resultColor = vec3(0.0);
+    vec3 resultColor = blur(64, albumImage, resolution.x, resolution.y, uv).rgb;
 
-    float sigma = 16.0;
-    float Z = 0.0;
-    for(int j = 0; j <= ksize; j++) {
-        kernel[ksize - j] = normpdf(float(j), sigma);
-        kernel[ksize + j] = normpdf(float(j), sigma);
-    }
-
-    for(int j = 0; j < size; j++) {
-        Z += kernel[j];
-    }
-
-    for(int i = -ksize; i <= ksize; i++) {
-        for(int j = -ksize; j <= ksize; j++) {
-            resultColor += kernel[ksize + j] * kernel[ksize + i] * texture2D(albumImage, uv + vec2(float(i * STEP), float(j * STEP)) / resolution).rgb;
-        }
-    }
-    
-    resultColor /= Z * Z;
-    
     resultColor = rgb2hsv(resultColor);
-    
+
     resultColor.z = resultColor.z * 0.7;
-    
+
     resultColor = hsv2rgb(resultColor);
 
     gl_FragColor = vec4(resultColor, 1.0);

@@ -181,9 +181,6 @@ let hideTimer: number = 0;
 plugin.onLoad(async () => {
 	// 加载配置
 	await initConfig();
-	try {
-		checkEapiRequestFuncName(); // 触发一次检查请求函数名字
-	} catch {}
 
 	const setControlsVisibility = (visible: boolean) => {
 		if (visible) {
@@ -529,7 +526,6 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 import * as APIs from "./api";
 import * as Utils from "./utils";
 import * as WorkerAPIs from "./worker";
-import { checkEapiRequestFuncName } from "./api";
 import { log, warn } from "./utils/logger";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 import { Provider } from "jotai";
