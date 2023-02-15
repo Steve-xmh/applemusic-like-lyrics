@@ -9,16 +9,20 @@ import { Loader, Center } from "@mantine/core";
 import { LyricBackground } from "./lyric-background";
 import {
 	adjustLyricOffsetModalOpenedAtom,
+	albumAtom,
+	albumImageUrlAtom,
 	currentLyricsAtom,
 	lyricErrorAtom,
 	musicIdAtom,
 	rightClickedLyricAtom,
 	selectLocalLyricModalOpenedAtom,
 	selectMusicIdModalOpenedAtom,
+	songArtistsAtom,
+	songNameAtom,
 	topbarMenuOpenedAtom,
 } from "../core/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { LyricPlayerTopBar } from "./lyric-player-topbar";
+import { LyricPlayerOptions } from "./lyric-player-options";
 import { NoLyricOptions } from "./no-lyric-options";
 import { PlayerSongInfo, PlayerSongInfoMenuContent } from "./song-info";
 import { LyricRenderer, RendererBackend } from "./lyric-renderer";
@@ -92,7 +96,6 @@ export const LyricView: React.FC<{
 			{showBackground && <LyricBackground />}
 			<PlayerSongInfo isFM={props.isFM} />
 			<div className="am-lyric">
-				<LyricPlayerTopBar />
 				{error ? (
 					<div className="am-lyric-view-error">
 						<div>歌词加载失败：</div>
@@ -116,9 +119,10 @@ export const LyricView: React.FC<{
 						/>
 					</Center>
 				)}
+				<LyricPlayerOptions />
 			</div>
 			<ModalsWrapper />
-			<TopBarMenu
+			<MainMenu
 				isFullScreen={fullscreen}
 				onSetFullScreen={(v) => setFullscreen(v)}
 			/>
@@ -127,12 +131,16 @@ export const LyricView: React.FC<{
 	);
 };
 
-const TopBarMenu: React.FC<{
+const MainMenu: React.FC<{
 	isFullScreen: boolean;
 	onSetFullScreen: (shouldFullScreent: boolean) => void;
 }> = (props) => {
 	const [menuOpened, setMenuOpened] = useAtom(topbarMenuOpenedAtom);
 	const musicId = useAtomValue(musicIdAtom);
+	const album = useAtomValue(albumAtom);
+	const songName: string = useAtomValue(songNameAtom);
+	const songArtists = useAtomValue(songArtistsAtom);
+	const albumImageUrl = useAtomValue(albumImageUrlAtom);
 	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
 	const setSelectMusicIdModalOpened = useSetAtom(selectMusicIdModalOpenedAtom);
 	const setLocalLyricModalOpened = useSetAtom(selectLocalLyricModalOpenedAtom);
@@ -171,6 +179,82 @@ const TopBarMenu: React.FC<{
 			opened={menuOpened}
 			onClose={() => setMenuOpened(false)}
 		>
+			<MenuItem
+				label={`复制音乐 ID：${musicId}`}
+				onClick={() => {
+					setClipboardData(String(musicId));
+					setMenuOpened(false);
+				}}
+			/>
+			<MenuItem
+				label={`复制音乐名称：${songName}`}
+				onClick={() => {
+					setClipboardData(songName);
+					setMenuOpened(false);
+				}}
+			/>
+			{songArtists.length === 1 && (
+				<MenuItem
+					label={`查看歌手：${songArtists[0].name}`}
+					onClick={() => {
+						location.hash = `#/m/artist/?id=${songArtists[0].id}`;
+						setMenuOpened(false);
+					}}
+				/>
+			)}
+			{songArtists.length > 1 && (
+				<MenuItem label="查看歌手...">
+					{songArtists.map((a) => (
+						<MenuItem
+							label={a.name}
+							key={`song-artist-${a.id}`}
+							onClick={() => {
+								location.hash = `#/m/artist/?id=${a.id}`;
+								setMenuOpened(false);
+							}}
+						/>
+					))}
+				</MenuItem>
+			)}
+			{album && (
+				<MenuItem
+					label={`查看专辑：${album.name}`}
+					onClick={() => {
+						location.hash = `#/m/album/?id=${album?.id}`;
+						setMenuOpened(false);
+					}}
+				/>
+			)}
+			<MenuItem
+				label="复制专辑图片链接"
+				labelOnly={albumImageUrl === null}
+				onClick={() => {
+					// 去除缓存链接头
+					let t = albumImageUrl;
+					if (t) {
+						if (t.startsWith("orpheus://cache/?")) {
+							t = t.slice(17);
+						}
+						setClipboardData(t);
+						setMenuOpened(false);
+					}
+				}}
+			/>
+			<MenuItem
+				label="在浏览器打开专辑图片"
+				labelOnly={albumImageUrl === null}
+				onClick={() => {
+					let t = albumImageUrl;
+					if (t) {
+						if (t.startsWith("orpheus://cache/?")) {
+							t = t.slice(17);
+						}
+						betterncm.ncm.openUrl(t);
+						setMenuOpened(false);
+					}
+				}}
+			/>
+			<MenuDevider />
 			{isPlayerSongInfoHidden && (
 				<>
 					<PlayerSongInfoMenuContent onCloseMenu={() => setMenuOpened(false)} />

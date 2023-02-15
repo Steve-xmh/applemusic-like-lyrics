@@ -147,6 +147,40 @@ body.amll-lyric-page-open
     .u-result.u-result-play
         display: none
     
+    // 美化播放列表
+    .m-playlist
+        right: 5vw
+        width: calc(57.142857vw - 15vw)
+        background: transparent
+        box-shadow: none
+        margin-bottom: 40px
+        .listsub
+            display: none
+        .listbd
+            top: 67px
+        li.j-item
+            height: max(5vh, 50px)
+            display: flex
+            flex-direction: column
+            justify-content: space-evenly
+            padding: 5px 20px
+            font-size: max(2vh, 20px)
+            border-bottom: solid 1px #FFF4
+            &:nth-child(2n)
+                background: unset
+            &::before
+                content: none
+            > *
+                display: none
+                padding: unset
+                height: unset
+                width: unset
+            .ico, i
+                display: none
+            .title, .f-thide
+                display: block
+                line-height: unset
+    
     // 在显示歌词页面的时候隐藏主页面，减轻渲染压力
     #x-g-mn
         > .g-sd,
