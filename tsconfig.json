@@ -1,15 +1,20 @@
 {
     "include": [
         "./src/**/*.ts",
-        "./src/**/*.tsx"
-, "src/components/lyric-background/index copy.tsx.lock", "src/components/lyric-background/index copy.tsx.lock"    ],
+        "./src/**/*.tsx",
+    ],
     "exclude": [
         "./node_modules/@types/node/**/*.ts",
         "./build.mjs"
     ],
     "compilerOptions": {
         "target": "ESNext",
-        "lib": ["ESNext", "DOM", "WebWorker"],
+        "lib": [
+            "ESNext",
+            "DOM",
+            "WebWorker",
+            "DOM.Iterable"
+        ],
         "module": "ESNext",
         "types": [],
         "jsx": "react-jsx",

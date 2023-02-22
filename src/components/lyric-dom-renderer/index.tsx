@@ -15,7 +15,12 @@ import { LyricLine } from "../../core/lyric-parser";
 import { guessTextReadDuration } from "../../utils";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
-import BezierEasing from "../../libs/bezier-easing";
+
+export interface LyricLineTransform {
+	top: number;
+	scale: number;
+	duration: number;
+}
 
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
@@ -34,199 +39,116 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
 	const alignTopSelectedLyric = useConfigValueBoolean(
 		"alignTopSelectedLyric",
 		false,
 	);
 
-	const scrollTween = React.useRef<
-		| {
-				lyricElement: Element;
-				id: Symbol;
-		  }
-		| undefined
-	>(undefined);
-	const forceScrollId = React.useRef(0);
+	const lineHeights = React.useRef<[number, boolean][]>([]);
+	const [scrollTop, setScrollTop] = React.useState(0);
+	const viewHeight = React.useRef<number>(window.innerHeight);
+	const [lineTransforms, setLineTransforms] = React.useState<
+		LyricLineTransform[]
+	>([]);
+
 	const scrollDelayRef = React.useRef(0);
+	const cachedLyricIndex = React.useRef(currentLyricIndex);
 	const scrollToLyric = React.useCallback(
-		(mustScroll: boolean = false) => {
+		(
+			mustScroll: boolean = false,
+			currentLyricIndex = cachedLyricIndex.current,
+		) => {
+			cachedLyricIndex.current = currentLyricIndex;
 			if (lyricListElement.current) {
-				const lyricView = lyricListElement.current.parentElement;
-				let scrollToIndex = currentLyricIndex;
+				let scrollToIndex = cachedLyricIndex.current;
 				for (const i of keepSelectLyrics.current) {
 					if (scrollToIndex > i) {
 						scrollToIndex = i;
 					}
 				}
-				let lyricElement: HTMLElement | null =
-					lyricListElement.current.children.item(scrollToIndex) as HTMLElement;
-				if (lyricElement && lyricView) {
-					if (mustScroll) {
-						scrollTween.current = undefined;
-					}
-					if (lyricElement !== scrollTween.current?.lyricElement) {
-						function calculateScrollDelta() {
-							let scrollDelta = 0;
-							if (lyricView && lyricElement && lyricListElement.current) {
-								const listRect = lyricView.getBoundingClientRect();
-								const lineRect = lyricElement.getBoundingClientRect();
-								const lineHeight = lineRect.height;
-								scrollDelta = lineRect.top - listRect.top;
-								if (!alignTopSelectedLyric) {
-									scrollDelta -= (window.innerHeight - lineHeight) / 2;
-								} else if (lyricElement.innerText.trim().length > 0) {
-									scrollDelta -= listRect.height * 0.1;
-								} else {
-									scrollDelta -=
-										window.innerHeight * 0.06 + listRect.height * 0.1;
-								}
-								// 三点动画补偿
-								const lastLyricLine = lyricListElement.current.children.item(
-									lastIndex.current,
-								) as HTMLElement;
-								if (lastLyricLine?.classList.contains("am-lyric-dots")) {
-									scrollDelta -= lastLyricLine.getBoundingClientRect().height;
-								}
-							}
-							return scrollDelta;
-						}
+				const curLineHeight = lineHeights.current[scrollToIndex]?.[0] ?? 0;
+				const scaleRatio = lyricScaleEffect ? 0.8 : 1;
 
-						if (mustScroll) {
-							const id = ++forceScrollId.current;
-							const onFrame = () => {
-								if (
-									lyricElement &&
-									!scrollTween.current &&
-									id === forceScrollId.current
-								) {
-									const prevScrollTop = lyricView.scrollTop;
-									const scrollDelta = calculateScrollDelta();
-									if (Math.abs(scrollDelta) > 10) {
-										lyricView.scrollTo(0, prevScrollTop + scrollDelta);
-										requestAnimationFrame(onFrame);
-									}
-								}
-							};
+				let scrollHeight = -lineHeights.current
+					.slice(0, scrollToIndex)
+					.reduce((pv, cv) => pv + (cv[1] ? 0 : cv[0] * scaleRatio), 0);
 
-							requestAnimationFrame(onFrame);
-						} else {
-							const id = Symbol("scroll-symbol");
-							const scrollDelta = calculateScrollDelta();
-
-							const e = BezierEasing(0.65, 0, 0.35, 1);
-							const easing = (n: number) => e(n);
-
-							const duration = 500;
-
-							if (scrollDelta > 0) {
-								let springElementIndex = scrollToIndex;
-								let affected = 1;
-								while (true) {
-									const s = lyricListElement.current.children.item(
-										++springElementIndex,
-									);
-									if (!s || affected > 10) break;
-									// log("弹簧元素", affected, springElementIndex, s);
-									if (s.classList.contains("am-lyric-line")) {
-										const subDuration = duration + affected * 100;
-										const offset = Math.sqrt(scrollDelta);
-										if (Math.abs(offset) < 1) {
-											break;
-										}
-										const animation: Keyframe[] = [
-											{
-												transform: "translateY(0px)",
-												offset: 0.0,
-												composite: "add",
-											},
-										];
-
-										const totalFrame = (subDuration / 1000) * 60;
-										const halfFrame = totalFrame / 2;
-										for (let i = 0; i < halfFrame; i++) {
-											animation.push({
-												transform: `translateY(${
-													easing(i / halfFrame) * offset
-												}px)`,
-												composite: "add",
-											});
-										}
-
-										animation.push({
-											transform: `translateY(${offset}px)`,
-											composite: "add",
-										});
-
-										for (let i = 0; i < halfFrame; i++) {
-											animation.push({
-												transform: `translateY(${
-													offset - easing(i / halfFrame) * offset
-												}px)`,
-												composite: "add",
-											});
-										}
-
-										animation.push({
-											transform: "translateY(0px)",
-											composite: "add",
-										});
-
-										s.animate(animation, subDuration);
-										affected++;
-									}
-								}
-							}
-
-							const tweenArray: number[] = [];
-
-							const amount = Math.floor((duration / 1000) * 60);
-							for (let i = 0; i < amount; i++) {
-								tweenArray.push(easing(i / amount) * scrollDelta);
-							}
-
-							for (let i = tweenArray.length - 1; i > 0; i--) {
-								tweenArray[i] -= tweenArray[i - 1];
-							}
-							if (tweenArray[0]) {
-								tweenArray[0] = 0;
-							}
-
-							let lastIndex = 0;
-							let lastTime: number;
-							let called = 0;
-							// log("scrollDelta", scrollDelta, "tweenArray", tweenArray);
-							const onFrameUpdate = (curTime: number) => {
-								lastTime ??= curTime;
-								const d = curTime - lastTime;
-								if (
-									scrollTween.current?.id === id &&
-									lastIndex < tweenArray.length
-								) {
-									const li = lastIndex;
-									const ci = Math.floor((d / 1000) * 60);
-									for (let i = li; i < ci; i++) {
-										lyricView.scrollBy(0, tweenArray[i]);
-										lastIndex = i + 1;
-										called++;
-									}
-									requestAnimationFrame(onFrameUpdate);
-								} else {
-									// log("called", called, "lastIndex", lastIndex);
-								}
-							};
-							scrollTween.current = {
-								lyricElement,
-								id: id,
-							};
-							requestAnimationFrame(onFrameUpdate);
-						}
-					}
-				} else {
+				if (!alignTopSelectedLyric) {
+					scrollHeight += (viewHeight.current - curLineHeight) / 2;
 				}
+
+				let i = 0;
+				const result: LyricLineTransform[] = [];
+				for (const height of lineHeights.current) {
+					const lineTransform = {
+						top: scrollHeight,
+						scale: scaleRatio,
+						duration: mustScroll ? 0 : 500,
+					};
+					if (i === scrollToIndex || keepSelectLyrics.current.has(i)) {
+						lineTransform.scale = 1;
+						if (lineHeights.current[i][1]) {
+							scrollHeight += curLineHeight * lineTransform.scale;
+						}
+					}
+					i++;
+					if (!height[1]) {
+						scrollHeight += height[0] * lineTransform.scale;
+					}
+					result.push(lineTransform);
+				}
+
+				setLineTransforms(result);
+				setScrollTop(0);
 			}
 		},
-		[currentLyricIndex, alignTopSelectedLyric],
+		[alignTopSelectedLyric, lyricScaleEffect],
 	);
+
+	const recalculateLineHeights = React.useCallback(() => {
+		// 计算每个歌词行的高度，用于布局计算
+		const el = lyricListElement.current;
+		if (el) {
+			lineHeights.current = [...el.children].map((el) => [
+				el.clientHeight,
+				el.classList.contains("am-lyric-dots"),
+			]);
+		}
+	}, []);
+
+	React.useLayoutEffect(() => {
+		scrollDelayRef.current = 0;
+		cachedLyricIndex.current = 0;
+		keepSelectLyrics.current.clear();
+		recalculateLineHeights();
+		scrollToLyric(true);
+	}, [
+		currentLyrics,
+		configTranslatedLyric,
+		configDynamicLyric,
+		configRomanLyric,
+		alignTopSelectedLyric,
+	]);
+
+	React.useLayoutEffect(() => {
+		const el = lyricListElement.current;
+		if (el) {
+			viewHeight.current = el.clientHeight;
+
+			const obz = new ResizeObserver(() => {
+				viewHeight.current = el.clientHeight;
+				recalculateLineHeights();
+				scrollToLyric(true);
+			});
+
+			obz.observe(el);
+
+			return () => {
+				obz.disconnect();
+			};
+		}
+	}, [scrollToLyric, recalculateLineHeights, alignTopSelectedLyric]);
 
 	React.useLayoutEffect(() => {
 		const btn = document.querySelector("a[data-action='max']");
@@ -374,7 +296,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			Date.now() - scrollDelayRef.current > 2000
 		) {
 			checkIfTooFast(currentLyricIndex);
-			scrollToLyric();
+			scrollToLyric(false, currentLyricIndex);
 		} else {
 			lastIndex.current = currentLyricIndex;
 		}
@@ -387,62 +309,65 @@ export const LyricDOMRenderer: React.FC = () => {
 	]);
 
 	React.useLayoutEffect(() => {
-		scrollToLyric(true);
-		scrollDelayRef.current = 0;
-		keepSelectLyrics.current.clear();
-	}, [
-		configTranslatedLyric,
-		configDynamicLyric,
-		configRomanLyric,
-		currentLyrics,
-	]);
+		const el = lyricListElement.current;
+		if (el) {
+			const onLyricScroll = (evt: WheelEvent) => {
+				evt.preventDefault();
+				evt.stopPropagation();
+				scrollDelayRef.current = Date.now();
+				setScrollTop((x) => {
+					return x - evt.deltaY;
+				});
+				return false;
+			};
 
-	const onLyricScroll = (_evt: React.MouseEvent) => {
-		scrollDelayRef.current = Date.now();
-	};
+			el.addEventListener("wheel", onLyricScroll, { passive: false });
 
-	const mapCurrentLyrics = React.useCallback(
-		(line: LyricLine, index: number, _lines: LyricLine[]) => {
-			let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
-			const offset = index - currentLyricIndex;
-			if (line.originalLyric.trim().length > 0) {
-				return (
-					<LyricLineView
-						key={`${index}-${line.time}-${line.originalLyric}`}
-						selected={index === currentLyricIndex || isTooFast}
-						line={line}
-						translated={configTranslatedLyric}
-						dynamic={configDynamicLyric}
-						roman={configRomanLyric}
-						offset={offset}
-						onClickLyric={onSeekToLyric}
-					/>
-				);
-			} else {
-				return (
-					<LyricDots
-						key={`${index}-dots`}
-						selected={index === currentLyricIndex}
-						time={line.time}
-						offset={offset}
-						duration={line.duration}
-					/>
-				);
-			}
-		},
-		[
-			onSeekToLyric,
-			currentLyrics,
-			currentLyricIndex,
-			configDynamicLyric,
-			configTranslatedLyric,
-			configRomanLyric,
-		],
-	);
+			return () => {
+				el.removeEventListener("wheel", onLyricScroll);
+			};
+		}
+	}, []);
 
 	return (
-		<div className="am-lyric-view" onWheel={onLyricScroll}>
-			<div ref={lyricListElement}>{currentLyrics?.map(mapCurrentLyrics)}</div>
+		<div className="am-lyric-view">
+			<div
+				ref={lyricListElement}
+				style={{ transform: `translateY(${scrollTop}px)` }}
+			>
+				{currentLyrics?.map(
+					(line: LyricLine, index: number, _lines: LyricLine[]) => {
+						let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
+						const offset = index - currentLyricIndex;
+						if (line.originalLyric.trim().length > 0) {
+							return (
+								<LyricLineView
+									key={`${index}-${line.time}-${line.originalLyric}`}
+									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
+									selected={index === currentLyricIndex || isTooFast}
+									line={line}
+									translated={configTranslatedLyric}
+									dynamic={configDynamicLyric}
+									roman={configRomanLyric}
+									offset={offset}
+									onClickLyric={onSeekToLyric}
+								/>
+							);
+						} else {
+							return (
+								<LyricDots
+									key={`${index}-dots`}
+									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
+									selected={index === currentLyricIndex}
+									time={line.time}
+									offset={offset}
+									duration={line.duration}
+								/>
+							);
+						}
+					},
+				)}
+			</div>
 		</div>
 	);
 };

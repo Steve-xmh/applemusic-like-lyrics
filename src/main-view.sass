@@ -1,5 +1,5 @@
 $tween-animation-duration: 500ms
-$tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
+$tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
 @mixin slide-bar()
     height: 8px
@@ -245,16 +245,16 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
 
     .am-lyric-view
         flex: 1
-        overflow: hidden scroll
-        position: relative
+        overflow: hidden
         -webkit-mask-image: linear-gradient(#0000, #0000 5%, #000 10%, #000 90%, #0000 95%, #0000)
         &::-webkit-scrollbar
             display: none
         > *
-            padding: 50vh 0
-            position: absolute
-            padding-left: 2rem
-            padding-right: min(30%, 5vw, 600px)
+            height: 100%
+            width: 100%
+            max-width: 100%
+            > *
+                transition: all $tween-animation-duration $tween-animation-timing
 
     .am-lyric-view-no-lyric
         height: 100%
@@ -265,15 +265,6 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         flex-wrap: nowrap
         justify-content: center
         align-items: baseline
-
-    // 歌词缩放效果
-    &.lyric-scale-effect // lyricScaleEffect
-        .am-lyric-line
-            transform: scale(0.85)
-
-            &.am-lyric-line-o0,
-            &.am-lyric-line-selected
-                transform: scale(1)
 
     // 已播放歌词隐藏效果
     &.lyric-hide-passed
@@ -331,52 +322,19 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
     &.use-ping-fang-font *
         font-family: 'PingFang SC' !important
 
-    // 专辑图居左
-    &.align-left-album-image .am-album-image
-        align-self: flex-start !important
-
-    // 歌名居左
-    &.align-left-music-name .am-music-name
-        text-align: left !important
-
-    // 歌曲别名居左
-    &.align-left-music-alias .am-music-alias
-        text-align: left !important
-
-    // 歌手名居左
-    &.align-left-music-artists .am-music-artists
-        justify-content: left !important
-
-    // 专辑名居左
-    &.align-left-music-album .am-music-album
-        justify-content: left !important
-
-    // 隐藏歌手名标签
-    &.hide-music-artists-label .am-artists-label
-        display: none
-
-    // 隐藏专辑名标签
-    &.hide-music-album-label .am-album-label
-        display: none
-
-    // 歌词滚动位置向上对齐
-    &.align-top-selected-lyric
-        .am-lyric-view > *
-            padding-top: 10vh
-            padding-bottom: 100vh
-
     &.font-shadow
         .am-lyric-view, .am-music-info
             filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
 
     .am-lyric-line
+        position: absolute
+        will-change: transform, filter, opacity
         font-weight: bold
         mix-blend-mode: screen
         font-size: 5vh
-        padding: max(1rem, 1vh) 0
-        transform-origin: left
+        padding: max(1rem, 2.5vh) 0
+        transform-origin: top left
         color: var(--applemusic-like-lyrics-font-color, unset)
-        transition: all $tween-animation-duration $tween-animation-timing
         line-break: loose
         word-break: break-word
         > .am-lyric-line-original
@@ -444,9 +402,11 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                     transform: translateY(calc(-2px * ($i + $fade-width) / (100 + $fade-width)))
 
     .am-lyric-dots
-        height: 0px
-        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1), height 0.75s $tween-animation-timing
-        transform-origin: left
+        position: absolute
+        will-change: transform, filter, opacity
+        padding: max(1rem, 1vh) 0
+        height: 6vh
+        transform-origin: top left
         opacity: 0
 
         > *

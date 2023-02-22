@@ -217,6 +217,25 @@ export const NCMEnvWrapper: React.FC = () => {
 				"",
 			);
 		}
+		// let lastLine: LyricLine | null = null;
+		// for (const line of parsed) {
+		// 	const tweenDurationDelta = 500;
+		// 	line.time -= tweenDurationDelta;
+		// 	if (
+		// 		line.dynamicLyricTime &&
+		// 		line.dynamicLyric &&
+		// 		lastLine &&
+		// 		lastLine.dynamicLyricTime
+		// 	) {
+		// 		const tweenDurationDelta = Math.min(500);
+		// 		line.dynamicLyricTime -= tweenDurationDelta;
+		// 	}
+		// 	line.duration += tweenDurationDelta;
+		// 	lastLine = line;
+		// 	if (line.originalLyric === "") {
+		// 		lastLine = null;
+		// 	}
+		// }
 		// log(currentRawLyricResp, parsed);
 		setCurrentLyrics(parsed);
 		setCurrentLyricsIndex(-1);
@@ -380,6 +399,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			const time = (progress * 1000) | 0;
 			let curLyricIndex: number | null = null;
 			if (currentLyrics) {
+				const lastLine = currentLyrics[currentLyrics.length - 1];
 				for (let i = currentLyrics.length - 1; i >= 0; i--) {
 					if (
 						time >
@@ -395,17 +415,13 @@ export const NCMEnvWrapper: React.FC = () => {
 						currentLyrics[curLyricIndex].time +
 							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
 				) {
-					// log("回调已设置歌词位置为", curLyricIndex);
 					setCurrentLyricsIndex(curLyricIndex);
 				} else if (
-					currentLyrics[currentLyrics.length - 1] &&
-					time >
-						(currentLyrics[currentLyrics.length - 1]?.dynamicLyricTime ||
-							currentLyrics[currentLyrics.length - 1].time) +
-							currentLyrics[currentLyrics.length - 1].duration +
-							750
+					configDynamicLyric &&
+					lastLine &&
+					lastLine.dynamicLyricTime &&
+					time > lastLine.dynamicLyricTime + lastLine.duration + 750
 				) {
-					// log("回调已设置歌词位置为", currentLyrics.length);
 					setCurrentLyricsIndex(currentLyrics.length);
 				}
 			}

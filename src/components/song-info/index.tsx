@@ -60,22 +60,14 @@ export const PlayerSongInfo: React.FC<{
 
 	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
 	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
-	const [hideMusicAlias] = useConfigBoolean("hideMusicAlias", false);
 	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
-	const [hideMusicAlbum] = useConfigBoolean("hideMusicAlbum", false);
 
 	const playProgressText = toDuration(playProgress);
 	const remainText = toDuration(playProgress - currentAudioDuration);
 
 	return (
 		<>
-			{!(
-				hideAlbumImage &&
-				hideMusicName &&
-				hideMusicAlias &&
-				hideMusicArtists &&
-				hideMusicAlbum
-			) && (
+			{!(hideAlbumImage && hideMusicName && hideMusicArtists) && (
 				<div
 					className="am-player-song-info"
 					onContextMenu={(evt) => {

@@ -1,13 +1,17 @@
 import { classname } from "../../api";
 import { Group, Tween } from "../../libs/tweenjs";
 import * as React from "react";
+import { LyricLineTransform } from ".";
 
-export const LyricDots: React.FC<{
-	selected: boolean;
-	time: number;
-	duration: number;
-	offset: number;
-}> = (props) => {
+export const LyricDots: React.FC<
+	{
+		selected: boolean;
+		time: number;
+		duration: number;
+		offset: number;
+		lineTransform: LyricLineTransform;
+	} & React.HTMLAttributes<HTMLDivElement>
+> = ({ selected, time: _time, duration, offset, lineTransform, ...props }) => {
 	const dot0 = React.useRef<HTMLDivElement>(null);
 	const dot1 = React.useRef<HTMLDivElement>(null);
 	const dot2 = React.useRef<HTMLDivElement>(null);
@@ -18,8 +22,8 @@ export const LyricDots: React.FC<{
 			dot0.current &&
 			dot1.current &&
 			dot2.current &&
-			props.selected &&
-			props.duration !== 0
+			selected &&
+			duration !== 0
 		) {
 			const cdot0 = dot0.current;
 			const cdot1 = dot1.current;
@@ -36,7 +40,7 @@ export const LyricDots: React.FC<{
 					newGroup.removeAll();
 				}
 			};
-			const dotDuration = props.duration - 750; // 减去原歌词动画的动画时长
+			const dotDuration = duration - 750; // 减去原歌词动画的动画时长
 
 			new Tween(
 				{
@@ -110,19 +114,25 @@ export const LyricDots: React.FC<{
 				tween.current = null;
 			}
 		};
-	}, [props.selected, props.duration]);
+	}, [selected, duration]);
 
-	return props.duration === 0 ? (
+	return duration === 0 ? (
 		<></>
 	) : (
 		<div
 			className={classname("am-lyric-dots", {
-				"am-lyric-dots-selected": props.selected && props.duration !== 0,
-				"am-lyric-line-before": props.offset < 0,
-				"am-lyric-line-after": props.offset > 0,
-				"am-lyric-line-selected": props.selected,
-				[`am-lyric-line-o${props.offset}`]: Math.abs(props.offset) < 5,
+				"am-lyric-dots-selected": selected && duration !== 0,
+				"am-lyric-line-before": offset < 0,
+				"am-lyric-line-after": offset > 0,
+				"am-lyric-line-selected": selected,
+				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
 			})}
+			style={{
+				transform: `translateY(${lineTransform.top}px) scale(${lineTransform.scale})`,
+				transitionDelay: offset > 0 && offset < 10 ? `${offset * 20}ms` : "",
+				transitionDuration: `${lineTransform.duration}ms`,
+			}}
+			{...props}
 		>
 			<div ref={dot0} />
 			<div ref={dot1} />

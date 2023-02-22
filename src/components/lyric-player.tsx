@@ -1,5 +1,4 @@
 import {
-	useConfig,
 	useConfigBoolean,
 	useFMOpened,
 	useNowPlayingOpened,
@@ -24,8 +23,8 @@ import {
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { LyricPlayerOptions } from "./lyric-player-options";
 import { NoLyricOptions } from "./no-lyric-options";
-import { PlayerSongInfo, PlayerSongInfoMenuContent } from "./song-info";
-import { LyricRenderer, RendererBackend } from "./lyric-renderer";
+import { PlayerSongInfo } from "./song-info";
+import { LyricRenderer } from "./lyric-renderer";
 import { Menu, MenuDevider, MenuItem } from "./appkit/menu";
 import { ModalsWrapper } from "./modals";
 import {
@@ -49,7 +48,6 @@ export const LyricView: React.FC<{
 	const [fullscreen, setFullscreen] = React.useState(
 		document.webkitIsFullScreen as boolean,
 	);
-	const [rendererBackend] = useConfig("rendererBackend", RendererBackend.DOM);
 
 	React.useEffect(() => {
 		if (document?.webkitIsFullScreen !== fullscreen) {
@@ -104,7 +102,7 @@ export const LyricView: React.FC<{
 					</div>
 				) : currentLyrics ? (
 					currentLyrics.length > 0 ? (
-						<LyricRenderer backend={rendererBackend as RendererBackend} />
+						<LyricRenderer />
 					) : (
 						<NoLyricOptions />
 					)
@@ -147,18 +145,6 @@ const MainMenu: React.FC<{
 	const setAdjustLyricOffsetModalOpened = useSetAtom(
 		adjustLyricOffsetModalOpenedAtom,
 	);
-
-	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
-	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
-	const [hideMusicAlias] = useConfigBoolean("hideMusicAlias", false);
-	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
-	const [hideMusicAlbum] = useConfigBoolean("hideMusicAlbum", false);
-	const isPlayerSongInfoHidden =
-		hideAlbumImage &&
-		hideMusicName &&
-		hideMusicAlias &&
-		hideMusicArtists &&
-		hideMusicAlbum;
 
 	const [configTranslatedLyric, setConfigTranslatedLyric] = useConfigBoolean(
 		"translated-lyric",
@@ -255,12 +241,6 @@ const MainMenu: React.FC<{
 				}}
 			/>
 			<MenuDevider />
-			{isPlayerSongInfoHidden && (
-				<>
-					<PlayerSongInfoMenuContent onCloseMenu={() => setMenuOpened(false)} />
-					<MenuDevider />
-				</>
-			)}
 			<MenuItem
 				label="显示翻译歌词"
 				checked={configTranslatedLyric}
