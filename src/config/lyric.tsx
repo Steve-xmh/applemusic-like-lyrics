@@ -29,6 +29,11 @@ export const LyricSettings: React.FC = () => {
 				label="合并没有译文的歌词"
 				defaultValue={false}
 			/>
+			<SwitchConfigComponent
+				settingKey="disableLyricBuffer"
+				label="禁用歌词缓冲（即所选歌词将会立即滚动）"
+				defaultValue={false}
+			/>
 			<SliderConfigComponent
 				settingKey="globalTimeStampOffset"
 				label="全局歌词时序偏移（秒）"

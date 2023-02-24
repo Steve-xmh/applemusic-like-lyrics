@@ -41,7 +41,10 @@ export const SongInfoStyleSettings: React.FC = () => {
 			<SwitchConfigComponent settingKey="hideMusicAlbum" label="隐藏专辑名" />
 			<SwitchConfigComponent settingKey="hideMusicArtists" label="隐藏歌手名" />
 			<SwitchConfigComponent settingKey="hideMenuButton" label="隐藏菜单按钮" />
-			<SwitchConfigComponent settingKey="hidePlayProgressBar" label="隐藏播放进度条" />
+			<SwitchConfigComponent
+				settingKey="hidePlayProgressBar"
+				label="隐藏播放进度条"
+			/>
 			<TextConfigComponent
 				label="歌手名分隔符"
 				settingKey="musicArtistsSeparator"

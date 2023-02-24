@@ -13,4 +13,3 @@ channel.call = function AppleMusicLikeLyricCallHook(
 		return hookCall.apply(hookCall, [cmd, ...args]);
 	}
 };
-

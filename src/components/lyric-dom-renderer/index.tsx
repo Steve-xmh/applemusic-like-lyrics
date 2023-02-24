@@ -49,6 +49,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
 	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
+	const disableLyricBuffer = useConfigValueBoolean("disableLyricBuffer", false);
 	const alignTopSelectedLyric = useConfigValueBoolean(
 		"alignTopSelectedLyric",
 		false,
@@ -307,7 +308,11 @@ export const LyricDOMRenderer: React.FC = () => {
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
 		) {
-			checkIfTooFast(currentLyricIndex);
+			if (disableLyricBuffer) {
+				keepSelectLyrics.current.clear();
+			} else {
+				checkIfTooFast(currentLyricIndex);
+			}
 			scrollToLyric(false, currentLyricIndex);
 		} else {
 			lastIndex.current = currentLyricIndex;

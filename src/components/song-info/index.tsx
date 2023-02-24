@@ -35,6 +35,7 @@ import IconPlay from "../../assets/icon_play.svg";
 import IconLossless from "../../assets/icon_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
 import { PlayMode, switchPlayMode } from "../../utils";
+import { AudioFFTControl } from "./audio-fft-control";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -46,51 +47,6 @@ function toDuration(duration: number) {
 
 	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
 }
-
-const AudioFFTControl: React.FC = () => {
-	const [fftData, setFFTData] = React.useState((): number[] =>
-		new Array(128).fill(0),
-	);
-
-	React.useLayoutEffect(() => {
-		let stopped = false;
-		let scale = 20;
-
-		function onFrame() {
-			if (stopped || !betterncm.isMRBNCM) return;
-			let data = betterncm_native?.audio?.getFFTData(64) ?? [];
-
-			setFFTData((oldData) => {
-				const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
-
-				scale = (scale * 5 + maxValue) / 6;
-
-				return data.map((v, i) => ((oldData[i] ?? 0) + v / scale) / 2);
-			});
-
-			requestAnimationFrame(onFrame);
-		}
-
-		onFrame();
-
-		return () => {
-			stopped = true;
-		};
-	}, []);
-
-	return (
-		<div className="am-audio-fft">
-			{fftData.map((v, i) => (
-				<div
-					key={`fft-${i}`}
-					style={{
-						height: `${v * 100}%`,
-					}}
-				/>
-			))}
-		</div>
-	);
-};
 
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;

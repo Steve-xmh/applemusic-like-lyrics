@@ -507,5 +507,7 @@ declare namespace betterncm_native {
 
 	export namespace audio {
 		export function getFFTData(amount?: number): number[];
+		export function acquireFFTData(): void;
+		export function releaseFFTData(): void;
 	}
 }

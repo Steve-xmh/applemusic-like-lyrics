@@ -54,6 +54,16 @@ export function useConfigBoolean(
 	return [value, setValue];
 }
 
+export function useConfigNumber(
+	key: string,
+	defaultValue = 0,
+): [number, React.Dispatch<number>] {
+	const [rawValue, setRawValue] = useConfig(key, defaultValue.toString());
+	const value = React.useMemo(() => Number(rawValue), [rawValue]);
+	const setValue = (v: number) => setRawValue(v.toString());
+	return [value, setValue];
+}
+
 export function useConfigValue(key: string, defaultValue: string): string;
 export function useConfigValue(
 	key: string,
@@ -86,6 +96,12 @@ export function useConfigValueBoolean(
 ): boolean {
 	const rawValue = useConfigValue(key, defaultValue.toString());
 	const value = React.useMemo(() => rawValue !== "false", [rawValue]);
+	return value;
+}
+
+export function useConfigValueNumber(key: string, defaultValue = 0): number {
+	const rawValue = useConfigValue(key, defaultValue.toString());
+	const value = React.useMemo(() => Number(rawValue), [rawValue]);
 	return value;
 }
 
