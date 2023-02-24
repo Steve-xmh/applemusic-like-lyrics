@@ -47,7 +47,7 @@ export const LyricLineView: React.FC<
 			})}
 			style={{
 				transform: `translateY(${lineTransform.top}px) scale(${lineTransform.scale})`,
-				transitionDelay: offset > 0 && offset < 10 ? `${offset * 20}ms` : "",
+				transitionDelay: `${lineTransform.delay}ms`,
 				transitionDuration: `${lineTransform.duration}ms`,
 			}}
 			{...props}

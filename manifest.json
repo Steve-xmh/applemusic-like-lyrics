@@ -13,15 +13,6 @@
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
-    "requirements": [
-        "libsonginfo",
-        "liblyric"
-    ],
-    "loadAfter": [
-        "LibSongInfo",
-        "LibLyric",
-        "LibFrontendPlay"
-    ],
     "incompatible": [
         "RefinedNowPlaying"
     ],
@@ -34,7 +25,7 @@
         ]
     },
     "hijacks": {
-        ">= 2.10.4 <= 2.10.6": {
+        ">= 1.0.0": {
             "orpheus://orpheus/pub/core.": {
                 "type": "replace",
                 "id": "core-js-fake-function",

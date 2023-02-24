@@ -338,6 +338,7 @@ declare module "betterncm-api/index" {
 				  })
 				| undefined,
 		) => Promise<Response>;
+		isMRBNCM?: boolean;
 	};
 	export { fs, app, ncm, utils, tests, reload };
 	export default BetterNCM;
@@ -502,5 +503,9 @@ declare namespace betterncm_native {
 	export namespace app {
 		export function version(): string;
 		export function restart(): never;
+	}
+
+	export namespace audio {
+		export function getFFTData(amount?: number): number[];
 	}
 }

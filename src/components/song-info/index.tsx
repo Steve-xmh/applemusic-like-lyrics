@@ -3,7 +3,11 @@ import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
 import { AudioQualityType, genAudioPlayerCommand, PlayState } from "../../api";
-import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
+import {
+	useAlbumImageUrl,
+	useConfigValue,
+	useConfigValueBoolean,
+} from "../../api/react";
 import {
 	musicIdAtom,
 	songArtistsAtom,
@@ -16,6 +20,7 @@ import {
 	currentPlayModeAtom,
 	currentAudioIdAtom,
 	topbarMenuOpenedAtom,
+	albumAtom,
 } from "../../core/states";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
@@ -42,6 +47,51 @@ function toDuration(duration: number) {
 	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
 }
 
+const AudioFFTControl: React.FC = () => {
+	const [fftData, setFFTData] = React.useState((): number[] =>
+		new Array(128).fill(0),
+	);
+
+	React.useLayoutEffect(() => {
+		let stopped = false;
+		let scale = 20;
+
+		function onFrame() {
+			if (stopped || !betterncm.isMRBNCM) return;
+			let data = betterncm_native?.audio?.getFFTData(64) ?? [];
+
+			setFFTData((oldData) => {
+				const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
+
+				scale = (scale * 5 + maxValue) / 6;
+
+				return data.map((v, i) => ((oldData[i] ?? 0) + v / scale) / 2);
+			});
+
+			requestAnimationFrame(onFrame);
+		}
+
+		onFrame();
+
+		return () => {
+			stopped = true;
+		};
+	}, []);
+
+	return (
+		<div className="am-audio-fft">
+			{fftData.map((v, i) => (
+				<div
+					key={`fft-${i}`}
+					style={{
+						height: `${v * 100}%`,
+					}}
+				/>
+			))}
+		</div>
+	);
+};
+
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
@@ -50,6 +100,7 @@ export const PlayerSongInfo: React.FC<{
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const songName: string = useAtomValue(songNameAtom);
+	const album = useAtomValue(albumAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom) / 1000;
 	const playProgress = useAtomValue(playProgressAtom);
@@ -58,9 +109,24 @@ export const PlayerSongInfo: React.FC<{
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
-	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
-	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
-	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
+	const hideAlbumImage = useConfigValueBoolean("hideAlbumImage", false);
+	const hideMusicName = useConfigValueBoolean("hideMusicName", false);
+	const hideMusicArtists = useConfigValueBoolean("hideMusicArtists", false);
+	const hideMusicAlbum = useConfigValueBoolean("hideMusicAlbum", false);
+	const hideMenuButton = useConfigValueBoolean("hideMenuButton", false);
+	const hidePlayProgressBar = useConfigValueBoolean(
+		"hidePlayProgressBar",
+		false,
+	);
+	const hideAudioQualityTag = useConfigValueBoolean(
+		"hideAudioQualityTag",
+		false,
+	);
+
+	const widgetUnderProgressBar = useConfigValue(
+		"widgetUnderProgressBar",
+		"play-controls",
+	);
 
 	const playProgressText = toDuration(playProgress);
 	const remainText = toDuration(playProgress - currentAudioDuration);
@@ -105,28 +171,38 @@ export const PlayerSongInfo: React.FC<{
 						</div>
 					)}
 					<div className="am-music-sub-widget">
-						<div className="am-music-quality">
-							{currentAudioQualityType === AudioQualityType.Lossless && (
-								<div className="am-music-quality-tag">
-									<IconLossless />
-									无损
-								</div>
-							)}
-							{currentAudioQualityType === AudioQualityType.HiRes && (
-								<div className="am-music-quality-tag">
-									<IconLossless />
-									高解析度无损
-								</div>
-							)}
-							{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
-								<div>
-									<IconDolbyAtmos />
-								</div>
-							)}
-						</div>
+						{!hideAudioQualityTag && (
+							<div className="am-music-quality">
+								{currentAudioQualityType === AudioQualityType.Lossless && (
+									<div className="am-music-quality-tag">
+										<IconLossless />
+										无损
+									</div>
+								)}
+								{currentAudioQualityType === AudioQualityType.HiRes && (
+									<div className="am-music-quality-tag">
+										<IconLossless />
+										高解析度无损
+									</div>
+								)}
+								{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
+									<div>
+										<IconDolbyAtmos />
+									</div>
+								)}
+							</div>
+						)}
 						<div className="am-music-info-with-menu">
 							<div className="am-music-info">
-								<div className="am-music-name">{songName}</div>
+								{!hideMusicName &&
+									(hideMusicAlbum || songName !== album.name) && (
+										<div className="am-music-name">{songName}</div>
+									)}
+								{!hideMusicAlbum && (
+									<div className="am-music-album">
+										<a href={`#/m/album/?id=${album.id}`}>{album.name}</a>
+									</div>
+								)}
 								<div className="am-music-artists">
 									<div className="am-artists">
 										{songArtists.map((artist, index) => (
@@ -140,146 +216,158 @@ export const PlayerSongInfo: React.FC<{
 									</div>
 								</div>
 							</div>
-							<button
-								className="am-music-main-menu"
-								onClick={() => setMenuOpened(true)}
-							>
-								<IconDots color="#FFFFFF" />
-							</button>
+							{!hideMenuButton && (
+								<button
+									className="am-music-main-menu"
+									onClick={() => setMenuOpened(true)}
+								>
+									<IconDots color="#FFFFFF" />
+								</button>
+							)}
 							{props.isFM && <LyricPlayerFMControls />}
 						</div>
 
-						<div className="am-music-progress-control">
+						{!hidePlayProgressBar && (
+							<div className="am-music-progress-control">
+								{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+								<div
+									className="am-music-progress-bar"
+									onClick={(evt) => {
+										const rect = evt.currentTarget.getBoundingClientRect();
+										const pos = (evt.clientX - rect.left) / rect.width;
+										legacyNativeCmder._envAdapter.callAdapter(
+											"audioplayer.seek",
+											() => {},
+											[
+												currentAudioId,
+												genAudioPlayerCommand(currentAudioId, "seek"),
+												pos * currentAudioDuration,
+											],
+										);
+									}}
+								>
+									<div
+										style={{
+											width: `${(playProgress / currentAudioDuration) * 100}%`,
+										}}
+									/>
+								</div>
+								<div className="am-music-progress-tips">
+									<div>{playProgressText}</div>
+									<div>{remainText}</div>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{widgetUnderProgressBar === "play-controls" && (
+						<div className="am-music-controls">
+							<button
+								className="am-music-track-shuffle"
+								onClick={() => {
+									if (currentPlayMode === PlayMode.Random) {
+										switchPlayMode(PlayMode.Order);
+										setCurrentPlayMode(PlayMode.Order);
+									} else {
+										switchPlayMode(PlayMode.Random);
+										setCurrentPlayMode(PlayMode.Random);
+									}
+								}}
+							>
+								{currentPlayMode === PlayMode.Random ? (
+									<IconShuffleOn color="#FFFFFF" />
+								) : (
+									<IconShuffle color="#FFFFFF" />
+								)}
+							</button>
+							<button
+								className="am-music-track-prev"
+								onClick={() => {
+									document
+										.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
+										?.click();
+								}}
+							>
+								<IconRewind color="#FFFFFF" />
+							</button>
+							<button
+								className="am-music-play"
+								onClick={() => {
+									if (playState === PlayState.Playing) {
+										document
+											.querySelector<HTMLButtonElement>(
+												"#main-player .btnp-pause",
+											)
+											?.click();
+									} else {
+										document
+											.querySelector<HTMLButtonElement>(
+												"#main-player .btnp-play",
+											)
+											?.click();
+									}
+								}}
+							>
+								{playState === PlayState.Playing ? (
+									<IconPause color="#FFFFFF" />
+								) : (
+									<IconPlay color="#FFFFFF" />
+								)}
+							</button>
+							<button
+								className="am-music-track-next"
+								onClick={() => {
+									document
+										.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
+										?.click();
+								}}
+							>
+								<IconForward color="#FFFFFF" />
+							</button>
+							<button
+								className="am-music-track-repeat"
+								onClick={() => {
+									if (currentPlayMode === PlayMode.Repeat) {
+										switchPlayMode(PlayMode.Order);
+										setCurrentPlayMode(PlayMode.Order);
+									} else {
+										switchPlayMode(PlayMode.Repeat);
+										setCurrentPlayMode(PlayMode.Repeat);
+									}
+								}}
+							>
+								{currentPlayMode === PlayMode.Repeat ? (
+									<IconRepeatOn color="#FFFFFF" />
+								) : (
+									<IconRepeat color="#FFFFFF" />
+								)}
+							</button>
+						</div>
+					)}
+
+					{widgetUnderProgressBar === "play-controls" && (
+						<div className="am-music-volume-controls">
+							<IconVolume2 color="#FFFFFF" />
 							{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 							<div
-								className="am-music-progress-bar"
+								className="am-music-volume-bar"
 								onClick={(evt) => {
 									const rect = evt.currentTarget.getBoundingClientRect();
 									const pos = (evt.clientX - rect.left) / rect.width;
 									legacyNativeCmder._envAdapter.callAdapter(
-										"audioplayer.seek",
+										"audioplayer.setVolume",
 										() => {},
-										[
-											currentAudioId,
-											genAudioPlayerCommand(currentAudioId, "seek"),
-											pos * currentAudioDuration,
-										],
+										["", "", pos],
 									);
 								}}
 							>
-								<div
-									style={{
-										width: `${(playProgress / currentAudioDuration) * 100}%`,
-									}}
-								/>
+								<div style={{ width: `${playVolume * 100}%` }} />
 							</div>
-							<div className="am-music-progress-tips">
-								<div>{playProgressText}</div>
-								<div>{remainText}</div>
-							</div>
+							<IconVolume color="#FFFFFF" />
 						</div>
-					</div>
+					)}
 
-					<div className="am-music-controls">
-						<button
-							className="am-music-track-shuffle"
-							onClick={() => {
-								if (currentPlayMode === PlayMode.Random) {
-									switchPlayMode(PlayMode.Order);
-									setCurrentPlayMode(PlayMode.Order);
-								} else {
-									switchPlayMode(PlayMode.Random);
-									setCurrentPlayMode(PlayMode.Random);
-								}
-							}}
-						>
-							{currentPlayMode === PlayMode.Random ? (
-								<IconShuffleOn color="#FFFFFF" />
-							) : (
-								<IconShuffle color="#FFFFFF" />
-							)}
-						</button>
-						<button
-							className="am-music-track-prev"
-							onClick={() => {
-								document
-									.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
-									?.click();
-							}}
-						>
-							<IconRewind color="#FFFFFF" />
-						</button>
-						<button
-							className="am-music-play"
-							onClick={() => {
-								if (playState === PlayState.Playing) {
-									document
-										.querySelector<HTMLButtonElement>(
-											"#main-player .btnp-pause",
-										)
-										?.click();
-								} else {
-									document
-										.querySelector<HTMLButtonElement>("#main-player .btnp-play")
-										?.click();
-								}
-							}}
-						>
-							{playState === PlayState.Playing ? (
-								<IconPause color="#FFFFFF" />
-							) : (
-								<IconPlay color="#FFFFFF" />
-							)}
-						</button>
-						<button
-							className="am-music-track-next"
-							onClick={() => {
-								document
-									.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
-									?.click();
-							}}
-						>
-							<IconForward color="#FFFFFF" />
-						</button>
-						<button
-							className="am-music-track-repeat"
-							onClick={() => {
-								if (currentPlayMode === PlayMode.Repeat) {
-									switchPlayMode(PlayMode.Order);
-									setCurrentPlayMode(PlayMode.Order);
-								} else {
-									switchPlayMode(PlayMode.Repeat);
-									setCurrentPlayMode(PlayMode.Repeat);
-								}
-							}}
-						>
-							{currentPlayMode === PlayMode.Repeat ? (
-								<IconRepeatOn color="#FFFFFF" />
-							) : (
-								<IconRepeat color="#FFFFFF" />
-							)}
-						</button>
-					</div>
-
-					<div className="am-music-volume-controls">
-						<IconVolume2 color="#FFFFFF" />
-						{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-						<div
-							className="am-music-volume-bar"
-							onClick={(evt) => {
-								const rect = evt.currentTarget.getBoundingClientRect();
-								const pos = (evt.clientX - rect.left) / rect.width;
-								legacyNativeCmder._envAdapter.callAdapter(
-									"audioplayer.setVolume",
-									() => {},
-									["", "", pos],
-								);
-							}}
-						>
-							<div style={{ width: `${playVolume * 100}%` }} />
-						</div>
-						<IconVolume color="#FFFFFF" />
-					</div>
+					{widgetUnderProgressBar === "audio-viz-fft" && <AudioFFTControl />}
 
 					<div className="am-music-info-bottom-spacer" />
 				</div>

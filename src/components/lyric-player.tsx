@@ -21,7 +21,6 @@ import {
 	topbarMenuOpenedAtom,
 } from "../core/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { LyricPlayerOptions } from "./lyric-player-options";
 import { NoLyricOptions } from "./no-lyric-options";
 import { PlayerSongInfo } from "./song-info";
 import { LyricRenderer } from "./lyric-renderer";
@@ -100,24 +99,23 @@ export const LyricView: React.FC<{
 						<div>{error.message}</div>
 						<div>{error.stack}</div>
 					</div>
-				) : currentLyrics ? (
-					currentLyrics.length > 0 ? (
-						<LyricRenderer />
-					) : (
-						<NoLyricOptions />
-					)
 				) : (
-					<Center className="am-lyric-view-loading">
-						<Loader
-							size={50}
-							style={{
-								width: "50px",
-								height: "50px",
-							}}
-						/>
-					</Center>
+					<>
+						<LyricRenderer />
+						{!currentLyrics && (
+							<Center className="am-lyric-view-loading">
+								<Loader
+									size={50}
+									style={{
+										width: "50px",
+										height: "50px",
+									}}
+								/>
+							</Center>
+						)}
+					</>
 				)}
-				<LyricPlayerOptions />
+				{currentLyrics?.length === 0 && <NoLyricOptions />}
 			</div>
 			<ModalsWrapper />
 			<MainMenu

@@ -20,12 +20,21 @@ export interface LyricLineTransform {
 	top: number;
 	scale: number;
 	duration: number;
+	delay: number;
 }
 
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
-	const currentLyrics = useAtomValue(currentLyricsAtom);
+	const currentLyricsA = useAtomValue(currentLyricsAtom);
+	// 实现复用
+	const [currentLyrics, setCurrentLyrics] = React.useState(currentLyricsA);
+	React.useLayoutEffect(() => {
+		if (currentLyricsA) {
+			setCurrentLyrics(currentLyricsA);
+		}
+	}, [currentLyricsA]);
+
 	const playState = useAtomValue(playStateAtom);
 	const forceUpdate = useForceUpdate();
 
@@ -46,7 +55,6 @@ export const LyricDOMRenderer: React.FC = () => {
 	);
 
 	const lineHeights = React.useRef<[number, boolean][]>([]);
-	const [scrollTop, setScrollTop] = React.useState(0);
 	const viewHeight = React.useRef<number>(window.innerHeight);
 	const [lineTransforms, setLineTransforms] = React.useState<
 		LyricLineTransform[]
@@ -71,20 +79,25 @@ export const LyricDOMRenderer: React.FC = () => {
 				const scaleRatio = lyricScaleEffect ? 0.8 : 1;
 
 				let scrollHeight = -lineHeights.current
-					.slice(0, scrollToIndex)
+					.slice(0, Math.max(0, scrollToIndex))
 					.reduce((pv, cv) => pv + (cv[1] ? 0 : cv[0] * scaleRatio), 0);
 
-				if (!alignTopSelectedLyric) {
+				if (alignTopSelectedLyric) {
+					scrollHeight += viewHeight.current * 0.1;
+				} else {
 					scrollHeight += (viewHeight.current - curLineHeight) / 2;
 				}
 
 				let i = 0;
 				const result: LyricLineTransform[] = [];
 				for (const height of lineHeights.current) {
-					const lineTransform = {
+					const lineTransform: LyricLineTransform = {
 						top: scrollHeight,
 						scale: scaleRatio,
 						duration: mustScroll ? 0 : 500,
+						delay: mustScroll
+							? 0
+							: Math.max(0, Math.min((i - scrollToIndex) * 15, 500)),
 					};
 					if (i === scrollToIndex || keepSelectLyrics.current.has(i)) {
 						lineTransform.scale = 1;
@@ -100,7 +113,6 @@ export const LyricDOMRenderer: React.FC = () => {
 				}
 
 				setLineTransforms(result);
-				setScrollTop(0);
 			}
 		},
 		[alignTopSelectedLyric, lyricScaleEffect],
@@ -119,10 +131,10 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	React.useLayoutEffect(() => {
 		scrollDelayRef.current = 0;
-		cachedLyricIndex.current = 0;
+		cachedLyricIndex.current = -1;
 		keepSelectLyrics.current.clear();
 		recalculateLineHeights();
-		scrollToLyric(true);
+		scrollToLyric(true, -1);
 	}, [
 		currentLyrics,
 		configTranslatedLyric,
@@ -259,8 +271,8 @@ export const LyricDOMRenderer: React.FC = () => {
 			}
 			// 预估的阅读时间
 			const guessedLineReadTime = Math.min(
-				2000,
-				Math.max(750, guessTextReadDuration(lastLyric)),
+				2500,
+				Math.max(1000, guessTextReadDuration(lastLyric)),
 			);
 			if (
 				lastLine &&
@@ -315,8 +327,13 @@ export const LyricDOMRenderer: React.FC = () => {
 				evt.preventDefault();
 				evt.stopPropagation();
 				scrollDelayRef.current = Date.now();
-				setScrollTop((x) => {
-					return x - evt.deltaY;
+				setLineTransforms((list) => {
+					return list.map((v) => {
+						v.top -= evt.deltaY;
+						v.duration = 250;
+						v.delay = 0;
+						return v;
+					});
 				});
 				return false;
 			};
@@ -327,14 +344,11 @@ export const LyricDOMRenderer: React.FC = () => {
 				el.removeEventListener("wheel", onLyricScroll);
 			};
 		}
-	}, []);
+	}, [alignTopSelectedLyric]);
 
 	return (
 		<div className="am-lyric-view">
-			<div
-				ref={lyricListElement}
-				style={{ transform: `translateY(${scrollTop}px)` }}
-			>
+			<div ref={lyricListElement}>
 				{currentLyrics?.map(
 					(line: LyricLine, index: number, _lines: LyricLine[]) => {
 						let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
@@ -343,7 +357,12 @@ export const LyricDOMRenderer: React.FC = () => {
 							return (
 								<LyricLineView
 									key={`${index}-${line.time}-${line.originalLyric}`}
-									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
+									lineTransform={
+										lineTransforms[index] ?? {
+											top: viewHeight.current,
+											scale: 1,
+										}
+									}
 									selected={index === currentLyricIndex || isTooFast}
 									line={line}
 									translated={configTranslatedLyric}

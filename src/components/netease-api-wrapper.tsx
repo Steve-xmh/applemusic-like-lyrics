@@ -217,26 +217,6 @@ export const NCMEnvWrapper: React.FC = () => {
 				"",
 			);
 		}
-		// let lastLine: LyricLine | null = null;
-		// for (const line of parsed) {
-		// 	const tweenDurationDelta = 500;
-		// 	line.time -= tweenDurationDelta;
-		// 	if (
-		// 		line.dynamicLyricTime &&
-		// 		line.dynamicLyric &&
-		// 		lastLine &&
-		// 		lastLine.dynamicLyricTime
-		// 	) {
-		// 		const tweenDurationDelta = Math.min(500);
-		// 		line.dynamicLyricTime -= tweenDurationDelta;
-		// 	}
-		// 	line.duration += tweenDurationDelta;
-		// 	lastLine = line;
-		// 	if (line.originalLyric === "") {
-		// 		lastLine = null;
-		// 	}
-		// }
-		// log(currentRawLyricResp, parsed);
 		setCurrentLyrics(parsed);
 		setCurrentLyricsIndex(-1);
 	}, [
@@ -403,26 +383,39 @@ export const NCMEnvWrapper: React.FC = () => {
 				for (let i = currentLyrics.length - 1; i >= 0; i--) {
 					if (
 						time >
-						(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
+						(currentLyrics[i].dynamicLyricTime ?? currentLyrics[i].time ?? 0)
 					) {
 						curLyricIndex = i;
 						break;
 					}
 				}
-				if (
-					curLyricIndex !== null &&
-					time <
-						currentLyrics[curLyricIndex].time +
-							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
-				) {
-					setCurrentLyricsIndex(curLyricIndex);
-				} else if (
-					configDynamicLyric &&
-					lastLine &&
-					lastLine.dynamicLyricTime &&
-					time > lastLine.dynamicLyricTime + lastLine.duration + 750
-				) {
-					setCurrentLyricsIndex(currentLyrics.length);
+				if (curLyricIndex !== null) {
+					const curLyricLine = currentLyrics[curLyricIndex];
+					if (
+						configDynamicLyric &&
+						curLyricLine.dynamicLyric &&
+						curLyricLine.dynamicLyricTime
+					) {
+						if (
+							time <
+							curLyricLine.dynamicLyricTime +
+								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
+						) {
+							setCurrentLyricsIndex(curLyricIndex);
+						} else if (
+							lastLine === curLyricLine &&
+							time > curLyricLine.dynamicLyricTime + curLyricLine.duration + 750
+						) {
+							setCurrentLyricsIndex(currentLyrics.length);
+						}
+					} else if (
+						time <
+							currentLyrics[curLyricIndex].time +
+								Math.max(0, currentLyrics[curLyricIndex].duration - 100) ||
+						curLyricIndex === currentLyrics.length - 1
+					) {
+						setCurrentLyricsIndex(curLyricIndex);
+					}
 				}
 			}
 		};

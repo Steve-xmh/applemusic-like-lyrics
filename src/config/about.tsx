@@ -1,4 +1,4 @@
-import { Title, Button, Text, Alert, Select } from "@mantine/core";
+import { Title, Button, Text, Alert, Select, Space } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
 import { useConfig, useConfigValueBoolean } from "../api/react";
@@ -17,6 +17,7 @@ export const AboutPage: React.FC = () => {
 	const enableUpdateBranch = useConfigValueBoolean("enableUpdateBranch", false);
 	const installableBranch = useInstallableBranches();
 	const [updating, setUpdating] = React.useState(false);
+	const isMRBNCM = React.useMemo(() => betterncm.isMRBNCM ?? false, []);
 	return (
 		<>
 			<Title order={2}>关于</Title>
@@ -101,6 +102,27 @@ export const AboutPage: React.FC = () => {
 				label="开启网易云时检查插件更新并提醒"
 				defaultValue={true}
 			/>
+			{!isMRBNCM && (
+				<Alert
+					sx={{ margin: "16px 0" }}
+					color="blue"
+					title="Apple Music-like lyrics 还有定制版本的 BetterNCM 哦！"
+				>
+					<div>
+						为了更好地实现作者的一些功能，特地重写了一份专用的 BetterNCM 哦
+					</div>
+					<Space h="sm" />
+					<div>可以实现音频可视化，性能提升还有更多！</div>
+					<Space h="md" />
+					<Button
+						onClick={() =>
+							betterncm.ncm.openUrl("https://github.com/Steve-xmh/mrbncm")
+						}
+					>
+						来试试吧！
+					</Button>
+				</Alert>
+			)}
 			{enableUpdateBranch && (
 				<Alert
 					sx={{ margin: "16px 0" }}
