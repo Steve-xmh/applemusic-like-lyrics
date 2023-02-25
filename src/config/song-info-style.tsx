@@ -1,17 +1,45 @@
 import { Select, Title } from "@mantine/core";
 import { useConfig } from "../api/react";
 import {
+	SliderConfigComponent,
 	SwitchConfigComponent,
 	TextConfigComponent,
 } from "./config-components";
+
+const fftWeightingMethodData = [
+	{
+		label: "不使用权重算法",
+		value: "",
+	},
+	{
+		label: "A 权重算法",
+		value: "aWeighting",
+	},
+	{
+		label: "B 权重算法",
+		value: "bWeighting",
+	},
+	{
+		label: "C 权重算法",
+		value: "cWeighting",
+	},
+	{
+		label: "D 权重算法",
+		value: "dWeighting",
+	},
+];
 
 export const SongInfoStyleSettings: React.FC = () => {
 	const [widgetUnderProgressBar, setWidgetUnderProgressBar] = useConfig(
 		"widgetUnderProgressBar",
 		"play-controls",
 	);
+	const [fftWeightingMethod, setFftWeightingMethod] = useConfig(
+		"fftWeightingMethod",
+		"",
+	);
 
-	const data = [
+	const widgetUnderProgressBarData = [
 		{
 			label: "不显示",
 			value: "none",
@@ -23,7 +51,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 	];
 
 	if (betterncm.isMRBNCM) {
-		data.push({
+		widgetUnderProgressBarData.push({
 			label: "音频可视化 - 频谱",
 			value: "audio-viz-fft",
 		});
@@ -54,8 +82,39 @@ export const SongInfoStyleSettings: React.FC = () => {
 				label="进度条下方的组件"
 				value={widgetUnderProgressBar}
 				onChange={setWidgetUnderProgressBar}
-				data={data}
+				data={widgetUnderProgressBarData}
 			/>
+			{widgetUnderProgressBar === "audio-viz-fft" && (
+				<>
+					<SliderConfigComponent
+						label="频谱线条数量"
+						min={8}
+						max={64}
+						defaultValue={64}
+						settingKey="fftBarAmount"
+					/>
+					<SliderConfigComponent
+						label="频谱线条粗细半径"
+						min={1}
+						max={50}
+						defaultValue={2}
+						settingKey="fftBarThinkness"
+					/>
+					<SliderConfigComponent
+						label="频谱线条变化级别（越大变化越慢）"
+						min={0}
+						max={16}
+						defaultValue={4}
+						settingKey="fftBarTweenSoftness"
+					/>
+					<Select
+						label="可视化频谱频率权重算法"
+						value={fftWeightingMethod}
+						onChange={setFftWeightingMethod}
+						data={fftWeightingMethodData}
+					/>
+				</>
+			)}
 		</>
 	);
 };

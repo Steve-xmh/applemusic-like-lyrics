@@ -1,7 +1,23 @@
 import * as React from "react";
+import { useConfigValue, useConfigValueNumber } from "../../api/react";
+import * as Weightings from "../../libs/a-weighting";
 
 export const AudioFFTControl: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
+
+	const fftBarAmount = Math.min(
+		64,
+		Math.max(useConfigValueNumber("fftBarAmount", 64), 8),
+	);
+	const fftBarTweenSoftness = Math.max(
+		0,
+		Math.floor(useConfigValueNumber("fftBarTweenSoftness", 4)),
+	);
+	const fftBarThinkness = Math.max(
+		1,
+		useConfigValueNumber("fftBarThinkness", 2),
+	);
+	const fftWeightingMethod = useConfigValue("fftWeightingMethod", "");
 
 	React.useLayoutEffect(() => {
 		const canvas = canvasRef.current;
@@ -31,12 +47,42 @@ export const AudioFFTControl: React.FC = () => {
 					const width = canvas.width;
 					const height = canvas.height;
 
-					let data = betterncm_native?.audio?.getFFTData(64) ?? [];
+					let rawData = betterncm_native?.audio?.getFFTData(64) ?? [];
+
+					const weighting: ((f: number) => number) | undefined =
+						Weightings[fftWeightingMethod];
+
+					if (weighting) {
+						rawData.forEach((v, i, a) => {
+							a[i] = v * weighting(((i + 1) / a.length) ** 2 * 22000 + 50);
+						});
+					}
+
+					rawData.splice(64);
+
+					const data: number[] = [];
+
+					// fftBarAmount
+					const chunkSize = Math.ceil(rawData.length / fftBarAmount);
+
+					for (let i = 0; i < rawData.length; i += chunkSize) {
+						let t = 0;
+						for (let j = 0; j < chunkSize; j++) {
+							t += rawData[Math.min(rawData.length - 1, i + j)];
+						}
+						data.push(t / chunkSize);
+					}
+
+					data.splice(fftBarAmount);
 
 					const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
 
-					scale = (scale * 5 + Math.max(2, maxValue)) / 6;
-					fftData = data.map((v, i) => ((fftData[i] ?? 0) * 4 + v / scale) / 5);
+					scale = (scale * 5 + Math.max(1, maxValue)) / 6;
+					fftData = data.map(
+						(v, i) =>
+							((fftData[i] ?? 0) * fftBarTweenSoftness + v / scale) /
+							(fftBarTweenSoftness + 1),
+					);
 
 					ctx.clearRect(0, 0, width, height);
 					ctx.beginPath();
@@ -44,14 +90,10 @@ export const AudioFFTControl: React.FC = () => {
 					const len = fftData.length;
 
 					const barWidth = width / len;
-					const barThinkness = Math.min(
-						2 * window.devicePixelRatio,
-						barWidth / 2,
-					);
 					const harfBarWidth = barWidth / 2;
 
 					ctx.strokeStyle = "white";
-					ctx.lineWidth = barThinkness * window.devicePixelRatio;
+					ctx.lineWidth = fftBarThinkness * window.devicePixelRatio;
 					ctx.lineCap = "round";
 					ctx.lineJoin = "round";
 
@@ -79,7 +121,7 @@ export const AudioFFTControl: React.FC = () => {
 				};
 			}
 		}
-	}, []);
+	}, [fftBarAmount, fftBarTweenSoftness, fftWeightingMethod, fftBarThinkness]);
 
 	return <canvas className="am-audio-fft" ref={canvasRef} />;
 };
