@@ -10,12 +10,33 @@ export const LyricDots: React.FC<
 		duration: number;
 		offset: number;
 		lineTransform: LyricLineTransform;
+		onSizeChanged: () => void;
 	} & React.HTMLAttributes<HTMLDivElement>
-> = ({ selected, time: _time, duration, offset, lineTransform, ...props }) => {
+> = ({
+	selected,
+	time: _time,
+	duration,
+	offset,
+	lineTransform,
+	onSizeChanged,
+	...props
+}) => {
 	const dot0 = React.useRef<HTMLDivElement>(null);
 	const dot1 = React.useRef<HTMLDivElement>(null);
 	const dot2 = React.useRef<HTMLDivElement>(null);
 	const tween = React.useRef<Group | null>(null);
+	const dotsRef = React.useRef<HTMLDivElement>(null);
+
+	React.useLayoutEffect(() => {
+		const dots = dotsRef.current;
+		if (dots) {
+			const obs = new ResizeObserver(onSizeChanged);
+			obs.observe(dots);
+			return () => {
+				obs.disconnect();
+			};
+		}
+	}, []);
 
 	React.useLayoutEffect(() => {
 		if (
@@ -132,6 +153,7 @@ export const LyricDots: React.FC<
 				transitionDelay: offset > 0 && offset < 10 ? `${offset * 20}ms` : "",
 				transitionDuration: `${lineTransform.duration}ms`,
 			}}
+			ref={dotsRef}
 			{...props}
 		>
 			<div ref={dot0} />

@@ -4,6 +4,7 @@ import { classname, PlayState } from "../../api";
 import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
 import { playStateAtom, rightClickedLyricAtom } from "../../core/states";
+import * as React from "react";
 
 export const LyricLineView: React.FC<
 	{
@@ -14,6 +15,7 @@ export const LyricLineView: React.FC<
 		translated: boolean;
 		roman: boolean;
 		lineTransform: LyricLineTransform;
+		onSizeChanged: () => void;
 		onClickLyric?: (line: LyricLine, evt: React.MouseEvent) => void;
 	} & React.HTMLAttributes<HTMLDivElement>
 > = ({
@@ -24,12 +26,26 @@ export const LyricLineView: React.FC<
 	translated,
 	roman,
 	lineTransform,
+	onSizeChanged,
 	onClickLyric,
 	...props
 }) => {
 	const playState = useAtomValue(playStateAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 	const forceDynamic = useConfigValueBoolean("forceDynamicLyric", false);
+	const lineRef = React.useRef<HTMLDivElement>(null);
+
+	React.useLayoutEffect(() => {
+		const dots = lineRef.current;
+		if (dots) {
+			const obs = new ResizeObserver(onSizeChanged);
+			obs.observe(dots);
+			return () => {
+				obs.disconnect();
+			};
+		}
+	}, []);
+
 	return (
 		<div
 			onClick={(evt) => {
@@ -50,6 +66,7 @@ export const LyricLineView: React.FC<
 				transitionDelay: `${lineTransform.delay}ms`,
 				transitionDuration: `${lineTransform.duration}ms`,
 			}}
+			ref={lineRef}
 			{...props}
 		>
 			{dynamic &&

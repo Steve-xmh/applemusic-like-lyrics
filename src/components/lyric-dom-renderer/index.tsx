@@ -368,6 +368,7 @@ export const LyricDOMRenderer: React.FC = () => {
 											scale: 1,
 										}
 									}
+									onSizeChanged={recalculateLineHeights}
 									selected={index === currentLyricIndex || isTooFast}
 									line={line}
 									translated={configTranslatedLyric}
@@ -380,6 +381,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						} else {
 							return (
 								<LyricDots
+									onSizeChanged={recalculateLineHeights}
 									key={`${index}-dots`}
 									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
 									selected={index === currentLyricIndex}

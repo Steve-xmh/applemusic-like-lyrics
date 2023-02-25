@@ -30,9 +30,10 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     text-overflow: ellipsis
 @mixin applemusic-like-lyrics-view-style()
     display: flex
-    height: 100%
+    height: calc(100% - 120px)
     width: 90%
     margin: 0 5%
+    padding: 60px 0
     z-index: 1
 
     svg
@@ -50,18 +51,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         width: 100%
         display: flex
         filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
-        // display: flex
-        // align-items: flex-end
-        // justify-content: space-between
-        // > *
-        //     background-color: #FFF
-        //     margin: 1px
-        //     flex: 1
-        //     border-radius: 3px
-        //     width: 6px
-        //     max-width: 6px
-        //     min-height: 6px
-        //     max-height: 100%
     
     .am-lyric-background
         z-index: -1
@@ -84,6 +73,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         flex-direction: column
         align-items: center
         justify-content: space-around
+        color: var(--applemusic-like-lyrics-font-color, unset)
         > *
             width: min(50vh, 40vw)
             align-self: center
@@ -176,6 +166,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                                 line-height: normal
                                 opacity: 0.8
                                 user-select: text
+                                color: var(--applemusic-like-lyrics-font-color, unset)
                                 &::after
                                     content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
                                     opacity: 0.5
@@ -251,7 +242,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     .am-lyric-view
         flex: 1
         overflow: hidden
-        -webkit-mask-image: linear-gradient(#0000, #0000 5%, #000 10%, #000 90%, #0000 95%, #0000)
+        -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
         box-sizing: content-box
         &::-webkit-scrollbar
             display: none
@@ -292,13 +283,13 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         .am-lyric-line
             filter: blur(4px)
             &.am-lyric-line-after, &.am-lyric-line-before
-                filter: blur(4px)
+                filter: blur(8px)
                 &.am-lyric-line-selected
                     filter: blur(0px)
             @for $i from -5 through 5
                 @if $i != 0
                     &.am-lyric-line-o#{$i}
-                        filter: blur(abs($i) * 1px)
+                        filter: blur(abs($i) * 2px)
 
     // 未播放歌词淡入效果
     &.lyric-blur-fade-in-effect

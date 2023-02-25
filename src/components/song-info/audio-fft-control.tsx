@@ -35,7 +35,7 @@ export const AudioFFTControl: React.FC = () => {
 
 					const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
 
-					scale = (scale * 5 + Math.max(10, maxValue)) / 6;
+					scale = (scale * 5 + Math.max(2, maxValue)) / 6;
 					fftData = data.map((v, i) => ((fftData[i] ?? 0) * 4 + v / scale) / 5);
 
 					ctx.clearRect(0, 0, width, height);
