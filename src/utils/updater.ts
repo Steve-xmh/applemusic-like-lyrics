@@ -100,7 +100,11 @@ export async function installLatestBranchVersion(branchName: string) {
 				zip.file(file.name, file.data);
 				return betterncm.fs
 					.writeFile(destPath, file.data)
-					.then((v) => (v ? Promise.resolve() : Promise.reject()));
+					.then((v) =>
+						v
+							? Promise.resolve()
+							: Promise.reject(`写入更新文件 ${file.name} 到 ${destPath} 失败`),
+					);
 			} else {
 				return Promise.resolve();
 			}
@@ -128,12 +132,13 @@ export async function installLatestBranchVersion(branchName: string) {
 	const outputPluginPath = normalizePath(
 		`${pluginsPath}/${plugin.mainPlugin.manifest.slug}.plugin`,
 	);
-	log("正在写入更新文件", outputPluginPath);
+	log("正在打包插件文件", outputPluginPath);
 	const data: Blob = await zip.generateAsync({
 		type: "blob",
 		compression: "STORE",
 	});
 
+	log("正在写入更新文件", outputPluginPath);
 	await betterncm.fs.writeFile(outputPluginPath, data);
 }
 

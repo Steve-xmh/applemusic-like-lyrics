@@ -2,6 +2,7 @@ import { Button, Text, Alert, Select, Space } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
 import { useConfig, useConfigValueBoolean } from "../api/react";
+import { error } from "../utils/logger";
 import {
 	installLatestBranchVersion,
 	useHasUpdates,
@@ -81,6 +82,7 @@ export const AboutPage: React.FC = () => {
 
 								betterncm_native.app.restart();
 							} catch (err) {
+								error(err);
 								showNotification({
 									title: "AMLL 更新失败",
 									color: "red",
