@@ -1,4 +1,3 @@
-import { Title } from "@mantine/core";
 import * as React from "react";
 import {
 	SliderConfigComponent,
@@ -8,7 +7,6 @@ import {
 export const LyricSettings: React.FC = () => {
 	return (
 		<>
-			<Title order={2}>歌词设置</Title>
 			<SwitchConfigComponent
 				settingKey="translated-lyric"
 				label="显示翻译歌词"

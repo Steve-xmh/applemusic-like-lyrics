@@ -19,6 +19,7 @@ import {
 	songArtistsAtom,
 	songNameAtom,
 	topbarMenuOpenedAtom,
+	windowedConfigOpenedAtom,
 } from "../core/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { NoLyricOptions } from "./no-lyric-options";
@@ -31,12 +32,16 @@ import {
 	PURE_MUSIC_LYRIC_LINE,
 } from "../core/lyric-parser";
 import { setClipboardData } from "../api";
+import { WindowedConfigComponent } from "../config";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
 	const isNowPlayingOpened = useNowPlayingOpened();
 	const isFMOpened = useFMOpened();
+	const [windowedConfigOpened, setWindowedConfigOpened] = useAtom(
+		windowedConfigOpenedAtom,
+	);
 
 	const error = useAtomValue(lyricErrorAtom);
 	const currentLyrics = useAtomValue(currentLyricsAtom);
@@ -123,6 +128,11 @@ export const LyricView: React.FC<{
 				onSetFullScreen={(v) => setFullscreen(v)}
 			/>
 			<RightClickLyricMenu />
+			{windowedConfigOpened && (
+				<WindowedConfigComponent
+					onClose={() => setWindowedConfigOpened(false)}
+				/>
+			)}
 		</>
 	);
 };
@@ -132,6 +142,7 @@ const MainMenu: React.FC<{
 	onSetFullScreen: (shouldFullScreent: boolean) => void;
 }> = (props) => {
 	const [menuOpened, setMenuOpened] = useAtom(topbarMenuOpenedAtom);
+	const setWindowedConfigOpened = useSetAtom(windowedConfigOpenedAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const album = useAtomValue(albumAtom);
 	const songName: string = useAtomValue(songNameAtom);
@@ -328,16 +339,7 @@ const MainMenu: React.FC<{
 			<MenuItem
 				label="Apple Music-like Lyric 插件设置..."
 				onClick={() => {
-					if (!document.querySelector(".better-ncm-manager.g-mn.ncmm-show"))
-						document
-							.querySelector<HTMLDivElement>("a[title=BetterNCM]")
-							?.click();
-					document.querySelector<HTMLDivElement>("[data-action=min]")?.click();
-					document
-						.querySelector<HTMLDivElement>(
-							`.better-ncm-manager .loaded-plugins-list .plugin-btn[data-plugin-slug='${plugin.manifest.slug}']`,
-						)
-						?.click();
+					setWindowedConfigOpened(true);
 					setMenuOpened(false);
 				}}
 			/>

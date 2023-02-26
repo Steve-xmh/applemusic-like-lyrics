@@ -1,11 +1,4 @@
-import {
-	Title,
-	Text,
-	Select,
-	SelectItem,
-	ThemeIcon,
-	Group,
-} from "@mantine/core";
+import { Text, Select, SelectItem, ThemeIcon, Group } from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -65,7 +58,6 @@ export const BackgroundSettings: React.FC = () => {
 
 	return (
 		<>
-			<Title order={2}>背景设置</Title>
 			<SwitchConfigComponent
 				settingKey="showBackground"
 				label="显示背景"

@@ -5,6 +5,7 @@ import { Pixel } from "../libs/color-quantize/utils";
 import { getCurrentPlayMode, PlayMode } from "../utils";
 import { LyricLine } from "./lyric-parser";
 
+export const windowedConfigOpenedAtom = atom(false);
 export const topbarMenuOpenedAtom = atom(false);
 export const isLyricPageOpeningAtom = atom(false);
 export const lyricEditorConnectedAtom = atom(false);

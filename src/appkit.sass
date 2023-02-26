@@ -13,6 +13,109 @@
         bottom: 0
 
 @mixin appkit-styles()
+    .appkit-window
+        border-radius: 10px
+        box-shadow: 0px 36px 100px rgba(0, 0, 0, 0.4), 0px 0px 3px rgba(0, 0, 0, 0.55)
+        border: solid 0.5px rgba(0, 0, 0, 0.2)
+        display: flex
+        background: #2c2c2c
+        color: rgba(255, 255, 255, 0.9)
+        user-select: none
+        font-family: 'PingFang SC'
+        font-style: normal
+        background: rgba(44, 44, 44, 0.8)
+        backdrop-filter: blur(40.7742px)
+        font-size: 11px
+        font-weight: 400
+        max-height: 100vh
+        max-width: 100vw
+        -webkit-font-smoothing: antialiased
+        -moz-osx-font-smoothing: grayscale
+        > *
+            border: solid 1px rgba(255, 255, 255, 0.2)
+            border-radius: 10px
+            overflow: hidden
+            display: flex
+            .spacer
+                flex: 1
+            .window-sidebar
+                flex: 0
+                display: flex
+                flex-direction: column
+                margin-bottom: 17px
+                .sidebar-item
+                    font-weight: 400
+                    font-size: 13px
+                    line-height: 16px
+                    margin: 0px 17px
+                    white-space: nowrap
+                    >*
+                        padding: 6px 7px
+                        border-radius: 5px
+                    &.selected>*
+                        background: linear-gradient(0deg, rgba(10, 130, 255, 0.75), rgba(10, 130, 255, 0.75)), #0A82FF
+            .window-sidebar-devider
+                width: 1px
+                min-width: 1px
+                background: rgba(255, 255, 255, 0.1)
+                box-shadow: -1px 0px 0.5px rgba(0, 0, 0, 0.05)
+            .window-content
+                background: #2c2c2c
+                flex: 1
+                min-width: 0
+                min-height: 0
+                display: flex
+                flex-direction: column
+                .window-content-inner
+                    flex: 1
+                    min-height: 0
+                    min-width: 0
+                    >*
+                        position: relative
+                        overflow: hidden scroll
+                        width: 100%
+                        height: 100%
+                        >*
+                            max-width: 100%
+                            height: fit-content
+                            margin: 0px 20px 20px 20px
+            .window-controls-content
+                flex: 0
+                display: flex
+                min-height: 52px
+                align-items: center
+                &.small
+                    min-height: 24px // 小窗口
+            .title
+                margin: 0 30px
+                font-size: 15px
+                font-weight: 590
+            .appkit-traffic-lights
+                position: absolute
+                display: flex
+                margin: 20px // 大窗口
+                &.small
+                    margin: 6px // 小窗口
+                button
+                    display: block
+                    border: 0.5px solid rgba(0, 0, 0, 0.2)
+                    height: 12px
+                    width: 12px
+                    margin-right: 8px
+                    border-radius: 6px
+                    padding: 0
+                    &.close
+                        background: #FF5F57
+                    &.minimize
+                        background: #FEBC2E
+                    &.zoom
+                        background: #28C840
+    .appkit-group-box
+        background: rgba(255, 255, 255, 0.05)
+        border: 1px solid rgba(255, 255, 255, 0.05)
+        border-radius: 6px
+        padding: 10px
+
     .appkit-menu
         z-index: 999
         background: rgba(40, 40, 40, 0.6)

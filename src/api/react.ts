@@ -189,10 +189,16 @@ export function useAlbumImage(
 	const [shouldLowQuality, setShouldLowQuality] = React.useState(
 		lowWidth && lowHeight && lowWidth * lowHeight > 0,
 	);
+	const currentRawLyricResp = useAtomValue(currentRawLyricRespAtom);
 
 	const albumImageUrls = React.useMemo(() => {
 		const songData = getPlayingSong();
 		const urls: string[] = [];
+
+		if (currentRawLyricResp.albumImageUrl) {
+			urls.push(currentRawLyricResp.albumImageUrl);
+		}
+
 		const originalTrackPic =
 			songData?.originFromTrack?.track?.track?.album?.picUrl;
 		if (originalTrackPic) {
@@ -230,7 +236,7 @@ export function useAlbumImage(
 		urls.push(EMPTY_IMAGE_URL);
 		urls.push(EMPTY_IMAGE_URL);
 		return urls;
-	}, [musicId, shouldLowQuality, lowWidth, lowHeight]);
+	}, [musicId, shouldLowQuality, lowWidth, lowHeight, currentRawLyricResp]);
 
 	const [selectedUrl, setSelectedUrl] = React.useState("");
 

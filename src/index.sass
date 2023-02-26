@@ -41,6 +41,7 @@
 
 #applemusic-like-lyrics-view-fm
     @include applemusic-like-lyrics-view-style
+    padding-top: 0
     .am-album-hide-sidebar
         width: 12px
         display: flex
@@ -52,12 +53,21 @@
             height: 10vh
             background-color: black
     .am-fm-player-ctl
-        margin-top: 1rem
         display: flex
         align-items: center
         justify-content: space-evenly
-    .am-lyric-background
-        z-index: -1
+    .am-player-song-info
+        > *
+            width: min(40vh, 40vw)
+        > .am-album-image
+            width: min(40vh, 40vw)
+            height: min(40vh, 40vw)
+        > .am-music-sub-widget
+            > .am-music-info-with-menu
+                font-size: 120%
+                @media screen and (min-height: 1024px)
+                    font-size: 200%
+                
     > *
         height: 100%
         width: 100%

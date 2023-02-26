@@ -1,8 +1,8 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
-import { AudioQualityType, genAudioPlayerCommand, PlayState } from "../../api";
+import { AudioQualityType, genAudioPlayerCommand } from "../../api";
 import {
 	useAlbumImageUrl,
 	useConfigValue,
@@ -15,27 +15,17 @@ import {
 	playProgressAtom,
 	currentAudioDurationAtom,
 	playVolumeAtom,
-	playStateAtom,
 	currentAudioQualityTypeAtom,
-	currentPlayModeAtom,
 	currentAudioIdAtom,
 	topbarMenuOpenedAtom,
 	albumAtom,
 } from "../../core/states";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
-import IconPause from "../../assets/icon_pause.svg";
-import IconRewind from "../../assets/icon_rewind.svg";
-import IconForward from "../../assets/icon_forward.svg";
-import IconShuffle from "../../assets/icon_shuffle.svg";
-import IconShuffleOn from "../../assets/icon_shuffle_on.svg";
-import IconRepeat from "../../assets/icon_repeat.svg";
-import IconRepeatOn from "../../assets/icon_repeat_on.svg";
-import IconPlay from "../../assets/icon_play.svg";
 import IconLossless from "../../assets/icon_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
-import { PlayMode, switchPlayMode } from "../../utils";
 import { AudioFFTControl } from "./audio-fft-control";
+import { PlayControls } from "./play-controls";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -51,7 +41,6 @@ function toDuration(duration: number) {
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
-	const [currentPlayMode, setCurrentPlayMode] = useAtom(currentPlayModeAtom);
 	const currentAudioQualityType = useAtomValue(currentAudioQualityTypeAtom);
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const musicId = useAtomValue(musicIdAtom);
@@ -61,7 +50,6 @@ export const PlayerSongInfo: React.FC<{
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom) / 1000;
 	const playProgress = useAtomValue(playProgressAtom);
 	const playVolume = useAtomValue(playVolumeAtom);
-	const playState = useAtomValue(playStateAtom);
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
@@ -180,7 +168,6 @@ export const PlayerSongInfo: React.FC<{
 									<IconDots color="#FFFFFF" />
 								</button>
 							)}
-							{props.isFM && <LyricPlayerFMControls />}
 						</div>
 
 						{!hidePlayProgressBar && (
@@ -216,89 +203,11 @@ export const PlayerSongInfo: React.FC<{
 						)}
 					</div>
 
-					{widgetUnderProgressBar === "play-controls" && (
-						<div className="am-music-controls">
-							<button
-								className="am-music-track-shuffle"
-								onClick={() => {
-									if (currentPlayMode === PlayMode.Random) {
-										switchPlayMode(PlayMode.Order);
-										setCurrentPlayMode(PlayMode.Order);
-									} else {
-										switchPlayMode(PlayMode.Random);
-										setCurrentPlayMode(PlayMode.Random);
-									}
-								}}
-							>
-								{currentPlayMode === PlayMode.Random ? (
-									<IconShuffleOn color="#FFFFFF" />
-								) : (
-									<IconShuffle color="#FFFFFF" />
-								)}
-							</button>
-							<button
-								className="am-music-track-prev"
-								onClick={() => {
-									document
-										.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
-										?.click();
-								}}
-							>
-								<IconRewind color="#FFFFFF" />
-							</button>
-							<button
-								className="am-music-play"
-								onClick={() => {
-									if (playState === PlayState.Playing) {
-										document
-											.querySelector<HTMLButtonElement>(
-												"#main-player .btnp-pause",
-											)
-											?.click();
-									} else {
-										document
-											.querySelector<HTMLButtonElement>(
-												"#main-player .btnp-play",
-											)
-											?.click();
-									}
-								}}
-							>
-								{playState === PlayState.Playing ? (
-									<IconPause color="#FFFFFF" />
-								) : (
-									<IconPlay color="#FFFFFF" />
-								)}
-							</button>
-							<button
-								className="am-music-track-next"
-								onClick={() => {
-									document
-										.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
-										?.click();
-								}}
-							>
-								<IconForward color="#FFFFFF" />
-							</button>
-							<button
-								className="am-music-track-repeat"
-								onClick={() => {
-									if (currentPlayMode === PlayMode.Repeat) {
-										switchPlayMode(PlayMode.Order);
-										setCurrentPlayMode(PlayMode.Order);
-									} else {
-										switchPlayMode(PlayMode.Repeat);
-										setCurrentPlayMode(PlayMode.Repeat);
-									}
-								}}
-							>
-								{currentPlayMode === PlayMode.Repeat ? (
-									<IconRepeatOn color="#FFFFFF" />
-								) : (
-									<IconRepeat color="#FFFFFF" />
-								)}
-							</button>
-						</div>
+					{widgetUnderProgressBar === "play-controls" && props.isFM && (
+						<LyricPlayerFMControls />
+					)}
+					{widgetUnderProgressBar === "play-controls" && !props.isFM && (
+						<PlayControls />
 					)}
 
 					{widgetUnderProgressBar === "play-controls" && (

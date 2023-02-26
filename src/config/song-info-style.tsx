@@ -1,4 +1,4 @@
-import { Select, Title } from "@mantine/core";
+import { Select } from "@mantine/core";
 import { useConfig } from "../api/react";
 import {
 	SliderConfigComponent,
@@ -59,7 +59,6 @@ export const SongInfoStyleSettings: React.FC = () => {
 
 	return (
 		<>
-			<Title order={2}>歌曲信息样式设置</Title>
 			<SwitchConfigComponent
 				settingKey="hideAudioQualityTag"
 				label="隐藏音质标签"
@@ -89,7 +88,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 					<SliderConfigComponent
 						label="频谱线条数量"
 						min={8}
-						max={64}
+						max={256}
 						defaultValue={64}
 						settingKey="fftBarAmount"
 					/>

@@ -1,4 +1,4 @@
-import { Title, Button, Text, Alert, Select, Space } from "@mantine/core";
+import { Button, Text, Alert, Select, Space } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
 import { useConfig, useConfigValueBoolean } from "../api/react";
@@ -20,7 +20,6 @@ export const AboutPage: React.FC = () => {
 	const isMRBNCM = React.useMemo(() => betterncm.isMRBNCM ?? false, []);
 	return (
 		<>
-			<Title order={2}>关于</Title>
 			<Text>Apple Music-like lyrics</Text>
 			{enableUpdateBranch && <Text>当前分支：{updateBranch}</Text>}
 			<Text>

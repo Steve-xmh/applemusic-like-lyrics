@@ -1,4 +1,3 @@
-import { Title } from "@mantine/core";
 import { useConfigValueBoolean } from "../api/react";
 import {
 	ColorConfigComponent,
@@ -11,7 +10,6 @@ export const LyricStyleSettings: React.FC = () => {
 	const fontShadow = useConfigValueBoolean("fontShadow");
 	return (
 		<>
-			<Title order={2}>歌词样式设置</Title>
 			<SwitchConfigComponent
 				settingKey="lyricBlurEffect"
 				label="歌词模糊效果"

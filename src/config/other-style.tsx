@@ -1,4 +1,4 @@
-import { Button, Title } from "@mantine/core";
+import { Button } from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -7,7 +7,6 @@ import {
 export const OtherStyleSettings: React.FC = () => {
 	return (
 		<>
-			<Title order={2}>其它样式设置</Title>
 			<SwitchConfigComponent
 				settingKey="autoHideControlBar"
 				label="鼠标静止时自动隐藏播放栏和标题栏"

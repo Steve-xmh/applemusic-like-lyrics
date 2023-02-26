@@ -6,7 +6,7 @@ export const AudioFFTControl: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
 	const fftBarAmount = Math.min(
-		64,
+		256,
 		Math.max(useConfigValueNumber("fftBarAmount", 64), 8),
 	);
 	const fftBarTweenSoftness = Math.max(
@@ -57,8 +57,6 @@ export const AudioFFTControl: React.FC = () => {
 							a[i] = v * weighting(((i + 1) / a.length) ** 2 * 22000 + 50);
 						});
 					}
-
-					rawData.splice(64);
 
 					const data: number[] = [];
 
