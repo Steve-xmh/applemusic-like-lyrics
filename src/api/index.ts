@@ -176,7 +176,7 @@ export async function getLyricCorrection(
  */
 export function getPlayingSong() {
 	if (APP_CONF.isOSX) {
-		return callCachedSearchFunction("baJ", []);
+		return callCachedSearchFunction("baD", []);
 	} else {
 		return callCachedSearchFunction("getPlaying", []);
 	}
