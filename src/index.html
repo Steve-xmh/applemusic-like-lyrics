@@ -3,13 +3,44 @@
 
 <head>
     <meta charset="utf8" />
-    <title>AMLL 歌词组件测试</title>
+    <title>AppKit 组件测试</title>
     <script src="./lyric-test.js"></script>
+    <link rel="stylesheet" href="./appkit.css">
+    <style>
+        #main-view > * {
+            margin-bottom: 15px;
+        }
+        #color-test {
+            font-weight: 900;
+            font-size: 40px;
+            position: absolute;
+            color: white;
+            opacity: 1;
+            mix-blend-mode: soft-light;
+        }
+        body {
+            background: #00CCFF;
+        }
+    </style>
 </head>
 
 <body>
     <div id="main-view">
-
+        <div class="appkit-switch selected">
+            Switch Test
+            <div>
+                <div></div>
+            </div>
+        </div>
+        <div class="appkit-switch ">
+            Switch Test
+            <div>
+                <div></div>
+            </div>
+        </div>
+        <div id="color-test">Font Color Test</div>
+        <button class="appkit-button">Label</button>
+        <button class="appkit-button accent">Label</button>
     </div>
 </body>
 

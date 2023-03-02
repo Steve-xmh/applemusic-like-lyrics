@@ -12,8 +12,70 @@
         right: 0
         bottom: 0
 
+@mixin pingfang-font()
+    font-family: "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+
 @mixin appkit-styles()
+    .appkit-button
+        @include pingfang-font
+        background: #FFFFFF
+        border: 0.5px solid rgba(0, 0, 0, 0.02)
+        box-shadow: 0px 0.25px 0.25px rgba(0, 0, 0, 0.15), 0px 1px 0.75px rgba(0, 0, 0, 0.05)
+        border-radius: 5px
+        font-size: 13px
+        font-weight: 400
+        font-style: normal
+        text-align: center
+        min-width: 70px
+        padding: 4px 14px
+        cursor: pointer
+        &:active
+            background: #6E6D70
+            color: #DFDEDF
+            &.accent
+                background: linear-gradient(180deg, #1568E5 0%, #155CCC 100%)
+                box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.5), inset 0px 0.5px 0px rgba(255, 255, 255, 0.25)
+        &.accent
+            background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%)
+            box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25)
+            color: white
+    .appkit-switch
+        @include pingfang-font
+        user-select: none
+        display: flex
+        align-items: center
+        font-size: 13px
+        &.selected > .appkit-switch-inner
+            background: #007AFF
+            justify-content: flex-end
+            &:active
+                background: linear-gradient(180deg, #155ECE 0%, #1868E5 100%)
+                > *
+                    background: #C8C8C8
+        > .appkit-switch-inner
+            margin: 0 10px
+            width: 40px
+            height: 22px
+            background: rgba(60, 60, 67, 0.18)
+            border: 0.5px solid rgba(0, 0, 0, 0.12)
+            box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.05)
+            border-radius: 100px
+            display: flex
+            justify-content: flex-start
+            cursor: pointer
+            &:active
+                background: #cdcdcd
+                box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25), inset 0px 0.5px 0px rgba(255, 255, 255, 0.15)
+            > *
+                transform: translateY(0.5px) // 矫正居中位置
+                border-radius: 50%
+                width: 20px
+                height: 20px
+                background: #FFFFFF
+                border: 0.5px solid rgba(0, 0, 0, 0.2)
+                box-shadow: 0px 0.5px 4px rgba(0, 0, 0, 0.2)
     .appkit-window
+        @include pingfang-font
         border-radius: 10px
         box-shadow: 0px 36px 100px rgba(0, 0, 0, 0.4), 0px 0px 3px rgba(0, 0, 0, 0.55)
         border: solid 0.5px rgba(0, 0, 0, 0.2)
@@ -21,7 +83,6 @@
         background: #2c2c2c
         color: rgba(255, 255, 255, 0.9)
         user-select: none
-        font-family: 'PingFang SC'
         font-style: normal
         background: rgba(44, 44, 44, 0.8)
         backdrop-filter: blur(40.7742px)
@@ -177,7 +238,6 @@
         font-size: 13px
         line-height: 18px
         color: white
-        font-family: "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
         font-style: normal
         font-weight: 400
         user-select: none

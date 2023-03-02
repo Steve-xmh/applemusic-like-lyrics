@@ -5,9 +5,9 @@ import {
 	Slider,
 	TextInput,
 	TextInputProps,
-	Switch,
 	Text,
 } from "@mantine/core";
+import { Switch } from "../components/appkit/switch";
 
 export const SwitchConfigComponent: React.FC<{
 	settingKey: string;
@@ -21,13 +21,14 @@ export const SwitchConfigComponent: React.FC<{
 	);
 	const settingValue = React.useMemo(() => rawValue === "true", [rawValue]);
 	return (
-		<Switch
-			disabled={props.disabled}
-			sx={{ margin: "16px 0" }}
-			checked={settingValue}
-			onChange={() => setSettingValue(String(!settingValue))}
-			label={props.label}
-		/>
+		<div className="amll-switch-config">
+			<Switch
+				disabled={props.disabled}
+				selected={settingValue}
+				onClick={() => setSettingValue(String(!settingValue))}
+				beforeSwitch={props.label}
+			/>
+		</div>
 	);
 };
 

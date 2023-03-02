@@ -3,6 +3,7 @@ node_modules/
 *.log
 *.map
 *.plugin
+src/**/*.css
 lyrics/
 /index.js
 /lyric-test.js

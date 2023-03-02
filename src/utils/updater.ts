@@ -37,6 +37,7 @@ export async function getInstallableBranches(force = false) {
 
 	const branches: RepoBranch[] = await fetch(
 		"https://gitcode.net/api/v4/projects/228337/repository/branches",
+		{ cache: "no-store" },
 	).then((v) => v.json());
 
 	const result: string[] = [];
@@ -46,6 +47,7 @@ export async function getInstallableBranches(force = false) {
 				// https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=
 				const entries: RepoTreeEntry[] = await fetch(
 					`https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=${branch.name}`,
+					{ cache: "no-store" },
 				).then((v) => v.json());
 
 				for (const file of UPDATE_FILES) {
@@ -72,6 +74,7 @@ export async function installLatestBranchVersion(branchName: string) {
 	log("正在更新版本到", branchName, "分支的最新版本");
 	const entries: RepoTreeEntry[] = await fetch(
 		`https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=${branchName}`,
+		{ cache: "no-store" },
 	).then((v) => v.json());
 
 	const files = await Promise.all(
@@ -79,7 +82,9 @@ export async function installLatestBranchVersion(branchName: string) {
 			if (entry.type === "blob") {
 				const downloadLink = `https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${branchName}/${entry.path}?inline=false`;
 				log("正在下载更新文件", entry.path);
-				const data = await fetch(downloadLink).then((v) => v.blob());
+				const data = await fetch(downloadLink, { cache: "no-store" }).then(
+					(v) => v.blob(),
+				);
 				return {
 					name: entry.name,
 					data,
