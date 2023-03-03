@@ -19,26 +19,28 @@
             mix-blend-mode: soft-light;
         }
         body {
-            background: #00CCFF;
+            background: #222222;
         }
     </style>
 </head>
 
 <body>
     <div id="main-view">
-        <div class="appkit-switch selected">
-            Switch Test
-            <div>
-                <div></div>
+        <div class="appkit-group-box" style="color:white;">
+            <div class="appkit-switch selected">
+                Switch Test
+                <div class="appkit-switch-inner">
+                    <div></div>
+                </div>
+            </div>
+            <div class="appkit-switch ">
+                Switch Test
+                <div class="appkit-switch-inner">
+                    <div></div>
+                </div>
             </div>
         </div>
-        <div class="appkit-switch ">
-            Switch Test
-            <div>
-                <div></div>
-            </div>
-        </div>
-        <div id="color-test">Font Color Test</div>
+        <!-- <div id="color-test">Font Color Test</div> -->
         <button class="appkit-button">Label</button>
         <button class="appkit-button accent">Label</button>
     </div>
