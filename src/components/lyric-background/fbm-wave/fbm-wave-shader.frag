@@ -44,27 +44,10 @@ float noise(vec2 p) {
     return res * res;
 }
 
-const mat2 mtx = mat2(0.80, 0.60, -0.60, 0.80);
-
 float fbm(vec2 p) {
     float f = 0.0;
 
-    f += 0.050000 * noise(p + time * 0.2) + time * 0.008;
-    p = mtx * p * 2.02;
-
-    f += 0.031250 * noise(p);
-    p = mtx * p * 2.01;
-
-    f += 0.250000 * noise(p);
-    p = mtx * p * 2.03;
-
-    // f += 0.125000 * noise(p);
-    // p = mtx * p * 2.01;
-
-    // f += 0.062500 * noise(p);
-    // p = mtx * p * 2.04;
-
-    // f += 0.015625 * noise(p + sin(time));
+    f += 0.148000 * noise(p) + time * 0.02;
 
     return f / 0.96875;
 }
@@ -76,7 +59,7 @@ float pattern(in vec2 p) {
 void main() {
     vec2 uv = gl_FragCoord.xy / resolution.x;
     float shade = pattern(uv) / 2.;
-    vec3 color = texture2D(albumColorMap, vec2(shade, shade), 16.).rgb;
+    vec3 color = texture2D(albumColorMap, vec2(shade, shade * 0.27), 16.).rgb;
     
     color = rgb2hsv(color);
     

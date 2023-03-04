@@ -1,6 +1,6 @@
 import { Select } from "@mantine/core";
 import { useConfig } from "../api/react";
-import { GroupBox } from "../components/appkit/group-box";
+import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -65,17 +65,23 @@ export const SongInfoStyleSettings: React.FC = () => {
 					settingKey="hideAudioQualityTag"
 					label="隐藏音质标签"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent settingKey="hideAlbumImage" label="隐藏专辑图" />
+				<GroupBoxDevider />
 				<SwitchConfigComponent settingKey="hideMusicName" label="隐藏歌名" />
+				<GroupBoxDevider />
 				<SwitchConfigComponent settingKey="hideMusicAlbum" label="隐藏专辑名" />
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="hideMusicArtists"
 					label="隐藏歌手名"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="hideMenuButton"
 					label="隐藏菜单按钮"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="hidePlayProgressBar"
 					label="隐藏播放进度条"
@@ -97,6 +103,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 				/>
 				{widgetUnderProgressBar === "audio-viz-fft" && (
 					<>
+						<GroupBoxDevider />
 						<SliderConfigComponent
 							label="频谱线条数量"
 							min={8}
@@ -104,6 +111,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 							defaultValue={64}
 							settingKey="fftBarAmount"
 						/>
+						<GroupBoxDevider />
 						<SliderConfigComponent
 							label="频谱线条粗细半径"
 							min={1}
@@ -111,6 +119,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 							defaultValue={2}
 							settingKey="fftBarThinkness"
 						/>
+						<GroupBoxDevider />
 						<SliderConfigComponent
 							label="频谱线条变化级别"
 							description="越大变化越慢"
@@ -119,6 +128,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 							defaultValue={4}
 							settingKey="fftBarTweenSoftness"
 						/>
+						<GroupBoxDevider />
 						<Select
 							label="可视化频谱频率权重算法"
 							value={fftWeightingMethod}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useConfig } from "../api/react";
-import { ColorInput, TextInput, TextInputProps, Text } from "@mantine/core";
+import { ColorInput, TextInput, TextInputProps } from "@mantine/core";
 import { Switch } from "../components/appkit/switch";
 import { Slider } from "../components/appkit/slider";
 
@@ -91,6 +91,7 @@ export const SliderConfigComponent: React.FC<{
 	label: string;
 	description?: string;
 	disabled?: boolean;
+	formatLabel?: (v: number) => string;
 }> = (props) => {
 	const [rawValue, setSettingValue] = useConfig(props.settingKey);
 	const settingValue = React.useMemo(

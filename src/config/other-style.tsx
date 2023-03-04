@@ -1,5 +1,5 @@
-import { Button } from "@mantine/core";
-import { GroupBox } from "../components/appkit/group-box";
+import { Button } from "../components/appkit/button";
+import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -13,6 +13,7 @@ export const OtherStyleSettings: React.FC = () => {
 					settingKey="autoHideControlBar"
 					label="鼠标静止时自动隐藏播放栏和标题栏"
 				/>
+				<GroupBoxDevider />
 				<SliderConfigComponent
 					step={0.5}
 					min={1}
@@ -25,15 +26,14 @@ export const OtherStyleSettings: React.FC = () => {
 			<GroupBox>
 				<SwitchConfigComponent
 					settingKey="usePingFangFont"
-					label="播放页面使用苹方字体"
-					description="需要系统安装"
+					label="播放页面使用苹果系字体"
+					description="需要系统预先安装字体，安装后需要重启网易云客户端方可使用。英文部分将会使用 SF Pro，中文部分将会使用苹方。"
 				/>
+				<GroupBoxDevider />
 				<Button
-					sx={{ margin: "8px 0" }}
-					variant="outline"
 					onClick={() => {
 						betterncm.ncm.openUrl(
-							"https://ghproxy.com/https://github.com/paraself/PingFang-Fonts/archive/refs/heads/master.zip",
+							"https://ghproxy.com/https://github.com/prchann/fonts/archive/refs/heads/main.zip",
 						);
 					}}
 				>

@@ -8,6 +8,7 @@ export const Switch: React.FC<
 	}>
 > = (props) => {
 	return (
+		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 		<div
 			onClick={props.onClick}
 			className={`appkit-switch ${props.selected ? "selected" : ""}`}

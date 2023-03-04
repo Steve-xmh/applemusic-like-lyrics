@@ -59,6 +59,7 @@ export const LyricLineView: React.FC<
 				"am-lyric-line-before": offset < 0,
 				"am-lyric-line-after": offset > 0,
 				"am-lyric-line-selected": selected,
+				"am-lyric-line-align-right": !!line.shouldAlignRight,
 				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
 			})}
 			style={{

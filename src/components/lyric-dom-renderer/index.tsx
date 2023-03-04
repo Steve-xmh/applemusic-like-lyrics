@@ -1,18 +1,17 @@
 import { genAudioPlayerCommand, PlayState } from "../../api";
 import { useAtom, useAtomValue } from "jotai";
 import * as React from "react";
-import { useConfigValueBoolean, useForceUpdate } from "../../api/react";
+import { useConfigValueBoolean } from "../../api/react";
 import {
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
 	currentLyricsAtom,
-	currentLyricsIndexAtom,
+	currentLyricsIndexesAtom,
 	playStateAtom,
 } from "../../core/states";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
 import { log } from "../../utils/logger";
 import { LyricLine } from "../../core/lyric-parser";
-import { guessTextReadDuration } from "../../utils";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
 
@@ -36,10 +35,9 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, [currentLyricsA]);
 
 	const playState = useAtomValue(playStateAtom);
-	const forceUpdate = useForceUpdate();
 
-	const [currentLyricIndex, setCurrentLyricIndex] = useAtom(
-		currentLyricsIndexAtom,
+	const [currentLyricIndexes, setCurrentLyricIndexes] = useAtom(
+		currentLyricsIndexesAtom,
 	);
 
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
@@ -49,7 +47,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
 	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
-	const disableLyricBuffer = useConfigValueBoolean("disableLyricBuffer", false);
+
 	const alignTopSelectedLyric = useConfigValueBoolean(
 		"alignTopSelectedLyric",
 		false,
@@ -62,15 +60,20 @@ export const LyricDOMRenderer: React.FC = () => {
 	>([]);
 
 	const scrollDelayRef = React.useRef(0);
-	const cachedLyricIndex = React.useRef(currentLyricIndex);
+	const cachedLyricIndex = React.useRef(currentLyricIndexes);
 	const scrollToLyric = React.useCallback(
 		(
 			mustScroll: boolean = false,
-			currentLyricIndex = cachedLyricIndex.current,
+			currentLyricIndexes = cachedLyricIndex.current,
 		) => {
-			cachedLyricIndex.current = currentLyricIndex;
+			cachedLyricIndex.current = currentLyricIndexes;
 			if (lyricListElement.current) {
-				let scrollToIndex = cachedLyricIndex.current;
+				let scrollToIndex = Number.MAX_SAFE_INTEGER;
+				for (const i of cachedLyricIndex.current) {
+					if (scrollToIndex > i) {
+						scrollToIndex = i;
+					}
+				}
 				for (const i of keepSelectLyrics.current) {
 					if (scrollToIndex > i) {
 						scrollToIndex = i;
@@ -83,8 +86,12 @@ export const LyricDOMRenderer: React.FC = () => {
 					.slice(0, Math.max(0, scrollToIndex))
 					.reduce((pv, cv) => pv + (cv[1] ? 0 : cv[0] * scaleRatio), 0);
 
+				const albumElement = document.querySelector(".am-album-image");
 				if (alignTopSelectedLyric) {
 					scrollHeight += viewHeight.current * 0.1;
+				} else if (albumElement) {
+					const rect = albumElement.getBoundingClientRect();
+					scrollHeight += rect.top + (rect.height - curLineHeight) / 2;
 				} else {
 					scrollHeight += (viewHeight.current - curLineHeight) / 2;
 				}
@@ -98,7 +105,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						duration: mustScroll ? 0 : 500,
 						delay: mustScroll
 							? 0
-							: Math.max(0, Math.min((i - scrollToIndex) * 15, 500)),
+							: Math.max(0, Math.min((i - scrollToIndex) * 100, 1000)),
 					};
 					if (i === scrollToIndex || keepSelectLyrics.current.has(i)) {
 						lineTransform.scale = 1;
@@ -132,10 +139,10 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	React.useLayoutEffect(() => {
 		scrollDelayRef.current = 0;
-		cachedLyricIndex.current = -1;
+		cachedLyricIndex.current = new Set();
 		keepSelectLyrics.current.clear();
 		recalculateLineHeights();
-		scrollToLyric(true, -1);
+		scrollToLyric(true, new Set());
 	}, [
 		currentLyrics,
 		configTranslatedLyric,
@@ -170,7 +177,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		};
 		const onLyricOpened = () => {
 			keepSelectLyrics.current.clear();
-			keepSelectLyrics.current.add(currentLyricIndex);
+			currentLyricIndexes.forEach((v) => keepSelectLyrics.current.add(v));
 			scrollToLyric(true); // 触发歌词更新重新定位
 		};
 
@@ -182,7 +189,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			btn?.removeEventListener("click", onLyricOpened);
 			window.removeEventListener("resize", onWindowSizeChanged);
 		};
-	}, [scrollToLyric, currentLyricIndex]);
+	}, [scrollToLyric, currentLyricIndexes]);
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine, evt: React.MouseEvent) => {
@@ -192,7 +199,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				if (currentLyrics) {
 					const index = currentLyrics.findIndex((v) => v === line);
 					keepSelectLyrics.current.clear();
-					setCurrentLyricIndex(index);
+					setCurrentLyricIndexes(new Set([index]));
 				}
 				if (
 					configDynamicLyric &&
@@ -200,25 +207,28 @@ export const LyricDOMRenderer: React.FC = () => {
 						currentAudioDuration < currentAudioDuration) &&
 					(line.dynamicLyricTime || -1) >= 0
 				) {
-					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.time);
+					log("正在跳转到歌词时间", line?.dynamicLyricTime || line.beginTime);
 					legacyNativeCmder._envAdapter.callAdapter(
 						"audioplayer.seek",
 						() => {},
 						[
 							currentAudioId,
 							genAudioPlayerCommand(currentAudioId, "seek"),
-							(line?.dynamicLyricTime || line.time) / 1000,
+							(line?.dynamicLyricTime || line.beginTime) / 1000,
 						],
 					);
-				} else if (line.time < currentAudioDuration && line.time >= 0) {
-					log("正在跳转到歌词时间", line.time);
+				} else if (
+					line.beginTime < currentAudioDuration &&
+					line.beginTime >= 0
+				) {
+					log("正在跳转到歌词时间", line.beginTime);
 					legacyNativeCmder._envAdapter.callAdapter(
 						"audioplayer.seek",
 						() => {},
 						[
 							currentAudioId,
 							genAudioPlayerCommand(currentAudioId, "seek"),
-							line.time / 1000,
+							line.beginTime / 1000,
 						],
 					);
 				}
@@ -254,76 +264,14 @@ export const LyricDOMRenderer: React.FC = () => {
 		],
 	);
 
-	const lastUpdateTime = React.useRef(Date.now());
-	const lastIndex = React.useRef(-1);
-
-	const checkIfTooFast = React.useCallback(
-		(currentLyricIndex: number) => {
-			const lastLyricIndex = lastIndex.current;
-			if (lastLyricIndex === currentLyricIndex || !currentLyrics) {
-				return;
-			}
-			const changeTime = Date.now();
-			const lastLine: LyricLine | undefined = currentLyrics[lastLyricIndex];
-			const lastLyric = lastLine?.originalLyric || "";
-			if (lastLyric.trim().length === 0) {
-				keepSelectLyrics.current.clear();
-				return;
-			}
-			// 预估的阅读时间
-			const guessedLineReadTime = Math.min(
-				2500,
-				Math.max(1000, guessTextReadDuration(lastLyric)),
-			);
-			if (
-				lastLine &&
-				changeTime - lastUpdateTime.current <= guessedLineReadTime
-			) {
-				if (keepSelectLyrics.current.size < 3) {
-					keepSelectLyrics.current.add(lastLyricIndex);
-				} else {
-					if (keepSelectLyrics.current.size > 0)
-						keepSelectLyrics.current.clear();
-					lastUpdateTime.current = changeTime;
-				}
-				forceUpdate();
-				keepSelectLyrics.current.add(currentLyricIndex);
-			} else {
-				lastUpdateTime.current = changeTime;
-				if (keepSelectLyrics.current.size > 0) forceUpdate();
-				keepSelectLyrics.current.clear();
-			}
-		},
-		[currentLyrics],
-	);
-
-	React.useLayoutEffect(() => {
-		return () => {
-			lastIndex.current = currentLyricIndex;
-		};
-	}, [currentLyricIndex]);
-
 	React.useLayoutEffect(() => {
 		if (
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
 		) {
-			if (disableLyricBuffer) {
-				keepSelectLyrics.current.clear();
-			} else {
-				checkIfTooFast(currentLyricIndex);
-			}
-			scrollToLyric(false, currentLyricIndex);
-		} else {
-			lastIndex.current = currentLyricIndex;
+			scrollToLyric(false, currentLyricIndexes);
 		}
-	}, [
-		scrollToLyric,
-		checkIfTooFast,
-		currentLyrics,
-		currentLyricIndex,
-		playState,
-	]);
+	}, [scrollToLyric, currentLyrics, currentLyricIndexes, playState]);
 
 	React.useLayoutEffect(() => {
 		const el = lyricListElement.current;
@@ -351,17 +299,26 @@ export const LyricDOMRenderer: React.FC = () => {
 		}
 	}, [alignTopSelectedLyric]);
 
+	const firstLyricIndex = React.useMemo(() => {
+		let i = -1;
+		for (const v of currentLyricIndexes) {
+			if (i < v) {
+				i = v;
+			}
+		}
+		return i;
+	}, [currentLyricIndexes]);
+
 	return (
 		<div className="am-lyric-view">
 			<div ref={lyricListElement}>
 				{currentLyrics?.map(
 					(line: LyricLine, index: number, _lines: LyricLine[]) => {
-						let isTooFast = keepSelectLyrics.current.has(index); // 如果歌词太快，我们就缓和一下
-						const offset = index - currentLyricIndex;
+						const offset = index - firstLyricIndex;
 						if (line.originalLyric.trim().length > 0) {
 							return (
 								<LyricLineView
-									key={`${index}-${line.time}-${line.originalLyric}`}
+									key={`${index}-${line.beginTime}-${line.originalLyric}`}
 									lineTransform={
 										lineTransforms[index] ?? {
 											top: viewHeight.current,
@@ -369,7 +326,7 @@ export const LyricDOMRenderer: React.FC = () => {
 										}
 									}
 									onSizeChanged={recalculateLineHeights}
-									selected={index === currentLyricIndex || isTooFast}
+									selected={currentLyricIndexes.has(index)}
 									line={line}
 									translated={configTranslatedLyric}
 									dynamic={configDynamicLyric}
@@ -384,8 +341,8 @@ export const LyricDOMRenderer: React.FC = () => {
 									onSizeChanged={recalculateLineHeights}
 									key={`${index}-dots`}
 									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
-									selected={index === currentLyricIndex}
-									time={line.time}
+									selected={currentLyricIndexes.has(index)}
+									time={line.beginTime}
 									offset={offset}
 									duration={line.duration}
 								/>

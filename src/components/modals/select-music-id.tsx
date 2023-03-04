@@ -10,7 +10,7 @@ import {
 	Space,
 	Button,
 } from "@mantine/core";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import * as React from "react";
 import {
 	getLyric,
@@ -94,7 +94,7 @@ export const SelectMusicIdModal: React.FC = () => {
 		selectMusicIdModalOpenedAtom,
 	);
 
-	const musicId = useAtomValue(musicIdAtom);
+	const musicId = useAtom(musicIdAtom);
 
 	const [selectMusicIdModalLoading, setSelectMusicIdModalLoading] =
 		React.useState(false);

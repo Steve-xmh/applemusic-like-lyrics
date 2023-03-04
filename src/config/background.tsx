@@ -10,7 +10,7 @@ import { BlurAlbumMethod } from "../components/lyric-background/blur-album";
 import { BackgroundRenderMethod } from "../components/lyric-background/render";
 import * as React from "react";
 import { MontereyWannaBe } from "../components/lyric-background/monterey-wannabe";
-import { GroupBox } from "../components/appkit/group-box";
+import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 
 type BGRendererMethodData = BackgroundRenderMethod &
 	SelectItem & {
@@ -88,6 +88,7 @@ export const BackgroundSettings: React.FC = () => {
 							settingKey="backgroundRenderScale"
 							label="背景渲染分辨率比率"
 						/>
+						<GroupBoxDevider />
 						<SliderConfigComponent
 							step={1}
 							min={0}
@@ -98,6 +99,7 @@ export const BackgroundSettings: React.FC = () => {
 							settingKey="backgroundRenderSkipFrames"
 							label="背景渲染跳帧"
 						/>
+						<GroupBoxDevider />
 						<SliderConfigComponent
 							settingKey="backgroundLightness"
 							label="背景专辑图采样色亮度"

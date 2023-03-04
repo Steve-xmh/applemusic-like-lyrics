@@ -11,6 +11,7 @@ import {
 	genBitmapImage,
 	getPlayingSong,
 	loadLyric,
+	loadTTMLLyric,
 	PlayState,
 	toPlayState,
 } from "../api";
@@ -30,7 +31,7 @@ import {
 	currentAudioIdAtom,
 	currentAudioQualityTypeAtom,
 	currentLyricsAtom,
-	currentLyricsIndexAtom,
+	currentLyricsIndexesAtom,
 	currentPlayModeAtom,
 	currentRawLyricRespAtom,
 	getMusicId,
@@ -41,6 +42,7 @@ import {
 	playProgressAtom,
 	playStateAtom,
 	playVolumeAtom,
+	ttmlLyricAtom,
 } from "../core/states";
 import { error, log, warn } from "../utils/logger";
 import { LyricEditorWSClient } from "../core/editor-client";
@@ -53,7 +55,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const setPlayProgress = useSetAtom(playProgressAtom);
 	const setPlayVolume = useSetAtom(playVolumeAtom);
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
-	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
+	const setCurrentLyricsIndexes = useSetAtom(currentLyricsIndexesAtom);
 	const setCurrentAudioQualityType = useSetAtom(currentAudioQualityTypeAtom);
 	const setLyricEditorConnected = useSetAtom(lyricEditorConnectedAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
@@ -69,6 +71,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const configTTMLLyric = useConfigValueBoolean("ttml-lyric", false);
 	const enableEditor = useConfigValueBoolean("enableEditor", false);
 	const configGlobalTimeStampOffset = Number(
 		useConfigValue("globalTimeStampOffset", "0"),
@@ -77,6 +80,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const [currentRawLyricResp, setCurrentRawLyricResp] = useAtom(
 		currentRawLyricRespAtom,
 	);
+	const [ttmlLyric, setTTMLLyric] = useAtom(ttmlLyricAtom);
 
 	const [reconnectCounter, setReconnectCounter] = React.useState(Symbol());
 	const editorWSClient = React.useRef<LyricEditorWSClient>();
@@ -164,6 +168,18 @@ export const NCMEnvWrapper: React.FC = () => {
 					error(err);
 				}
 			})();
+			(async () => {
+				setTTMLLyric(null);
+				// setTTMLLyric
+				try {
+					const lyric = await loadTTMLLyric(musicId);
+					if (!canceled) {
+						setTTMLLyric(lyric);
+					}
+				} catch (err) {
+					error(err);
+				}
+			})();
 			return () => {
 				canceled = true;
 				setCurrentLyrics(null);
@@ -192,6 +208,12 @@ export const NCMEnvWrapper: React.FC = () => {
 	}, [currentAudioId]);
 
 	React.useLayoutEffect(() => {
+		if (configTTMLLyric && ttmlLyric) {
+			log("存在 TTML 歌词，正在替换", ttmlLyric);
+			setCurrentLyrics(ttmlLyric);
+			setCurrentLyricsIndexes(new Set());
+			return;
+		}
 		let parsed: LyricLine[] = [];
 		let canUseDynamicLyric = !(
 			!currentRawLyricResp?.yrc?.lyric ||
@@ -218,12 +240,14 @@ export const NCMEnvWrapper: React.FC = () => {
 			);
 		}
 		setCurrentLyrics(parsed);
-		setCurrentLyricsIndex(-1);
+		setCurrentLyricsIndexes(new Set());
 	}, [
 		currentRawLyricResp,
 		configDynamicLyric,
 		configRomanLyric,
 		configTranslatedLyric,
+		configTTMLLyric,
+		ttmlLyric,
 	]);
 
 	React.useEffect(() => {
@@ -380,10 +404,20 @@ export const NCMEnvWrapper: React.FC = () => {
 			let curLyricIndex: number | null = null;
 			if (currentLyrics) {
 				const lastLine = currentLyrics[currentLyrics.length - 1];
+				const indexes = new Set<number>();
+				currentLyrics.forEach((line, index) => {
+					const beginTime = line.dynamicLyricTime ?? line.beginTime ?? 0;
+					const endTime = beginTime + line.duration;
+					if (time > beginTime && time < endTime) {
+						indexes.add(index);
+					}
+				});
 				for (let i = currentLyrics.length - 1; i >= 0; i--) {
 					if (
 						time >
-						(currentLyrics[i].dynamicLyricTime ?? currentLyrics[i].time ?? 0)
+						(currentLyrics[i].dynamicLyricTime ??
+							currentLyrics[i].beginTime ??
+							0)
 					) {
 						curLyricIndex = i;
 						break;
@@ -401,20 +435,20 @@ export const NCMEnvWrapper: React.FC = () => {
 							curLyricLine.dynamicLyricTime +
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
 						) {
-							setCurrentLyricsIndex(curLyricIndex);
+							setCurrentLyricsIndexes(indexes);
 						} else if (
 							lastLine === curLyricLine &&
 							time > curLyricLine.dynamicLyricTime + curLyricLine.duration + 750
 						) {
-							setCurrentLyricsIndex(currentLyrics.length);
+							setCurrentLyricsIndexes(new Set([currentLyrics.length]));
 						}
 					} else if (
 						time <
-							currentLyrics[curLyricIndex].time +
+							currentLyrics[curLyricIndex].beginTime +
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100) ||
 						curLyricIndex === currentLyrics.length - 1
 					) {
-						setCurrentLyricsIndex(curLyricIndex);
+						setCurrentLyricsIndexes(indexes);
 					}
 				}
 			}

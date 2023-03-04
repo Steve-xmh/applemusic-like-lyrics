@@ -1,11 +1,17 @@
 export const Button: React.FC<
-	React.PropsWithChildren<{
-		accent?: boolean;
-	}>
+	React.PropsWithChildren<
+		{
+			accent?: boolean;
+		} & React.HTMLAttributes<HTMLButtonElement>
+	>
 > = (props) => {
+	const { className, accent, children, ...others } = props;
 	return (
-		<button className={`appkit-button ${props.accent ? "accent" : ""}`}>
-			{props.children}
+		<button
+			className={`appkit-button ${accent ? "accent" : ""} ${className || ""}`}
+			{...others}
+		>
+			{children}
 		</button>
 	);
 };

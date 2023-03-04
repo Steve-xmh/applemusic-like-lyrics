@@ -143,6 +143,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 > .am-music-info
                     flex: 1
                     transition: flex 0.5s ease-out
+                    filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
                     mix-blend-mode: soft-light
                     width: calc(100% - 50px)
                     height: fit-content
@@ -251,6 +252,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         flex: 1
         overflow: hidden
         -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
+        filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
         box-sizing: content-box
         &::-webkit-scrollbar
             display: none
@@ -291,13 +293,13 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         .am-lyric-line
             filter: blur(4px)
             &.am-lyric-line-after, &.am-lyric-line-before
-                filter: blur(8px)
+                filter: blur(0.3vh * 6)
                 &.am-lyric-line-selected
                     filter: blur(0px)
             @for $i from -5 through 5
                 @if $i != 0
                     &.am-lyric-line-o#{$i}
-                        filter: blur(abs($i) * 2px)
+                        filter: blur(abs($i) * 0.3vh)
 
     // 未播放歌词淡入效果
     &.lyric-blur-fade-in-effect
@@ -325,24 +327,29 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 width: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
                 height: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
 
-    &.use-ping-fang-font *
-        font-family: 'PingFang SC' !important
-
-    &.font-shadow
-        .am-lyric-view, .am-music-info
-            filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+    &.use-ping-fang-font
+        .am-lyric-view *
+            font-family: 'SF Pro Display', 'PingFang SC' !important
+        .am-player-song-info
+            font-family: 'PingFang SC' !important
 
     .am-lyric-line
         position: absolute
         will-change: transform, filter, opacity
         font-weight: bold
-        mix-blend-mode: soft-lightfont-weight
+        mix-blend-mode: soft-light
         font-size: 5vh
         padding-bottom: max(2rem, 5vh)
         transform-origin: top left
         color: var(--applemusic-like-lyrics-font-color, unset)
         line-break: loose
         word-break: break-word
+        box-sizing: border-box
+        &.am-lyric-line-align-right
+            width: 100%
+            margin-left: 0
+            transform-origin: top right
+            text-align: right
         > .am-lyric-line-original
             opacity: 0.5
             transition: opacity $tween-animation-duration $tween-animation-timing

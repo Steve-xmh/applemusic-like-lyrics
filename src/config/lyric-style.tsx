@@ -1,5 +1,5 @@
 import { useConfigValueBoolean } from "../api/react";
-import { GroupBox } from "../components/appkit/group-box";
+import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 import {
 	ColorConfigComponent,
 	SliderConfigComponent,
@@ -16,14 +16,17 @@ export const LyricStyleSettings: React.FC = () => {
 					settingKey="lyricBlurEffect"
 					label="歌词模糊效果"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="lyricScaleEffect"
 					label="歌词缩放效果"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="lyricHidePassed"
 					label="已播放歌词隐藏效果"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="lyricBlurFadeInEffect"
 					label="未播放歌词淡入效果"
@@ -35,6 +38,7 @@ export const LyricStyleSettings: React.FC = () => {
 					label="文字阴影"
 					defaultValue={false}
 				/>
+				<GroupBoxDevider />
 				<SliderConfigComponent
 					settingKey="fontShadowSize"
 					label="文字阴影大小"
@@ -52,12 +56,14 @@ export const LyricStyleSettings: React.FC = () => {
 					settingKey="fontColor"
 					defaultValue="#FFFFFFFF"
 				/>
+				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="lyricFixedFontSize"
 					defaultValue={lyricFixedFontSize}
 					label="自定义字体大小"
 					description="关闭以使用自适应字体大小"
 				/>
+				<GroupBoxDevider />
 				<SliderConfigComponent
 					step={1}
 					min={8}

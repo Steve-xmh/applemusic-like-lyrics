@@ -1,5 +1,7 @@
 import { log, warn } from "../utils/logger";
 import { genRandomString, normalizePath } from "../utils";
+import { LyricLine } from "../core/lyric-types";
+import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export enum PlayState {
@@ -236,6 +238,20 @@ export const loadLyric = async (
 		// 如果是摘要字符串的话，那就是本地文件
 		return {};
 	}
+};
+
+export const loadTTMLLyric = async (
+	id: string | number,
+): Promise<LyricLine[] | null> => {
+	const lyricsPath = normalizePath(
+		`${plugin.pluginPath}/../../amll-data/ttml-lyrics`,
+	);
+	const ttmlLyricPath = `${lyricsPath}/${id}.ttml`;
+	if (await betterncm.fs.exists(ttmlLyricPath)) {
+		const cachedLyricData = await betterncm.fs.readFileText(ttmlLyricPath);
+		return parseTTMLLyric(cachedLyricData);
+	}
+	return null;
 };
 
 export function genAudioPlayerCommand(audioId: string, command: string) {

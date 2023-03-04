@@ -65,7 +65,6 @@ for (const tabItem of TABS) {
 export const WindowedConfigComponent: React.FC<{
 	onClose?: React.MouseEventHandler;
 }> = (props) => {
-	const hasWarnings = useHasWarnings();
 	const hasUpdates = useHasUpdates();
 	const [checkedUpdate, setCheckedUpdate] = React.useState(false);
 	const [tab, setTab] = React.useState("genernal");
