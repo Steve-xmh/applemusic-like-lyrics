@@ -43,6 +43,16 @@ react-is/cjs/react-is.production.min.js:
    * LICENSE file in the root directory of this source tree.
    */
 
+pangu/dist/browser/pangu.min.js:
+  /*!
+   * pangu.js
+   * --------
+   * @version: 4.0.7
+   * @homepage: https://github.com/vinta/pangu.js
+   * @license: MIT
+   * @author: Vinta Chen <vinta.chen@gmail.com> (https://github.com/vinta)
+   */
+
 jszip/dist/jszip.min.js:
   /*!
   
@@ -75,14 +85,4 @@ prismjs/components/prism-core.js:
    * @author Lea Verou <https://lea.verou.me>
    * @namespace
    * @public
-   */
-
-pangu/dist/browser/pangu.min.js:
-  /*!
-   * pangu.js
-   * --------
-   * @version: 4.0.7
-   * @homepage: https://github.com/vinta/pangu.js
-   * @license: MIT
-   * @author: Vinta Chen <vinta.chen@gmail.com> (https://github.com/vinta)
    */
