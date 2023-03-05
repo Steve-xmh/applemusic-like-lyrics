@@ -6,11 +6,7 @@
  */
 
 import { processLyric } from "./lyric-parser";
-import {
-	BackgroundLyricLine,
-	DynamicLyricWord,
-	LyricLine,
-} from "./lyric-types";
+import { DynamicLyricWord, LyricLine } from "./lyric-types";
 
 const timeRegexp =
 	/^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;

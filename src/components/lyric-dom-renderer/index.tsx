@@ -34,11 +34,6 @@ export const LyricDOMRenderer: React.FC = () => {
 	const currentLyricsA = useAtomValue(currentLyricsAtom);
 	// 实现复用
 	const [currentLyrics, setCurrentLyrics] = React.useState(currentLyricsA);
-	React.useLayoutEffect(() => {
-		if (currentLyricsA) {
-			setCurrentLyrics(currentLyricsA);
-		}
-	}, [currentLyricsA]);
 
 	const playState = useAtomValue(playStateAtom);
 
@@ -85,7 +80,11 @@ export const LyricDOMRenderer: React.FC = () => {
 						scrollToIndex = i;
 					}
 				}
-				const curLineHeight = lineHeights.current[scrollToIndex]?.height ?? 0;
+				const curLine = lineHeights.current[scrollToIndex];
+				let curLineHeight = curLine?.height ?? 0;
+				if (curLine?.isDots && lineHeights.current[scrollToIndex + 1]) {
+					curLineHeight = lineHeights.current[scrollToIndex + 1].height;
+				}
 				const scaleRatio = lyricScaleEffect ? 0.9 : 1;
 
 				let scrollHeight = -lineHeights.current
@@ -96,12 +95,15 @@ export const LyricDOMRenderer: React.FC = () => {
 						0,
 					);
 
+				const songInfoElement = document.querySelector(".am-player-song-info");
 				const albumElement = document.querySelector(".am-album-image");
 				if (alignTopSelectedLyric) {
 					scrollHeight += viewHeight.current * 0.1;
-				} else if (albumElement) {
+				} else if (albumElement && songInfoElement) {
+					const pRect = songInfoElement.getBoundingClientRect();
 					const rect = albumElement.getBoundingClientRect();
-					scrollHeight += rect.top + (rect.height - curLineHeight) / 2;
+					scrollHeight +=
+						rect.top - pRect.top + (rect.height - curLineHeight) / 2;
 				} else {
 					scrollHeight += (viewHeight.current - curLineHeight) / 2;
 				}
@@ -117,6 +119,10 @@ export const LyricDOMRenderer: React.FC = () => {
 							? 0
 							: Math.max(0, Math.min((i - scrollToIndex) * 100, 1000)),
 					};
+					if (scrollHeight > viewHeight.current || scrollHeight + height.height < 0) {
+						lineTransform.duration = 0;
+						lineTransform.delay = 0;
+					}
 					if (
 						i === scrollToIndex ||
 						keepSelectLyrics.current.has(i) ||
@@ -127,7 +133,8 @@ export const LyricDOMRenderer: React.FC = () => {
 							lineHeights.current[i].isDots ||
 							lineHeights.current[i].isBGLyric
 						) {
-							scrollHeight += curLineHeight * lineTransform.scale;
+							scrollHeight +=
+								lineHeights.current[i].height * lineTransform.scale;
 						}
 					}
 					i++;
@@ -148,12 +155,23 @@ export const LyricDOMRenderer: React.FC = () => {
 		const el = lyricListElement.current;
 		if (el) {
 			lineHeights.current = [...el.children].map((el) => ({
-				height: el.clientHeight,
+				height: el.getBoundingClientRect().height,
 				isDots: el.classList.contains("am-lyric-dots"),
 				isBGLyric: el.classList.contains("am-lyric-line-bg-lyric"),
 			}));
 		}
 	}, []);
+
+	React.useLayoutEffect(() => {
+		if (currentLyricsA) {
+			setCurrentLyrics(currentLyricsA);
+		}
+	}, [currentLyricsA, scrollToLyric, recalculateLineHeights]);
+	
+	React.useEffect(() => {
+		recalculateLineHeights();
+		scrollToLyric(true);
+	}, [currentLyrics])
 
 	React.useLayoutEffect(() => {
 		scrollDelayRef.current = 0;

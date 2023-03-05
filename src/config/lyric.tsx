@@ -66,14 +66,6 @@ export const LyricSettings: React.FC = () => {
 					max={10}
 				/>
 			</GroupBox>
-			<GroupBox>
-				<SwitchConfigComponent
-					settingKey="enableEditor"
-					label="启用歌词编辑器连接"
-					description="请勿开启！"
-					defaultValue={false}
-				/>
-			</GroupBox>
 		</>
 	);
 };

@@ -30,6 +30,10 @@ export const OtherStyleSettings: React.FC = () => {
 					description="需要系统预先安装字体，安装后需要重启网易云客户端方可使用。英文部分将会使用 SF Pro，中文部分将会使用苹方。"
 				/>
 				<GroupBoxDevider />
+				<div style={{
+					display: "flex",
+					justifyContent: "flex-end",
+				}}>
 				<Button
 					onClick={() => {
 						betterncm.ncm.openUrl(
@@ -37,8 +41,17 @@ export const OtherStyleSettings: React.FC = () => {
 						);
 					}}
 				>
-					你可以在此下载安装苹方字体
+					点此下载安装相关字体
 				</Button>
+				</div>
+			</GroupBox>
+			<GroupBox>
+				<SwitchConfigComponent
+					settingKey="enableEditor"
+					label="启用歌词编辑器连接"
+					description="请勿开启！"
+					defaultValue={false}
+				/>
 			</GroupBox>
 		</>
 	);

@@ -1,6 +1,7 @@
 import { getConfig } from "../config/core";
 import pangu from "pangu/dist/browser/pangu.min.js";
 import { DynamicLyricWord, LyricLine, LyricPureLine } from "./lyric-types";
+import { log } from "../utils/logger";
 // import { guessTextReadDuration } from "../utils";
 
 export const PURE_MUSIC_LYRIC_LINE: LyricLine[] = [
@@ -342,6 +343,7 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			const nextLyric = lyric[i + 1];
 			if (
 				nextLyric &&
+				thisLyric.duration > 0 &&
 				nextLyric.beginTime - (thisLyric.beginTime + thisLyric.duration) > 5000
 			) {
 				result.push({
@@ -375,6 +377,8 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			originalLyric: "",
 		});
 	}
+
+	log("歌词已处理", result);
 
 	return result;
 }
