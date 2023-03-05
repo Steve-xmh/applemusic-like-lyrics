@@ -22,6 +22,12 @@ export interface LyricLineTransform {
 	delay: number;
 }
 
+export interface LyricLineMeta {
+	height: number;
+	isDots: boolean;
+	isBGLyric: boolean;
+}
+
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
@@ -53,7 +59,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		false,
 	);
 
-	const lineHeights = React.useRef<[number, boolean][]>([]);
+	const lineHeights = React.useRef<LyricLineMeta[]>([]);
 	const viewHeight = React.useRef<number>(window.innerHeight);
 	const [lineTransforms, setLineTransforms] = React.useState<
 		LyricLineTransform[]
@@ -79,12 +85,16 @@ export const LyricDOMRenderer: React.FC = () => {
 						scrollToIndex = i;
 					}
 				}
-				const curLineHeight = lineHeights.current[scrollToIndex]?.[0] ?? 0;
-				const scaleRatio = lyricScaleEffect ? 0.8 : 1;
+				const curLineHeight = lineHeights.current[scrollToIndex]?.height ?? 0;
+				const scaleRatio = lyricScaleEffect ? 0.9 : 1;
 
 				let scrollHeight = -lineHeights.current
 					.slice(0, Math.max(0, scrollToIndex))
-					.reduce((pv, cv) => pv + (cv[1] ? 0 : cv[0] * scaleRatio), 0);
+					.reduce(
+						(pv, cv) =>
+							pv + (cv.isDots || cv.isBGLyric ? 0 : cv.height * scaleRatio),
+						0,
+					);
 
 				const albumElement = document.querySelector(".am-album-image");
 				if (alignTopSelectedLyric) {
@@ -107,15 +117,22 @@ export const LyricDOMRenderer: React.FC = () => {
 							? 0
 							: Math.max(0, Math.min((i - scrollToIndex) * 100, 1000)),
 					};
-					if (i === scrollToIndex || keepSelectLyrics.current.has(i)) {
+					if (
+						i === scrollToIndex ||
+						keepSelectLyrics.current.has(i) ||
+						cachedLyricIndex.current.has(i)
+					) {
 						lineTransform.scale = 1;
-						if (lineHeights.current[i][1]) {
+						if (
+							lineHeights.current[i].isDots ||
+							lineHeights.current[i].isBGLyric
+						) {
 							scrollHeight += curLineHeight * lineTransform.scale;
 						}
 					}
 					i++;
-					if (!height[1]) {
-						scrollHeight += height[0] * lineTransform.scale;
+					if (!(height.isDots || height.isBGLyric)) {
+						scrollHeight += height.height * lineTransform.scale;
 					}
 					result.push(lineTransform);
 				}
@@ -130,10 +147,11 @@ export const LyricDOMRenderer: React.FC = () => {
 		// 计算每个歌词行的高度，用于布局计算
 		const el = lyricListElement.current;
 		if (el) {
-			lineHeights.current = [...el.children].map((el) => [
-				el.clientHeight,
-				el.classList.contains("am-lyric-dots"),
-			]);
+			lineHeights.current = [...el.children].map((el) => ({
+				height: el.clientHeight,
+				isDots: el.classList.contains("am-lyric-dots"),
+				isBGLyric: el.classList.contains("am-lyric-line-bg-lyric"),
+			}));
 		}
 	}, []);
 
@@ -325,7 +343,9 @@ export const LyricDOMRenderer: React.FC = () => {
 											scale: 1,
 										}
 									}
-									onSizeChanged={recalculateLineHeights}
+									onSizeChanged={() =>
+										requestAnimationFrame(recalculateLineHeights)
+									}
 									selected={currentLyricIndexes.has(index)}
 									line={line}
 									translated={configTranslatedLyric}
@@ -338,7 +358,9 @@ export const LyricDOMRenderer: React.FC = () => {
 						} else {
 							return (
 								<LyricDots
-									onSizeChanged={recalculateLineHeights}
+									onSizeChanged={() =>
+										requestAnimationFrame(recalculateLineHeights)
+									}
 									key={`${index}-dots`}
 									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
 									selected={currentLyricIndexes.has(index)}

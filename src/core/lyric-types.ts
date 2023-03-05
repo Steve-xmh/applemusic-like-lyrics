@@ -8,8 +8,8 @@ export interface DynamicLyricWord {
 export interface LyricLine extends BackgroundLyricLine {
 	beginTime: number;
 	duration: number;
-	backgroundLyric?: BackgroundLyricLine;
 	shouldAlignRight?: boolean;
+	backgroundLyric?: LyricLine;
 }
 
 export interface BackgroundLyricLine {
@@ -17,6 +17,7 @@ export interface BackgroundLyricLine {
 	translatedLyric?: string;
 	romanLyric?: string;
 	dynamicLyricTime?: number;
+	isBackgroundLyric?: boolean;
 	dynamicLyric?: DynamicLyricWord[];
 }
 

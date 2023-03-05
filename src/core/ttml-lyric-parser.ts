@@ -42,7 +42,8 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 			originalLyric: "",
 			dynamicLyric: [] as DynamicLyricWord[],
 			dynamicLyricTime: parseTimespan(lineEl.getAttribute("begin")!!),
-			backgroundLyric: undefined as BackgroundLyricLine | undefined,
+			isBackgroundLyric: false,
+			backgroundLyric: undefined as LyricLine | undefined,
 			translatedLyric: undefined as string | undefined,
 			romanLyric: undefined as string | undefined,
 		} satisfies LyricLine;
@@ -70,7 +71,12 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						translatedLyric: undefined as string | undefined,
 						romanLyric: undefined as string | undefined,
 						dynamicLyric: [] as DynamicLyricWord[],
-					} satisfies BackgroundLyricLine;
+						dynamicLyricTime: line.dynamicLyricTime,
+						isBackgroundLyric: true,
+						beginTime: line.beginTime,
+						duration: line.duration,
+						shouldAlignRight: line.shouldAlignRight,
+					} satisfies LyricLine;
 
 					for (const wordEl of childEl.querySelectorAll(
 						"span>span[begin][end]",
@@ -136,6 +142,9 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 		}
 
 		result.push(line);
+		if (line.backgroundLyric) {
+			result.push(line.backgroundLyric);
+		}
 	}
 
 	return processLyric(result);

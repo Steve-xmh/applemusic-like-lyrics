@@ -235,6 +235,10 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 opacity: 0.75
             > .am-lyric-line-dynamic > *
                 opacity: 0.75
+            &.am-lyric-line-bg-lyric
+                opacity: 0 !important
+                &.am-lyric-line-selected
+                    opacity: 0.5 !important
             &.am-lyric-line-o0,
             &.am-lyric-line-selected
                 opacity: 1
@@ -345,6 +349,12 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         line-break: loose
         word-break: break-word
         box-sizing: border-box
+        &.am-lyric-line-bg-lyric
+            font-size: 3vh
+            padding-bottom: max(1rem, 3vh)
+            opacity: 0 !important
+            &.am-lyric-line-selected
+                opacity: 0.5 !important
         &.am-lyric-line-align-right
             width: 100%
             margin-left: 0
@@ -386,10 +396,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             opacity: 0.5
             > .am-lyric-line-dynamic > *
                 opacity: 1
-        &.am-lyric-line-o0
-            > .am-lyric-line-dynamic > *
-                animation-name: am-lyric-word-animation
-                animation-play-state: running
         &.am-lyric-line-o0,
         &.am-lyric-line-selected
             filter: blur(0px)
@@ -398,6 +404,8 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 opacity: 1
             > .am-lyric-line-dynamic > *
                 opacity: 1
+                animation-name: am-lyric-word-animation
+                animation-play-state: running
 
         @keyframes am-lyric-float-animation
             from
