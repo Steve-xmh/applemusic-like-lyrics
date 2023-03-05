@@ -30,19 +30,21 @@ export const OtherStyleSettings: React.FC = () => {
 					description="需要系统预先安装字体，安装后需要重启网易云客户端方可使用。英文部分将会使用 SF Pro，中文部分将会使用苹方。"
 				/>
 				<GroupBoxDevider />
-				<div style={{
-					display: "flex",
-					justifyContent: "flex-end",
-				}}>
-				<Button
-					onClick={() => {
-						betterncm.ncm.openUrl(
-							"https://ghproxy.com/https://github.com/prchann/fonts/archive/refs/heads/main.zip",
-						);
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "flex-end",
 					}}
 				>
-					点此下载安装相关字体
-				</Button>
+					<Button
+						onClick={() => {
+							betterncm.ncm.openUrl(
+								"https://ghproxy.com/https://github.com/prchann/fonts/archive/refs/heads/main.zip",
+							);
+						}}
+					>
+						点此下载安装相关字体
+					</Button>
 				</div>
 			</GroupBox>
 			<GroupBox>

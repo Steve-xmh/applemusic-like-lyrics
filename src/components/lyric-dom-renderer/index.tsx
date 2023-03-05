@@ -119,7 +119,10 @@ export const LyricDOMRenderer: React.FC = () => {
 							? 0
 							: Math.max(0, Math.min((i - scrollToIndex) * 100, 1000)),
 					};
-					if (scrollHeight > viewHeight.current || scrollHeight + height.height < 0) {
+					if (
+						scrollHeight > viewHeight.current ||
+						scrollHeight + height.height < 0
+					) {
 						lineTransform.duration = 0;
 						lineTransform.delay = 0;
 					}
@@ -167,11 +170,11 @@ export const LyricDOMRenderer: React.FC = () => {
 			setCurrentLyrics(currentLyricsA);
 		}
 	}, [currentLyricsA, scrollToLyric, recalculateLineHeights]);
-	
+
 	React.useEffect(() => {
 		recalculateLineHeights();
 		scrollToLyric(true);
-	}, [currentLyrics])
+	}, [currentLyrics]);
 
 	React.useLayoutEffect(() => {
 		scrollDelayRef.current = 0;

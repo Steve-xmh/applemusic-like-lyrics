@@ -33,6 +33,7 @@ import {
 } from "../core/lyric-parser";
 import { setClipboardData } from "../api";
 import { WindowedConfigComponent } from "../config";
+import exportTTMLText from "../core/ttml-writer";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
@@ -146,6 +147,7 @@ const MainMenu: React.FC<{
 	const musicId = useAtomValue(musicIdAtom);
 	const album = useAtomValue(albumAtom);
 	const songName: string = useAtomValue(songNameAtom);
+	const currentLyrics = useAtomValue(currentLyricsAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
 	const albumImageUrl = useAtomValue(albumImageUrlAtom);
 	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
@@ -335,6 +337,18 @@ const MainMenu: React.FC<{
 					}}
 				/>
 			</MenuItem>
+			<MenuItem
+				label="导出 TTML 歌词到剪切板"
+				labelOnly={!currentLyrics}
+				onClick={() => {
+					if (currentLyrics) {
+						try {
+							setClipboardData(exportTTMLText(currentLyrics));
+						} catch {}
+						setMenuOpened(false);
+					}
+				}}
+			/>
 			<MenuDevider />
 			<MenuItem
 				label="Apple Music-like Lyric 插件设置..."
