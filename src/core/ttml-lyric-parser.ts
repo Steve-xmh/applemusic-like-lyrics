@@ -22,12 +22,17 @@ function parseTimespan(timeSpan: string): number {
 	}
 }
 
+const wordReg = /^([,.'"?A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\-]+)$/;
+
 export function parseLyric(ttmlText: string): LyricLine[] {
 	const domParser = new DOMParser();
 	const ttmlDoc: XMLDocument = domParser.parseFromString(
 		ttmlText,
 		"application/xml",
 	);
+
+	console.log(ttmlDoc);
+
 	const result: LyricLine[] = [];
 
 	for (const lineEl of ttmlDoc.querySelectorAll("body p[begin][end]")) {
@@ -47,15 +52,26 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 		line.duration =
 			parseTimespan(lineEl.getAttribute("end")!!) - line.beginTime;
 
+		let notFirst = false;
 		for (const wordEl of lineEl.querySelectorAll("p>span[begin][end]")) {
 			const word = {
-				word: wordEl.innerHTML.trim(),
+				word: wordEl.innerHTML,
 				time: parseTimespan(wordEl.getAttribute("begin")!!),
 				duration: 0,
 				flag: 0,
 			} satisfies DynamicLyricWord;
+			if (notFirst) {
+				if (wordReg.test(wordEl.innerHTML)) {
+					word.word = ` ${word.word}`;
+				}
+			} else {
+				notFirst = true;
+			}
 			word.duration = parseTimespan(wordEl.getAttribute("end")!!) - word.time;
 			line.dynamicLyric.push(word);
+		}
+		if (line.dynamicLyric.length === 0) {
+			line.originalLyric = lineEl.textContent || "";
 		}
 
 		for (const childEl of lineEl.children) {
@@ -74,15 +90,23 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						shouldAlignRight: line.shouldAlignRight,
 					} satisfies LyricLine;
 
+					let notFirst = false;
 					for (const wordEl of childEl.querySelectorAll(
 						"span>span[begin][end]",
 					)) {
 						const word = {
-							word: wordEl.innerHTML.trim(),
+							word: wordEl.innerHTML,
 							time: parseTimespan(wordEl.getAttribute("begin")!!),
 							duration: 0,
 							flag: 0,
 						} satisfies DynamicLyricWord;
+						if (notFirst) {
+							if (wordReg.test(wordEl.innerHTML)) {
+								word.word = ` ${word.word}`;
+							}
+						} else {
+							notFirst = true;
+						}
 						word.duration =
 							parseTimespan(wordEl.getAttribute("end")!!) - word.time;
 						bgLine.dynamicLyric.push(word);
@@ -142,6 +166,8 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 			result.push(line.backgroundLyric);
 		}
 	}
+
+	console.log(result);
 
 	return processLyric(result);
 }

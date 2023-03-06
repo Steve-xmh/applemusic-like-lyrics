@@ -40,7 +40,8 @@ interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
 	romalrc?: EAPILyric;
-	yrc?: EAPILyric;
+	yromalrc?: EAPILyric;
+	ytlrc?: EAPILyric;
 }
 
 declare namespace channel {

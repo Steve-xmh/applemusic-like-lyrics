@@ -117,7 +117,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						duration: mustScroll ? 0 : 500,
 						delay: mustScroll
 							? 0
-							: Math.max(0, Math.min((i - scrollToIndex) * 100, 1000)),
+							: Math.max(0, Math.min((i - scrollToIndex) * 75, 1000)),
 					};
 					if (
 						scrollHeight > viewHeight.current ||
