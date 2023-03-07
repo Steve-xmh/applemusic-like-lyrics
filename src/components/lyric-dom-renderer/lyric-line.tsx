@@ -67,6 +67,7 @@ export const LyricLineView: React.FC<
 				transform: `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
 				transitionDelay: `${lineTransform.delay}ms`,
 				transitionDuration: `${lineTransform.duration}ms`,
+				display: Math.abs(offset) > 25 ? "none" : "",
 			}}
 			ref={lineRef}
 			{...props}

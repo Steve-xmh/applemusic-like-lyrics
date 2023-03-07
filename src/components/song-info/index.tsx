@@ -2,7 +2,7 @@ import { Loader, LoadingOverlay } from "@mantine/core";
 import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
-import { AudioQualityType, genAudioPlayerCommand } from "../../api";
+import { genAudioPlayerCommand } from "../../api";
 import {
 	useAlbumImageUrl,
 	useConfigValue,
@@ -15,18 +15,16 @@ import {
 	playProgressAtom,
 	currentAudioDurationAtom,
 	playVolumeAtom,
-	currentAudioQualityTypeAtom,
 	currentAudioIdAtom,
 	topbarMenuOpenedAtom,
 	albumAtom,
 } from "../../core/states";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
-import IconLossless from "../../assets/icon_lossless.svg";
-import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
 import { AudioFFTControl } from "./audio-fft-control";
 import { PlayControls } from "./play-controls";
 import { NowPlayingSlider } from "../appkit/np-slider";
+import { AudioQualityTag } from "./audio-quality-tag";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -42,7 +40,6 @@ function toDuration(duration: number) {
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
-	const currentAudioQualityType = useAtomValue(currentAudioQualityTypeAtom);
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const songName: string = useAtomValue(songNameAtom);
@@ -129,27 +126,6 @@ export const PlayerSongInfo: React.FC<{
 						</div>
 					)}
 					<div className="am-music-sub-widget">
-						{!hideAudioQualityTag && (
-							<div className="am-music-quality">
-								{currentAudioQualityType === AudioQualityType.Lossless && (
-									<div className="am-music-quality-tag">
-										<IconLossless />
-										无损
-									</div>
-								)}
-								{currentAudioQualityType === AudioQualityType.HiRes && (
-									<div className="am-music-quality-tag">
-										<IconLossless />
-										高解析度无损
-									</div>
-								)}
-								{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
-									<div>
-										<IconDolbyAtmos />
-									</div>
-								)}
-							</div>
-						)}
 						<div className="am-music-info-with-menu">
 							<div className="am-music-info">
 								{!hideMusicName &&
@@ -212,6 +188,7 @@ export const PlayerSongInfo: React.FC<{
 								/>
 								<div className="am-music-progress-tips">
 									<div>{playProgressText}</div>
+									{!hideAudioQualityTag && <AudioQualityTag />}
 									<div>{remainText}</div>
 								</div>
 							</div>
