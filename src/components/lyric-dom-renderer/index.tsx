@@ -17,6 +17,7 @@ import { LyricDots } from "./lyric-dots";
 
 export interface LyricLineTransform {
 	top: number;
+	left: number;
 	scale: number;
 	duration: number;
 	delay: number;
@@ -55,7 +56,10 @@ export const LyricDOMRenderer: React.FC = () => {
 	);
 
 	const lineHeights = React.useRef<LyricLineMeta[]>([]);
-	const viewHeight = React.useRef<number>(window.innerHeight);
+	const viewHeight = React.useRef<[number, number]>([
+		window.innerHeight,
+		window.innerWidth,
+	]);
 	const [lineTransforms, setLineTransforms] = React.useState<
 		LyricLineTransform[]
 	>([]);
@@ -98,14 +102,14 @@ export const LyricDOMRenderer: React.FC = () => {
 				const songInfoElement = document.querySelector(".am-player-song-info");
 				const albumElement = document.querySelector(".am-album-image");
 				if (alignTopSelectedLyric) {
-					scrollHeight += viewHeight.current * 0.1;
+					scrollHeight += viewHeight.current[1] * 0.1;
 				} else if (albumElement && songInfoElement) {
 					const pRect = songInfoElement.getBoundingClientRect();
 					const rect = albumElement.getBoundingClientRect();
 					scrollHeight +=
 						rect.top - pRect.top + (rect.height - curLineHeight) / 2;
 				} else {
-					scrollHeight += (viewHeight.current - curLineHeight) / 2;
+					scrollHeight += (viewHeight.current[1] - curLineHeight) / 2;
 				}
 
 				let i = 0;
@@ -113,6 +117,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				for (const height of lineHeights.current) {
 					const lineTransform: LyricLineTransform = {
 						top: scrollHeight,
+						left: 0,
 						scale: scaleRatio,
 						duration: mustScroll ? 0 : 500,
 						delay: mustScroll
@@ -120,8 +125,8 @@ export const LyricDOMRenderer: React.FC = () => {
 							: Math.max(0, Math.min((i - scrollToIndex) * 75, 1000)),
 					};
 					if (
-						scrollHeight > viewHeight.current ||
-						scrollHeight + height.height < 0
+						scrollHeight > viewHeight.current[1] * 2 ||
+						scrollHeight + height.height < -viewHeight.current[1]
 					) {
 						lineTransform.duration = 0;
 						lineTransform.delay = 0;
@@ -158,7 +163,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		const el = lyricListElement.current;
 		if (el) {
 			lineHeights.current = [...el.children].map((el) => ({
-				height: el.getBoundingClientRect().height,
+				height: el.clientHeight,
 				isDots: el.classList.contains("am-lyric-dots"),
 				isBGLyric: el.classList.contains("am-lyric-line-bg-lyric"),
 			}));
@@ -193,10 +198,18 @@ export const LyricDOMRenderer: React.FC = () => {
 	React.useLayoutEffect(() => {
 		const el = lyricListElement.current;
 		if (el) {
-			viewHeight.current = el.clientHeight;
+			viewHeight.current = [el.clientWidth, el.clientHeight];
+			el.style.setProperty(
+				"--amll-lyric-view-width",
+				`${viewHeight.current[0]}px`,
+			);
 
 			const obz = new ResizeObserver(() => {
-				viewHeight.current = el.clientHeight;
+				viewHeight.current = [el.clientWidth, el.clientHeight];
+				el.style.setProperty(
+					"--amll-lyric-view-width",
+					`${viewHeight.current[0]}px`,
+				);
 				recalculateLineHeights();
 				scrollToLyric(true);
 			});

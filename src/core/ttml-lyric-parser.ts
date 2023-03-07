@@ -41,8 +41,10 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 			duration: 0,
 			shouldAlignRight: lineEl.getAttribute("ttm:agent") !== "v1",
 			originalLyric: "",
-			dynamicLyric: [] as DynamicLyricWord[],
-			dynamicLyricTime: parseTimespan(lineEl.getAttribute("begin")!!),
+			dynamicLyric: [] as DynamicLyricWord[] | undefined,
+			dynamicLyricTime: parseTimespan(lineEl.getAttribute("begin")!!) as
+				| number
+				| undefined,
 			isBackgroundLyric: false,
 			backgroundLyric: undefined as LyricLine | undefined,
 			translatedLyric: undefined as string | undefined,
@@ -68,10 +70,7 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 				notFirst = true;
 			}
 			word.duration = parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-			line.dynamicLyric.push(word);
-		}
-		if (line.dynamicLyric.length === 0) {
-			line.originalLyric = lineEl.textContent || "";
+			line.dynamicLyric?.push(word);
 		}
 
 		for (const childEl of lineEl.children) {
@@ -82,7 +81,7 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						originalLyric: "",
 						translatedLyric: undefined as string | undefined,
 						romanLyric: undefined as string | undefined,
-						dynamicLyric: [] as DynamicLyricWord[],
+						dynamicLyric: [] as DynamicLyricWord[] | undefined,
 						dynamicLyricTime: line.dynamicLyricTime,
 						isBackgroundLyric: true,
 						beginTime: line.beginTime,
@@ -109,15 +108,16 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						}
 						word.duration =
 							parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-						bgLine.dynamicLyric.push(word);
+						bgLine.dynamicLyric?.push(word);
 					}
 
-					const firstWord = bgLine.dynamicLyric[0];
+					const firstWord = bgLine.dynamicLyric?.[0];
 					if (firstWord?.word.startsWith("(")) {
 						firstWord.word = firstWord.word.substring(1);
 					}
 
-					const lastWord = bgLine.dynamicLyric[bgLine.dynamicLyric.length - 1];
+					const lastWord =
+						bgLine.dynamicLyric?.[bgLine.dynamicLyric.length - 1];
 					if (lastWord?.word.endsWith(")")) {
 						lastWord.word = lastWord.word.substring(
 							0,
@@ -136,10 +136,20 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						}
 					}
 
-					bgLine.originalLyric = bgLine.dynamicLyric.reduce(
-						(pv, cv) => pv + cv.word,
-						"",
-					);
+					if (bgLine.dynamicLyric?.length === 0) {
+						bgLine.originalLyric = "";
+						for (const childNode of childEl.childNodes) {
+							if (childNode.nodeType === Node.TEXT_NODE) {
+								bgLine.originalLyric += childNode.textContent;
+							}
+						}
+						bgLine.originalLyric = bgLine.originalLyric.trim();
+						bgLine.dynamicLyric = undefined;
+						bgLine.dynamicLyricTime = undefined;
+					} else if (line.dynamicLyric) {
+						bgLine.originalLyric =
+							bgLine.dynamicLyric?.reduce((pv, cv) => pv + cv.word, "") || "";
+					}
 
 					line.backgroundLyric = bgLine;
 				} else if (role === "x-translation") {
@@ -153,8 +163,17 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 			}
 		}
 
-		if (line.dynamicLyric.length === 0) {
-		} else {
+		if (line.dynamicLyric?.length === 0) {
+			line.originalLyric = "";
+			for (const childNode of lineEl.childNodes) {
+				if (childNode.nodeType === Node.TEXT_NODE) {
+					line.originalLyric += childNode.textContent;
+				}
+			}
+			line.originalLyric = line.originalLyric.trim();
+			line.dynamicLyric = undefined;
+			line.dynamicLyricTime = undefined;
+		} else if (line.dynamicLyric) {
 			line.originalLyric = line.dynamicLyric.reduce(
 				(pv, cv) => pv + cv.word,
 				"",

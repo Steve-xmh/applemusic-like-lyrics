@@ -64,7 +64,7 @@ export const LyricLineView: React.FC<
 				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
 			})}
 			style={{
-				transform: `translateY(${lineTransform.top}px) scale(${lineTransform.scale})`,
+				transform: `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
 				transitionDelay: `${lineTransform.delay}ms`,
 				transitionDuration: `${lineTransform.duration}ms`,
 			}}

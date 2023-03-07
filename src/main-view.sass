@@ -342,6 +342,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         will-change: transform, filter, opacity
         font-weight: bold
         mix-blend-mode: soft-light
+        width: var(--amll-lyric-view-width)
         font-size: 5vh
         padding-bottom: max(2rem, 5vh)
         transform-origin: left
@@ -356,10 +357,9 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             &.am-lyric-line-selected
                 opacity: 0.5 !important
         &.am-lyric-line-align-right
-            width: 100%
-            margin-left: 0
-            transform-origin: right
             text-align: right
+            transform-origin: right
+            margin: 0
         > .am-lyric-line-original
             opacity: 0.5
             transition: opacity $tween-animation-duration $tween-animation-timing
