@@ -33,13 +33,26 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 
 	console.log(ttmlDoc);
 
+	let mainAgentId = "v1";
+
+	for (const agent of ttmlDoc.querySelectorAll("ttm\\:agent")) {
+		if (agent.getAttribute("type") === "person") {
+			const id = agent.getAttribute("xml:id");
+			if (id) {
+				mainAgentId = id;
+			}
+		}
+	}
+
 	const result: LyricLine[] = [];
 
 	for (const lineEl of ttmlDoc.querySelectorAll("body p[begin][end]")) {
 		const line = {
 			beginTime: parseTimespan(lineEl.getAttribute("begin")!!),
 			duration: 0,
-			shouldAlignRight: lineEl.getAttribute("ttm:agent") !== "v1",
+			shouldAlignRight:
+				!!lineEl.getAttribute("ttm:agent") &&
+				lineEl.getAttribute("ttm:agent") !== mainAgentId,
 			originalLyric: "",
 			dynamicLyric: [] as DynamicLyricWord[] | undefined,
 			dynamicLyricTime: parseTimespan(lineEl.getAttribute("begin")!!) as

@@ -33,7 +33,7 @@ export default function exportTTMLText(
 		if (line.originalLyric.length === 0 && tmp.length > 0) {
 			params.push(tmp);
 			tmp = [];
-		} else if (!line.isBackgroundLyric) {
+		} else if (!line.isBackgroundLyric && line.originalLyric.length > 0) {
 			tmp.push(line);
 		}
 	}
@@ -60,6 +60,24 @@ export default function exportTTMLText(
 	ttRoot.appendChild(head);
 
 	const body = doc.createElement("body");
+	const hasOtherPerson = !!lyric.find((v) => v.shouldAlignRight);
+
+	const metadata = doc.createElement("metadata");
+	const mainPersonAgent = doc.createElement("ttm:agent");
+	mainPersonAgent.setAttribute("type", "person");
+	mainPersonAgent.setAttribute("xml:id", "v1");
+
+	metadata.appendChild(mainPersonAgent);
+
+	if (hasOtherPerson) {
+		const otherPersonAgent = doc.createElement("ttm:agent");
+		otherPersonAgent.setAttribute("type", "other");
+		otherPersonAgent.setAttribute("xml:id", "v2");
+
+		metadata.appendChild(otherPersonAgent);
+	}
+
+	head.appendChild(metadata);
 
 	const guessDuration =
 		(lyric[lyric.length - 1]?.beginTime ?? 0) +
@@ -86,7 +104,7 @@ export default function exportTTMLText(
 			lineP.setAttribute("begin", msToTimestamp(beginTime));
 			lineP.setAttribute("end", msToTimestamp(endTime));
 
-			lineP.setAttribute("ttm:agent", line.shouldAlignRight ? "v1000" : "v1");
+			lineP.setAttribute("ttm:agent", line.shouldAlignRight ? "v2" : "v1");
 			lineP.setAttribute("itunes:key", `L${++i}`);
 
 			if (line.dynamicLyric && line.dynamicLyricTime !== undefined) {
@@ -107,7 +125,7 @@ export default function exportTTMLText(
 
 				bgLineSpan.setAttribute(
 					"ttm:agent",
-					bgLine.shouldAlignRight ? "v1000" : "v1",
+					bgLine.shouldAlignRight ? "v2" : "v1",
 				);
 				bgLineSpan.setAttribute("itunes:key", `L${++i}`);
 

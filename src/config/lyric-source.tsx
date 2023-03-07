@@ -6,6 +6,7 @@ export const LyricSourceSettings: React.FC = () => {
 			<GroupBox>
 				你可以在此处添加歌词来源，如果网易云没有歌词可用时将会依次尝试此处的歌词来源获取歌词。
 			</GroupBox>
+			<GroupBox>（施工中）（以后会有的）</GroupBox>
 		</>
 	);
 };

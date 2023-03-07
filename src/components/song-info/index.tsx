@@ -147,18 +147,20 @@ export const PlayerSongInfo: React.FC<{
 										<a href={`#/m/album/?id=${album.id}`}>{album.name}</a>
 									</div>
 								)}
-								<div className="am-music-artists">
-									<div className="am-artists">
-										{songArtists.map((artist, index) => (
-											<a
-												href={`#/m/artist/?id=${artist.id}`}
-												key={`${artist.id}-${artist.name}-${index}`}
-											>
-												{artist.name}
-											</a>
-										))}
+								{!hideMusicArtists && (
+									<div className="am-music-artists">
+										<div className="am-artists">
+											{songArtists.map((artist, index) => (
+												<a
+													href={`#/m/artist/?id=${artist.id}`}
+													key={`${artist.id}-${artist.name}-${index}`}
+												>
+													{artist.name}
+												</a>
+											))}
+										</div>
 									</div>
-								</div>
+								)}
 							</div>
 							{!hideMenuButton && (
 								<button

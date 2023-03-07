@@ -197,6 +197,7 @@ export function useAlbumImage(
 
 		if (currentRawLyricResp.albumImageUrl) {
 			urls.push(currentRawLyricResp.albumImageUrl);
+			urls.push(currentRawLyricResp.albumImageUrl);
 		}
 
 		const originalTrackPic =
