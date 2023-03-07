@@ -1,6 +1,6 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
 import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
 import { AudioQualityType, genAudioPlayerCommand } from "../../api";
 import {
@@ -26,6 +26,7 @@ import IconLossless from "../../assets/icon_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
 import { AudioFFTControl } from "./audio-fft-control";
 import { PlayControls } from "./play-controls";
+import { NowPlayingSlider } from "../appkit/np-slider";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -48,8 +49,8 @@ export const PlayerSongInfo: React.FC<{
 	const album = useAtomValue(albumAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom) / 1000;
-	const playProgress = useAtomValue(playProgressAtom);
-	const playVolume = useAtomValue(playVolumeAtom);
+	const [playProgress, setPlayProgress] = useAtom(playProgressAtom);
+	const [playVolume, setPlayVolume] = useAtom(playVolumeAtom);
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
@@ -72,8 +73,21 @@ export const PlayerSongInfo: React.FC<{
 		"play-controls",
 	);
 
-	const playProgressText = toDuration(playProgress);
-	const remainText = toDuration(playProgress - currentAudioDuration);
+	const [lockPlayProgress, setLockPlayProgress] = React.useState(false);
+	const [curPlayProgress, setCurPlayProgress] = React.useState(playProgress);
+	const [lockPlayVolume, setLockPlayVolume] = React.useState(false);
+	const [curVolume, setCurVolume] = React.useState(playVolume);
+
+	React.useLayoutEffect(() => {
+		if (!lockPlayProgress) setCurPlayProgress(playProgress);
+	}, [lockPlayProgress, playProgress]);
+
+	React.useLayoutEffect(() => {
+		if (!lockPlayVolume) setCurVolume(playVolume);
+	}, [lockPlayVolume, playVolume]);
+
+	const playProgressText = toDuration(curPlayProgress);
+	const remainText = toDuration(curPlayProgress - currentAudioDuration);
 
 	return (
 		<>
@@ -174,29 +188,28 @@ export const PlayerSongInfo: React.FC<{
 
 						{!hidePlayProgressBar && (
 							<div className="am-music-progress-control">
-								{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-								<div
-									className="am-music-progress-bar"
-									onClick={(evt) => {
-										const rect = evt.currentTarget.getBoundingClientRect();
-										const pos = (evt.clientX - rect.left) / rect.width;
+								<NowPlayingSlider
+									onAfterChange={(v) => {
+										setPlayProgress(v);
+										setLockPlayProgress(false);
 										legacyNativeCmder._envAdapter.callAdapter(
 											"audioplayer.seek",
 											() => {},
 											[
 												currentAudioId,
 												genAudioPlayerCommand(currentAudioId, "seek"),
-												pos * currentAudioDuration,
+												v,
 											],
 										);
 									}}
-								>
-									<div
-										style={{
-											width: `${(playProgress / currentAudioDuration) * 100}%`,
-										}}
-									/>
-								</div>
+									onBeforeChange={() => {
+										setLockPlayProgress(true);
+									}}
+									onChange={setCurPlayProgress}
+									value={curPlayProgress}
+									min={0}
+									max={currentAudioDuration}
+								/>
 								<div className="am-music-progress-tips">
 									<div>{playProgressText}</div>
 									<div>{remainText}</div>
@@ -215,21 +228,32 @@ export const PlayerSongInfo: React.FC<{
 					{widgetUnderProgressBar === "play-controls" && (
 						<div className="am-music-volume-controls">
 							<IconVolume2 color="#FFFFFF" />
-							{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-							<div
-								className="am-music-volume-bar"
-								onClick={(evt) => {
-									const rect = evt.currentTarget.getBoundingClientRect();
-									const pos = (evt.clientX - rect.left) / rect.width;
+							<NowPlayingSlider
+								onAfterChange={(v) => {
+									setPlayVolume(v);
+									setLockPlayVolume(false);
 									legacyNativeCmder._envAdapter.callAdapter(
 										"audioplayer.setVolume",
 										() => {},
-										["", "", pos],
+										["", "", v],
 									);
 								}}
-							>
-								<div style={{ width: `${playVolume * 100}%` }} />
-							</div>
+								onBeforeChange={() => {
+									setLockPlayVolume(true);
+								}}
+								onChange={(v) => {
+									setCurVolume(v);
+									legacyNativeCmder._envAdapter.callAdapter(
+										"audioplayer.setVolume",
+										() => {},
+										["", "", v],
+									);
+								}}
+								value={curVolume}
+								step={0.01}
+								min={0.0}
+								max={1.0}
+							/>
 							<IconVolume color="#FFFFFF" />
 						</div>
 					)}

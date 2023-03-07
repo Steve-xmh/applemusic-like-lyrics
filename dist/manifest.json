@@ -10,7 +10,7 @@
 	"description": "一个基于 BetterNCM 的类 Apple Music 歌词显示插件",
 	"preview": "preview.svg",
 	"version": "2.0.0-dev",
-	"commit": "30a7c0b22cfd277d506aebc3aabbbc86dea6a96d",
+	"commit": "fc01bc0c953cefe14dedcaf59250c3d29ae184f9",
 	"type": "extension",
 	"noDevReload": true,
 	"incompatible": [

@@ -1,29 +1,6 @@
 $tween-animation-duration: 500ms
 $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
-@mixin slide-bar()
-    height: 8px
-    background: #FFF7
-    border-radius: 4px
-    overflow: hidden
-    cursor: pointer
-    &:hover::after
-        content: " "
-        display: inline-block
-        background: white
-        position: absolute
-        vertical-align: top
-        width: 6px
-        height: 16px
-        margin-top: -4px
-        margin-left: -3px
-        border-radius: 3px
-        box-shadow: 0 0 3px #0008
-    > *
-        display: inline-block
-        vertical-align: top
-        background: white
-        height: 8px
 @mixin text-overflow-ellipsis()
     overflow: hidden
     white-space: nowrap
@@ -186,8 +163,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 display: flex
                 flex-direction: column
                 margin-top: 16px
-                > .am-music-progress-bar
-                    @include slide-bar()
                 > .am-music-progress-tips
                     margin-top: 16px
                     font-weight: 1000
@@ -218,9 +193,8 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             flex-direction: row
             > *
                 margin: 8px
-            > .am-music-volume-bar
-                flex: 1
-                @include slide-bar()
+                &:nth-child(2)
+                    flex: 1
     .am-lyric
         flex: 1
         z-index: 2
@@ -254,7 +228,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
     .am-lyric-view
         flex: 1
-        overflow: hidden
+        overflow-y: hidden
         -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
         filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
         box-sizing: content-box
@@ -262,10 +236,10 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             display: none
         > *
             height: 100%
-            width: 100%
+            margin: auto
+            width: 90%
             max-width: 100%
             > *
-                margin-left: 1vw
                 transition: all $tween-animation-duration $tween-animation-timing
 
     .am-lyric-view-no-lyric

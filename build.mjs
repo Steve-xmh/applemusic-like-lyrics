@@ -161,6 +161,11 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 					},
 				});
 				output.pipe(fs.createWriteStream("Apple Music-like lyrics.plugin"));
+				output.pipe(
+					fs.createWriteStream(
+						`Apple Music-like lyrics-${getCommitHash()}.plugin`,
+					),
+				);
 				fs.writeFileSync(
 					"dist/manifest.json",
 					JSON.stringify(manifest, null, "\t"),
