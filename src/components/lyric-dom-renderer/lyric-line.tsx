@@ -5,6 +5,49 @@ import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
 import { playStateAtom, rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
+import { DynamicLyricWord } from "../../core/lyric-types";
+
+const LyricWord: React.FC<{
+	word: DynamicLyricWord;
+	playState: PlayState;
+	delay: number;
+	index: number;
+}> = ({ word, playState, delay, index }) => {
+	if (word.shouldGlow) {
+		const duration = Math.max(1000, Math.min(2500, word.duration));
+		const letters = React.useMemo(() => word.word.split(""), [word.word]);
+		const letterDuration = duration / letters.length;
+
+		return (
+			<span className="am-lyric-glow-word">
+				{letters.map((v, i) => (
+					<span
+						style={{
+							animationDelay: `${i * letterDuration}ms`,
+							animationDuration: `${letterDuration}ms`,
+						}}
+					>
+						{v}
+					</span>
+				))}
+			</span>
+		);
+	} else {
+		return (
+			<span
+				key={`am-lyric-real-word dynamic-word-${word.word}-${index}`}
+				style={{
+					animationDelay: `${delay}ms`,
+					animationDuration: `${word.duration}ms`,
+					animationPlayState:
+						playState === PlayState.Pausing ? "paused" : undefined,
+				}}
+			>
+				{word.word}
+			</span>
+		);
+	}
+};
 
 export const LyricLineView: React.FC<
 	{
@@ -78,17 +121,12 @@ export const LyricLineView: React.FC<
 			(selected || forceDynamic || Math.abs(offset) < 5) ? (
 				<div className="am-lyric-line-dynamic">
 					{line.dynamicLyric.map((word, i) => (
-						<span
-							key={`am-lyric-real-word dynamic-word-${word.word}-${i}`}
-							style={{
-								animationDelay: `${word.time - (line.dynamicLyricTime || 0)}ms`,
-								animationDuration: `${word.duration}ms`,
-								animationPlayState:
-									playState === PlayState.Pausing ? "paused" : undefined,
-							}}
-						>
-							{word.word}
-						</span>
+						<LyricWord
+							word={word}
+							playState={playState}
+							delay={word.time - (line.dynamicLyricTime || 0)}
+							index={i}
+						/>
 					))}
 				</div>
 			) : (

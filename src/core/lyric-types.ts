@@ -3,6 +3,7 @@ export interface DynamicLyricWord {
 	duration: number;
 	flag: number;
 	word: string;
+	shouldGlow: boolean;
 }
 
 export interface LyricLine extends BackgroundLyricLine {

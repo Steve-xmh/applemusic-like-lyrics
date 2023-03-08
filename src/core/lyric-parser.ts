@@ -139,6 +139,7 @@ export function parseLyric(
 								time: processed[i - 1].beginTime + processed[i - 1].duration,
 								duration: 0,
 								flag: 0,
+								shouldGlow: false,
 							},
 							...dynamicLyric,
 						);
@@ -257,6 +258,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: `${subWord.trimStart()} `,
+										shouldGlow: false,
 									});
 								} else {
 									words.push({
@@ -264,6 +266,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: subWord.trimStart(),
+										shouldGlow: false,
 									});
 								}
 							} else if (i === 0) {
@@ -273,6 +276,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: ` ${subWord.trimStart()}`,
+										shouldGlow: false,
 									});
 								} else {
 									words.push({
@@ -280,6 +284,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: subWord.trimStart(),
+										shouldGlow: false,
 									});
 								}
 							} else {
@@ -288,6 +293,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 									duration: splitedDuration,
 									flag,
 									word: `${subWord.trimStart()} `,
+									shouldGlow: false,
 								});
 							}
 						});
@@ -341,6 +347,14 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			isSpace = false;
 			result.push(thisLyric);
 			const nextLyric = lyric[i + 1];
+			if (thisLyric.dynamicLyric) {
+				const lastWord =
+					thisLyric.dynamicLyric[thisLyric.dynamicLyric.length - 1];
+				if (lastWord)
+					lastWord.shouldGlow =
+						/^([0-9a-zA-Z\.\?\,]+)$/.test(lastWord.word) &&
+						lastWord.duration > 1000;
+			}
 			if (
 				nextLyric &&
 				thisLyric.duration > 0 &&

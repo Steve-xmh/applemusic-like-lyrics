@@ -74,6 +74,7 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 				time: parseTimespan(wordEl.getAttribute("begin")!!),
 				duration: 0,
 				flag: 0,
+				shouldGlow: false,
 			} satisfies DynamicLyricWord;
 			if (notFirst) {
 				if (wordReg.test(wordEl.innerHTML)) {
@@ -111,6 +112,7 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 							time: parseTimespan(wordEl.getAttribute("begin")!!),
 							duration: 0,
 							flag: 0,
+							shouldGlow: false,
 						} satisfies DynamicLyricWord;
 						if (notFirst) {
 							if (wordReg.test(wordEl.innerHTML)) {
