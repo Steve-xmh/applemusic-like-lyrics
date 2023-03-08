@@ -350,10 +350,11 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			if (thisLyric.dynamicLyric) {
 				const lastWord =
 					thisLyric.dynamicLyric[thisLyric.dynamicLyric.length - 1];
-				if (lastWord)
+				if (lastWord) {
 					lastWord.shouldGlow =
-						/^([0-9a-zA-Z\.\?\,]+)$/.test(lastWord.word) &&
+						/^([ 0-9a-zA-Z\.\?\,]+)$/.test(lastWord.word) &&
 						lastWord.duration > 1000;
+				}
 			}
 			if (
 				nextLyric &&

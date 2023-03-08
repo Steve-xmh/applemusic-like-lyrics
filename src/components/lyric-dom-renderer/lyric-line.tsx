@@ -16,15 +16,21 @@ const LyricWord: React.FC<{
 	if (word.shouldGlow) {
 		const duration = Math.max(1000, Math.min(2500, word.duration));
 		const letters = React.useMemo(() => word.word.split(""), [word.word]);
-		const letterDuration = duration / letters.length;
+		const letterDuration = duration / letters.length / 2;
 
 		return (
-			<span className="am-lyric-glow-word">
+			<span
+				className="am-lyric-glow-word"
+				style={{
+					animationDelay: `${delay}ms`,
+					animationDuration: `${duration}ms`,
+				}}
+			>
 				{letters.map((v, i) => (
 					<span
 						style={{
-							animationDelay: `${i * letterDuration}ms`,
-							animationDuration: `${letterDuration}ms`,
+							animationDelay: `${delay + i * letterDuration}ms`,
+							animationDuration: `${duration - i * letterDuration}ms`,
 						}}
 					>
 						{v}

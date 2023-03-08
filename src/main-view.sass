@@ -28,7 +28,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         width: 100%
         display: flex
         filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
-    
+
     .am-lyric-background
         z-index: -1
         position: fixed
@@ -315,7 +315,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         position: absolute
         will-change: transform, filter, opacity
         font-weight: bold
-        mix-blend-mode: soft-light
         width: var(--amll-lyric-view-width)
         font-size: 5vh
         padding-bottom: max(2rem, 5vh)
@@ -376,10 +375,49 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             opacity: 1
             > .am-lyric-line-original
                 opacity: 1
-            > .am-lyric-line-dynamic > *
+            > .am-lyric-line-dynamic
+                > *
+                    opacity: 1
+                    animation-name: am-lyric-word-animation
+                    animation-play-state: running
+                > .am-lyric-glow-word
+                    padding: 2vh
+                    margin: -2vh
+                    animation-name: am-lyric-glow-word-animation
+                    animation-play-state: running
+                    transform-style: preserve-3d
+                    perspective: 50vw
+                    > *
+                        opacity: 0.5
+                        transform: translate3d(0, 0, 0)
+                        animation-name: am-lyric-glow-letter-animation
+                        animation-play-state: running
+                        animation-fill-mode: forwards
+                        position: relative
+                        display: inline-block
+                        z-index: 2
+                        padding: 2vh
+                        margin: -2vh
+
+        // @keyframes am-lyric-glow-word-animation
+        //     from
+        //         opacity: 0.5
+        //     to
+        //         opacity: 1
+
+        @keyframes am-lyric-glow-letter-animation
+            0%
+                opacity: 0.5
+                transform: translate3d(0, 0px, 0px)
+                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
+            50%
                 opacity: 1
-                animation-name: am-lyric-word-animation
-                animation-play-state: running
+                transform: translate3d(0, -2px, 20px)
+                filter: drop-shadow(0 0 2px var(--applemusic-like-lyrics-font-color, white))
+            100%
+                opacity: 1
+                transform: translate3d(0, -1px, 0)
+                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
 
         @keyframes am-lyric-float-animation
             from
