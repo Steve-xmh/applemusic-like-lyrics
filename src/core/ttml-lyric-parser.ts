@@ -24,7 +24,7 @@ function parseTimespan(timeSpan: string): number {
 
 const wordReg = /^([,.'"?A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\-]+)$/;
 
-export function parseLyric(ttmlText: string): LyricLine[] {
+export function parseLyric(ttmlText: string, strictMode = false): LyricLine[] {
 	const domParser = new DOMParser();
 	const ttmlDoc: XMLDocument = domParser.parseFromString(
 		ttmlText,
@@ -67,24 +67,51 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 		line.duration =
 			parseTimespan(lineEl.getAttribute("end")!!) - line.beginTime;
 
-		let notFirst = false;
-		for (const wordEl of lineEl.querySelectorAll("p>span[begin][end]")) {
-			const word = {
-				word: wordEl.innerHTML,
-				time: parseTimespan(wordEl.getAttribute("begin")!!),
-				duration: 0,
-				flag: 0,
-				shouldGlow: false,
-			} satisfies DynamicLyricWord;
-			if (notFirst) {
-				if (wordReg.test(wordEl.innerHTML)) {
-					word.word = ` ${word.word}`;
+		if (strictMode) {
+			let wordTmp = "";
+			for (const wordNode of lineEl.childNodes) {
+				if (wordNode.nodeType === Node.TEXT_NODE) {
+					wordTmp += wordNode.textContent;
+				} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
+					const wordEl = wordNode as Element;
+					if (wordEl.hasAttribute("begin") && wordEl.hasAttribute("end")) {
+						if (wordNode.textContent) {
+							wordTmp += wordNode.textContent;
+						}
+						const word = {
+							word: wordTmp,
+							time: parseTimespan(wordEl.getAttribute("begin")!!),
+							shouldGlow: false,
+							duration: 0,
+							flag: 0,
+						} satisfies DynamicLyricWord;
+						word.duration =
+							parseTimespan(wordEl.getAttribute("end")!!) - word.time;
+						wordTmp = "";
+						line.dynamicLyric?.push(word);
+					}
 				}
-			} else {
-				notFirst = true;
 			}
-			word.duration = parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-			line.dynamicLyric?.push(word);
+		} else {
+			let notFirst = false;
+			for (const wordEl of lineEl.querySelectorAll("p>span[begin][end]")) {
+				const word = {
+					word: wordEl.innerHTML,
+					time: parseTimespan(wordEl.getAttribute("begin")!!),
+					shouldGlow: false,
+					duration: 0,
+					flag: 0,
+				} satisfies DynamicLyricWord;
+				if (notFirst) {
+					if (wordReg.test(wordEl.innerHTML)) {
+						word.word = ` ${word.word}`;
+					}
+				} else {
+					notFirst = true;
+				}
+				word.duration = parseTimespan(wordEl.getAttribute("end")!!) - word.time;
+				line.dynamicLyric?.push(word);
+			}
 		}
 
 		for (const childEl of lineEl.children) {
@@ -103,27 +130,57 @@ export function parseLyric(ttmlText: string): LyricLine[] {
 						shouldAlignRight: line.shouldAlignRight,
 					} satisfies LyricLine;
 
-					let notFirst = false;
-					for (const wordEl of childEl.querySelectorAll(
-						"span>span[begin][end]",
-					)) {
-						const word = {
-							word: wordEl.innerHTML,
-							time: parseTimespan(wordEl.getAttribute("begin")!!),
-							duration: 0,
-							flag: 0,
-							shouldGlow: false,
-						} satisfies DynamicLyricWord;
-						if (notFirst) {
-							if (wordReg.test(wordEl.innerHTML)) {
-								word.word = ` ${word.word}`;
+					if (strictMode) {
+						let wordTmp = "";
+						for (const wordNode of childEl.childNodes) {
+							if (wordNode.nodeType === Node.TEXT_NODE) {
+								wordTmp += wordNode.textContent;
+							} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
+								const wordEl = wordNode as Element;
+								if (
+									wordEl.hasAttribute("begin") &&
+									wordEl.hasAttribute("end")
+								) {
+									if (wordNode.textContent) {
+										wordTmp += wordNode.textContent;
+									}
+									const word = {
+										word: wordTmp,
+										time: parseTimespan(wordEl.getAttribute("begin")!!),
+										shouldGlow: false,
+										duration: 0,
+										flag: 0,
+									} satisfies DynamicLyricWord;
+									word.duration =
+										parseTimespan(wordEl.getAttribute("end")!!) - word.time;
+									wordTmp = "";
+									line.dynamicLyric?.push(word);
+								}
 							}
-						} else {
-							notFirst = true;
 						}
-						word.duration =
-							parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-						bgLine.dynamicLyric?.push(word);
+					} else {
+						let notFirst = false;
+						for (const wordEl of childEl.querySelectorAll(
+							"span>span[begin][end]",
+						)) {
+							const word = {
+								word: wordEl.innerHTML,
+								time: parseTimespan(wordEl.getAttribute("begin")!!),
+								shouldGlow: false,
+								duration: 0,
+								flag: 0,
+							} satisfies DynamicLyricWord;
+							if (notFirst) {
+								if (wordReg.test(wordEl.innerHTML)) {
+									word.word = ` ${word.word}`;
+								}
+							} else {
+								notFirst = true;
+							}
+							word.duration =
+								parseTimespan(wordEl.getAttribute("end")!!) - word.time;
+							bgLine.dynamicLyric?.push(word);
+						}
 					}
 
 					const firstWord = bgLine.dynamicLyric?.[0];

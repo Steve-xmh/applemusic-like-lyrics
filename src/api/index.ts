@@ -249,7 +249,11 @@ export const loadTTMLLyric = async (
 	const ttmlLyricPath = `${lyricsPath}/${id}.ttml`;
 	if (await betterncm.fs.exists(ttmlLyricPath)) {
 		const cachedLyricData = await betterncm.fs.readFileText(ttmlLyricPath);
-		return parseTTMLLyric(cachedLyricData);
+		if (cachedLyricData.includes("\n")) {
+			return parseTTMLLyric(cachedLyricData);
+		} else {
+			return parseTTMLLyric(cachedLyricData, true);
+		}
 	}
 	return null;
 };
