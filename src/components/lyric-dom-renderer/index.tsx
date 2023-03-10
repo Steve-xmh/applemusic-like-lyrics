@@ -130,6 +130,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				}
 
 				let i = 0;
+				let curDelay = 0;
 				const result: LyricLineTransform[] = [];
 				for (const height of lineHeights.current) {
 					const lineTransform: LyricLineTransform = {
@@ -137,9 +138,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						left: 0,
 						scale: scaleRatio,
 						duration: mustScroll ? 0 : 500,
-						delay: mustScroll
-							? 0
-							: Math.max(0, Math.min((i - scrollToIndex) * 75, 1000)),
+						delay: mustScroll ? 0 : Math.max(0, Math.min(curDelay, 1000)),
 					};
 					if (
 						scrollHeight > viewHeight.current[1] * 2 ||
@@ -147,6 +146,13 @@ export const LyricDOMRenderer: React.FC = () => {
 					) {
 						lineTransform.duration = 0;
 						lineTransform.delay = 0;
+					} else if (
+						!(
+							scrollHeight > viewHeight.current[1] ||
+							scrollHeight + height.height < 0
+						)
+					) {
+						curDelay += 50;
 					}
 					if (
 						i === scrollToIndex ||
