@@ -1,18 +1,17 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { LyricLineTransform } from ".";
-import { classname, PlayState } from "../../api";
+import { classname } from "../../api";
 import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
-import { playStateAtom, rightClickedLyricAtom } from "../../core/states";
+import { rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
 import { DynamicLyricWord } from "../../core/lyric-types";
 
 const LyricWord: React.FC<{
 	word: DynamicLyricWord;
-	playState: PlayState;
 	delay: number;
 	index: number;
-}> = ({ word, playState, delay, index }) => {
+}> = ({ word, delay, index }) => {
 	if (word.shouldGlow) {
 		const duration = Math.max(1000, Math.min(2500, word.duration));
 		const letters = React.useMemo(() => word.word.split(""), [word.word]);
@@ -45,8 +44,6 @@ const LyricWord: React.FC<{
 				style={{
 					animationDelay: `${delay}ms`,
 					animationDuration: `${word.duration}ms`,
-					animationPlayState:
-						playState === PlayState.Pausing ? "paused" : undefined,
 				}}
 			>
 				{word.word}
@@ -79,21 +76,92 @@ export const LyricLineView: React.FC<
 	onClickLyric,
 	...props
 }) => {
-	const playState = useAtomValue(playStateAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 	const forceDynamic = useConfigValueBoolean("forceDynamicLyric", false);
 	const lineRef = React.useRef<HTMLDivElement>(null);
 
 	React.useLayoutEffect(() => {
-		const dots = lineRef.current;
-		if (dots) {
-			const obs = new ResizeObserver(onSizeChanged);
-			obs.observe(dots);
+		const line = lineRef.current;
+		if (line) {
+			const obs = new ResizeObserver((entries) => {
+				const height = entries[0].contentRect.height;
+				if (height > 0) {
+					onSizeChanged();
+				}
+			});
+			obs.observe(line);
 			return () => {
 				obs.disconnect();
 			};
 		}
 	}, []);
+
+	const prevTransform = React.useRef(
+		`translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
+	);
+	const prevTransformTop = React.useRef(lineTransform.top);
+	React.useEffect(() => {
+		const line = lineRef.current;
+		if (line) {
+			let canceled = false;
+
+			(async () => {
+				const animateTime = lineTransform.duration * 0.7;
+				const bounceTime = lineTransform.duration * 0.3;
+
+				const dest = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
+				const middle =
+					prevTransformTop.current === lineTransform.top
+						? dest
+						: `translateY(${lineTransform.top - 2}px) translateX(${
+								lineTransform.left
+						  }) scale(${lineTransform.scale})`;
+
+				await line.animate(
+					[
+						{
+							transform: prevTransform.current,
+						},
+						{
+							transform: middle,
+						},
+					],
+					{
+						easing: "cubic-bezier(0.46, 0, 0.07, 1)",
+						delay: lineTransform.delay,
+						fill: "backwards",
+						duration: animateTime,
+						composite: "add",
+					},
+				).finished;
+				if (canceled) return;
+				await line.animate(
+					[
+						{
+							transform: middle,
+						},
+						{
+							transform: dest,
+						},
+					],
+					{
+						easing: "ease-in-out",
+						duration: bounceTime,
+						composite: "add",
+						fill: "forwards",
+					},
+				).finished;
+				if (canceled) return;
+			})();
+
+			return () => {
+				prevTransform.current = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
+				prevTransformTop.current = lineTransform.top;
+				canceled = true;
+				line.getAnimations().forEach((a) => a.cancel());
+			};
+		}
+	}, [lineTransform]);
 
 	return (
 		<div
@@ -113,40 +181,40 @@ export const LyricLineView: React.FC<
 				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
 			})}
 			style={{
-				transform: `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
-				transitionDelay: `${lineTransform.delay}ms`,
-				transitionDuration: `${lineTransform.duration}ms`,
 				display: Math.abs(offset) > 25 ? "none" : "",
 			}}
 			ref={lineRef}
 			{...props}
 		>
-			{dynamic &&
-			line.dynamicLyric &&
-			line.dynamicLyricTime &&
-			(selected || forceDynamic || Math.abs(offset) < 5) ? (
-				<div className="am-lyric-line-dynamic">
-					{line.dynamicLyric.map((word, i) => (
-						<LyricWord
-							word={word}
-							playState={playState}
-							delay={word.time - (line.dynamicLyricTime || 0)}
-							index={i}
-						/>
-					))}
+			<div>
+				{dynamic &&
+				line.dynamicLyric &&
+				line.dynamicLyricTime &&
+				(selected || forceDynamic || Math.abs(offset) < 5) ? (
+					<div className="am-lyric-line-dynamic">
+						{line.dynamicLyric.map((word, i) => (
+							<LyricWord
+								word={word}
+								delay={word.time - (line.dynamicLyricTime || 0)}
+								index={i}
+							/>
+						))}
+					</div>
+				) : (
+					<div className="am-lyric-line-original">
+						{line.dynamicLyric
+							?.map((v) => v.word)
+							.join("")
+							.trim() || line.originalLyric}
+					</div>
+				)}
+				<div className="am-lyric-line-translated">
+					{translated ? line.translatedLyric : ""}
 				</div>
-			) : (
-				<div className="am-lyric-line-original">
-					{line.dynamicLyric
-						?.map((v) => v.word)
-						.join("")
-						.trim() || line.originalLyric}
+				<div className="am-lyric-line-roman">
+					{roman ? line.romanLyric : ""}
 				</div>
-			)}
-			<div className="am-lyric-line-translated">
-				{translated ? line.translatedLyric : ""}
 			</div>
-			<div className="am-lyric-line-roman">{roman ? line.romanLyric : ""}</div>
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import { genAudioPlayerCommand, PlayState } from "../../api";
+import { classname, genAudioPlayerCommand, PlayState } from "../../api";
 import { useAtom, useAtomValue } from "jotai";
 import * as React from "react";
 import { useConfigValueBoolean } from "../../api/react";
@@ -21,6 +21,7 @@ export interface LyricLineTransform {
 	scale: number;
 	duration: number;
 	delay: number;
+	opacity?: number;
 }
 
 export interface LyricLineMeta {
@@ -29,6 +30,8 @@ export interface LyricLineMeta {
 	isBGLyric: boolean;
 }
 
+const eqSet: <T>(xs: Set<T>, ys: Set<T>) => boolean = (xs, ys): boolean =>
+	xs.size === ys.size && [...xs].every((x) => ys.has(x));
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
@@ -44,20 +47,6 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	const [cachedLyricIndexes, setCachedLyricIndexes] =
 		React.useState(currentLyricIndexes);
-
-	React.useLayoutEffect(() => {
-		setCachedLyricIndexes((prev) => {
-			for (const i of currentLyricIndexes) {
-				if (prev.has(i)) {
-					const result = new Set<number>();
-					prev.forEach((v) => result.add(v));
-					currentLyricIndexes.forEach((v) => result.add(v));
-					return result;
-				}
-			}
-			return currentLyricIndexes;
-		});
-	}, [currentLyricIndexes]);
 
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
 	const keepSelectLyrics = React.useRef<Set<number>>(new Set());
@@ -81,6 +70,24 @@ export const LyricDOMRenderer: React.FC = () => {
 		LyricLineTransform[]
 	>([]);
 
+	React.useLayoutEffect(() => {
+		setCachedLyricIndexes((prev) => {
+			if (eqSet(prev, currentLyricIndexes)) {
+				return prev;
+			} else {
+				for (const i of currentLyricIndexes) {
+					if (prev.has(i)) {
+						const result = new Set<number>();
+						prev.forEach((v) => result.add(v));
+						currentLyricIndexes.forEach((v) => result.add(v));
+						return result;
+					}
+				}
+				return currentLyricIndexes;
+			}
+		});
+	}, [currentLyricIndexes]);
+
 	const scrollDelayRef = React.useRef(0);
 	const cachedLyricIndex = React.useRef(currentLyricIndexes);
 	const scrollToLyric = React.useCallback(
@@ -88,9 +95,16 @@ export const LyricDOMRenderer: React.FC = () => {
 			mustScroll: boolean = false,
 			currentLyricIndexes = cachedLyricIndex.current,
 		) => {
+			log("触发滚动函数");
 			cachedLyricIndex.current = currentLyricIndexes;
 			if (lyricListElement.current) {
 				let scrollToIndex = Number.MAX_SAFE_INTEGER;
+				if (
+					cachedLyricIndex.current.size + keepSelectLyrics.current.size ===
+					0
+				) {
+					scrollToIndex = 0;
+				}
 				for (const i of cachedLyricIndex.current) {
 					if (scrollToIndex > i) {
 						scrollToIndex = i;
@@ -101,6 +115,8 @@ export const LyricDOMRenderer: React.FC = () => {
 						scrollToIndex = i;
 					}
 				}
+				const isPrevDots =
+					lineHeights.current[scrollToIndex - 1]?.isDots ?? false;
 				const curLine = lineHeights.current[scrollToIndex];
 				let curLineHeight = curLine?.height ?? 0;
 				if (curLine?.isDots && lineHeights.current[scrollToIndex + 1]) {
@@ -137,7 +153,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						top: scrollHeight,
 						left: 0,
 						scale: scaleRatio,
-						duration: mustScroll ? 0 : 500,
+						duration: mustScroll ? 0 : 750,
 						delay: mustScroll ? 0 : Math.max(0, Math.min(curDelay, 1000)),
 					};
 					if (
@@ -150,7 +166,8 @@ export const LyricDOMRenderer: React.FC = () => {
 						!(
 							scrollHeight > viewHeight.current[1] ||
 							scrollHeight + height.height < 0
-						)
+						) &&
+						(isPrevDots ? i >= 0 : true)
 					) {
 						curDelay += 50;
 					}
@@ -197,6 +214,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		if (currentLyricsA) {
 			setCurrentLyrics(currentLyricsA);
 		}
+		setLineTransforms([]);
 	}, [currentLyricsA, scrollToLyric, recalculateLineHeights]);
 
 	React.useEffect(() => {
@@ -339,12 +357,16 @@ export const LyricDOMRenderer: React.FC = () => {
 		],
 	);
 
+	const memoIndexes = React.useRef(new Set<number>());
 	React.useLayoutEffect(() => {
 		if (
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
 		) {
-			scrollToLyric(false, cachedLyricIndexes);
+			if (!eqSet(memoIndexes.current, currentLyricIndexes)) {
+				scrollToLyric(false, cachedLyricIndexes);
+				memoIndexes.current = currentLyricIndexes;
+			}
 		}
 	}, [scrollToLyric, currentLyrics, cachedLyricIndexes, playState]);
 
@@ -385,7 +407,11 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, [cachedLyricIndexes]);
 
 	return (
-		<div className="am-lyric-view">
+		<div
+			className={classname("am-lyric-view", {
+				"am-lyric-pause-all": playState === PlayState.Pausing,
+			})}
+		>
 			<div ref={lyricListElement}>
 				{currentLyrics?.map(
 					(line: LyricLine, index: number, _lines: LyricLine[]) => {
@@ -396,7 +422,7 @@ export const LyricDOMRenderer: React.FC = () => {
 									key={`${index}-${line.beginTime}-${line.originalLyric}`}
 									lineTransform={
 										lineTransforms[index] ?? {
-											top: viewHeight.current,
+											top: 10000,
 											scale: 1,
 										}
 									}
@@ -419,7 +445,12 @@ export const LyricDOMRenderer: React.FC = () => {
 										requestAnimationFrame(recalculateLineHeights)
 									}
 									key={`${index}-dots`}
-									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
+									lineTransform={
+										lineTransforms[index] ?? {
+											top: 10000,
+											scale: 1,
+										}
+									}
 									selected={cachedLyricIndexes.has(index)}
 									time={line.beginTime}
 									offset={offset}

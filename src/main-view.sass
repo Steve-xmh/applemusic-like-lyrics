@@ -202,19 +202,19 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         flex-direction: column
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
-            filter: blur(0) !important
-            opacity: 1 !important
-            visibility: visible !important
-            > .am-lyric-line-original
-                opacity: 0.75
-            > .am-lyric-line-dynamic > *
-                opacity: 0.75
+            > *
+                filter: blur(0) !important
+                opacity: 1 !important
+                visibility: visible !important
+                > .am-lyric-line-original
+                    opacity: 0.75
+                > .am-lyric-line-dynamic > *
+                    opacity: 0.75
             &.am-lyric-line-bg-lyric
-                opacity: 0 !important
-                &.am-lyric-line-selected
+                &.am-lyric-line-selected > * > *
                     opacity: 0.5 !important
             &.am-lyric-line-o0,
-            &.am-lyric-line-selected
+            &.am-lyric-line-selected > *
                 opacity: 1
                 > .am-lyric-line-dynamic > *
                     opacity: 1
@@ -232,6 +232,9 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
         filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
         box-sizing: content-box
+        &.am-lyric-pause-all
+            *
+                animation-play-state: paused !important
         &::-webkit-scrollbar
             display: none
         > *
@@ -255,7 +258,8 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     // 已播放歌词隐藏效果
     &.lyric-hide-passed
         .am-lyric-line
-            opacity: 0.5
+            > *
+                opacity: 0.5
             &.am-lyric-line-before
                 opacity: 0
                 visibility: hidden
@@ -263,34 +267,36 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                     @if $i != 0
                         &.am-lyric-line-o#{$i}
                             visibility: visible
-            &.am-lyric-line-selected
+            &.am-lyric-line-selected > *
                 opacity: 1
 
     // 歌词模糊效果
     &.lyric-blur-effect
         .am-lyric-line
-            filter: blur(4px)
+            > *
+                filter: blur(4px)
             &.am-lyric-line-after, &.am-lyric-line-before
-                filter: blur(0.3vh * 6)
-                &.am-lyric-line-selected
+                > *
+                    filter: blur(0.3vh * 6)
+                &.am-lyric-line-selected > *
                     filter: blur(0px)
             @for $i from -5 through 5
                 @if $i != 0
-                    &.am-lyric-line-o#{$i}
+                    &.am-lyric-line-o#{$i} > *
                         filter: blur(abs($i) * 0.3vh)
 
     // 未播放歌词淡入效果
     &.lyric-blur-fade-in-effect
         .am-lyric-line
-            &.am-lyric-line-after
+            &.am-lyric-line-after > *
                 opacity: 0.1
-            &.am-lyric-line-o1
+            &.am-lyric-line-o1 > *
                 opacity: 0.4
-            &.am-lyric-line-o2
+            &.am-lyric-line-o2 > *
                 opacity: 0.3
-            &.am-lyric-line-o3
+            &.am-lyric-line-o3 > *
                 opacity: 0.2
-            > .am-lyric-line-dynamic > *
+            > * > .am-lyric-line-dynamic > *
                 opacity: 0.5
 
     // 自定义歌词字体大小
@@ -313,7 +319,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
     .am-lyric-line
         position: absolute
-        will-change: transform, filter, opacity
+        will-change: transform
         font-weight: bold
         width: var(--amll-lyric-view-width)
         font-size: 5vh
@@ -326,34 +332,38 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         &.am-lyric-line-bg-lyric
             font-size: 3vh
             padding-bottom: max(1rem, 3vh)
-            opacity: 0 !important
-            &.am-lyric-line-selected
+            > *
+                opacity: 0 !important
+            &.am-lyric-line-selected > *
                 opacity: 0.5 !important
         &.am-lyric-line-align-right
             text-align: right
             transform-origin: right
             margin: 0
-        > .am-lyric-line-original
-            opacity: 0.5
-            transition: opacity $tween-animation-duration $tween-animation-timing
-        > .am-lyric-line-translated,
-        > .am-lyric-line-roman
-            opacity: 0.35
-            font-size: max(16px, 65%)
-            margin-top: 0.5rem
+        > *
+            will-change: filter, opacity
+            transition: all $tween-animation-duration $tween-animation-timing
+            .am-lyric-line-original
+                opacity: 0.5
+                transition: opacity $tween-animation-duration $tween-animation-timing
+            .am-lyric-line-translated,
+            .am-lyric-line-roman
+                opacity: 0.35
+                font-size: max(16px, 65%)
+                margin-top: 0.5rem
 
-        > .am-lyric-line-dynamic
-            position: relative
-            display: inline-block
-            white-space: break-spaces
-            > *
-                opacity: calc(7 / 15)
+            .am-lyric-line-dynamic
+                position: relative
                 display: inline-block
-                transition: transform $tween-animation-duration $tween-animation-timing
-                animation-play-state: paused
-                animation-timing-function: linear
-                animation-fill-mode: both
-                // transition: opacity $tween-animation-duration $tween-animation-timing
+                white-space: break-spaces
+                transition: opacity $tween-animation-duration $tween-animation-timing
+                > *
+                    opacity: calc(7 / 15)
+                    display: inline-block
+                    transition: transform $tween-animation-duration $tween-animation-timing
+                    animation-play-state: paused
+                    animation-timing-function: linear
+                    animation-fill-mode: both
 
         &:hover
             opacity: 1 !important
@@ -362,21 +372,24 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             > .am-lyric-line-dynamic > *
                 opacity: 1 !important
 
-        &.am-lyric-line-after
+        &.am-lyric-line-after > *
             opacity: 0.5
 
-        &.am-lyric-line-before
+        &.am-lyric-line-before > *
             opacity: 0.5
-            > .am-lyric-line-dynamic > *
+            .am-lyric-line-original
                 opacity: 0.5
-                transition: opacity $tween-animation-duration $tween-animation-timing
-        &.am-lyric-line-o0,
-        &.am-lyric-line-selected
+                transition: opacity calc($tween-animation-duration) $tween-animation-timing
+            .am-lyric-line-dynamic > *
+                opacity: 0.5
+                transition: opacity calc($tween-animation-duration) $tween-animation-timing
+        &.am-lyric-line-o0 > *,
+        &.am-lyric-line-selected > *
             filter: blur(0px)
             opacity: 1
-            > .am-lyric-line-original
+            .am-lyric-line-original
                 opacity: 1
-            > .am-lyric-line-dynamic
+            .am-lyric-line-dynamic
                 > *
                     opacity: 1
                     animation-name: am-lyric-word-animation
@@ -399,12 +412,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                         z-index: 2
                         padding: 2vh
                         margin: -2vh
-
-        // @keyframes am-lyric-glow-word-animation
-        //     from
-        //         opacity: 0.5
-        //     to
-        //         opacity: 1
 
         @keyframes am-lyric-glow-letter-animation
             0%
@@ -445,7 +452,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
         > *
             will-change: transform, filter, opacity
-            padding: max(1rem, 1vh) 0
             height: 6vh
             transform-origin: center
             > *
