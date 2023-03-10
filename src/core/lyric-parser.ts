@@ -317,7 +317,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 	return result;
 }
 
-// 处理歌词，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
+// 处理歌词，组合标点符号，拆分CJK逐词歌词到字，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
 export function processLyric(lyric: LyricLine[]): LyricLine[] {
 	if (
 		lyric.length > 0 &&
@@ -345,6 +345,52 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 		} else {
 			thisLyric.originalLyric = pangu.spacing(thisLyric.originalLyric);
 			isSpace = false;
+			if (thisLyric.dynamicLyric && thisLyric.dynamicLyricTime) {
+				const processedDynamicLyric: DynamicLyricWord[] = [];
+				thisLyric.dynamicLyric.forEach((word) => {
+					if (
+						/^([-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/，。！：；“”‘’【】（）￥？《》…]+)$/.test(
+							word.word.trim(),
+						)
+					) {
+						const lastWord =
+							processedDynamicLyric[processedDynamicLyric.length - 1];
+						if (lastWord) {
+							lastWord.word += word.word;
+						} else {
+							processedDynamicLyric.push(word);
+						}
+					} else if (
+						/^([ 　\u4e00-\u9fff\u3400-\u4dbf\u{20000}-\u{2a6df}\u{2a700}-\u{2ebef}\u{30000}-\u{323af}\ufa0e\ufa0f\ufa11\ufa13\ufa14\ufa1f\ufa21\ufa23\ufa24\ufa27\ufa28\ufa29\u3006\u3007]+)$/u.test(
+							word.word.trim(),
+						)
+					) {
+						const chars = word.word.split("");
+						const duration = word.duration / chars.length;
+						for (let i = 0; i < chars.length; i++) {
+							processedDynamicLyric.push({
+								time: word.time + duration * i,
+								duration: duration,
+								flag: 0,
+								word: chars[i],
+								shouldGlow: false,
+							});
+						}
+					} else {
+						processedDynamicLyric.push(word);
+					}
+				});
+
+				const lastWord =
+					processedDynamicLyric[processedDynamicLyric.length - 1];
+
+				if (lastWord) {
+					thisLyric.duration =
+						lastWord.duration + lastWord.time - thisLyric.dynamicLyricTime;
+				}
+
+				thisLyric.dynamicLyric = processedDynamicLyric;
+			}
 			result.push(thisLyric);
 			const nextLyric = lyric[i + 1];
 			if (thisLyric.dynamicLyric) {
@@ -391,6 +437,11 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			duration: result[0]?.beginTime - 500,
 			originalLyric: "",
 		});
+	}
+
+	const lastLine = result[result.length - 1];
+	if (lastLine && lastLine.duration === 0) {
+		lastLine.duration = Infinity;
 	}
 
 	log("歌词已处理", result);

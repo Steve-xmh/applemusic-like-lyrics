@@ -42,6 +42,23 @@ export const LyricDOMRenderer: React.FC = () => {
 		currentLyricsIndexesAtom,
 	);
 
+	const [cachedLyricIndexes, setCachedLyricIndexes] =
+		React.useState(currentLyricIndexes);
+
+	React.useLayoutEffect(() => {
+		setCachedLyricIndexes((prev) => {
+			for (const i of currentLyricIndexes) {
+				if (prev.has(i)) {
+					const result = new Set<number>();
+					prev.forEach((v) => result.add(v));
+					currentLyricIndexes.forEach((v) => result.add(v));
+					return result;
+				}
+			}
+			return currentLyricIndexes;
+		});
+	}, [currentLyricIndexes]);
+
 	const lyricListElement = React.useRef<HTMLDivElement>(null);
 	const keepSelectLyrics = React.useRef<Set<number>>(new Set());
 
@@ -229,7 +246,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		};
 		const onLyricOpened = () => {
 			keepSelectLyrics.current.clear();
-			currentLyricIndexes.forEach((v) => keepSelectLyrics.current.add(v));
+			cachedLyricIndexes.forEach((v) => keepSelectLyrics.current.add(v));
 			scrollToLyric(true); // 触发歌词更新重新定位
 		};
 
@@ -241,7 +258,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			btn?.removeEventListener("click", onLyricOpened);
 			window.removeEventListener("resize", onWindowSizeChanged);
 		};
-	}, [scrollToLyric, currentLyricIndexes]);
+	}, [scrollToLyric, cachedLyricIndexes]);
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine, evt: React.MouseEvent) => {
@@ -321,9 +338,9 @@ export const LyricDOMRenderer: React.FC = () => {
 			playState === PlayState.Playing &&
 			Date.now() - scrollDelayRef.current > 2000
 		) {
-			scrollToLyric(false, currentLyricIndexes);
+			scrollToLyric(false, cachedLyricIndexes);
 		}
-	}, [scrollToLyric, currentLyrics, currentLyricIndexes, playState]);
+	}, [scrollToLyric, currentLyrics, cachedLyricIndexes, playState]);
 
 	React.useLayoutEffect(() => {
 		const el = lyricListElement.current;
@@ -353,13 +370,13 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	const firstLyricIndex = React.useMemo(() => {
 		let i = -1;
-		for (const v of currentLyricIndexes) {
+		for (const v of cachedLyricIndexes) {
 			if (i < v) {
 				i = v;
 			}
 		}
 		return i;
-	}, [currentLyricIndexes]);
+	}, [cachedLyricIndexes]);
 
 	return (
 		<div className="am-lyric-view">
@@ -380,7 +397,7 @@ export const LyricDOMRenderer: React.FC = () => {
 									onSizeChanged={() =>
 										requestAnimationFrame(recalculateLineHeights)
 									}
-									selected={currentLyricIndexes.has(index)}
+									selected={cachedLyricIndexes.has(index)}
 									line={line}
 									translated={configTranslatedLyric}
 									dynamic={configDynamicLyric}
@@ -397,7 +414,7 @@ export const LyricDOMRenderer: React.FC = () => {
 									}
 									key={`${index}-dots`}
 									lineTransform={lineTransforms[index] ?? { top: 0, scale: 1 }}
-									selected={currentLyricIndexes.has(index)}
+									selected={cachedLyricIndexes.has(index)}
 									time={line.beginTime}
 									offset={offset}
 									duration={line.duration}

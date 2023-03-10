@@ -413,7 +413,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             50%
                 opacity: 1
                 transform: translate3d(0, -2px, 20px)
-                filter: drop-shadow(0 0 2px var(--applemusic-like-lyrics-font-color, white))
+                filter: drop-shadow(0 0 4px var(--applemusic-like-lyrics-font-color, white))
             100%
                 opacity: 1
                 transform: translate3d(0, -1px, 0)
@@ -439,17 +439,22 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         will-change: transform, filter, opacity
         padding: max(1rem, 1vh) 0
         height: 6vh
-        transform-origin: top left
+        transform-origin: center
         opacity: 0
 
         > *
-            display: inline-block
-            margin-right: 2vh
-            width: 3vh
-            height: 3vh
-            background-color: var(--applemusic-like-lyrics-font-color, white)
-            box-shadow: 0 2px 5px #0008
-            border-radius: 50%
+            will-change: transform, filter, opacity
+            padding: max(1rem, 1vh) 0
+            height: 6vh
+            transform-origin: center
+            > *
+                display: inline-block
+                margin-right: 2vh
+                width: 3vh
+                height: 3vh
+                background-color: var(--applemusic-like-lyrics-font-color, white)
+                box-shadow: 0 2px 5px #0008
+                border-radius: 50%
 
         &.am-lyric-dots-selected
             height: 6vh
