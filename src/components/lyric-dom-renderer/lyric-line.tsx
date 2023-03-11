@@ -103,13 +103,13 @@ export const LyricLineView: React.FC<
 	React.useEffect(() => {
 		const line = lineRef.current;
 		if (line) {
+			const dest = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
 			let canceled = false;
 
 			(async () => {
 				const animateTime = lineTransform.duration * 0.7;
 				const bounceTime = lineTransform.duration * 0.3;
 
-				const dest = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
 				const middle =
 					prevTransformTop.current === lineTransform.top
 						? dest

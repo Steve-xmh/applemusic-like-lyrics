@@ -304,9 +304,9 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         .am-lyric-line
             font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
         .am-lyric-dots
-            &.am-lyric-dots-selected
+            &.am-lyric-dots-selected > *
                 height: min(30px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5))
-            > *
+            > * > *
                 margin-right: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333))
                 width: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
                 height: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))

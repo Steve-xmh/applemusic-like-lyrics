@@ -167,7 +167,7 @@ export const LyricDOMRenderer: React.FC = () => {
 							scrollHeight > viewHeight.current[1] ||
 							scrollHeight + height.height < 0
 						) &&
-						(isPrevDots ? i >= 0 : true)
+						(isPrevDots ? i > 0 : true)
 					) {
 						curDelay += 50;
 					}
