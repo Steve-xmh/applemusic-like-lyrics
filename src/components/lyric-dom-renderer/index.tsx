@@ -10,10 +10,11 @@ import {
 	playStateAtom,
 } from "../../core/states";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
-import { log } from "../../utils/logger";
+import { log, warn } from "../../utils/logger";
 import { LyricLine } from "../../core/lyric-parser";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
+import { eqSet } from "../../utils";
 
 export interface LyricLineTransform {
 	top: number;
@@ -21,7 +22,7 @@ export interface LyricLineTransform {
 	scale: number;
 	duration: number;
 	delay: number;
-	opacity?: number;
+	userScrolling?: boolean;
 }
 
 export interface LyricLineMeta {
@@ -30,8 +31,6 @@ export interface LyricLineMeta {
 	isBGLyric: boolean;
 }
 
-const eqSet: <T>(xs: Set<T>, ys: Set<T>) => boolean = (xs, ys): boolean =>
-	xs.size === ys.size && [...xs].every((x) => ys.has(x));
 export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
@@ -95,7 +94,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			mustScroll: boolean = false,
 			currentLyricIndexes = cachedLyricIndex.current,
 		) => {
-			log("触发滚动函数");
+			log("触发滚动函数", lineHeights.current);
 			cachedLyricIndex.current = currentLyricIndexes;
 			if (lyricListElement.current) {
 				let scrollToIndex = Number.MAX_SAFE_INTEGER;
@@ -192,6 +191,8 @@ export const LyricDOMRenderer: React.FC = () => {
 					result.push(lineTransform);
 				}
 
+				log("已计算新布局", result);
+
 				setLineTransforms(result);
 			}
 		},
@@ -207,6 +208,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				isDots: el.classList.contains("am-lyric-dots"),
 				isBGLyric: el.classList.contains("am-lyric-line-bg-lyric"),
 			}));
+			warn("已触发高度重新计算", lineHeights.current);
 		}
 	}, []);
 
@@ -378,12 +380,14 @@ export const LyricDOMRenderer: React.FC = () => {
 				evt.stopPropagation();
 				scrollDelayRef.current = Date.now();
 				setLineTransforms((list) => {
-					return list.map((v) => {
-						v.top -= evt.deltaY;
-						v.duration = 250;
-						v.delay = 0;
-						return v;
-					});
+					return list.map((v) => ({
+						top: v.top - evt.deltaY,
+						duration: 0,
+						delay: 0,
+						left: v.left,
+						scale: v.scale,
+						userScrolling: true,
+					}));
 				});
 				return false;
 			};
@@ -421,10 +425,15 @@ export const LyricDOMRenderer: React.FC = () => {
 								<LyricLineView
 									key={`${index}-${line.beginTime}-${line.originalLyric}`}
 									lineTransform={
-										lineTransforms[index] ?? {
+										lineTransforms[index] ??
+										({
 											top: 10000,
+											left: 0,
 											scale: 1,
-										}
+											duration: 0,
+											delay: 0,
+											opacity: 0,
+										} as LyricLineTransform)
 									}
 									onSizeChanged={() =>
 										requestAnimationFrame(recalculateLineHeights)
@@ -446,10 +455,15 @@ export const LyricDOMRenderer: React.FC = () => {
 									}
 									key={`${index}-dots`}
 									lineTransform={
-										lineTransforms[index] ?? {
+										lineTransforms[index] ??
+										({
 											top: 10000,
+											left: 0,
 											scale: 1,
-										}
+											duration: 0,
+											delay: 0,
+											opacity: 0,
+										} as LyricLineTransform)
 									}
 									selected={cachedLyricIndexes.has(index)}
 									time={line.beginTime}

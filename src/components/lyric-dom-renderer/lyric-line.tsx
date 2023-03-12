@@ -83,83 +83,137 @@ export const LyricLineView: React.FC<
 	React.useLayoutEffect(() => {
 		const line = lineRef.current;
 		if (line) {
-			const obs = new ResizeObserver((entries) => {
-				const height = entries[0].contentRect.height;
-				if (height > 0) {
+			let lastWidth = line.clientWidth;
+			let lastHeight = line.clientHeight;
+			const obs = new ResizeObserver(() => {
+				const width = line.clientWidth;
+				const height = line.clientHeight;
+				if (height !== lastHeight || width !== lastWidth) {
+					lastWidth = width;
+					lastHeight = height;
 					onSizeChanged();
 				}
 			});
 			obs.observe(line);
+			const attrObs = new MutationObserver(() => {});
+			attrObs.observe(line, {
+				attributes: true,
+				attributeFilter: ["style"],
+			});
 			return () => {
 				obs.disconnect();
 			};
 		}
-	}, []);
+	}, [onSizeChanged]);
 
 	const prevTransform = React.useRef(
 		`translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
 	);
 	const prevTransformTop = React.useRef(lineTransform.top);
+	const prevTransformUserScrolling = React.useRef(lineTransform.userScrolling);
 	React.useEffect(() => {
 		const line = lineRef.current;
 		if (line) {
-			const dest = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
-			let canceled = false;
+			if (prevTransformUserScrolling.current !== lineTransform.userScrolling) {
+				if (lineTransform.userScrolling) {
+					line.style.transition = "all 0.25s";
+				} else {
+					line.style.transition = "";
+				}
+				prevTransformUserScrolling.current = lineTransform.userScrolling;
+			}
+			const dest = `translateY(${lineTransform.top.toFixed(
+				3,
+			)}px) translateX(${lineTransform.left.toFixed(
+				3,
+			)}) scale(${lineTransform.scale.toFixed(3)})`;
+			if (lineTransform.userScrolling) {
+				line.style.transform = dest;
+				return () => {
+					prevTransform.current = dest;
+					prevTransformTop.current = lineTransform.top;
+				};
+			} else {
+				let canceled = false;
 
-			(async () => {
-				const animateTime = lineTransform.duration * 0.7;
-				const bounceTime = lineTransform.duration * 0.3;
+				const animations: Animation[] = [];
 
-				const middle =
-					prevTransformTop.current === lineTransform.top
-						? dest
-						: `translateY(${lineTransform.top - 2}px) translateX(${
-								lineTransform.left
-						  }) scale(${lineTransform.scale})`;
+				if (lineTransform.duration > 0) {
+					(async () => {
+						const animateTime = lineTransform.duration * 0.7;
+						const bounceTime = lineTransform.duration * 0.3;
 
-				await line.animate(
-					[
-						{
-							transform: prevTransform.current,
-						},
-						{
-							transform: middle,
-						},
-					],
-					{
-						easing: "cubic-bezier(0.46, 0, 0.07, 1)",
-						delay: lineTransform.delay,
-						fill: "backwards",
-						duration: animateTime,
-						composite: "add",
-					},
-				).finished;
-				if (canceled) return;
-				await line.animate(
-					[
-						{
-							transform: middle,
-						},
-						{
-							transform: dest,
-						},
-					],
-					{
-						easing: "ease-in-out",
-						duration: bounceTime,
-						composite: "add",
-						fill: "forwards",
-					},
-				).finished;
-				if (canceled) return;
-			})();
+						const middle =
+							prevTransformTop.current === lineTransform.top
+								? dest
+								: `translateY(${(lineTransform.top - 2).toFixed(
+										3,
+								  )}px) translateX(${lineTransform.left.toFixed(
+										3,
+								  )}) scale(${lineTransform.scale.toFixed(3)})`;
 
-			return () => {
-				prevTransform.current = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`;
-				prevTransformTop.current = lineTransform.top;
-				canceled = true;
-				line.getAnimations().forEach((a) => a.cancel());
-			};
+						let animation: Animation;
+
+						animation = line.animate(
+							[
+								{
+									transform: prevTransform.current,
+								},
+								{
+									transform: middle,
+								},
+							],
+							{
+								easing: "cubic-bezier(0.46, 0, 0.07, 1)",
+								delay: lineTransform.delay,
+								fill: "backwards",
+								duration: animateTime,
+							},
+						);
+						animations.push(animation);
+						await animation.finished;
+
+						if (canceled) return;
+						animation = line.animate(
+							[
+								{
+									transform: middle,
+								},
+								{
+									transform: dest,
+								},
+							],
+							{
+								easing: "ease-in-out",
+								fill: "forwards",
+								duration: bounceTime,
+							},
+						);
+						animations.push(animation);
+						await animation.finished;
+
+						if (canceled) return;
+						line.style.transform = dest;
+					})();
+				} else {
+					line.style.transform = dest;
+				}
+
+				return () => {
+					prevTransform.current = dest;
+					prevTransformTop.current = lineTransform.top;
+					canceled = true;
+					animations.forEach((a) => {
+						try {
+							a.finish();
+						} catch {}
+						try {
+							a.cancel();
+						} catch {}
+					});
+					line.style.transform = dest;
+				};
+			}
 		}
 	}, [lineTransform]);
 
@@ -180,9 +234,9 @@ export const LyricLineView: React.FC<
 				"am-lyric-line-bg-lyric": !!line.isBackgroundLyric,
 				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
 			})}
-			style={{
-				display: Math.abs(offset) > 25 ? "none" : "",
-			}}
+			// style={{
+			// 	display: Math.abs(offset) > 25 ? "none" : "",
+			// }}
 			ref={lineRef}
 			{...props}
 		>

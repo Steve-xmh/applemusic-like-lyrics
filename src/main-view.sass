@@ -133,6 +133,14 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                         cursor: text
                         user-select: text
                         min-width: 0
+                    .am-music-album
+                        opacity: 0.75
+                        a
+                            color: var(--applemusic-like-lyrics-font-color, unset)
+                            &:hover
+                                opacity: 0.75
+                            &:active
+                                opacity: 0.5
                     .am-music-artists
                         width: 100%
                         line-height: normal
@@ -148,11 +156,15 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                             white-space: nowrap
                             text-overflow: ellipsis
                             text-align: center
+                            opacity: 0.75
                             a
                                 line-height: normal
-                                opacity: 0.8
                                 user-select: text
                                 color: var(--applemusic-like-lyrics-font-color, unset)
+                                &:hover
+                                    opacity: 0.75
+                                &:active
+                                    opacity: 0.5
                                 &::after
                                     content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
                                     opacity: 0.5

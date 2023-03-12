@@ -46,7 +46,7 @@ import {
 } from "../core/states";
 import { error, log, warn } from "../utils/logger";
 import { LyricEditorWSClient } from "../core/editor-client";
-import { getCurrentPlayMode, PlayMode } from "../utils";
+import { eqSet, getCurrentPlayMode, PlayMode } from "../utils";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
@@ -369,6 +369,8 @@ export const NCMEnvWrapper: React.FC = () => {
 			}, 200);
 		};
 
+		let lastIndexes = new Set<number>();
+
 		const onPlayProgress = (
 			audioId: string,
 			progress: number,
@@ -435,12 +437,19 @@ export const NCMEnvWrapper: React.FC = () => {
 							curLyricLine.dynamicLyricTime +
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
 						) {
-							setCurrentLyricsIndexes(indexes);
+							if (!eqSet(lastIndexes, indexes)) {
+								lastIndexes = indexes;
+								setCurrentLyricsIndexes(indexes);
+							}
 						} else if (
 							lastLine === curLyricLine &&
 							time > curLyricLine.dynamicLyricTime + curLyricLine.duration + 750
 						) {
-							setCurrentLyricsIndexes(new Set([currentLyrics.length]));
+							const s = new Set([currentLyrics.length]);
+							if (!eqSet(lastIndexes, s)) {
+								lastIndexes = s;
+								setCurrentLyricsIndexes(s);
+							}
 						}
 					} else if (
 						time <
@@ -448,7 +457,10 @@ export const NCMEnvWrapper: React.FC = () => {
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100) ||
 						curLyricIndex === currentLyrics.length - 1
 					) {
-						setCurrentLyricsIndexes(indexes);
+						if (!eqSet(lastIndexes, indexes)) {
+							lastIndexes = indexes;
+							setCurrentLyricsIndexes(indexes);
+						}
 					}
 				}
 			}
