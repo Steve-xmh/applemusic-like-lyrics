@@ -54,6 +54,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
 	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
+	const noCacheLyricState = useConfigValueBoolean("noCacheLyricState", false);
 
 	const alignTopSelectedLyric = useConfigValueBoolean(
 		"alignTopSelectedLyric",
@@ -89,6 +90,7 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	const scrollDelayRef = React.useRef(0);
 	const cachedLyricIndex = React.useRef(currentLyricIndexes);
+	const lastLyricTransform = React.useRef<LyricLineTransform[]>([]);
 	const scrollToLyric = React.useCallback(
 		(
 			mustScroll: boolean = false,
@@ -166,9 +168,10 @@ export const LyricDOMRenderer: React.FC = () => {
 							scrollHeight > viewHeight.current[1] ||
 							scrollHeight + height.height < 0
 						) &&
-						(isPrevDots ? i > 0 : true)
+						(isPrevDots ? i > 0 : true) &&
+						lastLyricTransform.current[i]?.top !== lineTransform.top
 					) {
-						curDelay += 50;
+						curDelay += 100;
 					}
 					if (
 						i === scrollToIndex ||
@@ -194,6 +197,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				log("已计算新布局", result);
 
 				setLineTransforms(result);
+				lastLyricTransform.current = result;
 			}
 		},
 		[alignTopSelectedLyric, lyricScaleEffect],
@@ -213,7 +217,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, []);
 
 	React.useLayoutEffect(() => {
-		if (currentLyricsA) {
+		if (currentLyricsA || noCacheLyricState) {
 			setCurrentLyrics(currentLyricsA);
 		}
 		setLineTransforms([]);

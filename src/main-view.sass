@@ -275,7 +275,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
             &.am-lyric-line-before
                 opacity: 0
                 visibility: hidden
-                @for $i from -5 through 5
+                @for $i from -10 through 10
                     @if $i != 0
                         &.am-lyric-line-o#{$i}
                             visibility: visible
@@ -292,7 +292,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                     filter: blur(0.3vh * 6)
                 &.am-lyric-line-selected > *
                     filter: blur(0px)
-            @for $i from -5 through 5
+            @for $i from -10 through 10
                 @if $i != 0
                     &.am-lyric-line-o#{$i} > *
                         filter: blur(abs($i) * 0.3vh)

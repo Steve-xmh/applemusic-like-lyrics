@@ -9,8 +9,8 @@
 	],
 	"description": "类 Apple Music 歌词页面插件|测试版|近乎完美的 Apple Music 歌词体验",
 	"preview": "preview-beta.svg",
-	"version": "0.0.2",
-	"commit": "1474a30d647b9f8f634658a1fdd808e7fb41590a",
+	"version": "0.0.3",
+	"commit": "6f8532da833cf3b41571f011b5b643e8b86dc281",
 	"type": "extension",
 	"noDevReload": true,
 	"incompatible": [

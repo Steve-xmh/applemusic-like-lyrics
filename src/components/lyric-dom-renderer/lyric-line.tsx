@@ -95,11 +95,6 @@ export const LyricLineView: React.FC<
 				}
 			});
 			obs.observe(line);
-			const attrObs = new MutationObserver(() => {});
-			attrObs.observe(line, {
-				attributes: true,
-				attributeFilter: ["style"],
-			});
 			return () => {
 				obs.disconnect();
 			};
@@ -232,7 +227,7 @@ export const LyricLineView: React.FC<
 				"am-lyric-line-selected": selected,
 				"am-lyric-line-align-right": !!line.shouldAlignRight,
 				"am-lyric-line-bg-lyric": !!line.isBackgroundLyric,
-				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 5,
+				[`am-lyric-line-o${offset}`]: Math.abs(offset) < 10,
 			})}
 			// style={{
 			// 	display: Math.abs(offset) > 25 ? "none" : "",

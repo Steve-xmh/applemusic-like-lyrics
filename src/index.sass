@@ -182,6 +182,26 @@ header, .m-winctrl
     display: none
 
 body.amll-lyric-page-open
+    header
+        .m-leftbox
+            justify-content: flex-end
+        .m-topbox, .msg, .itm2
+            display: none
+        .m-hst, .m-zoom, .playfull
+            *
+                color: var(--applemusic-like-lyrics-font-color, unset)
+                fill: var(--applemusic-like-lyrics-font-color, unset)
+    .m-winctrl *
+        color: var(--applemusic-like-lyrics-font-color, unset)
+        fill: var(--applemusic-like-lyrics-font-color, unset)
+    .g-single.z-show
+        .g-singlec-hd.j-flag *
+            color: var(--applemusic-like-lyrics-font-color, unset)
+            fill: var(--applemusic-like-lyrics-font-color, unset)
+        .g-bd2.f-cb *
+            color: var(--applemusic-like-lyrics-font-color, unset)
+            fill: var(--applemusic-like-lyrics-font-color, unset)
+    
     // 隐藏播放控制栏
     #main-player, .m-pinfo
         transform: translateY(100%)

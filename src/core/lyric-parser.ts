@@ -418,6 +418,24 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 		}
 	});
 
+	if (getConfig("advanceDynamicLyricTime", "false") === "true") {
+		result.forEach((line) => {
+			if (line.originalLyric.trim().length > 0) {
+				if (line.dynamicLyricTime !== undefined) {
+					const delta = Math.abs(
+						Math.max(0, line.dynamicLyricTime - 750) - line.dynamicLyricTime,
+					);
+					line.dynamicLyricTime -= delta;
+				}
+				const delta = Math.abs(
+					Math.max(0, line.beginTime - 750) - line.beginTime,
+				);
+				line.beginTime -= delta;
+				// line.duration += delta;
+			}
+		});
+	}
+
 	if (getConfig("enableLyricBuffer", "false") === "true") {
 		// TODO: 通过预估的阅读时间增加缓冲
 		result.forEach((line) => {
