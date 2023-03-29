@@ -49,7 +49,9 @@ export const PlayControls: React.FC = () => {
 			<button
 				className="am-music-play"
 				onClick={() => {
-					if (playState === PlayState.Playing) {
+					if (
+						document.querySelector<HTMLButtonElement>("#main-player .btnp-play")
+					) {
 						document
 							.querySelector<HTMLButtonElement>("#main-player .btnp-pause")
 							?.click();

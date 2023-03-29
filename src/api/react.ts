@@ -190,6 +190,8 @@ export function useAlbumImage(
 		lowWidth && lowHeight && lowWidth * lowHeight > 0,
 	);
 	const currentRawLyricResp = useAtomValue(currentRawLyricRespAtom);
+	// const prefix = "orpheus://cache/?"; // 如果加入缓存的话会导致部分情况下无法解码图片（但是可以加载显示）
+	const prefix = "";
 
 	const albumImageUrls = React.useMemo(() => {
 		const songData = getPlayingSong();
@@ -203,25 +205,25 @@ export function useAlbumImage(
 		const originalTrackPic =
 			songData?.originFromTrack?.track?.track?.album?.picUrl;
 		if (originalTrackPic) {
-			const url = `orpheus://cache/?${originalTrackPic}`;
+			const url = `${prefix}${originalTrackPic}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
 		const radioIntervenePic = songData?.data?.radio?.intervenePicUrl;
 		if (radioIntervenePic) {
-			const url = `orpheus://cache/?${radioIntervenePic}`;
+			const url = `${prefix}${radioIntervenePic}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
 		const picUrl = songData?.data?.album?.picUrl;
 		if (picUrl) {
-			const url = `orpheus://cache/?${picUrl}`;
+			const url = `${prefix}${picUrl}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
@@ -230,9 +232,7 @@ export function useAlbumImage(
 			const url = `orpheus://localmusic/pic?${encodeURIComponent(playFile)}`;
 			urls.push(url, url);
 		}
-		const noSongImage = `orpheus://cache/?${getNCMImageUrl(
-			"16601526067802346",
-		)}`;
+		const noSongImage = `${prefix}${getNCMImageUrl("16601526067802346")}`;
 		urls.push(noSongImage, noSongImage);
 		urls.push(EMPTY_IMAGE_URL);
 		urls.push(EMPTY_IMAGE_URL);

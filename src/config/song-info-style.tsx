@@ -70,7 +70,11 @@ export const SongInfoStyleSettings: React.FC = () => {
 				<GroupBoxDevider />
 				<SwitchConfigComponent settingKey="hideMusicName" label="隐藏歌名" />
 				<GroupBoxDevider />
-				<SwitchConfigComponent settingKey="hideMusicAlbum" label="隐藏专辑名" />
+				<SwitchConfigComponent
+					settingKey="hideMusicAlbum"
+					label="隐藏专辑名"
+					defaultValue={true}
+				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent
 					settingKey="hideMusicArtists"

@@ -11,7 +11,7 @@
     //     margin-top: 0
     .appkit-slider
         min-width: max(150px, 20%)
-    
+
 .amll-switch-config
     // margin-top: 16px
     // &:first-child
@@ -52,7 +52,7 @@
         word-break: break-word
         white-space: break-spaces
         text-overflow: ellipsis
-        
+
 .m-fm
     width: 100%
     .fmcmt
@@ -122,6 +122,10 @@ $hide-selectors: $hide-selectors + ", .m-topbox"
 $hide-selectors: $hide-selectors + ", .m-tool"
 $hide-selectors: $hide-selectors + ", header .m-zoom svg"
 $hide-selectors: $hide-selectors + ", .m-leftbox::after"
+
+.mq-playing .g-hd .m-leftbox::after
+    border-color: var(--applemusic-like-lyrics-font-color, unset)
+    opacity: 0.4
 
 body
     #{$hide-selectors}
@@ -201,7 +205,7 @@ body.amll-lyric-page-open
         .g-bd2.f-cb *
             color: var(--applemusic-like-lyrics-font-color, unset)
             fill: var(--applemusic-like-lyrics-font-color, unset)
-    
+
     // 隐藏播放控制栏
     #main-player, .m-pinfo
         transform: translateY(100%)

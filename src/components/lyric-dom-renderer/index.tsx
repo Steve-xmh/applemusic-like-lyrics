@@ -7,7 +7,9 @@ import {
 	currentAudioIdAtom,
 	currentLyricsAtom,
 	currentLyricsIndexesAtom,
+	currentRawLyricRespAtom,
 	playStateAtom,
+	songArtistsAtom,
 } from "../../core/states";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
 import { log, warn } from "../../utils/logger";
@@ -35,6 +37,8 @@ export const LyricDOMRenderer: React.FC = () => {
 	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
 	const currentLyricsA = useAtomValue(currentLyricsAtom);
+	const songArtists = useAtomValue(songArtistsAtom);
+	const currentRawLyricResp = useAtomValue(currentRawLyricRespAtom);
 	// 实现复用
 	const [currentLyrics, setCurrentLyrics] = React.useState(currentLyricsA);
 
@@ -91,6 +95,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	const scrollDelayRef = React.useRef(0);
 	const cachedLyricIndex = React.useRef(currentLyricIndexes);
 	const lastLyricTransform = React.useRef<LyricLineTransform[]>([]);
+	const lastScrollTime = React.useRef(Date.now());
 	const scrollToLyric = React.useCallback(
 		(
 			mustScroll: boolean = false,
@@ -148,13 +153,18 @@ export const LyricDOMRenderer: React.FC = () => {
 
 				let i = 0;
 				let curDelay = 0;
+				const curTime = Date.now();
+				const duration = mustScroll
+					? 0
+					: Math.min(750, Math.max(0, curTime - lastScrollTime.current));
+				lastScrollTime.current = curTime;
 				const result: LyricLineTransform[] = [];
 				for (const height of lineHeights.current) {
 					const lineTransform: LyricLineTransform = {
 						top: scrollHeight,
 						left: 0,
 						scale: scaleRatio,
-						duration: mustScroll ? 0 : 750,
+						duration: duration,
 						delay: mustScroll ? 0 : Math.max(0, Math.min(curDelay, 1000)),
 					};
 					if (
@@ -414,6 +424,26 @@ export const LyricDOMRenderer: React.FC = () => {
 		return i;
 	}, [cachedLyricIndexes]);
 
+	const creditLineTransform: LyricLineTransform = React.useMemo(() => {
+		const trans: LyricLineTransform = {
+			top: 0,
+			left: 0,
+			scale: 1,
+			duration: 750,
+			delay: 0,
+		};
+		if (lineTransforms.length > 0) {
+			const lastLineTransform = lineTransforms[lineTransforms.length - 1];
+			const lastLineHeight =
+				lineHeights.current[lineTransforms.length - 1].height ?? 0;
+			trans.top =
+				lastLineTransform.top + lastLineHeight * lastLineTransform.scale;
+			trans.duration = lastLineTransform.duration;
+			trans.delay = lastLineTransform.delay;
+		}
+		return trans;
+	}, [lineTransforms]);
+
 	return (
 		<div
 			className={classname("am-lyric-view", {
@@ -478,6 +508,21 @@ export const LyricDOMRenderer: React.FC = () => {
 						}
 					},
 				)}
+				<div
+					className="am-lyric-credits"
+					style={{
+						transform: `translateY(${creditLineTransform.top}px) translateX(${creditLineTransform.left}) scale(${creditLineTransform.scale})`,
+						transition: `all ${creditLineTransform.duration}ms cubic-bezier(0.46, 0, 0.07, 1) ${creditLineTransform.delay}ms`,
+					}}
+				>
+					<div>创作者：{songArtists.map((v) => v.name).join(", ")}</div>
+					{currentRawLyricResp.lyricUser && (
+						<div>原文歌词贡献者：{currentRawLyricResp.lyricUser.nickname}</div>
+					)}
+					{currentRawLyricResp.transUser && (
+						<div>翻译歌词贡献者：{currentRawLyricResp.transUser.nickname}</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

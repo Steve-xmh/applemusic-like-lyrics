@@ -15,7 +15,10 @@ import {
 	PlayState,
 	toPlayState,
 } from "../api";
-import { grabImageColors as workerGrabImageColors } from "../worker";
+import {
+	grabImageColors as workerGrabImageColors,
+	calcImageAverageColor as workerCalcImageAverageColor,
+} from "../worker";
 import {
 	useNowPlayingOpened,
 	useConfigValueBoolean,
@@ -130,12 +133,21 @@ export const NCMEnvWrapper: React.FC = () => {
 			() => {
 				if (!canceled) {
 					(async () => {
-						const bm = await genBitmapImage(albumImage, 128, 128);
-						if (bm) {
-							const colors = await workerGrabImageColors(bm, 16);
-							setAlbumImageMainColors(colors);
-						} else {
-							warn("缩放图片失败", albumImage.src);
+						try {
+							const bm = await genBitmapImage(albumImage, 64, 64);
+							if (bm) {
+								try {
+									const colors = await workerGrabImageColors(bm, 16);
+									const avgColor = await workerCalcImageAverageColor(bm);
+									setAlbumImageMainColors([avgColor, ...colors]);
+								} catch (err) {
+									warn("计算图片主题色失败", err);
+								}
+							} else {
+								warn("缩放图片失败", albumImage.src);
+							}
+						} catch (err) {
+							warn("缩放图片失败", albumImage.src, err);
 						}
 					})();
 				}

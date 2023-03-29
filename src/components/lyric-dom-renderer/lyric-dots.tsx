@@ -56,7 +56,7 @@ export const LyricDots: React.FC<
 		const dots = dotsRef.current;
 		if (dot0el && dot1el && dot2el && dots && selected && duration >= 5000) {
 			const globalDelay = 750;
-			const dotAnimationDuration = (duration - globalDelay) / 3;
+			const dotAnimationDuration = Math.max(0, (duration - globalDelay) / 3);
 			dotAnimation[1].offset = 0.5;
 			dot0el.animate(dotAnimation, {
 				duration: dotAnimationDuration,

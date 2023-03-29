@@ -135,8 +135,8 @@ export const LyricLineView: React.FC<
 
 				if (lineTransform.duration > 0) {
 					(async () => {
-						const animateTime = lineTransform.duration * 0.7;
-						const bounceTime = lineTransform.duration * 0.3;
+						const animateTime = Math.max(0, lineTransform.duration * 0.7);
+						const bounceTime = Math.max(0, lineTransform.duration * 0.3);
 
 						const middle =
 							prevTransformTop.current === lineTransform.top

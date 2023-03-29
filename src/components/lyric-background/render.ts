@@ -12,21 +12,6 @@ const EMPTY_128_F32_ARRAY = new Float32Array(128);
 
 const smallestPowOfTwo = (b: number) =>
 	Math.max(2, Math.ceil(Math.log2(Math.log2(b))));
-const shuffleArray = <T>(array: T[]) => {
-	let currentIndex = array.length;
-	let randomIndex: number;
-
-	while (currentIndex !== 0) {
-		randomIndex = Math.floor(Math.random() * currentIndex);
-		currentIndex--;
-		[array[currentIndex], array[randomIndex]] = [
-			array[randomIndex],
-			array[currentIndex],
-		];
-	}
-
-	return array;
-};
 
 export const BUILDIN_RENDER_METHODS = [
 	BlurAlbumMethod,
@@ -226,7 +211,7 @@ export class CanvasBackgroundRender {
 	private albumColorMapTex: WebGLTexture;
 	setAlbumColorMap(colorMap: Pixel[]) {
 		const tmp = [...colorMap];
-		shuffleArray(tmp);
+		// shuffleArray(tmp);
 		const size = Math.pow(2, smallestPowOfTwo(tmp.length));
 		const pixelsData: number[] = [];
 
@@ -236,7 +221,7 @@ export class CanvasBackgroundRender {
 			pixelsData.push(p[0], p[1], p[2], 0xff);
 			ci++;
 			if (ci >= tmp.length) {
-				shuffleArray(tmp);
+				// shuffleArray(tmp);
 				ci = 0;
 			}
 		}

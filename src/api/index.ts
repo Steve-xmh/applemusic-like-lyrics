@@ -189,6 +189,15 @@ export interface LyricFileEntry {
 	lyric: string;
 }
 
+export interface LyricAuthorUser {
+	id: number;
+	status: number;
+	demand: number;
+	userid: number;
+	nickname: string;
+	uptime: number;
+}
+
 export interface LyricFile {
 	lrc?: LyricFileEntry;
 	klyric?: LyricFileEntry;
@@ -197,6 +206,8 @@ export interface LyricFile {
 	yrc?: LyricFileEntry;
 	yromalrc?: LyricFileEntry;
 	ytlrc?: LyricFileEntry;
+	lyricUser?: LyricAuthorUser;
+	transUser?: LyricAuthorUser;
 
 	// AMLL 特供
 	lyricOffset?: number;

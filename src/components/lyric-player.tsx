@@ -11,6 +11,7 @@ import {
 	albumAtom,
 	albumImageUrlAtom,
 	currentLyricsAtom,
+	currentRawLyricRespAtom,
 	lyricErrorAtom,
 	musicIdAtom,
 	rightClickedLyricAtom,
@@ -150,6 +151,7 @@ const MainMenu: React.FC<{
 	const currentLyrics = useAtomValue(currentLyricsAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
 	const albumImageUrl = useAtomValue(albumImageUrlAtom);
+	const currentRawLyricResp = useAtomValue(currentRawLyricRespAtom);
 	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
 	const setSelectMusicIdModalOpened = useSetAtom(selectMusicIdModalOpenedAtom);
 	const setLocalLyricModalOpened = useSetAtom(selectLocalLyricModalOpenedAtom);
@@ -176,20 +178,6 @@ const MainMenu: React.FC<{
 			opened={menuOpened}
 			onClose={() => setMenuOpened(false)}
 		>
-			<MenuItem
-				label={`复制音乐 ID：${musicId}`}
-				onClick={() => {
-					setClipboardData(String(musicId));
-					setMenuOpened(false);
-				}}
-			/>
-			<MenuItem
-				label={`复制音乐名称：${songName}`}
-				onClick={() => {
-					setClipboardData(songName);
-					setMenuOpened(false);
-				}}
-			/>
 			{songArtists.length === 1 && (
 				<MenuItem
 					label={`查看歌手：${songArtists[0].name}`}
@@ -222,35 +210,132 @@ const MainMenu: React.FC<{
 					}}
 				/>
 			)}
-			<MenuItem
-				label="复制专辑图片链接"
-				labelOnly={albumImageUrl === null}
-				onClick={() => {
-					// 去除缓存链接头
-					let t = albumImageUrl;
-					if (t) {
-						if (t.startsWith("orpheus://cache/?")) {
-							t = t.slice(17);
-						}
-						setClipboardData(t);
+			<MenuItem label="复制音乐数据...">
+				<MenuItem
+					label={`复制音乐 ID：${musicId}`}
+					onClick={() => {
+						setClipboardData(String(musicId));
 						setMenuOpened(false);
-					}
-				}}
-			/>
-			<MenuItem
-				label="在浏览器打开专辑图片"
-				labelOnly={albumImageUrl === null}
-				onClick={() => {
-					let t = albumImageUrl;
-					if (t) {
-						if (t.startsWith("orpheus://cache/?")) {
-							t = t.slice(17);
-						}
-						betterncm.ncm.openUrl(t);
+					}}
+				/>
+				<MenuItem
+					label={`复制音乐名称：${songName}`}
+					onClick={() => {
+						setClipboardData(songName);
 						setMenuOpened(false);
-					}
-				}}
-			/>
+					}}
+				/>
+				{(currentRawLyricResp.lrc ||
+					currentRawLyricResp.tlyric ||
+					currentRawLyricResp.romalrc ||
+					currentRawLyricResp.yrc ||
+					currentRawLyricResp.yromalrc ||
+					currentRawLyricResp.ytlrc) && (
+					<MenuItem label="复制歌词源文件...">
+						{currentRawLyricResp.lrc && (
+							<MenuItem
+								label="原文歌词文件 (Lrc)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.lrc?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+						{currentRawLyricResp.lrc && (
+							<MenuItem
+								label="翻译歌词文件 (TLyric)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.tlyric?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+						{currentRawLyricResp.romalrc && (
+							<MenuItem
+								label="音译歌词文件 (RomaLrc)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.romalrc?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+						{currentRawLyricResp.yrc && (
+							<MenuItem
+								label="逐词原文歌词文件 (Yrc)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.yrc?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+						{currentRawLyricResp.ytlrc && (
+							<MenuItem
+								label="逐词翻译歌词文件 (YTLrc)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.ytlrc?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+						{currentRawLyricResp.yromalrc && (
+							<MenuItem
+								label="逐词音译歌词文件 (YRomaLrc)"
+								onClick={() => {
+									setClipboardData(currentRawLyricResp?.yromalrc?.lyric || "");
+									setMenuOpened(false);
+								}}
+							/>
+						)}
+					</MenuItem>
+				)}
+				{album && (
+					<MenuItem
+						label={`复制专辑名称：${album.name}`}
+						onClick={() => {
+							setClipboardData(album.name);
+							setMenuOpened(false);
+						}}
+					/>
+				)}
+				{album && (
+					<MenuItem
+						label={`复制作者名称：${album.name}`}
+						onClick={() => {
+							setClipboardData(album.name);
+							setMenuOpened(false);
+						}}
+					/>
+				)}
+				<MenuItem
+					label="复制专辑图片链接"
+					labelOnly={albumImageUrl === null}
+					onClick={() => {
+						// 去除缓存链接头
+						let t = albumImageUrl;
+						if (t) {
+							if (t.startsWith("orpheus://cache/?")) {
+								t = t.slice(17);
+							}
+							setClipboardData(t);
+							setMenuOpened(false);
+						}
+					}}
+				/>
+				<MenuItem
+					label="在浏览器打开专辑图片"
+					labelOnly={albumImageUrl === null}
+					onClick={() => {
+						let t = albumImageUrl;
+						if (t) {
+							if (t.startsWith("orpheus://cache/?")) {
+								t = t.slice(17);
+							}
+							betterncm.ncm.openUrl(t);
+							setMenuOpened(false);
+						}
+					}}
+				/>
+			</MenuItem>
 			<MenuDevider />
 			<MenuItem
 				label="显示翻译歌词"

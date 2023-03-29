@@ -13,6 +13,7 @@ import { Pixel } from "../../libs/color-quantize/utils";
 import { normalizeColor } from "../../utils/color";
 import { BlurAlbumMethod } from "./blur-album";
 import { getConfig } from "../../config/core";
+import { rgb } from "color-convert/conversions";
 
 const LyricCanvasBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -121,12 +122,15 @@ const LyricCanvasBackground: React.FC = () => {
 	React.useEffect(() => {
 		try {
 			const colors = albumImageMainColors
-				.slice(0, 2)
+				.slice(0, 4)
 				.map<Pixel>(normalizeColor);
-			colors.reverse();
+			for (let i = 0; i < 4; i++) {
+				colors.push(colors[0]);
+			}
 			let l = Number(backgroundLightness);
 			if (Number.isNaN(l)) l = 1;
 			l = Math.max(Math.min(2, l), 0);
+			colors.sort((a, b) => rgb.hsv(a)[2] - rgb.hsv(b)[2]);
 			colors.forEach((c) => {
 				if (l > 1) {
 					const m = 2 - l;
@@ -140,7 +144,7 @@ const LyricCanvasBackground: React.FC = () => {
 				}
 			});
 			const c = [...colors];
-			for (let i = 0; i < 30; i++) {
+			for (let i = 0; i < 28; i++) {
 				colors.push(...c);
 			}
 			const renderer = rendererRef.current;
@@ -187,7 +191,7 @@ const LyricCanvasBackground: React.FC = () => {
 		<>
 			<canvas
 				ref={canvasRef}
-				className="am-lyric-background"
+				className={`am-lyric-background ${backgroundRenderMethod}`}
 				style={{
 					position: "fixed",
 					left: "0",

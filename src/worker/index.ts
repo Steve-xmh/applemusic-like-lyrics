@@ -122,6 +122,38 @@ export const grabImageColors = defineWorkerFunction(
 		}
 	},
 );
+export const calcImageAverageColor = defineWorkerFunction(
+	"calcImageAverageColor",
+	(img: ImageBitmap): Pixel => {
+		let canvas: HTMLCanvasElement | OffscreenCanvas;
+		let ctx:
+			| CanvasRenderingContext2D
+			| OffscreenCanvasRenderingContext2D
+			| null;
+		if (IS_WORKER || !APP_CONF.isOSX) {
+			canvas = new OffscreenCanvas(img.width, img.height);
+			ctx = canvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
+		} else {
+			canvas = document.createElement("canvas");
+			canvas.width = img.width;
+			canvas.height = img.height;
+			ctx = canvas.getContext("2d");
+		}
+		if (ctx) {
+			ctx.drawImage(img, 0, 0);
+			const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			const avgColor: Pixel = [0, 0, 0];
+			for (let i = 0; i < data.width * data.height; i++) {
+				avgColor[0] += data.data[i * 4];
+				avgColor[1] += data.data[i * 4 + 1];
+				avgColor[2] += data.data[i * 4 + 2];
+			}
+			return avgColor;
+		} else {
+			return [0, 0, 0];
+		}
+	},
+);
 
 export const setConfigFromMain = defineWorkerFunction(
 	"setConfigFromMain",

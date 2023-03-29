@@ -47,7 +47,8 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
     float f = 0.0;
 
-    f += 0.148000 * noise(p) + time * 0.02;
+    f += 0.148000 * noise(p) + time * 0.01;
+    f += 0.125000 * sin(p.x * 5.0 + time * 0.1) - p.y;
 
     return f / 0.96875;
 }
