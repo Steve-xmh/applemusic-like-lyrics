@@ -232,6 +232,13 @@
                 position: absolute
                 display: flex
                 margin: 20px // 大窗口
+                &:hover > button
+                    &.close
+                        background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+                    &.minimize
+                        background-image: url("data:image/svg+xml,%3Csvg width='8' height='2' viewBox='0 0 8 2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.75 1H7.25' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+                    &.zoom
+                        background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.49999 -1.35601e-05L-6.78003e-06 4.49999V-6.78003e-06L4.49999 -1.35601e-05Z' fill='black' fill-opacity='0.5'/%3E%3Cpath d='M1.49999 5.99999L5.99999 1.49999L6 6L1.49999 5.99999Z' fill='black' fill-opacity='0.5'/%3E%3C/svg%3E%0A")
                 &.small
                     margin: 6px // 小窗口
                 button
@@ -241,13 +248,15 @@
                     width: 12px
                     margin-right: 8px
                     border-radius: 6px
+                    background-position: center
+                    background-repeat: no-repeat
                     padding: 0
                     &.close
-                        background: #FF5F57
+                        background-color: #FF5F57
                     &.minimize
-                        background: #FEBC2E
+                        background-color: #FEBC2E
                     &.zoom
-                        background: #28C840
+                        background-color: #28C840
     .appkit-group-box
         background: rgba(255, 255, 255, 0.05)
         border: 1px solid rgba(255, 255, 255, 0.05)

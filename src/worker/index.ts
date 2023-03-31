@@ -148,6 +148,9 @@ export const calcImageAverageColor = defineWorkerFunction(
 				avgColor[1] += data.data[i * 4 + 1];
 				avgColor[2] += data.data[i * 4 + 2];
 			}
+			avgColor[0] /= data.width * data.height;
+			avgColor[1] /= data.width * data.height;
+			avgColor[2] /= data.width * data.height;
 			return avgColor;
 		} else {
 			return [0, 0, 0];

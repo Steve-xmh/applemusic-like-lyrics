@@ -71,7 +71,7 @@ const buildOption = {
 	bundle: true,
 	sourcemap: IS_DEV ? "inline" : false,
 	legalComments: "external",
-	minify: !IS_DEV || process.argv.includes("--dist"),
+	minify: true,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
 	logOverride: {

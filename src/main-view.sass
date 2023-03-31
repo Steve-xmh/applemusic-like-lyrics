@@ -187,14 +187,20 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                     font-weight: 1000
                     opacity: 0.5
                     display: flex
-                    justify-content: space-between
+                    align-items: center
                     font-size: 12px
+                    > *
+                        flex: 0
+                        &:first-child
+                            flex: 1
+                        &:last-child
+                            flex: 1
+                            text-align: right
         > .am-music-controls
             display: flex
             justify-content: space-between
             mix-blend-mode: soft-light
-            > .am-music-track-shuffle,
-            > .am-music-track-repeat
+            > .am-music-track-btn
                 opacity: 0.5
             > .am-music-track-prev,
             > .am-music-play,
@@ -465,19 +471,19 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         position: absolute
         will-change: transform, filter, opacity
         padding: max(1rem, 1vh) 0
-        height: 6vh
+        height: 2rem
         transform-origin: center
         opacity: 0
 
         > *
             will-change: transform, filter, opacity
-            height: 6vh
+            height: 2rem
             transform-origin: center
             > *
                 display: inline-block
-                margin-right: 2vh
-                width: 3vh
-                height: 3vh
+                margin-right: 0.25rem
+                width: 0.5rem
+                height: 0.5rem
                 background-color: var(--applemusic-like-lyrics-font-color, white)
                 box-shadow: 0 2px 5px #0008
                 border-radius: 50%

@@ -47,8 +47,8 @@ float noise(vec2 p) {
 float fbm(vec2 p) {
     float f = 0.0;
 
-    f += 0.148000 * noise(p) + time * 0.01;
-    f += 0.125000 * sin(p.x * 5.0 + time * 0.1) - p.y;
+    f += 0.148000 * noise(p) + time * 0.0137;
+    f += 0.125000 * sin(p.x * 5.0) - sin(time * 0.1) * 0.1 - p.y;
 
     return f / 0.96875;
 }
@@ -64,9 +64,9 @@ void main() {
     
     color = rgb2hsv(color);
     
-    color.z = clamp(color.z, 0.2, 0.6);
+    color.z = clamp(color.z, 0.0, 0.6);
     
     color = hsv2rgb(color);
     
-    gl_FragColor = vec4(color.rgb, 1.);
+    gl_FragColor = vec4(color.rgb, 1.0);
 }

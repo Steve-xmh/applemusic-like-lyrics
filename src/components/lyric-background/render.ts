@@ -56,9 +56,10 @@ export class CanvasBackgroundRender {
 		const gl = canvas.getContext("webgl");
 		if (gl) {
 			this.gl = gl;
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
-			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+			gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 			this._displaySize = [canvas.clientWidth, canvas.clientHeight];
 			this.resize();
 			this.rebuildVertex();

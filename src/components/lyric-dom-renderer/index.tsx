@@ -434,10 +434,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		};
 		if (lineTransforms.length > 0) {
 			const lastLineTransform = lineTransforms[lineTransforms.length - 1];
-			const lastLineHeight =
-				lineHeights.current[lineTransforms.length - 1].height ?? 0;
-			trans.top =
-				lastLineTransform.top + lastLineHeight * lastLineTransform.scale;
+			trans.top = lastLineTransform.top;
 			trans.duration = lastLineTransform.duration;
 			trans.delay = lastLineTransform.delay;
 		}

@@ -172,6 +172,12 @@ const MainMenu: React.FC<{
 		true,
 	);
 
+	const isFavSong = React.useMemo(() => {
+		return document
+			.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
+			?.classList.contains("loved");
+	}, [menuOpened]);
+
 	return (
 		<Menu
 			hasCheckBoxMenuItems
@@ -187,6 +193,24 @@ const MainMenu: React.FC<{
 					}}
 				/>
 			)}
+			<MenuItem
+				label={isFavSong ? "取消喜欢歌曲" : "喜欢歌曲"}
+				onClick={() => {
+					document
+						.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
+						?.click();
+					setMenuOpened(false);
+				}}
+			/>
+			<MenuItem
+				label="收藏歌曲"
+				onClick={() => {
+					document
+						.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-fav")
+						?.click();
+					setMenuOpened(false);
+				}}
+			/>
 			{songArtists.length > 1 && (
 				<MenuItem label="查看歌手...">
 					{songArtists.map((a) => (

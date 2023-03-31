@@ -1,6 +1,7 @@
 import { Select } from "@mantine/core";
 import { useConfig } from "../api/react";
 import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
+import { PlayControlButtonType } from "../components/song-info/play-control-button";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -30,6 +31,37 @@ const fftWeightingMethodData = [
 	},
 ];
 
+const controlButtonTypeData = [
+	{
+		label: "切换顺序播放播放",
+		value: PlayControlButtonType.PlaybackOrder,
+	},
+	{
+		label: "切换列表循环播放",
+		value: PlayControlButtonType.PlaybackRepeat,
+	},
+	{
+		label: "切换单曲循环播放",
+		value: PlayControlButtonType.PlaybackOne,
+	},
+	{
+		label: "切换随机播放",
+		value: PlayControlButtonType.PlaybackRandom,
+	},
+	{
+		label: "切换心动模式播放",
+		value: PlayControlButtonType.PlaybackAI,
+	},
+	{
+		label: "收藏歌曲",
+		value: PlayControlButtonType.AddToPlaylist,
+	},
+	{
+		label: "喜欢/取消喜欢歌曲",
+		value: PlayControlButtonType.AddToFav,
+	},
+];
+
 export const SongInfoStyleSettings: React.FC = () => {
 	const [widgetUnderProgressBar, setWidgetUnderProgressBar] = useConfig(
 		"widgetUnderProgressBar",
@@ -38,6 +70,14 @@ export const SongInfoStyleSettings: React.FC = () => {
 	const [fftWeightingMethod, setFftWeightingMethod] = useConfig(
 		"fftWeightingMethod",
 		"",
+	);
+	const [leftControlBtn, setLeftControlBtn] = useConfig(
+		"leftControlBtn",
+		PlayControlButtonType.PlaybackRandom,
+	);
+	const [rightControlBtn, setRightControlBtn] = useConfig(
+		"rightControlBtn",
+		PlayControlButtonType.PlaybackRepeat,
 	);
 
 	const widgetUnderProgressBarData = [
@@ -105,6 +145,24 @@ export const SongInfoStyleSettings: React.FC = () => {
 					onChange={setWidgetUnderProgressBar}
 					data={widgetUnderProgressBarData}
 				/>
+				{widgetUnderProgressBar === "play-controls" && (
+					<>
+						<GroupBoxDevider />
+						<Select
+							label="左侧控制按钮功能"
+							value={leftControlBtn}
+							onChange={setLeftControlBtn}
+							data={controlButtonTypeData}
+						/>
+						<GroupBoxDevider />
+						<Select
+							label="右侧控制按钮功能"
+							value={rightControlBtn}
+							onChange={setRightControlBtn}
+							data={controlButtonTypeData}
+						/>
+					</>
+				)}
 				{widgetUnderProgressBar === "audio-viz-fft" && (
 					<>
 						<GroupBoxDevider />

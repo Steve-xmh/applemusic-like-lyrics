@@ -233,10 +233,11 @@ export function resizeImage(
 }
 
 export enum PlayMode {
-	Order = "type-order", // playonce
-	Repeat = "type-repeat", // playorder
-	One = "type-one", // playcycle
-	Random = "type-random", // playrandom
+	Order = "type-order", // playonce 顺序播放
+	Repeat = "type-repeat", // playorder 列表循环
+	AI = "type-ai", // mode2 = true 心动模式
+	One = "type-one", // playcycle 单曲循环
+	Random = "type-random", // playrandom 随机播放
 }
 
 export function switchPlayMode(playMode: PlayMode) {
@@ -254,6 +255,10 @@ export function getCurrentPlayMode(): PlayMode | undefined {
 		const setting = JSON.parse(
 			localStorage.getItem("NM_SETTING_PLAYER") || "{}",
 		);
+
+		if (setting.mode2) {
+			return PlayMode.AI;
+		}
 
 		switch (setting?.mode) {
 			case "playonce":
