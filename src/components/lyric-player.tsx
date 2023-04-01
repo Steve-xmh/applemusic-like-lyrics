@@ -184,15 +184,6 @@ const MainMenu: React.FC<{
 			opened={menuOpened}
 			onClose={() => setMenuOpened(false)}
 		>
-			{songArtists.length === 1 && (
-				<MenuItem
-					label={`查看歌手：${songArtists[0].name}`}
-					onClick={() => {
-						location.hash = `#/m/artist/?id=${songArtists[0].id}`;
-						setMenuOpened(false);
-					}}
-				/>
-			)}
 			<MenuItem
 				label={isFavSong ? "取消喜欢歌曲" : "喜欢歌曲"}
 				onClick={() => {
@@ -211,6 +202,16 @@ const MainMenu: React.FC<{
 					setMenuOpened(false);
 				}}
 			/>
+			<MenuDevider />
+			{songArtists.length === 1 && (
+				<MenuItem
+					label={`查看歌手：${songArtists[0].name}`}
+					onClick={() => {
+						location.hash = `#/m/artist/?id=${songArtists[0].id}`;
+						setMenuOpened(false);
+					}}
+				/>
+			)}
 			{songArtists.length > 1 && (
 				<MenuItem label="查看歌手...">
 					{songArtists.map((a) => (

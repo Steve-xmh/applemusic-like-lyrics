@@ -2,6 +2,7 @@ export const Button: React.FC<
 	React.PropsWithChildren<
 		{
 			accent?: boolean;
+			disabled?: boolean;
 		} & React.HTMLAttributes<HTMLButtonElement>
 	>
 > = (props) => {

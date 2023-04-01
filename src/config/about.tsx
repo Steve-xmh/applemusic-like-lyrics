@@ -1,4 +1,4 @@
-import { Button, Text, Alert, Select, Space } from "@mantine/core";
+import { Alert, Select, Space } from "@mantine/core";
 import { showNotification, hideNotification } from "@mantine/notifications";
 import * as React from "react";
 import { useConfig, useConfigValueBoolean } from "../api/react";
@@ -10,6 +10,9 @@ import {
 	useLatestVersion,
 } from "../utils/updater";
 import { SwitchConfigComponent } from "./config-components";
+import { Button } from "../components/appkit/button";
+import { GroupBox } from "../components/appkit/group-box";
+import AMLLIcon from "../assets/amll-icon.svg";
 
 export const AboutPage: React.FC = () => {
 	const latestVersion = useLatestVersion();
@@ -20,44 +23,32 @@ export const AboutPage: React.FC = () => {
 	const [updating, setUpdating] = React.useState(false);
 	const isMRBNCM = React.useMemo(() => betterncm.isMRBNCM ?? false, []);
 	return (
-		<>
-			<Text>Apple Music-like lyrics</Text>
-			{enableUpdateBranch && <Text>当前分支：{updateBranch}</Text>}
-			<Text>
-				当前版本：{plugin.mainPlugin.manifest.version} (
+		<div className="amll-about">
+			<div className="amll-icon">
+				<AMLLIcon />
+			</div>
+			<div className="amll-name">Apple Music-like lyrics</div>
+			<div className="version">
+				{plugin.mainPlugin.manifest.version} (
 				{plugin.mainPlugin.manifest.commit})
-			</Text>
-			{hasUpdates ? (
-				<Text>Github 有可用更新：{latestVersion}</Text>
-			) : (
-				<Text>已是最新版本</Text>
+			</div>
+			{enableUpdateBranch && (
+				<div className="current-branch">当前分支：{updateBranch}</div>
 			)}
-			<Text>By SteveXMH</Text>
-			<Button.Group sx={{ margin: "8px 0" }} orientation="horizontal">
-				<Button
-					variant="outline"
-					onClick={() => {
-						betterncm.ncm.openUrl(
-							"https://github.com/Steve-xmh/applemusic-like-lyrics",
-						);
-					}}
-				>
-					访问 Github 仓库
-				</Button>
-				<Button
-					variant="outline"
-					onClick={() => {
-						betterncm.ncm.openUrl(
-							"https://github.com/Steve-xmh/applemusic-like-lyrics/issues/new",
-						);
-					}}
-				>
-					编写 Issue 提交 BUG
-				</Button>
-				{hasUpdates && (
+			{hasUpdates ? (
+				<div className="update-tip has-update">
+					Github 有可用更新：{latestVersion}
+				</div>
+			) : (
+				<div className="update-tip">已是最新版本</div>
+			)}
+			<div className="author">By SteveXMH</div>
+
+			{hasUpdates && (
+				<div className="update-btn">
 					<Button
-						variant="outline"
 						disabled={updating}
+						accent
 						onClick={async () => {
 							try {
 								setUpdating(true);
@@ -96,13 +87,36 @@ export const AboutPage: React.FC = () => {
 					>
 						升级
 					</Button>
-				)}
-			</Button.Group>
-			<SwitchConfigComponent
-				settingKey="enableAutoCheckUpdate"
-				label="开启网易云时检查插件更新并提醒"
-				defaultValue={true}
-			/>
+				</div>
+			)}
+
+			<div className="ext-links">
+				<Button
+					onClick={() => {
+						betterncm.ncm.openUrl(
+							"https://github.com/Steve-xmh/applemusic-like-lyrics",
+						);
+					}}
+				>
+					访问 Github 仓库
+				</Button>
+				<Button
+					onClick={() => {
+						betterncm.ncm.openUrl(
+							"https://github.com/Steve-xmh/applemusic-like-lyrics/issues/new",
+						);
+					}}
+				>
+					编写 Issue 提交 BUG
+				</Button>
+			</div>
+			<GroupBox>
+				<SwitchConfigComponent
+					settingKey="enableAutoCheckUpdate"
+					label="开启网易云时检查插件更新并提醒"
+					defaultValue={true}
+				/>
+			</GroupBox>
 			{!isMRBNCM && (
 				<Alert
 					sx={{ margin: "16px 0" }}
@@ -138,11 +152,13 @@ export const AboutPage: React.FC = () => {
 					<div>故仅供尝鲜，不要作为常用版本使用！</div>
 				</Alert>
 			)}
-			<SwitchConfigComponent
-				settingKey="enableUpdateBranch"
-				label="启用开发分支版本更新检查"
-				disabled={updating}
-			/>
+			<GroupBox>
+				<SwitchConfigComponent
+					settingKey="enableUpdateBranch"
+					label="启用开发分支版本更新检查"
+					disabled={updating}
+				/>
+			</GroupBox>
 			{enableUpdateBranch && (
 				<Select
 					label="更新分支"
@@ -155,6 +171,6 @@ export const AboutPage: React.FC = () => {
 					}))}
 				/>
 			)}
-		</>
+		</div>
 	);
 };
