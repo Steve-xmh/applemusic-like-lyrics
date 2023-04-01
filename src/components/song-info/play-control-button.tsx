@@ -18,6 +18,7 @@ import IconFavoriteOn from "../../assets/icon_favorite_on.svg";
 import IconFavoriteHeart from "../../assets/icon_favorite_heart.svg";
 import IconFavoriteHeartOn from "../../assets/icon_favorite_heart_on.svg";
 import IconAddToPlaylist from "../../assets/icon_add_to_playlist.svg";
+import { getPlayingSong } from "../../api";
 
 export enum PlayControlButtonType {
 	PlaybackSwitcher = "playback-switcher",
@@ -84,7 +85,12 @@ const PlaybackSwitcherButton: React.FC<{
 						nextPlayMode = PlayMode.Repeat;
 						break;
 					case PlayMode.Repeat:
-						nextPlayMode = PlayMode.AI;
+						// 只有处于 我喜欢的音乐 歌单中才可以使用心动模式
+						if (getPlayingSong().originFromTrack.userId === "") {
+							nextPlayMode = PlayMode.One;
+						} else {
+							nextPlayMode = PlayMode.AI;
+						}
 						break;
 					case PlayMode.AI:
 						nextPlayMode = PlayMode.One;
