@@ -39,6 +39,7 @@ import {
 	currentRawLyricRespAtom,
 	getMusicId,
 	lyricEditorConnectedAtom,
+	lyricForceReloadAtom,
 	lyricOffsetAtom,
 	musicIdAtom,
 	playingSongDataAtom,
@@ -55,6 +56,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const curLyricOffset = useAtomValue(lyricOffsetAtom);
+	const lyricForceReload = useAtomValue(lyricForceReloadAtom);
 	const setPlayProgress = useSetAtom(playProgressAtom);
 	const setPlayVolume = useSetAtom(playVolumeAtom);
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
@@ -197,7 +199,7 @@ export const NCMEnvWrapper: React.FC = () => {
 				setCurrentLyrics(null);
 			};
 		}
-	}, [musicId, isLyricPageOpening, isFMPageOpening]);
+	}, [musicId, lyricForceReload, isLyricPageOpening, isFMPageOpening]);
 
 	React.useLayoutEffect(() => {
 		const bitrate: number | undefined =
@@ -417,7 +419,6 @@ export const NCMEnvWrapper: React.FC = () => {
 			const time = (progress * 1000) | 0;
 			let curLyricIndex: number | null = null;
 			if (currentLyrics) {
-				const lastLine = currentLyrics[currentLyrics.length - 1];
 				const indexes = new Set<number>();
 				currentLyrics.forEach((line, index) => {
 					const beginTime = line.dynamicLyricTime ?? line.beginTime ?? 0;
@@ -452,15 +453,6 @@ export const NCMEnvWrapper: React.FC = () => {
 							if (!eqSet(lastIndexes, indexes)) {
 								lastIndexes = indexes;
 								setCurrentLyricsIndexes(indexes);
-							}
-						} else if (
-							lastLine === curLyricLine &&
-							time > curLyricLine.dynamicLyricTime + curLyricLine.duration + 750
-						) {
-							const s = new Set([currentLyrics.length]);
-							if (!eqSet(lastIndexes, s)) {
-								lastIndexes = s;
-								setCurrentLyricsIndexes(s);
 							}
 						}
 					} else if (

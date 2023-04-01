@@ -12,7 +12,7 @@ import {
 	songArtistsAtom,
 } from "../../core/states";
 import { GLOBAL_EVENTS } from "../../utils/global-events";
-import { log, warn } from "../../utils/logger";
+import { log } from "../../utils/logger";
 import { LyricLine } from "../../core/lyric-parser";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
@@ -101,7 +101,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			mustScroll: boolean = false,
 			currentLyricIndexes = cachedLyricIndex.current,
 		) => {
-			log("触发滚动函数", lineHeights.current);
+			// log("触发滚动函数", lineHeights.current);
 			cachedLyricIndex.current = currentLyricIndexes;
 			if (lyricListElement.current) {
 				let scrollToIndex = Number.MAX_SAFE_INTEGER;
@@ -204,7 +204,7 @@ export const LyricDOMRenderer: React.FC = () => {
 					result.push(lineTransform);
 				}
 
-				log("已计算新布局", result);
+				// log("已计算新布局", result);
 
 				setLineTransforms(result);
 				lastLyricTransform.current = result;
@@ -222,13 +222,28 @@ export const LyricDOMRenderer: React.FC = () => {
 				isDots: el.classList.contains("am-lyric-dots"),
 				isBGLyric: el.classList.contains("am-lyric-line-bg-lyric"),
 			}));
-			warn("已触发高度重新计算", lineHeights.current);
+			// warn("已触发高度重新计算", lineHeights.current);
 		}
 	}, []);
+
+	const [firstLyricIndex, setFirstLyricIndex] = React.useState(-1);
+
+	React.useEffect(() => {
+		if (cachedLyricIndexes.size > 0) {
+			let i = -1;
+			for (const v of cachedLyricIndexes) {
+				if (i < v) {
+					i = v;
+				}
+			}
+			setFirstLyricIndex(i);
+		}
+	}, [cachedLyricIndexes]);
 
 	React.useLayoutEffect(() => {
 		if (currentLyricsA || noCacheLyricState) {
 			setCurrentLyrics(currentLyricsA);
+			setFirstLyricIndex(-1);
 		}
 		setLineTransforms([]);
 	}, [currentLyricsA, scrollToLyric, recalculateLineHeights]);
@@ -413,16 +428,6 @@ export const LyricDOMRenderer: React.FC = () => {
 			};
 		}
 	}, [alignTopSelectedLyric]);
-
-	const firstLyricIndex = React.useMemo(() => {
-		let i = -1;
-		for (const v of cachedLyricIndexes) {
-			if (i < v) {
-				i = v;
-			}
-		}
-		return i;
-	}, [cachedLyricIndexes]);
 
 	const creditLineTransform: LyricLineTransform = React.useMemo(() => {
 		const trans: LyricLineTransform = {

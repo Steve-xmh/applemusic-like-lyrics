@@ -214,14 +214,18 @@ export interface LyricFile {
 	albumImageUrl?: string;
 }
 
+export const getLyricCachePath = () =>
+	normalizePath(`${plugin.pluginPath}/../../amll-data/lyrics`);
+
 export const loadLyric = async (
 	id: string | number,
 	ignoreCache = false,
 ): Promise<LyricFile> => {
-	const lyricsPath = normalizePath(
-		`${plugin.pluginPath}/../../amll-data/lyrics`,
-	);
+	const lyricsPath = getLyricCachePath();
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
+	log("正在加载歌词", id);
+	log("歌词文件夹路径", lyricsPath);
+	log("歌词文件路径", cachedLyricPath);
 	try {
 		if (!ignoreCache && (await betterncm.fs.exists(cachedLyricPath))) {
 			log("发现歌词缓存，正在加载缓存", cachedLyricPath);

@@ -57,8 +57,20 @@ const controlButtonTypeData = [
 		value: PlayControlButtonType.AddToPlaylist,
 	},
 	{
-		label: "喜欢/取消喜欢歌曲",
+		label: "喜欢/取消喜欢歌曲（星型样式）",
 		value: PlayControlButtonType.AddToFav,
+	},
+	{
+		label: "喜欢/取消喜欢歌曲（心型样式）",
+		value: PlayControlButtonType.AddToFavHeart,
+	},
+	{
+		label: "切换播放模式",
+		value: PlayControlButtonType.PlaybackSwitcher,
+	},
+	{
+		label: "切换播放模式（填充样式）",
+		value: PlayControlButtonType.PlaybackSwitcherFilled,
 	},
 ];
 

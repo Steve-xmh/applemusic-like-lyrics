@@ -32,7 +32,7 @@ import {
 	PURE_MUSIC_LYRIC_DATA,
 	PURE_MUSIC_LYRIC_LINE,
 } from "../core/lyric-parser";
-import { setClipboardData } from "../api";
+import { getLyricCachePath, setClipboardData } from "../api";
 import { WindowedConfigComponent } from "../config";
 import exportTTMLText from "../core/ttml-writer";
 
@@ -427,7 +427,7 @@ const MainMenu: React.FC<{
 				<MenuItem
 					label="纯音乐歌词"
 					onClick={async () => {
-						const lyricsPath = `${plugin.pluginPath}/lyrics`;
+						const lyricsPath = getLyricCachePath();
 						const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 						setCurrentLyrics(PURE_MUSIC_LYRIC_LINE);
 						try {

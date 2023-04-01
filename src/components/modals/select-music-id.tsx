@@ -10,10 +10,11 @@ import {
 	Space,
 	Button,
 } from "@mantine/core";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import * as React from "react";
 import {
 	getLyric,
+	getLyricCachePath,
 	getNCMImageUrl,
 	getSongDetail,
 	SongDetailResponse,
@@ -94,7 +95,7 @@ export const SelectMusicIdModal: React.FC = () => {
 		selectMusicIdModalOpenedAtom,
 	);
 
-	const musicId = useAtom(musicIdAtom);
+	const musicId = useAtomValue(musicIdAtom);
 
 	const [selectMusicIdModalLoading, setSelectMusicIdModalLoading] =
 		React.useState(false);
@@ -140,7 +141,7 @@ export const SelectMusicIdModal: React.FC = () => {
 						setSelectMusicIdModalLoading(true);
 						try {
 							const data = await getLyric(selectMusicId);
-							const lyricsPath = `${plugin.pluginPath}/lyrics`;
+							const lyricsPath = getLyricCachePath();
 							const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 							if (!(await betterncm.fs.exists(lyricsPath))) {
 								betterncm.fs.mkdir(lyricsPath);

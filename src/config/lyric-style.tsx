@@ -81,6 +81,12 @@ export const LyricStyleSettings: React.FC = () => {
 					label="歌词滚动位置向上对齐"
 				/>
 			</GroupBox>
+			<GroupBox>
+				<SwitchConfigComponent
+					settingKey="hideLyricInfoBorder"
+					label="隐藏歌词歌曲信息分隔线"
+				/>
+			</GroupBox>
 		</>
 	);
 };

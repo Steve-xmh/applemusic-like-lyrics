@@ -24,6 +24,7 @@ export const albumImageMainColorsAtom = atom<Pixel[]>([[0, 0, 0]]);
 export const rightClickedLyricAtom = atom<LyricLine | null>(null);
 export const playProgressAtom = atom(0);
 export const playVolumeAtom = atom(0);
+export const lyricForceReloadAtom = atom(Symbol("lyric-force-reload-atom"));
 export const lyricErrorAtom = atom<Error | null>(null);
 
 export const musicIdAtom: Atom<string | number> = selectAtom(

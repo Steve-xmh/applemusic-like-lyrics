@@ -11,11 +11,17 @@ import IconRepeatAI from "../../assets/icon_ai.svg";
 import IconRepeatAIOn from "../../assets/icon_ai_on.svg";
 import IconRepeatOne from "../../assets/icon_repeatone.svg";
 import IconRepeatOneOn from "../../assets/icon_repeatone_on.svg";
+import IconOrder from "../../assets/icon_order.svg";
+import IconOrderOn from "../../assets/icon_order_on.svg";
 import IconFavorite from "../../assets/icon_favorite.svg";
 import IconFavoriteOn from "../../assets/icon_favorite_on.svg";
+import IconFavoriteHeart from "../../assets/icon_favorite_heart.svg";
+import IconFavoriteHeartOn from "../../assets/icon_favorite_heart_on.svg";
 import IconAddToPlaylist from "../../assets/icon_add_to_playlist.svg";
 
 export enum PlayControlButtonType {
+	PlaybackSwitcher = "playback-switcher",
+	PlaybackSwitcherFilled = "playback-switcher-filled",
 	PlaybackOrder = "playback-type-order",
 	PlaybackRepeat = "playback-type-loop",
 	PlaybackOne = "playback-type-one",
@@ -23,7 +29,84 @@ export enum PlayControlButtonType {
 	PlaybackAI = "playback-type-ai",
 	AddToPlaylist = "add-to-playlist",
 	AddToFav = "add-to-fav",
+	AddToFavHeart = "add-to-fav-heart",
 }
+
+const getPlaybackModeIcon = (playMode: PlayMode, filled = false) => {
+	switch (playMode) {
+		case PlayMode.Order:
+			return filled ? (
+				<IconOrderOn color="#FFFFFF" />
+			) : (
+				<IconOrder color="#FFFFFF" />
+			);
+		case PlayMode.Repeat:
+			return filled ? (
+				<IconRepeatOn color="#FFFFFF" />
+			) : (
+				<IconRepeat color="#FFFFFF" />
+			);
+		case PlayMode.AI:
+			return filled ? (
+				<IconRepeatAIOn color="#FFFFFF" />
+			) : (
+				<IconRepeatAI color="#FFFFFF" />
+			);
+		case PlayMode.One:
+			return filled ? (
+				<IconRepeatOneOn color="#FFFFFF" />
+			) : (
+				<IconRepeatOne color="#FFFFFF" />
+			);
+		case PlayMode.Random:
+			return filled ? (
+				<IconShuffleOn color="#FFFFFF" />
+			) : (
+				<IconShuffle color="#FFFFFF" />
+			);
+		default:
+			throw new TypeError(`未知的播放类型：${playMode}`);
+	}
+};
+
+const PlaybackSwitcherButton: React.FC<{
+	filled?: boolean;
+}> = (props) => {
+	const [currentPlayMode, setCurrentPlayMode] = useAtom(currentPlayModeAtom);
+	return (
+		<button
+			className="am-music-track-btn"
+			onClick={() => {
+				let nextPlayMode: PlayMode;
+
+				switch (currentPlayMode) {
+					case PlayMode.Order:
+						nextPlayMode = PlayMode.Repeat;
+						break;
+					case PlayMode.Repeat:
+						nextPlayMode = PlayMode.AI;
+						break;
+					case PlayMode.AI:
+						nextPlayMode = PlayMode.One;
+						break;
+					case PlayMode.One:
+						nextPlayMode = PlayMode.Random;
+						break;
+					case PlayMode.Random:
+						nextPlayMode = PlayMode.Order;
+						break;
+					default:
+						throw new TypeError(`未知的播放类型：${currentPlayMode}`);
+				}
+
+				switchPlayMode(nextPlayMode);
+				setCurrentPlayMode(nextPlayMode);
+			}}
+		>
+			{getPlaybackModeIcon(currentPlayMode, props.filled)}
+		</button>
+	);
+};
 
 export const PlayControlButton: React.FC<{
 	type: PlayControlButtonType;
@@ -37,7 +120,10 @@ export const PlayControlButton: React.FC<{
 	);
 
 	React.useLayoutEffect(() => {
-		if (props.type === PlayControlButtonType.AddToFav) {
+		if (
+			props.type === PlayControlButtonType.AddToFav ||
+			props.type === PlayControlButtonType.AddToFavHeart
+		) {
 			const pinfo = document.querySelector<HTMLDivElement>(".m-pinfo>*");
 			if (pinfo) {
 				const obz = new MutationObserver(() => {
@@ -73,9 +159,9 @@ export const PlayControlButton: React.FC<{
 					}}
 				>
 					{currentPlayMode === PlayMode.Order ? (
-						<IconRepeatOn color="#FFFFFF" />
+						<IconOrderOn color="#FFFFFF" />
 					) : (
-						<IconRepeat color="#FFFFFF" />
+						<IconOrder color="#FFFFFF" />
 					)}
 				</button>
 			);
@@ -193,6 +279,27 @@ export const PlayControlButton: React.FC<{
 					)}
 				</button>
 			);
+		case PlayControlButtonType.AddToFavHeart:
+			return (
+				<button
+					className="am-music-track-btn"
+					onClick={() => {
+						document
+							.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
+							?.click();
+					}}
+				>
+					{isFavSong ? (
+						<IconFavoriteHeartOn color="#FFFFFF" />
+					) : (
+						<IconFavoriteHeart color="#FFFFFF" />
+					)}
+				</button>
+			);
+		case PlayControlButtonType.PlaybackSwitcher:
+			return <PlaybackSwitcherButton />;
+		case PlayControlButtonType.PlaybackSwitcherFilled:
+			return <PlaybackSwitcherButton filled />;
 		default:
 			throw new TypeError(`未知的控制按钮类型：${props.type}`);
 	}

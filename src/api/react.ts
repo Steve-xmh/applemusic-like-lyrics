@@ -2,13 +2,11 @@ import * as React from "react";
 import { getConfig, setConfig } from "../config/core";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
-import { getNCMImageUrl, getPlayingSong, loadLyric } from ".";
+import { getNCMImageUrl, getPlayingSong } from ".";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
-	currentLyricsAtom,
 	currentRawLyricRespAtom,
-	lyricErrorAtom,
-	musicIdAtom,
+	lyricForceReloadAtom,
 } from "../core/states";
 
 export function useConfig(
@@ -345,20 +343,9 @@ export function useForceUpdate(): () => void {
 }
 
 export function useReloadLyricByCurrentAudioId() {
-	const musicId = useAtomValue(musicIdAtom);
-	const setCurrentRawLyricResp = useSetAtom(currentRawLyricRespAtom);
-	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
-	const setLyricError = useSetAtom(lyricErrorAtom);
+	const setLyricForceReload = useSetAtom(lyricForceReloadAtom);
 
-	return React.useCallback(async () => {
-		setLyricError(null);
-		setCurrentLyrics(null);
-		try {
-			const lyric = await loadLyric(musicId);
-			log("已获取到歌词", lyric);
-			setCurrentRawLyricResp(lyric);
-		} catch (err) {
-			setLyricError(err);
-		}
-	}, [musicId]);
+	return async () => {
+		setLyricForceReload(Symbol("lyric-force-reload-atom"));
+	};
 }

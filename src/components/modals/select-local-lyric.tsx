@@ -7,6 +7,7 @@ import {
 	selectLocalLyricModalOpenedAtom,
 } from "../../core/states";
 import { warn } from "../../utils/logger";
+import { getLyricCachePath } from "../../api";
 
 export const SelectLocalLyricModal: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -79,7 +80,7 @@ export const SelectLocalLyricModal: React.FC = () => {
 					if (originalLyricFile) {
 						setLocalLyricModalLoading(true);
 						try {
-							const lyricsPath = `${plugin.pluginPath}/lyrics`;
+							const lyricsPath = getLyricCachePath();
 							const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 							if (!(await betterncm.fs.exists(lyricsPath))) {
 								betterncm.fs.mkdir(lyricsPath);
