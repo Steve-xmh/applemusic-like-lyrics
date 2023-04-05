@@ -4,10 +4,7 @@ import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
 import { getNCMImageUrl, getPlayingSong } from ".";
 import { useAtomValue, useSetAtom } from "jotai";
-import {
-	currentRawLyricRespAtom,
-	lyricForceReloadAtom,
-} from "../core/states";
+import { currentRawLyricRespAtom, lyricForceReloadAtom } from "../core/states";
 
 export function useConfig(
 	key: string,

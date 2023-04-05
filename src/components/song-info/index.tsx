@@ -25,6 +25,7 @@ import { AudioFFTControl } from "./audio-fft-control";
 import { PlayControls } from "./play-controls";
 import { NowPlayingSlider } from "../appkit/np-slider";
 import { AudioQualityTag } from "./audio-quality-tag";
+import { SongInfoTextMarquee } from "./song-info-text-marquee";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -130,26 +131,32 @@ export const PlayerSongInfo: React.FC<{
 							<div className="am-music-info">
 								{!hideMusicName &&
 									(hideMusicAlbum || songName !== album.name) && (
-										<div className="am-music-name">{songName}</div>
+										<SongInfoTextMarquee>
+											<div className="am-music-name">{songName}</div>
+										</SongInfoTextMarquee>
 									)}
 								{!hideMusicAlbum && (
-									<div className="am-music-album">
-										<a href={`#/m/album/?id=${album.id}`}>{album.name}</a>
-									</div>
+									<SongInfoTextMarquee>
+										<div className="am-music-album">
+											<a href={`#/m/album/?id=${album.id}`}>{album.name}</a>
+										</div>
+									</SongInfoTextMarquee>
 								)}
 								{!hideMusicArtists && (
-									<div className="am-music-artists">
-										<div className="am-artists">
-											{songArtists.map((artist, index) => (
-												<a
-													href={`#/m/artist/?id=${artist.id}`}
-													key={`${artist.id}-${artist.name}-${index}`}
-												>
-													{artist.name}
-												</a>
-											))}
+									<SongInfoTextMarquee>
+										<div className="am-music-artists">
+											<div className="am-artists">
+												{songArtists.map((artist, index) => (
+													<a
+														href={`#/m/artist/?id=${artist.id}`}
+														key={`${artist.id}-${artist.name}-${index}`}
+													>
+														{artist.name}
+													</a>
+												))}
+											</div>
 										</div>
-									</div>
+									</SongInfoTextMarquee>
 								)}
 							</div>
 							{!hideMenuButton && (
