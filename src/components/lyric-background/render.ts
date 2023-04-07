@@ -49,6 +49,8 @@ export class CanvasBackgroundRender {
 	private _skipFrameRate = 0;
 	private currentRenderMethod: BackgroundRenderMethod;
 	private _displaySize = [0, 0];
+	private _currentAlbumColorMapColors: Pixel[] = [];
+	private _currentAlbumImage: HTMLImageElement;
 	private get time() {
 		return Date.now() - this.createTime;
 	}
@@ -75,6 +77,8 @@ export class CanvasBackgroundRender {
 		this.resetTime();
 		this.rebuildShader(renderMethod.fragmentShaderCode);
 		this.rebuildProgram();
+		if (this._currentAlbumColorMapColors.length > 0) this.setAlbumColorMap(this._currentAlbumColorMapColors);
+		if (this._currentAlbumImage) this.setAlbumImage(this._currentAlbumImage);
 		this.currentRenderMethod = renderMethod;
 	}
 	resetTime() {
@@ -211,6 +215,7 @@ export class CanvasBackgroundRender {
 	private albumColorMapSize = 0;
 	private albumColorMapTex: WebGLTexture;
 	setAlbumColorMap(colorMap: Pixel[]) {
+		this._currentAlbumColorMapColors = colorMap;
 		const tmp = [...colorMap];
 		// shuffleArray(tmp);
 		const size = Math.pow(2, smallestPowOfTwo(tmp.length));
@@ -250,6 +255,7 @@ export class CanvasBackgroundRender {
 	private albumImageSize = [0, 0];
 	private albumImageTex: WebGLTexture;
 	setAlbumImage(image: HTMLImageElement) {
+		this._currentAlbumImage = image;
 		this.albumImageSize = [image.width, image.height];
 		const fitImageSize = Math.min(
 			this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE),
