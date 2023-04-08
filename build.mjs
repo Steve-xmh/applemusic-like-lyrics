@@ -170,10 +170,9 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 					"dist/manifest.json",
 					JSON.stringify(manifest, null, "\t"),
 				);
-				fs.copyFileSync("assets/thumbnail.svg", "dist/thumbnail.svg");
 			}
 		})
 		.catch((error) => {
-			console.log("Build Failed");
+			console.log("Build Failed", error);
 		});
 }
