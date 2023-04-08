@@ -26,7 +26,6 @@ export const AdjustLyricOffsetModal: React.FC = () => {
 			opened={modalOpened}
 			closeOnClickOutside
 			onClose={() => setModalOpened(false)}
-			zIndex={151}
 			centered
 		>
 			<Text>注：本设置用于调节单独歌曲的位移，该位移将会和全局位移叠加。</Text>

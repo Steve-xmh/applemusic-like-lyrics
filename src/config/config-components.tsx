@@ -1,18 +1,14 @@
 import * as React from "react";
 import { useConfig } from "../api/react";
-import {
-	ColorInput,
-	Slider,
-	TextInput,
-	TextInputProps,
-	Switch,
-	Text,
-} from "@mantine/core";
+import { ColorInput, TextInput, TextInputProps } from "@mantine/core";
+import { Switch } from "../components/appkit/switch";
+import { Slider } from "../components/appkit/slider";
 
 export const SwitchConfigComponent: React.FC<{
 	settingKey: string;
 	defaultValue?: boolean;
 	label: string;
+	description?: string;
 	disabled?: boolean;
 }> = (props) => {
 	const [rawValue, setSettingValue] = useConfig(
@@ -21,13 +17,19 @@ export const SwitchConfigComponent: React.FC<{
 	);
 	const settingValue = React.useMemo(() => rawValue === "true", [rawValue]);
 	return (
-		<Switch
-			disabled={props.disabled}
-			sx={{ margin: "16px 0" }}
-			checked={settingValue}
-			onChange={() => setSettingValue(String(!settingValue))}
-			label={props.label}
-		/>
+		<div className="amll-switch-config">
+			<Switch
+				disabled={props.disabled}
+				selected={settingValue}
+				onClick={() => setSettingValue(String(!settingValue))}
+				beforeSwitch={
+					<div className="amll-config-text">
+						<div className="amll-config-label">{props.label}</div>
+						<div className="amll-config-description">{props.description}</div>
+					</div>
+				}
+			/>
+		</div>
 	);
 };
 
@@ -87,8 +89,9 @@ export const SliderConfigComponent: React.FC<{
 	defaultValue?: number;
 	step?: number;
 	label: string;
-	formatLabel?: typeof Slider["label"];
+	description?: string;
 	disabled?: boolean;
+	formatLabel?: (v: number) => string;
 }> = (props) => {
 	const [rawValue, setSettingValue] = useConfig(props.settingKey);
 	const settingValue = React.useMemo(
@@ -96,21 +99,20 @@ export const SliderConfigComponent: React.FC<{
 		[rawValue, props.defaultValue],
 	);
 	return (
-		<>
-			<Text sx={{ margin: "8px 0" }} fz="md">
-				{props.label}
-			</Text>
+		<div className="amll-slider-config">
+			<div className="amll-config-text">
+				<div className="amll-config-label">{props.label}</div>
+				<div className="amll-config-description">{props.description}</div>
+			</div>
 			<Slider
-				sx={{ margin: "8px 0" }}
 				disabled={props.disabled}
 				step={props.step}
 				min={props.min}
 				max={props.max}
 				defaultValue={props.defaultValue}
-				label={props.formatLabel}
 				value={settingValue}
 				onChange={(v) => setSettingValue(String(v))}
 			/>
-		</>
+		</div>
 	);
 };

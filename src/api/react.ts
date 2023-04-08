@@ -2,14 +2,9 @@ import * as React from "react";
 import { getConfig, setConfig } from "../config/core";
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
-import { getNCMImageUrl, getPlayingSong, loadLyric } from ".";
+import { getNCMImageUrl, getPlayingSong } from ".";
 import { useAtomValue, useSetAtom } from "jotai";
-import {
-	currentLyricsAtom,
-	currentRawLyricRespAtom,
-	lyricErrorAtom,
-	musicIdAtom,
-} from "../core/states";
+import { currentRawLyricRespAtom, lyricForceReloadAtom } from "../core/states";
 
 export function useConfig(
 	key: string,
@@ -54,6 +49,16 @@ export function useConfigBoolean(
 	return [value, setValue];
 }
 
+export function useConfigNumber(
+	key: string,
+	defaultValue = 0,
+): [number, React.Dispatch<number>] {
+	const [rawValue, setRawValue] = useConfig(key, defaultValue.toString());
+	const value = React.useMemo(() => Number(rawValue), [rawValue]);
+	const setValue = (v: number) => setRawValue(v.toString());
+	return [value, setValue];
+}
+
 export function useConfigValue(key: string, defaultValue: string): string;
 export function useConfigValue(
 	key: string,
@@ -86,6 +91,12 @@ export function useConfigValueBoolean(
 ): boolean {
 	const rawValue = useConfigValue(key, defaultValue.toString());
 	const value = React.useMemo(() => rawValue !== "false", [rawValue]);
+	return value;
+}
+
+export function useConfigValueNumber(key: string, defaultValue = 0): number {
+	const rawValue = useConfigValue(key, defaultValue.toString());
+	const value = React.useMemo(() => Number(rawValue), [rawValue]);
 	return value;
 }
 
@@ -173,32 +184,41 @@ export function useAlbumImage(
 	const [shouldLowQuality, setShouldLowQuality] = React.useState(
 		lowWidth && lowHeight && lowWidth * lowHeight > 0,
 	);
+	const currentRawLyricResp = useAtomValue(currentRawLyricRespAtom);
+	// const prefix = "orpheus://cache/?"; // 如果加入缓存的话会导致部分情况下无法解码图片（但是可以加载显示）
+	const prefix = "";
 
 	const albumImageUrls = React.useMemo(() => {
 		const songData = getPlayingSong();
 		const urls: string[] = [];
+
+		if (currentRawLyricResp.albumImageUrl) {
+			urls.push(currentRawLyricResp.albumImageUrl);
+			urls.push(currentRawLyricResp.albumImageUrl);
+		}
+
 		const originalTrackPic =
 			songData?.originFromTrack?.track?.track?.album?.picUrl;
 		if (originalTrackPic) {
-			const url = `orpheus://cache/?${originalTrackPic}`;
+			const url = `${prefix}${originalTrackPic}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
 		const radioIntervenePic = songData?.data?.radio?.intervenePicUrl;
 		if (radioIntervenePic) {
-			const url = `orpheus://cache/?${radioIntervenePic}`;
+			const url = `${prefix}${radioIntervenePic}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
 		const picUrl = songData?.data?.album?.picUrl;
 		if (picUrl) {
-			const url = `orpheus://cache/?${picUrl}`;
+			const url = `${prefix}${picUrl}`;
 			urls.push(
-				`${url}?imageView&type=webp&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
+				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
 			);
 			urls.push(url);
 		}
@@ -207,14 +227,12 @@ export function useAlbumImage(
 			const url = `orpheus://localmusic/pic?${encodeURIComponent(playFile)}`;
 			urls.push(url, url);
 		}
-		const noSongImage = `orpheus://cache/?${getNCMImageUrl(
-			"16601526067802346",
-		)}`;
+		const noSongImage = `${prefix}${getNCMImageUrl("16601526067802346")}`;
 		urls.push(noSongImage, noSongImage);
 		urls.push(EMPTY_IMAGE_URL);
 		urls.push(EMPTY_IMAGE_URL);
 		return urls;
-	}, [musicId, shouldLowQuality, lowWidth, lowHeight]);
+	}, [musicId, shouldLowQuality, lowWidth, lowHeight, currentRawLyricResp]);
 
 	const [selectedUrl, setSelectedUrl] = React.useState("");
 
@@ -322,20 +340,9 @@ export function useForceUpdate(): () => void {
 }
 
 export function useReloadLyricByCurrentAudioId() {
-	const musicId = useAtomValue(musicIdAtom);
-	const setCurrentRawLyricResp = useSetAtom(currentRawLyricRespAtom);
-	const setCurrentLyrics = useSetAtom(currentLyricsAtom);
-	const setLyricError = useSetAtom(lyricErrorAtom);
+	const setLyricForceReload = useSetAtom(lyricForceReloadAtom);
 
-	return React.useCallback(async () => {
-		setLyricError(null);
-		setCurrentLyrics(null);
-		try {
-			const lyric = await loadLyric(musicId);
-			log("已获取到歌词", lyric);
-			setCurrentRawLyricResp(lyric);
-		} catch (err) {
-			setLyricError(err);
-		}
-	}, [musicId]);
+	return async () => {
+		setLyricForceReload(Symbol("lyric-force-reload-atom"));
+	};
 }

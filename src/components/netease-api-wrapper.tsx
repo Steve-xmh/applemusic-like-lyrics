@@ -7,13 +7,18 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
 import {
+	AudioQualityType,
 	genBitmapImage,
 	getPlayingSong,
 	loadLyric,
+	loadTTMLLyric,
 	PlayState,
 	toPlayState,
 } from "../api";
-import { grabImageColors as workerGrabImageColors } from "../worker";
+import {
+	grabImageColors as workerGrabImageColors,
+	calcImageAverageColor as workerCalcImageAverageColor,
+} from "../worker";
 import {
 	useNowPlayingOpened,
 	useConfigValueBoolean,
@@ -27,35 +32,52 @@ import {
 	albumImageUrlAtom,
 	currentAudioDurationAtom,
 	currentAudioIdAtom,
+	currentAudioQualityTypeAtom,
 	currentLyricsAtom,
-	currentLyricsIndexAtom,
+	currentLyricsIndexesAtom,
+	currentPlayModeAtom,
 	currentRawLyricRespAtom,
 	getMusicId,
+	lyricEditorConnectedAtom,
+	lyricForceReloadAtom,
 	lyricOffsetAtom,
 	musicIdAtom,
 	playingSongDataAtom,
+	playProgressAtom,
 	playStateAtom,
+	playVolumeAtom,
+	ttmlLyricAtom,
 } from "../core/states";
-import { error, warn } from "../utils/logger";
+import { error, log, warn } from "../utils/logger";
+import { LyricEditorWSClient } from "../core/editor-client";
+import { eqSet, getCurrentPlayMode, PlayMode } from "../utils";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
 	const musicId = useAtomValue(musicIdAtom);
 	const curLyricOffset = useAtomValue(lyricOffsetAtom);
-	const setCurrentAudioId = useSetAtom(currentAudioIdAtom);
+	const lyricForceReload = useAtomValue(lyricForceReloadAtom);
+	const setPlayProgress = useSetAtom(playProgressAtom);
+	const setPlayVolume = useSetAtom(playVolumeAtom);
 	const setCurrentAudioDuration = useSetAtom(currentAudioDurationAtom);
-	const setCurrentLyricsIndex = useSetAtom(currentLyricsIndexAtom);
+	const setCurrentLyricsIndexes = useSetAtom(currentLyricsIndexesAtom);
+	const setCurrentAudioQualityType = useSetAtom(currentAudioQualityTypeAtom);
+	const setLyricEditorConnected = useSetAtom(lyricEditorConnectedAtom);
 	const setPlayingSongData = useSetAtom(playingSongDataAtom);
 	const setAlbumImageMainColors = useSetAtom(albumImageMainColorsAtom);
-	const setAlbumImageUrlAtom = useSetAtom(albumImageUrlAtom);
+	const setAlbumImageUrl = useSetAtom(albumImageUrlAtom);
+	const setCurrentPlayMode = useSetAtom(currentPlayModeAtom);
 	const isLyricPageOpening = useNowPlayingOpened();
 	const isFMPageOpening = useFMOpened();
 	const [currentLyrics, setCurrentLyrics] = useAtom(currentLyricsAtom);
+	const [currentAudioId, setCurrentAudioId] = useAtom(currentAudioIdAtom);
 	const [albumImageLoaded, albumImage] = useAlbumImage(musicId, 128, 128);
 
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const configTTMLLyric = useConfigValueBoolean("ttml-lyric", false);
+	const enableEditor = useConfigValueBoolean("enableEditor", false);
 	const configGlobalTimeStampOffset = Number(
 		useConfigValue("globalTimeStampOffset", "0"),
 	);
@@ -63,24 +85,71 @@ export const NCMEnvWrapper: React.FC = () => {
 	const [currentRawLyricResp, setCurrentRawLyricResp] = useAtom(
 		currentRawLyricRespAtom,
 	);
+	const [ttmlLyric, setTTMLLyric] = useAtom(ttmlLyricAtom);
 
+	const [reconnectCounter, setReconnectCounter] = React.useState(Symbol());
+	const editorWSClient = React.useRef<LyricEditorWSClient>();
 	React.useEffect(() => {
+		if (enableEditor) {
+			let client = new LyricEditorWSClient();
+			log("正在连接到歌词编辑器！", client.url);
+
+			client.addEventListener("message", (msg) => {
+				log("歌词编辑器返回信息！", msg);
+			});
+
+			client.addEventListener("open", () => {
+				log("歌词编辑器已连接！");
+				setLyricEditorConnected(true);
+			});
+
+			client.addEventListener("error", (msg) => {
+				warn("歌词编辑器连接出错：", msg);
+				setReconnectCounter(Symbol());
+			});
+
+			client.addEventListener("close", () => {
+				log("歌词编辑器已断开连接！");
+				setReconnectCounter(Symbol());
+			});
+
+			editorWSClient.current = client;
+
+			return () => {
+				log("歌词编辑器接口已关闭！");
+				client.dispose();
+				setLyricEditorConnected(false);
+				editorWSClient.current = undefined;
+			};
+		}
+	}, [reconnectCounter, enableEditor]);
+
+	React.useLayoutEffect(() => {
 		const img = new Image();
 		let canceled = false;
 		if (albumImageLoaded) {
-			setAlbumImageUrlAtom(albumImage.src);
+			setAlbumImageUrl(albumImage.src);
 		}
 		img.addEventListener(
 			"load",
 			() => {
 				if (!canceled) {
 					(async () => {
-						const bm = await genBitmapImage(albumImage, 128, 128);
-						if (bm) {
-							const colors = await workerGrabImageColors(bm, 16);
-							setAlbumImageMainColors(colors);
-						} else {
-							warn("缩放图片失败", albumImage.src);
+						try {
+							const bm = await genBitmapImage(albumImage, 64, 64);
+							if (bm) {
+								try {
+									const colors = await workerGrabImageColors(bm, 16);
+									const avgColor = await workerCalcImageAverageColor(bm);
+									setAlbumImageMainColors([avgColor, ...colors]);
+								} catch (err) {
+									warn("计算图片主题色失败", err);
+								}
+							} else {
+								warn("缩放图片失败", albumImage.src);
+							}
+						} catch (err) {
+							warn("缩放图片失败", albumImage.src, err);
 						}
 					})();
 				}
@@ -95,11 +164,11 @@ export const NCMEnvWrapper: React.FC = () => {
 		img.src = albumImage.src;
 		return () => {
 			canceled = true;
-			setAlbumImageUrlAtom(null);
+			setAlbumImageUrl(null);
 		};
 	}, [albumImageLoaded]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		if (isLyricPageOpening || isFMPageOpening) {
 			let canceled = false;
 			(async () => {
@@ -113,14 +182,52 @@ export const NCMEnvWrapper: React.FC = () => {
 					error(err);
 				}
 			})();
+			(async () => {
+				setTTMLLyric(null);
+				// setTTMLLyric
+				try {
+					const lyric = await loadTTMLLyric(musicId);
+					if (!canceled) {
+						setTTMLLyric(lyric);
+					}
+				} catch (err) {
+					error(err);
+				}
+			})();
 			return () => {
 				canceled = true;
 				setCurrentLyrics(null);
 			};
 		}
-	}, [musicId, isLyricPageOpening, isFMPageOpening]);
+	}, [musicId, lyricForceReload, isLyricPageOpening, isFMPageOpening]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
+		const bitrate: number | undefined =
+			getPlayingSong()?.from?.lastPlayInfo?.bitrate;
+		const envSound: string | undefined =
+			getPlayingSong()?.from?.lastPlayInfo?.envSound;
+		if (envSound === "dolby") {
+			setCurrentAudioQualityType(AudioQualityType.DolbyAtmos);
+		} else if (bitrate === undefined) {
+			setCurrentAudioQualityType(AudioQualityType.Local);
+		} else if (bitrate <= 192) {
+			setCurrentAudioQualityType(AudioQualityType.Normal);
+		} else if (bitrate <= 320) {
+			setCurrentAudioQualityType(AudioQualityType.High);
+		} else if (bitrate <= 999) {
+			setCurrentAudioQualityType(AudioQualityType.Lossless);
+		} else if (bitrate <= 1999) {
+			setCurrentAudioQualityType(AudioQualityType.HiRes);
+		}
+	}, [currentAudioId]);
+
+	React.useLayoutEffect(() => {
+		if (configTTMLLyric && ttmlLyric) {
+			log("存在 TTML 歌词，正在替换", ttmlLyric);
+			setCurrentLyrics(ttmlLyric);
+			setCurrentLyricsIndexes(new Set());
+			return;
+		}
 		let parsed: LyricLine[] = [];
 		let canUseDynamicLyric = !(
 			!currentRawLyricResp?.yrc?.lyric ||
@@ -146,25 +253,127 @@ export const NCMEnvWrapper: React.FC = () => {
 				"",
 			);
 		}
-		// log(currentRawLyricResp, parsed);
 		setCurrentLyrics(parsed);
-		setCurrentLyricsIndex(-1);
+		setCurrentLyricsIndexes(new Set());
 	}, [
 		currentRawLyricResp,
 		configDynamicLyric,
 		configRomanLyric,
 		configTranslatedLyric,
+		configTTMLLyric,
+		ttmlLyric,
 	]);
 
 	React.useEffect(() => {
-		setPlayState(getPlayingSong().state);
+		const client = editorWSClient.current;
+
+		if (client) {
+			const onMessage = (msg: MessageEvent) => {
+				if (msg.data.type === "pullLyric") {
+					editorWSClient.current?.send(
+						JSON.stringify({
+							type: "updateLyric",
+							value:
+								currentLyrics?.map((v) => [
+									v.originalLyric,
+									v.translatedLyric,
+									v.romanLyric,
+								]) ?? [],
+						}),
+					);
+				}
+			};
+
+			client.addEventListener("data", onMessage);
+
+			return () => {
+				client.removeEventListener("data", onMessage);
+			};
+		}
+	}, [reconnectCounter, currentLyrics]);
+
+	React.useEffect(() => {
+		const client = editorWSClient.current;
+
+		if (client) {
+			const onMessage = (msg: MessageEvent) => {
+				if (msg.data.type === "pullMusicID") {
+					editorWSClient.current?.send(
+						JSON.stringify({
+							type: "updateMusicID",
+							value: String(musicId),
+						}),
+					);
+				}
+			};
+
+			client.addEventListener("data", onMessage);
+
+			return () => {
+				client.removeEventListener("data", onMessage);
+			};
+		}
+	}, [reconnectCounter, musicId]);
+
+	React.useLayoutEffect(() => {
+		setPlayState(toPlayState(getPlayingSong().state));
+		setCurrentPlayMode(getCurrentPlayMode() || PlayMode.One);
 	}, [isLyricPageOpening]);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		setPlayingSongData(getPlayingSong());
+
+		const onVolumeChanged = (
+			_audioId: string,
+			_unknownArg0: number,
+			_unknownArg1: number,
+			volume: number, // [0.0-1.0]
+		) => {
+			setPlayVolume(volume);
+		};
+
+		legacyNativeCmder.appendRegisterCall(
+			"Volume",
+			"audioplayer",
+			onVolumeChanged,
+		);
+		// legacyNativeCmder._envAdapter.callAdapter("audioplayer.setVolume", () => {}, [])
+		try {
+			const nmSettings = JSON.parse(
+				localStorage.getItem("NM_SETTING_PLAYER") ?? "{}",
+			);
+			setPlayVolume(nmSettings?.volume ?? 0.5);
+		} catch {}
+
+		let duration = 0;
+
+		try {
+			duration = getPlayingSong()?.data?.duration || 0;
+			setCurrentAudioDuration(duration);
+		} catch {}
+
+		try {
+			const nmSettings = JSON.parse(
+				localStorage.getItem("NM_SETTING_USER") ?? "{}",
+			);
+			setPlayState(
+				nmSettings?.pauseStatus ? PlayState.Pausing : PlayState.Playing,
+			);
+			setPlayProgress(
+				(((nmSettings?.lastPlaying?.playPostion || 0) * duration) / 1000) | 0,
+			);
+		} catch {}
+
+		return () => {
+			legacyNativeCmder.removeRegisterCall(
+				"Volume",
+				"audioplayer",
+				onVolumeChanged,
+			);
+		};
 	}, []);
 
-	React.useEffect(() => {
+	React.useLayoutEffect(() => {
 		let tweenId = 0;
 		let onIntervalGettingSongData = 0;
 		const setIntervalGetSongData = () => {
@@ -174,12 +383,20 @@ export const NCMEnvWrapper: React.FC = () => {
 			}, 200);
 		};
 
+		let lastIndexes = new Set<number>();
+
 		const onPlayProgress = (
 			audioId: string,
 			progress: number,
 			loadProgress: number, // 当前音乐加载进度 [0.0-1.0] 1 为加载完成
 			isTween = false,
 		) => {
+			editorWSClient.current?.send(
+				`{\"type\":\"syncTime\",\"value\":[${
+					(progress * 1000) | 0
+				},${Date.now()}]}`,
+			);
+			setPlayProgress(progress);
 			progress += configGlobalTimeStampOffset; // 全局位移
 			progress += curLyricOffset; // 当前歌曲位移
 			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
@@ -196,39 +413,59 @@ export const NCMEnvWrapper: React.FC = () => {
 				};
 				requestAnimationFrame(tweenPlayProgress);
 			}
-			setPlayState(toPlayState(getPlayingSong().state));
+			// setPlayState(toPlayState(getPlayingSong().state));
 			clearInterval(onIntervalGettingSongData);
 			setCurrentAudioId(audioId);
 			const time = (progress * 1000) | 0;
 			let curLyricIndex: number | null = null;
 			if (currentLyrics) {
+				const indexes = new Set<number>();
+				currentLyrics.forEach((line, index) => {
+					const beginTime = line.dynamicLyricTime ?? line.beginTime ?? 0;
+					const endTime = beginTime + line.duration;
+					if (time > beginTime && time < endTime) {
+						indexes.add(index);
+					}
+				});
 				for (let i = currentLyrics.length - 1; i >= 0; i--) {
 					if (
 						time >
-						(currentLyrics[i]?.dynamicLyricTime || currentLyrics[i]?.time)
+						(currentLyrics[i].dynamicLyricTime ??
+							currentLyrics[i].beginTime ??
+							0)
 					) {
 						curLyricIndex = i;
 						break;
 					}
 				}
-				if (
-					curLyricIndex !== null &&
-					time <
-						currentLyrics[curLyricIndex].time +
-							Math.max(0, currentLyrics[curLyricIndex].duration - 100)
-				) {
-					// log("回调已设置歌词位置为", curLyricIndex);
-					setCurrentLyricsIndex(curLyricIndex);
-				} else if (
-					currentLyrics[currentLyrics.length - 1] &&
-					time >
-						(currentLyrics[currentLyrics.length - 1]?.dynamicLyricTime ||
-							currentLyrics[currentLyrics.length - 1].time) +
-							currentLyrics[currentLyrics.length - 1].duration +
-							750
-				) {
-					// log("回调已设置歌词位置为", currentLyrics.length);
-					setCurrentLyricsIndex(currentLyrics.length);
+				if (curLyricIndex !== null) {
+					const curLyricLine = currentLyrics[curLyricIndex];
+					if (
+						configDynamicLyric &&
+						curLyricLine.dynamicLyric &&
+						curLyricLine.dynamicLyricTime
+					) {
+						if (
+							time <
+							curLyricLine.dynamicLyricTime +
+								Math.max(0, currentLyrics[curLyricIndex].duration - 100)
+						) {
+							if (!eqSet(lastIndexes, indexes)) {
+								lastIndexes = indexes;
+								setCurrentLyricsIndexes(indexes);
+							}
+						}
+					} else if (
+						time <
+							currentLyrics[curLyricIndex].beginTime +
+								Math.max(0, currentLyrics[curLyricIndex].duration - 100) ||
+						curLyricIndex === currentLyrics.length - 1
+					) {
+						if (!eqSet(lastIndexes, indexes)) {
+							lastIndexes = indexes;
+							setCurrentLyricsIndexes(indexes);
+						}
+					}
 				}
 			}
 		};

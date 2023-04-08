@@ -7,21 +7,12 @@
         "https://github.com/Steve-xmh",
         "https://github.com/Steve-xmh/applemusic-like-lyrics"
     ],
-    "description": "一个基于 BetterNCM 的类 Apple Music 歌词显示插件",
+    "description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
     "preview": "preview.svg",
-    "version": "1.8.7",
+    "version": "2.0.0",
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
-    "requirements": [
-        "libsonginfo",
-        "liblyric"
-    ],
-    "loadAfter": [
-        "LibSongInfo",
-        "LibLyric",
-        "LibFrontendPlay"
-    ],
     "incompatible": [
         "RefinedNowPlaying"
     ],
@@ -34,13 +25,7 @@
         ]
     },
     "hijacks": {
-        ">= 2.10.4 <= 2.10.6": {
-            "orpheus://orpheus/pub/core.": {
-                "type": "replace",
-                "id": "core-js-fake-function",
-                "from": "=Function.prototype;",
-                "to": "=window.FakeFunction||Function.prototype;"
-            },
+        ">= 1.0.0": {
             "orpheus://orpheus/pub/app.html": {
                 "type": "replace",
                 "id": "csp-worker",

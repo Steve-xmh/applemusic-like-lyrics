@@ -1,31 +1,12 @@
 import { getConfig } from "../config/core";
 import pangu from "pangu/dist/browser/pangu.min.js";
+import { DynamicLyricWord, LyricLine, LyricPureLine } from "./lyric-types";
+import { log } from "../utils/logger";
+// import { guessTextReadDuration } from "../utils";
 
-export interface DynamicLyricWord {
-	time: number;
-	duration: number;
-	flag: number;
-	word: string;
-}
-
-export interface LyricLine {
-	time: number;
-	duration: number;
-	originalLyric: string;
-	translatedLyric?: string;
-	romanLyric?: string;
-	dynamicLyricTime?: number;
-	dynamicLyric?: DynamicLyricWord[];
-}
-
-export interface LyricPureLine {
-	time: number;
-	lyric: string;
-}
-
-export const PURE_MUSIC_LYRIC_LINE = [
+export const PURE_MUSIC_LYRIC_LINE: LyricLine[] = [
 	{
-		time: 0,
+		beginTime: 0,
 		duration: 5940000,
 		originalLyric: "纯音乐，请欣赏",
 	},
@@ -52,26 +33,26 @@ export function parseLyric(
 ): LyricLine[] {
 	if (dynamic.trim().length === 0) {
 		const result: LyricLine[] = parsePureLyric(original).map((v) => ({
-			time: v.time,
+			beginTime: v.time,
 			originalLyric: v.lyric,
 			duration: 0,
 		}));
 
 		parsePureLyric(translated).forEach((line) => {
-			const target = result.find((v) => v.time === line.time);
+			const target = result.find((v) => v.beginTime === line.time);
 			if (target) {
 				target.translatedLyric = line.lyric;
 			}
 		});
 
 		parsePureLyric(roman).forEach((line) => {
-			const target = result.find((v) => v.time === line.time);
+			const target = result.find((v) => v.beginTime === line.time);
 			if (target) {
 				target.romanLyric = line.lyric;
 			}
 		});
 
-		result.sort((a, b) => a.time - b.time);
+		result.sort((a, b) => a.beginTime - b.beginTime);
 
 		// log("原始歌词解析", JSON.parse(JSON.stringify(result)));
 
@@ -81,7 +62,8 @@ export function parseLyric(
 
 		for (let i = 0; i < processed.length; i++) {
 			if (i < processed.length - 1) {
-				processed[i].duration = processed[i + 1].time - processed[i].time;
+				processed[i].duration =
+					processed[i + 1].beginTime - processed[i].beginTime;
 			}
 		}
 
@@ -90,12 +72,13 @@ export function parseLyric(
 		const processed = parsePureDynamicLyric(dynamic);
 
 		parsePureLyric(translated).forEach((line) => {
-			let target = processed.find((v) => v.time === line.time);
+			let target = processed.find((v) => v.beginTime === line.time);
 			if (!target) {
 				processed.forEach((v) => {
 					if (target) {
 						if (
-							Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
+							Math.abs(target.beginTime - line.time) >
+							Math.abs(v.beginTime - line.time)
 						) {
 							target = v;
 						}
@@ -114,19 +97,19 @@ export function parseLyric(
 		});
 
 		parsePureLyric(roman).forEach((line) => {
-			// rome-ignore lint/suspicious/noExplicitAny: TypeScript 的类型解析不允许我写成 LyricLine | null，希望有大佬能帮我看看是为什么
-			let target: any = null;
-			processed.forEach((v) => {
+			let target: LyricLine | null = null;
+			for (const v of processed) {
 				if (target) {
 					if (
-						Math.abs(target.time - line.time) > Math.abs(v.time - line.time)
+						Math.abs(target.beginTime - line.time) >
+						Math.abs(v.beginTime - line.time)
 					) {
 						target = v;
 					}
 				} else {
 					target = v;
 				}
-			});
+			}
 			if (target) {
 				target.romanLyric = target.romanLyric || "";
 				if (target.romanLyric.length > 0) {
@@ -153,14 +136,17 @@ export function parseLyric(
 						processed[i - 1].dynamicLyric?.push(
 							{
 								word: " ",
-								time: processed[i - 1].time + processed[i - 1].duration,
+								time: processed[i - 1].beginTime + processed[i - 1].duration,
 								duration: 0,
 								flag: 0,
+								shouldGlow: false,
 							},
 							...dynamicLyric,
 						);
 						processed[i - 1].duration =
-							mergeLine.duration + mergeLine.time - processed[i - 1].time;
+							mergeLine.duration +
+							mergeLine.beginTime -
+							processed[i - 1].beginTime;
 					} else {
 						i++;
 					}
@@ -180,8 +166,9 @@ export function parseLyric(
 				thisLine.duration > 0
 			) {
 				const thisLineEndTime =
-					(thisLine?.dynamicLyricTime || thisLine.time) + thisLine.duration;
-				let nextLineStartTime = nextLine.time;
+					(thisLine?.dynamicLyricTime || thisLine.beginTime) +
+					thisLine.duration;
+				let nextLineStartTime = nextLine.beginTime;
 				if (
 					nextLine.dynamicLyricTime &&
 					nextLineStartTime > nextLine.dynamicLyricTime
@@ -190,7 +177,7 @@ export function parseLyric(
 				}
 				if (nextLineStartTime - thisLineEndTime >= 5000) {
 					processed.splice(i + 1, 0, {
-						time: thisLineEndTime,
+						beginTime: thisLineEndTime,
 						originalLyric: "",
 						duration: nextLineStartTime - thisLineEndTime,
 					});
@@ -205,6 +192,7 @@ const yrcLineRegexp = /^\[(?<time>[0-9]+),(?<duration>[0-9]+)\](?<line>.*)/;
 const yrcWordTimeRegexp =
 	/^\((?<time>[0-9]+),(?<duration>[0-9]+),(?<flag>[0-9]+)\)(?<word>[^\(]*)/;
 const timeRegexp = /^\[((?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)\]/;
+
 function parsePureLyric(lyric: string): LyricPureLine[] {
 	const result: LyricPureLine[] = [];
 
@@ -270,6 +258,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: `${subWord.trimStart()} `,
+										shouldGlow: false,
 									});
 								} else {
 									words.push({
@@ -277,6 +266,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: subWord.trimStart(),
+										shouldGlow: false,
 									});
 								}
 							} else if (i === 0) {
@@ -286,6 +276,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: ` ${subWord.trimStart()}`,
+										shouldGlow: false,
 									});
 								} else {
 									words.push({
@@ -293,6 +284,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 										duration: splitedDuration,
 										flag,
 										word: subWord.trimStart(),
+										shouldGlow: false,
 									});
 								}
 							} else {
@@ -301,6 +293,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 									duration: splitedDuration,
 									flag,
 									word: `${subWord.trimStart()} `,
+									shouldGlow: false,
 								});
 							}
 						});
@@ -311,7 +304,7 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 				}
 			}
 			const line: LyricLine = {
-				time,
+				beginTime: time,
 				duration,
 				originalLyric: words.map((v) => v.word).join(""),
 				dynamicLyric: words,
@@ -324,11 +317,11 @@ export function parsePureDynamicLyric(lyric: string): LyricLine[] {
 	return result;
 }
 
-// 处理歌词，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
+// 处理歌词，组合标点符号，拆分CJK逐词歌词到字，去除一些太短的空格间曲段，并为前摇太长的歌曲加前导空格
 export function processLyric(lyric: LyricLine[]): LyricLine[] {
 	if (
 		lyric.length > 0 &&
-		lyric[lyric.length - 1].time === 5940000 &&
+		lyric[lyric.length - 1].beginTime === 5940000 &&
 		lyric[lyric.length - 1].duration === 0
 	) {
 		// 纯音乐，请欣赏
@@ -341,28 +334,136 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 	lyric.forEach((thisLyric, i, lyric) => {
 		if (thisLyric.originalLyric.trim().length === 0) {
 			const nextLyric = lyric[i + 1];
-			if (nextLyric && nextLyric.time - thisLyric.time > 5000 && !isSpace) {
+			if (
+				nextLyric &&
+				nextLyric.beginTime - thisLyric.beginTime > 5000 &&
+				!isSpace
+			) {
 				result.push(thisLyric);
 				isSpace = true;
 			}
 		} else {
 			thisLyric.originalLyric = pangu.spacing(thisLyric.originalLyric);
 			isSpace = false;
+			if (thisLyric.dynamicLyric && thisLyric.dynamicLyricTime) {
+				const processedDynamicLyric: DynamicLyricWord[] = [];
+				thisLyric.dynamicLyric.forEach((word) => {
+					if (
+						/^([-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/，。！：；“”‘’【】（）￥？《》…]+)$/.test(
+							word.word.trim(),
+						)
+					) {
+						const lastWord =
+							processedDynamicLyric[processedDynamicLyric.length - 1];
+						if (lastWord) {
+							lastWord.word += word.word;
+						} else {
+							processedDynamicLyric.push(word);
+						}
+					} else if (
+						/^([ 　\u4e00-\u9fff\u3400-\u4dbf\u{20000}-\u{2a6df}\u{2a700}-\u{2ebef}\u{30000}-\u{323af}\ufa0e\ufa0f\ufa11\ufa13\ufa14\ufa1f\ufa21\ufa23\ufa24\ufa27\ufa28\ufa29\u3006\u3007]+)$/u.test(
+							word.word.trim(),
+						)
+					) {
+						const chars = word.word.split("");
+						const duration = word.duration / chars.length;
+						for (let i = 0; i < chars.length; i++) {
+							processedDynamicLyric.push({
+								time: word.time + duration * i,
+								duration: duration,
+								flag: 0,
+								word: chars[i],
+								shouldGlow: false,
+							});
+						}
+					} else {
+						processedDynamicLyric.push(word);
+					}
+				});
+
+				const lastWord =
+					processedDynamicLyric[processedDynamicLyric.length - 1];
+
+				if (lastWord) {
+					thisLyric.duration =
+						lastWord.duration + lastWord.time - thisLyric.dynamicLyricTime;
+				}
+
+				thisLyric.dynamicLyric = processedDynamicLyric;
+			}
 			result.push(thisLyric);
+			const nextLyric = lyric[i + 1];
+			if (thisLyric.dynamicLyric) {
+				const lastWord =
+					thisLyric.dynamicLyric[thisLyric.dynamicLyric.length - 1];
+				if (lastWord) {
+					lastWord.shouldGlow =
+						/^([ 0-9a-zA-Z\.\?\,]+)$/.test(lastWord.word) &&
+						lastWord.duration > 1000;
+				}
+			}
+			if (
+				nextLyric &&
+				thisLyric.duration > 0 &&
+				nextLyric.beginTime - (thisLyric.beginTime + thisLyric.duration) > 5000
+			) {
+				result.push({
+					beginTime: thisLyric.beginTime + thisLyric.duration,
+					duration:
+						nextLyric.beginTime - thisLyric.beginTime - thisLyric.duration,
+					originalLyric: "",
+				});
+				isSpace = true;
+			}
 		}
 	});
+
+	if (getConfig("advanceDynamicLyricTime", "false") === "true") {
+		result.forEach((line) => {
+			if (line.originalLyric.trim().length > 0) {
+				if (line.dynamicLyricTime !== undefined) {
+					const delta = Math.abs(
+						Math.max(0, line.dynamicLyricTime - 750) - line.dynamicLyricTime,
+					);
+					line.dynamicLyricTime -= delta;
+				}
+				const delta = Math.abs(
+					Math.max(0, line.beginTime - 750) - line.beginTime,
+				);
+				line.beginTime -= delta;
+				// line.duration += delta;
+			}
+		});
+	}
+
+	if (getConfig("enableLyricBuffer", "false") === "true") {
+		// TODO: 通过预估的阅读时间增加缓冲
+		result.forEach((line) => {
+			if (line.originalLyric.trim().length > 0) {
+				// const guessTime = guessTextReadDuration(line.originalLyric);
+			}
+		});
+	}
 
 	while (result[0]?.originalLyric.length === 0) {
 		result.shift();
 	}
 
-	if (result[0]?.time > 5000) {
+	if (result[0]?.beginTime > 5000) {
 		result.unshift({
-			time: 500,
-			duration: result[0]?.time - 500,
+			beginTime: 500,
+			duration: result[0]?.beginTime - 500,
 			originalLyric: "",
 		});
 	}
 
+	const lastLine = result[result.length - 1];
+	if (lastLine && lastLine.duration === 0) {
+		lastLine.duration = Infinity;
+	}
+
+	log("歌词已处理", result);
+
 	return result;
 }
+export { LyricLine };

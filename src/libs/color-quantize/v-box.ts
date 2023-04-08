@@ -10,7 +10,7 @@ export type VBoxRangeKey = "r1" | "r2" | "g1" | "g2" | "b1" | "b2";
 export class VBox {
 	private _count: number = -1;
 	private _volume: number = 0;
-	private _avg: Pixel = [];
+	private _avg: Pixel = [0, 0, 0];
 
 	constructor(
 		public r1: number, // min red

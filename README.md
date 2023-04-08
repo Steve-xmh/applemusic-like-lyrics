@@ -1,12 +1,21 @@
+<div align=center>
+
+![](./src/assets/amll-icon.svg)
+
 # Apple Music-like Lyrics
 
-一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM) 的类 Apple Music 歌词显示插件
+一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 的类 Apple Music 歌词显示插件。
 
+这是你能在网易云上见到的最像 iPad Apple Music 的播放页面了。
 
-https://user-images.githubusercontent.com/39523898/212098052-86421fa1-558a-481f-b433-b2d1b3ccf3e4.mp4
+![](https://user-images.githubusercontent.com/39523898/230704437-9dd0a7f3-adcb-42e4-a19e-797e8abceb74.png)
+![](https://user-images.githubusercontent.com/39523898/230704176-610d4a64-b33f-4d3e-934a-4387bd9c81f5.png)
+![](https://user-images.githubusercontent.com/39523898/230704540-1b45fdab-be21-4285-a0f6-5abca75103e5.png)
+![](https://user-images.githubusercontent.com/39523898/230705199-002402ca-b18a-48d2-b4e7-54054d604af9.png)
+![](https://user-images.githubusercontent.com/39523898/230705314-44f28376-c3d8-4119-8482-f441565574db.png)
+![](https://user-images.githubusercontent.com/39523898/230705260-79b3c1cb-992f-4388-b3d0-cfb047155d4c.png)
 
-![](./assets/demo0.png)
-![](./assets/demo1.png)
+</div>
 
 ## 安装说明
 
@@ -20,7 +29,7 @@ https://user-images.githubusercontent.com/39523898/212098052-86421fa1-558a-481f-
 
 ## 开发/构建/打包流程
 
-推荐将本仓库克隆到 BetterNCM 插件目录下的 `plugins_dev` 文件夹内，可以获得自动重载的能力。
+安装好 `nodejs` 和 `yarn`，克隆本仓库到任意文件夹后在终端输入以下指令即可构建：
 
 ```bash
 yarn
@@ -32,5 +41,7 @@ yarn dist # 在发行构建的基础上打包 .plugin 插件文件
 ## 鸣谢
 
 - [MicroCBer/BetterNCM](https://github.com/MicroCBer/BetterNCM)
+- [Steve-xmh/mrbncm](https://github.com/Steve-xmh/mrbncm)
+- [Steve-xmh/mmbncm](https://github.com/Steve-xmh/mmbncm)
 - [solstice23/refined-now-playing-netease](https://github.com/solstice23/refined-now-playing-netease)
 - [Barba828/color-quantize](https://github.com/Barba828/color-quantize)

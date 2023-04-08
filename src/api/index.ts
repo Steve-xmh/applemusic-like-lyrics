@@ -1,14 +1,25 @@
-import { getConfig, setConfig } from "../config/core";
-import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
 import { genRandomString, normalizePath } from "../utils";
+import { LyricLine } from "../core/lyric-types";
+import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 const cachedFunctionMap: Map<string, Function> = new Map();
-
-export const settingPrefix = "applemusic-like-lyrics:";
 
 export enum PlayState {
 	Playing = "playing",
 	Pausing = "pausing",
+}
+
+export enum AudioQualityType {
+	// 128
+	Normal = "normal",
+	// 320
+	High = "high",
+	// 999
+	Lossless = "lossless",
+	// 1999
+	HiRes = "hires",
+	DolbyAtmos = "dolbyatmos",
+	Local = "local",
 }
 
 export function toPlayState(enumId: number): PlayState {
@@ -18,6 +29,26 @@ export function toPlayState(enumId: number): PlayState {
 		return PlayState.Playing;
 	} else {
 		throw new TypeError(`未知的播放状态值 ${enumId}`);
+	}
+}
+
+// rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
+export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
+	searchFunctionName: string | ((func: Function) => boolean),
+	args: Parameters<F>,
+): ReturnType<F> {
+	if (!cachedFunctionMap.has(searchFunctionName.toString())) {
+		const findResult = betterncm.ncm.findApiFunction(searchFunctionName);
+		if (findResult) {
+			const [func, funcRoot] = findResult;
+			cachedFunctionMap.set(searchFunctionName.toString(), func.bind(funcRoot));
+		}
+	}
+	const cachedFunc = cachedFunctionMap.get(searchFunctionName.toString());
+	if (cachedFunc) {
+		return cachedFunc.apply(null, args);
+	} else {
+		throw new TypeError(`函数 ${searchFunctionName.toString()} 未找到`);
 	}
 }
 
@@ -41,56 +72,6 @@ export function getNCMImageUrl(id: number | string) {
 	}
 }
 
-export interface EAPIRequestConfig {
-	/**
-	 * 返回响应的数据类型，绝大部分情况下都是 `json`
-	 */
-	type: string;
-	// rome-ignore lint/suspicious/noExplicitAny: 该对象可以是任何序列化成 JSON 的对象
-	data?: any;
-	method?: string;
-	// rome-ignore lint/suspicious/noExplicitAny: 该对象可以是任何序列化成 URI 请求字符串的对象
-	query?: { [param: string]: any };
-	onload?: Function;
-	onerror?: Function;
-	oncallback?: Function;
-}
-
-/**
- * 调用网易云自己的加密请求函数，获取相应的信息
- * @param url 请求的链接，通常是 `APP_CONF.domain + 路径`
- * @param config 请求的参数
- * @todo 确认兼容版本范围内的函数名是否可用
- */
-export function eapiRequest(url: string, config: EAPIRequestConfig) {
-	return callCachedSearchFunction(checkEapiRequestFuncName(), [url, config]); // 经测试 2.10.6 可用
-}
-
-export function checkEapiRequestFuncName(): string {
-	let funcName = getConfig("eapiRequestFuncName", "");
-	log("加密请求函数", funcName);
-	const ncmPackageVersion = getConfig("ncmPackageVersion", "");
-	if (ncmPackageVersion !== APP_CONF.packageVersion) {
-		funcName = "";
-		setConfig("ncmPackageVersion", APP_CONF.packageVersion);
-	}
-	if (funcName === "") {
-		funcName = tryFindEapiRequestFuncName() || "";
-		if (funcName === "") {
-			funcName = tryFindEapiRequestFuncName(true) || "";
-		}
-		setConfig("eapiRequestFuncName", funcName);
-		GLOBAL_EVENTS.dispatchEvent(
-			new Event("config-changed-eapiRequestFuncName"),
-		);
-	}
-	return funcName;
-}
-
-try {
-	checkEapiRequestFuncName(); // 触发一次检查请求函数名字
-} catch {}
-
 export interface SongDetailResponse {
 	songs: {
 		al: {
@@ -108,17 +89,15 @@ export interface SongDetailResponse {
 	}[];
 }
 
-export function getSongDetail(...songIds: number[]) {
-	return new Promise<SongDetailResponse>((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/v3/song/detail`, {
-			type: "json",
-			data: {
-				c: JSON.stringify(songIds.map((id) => ({ id }))),
-			},
-			onload: resolve,
-			onerror: reject,
-		});
-	});
+export async function getSongDetail(
+	...songIds: number[]
+): Promise<SongDetailResponse> {
+	const v = await fetch(
+		`${APP_CONF.domain}/api/v3/song/detail?c=${encodeURIComponent(
+			JSON.stringify(songIds.map((id) => ({ id }))),
+		)}`,
+	);
+	return await v.json();
 }
 
 export interface ListenTogetherStatus {
@@ -161,69 +140,21 @@ export interface ListenTogetherStatus {
 	message: string;
 }
 
-export function getListenTogetherStatus() {
-	return new Promise<ListenTogetherStatus>((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/listen/together/status/get`, {
-			type: "json",
-			onload: resolve,
-			onerror: reject,
-		});
-	});
+export async function getListenTogetherStatus(): Promise<ListenTogetherStatus> {
+	const v = await fetch(`${APP_CONF.domain}/api/listen/together/status/get`);
+	return await v.json();
 }
 
-export function tryFindEapiRequestFuncName(
-	unsafe: boolean = false,
-): string | null {
-	// 为了避免自身被搜索到，就把字符串拆开来组合了
-	const keyword1 = ["_bindTokenRequest", "yidun", "getToken", "undefined"];
-	const keyword2 = ["/api", "register", "anonimous"];
-	const result = betterncm.ncm.findApiFunction(
-		(v) =>
-			(v.toString().includes(keyword1.join(" ")) ||
-				v.toString().includes(keyword2.join("/"))) &&
-			v !== tryFindEapiRequestFuncName,
+/**
+ * 根据歌曲 ID 获取歌词数据信息
+ * @param songId 歌曲ID
+ * @returns 歌词数据信息
+ */
+export async function getLyric(songId: number): Promise<EAPILyricResponse> {
+	const v = await fetch(
+		`${APP_CONF.domain}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
 	);
-	if (result) {
-		for (const key in result[1]) {
-			if (result[1][key] === result[0]) {
-				log("查找到原始请求函数：", key, result);
-				const originalFuncName = key;
-				if (unsafe) return originalFuncName;
-				for (const key in result[1]) {
-					if (
-						result[1][key]?.originalFunc
-							?.toString()
-							?.includes(`.${originalFuncName}(`)
-					) {
-						log("查找到绑定请求函数：", key, result);
-						return key;
-					}
-				}
-			}
-		}
-	}
-	log("查找请求函数失败");
-	return null;
-}
-
-// rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
-export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
-	searchFunctionName: string | ((func: Function) => boolean),
-	args: Parameters<F>,
-): ReturnType<F> {
-	if (!cachedFunctionMap.has(searchFunctionName.toString())) {
-		const findResult = betterncm.ncm.findApiFunction(searchFunctionName);
-		if (findResult) {
-			const [func, funcRoot] = findResult;
-			cachedFunctionMap.set(searchFunctionName.toString(), func.bind(funcRoot));
-		}
-	}
-	const cachedFunc = cachedFunctionMap.get(searchFunctionName.toString());
-	if (cachedFunc) {
-		return cachedFunc.apply(null, args);
-	} else {
-		throw new TypeError(`函数 ${searchFunctionName.toString()} 未找到`);
-	}
+	return await v.json();
 }
 
 /**
@@ -231,76 +162,13 @@ export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
  * @param songId 歌曲ID
  * @returns 歌词数据信息
  */
-export function getLyric(songId: number): Promise<EAPILyricResponse> {
-	// 参考
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27946
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27424
-	return new Promise((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/song/lyric/v1`, {
-			type: "json",
-			query: {
-				id: songId,
-				cp: false,
-				tv: 0,
-				lv: 0,
-				rv: 0,
-				kv: 0,
-				yv: 0,
-				ytv: 0,
-				yrv: 0,
-			},
-			onload: resolve,
-			onerror: reject,
-		});
-	});
-}
-
-/**
- * 根据歌曲 ID 获取歌曲文件下载链接
- * @param songId 歌曲ID
- * @param byterate 音质码率，默认最高
- * @returns 歌词数据信息
- */
-export function getMusicURL(
+export async function getLyricCorrection(
 	songId: number,
-	byterate: number = 999000,
 ): Promise<EAPILyricResponse> {
-	// 参考
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27946
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27424
-	return new Promise((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/song/enhance/download/url`, {
-			method: "POST",
-			type: "json",
-			data: {
-				id: songId,
-				br: byterate,
-			},
-			onload: resolve,
-			onerror: reject,
-		});
-	});
-}
-
-/**
- * 根据歌曲 ID 获取歌词数据信息
- * @param songId 歌曲ID
- * @returns 歌词数据信息
- */
-export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
-	// 参考
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27946
-	// orpheus://orpheus/pub/core.e5842f1.js?d7496bf6377403c83793c37f6fbf0300:formatted:27424
-	return new Promise((resolve, reject) => {
-		eapiRequest(`${APP_CONF.domain}/api/song/web/lyric/correction`, {
-			type: "json",
-			query: {
-				id: songId,
-			},
-			onload: resolve,
-			onerror: reject,
-		});
-	});
+	const v = await fetch(
+		`${APP_CONF.domain}/api/song/web/lyric/correction?id=${songId}`,
+	);
+	return await v.json();
 }
 
 /**
@@ -310,7 +178,7 @@ export function getLyricCorrection(songId: number): Promise<EAPILyricResponse> {
  */
 export function getPlayingSong() {
 	if (APP_CONF.isOSX) {
-		return callCachedSearchFunction("baJ", []);
+		return callCachedSearchFunction("baD", []);
 	} else {
 		return callCachedSearchFunction("getPlaying", []);
 	}
@@ -321,6 +189,15 @@ export interface LyricFileEntry {
 	lyric: string;
 }
 
+export interface LyricAuthorUser {
+	id: number;
+	status: number;
+	demand: number;
+	userid: number;
+	nickname: string;
+	uptime: number;
+}
+
 export interface LyricFile {
 	lrc?: LyricFileEntry;
 	klyric?: LyricFileEntry;
@@ -329,20 +206,26 @@ export interface LyricFile {
 	yrc?: LyricFileEntry;
 	yromalrc?: LyricFileEntry;
 	ytlrc?: LyricFileEntry;
+	lyricUser?: LyricAuthorUser;
+	transUser?: LyricAuthorUser;
 
 	// AMLL 特供
 	lyricOffset?: number;
 	albumImageUrl?: string;
 }
 
+export const getLyricCachePath = () =>
+	normalizePath(`${plugin.pluginPath}/../../amll-data/lyrics`);
+
 export const loadLyric = async (
 	id: string | number,
 	ignoreCache = false,
 ): Promise<LyricFile> => {
-	const lyricsPath = normalizePath(
-		`${plugin.pluginPath}/../../amll-data/lyrics`,
-	);
+	const lyricsPath = getLyricCachePath();
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
+	log("正在加载歌词", id);
+	log("歌词文件夹路径", lyricsPath);
+	log("歌词文件路径", cachedLyricPath);
 	try {
 		if (!ignoreCache && (await betterncm.fs.exists(cachedLyricPath))) {
 			log("发现歌词缓存，正在加载缓存", cachedLyricPath);
@@ -370,6 +253,24 @@ export const loadLyric = async (
 		// 如果是摘要字符串的话，那就是本地文件
 		return {};
 	}
+};
+
+export const loadTTMLLyric = async (
+	id: string | number,
+): Promise<LyricLine[] | null> => {
+	const lyricsPath = normalizePath(
+		`${plugin.pluginPath}/../../amll-data/ttml-lyrics`,
+	);
+	const ttmlLyricPath = `${lyricsPath}/${id}.ttml`;
+	if (await betterncm.fs.exists(ttmlLyricPath)) {
+		const cachedLyricData = await betterncm.fs.readFileText(ttmlLyricPath);
+		if (cachedLyricData.includes("\n")) {
+			return parseTTMLLyric(cachedLyricData);
+		} else {
+			return parseTTMLLyric(cachedLyricData, true);
+		}
+	}
+	return null;
 };
 
 export function genAudioPlayerCommand(audioId: string, command: string) {

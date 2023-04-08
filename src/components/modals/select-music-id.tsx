@@ -14,6 +14,7 @@ import { useAtom, useAtomValue } from "jotai";
 import * as React from "react";
 import {
 	getLyric,
+	getLyricCachePath,
 	getNCMImageUrl,
 	getSongDetail,
 	SongDetailResponse,
@@ -113,12 +114,10 @@ export const SelectMusicIdModal: React.FC = () => {
 			onClose={() => setSelectMusicIdModalOpened(false)}
 			closeOnClickOutside={!selectMusicIdModalLoading}
 			centered
-			zIndex={151}
 		>
 			<LoadingOverlay
 				visible={selectMusicIdModalLoading}
 				radius="sm"
-				zIndex={153}
 				size={50}
 				loaderProps={{
 					style: {
@@ -142,7 +141,7 @@ export const SelectMusicIdModal: React.FC = () => {
 						setSelectMusicIdModalLoading(true);
 						try {
 							const data = await getLyric(selectMusicId);
-							const lyricsPath = `${plugin.pluginPath}/lyrics`;
+							const lyricsPath = getLyricCachePath();
 							const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 							if (!(await betterncm.fs.exists(lyricsPath))) {
 								betterncm.fs.mkdir(lyricsPath);

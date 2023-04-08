@@ -1,5 +1,5 @@
-$tween-animation-duration: 750ms
-$tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
+$tween-animation-duration: 500ms
+$tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
 
 @mixin text-overflow-ellipsis()
     overflow: hidden
@@ -7,14 +7,24 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
     text-overflow: ellipsis
 @mixin applemusic-like-lyrics-view-style()
     display: flex
-    height: 100%
-    width: 80%
-    margin: 0 10%
+    height: calc(100% - 120px)
+    width: 90%
+    margin: 0 5%
+    padding: 60px 0
     z-index: 1
 
     svg
         width: unset
         height: unset
+
+    .amll-song-info-text-marquee
+        min-width: 0
+        overflow: hidden
+        -webkit-mask-image: linear-gradient(to right, #000 95%, #0000)
+        &.animating
+            -webkit-mask-image: linear-gradient(to left, #0000, #000 5%, #000 95%, #0000)
+        > *
+            width: fit-content
 
     .amll-error-boundary
         margin: 60px 0
@@ -22,31 +32,63 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             white-space: pre-wrap
             user-select: text
 
+    .am-audio-fft
+        height: 5vh
+        width: 100%
+        display: flex
+        filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+
     .am-lyric-background
         z-index: -1
+        position: fixed
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        width: 100vw
+        height: 100vh
+        &.am-lyric-bg-album-image::after
+            position: absolute
+            width: 100%
+            height: 100%
+            content: " "
+            backdrop-filter: blur(20vh) brightness(60%)
+            -webkit-backdrop-filter: blur(20vh) brightness(60%)
 
     .am-lyric-view-loading
         flex: 1
 
+    .am-lyric-credits
+        color: var(--applemusic-like-lyrics-font-color, unset)
+        border-top: solid 1px var(--applemusic-like-lyrics-font-color, unset)
+        padding-top: 8px
+        font-size: 125%
+        line-height: 150%
+
     .am-player-song-info
-        flex: 1
+        flex: 0.75
         height: 100%
+        padding-right: 5vw
         z-index: 2
         display: flex
         flex-direction: column
-        overflow: hidden
         align-items: center
-        justify-content: center
+        justify-content: space-around
+        color: var(--applemusic-like-lyrics-font-color, unset)
+        > *
+            width: min(50vh, 40vw)
+            align-self: center
         > .am-music-info-spacer
-            flex: 1
+            flex: 0.2
         > .am-music-info-bottom-spacer
-            flex: 1
+            flex: 0.2
             transition: flex 0.5s ease-out
         > .am-album-image
-            width: 70%
             aspect-ratio: 1 / 1
-            max-height: 45vh
+            height: min(50vh, 40vw)
+            width: min(50vh, 40vw)
             flex: 0
+            align-self: center
             position: relative
             > *
                 width: 100%
@@ -59,76 +101,132 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
                 height: 100%
                 aspect-ratio: 1 / 1
                 object-fit: cover
-        > .am-music-info
+        .am-music-quality
+            display: flex
+            flex-direction: row
+            justify-content: center
+            > .am-music-quality-tag
+                padding: 2px 6px
+                border-radius: 4px
+                align-self: center
+                justify-self: center
+                fill: white
+        > .am-music-sub-widget
             flex: 0
-            transition: flex 0.5s ease-out
-            width: 100%
-
-            .am-music-name
-                @include text-overflow-ellipsis
-                font-size: 1.5rem
-                line-height: normal
-                margin: 1rem 0 0.25rem 0
-                cursor: text
-                user-select: text
-                text-align: center
-            .am-music-alias
-                @include text-overflow-ellipsis
-                font-size: 1.2rem
-                line-height: normal
-                margin-top: 0.1rem
-                opacity: 0.75
-                cursor: text
-                text-align: center
-                user-select: text
-                white-space: nowrap
-                text-overflow: ellipsis
-            .am-music-artists
-                width: 100%
-                font-size: 1rem
-                line-height: normal
-                margin: 0.25rem 0
+            > .am-music-info-with-menu
+                font-size: 200%
+                font-weight: 1000
+                flex: 0
                 display: flex
-                align-items: baseline
-                flex-wrap: nowrap
-                justify-content: center
-                .am-artists-label
-                    line-height: normal
-                    white-space: nowrap
-                .am-artists
-                    @include text-overflow-ellipsis
-                    max-width: 100%
-                    overflow: hidden
-                    white-space: nowrap
-                    text-overflow: ellipsis
-                    text-align: center
-                    a
+                align-self: stretch
+                flex-direction: row
+                > .am-music-main-menu
+                    aspect-ratio: 1 / 1
+                    display: inline-block
+                    position: relative
+                    border: none
+                    background: #FFF3
+                    width: 40px
+                    margin-left: 20px
+                    border-radius: 50%
+                    align-self: center
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                > .am-music-info
+                    flex: 1
+                    transition: flex 0.5s ease-out
+                    filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+                    mix-blend-mode: soft-light
+                    width: calc(100% - 50px)
+                    height: fit-content
+                    min-width: 0
+                    display: flex
+                    flex-direction: column
+                    .am-music-name, .am-music-album
+                        white-space: nowrap
                         line-height: normal
-                        opacity: 0.8
+                        cursor: text
                         user-select: text
-                        &::after
-                            content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
-                            opacity: 0.5
-                        &:last-child::after
-                            content: ""
-
-            .am-music-album
-                max-width: 100%
-                font-size: 1rem
-                line-height: normal
-                margin: 0.25rem 0
+                        min-width: 0
+                    .am-music-album
+                        opacity: 0.75
+                        a
+                            color: var(--applemusic-like-lyrics-font-color, unset)
+                            &:hover
+                                opacity: 0.75
+                            &:active
+                                opacity: 0.5
+                    .am-music-artists
+                        width: 100%
+                        line-height: normal
+                        display: flex
+                        align-items: baseline
+                        flex-wrap: nowrap
+                        justify-content: flex-start
+                        min-width: 0
+                        .am-artists
+                            max-width: 100%
+                            overflow: hidden
+                            white-space: nowrap
+                            text-align: center
+                            opacity: 0.75
+                            a
+                                line-height: normal
+                                user-select: text
+                                color: var(--applemusic-like-lyrics-font-color, unset)
+                                &:hover
+                                    opacity: 0.75
+                                &:active
+                                    opacity: 0.5
+                                &::after
+                                    content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+                                    opacity: 0.5
+                                &:last-child::after
+                                    content: ""
+            > .am-music-progress-control
+                mix-blend-mode: soft-light
                 display: flex
-                align-items: baseline
-                justify-content: center
-                .am-album-label
-                    white-space: nowrap
-                .am-album
-                    @include text-overflow-ellipsis
-                    max-width: 100%
-                a
-                    opacity: 0.8
-                    user-select: text
+                flex-direction: column
+                margin-top: 16px
+                > .am-music-progress-tips
+                    margin-top: 16px
+                    font-weight: 1000
+                    opacity: 0.5
+                    display: flex
+                    align-items: center
+                    font-size: 12px
+                    > *
+                        flex: 0
+                        &:first-child
+                            flex: 1
+                        &:last-child
+                            flex: 1
+                            text-align: right
+        > .am-music-controls
+            display: flex
+            justify-content: space-between
+            mix-blend-mode: soft-light
+            > .am-music-track-btn
+                opacity: 0.5
+            > .am-music-track-prev,
+            > .am-music-play,
+            > .am-music-track-next
+                > *
+                    height: 5vh
+                    width: 5vh
 
+            > *
+                border: none
+                background: transparent
+        > .am-music-volume-controls
+            display: flex
+            align-items: center
+            flex-direction: row
+            > *
+                margin: 8px
+                &:nth-child(2)
+                    flex: 1
     .am-lyric
         flex: 1
         z-index: 2
@@ -136,48 +234,48 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         flex-direction: column
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
-            filter: blur(0) !important
-            opacity: 1 !important
-            visibility: visible !important
-            > .am-lyric-line-original
-                opacity: 0.75
-            > .am-lyric-line-dynamic > *
-                opacity: 0.75
+            > *
+                filter: blur(0) !important
+                opacity: 1 !important
+                visibility: visible !important
+                > .am-lyric-line-original
+                    opacity: 0.75
+                > .am-lyric-line-dynamic > *
+                    opacity: 0.75
+            &.am-lyric-line-bg-lyric
+                &.am-lyric-line-selected > * > *
+                    opacity: 0.5 !important
             &.am-lyric-line-o0,
-            &.am-lyric-line-selected
+            &.am-lyric-line-selected > *
                 opacity: 1
                 > .am-lyric-line-dynamic > *
                     opacity: 1
-        &:hover .am-lyric-options
-            opacity: 1
 
     .am-lyric-view-error
-        flex: 1
+        flex: 100000
         *
             overflow-wrap: break-word
             white-space: pre-wrap
             margin-bottom: 1rem
 
-    .am-lyric-options
-        opacity: 0
-        transition: opacity $tween-animation-duration $tween-animation-timing
-        position: absolute
-        right: 10%
-        top: 100px
-        z-index: 1
-
     .am-lyric-view
         flex: 1
-        overflow: hidden scroll
-        position: relative
-        -webkit-mask-image: linear-gradient(#0000, #0000 5%, #000 10%, #000 90%, #0000 95%, #0000)
+        overflow-y: hidden
+        -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
+        filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+        box-sizing: content-box
+        &.am-lyric-pause-all
+            *
+                animation-play-state: paused !important
         &::-webkit-scrollbar
             display: none
         > *
-            padding: 50vh 0
-            position: absolute
-            padding-left: 2rem
-            padding-right: min(30%, 5vw, 600px)
+            height: 100%
+            margin: auto
+            width: 90%
+            max-width: 100%
+            > *
+                transition: all $tween-animation-duration $tween-animation-timing
 
     .am-lyric-view-no-lyric
         height: 100%
@@ -188,145 +286,121 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
         flex-wrap: nowrap
         justify-content: center
         align-items: baseline
-
-    // 歌词缩放效果
-    &.lyric-scale-effect // lyricScaleEffect
-        .am-lyric-line
-            transform: scale(0.85)
-
-            &.am-lyric-line-o0,
-            &.am-lyric-line-selected
-                transform: scale(1)
+        font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
+        color: var(--applemusic-like-lyrics-font-color, unset)
 
     // 已播放歌词隐藏效果
     &.lyric-hide-passed
         .am-lyric-line
-            opacity: 0.5
+            > *
+                opacity: 0.5
             &.am-lyric-line-before
                 opacity: 0
                 visibility: hidden
-                @for $i from -5 through 5
+                @for $i from -10 through 10
                     @if $i != 0
                         &.am-lyric-line-o#{$i}
                             visibility: visible
-            &.am-lyric-line-selected
+            &.am-lyric-line-selected > *
                 opacity: 1
 
     // 歌词模糊效果
     &.lyric-blur-effect
         .am-lyric-line
-            filter: blur(4px)
-            &.am-lyric-line-after, &.am-lyric-line-before
+            > *
                 filter: blur(4px)
-                &.am-lyric-line-selected
+            &.am-lyric-line-after, &.am-lyric-line-before
+                > *
+                    filter: blur(0.3vh * 6)
+                &.am-lyric-line-selected > *
                     filter: blur(0px)
-            @for $i from -5 through 5
+            @for $i from -10 through 10
                 @if $i != 0
-                    &.am-lyric-line-o#{$i}
-                        filter: blur(abs($i) * 1px)
+                    &.am-lyric-line-o#{$i} > *
+                        filter: blur(abs($i) * 0.3vh)
 
     // 未播放歌词淡入效果
     &.lyric-blur-fade-in-effect
         .am-lyric-line
-            &.am-lyric-line-after
+            &.am-lyric-line-after > *
                 opacity: 0.1
-            &.am-lyric-line-o1
+            &.am-lyric-line-o1 > *
                 opacity: 0.4
-            &.am-lyric-line-o2
+            &.am-lyric-line-o2 > *
                 opacity: 0.3
-            &.am-lyric-line-o3
+            &.am-lyric-line-o3 > *
                 opacity: 0.2
-            > .am-lyric-line-dynamic > *
-                > .am-lyric-real-word
-                    opacity: 1
+            > * > .am-lyric-line-dynamic > *
+                opacity: 0.5
 
     // 自定义歌词字体大小
     &.lyric-fixed-font-size
         .am-lyric-line
             font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
-        .am-lyric-dots
-            &.am-lyric-dots-selected
-                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5)
-            > *
-                margin-right: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333)
-                width: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
-                height: calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25)
+        // .am-lyric-dots
+        //     &.am-lyric-dots-selected > *
+        //         height: min(30px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5))
+        //     > * > *
+        //         margin-right: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333))
+        //         width: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
+        //         height: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
 
-    &.use-ping-fang-font *
-        font-family: 'PingFang SC' !important
-
-    // 专辑图居左
-    &.align-left-album-image .am-album-image
-        align-self: flex-start !important
-
-    // 歌名居左
-    &.align-left-music-name .am-music-name
-        text-align: left !important
-
-    // 歌曲别名居左
-    &.align-left-music-alias .am-music-alias
-        text-align: left !important
-
-    // 歌手名居左
-    &.align-left-music-artists .am-music-artists
-        justify-content: left !important
-
-    // 专辑名居左
-    &.align-left-music-album .am-music-album
-        justify-content: left !important
-
-    // 隐藏歌手名标签
-    &.hide-music-artists-label .am-artists-label
-        display: none
-
-    // 隐藏专辑名标签
-    &.hide-music-album-label .am-album-label
-        display: none
-
-    // 歌词滚动位置向上对齐
-    &.align-top-selected-lyric
-        .am-lyric-view > *
-            padding-bottom: 100vh
-
-    &.font-shadow
-        .am-lyric-view, .am-music-info
-            filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #7774)
+    &.hide-lyric-info-border
+        .am-lyric-credits
+            border-top: unset
+    &.use-ping-fang-font
+        .am-lyric-view *
+            font-family: 'SF Pro Display', 'PingFang SC' !important
+        .am-player-song-info
+            font-family: 'PingFang SC' !important
 
     .am-lyric-line
+        position: absolute
+        will-change: transform
         font-weight: bold
-        font-size: clamp(32px, 3vw, 4vh)
-        padding: max(1rem, 1vh) 0
+        width: var(--amll-lyric-view-width)
+        font-size: 5vh
+        padding-bottom: max(2rem, 5vh)
         transform-origin: left
         color: var(--applemusic-like-lyrics-font-color, unset)
-        transition: all $tween-animation-duration $tween-animation-timing
         line-break: loose
         word-break: break-word
-
-        > .am-lyric-line-translated,
-        > .am-lyric-line-roman
-            opacity: 0.5
-            font-size: max(16px, 65%)
-            margin-top: 0.5rem
-
-        > .am-lyric-line-dynamic > *
-            position: relative
-            display: inline-block
-            white-space: break-spaces
-            > .am-lyric-fake-word
-                animation-name: am-lyric-word-animation
-                animation-timing-function: linear
-                animation-fill-mode: both
-                width: 100%
-                right: 0%
-                position: absolute
-                white-space: nowrap
-                overflow: hidden
-            > .am-lyric-real-word
-                opacity: 0.75
-                animation-name: am-lyric-float-animation
-                animation-timing-function: linear
-                animation-fill-mode: both
+        box-sizing: border-box
+        &.am-lyric-line-bg-lyric
+            font-size: 3vh
+            padding-bottom: max(1rem, 3vh)
+            > *
+                opacity: 0 !important
+            &.am-lyric-line-selected > *
+                opacity: 0.5 !important
+        &.am-lyric-line-align-right
+            text-align: right
+            transform-origin: right
+            margin: 0
+        > *
+            will-change: filter, opacity
+            transition: all $tween-animation-duration $tween-animation-timing
+            .am-lyric-line-original
+                opacity: 0.5
                 transition: opacity $tween-animation-duration $tween-animation-timing
+            .am-lyric-line-translated,
+            .am-lyric-line-roman
+                opacity: 0.35
+                font-size: max(16px, 65%)
+                margin-top: 0.5rem
+
+            .am-lyric-line-dynamic
+                position: relative
+                display: inline-block
+                white-space: break-spaces
+                transition: opacity $tween-animation-duration $tween-animation-timing
+                > *
+                    opacity: calc(7 / 15)
+                    display: inline-block
+                    transition: transform $tween-animation-duration $tween-animation-timing
+                    animation-play-state: paused
+                    animation-timing-function: linear
+                    animation-fill-mode: both
 
         &:hover
             opacity: 1 !important
@@ -335,40 +409,60 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             > .am-lyric-line-dynamic > *
                 opacity: 1 !important
 
-        &.am-lyric-line-after
+        &.am-lyric-line-after > *
             opacity: 0.5
-            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
+
+        &.am-lyric-line-before > *
+            opacity: 0.5
+            .am-lyric-line-original
                 opacity: 0.5
-                animation-name: unset
-                animation-fill-mode: unset
-                animation-play-state: unset
-
-        &.am-lyric-line-before
-            opacity: 0.5
-            > .am-lyric-line-dynamic > * > .am-lyric-fake-word
-                opacity: 1
-                width: 100%
-                animation-name: unset
-                animation-fill-mode: unset
-                animation-play-state: unset
-
-        &.am-lyric-line-o0,
-        &.am-lyric-line-selected
+                transition: opacity calc($tween-animation-duration) $tween-animation-timing
+            .am-lyric-line-dynamic > *
+                opacity: 0.5
+                transition: opacity calc($tween-animation-duration) $tween-animation-timing
+        &.am-lyric-line-o0 > *,
+        &.am-lyric-line-selected > *
             filter: blur(0px)
             opacity: 1
-            > .am-lyric-line-dynamic
-                > * > .am-lyric-real-word
+            .am-lyric-line-original
+                opacity: 1
+            .am-lyric-line-dynamic
+                > *
+                    opacity: 1
+                    animation-name: am-lyric-word-animation
                     animation-play-state: running
-                    opacity: 0.5
+                > .am-lyric-glow-word
+                    padding: 2vh
+                    margin: -2vh
+                    animation-name: am-lyric-glow-word-animation
+                    animation-play-state: running
+                    transform-style: preserve-3d
+                    perspective: 50vw
+                    > *
+                        opacity: 0.5
+                        transform: translate3d(0, 0, 0)
+                        animation-name: am-lyric-glow-letter-animation
+                        animation-play-state: running
+                        animation-fill-mode: forwards
+                        position: relative
+                        display: inline-block
+                        z-index: 2
+                        padding: 2vh
+                        margin: -2vh
 
-        // @keyframes am-lyric-word-animation
-        //     from
-        //         width: 0%
-        //         right: 100%
-
-        //     to
-        //         width: 100%
-        //         right: 0%
+        @keyframes am-lyric-glow-letter-animation
+            0%
+                opacity: 0.5
+                transform: translate3d(0, 0px, 0px)
+                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
+            50%
+                opacity: 1
+                transform: translate3d(0, -2px, 20px)
+                filter: drop-shadow(0 0 4px var(--applemusic-like-lyrics-font-color, white))
+            100%
+                opacity: 1
+                transform: translate3d(0, -1px, 0)
+                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
 
         @keyframes am-lyric-float-animation
             from
@@ -380,24 +474,31 @@ $tween-animation-timing: cubic-bezier(0.65, 0, 0.35, 1)
             $fade-width: 20
             @for $i from -$fade-width through 100
                 #{calc(($i + $fade-width) / (100 + $fade-width)) * 100}%
-                    $mask-img: linear-gradient(to right, #000 $i * 1%, #0000 ($i + $fade-width) * 1%)
+                    $mask-img: linear-gradient(to right, #000 $i * 1%, rgba(0, 0, 0, 0.5) ($i + $fade-width) * 1%)
                     -webkit-mask-image: $mask-img
                     mask-image: $mask-img
+                    transform: translateY(calc(-2px * ($i + $fade-width) / (100 + $fade-width)))
 
     .am-lyric-dots
-        height: 0px
-        transition: opacity 0.75s cubic-bezier(0.65, 0, 0.35, 1), height 0.75s $tween-animation-timing
-        transform-origin: left
+        position: absolute
+        will-change: transform, filter, opacity
+        padding: max(1rem, 1vh) 0
+        height: max(1rem, 2vh)
+        transform-origin: center
         opacity: 0
 
         > *
-            display: inline-block
-            margin-right: 2vh
-            width: 3vh
-            height: 3vh
-            background-color: var(--applemusic-like-lyrics-font-color, white)
-            box-shadow: 0 2px 5px #0008
-            border-radius: 50%
+            will-change: transform, filter, opacity
+            height: 2rem
+            transform-origin: center
+            > *
+                display: inline-block
+                margin-right: max(0.3rem, 0.7vh)
+                width: max(0.5rem, 1vh)
+                height: max(0.5rem, 1vh)
+                background-color: var(--applemusic-like-lyrics-font-color, white)
+                box-shadow: 0 2px 5px #0008
+                border-radius: 50%
 
         &.am-lyric-dots-selected
             height: 6vh

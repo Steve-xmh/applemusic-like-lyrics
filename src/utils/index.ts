@@ -232,5 +232,53 @@ export function resizeImage(
 	}
 }
 
+export enum PlayMode {
+	Order = "type-order", // playonce 顺序播放
+	Repeat = "type-repeat", // playorder 列表循环
+	AI = "type-ai", // mode2 = true 心动模式
+	One = "type-one", // playcycle 单曲循环
+	Random = "type-random", // playrandom 随机播放
+}
+
+export function switchPlayMode(playMode: PlayMode) {
+	const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
+	while (playModeBtn) {
+		if (playModeBtn.classList.contains(playMode)) {
+			return;
+		}
+		playModeBtn.click();
+	}
+}
+
+export function getCurrentPlayMode(): PlayMode | undefined {
+	try {
+		const setting = JSON.parse(
+			localStorage.getItem("NM_SETTING_PLAYER") || "{}",
+		);
+
+		if (setting.mode2) {
+			return PlayMode.AI;
+		}
+
+		switch (setting?.mode) {
+			case "playonce":
+				return PlayMode.Order;
+			case "playorder":
+				return PlayMode.Repeat;
+			case "playcycle":
+				return PlayMode.One;
+			case "playrandom":
+				return PlayMode.Random;
+			default:
+		}
+	} catch {}
+	return undefined;
+}
+
+export const eqSet: <T>(xs: Set<T>, ys: Set<T>) => boolean = (
+	xs,
+	ys,
+): boolean => xs.size === ys.size && [...xs].every((x) => ys.has(x));
+
 export const IS_WORKER =
 	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

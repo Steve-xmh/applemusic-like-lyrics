@@ -1,132 +1,99 @@
 import { Loader, LoadingOverlay } from "@mantine/core";
-import { useAtomValue } from "jotai";
+import { IconDots, IconVolume, IconVolume2 } from "@tabler/icons";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import * as React from "react";
-import { setClipboardData } from "../../api";
-import { useAlbumImageUrl, useConfigBoolean } from "../../api/react";
+import { genAudioPlayerCommand } from "../../api";
 import {
-	albumAtom,
+	useAlbumImageUrl,
+	useConfigValue,
+	useConfigValueBoolean,
+} from "../../api/react";
+import {
 	musicIdAtom,
-	songAliasNameAtom,
 	songArtistsAtom,
 	songNameAtom,
-	albumImageUrlAtom,
+	playProgressAtom,
+	currentAudioDurationAtom,
+	playVolumeAtom,
+	currentAudioIdAtom,
+	topbarMenuOpenedAtom,
+	albumAtom,
 } from "../../core/states";
-import { Menu, MenuItem } from "../appkit/menu";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
-export const PlayerSongInfoMenuContent: React.FC<{
-	onCloseMenu: () => void;
-}> = (props) => {
-	const musicId = useAtomValue(musicIdAtom);
-	const album = useAtomValue(albumAtom);
-	const songArtists = useAtomValue(songArtistsAtom);
-	const songName: string = useAtomValue(songNameAtom);
-	const albumImageUrl = useAtomValue(albumImageUrlAtom);
-	return (
-		<>
-			<MenuItem
-				label={`复制音乐 ID：${musicId}`}
-				onClick={() => setClipboardData(String(musicId))}
-			/>
-			<MenuItem label={`复制音乐名称：${songName}`} />
-			{songArtists.length === 1 && (
-				<MenuItem
-					label={`查看歌手：${songArtists[0].name}`}
-					onClick={() => {
-						location.hash = `#/m/artist/?id=${songArtists[0].id}`;
-						props.onCloseMenu();
-					}}
-				/>
-			)}
-			{songArtists.length > 1 && (
-				<MenuItem label="查看歌手...">
-					{songArtists.map((a) => (
-						<MenuItem
-							label={a.name}
-							key={`song-artist-${a.id}`}
-							onClick={() => {
-								location.hash = `#/m/artist/?id=${a.id}`;
-								props.onCloseMenu();
-							}}
-						/>
-					))}
-				</MenuItem>
-			)}
-			{album && (
-				<MenuItem
-					label={`查看专辑：${album.name}`}
-					onClick={() => {
-						location.hash = `#/m/album/?id=${album?.id}`;
-						props.onCloseMenu();
-					}}
-				/>
-			)}
-			<MenuItem
-				label="复制专辑图片链接"
-				labelOnly={albumImageUrl === null}
-				onClick={() => {
-					// 去除缓存链接头
-					let t = albumImageUrl;
-					if (t) {
-						if (t.startsWith("orpheus://cache/?")) {
-							t = t.slice(17);
-						}
-						setClipboardData(t);
-						props.onCloseMenu();
-					}
-				}}
-			/>
-			<MenuItem
-				label="在浏览器打开专辑图片"
-				labelOnly={albumImageUrl === null}
-				onClick={() => {
-					let t = albumImageUrl;
-					if (t) {
-						if (t.startsWith("orpheus://cache/?")) {
-							t = t.slice(17);
-						}
-						betterncm.ncm.openUrl(t);
-						props.onCloseMenu();
-					}
-				}}
-			/>
-		</>
-	);
-};
+import { AudioFFTControl } from "./audio-fft-control";
+import { PlayControls } from "./play-controls";
+import { NowPlayingSlider } from "../appkit/np-slider";
+import { AudioQualityTag } from "./audio-quality-tag";
+import { SongInfoTextMarquee } from "./song-info-text-marquee";
+
+function toDuration(duration: number) {
+	const isRemainTime = duration < 0;
+
+	const d = Math.abs(duration | 0);
+	const sec = d % 60;
+	const min = Math.floor((d - sec) / 60);
+	const secText = "0".repeat(2 - sec.toString().length) + sec;
+
+	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
+}
 
 export const PlayerSongInfo: React.FC<{
 	isFM?: boolean;
 }> = (props) => {
+	const currentAudioId = useAtomValue(currentAudioIdAtom);
 	const musicId = useAtomValue(musicIdAtom);
-	const album = useAtomValue(albumAtom);
 	const songName: string = useAtomValue(songNameAtom);
-	const songAliasName: string[] = useAtomValue(songAliasNameAtom);
+	const album = useAtomValue(albumAtom);
 	const songArtists = useAtomValue(songArtistsAtom);
+	const currentAudioDuration = useAtomValue(currentAudioDurationAtom) / 1000;
+	const [playProgress, setPlayProgress] = useAtom(playProgressAtom);
+	const [playVolume, setPlayVolume] = useAtom(playVolumeAtom);
 	const albumImageUrl = useAlbumImageUrl(musicId, 64, 64);
-	const [songInfoMenu, setSongInfoMenu] = React.useState(false);
+	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
-	const [hideAlbumImage] = useConfigBoolean("hideAlbumImage", false);
-	const [hideMusicName] = useConfigBoolean("hideMusicName", false);
-	const [hideMusicAlias] = useConfigBoolean("hideMusicAlias", false);
-	const [hideMusicArtists] = useConfigBoolean("hideMusicArtists", false);
-	const [hideMusicAlbum] = useConfigBoolean("hideMusicAlbum", false);
+	const hideAlbumImage = useConfigValueBoolean("hideAlbumImage", false);
+	const hideMusicName = useConfigValueBoolean("hideMusicName", false);
+	const hideMusicArtists = useConfigValueBoolean("hideMusicArtists", false);
+	const hideMusicAlbum = useConfigValueBoolean("hideMusicAlbum", false);
+	const hideMenuButton = useConfigValueBoolean("hideMenuButton", false);
+	const hidePlayProgressBar = useConfigValueBoolean(
+		"hidePlayProgressBar",
+		false,
+	);
+	const hideAudioQualityTag = useConfigValueBoolean(
+		"hideAudioQualityTag",
+		false,
+	);
+
+	const widgetUnderProgressBar = useConfigValue(
+		"widgetUnderProgressBar",
+		"play-controls",
+	);
+
+	const [lockPlayProgress, setLockPlayProgress] = React.useState(false);
+	const [curPlayProgress, setCurPlayProgress] = React.useState(playProgress);
+	const [lockPlayVolume, setLockPlayVolume] = React.useState(false);
+	const [curVolume, setCurVolume] = React.useState(playVolume);
+
+	React.useLayoutEffect(() => {
+		if (!lockPlayProgress) setCurPlayProgress(playProgress);
+	}, [lockPlayProgress, playProgress]);
+
+	React.useLayoutEffect(() => {
+		if (!lockPlayVolume) setCurVolume(playVolume);
+	}, [lockPlayVolume, playVolume]);
+
+	const playProgressText = toDuration(curPlayProgress);
+	const remainText = toDuration(curPlayProgress - currentAudioDuration);
 
 	return (
 		<>
-			<Menu onClose={() => setSongInfoMenu(false)} opened={songInfoMenu}>
-				<PlayerSongInfoMenuContent onCloseMenu={() => setSongInfoMenu(false)} />
-			</Menu>
-			{!(
-				hideAlbumImage &&
-				hideMusicName &&
-				hideMusicAlias &&
-				hideMusicArtists &&
-				hideMusicAlbum
-			) && (
+			{!(hideAlbumImage && hideMusicName && hideMusicArtists) && (
 				<div
 					className="am-player-song-info"
 					onContextMenu={(evt) => {
-						setSongInfoMenu(true);
+						setMenuOpened(true);
 						evt.preventDefault();
 					}}
 				>
@@ -159,40 +126,124 @@ export const PlayerSongInfo: React.FC<{
 							</div>
 						</div>
 					)}
-					<div className="am-music-info">
-						{!hideMusicName && <div className="am-music-name">{songName}</div>}
-						{!hideMusicAlias && songAliasName.length > 0 && (
-							<div className="am-music-alias">
-								{songAliasName.map((alia, index) => (
-									<div key={`${alia}-${index}`}>{alia}</div>
-								))}
+					<div className="am-music-sub-widget">
+						<div className="am-music-info-with-menu">
+							<div className="am-music-info">
+								{!hideMusicName &&
+									(hideMusicAlbum || songName !== album.name) && (
+										<SongInfoTextMarquee>
+											<div className="am-music-name">{songName}</div>
+										</SongInfoTextMarquee>
+									)}
+								{!hideMusicAlbum && (
+									<SongInfoTextMarquee>
+										<div className="am-music-album">
+											<a href={`#/m/album/?id=${album.id}`}>{album.name}</a>
+										</div>
+									</SongInfoTextMarquee>
+								)}
+								{!hideMusicArtists && (
+									<SongInfoTextMarquee>
+										<div className="am-music-artists">
+											<div className="am-artists">
+												{songArtists.map((artist, index) => (
+													<a
+														href={`#/m/artist/?id=${artist.id}`}
+														key={`${artist.id}-${artist.name}-${index}`}
+													>
+														{artist.name}
+													</a>
+												))}
+											</div>
+										</div>
+									</SongInfoTextMarquee>
+								)}
 							</div>
-						)}
-						{!hideMusicArtists && (
-							<div className="am-music-artists">
-								<div className="am-artists-label">歌手：</div>
-								<div className="am-artists">
-									{songArtists.map((artist, index) => (
-										<a
-											href={`#/m/artist/?id=${artist.id}`}
-											key={`${artist.id}-${artist.name}-${index}`}
-										>
-											{artist.name}
-										</a>
-									))}
+							{!hideMenuButton && (
+								<button
+									className="am-music-main-menu"
+									onClick={() => setMenuOpened(true)}
+								>
+									<IconDots color="#FFFFFF" />
+								</button>
+							)}
+						</div>
+
+						{!hidePlayProgressBar && (
+							<div className="am-music-progress-control">
+								<NowPlayingSlider
+									onAfterChange={(v) => {
+										setPlayProgress(v);
+										setLockPlayProgress(false);
+										legacyNativeCmder._envAdapter.callAdapter(
+											"audioplayer.seek",
+											() => {},
+											[
+												currentAudioId,
+												genAudioPlayerCommand(currentAudioId, "seek"),
+												v,
+											],
+										);
+									}}
+									onBeforeChange={() => {
+										setLockPlayProgress(true);
+									}}
+									onChange={setCurPlayProgress}
+									value={curPlayProgress}
+									min={0}
+									max={currentAudioDuration}
+								/>
+								<div className="am-music-progress-tips">
+									<div>{playProgressText}</div>
+									{!hideAudioQualityTag && <AudioQualityTag />}
+									<div>{remainText}</div>
 								</div>
 							</div>
 						)}
-						{!hideMusicAlbum && album && (
-							<div className="am-music-album">
-								<div className="am-album-label">专辑：</div>
-								<div className="am-album">
-									<a href={`#/m/album/?id=${album?.id}`}>{album.name}</a>
-								</div>
-							</div>
-						)}
-						{props.isFM && <LyricPlayerFMControls />}
 					</div>
+
+					{widgetUnderProgressBar === "play-controls" && props.isFM && (
+						<LyricPlayerFMControls />
+					)}
+					{widgetUnderProgressBar === "play-controls" && !props.isFM && (
+						<PlayControls />
+					)}
+
+					{widgetUnderProgressBar === "play-controls" && (
+						<div className="am-music-volume-controls">
+							<IconVolume2 color="#FFFFFF" />
+							<NowPlayingSlider
+								onAfterChange={(v) => {
+									setPlayVolume(v);
+									setLockPlayVolume(false);
+									legacyNativeCmder._envAdapter.callAdapter(
+										"audioplayer.setVolume",
+										() => {},
+										["", "", v],
+									);
+								}}
+								onBeforeChange={() => {
+									setLockPlayVolume(true);
+								}}
+								onChange={(v) => {
+									setCurVolume(v);
+									legacyNativeCmder._envAdapter.callAdapter(
+										"audioplayer.setVolume",
+										() => {},
+										["", "", v],
+									);
+								}}
+								value={curVolume}
+								step={0.01}
+								min={0.0}
+								max={1.0}
+							/>
+							<IconVolume color="#FFFFFF" />
+						</div>
+					)}
+
+					{widgetUnderProgressBar === "audio-viz-fft" && <AudioFFTControl />}
+
 					<div className="am-music-info-bottom-spacer" />
 				</div>
 			)}

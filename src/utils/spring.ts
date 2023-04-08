@@ -54,8 +54,8 @@ export class Spring {
 	get arrived() {
 		const [pos, vel] = this.positionVelocity();
 		return (
-			Math.abs(Math.round(pos * 10) - Math.round(this._target * 10)) <
-				Number.EPSILON && Math.round(vel * 10) === 0
+			Math.abs(Math.round(pos * 100) - Math.round(this._target * 100)) <
+				Number.EPSILON && Math.round(vel * 100) === 0
 		);
 	}
 

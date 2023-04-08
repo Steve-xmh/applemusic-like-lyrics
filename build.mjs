@@ -1,6 +1,7 @@
 import { build, serve } from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
 import { glsl } from "esbuild-plugin-glsl";
+import svgrPlugin from "esbuild-plugin-svgr";
 import JSZip from "jszip";
 import fs from "fs";
 import path from "path";
@@ -33,6 +34,7 @@ manifest.commit = getCommitHash();
 /** @type {any[]} */
 const plugins = [
 	sassPlugin(),
+	svgrPlugin(),
 	glsl({
 		minify: !IS_DEV,
 	}),
@@ -69,7 +71,7 @@ const buildOption = {
 	bundle: true,
 	sourcemap: IS_DEV ? "inline" : false,
 	legalComments: "external",
-	minify: !IS_DEV || process.argv.includes("--dist"),
+	minify: true,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
 	logOverride: {
@@ -159,6 +161,11 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 					},
 				});
 				output.pipe(fs.createWriteStream("Apple Music-like lyrics.plugin"));
+				output.pipe(
+					fs.createWriteStream(
+						`Apple Music-like lyrics-${getCommitHash()}.plugin`,
+					),
+				);
 				fs.writeFileSync(
 					"dist/manifest.json",
 					JSON.stringify(manifest, null, "\t"),

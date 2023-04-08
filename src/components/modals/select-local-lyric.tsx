@@ -7,6 +7,7 @@ import {
 	selectLocalLyricModalOpenedAtom,
 } from "../../core/states";
 import { warn } from "../../utils/logger";
+import { getLyricCachePath } from "../../api";
 
 export const SelectLocalLyricModal: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -33,12 +34,10 @@ export const SelectLocalLyricModal: React.FC = () => {
 			closeOnClickOutside={!selectLocalLyricModalLoading}
 			onClose={() => setLocalLyricModalOpened(false)}
 			centered
-			zIndex={151}
 		>
 			<LoadingOverlay
 				visible={selectLocalLyricModalLoading}
 				radius="sm"
-				zIndex={153}
 				size={50}
 				loaderProps={{
 					style: {
@@ -81,7 +80,7 @@ export const SelectLocalLyricModal: React.FC = () => {
 					if (originalLyricFile) {
 						setLocalLyricModalLoading(true);
 						try {
-							const lyricsPath = `${plugin.pluginPath}/lyrics`;
+							const lyricsPath = getLyricCachePath();
 							const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 							if (!(await betterncm.fs.exists(lyricsPath))) {
 								betterncm.fs.mkdir(lyricsPath);

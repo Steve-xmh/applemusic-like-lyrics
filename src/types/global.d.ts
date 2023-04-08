@@ -20,6 +20,11 @@ declare module "*.vert" {
 	export default value;
 }
 
+declare module "*.svg" {
+	const value: React.FC<React.SVGProps<SVGSVGElement>>;
+	export default value;
+}
+
 interface EAPIResponse {
 	code: number;
 	error?: string;
@@ -35,7 +40,8 @@ interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
 	romalrc?: EAPILyric;
-	yrc?: EAPILyric;
+	yromalrc?: EAPILyric;
+	ytlrc?: EAPILyric;
 }
 
 declare namespace channel {
