@@ -1,15 +1,15 @@
 {
     "manifest_version": 1,
-    "name": "Apple Music-like lyrics 2.0 Beta",
-    "slug": "Apple-Musiclike-lyrics-2-0-Beta",
+    "name": "Apple Music-like lyrics",
+    "slug": "Apple-Musiclike-lyrics",
     "author": "SteveXMH",
     "author_links": [
         "https://github.com/Steve-xmh",
         "https://github.com/Steve-xmh/applemusic-like-lyrics"
     ],
-    "description": "类 Apple Music 歌词页面插件|测试版|近乎完美的 Apple Music 歌词体验",
-    "preview": "preview-beta.svg",
-    "version": "0.0.7",
+    "description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
+    "preview": "preview.svg",
+    "version": "2.0.0",
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
