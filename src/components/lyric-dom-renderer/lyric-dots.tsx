@@ -1,6 +1,7 @@
 import { classname } from "../../api";
 import * as React from "react";
 import { LyricLineTransform } from ".";
+import { warn } from "../../utils/logger";
 
 const dotAnimation = [
 	{
@@ -55,69 +56,102 @@ export const LyricDots: React.FC<
 		const dot2el = dot2.current;
 		const dots = dotsRef.current;
 		if (dot0el && dot1el && dot2el && dots && selected && duration >= 5000) {
-			const globalDelay = 750;
-			const dotAnimationDuration = Math.max(0, (duration - globalDelay) / 3);
-			dotAnimation[1].offset = 0.5;
-			dot0el.animate(dotAnimation, {
-				duration: dotAnimationDuration,
-				delay: globalDelay,
-				fill: "both",
-			});
-			dotAnimation[1].offset =
-				(100 + dotAnimationDuration) / (dotAnimationDuration * 2);
-			dot1el.animate(dotAnimation, {
-				duration: dotAnimationDuration * 2,
-				delay: globalDelay,
-				fill: "both",
-			});
-			dotAnimation[1].offset =
-				(200 + dotAnimationDuration * 2) / (dotAnimationDuration * 3);
-			dot2el.animate(dotAnimation, {
-				duration: dotAnimationDuration * 3,
-				delay: globalDelay,
-				fill: "both",
-			});
-
-			const breathDuration = duration - 2000 - globalDelay;
-			const breathDelay = 1000;
-			const breathTime = Math.floor(breathDuration / 4000);
-			const breathGap = Math.max(0, (breathDuration - breathTime * 4000) / 2);
-
 			let stopped = false;
 
-			(async () => {
-				if (stopped) return;
-				dots.style.opacity = "1";
-				await dots.animate(
-					[
+			try {
+				const globalDelay = 750;
+				const dotAnimationDuration = Math.max(1, (duration - globalDelay) / 3);
+				dotAnimation[1].offset = 0.5;
+				dot0el.animate(dotAnimation, {
+					duration: dotAnimationDuration,
+					delay: globalDelay,
+					fill: "both",
+				});
+				dotAnimation[1].offset =
+					(100 + dotAnimationDuration) / (dotAnimationDuration * 2);
+				dot1el.animate(dotAnimation, {
+					duration: dotAnimationDuration * 2,
+					delay: globalDelay,
+					fill: "both",
+				});
+				dotAnimation[1].offset =
+					(200 + dotAnimationDuration * 2) / (dotAnimationDuration * 3);
+				dot2el.animate(dotAnimation, {
+					duration: dotAnimationDuration * 3,
+					delay: globalDelay,
+					fill: "both",
+				});
+
+				const breathDuration = duration - 2000 - globalDelay;
+				const breathDelay = 1000;
+				const breathTime = Math.floor(breathDuration / 4000);
+				const breathGap = Math.max(0, (breathDuration - breathTime * 4000) / 2);
+
+				(async () => {
+					if (stopped) return;
+					dots.style.opacity = "1";
+					await dots.animate(
+						[
+							{
+								transform: "scale(0.9)",
+							},
+							{
+								transform: "scale(1)",
+							},
+						],
 						{
-							transform: "scale(0.9)",
+							delay: globalDelay,
+							duration: Math.max(1, breathDelay),
+							endDelay: Math.max(0, breathGap),
+							easing: "ease-out",
 						},
-						{
-							transform: "scale(1)",
-						},
-					],
-					{
-						delay: globalDelay,
-						duration: breathDelay,
-						endDelay: breathGap,
-						easing: "ease-out",
-					},
-				).finished;
-				if (stopped) return;
-				for (let i = 0; i < breathTime; i++) {
+					).finished;
+					if (stopped) return;
+					for (let i = 0; i < breathTime; i++) {
+						if (stopped) return;
+						await dots.animate(
+							[
+								{
+									transform: "scale(1.0)",
+								},
+								{
+									transform: "scale(0.9)",
+								},
+							],
+							{
+								duration: 2000,
+								easing: "ease-in-out",
+							},
+						).finished;
+						if (stopped) return;
+						await dots.animate(
+							[
+								{
+									transform: "scale(0.9)",
+								},
+								{
+									transform: "scale(1.0)",
+								},
+							],
+							{
+								duration: 2000,
+								easing: "ease-in-out",
+							},
+						).finished;
+					}
 					if (stopped) return;
 					await dots.animate(
 						[
 							{
-								transform: "scale(1.0)",
+								transform: "scale(1)",
 							},
 							{
-								transform: "scale(0.9)",
+								transform: "scale(1.1)",
 							},
 						],
 						{
-							duration: 2000,
+							delay: Math.max(0, 250 + breathGap),
+							duration: 500,
 							easing: "ease-in-out",
 						},
 					).finished;
@@ -125,53 +159,24 @@ export const LyricDots: React.FC<
 					await dots.animate(
 						[
 							{
-								transform: "scale(0.9)",
+								transform: "scale(1.1)",
+								opacity: "1.0",
 							},
 							{
-								transform: "scale(1.0)",
+								transform: "scale(0.5)",
+								opacity: "0.0",
 							},
 						],
 						{
-							duration: 2000,
-							easing: "ease-in-out",
+							duration: 250,
+							easing: "ease-in",
 						},
 					).finished;
-				}
-				if (stopped) return;
-				await dots.animate(
-					[
-						{
-							transform: "scale(1)",
-						},
-						{
-							transform: "scale(1.1)",
-						},
-					],
-					{
-						delay: 250 + breathGap,
-						duration: 500,
-						easing: "ease-in-out",
-					},
-				).finished;
-				if (stopped) return;
-				await dots.animate(
-					[
-						{
-							transform: "scale(1.1)",
-							opacity: "1.0",
-						},
-						{
-							transform: "scale(0.5)",
-							opacity: "0.0",
-						},
-					],
-					{
-						duration: 250,
-						easing: "ease-in",
-					},
-				).finished;
-				dots.style.opacity = "0.0";
-			})();
+					dots.style.opacity = "0.0";
+				})();
+			} catch (err) {
+				warn("三点动画播放出错", err);
+			}
 
 			return () => {
 				stopped = true;

@@ -228,8 +228,6 @@ const ConfigComponent: React.FC = () => {
 };
 
 plugin.onConfig(() => {
-	console.log("正在创建配置窗口");
-
 	const root = document.createElement("div");
 
 	root.style.height = "100%";

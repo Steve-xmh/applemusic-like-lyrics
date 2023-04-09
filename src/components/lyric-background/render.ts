@@ -77,7 +77,8 @@ export class CanvasBackgroundRender {
 		this.resetTime();
 		this.rebuildShader(renderMethod.fragmentShaderCode);
 		this.rebuildProgram();
-		if (this._currentAlbumColorMapColors.length > 0) this.setAlbumColorMap(this._currentAlbumColorMapColors);
+		if (this._currentAlbumColorMapColors.length > 0)
+			this.setAlbumColorMap(this._currentAlbumColorMapColors);
 		if (this._currentAlbumImage) this.setAlbumImage(this._currentAlbumImage);
 		this.currentRenderMethod = renderMethod;
 	}

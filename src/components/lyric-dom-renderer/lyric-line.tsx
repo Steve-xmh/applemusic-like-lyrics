@@ -162,7 +162,7 @@ export const LyricLineView: React.FC<
 								easing: "cubic-bezier(0.46, 0, 0.07, 1)",
 								delay: lineTransform.delay,
 								fill: "backwards",
-								duration: animateTime,
+								duration: Math.max(1, animateTime),
 							},
 						);
 						animations.push(animation);
@@ -181,7 +181,7 @@ export const LyricLineView: React.FC<
 							{
 								easing: "ease-in-out",
 								fill: "forwards",
-								duration: bounceTime,
+								duration: Math.max(1, bounceTime),
 							},
 						);
 						animations.push(animation);
