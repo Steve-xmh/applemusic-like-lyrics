@@ -1,6 +1,6 @@
 import { log, warn } from "../utils/logger";
 import { genRandomString, normalizePath } from "../utils";
-import { LyricLine } from "../core/lyric-types";
+import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 const cachedFunctionMap: Map<string, Function> = new Map();
 

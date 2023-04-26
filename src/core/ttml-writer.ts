@@ -4,7 +4,7 @@
  * 但是可能会有信息会丢失
  */
 
-import { LyricLine } from "./lyric-types";
+import type { LyricLine } from "./lyric-types";
 
 function msToTimestamp(timeMS: number): string {
 	timeMS = timeMS / 1000;

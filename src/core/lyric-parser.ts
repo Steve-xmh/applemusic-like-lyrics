@@ -1,6 +1,6 @@
 import { getConfig } from "../config/core";
 import pangu from "pangu/dist/browser/pangu.min.js";
-import { DynamicLyricWord, LyricLine, LyricPureLine } from "./lyric-types";
+import type { DynamicLyricWord, LyricLine, LyricPureLine } from "./lyric-types";
 import { log } from "../utils/logger";
 // import { guessTextReadDuration } from "../utils";
 

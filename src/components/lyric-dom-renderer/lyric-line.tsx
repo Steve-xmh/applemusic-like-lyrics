@@ -5,7 +5,7 @@ import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
 import { rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
-import { DynamicLyricWord } from "../../core/lyric-types";
+import type { DynamicLyricWord } from "../../core/lyric-types";
 
 const LyricWord: React.FC<{
 	word: DynamicLyricWord;
