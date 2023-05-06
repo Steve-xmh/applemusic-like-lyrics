@@ -135,13 +135,32 @@ export const LyricLineView: React.FC<
 
 				if (lineTransform.duration > 0) {
 					(async () => {
-						const animateTime = Math.max(0, lineTransform.duration * 0.7);
-						const bounceTime = Math.max(0, lineTransform.duration * 0.3);
+						const deltaY = lineTransform.top - prevTransformTop.current;
+						const bounceY =
+							Math.min(
+								5,
+								Math.max(
+									(deltaY * 0.01) / (Math.max(1, lineTransform.delay) / 100),
+									-5,
+								),
+							) || 0;
+
+						const bounceTime =
+							deltaY * bounceY === 0
+								? 0
+								: Math.max(
+										0,
+										Math.abs(bounceY / deltaY) * lineTransform.duration,
+								  ) || 0;
+						const animateTime = Math.max(
+							0,
+							lineTransform.duration - bounceTime,
+						);
 
 						const middle =
-							prevTransformTop.current === lineTransform.top
+							bounceTime < 100 || deltaY === 0
 								? dest
-								: `translateY(${(lineTransform.top - 2).toFixed(
+								: `translateY(${(lineTransform.top + bounceY).toFixed(
 										3,
 								  )}px) translateX(${lineTransform.left.toFixed(
 										3,
@@ -160,8 +179,7 @@ export const LyricLineView: React.FC<
 							],
 							{
 								easing: "cubic-bezier(0.46, 0, 0.07, 1)",
-								delay: lineTransform.delay,
-								fill: "backwards",
+								delay: Math.max(0, lineTransform.delay),
 								duration: Math.max(1, animateTime),
 							},
 						);
@@ -169,25 +187,27 @@ export const LyricLineView: React.FC<
 						await animation.finished;
 
 						if (canceled) return;
-						animation = line.animate(
-							[
+						if (bounceTime > 0) {
+							animation = line.animate(
+								[
+									{
+										transform: middle,
+									},
+									{
+										transform: dest,
+									},
+								],
 								{
-									transform: middle,
+									easing: "cubic-bezier(0.46, 0, 0.07, 1)",
+									duration: Math.max(1, bounceTime),
 								},
-								{
-									transform: dest,
-								},
-							],
-							{
-								easing: "ease-in-out",
-								fill: "forwards",
-								duration: Math.max(1, bounceTime),
-							},
-						);
-						animations.push(animation);
-						await animation.finished;
+							);
+							animations.push(animation);
+							await animation.finished;
 
-						if (canceled) return;
+							if (canceled) return;
+						}
+
 						line.style.transform = dest;
 					})();
 				} else {
