@@ -235,6 +235,9 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         flex-direction: column
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
+            opacity: 0.75 !important
+            &:hover
+                opacity: 1 !important
             > *
                 filter: blur(0) !important
                 opacity: 1 !important
@@ -263,7 +266,8 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         flex: 1
         overflow-y: hidden
         -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
-        filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+        // filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+        filter: drop-shadow(0 0 0 #0004)
         box-sizing: content-box
         &.am-lyric-pause-all
             *
