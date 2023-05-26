@@ -1,11 +1,14 @@
 import { useSetAtom } from "jotai";
-import { LyricLineTransform } from ".";
+import { LyricLineTransform, LyricRendererContext } from ".";
 import { classname } from "../../api";
 import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
 import { rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
 import type { DynamicLyricWord } from "../../core/lyric-types";
+import { Spring } from "../../utils/spring";
+import { useSpring } from "../../utils/spring-svelte";
+import { log } from "../../utils/logger";
 
 const LyricWord: React.FC<{
 	word: DynamicLyricWord;
@@ -52,6 +55,17 @@ const LyricWord: React.FC<{
 	}
 };
 
+// const useSpring = (init: number, damper: number, speed: number) => {
+// 	const sprRef = React.useRef<Spring>() as React.MutableRefObject<Spring>;
+// 	if (!sprRef.current) {
+// 		const spring = new Spring(init);
+// 		spring.damper = damper;
+// 		spring.speed = speed;
+// 		sprRef.current = spring;
+// 	}
+// 	return sprRef;
+// };
+
 export const LyricLineView: React.FC<
 	{
 		offset: number;
@@ -80,17 +94,24 @@ export const LyricLineView: React.FC<
 	const forceDynamic = useConfigValueBoolean("forceDynamicLyric", false);
 	const lineRef = React.useRef<HTMLDivElement>(null);
 
+	const lyricCtx = React.useContext(LyricRendererContext);
+	const lyricViewSizeRef = React.useRef(lyricCtx.lyricPageSize);
+	const selfSizeRef = React.useRef([0, 0]);
+	const visibilityRef = React.useRef("");
+
 	React.useLayoutEffect(() => {
 		const line = lineRef.current;
 		if (line) {
 			let lastWidth = line.clientWidth;
 			let lastHeight = line.clientHeight;
+			selfSizeRef.current = [lastWidth, lastHeight];
 			const obs = new ResizeObserver(() => {
 				const width = line.clientWidth;
 				const height = line.clientHeight;
 				if (height !== lastHeight || width !== lastWidth) {
 					lastWidth = width;
 					lastHeight = height;
+					selfSizeRef.current = [width, height];
 					onSizeChanged();
 				}
 			});
@@ -101,134 +122,116 @@ export const LyricLineView: React.FC<
 		}
 	}, [onSizeChanged]);
 
-	const prevTransform = React.useRef(
-		`translateY(${lineTransform.top}px) translateX(${lineTransform.left}) scale(${lineTransform.scale})`,
-	);
-	const prevTransformTop = React.useRef(lineTransform.top);
-	const prevTransformUserScrolling = React.useRef(lineTransform.userScrolling);
+	React.useLayoutEffect(() => {
+		if (lineRef.current) {
+			lineRef.current.style.visibility = "hidden";
+		}
+	}, [lineRef.current]);
+
 	React.useEffect(() => {
-		const line = lineRef.current;
-		if (line) {
-			if (prevTransformUserScrolling.current !== lineTransform.userScrolling) {
-				if (lineTransform.userScrolling) {
-					line.style.transition = "all 0.25s";
+		lyricViewSizeRef.current = lyricCtx.lyricPageSize;
+	}, [lyricCtx.lyricPageSize]);
+
+	const lastLineTransformRef = React.useRef(lineTransform);
+	const springRef = useSpring(
+		{
+			top: lineTransform.top,
+			left: lineTransform.left,
+			scale: lineTransform.scale,
+		},
+		{
+			stiffness: 0.023,
+			damping: 0.3,
+			precision: 0.001,
+		},
+		(value) => {
+			const line = lineRef.current;
+			lastLineTransformRef.current.left = value.left;
+			lastLineTransformRef.current.top = value.top;
+			lastLineTransformRef.current.scale = value.scale;
+			if (line) {
+				const { top, left, scale } = value;
+				const isOutOfSight =
+					top > lyricViewSizeRef.current[1] ||
+					top < -selfSizeRef.current[1] ||
+					left > lyricViewSizeRef.current[0] ||
+					left < -selfSizeRef.current[0];
+				if (isOutOfSight) {
+					if (visibilityRef.current !== "hidden") {
+						lineRef.current.style.visibility = "hidden";
+						visibilityRef.current = "hidden";
+					}
 				} else {
-					line.style.transition = "";
+					lineRef.current.style.transform = `translateY(${top}px) translateX(${left}px) scale(${scale})`;
+					if (visibilityRef.current !== "") {
+						lineRef.current.style.visibility = "";
+						visibilityRef.current = "";
+					}
 				}
-				prevTransformUserScrolling.current = lineTransform.userScrolling;
 			}
-			const dest = `translateY(${lineTransform.top.toFixed(
-				3,
-			)}px) translateX(${lineTransform.left.toFixed(
-				3,
-			)}) scale(${lineTransform.scale.toFixed(3)})`;
-			if (lineTransform.userScrolling) {
-				line.style.transform = dest;
-				return () => {
-					prevTransform.current = dest;
-					prevTransformTop.current = lineTransform.top;
-				};
-			} else {
-				let canceled = false;
+		},
+	);
 
-				const animations: Animation[] = [];
-
-				if (lineTransform.duration > 0) {
-					(async () => {
-						const deltaY = lineTransform.top - prevTransformTop.current;
-						const bounceY =
-							Math.min(
-								5,
-								Math.max(
-									(deltaY * 0.01) / (Math.max(1, lineTransform.delay) / 100),
-									-5,
-								),
-							) || 0;
-
-						const bounceTime =
-							deltaY * bounceY === 0
-								? 0
-								: Math.max(
-										0,
-										Math.abs(bounceY / deltaY) * lineTransform.duration,
-								  ) || 0;
-						const animateTime = Math.max(
-							0,
-							lineTransform.duration - bounceTime,
-						);
-
-						const middle =
-							bounceTime < 100 || deltaY === 0
-								? dest
-								: `translateY(${(lineTransform.top + bounceY).toFixed(
-										3,
-								  )}px) translateX(${lineTransform.left.toFixed(
-										3,
-								  )}) scale(${lineTransform.scale.toFixed(3)})`;
-
-						let animation: Animation;
-
-						animation = line.animate(
-							[
-								{
-									transform: prevTransform.current,
-								},
-								{
-									transform: middle,
-								},
-							],
-							{
-								easing: "cubic-bezier(0.46, 0, 0.07, 1)",
-								delay: Math.max(0, lineTransform.delay),
-								duration: Math.max(1, animateTime),
-							},
-						);
-						animations.push(animation);
-						await animation.finished;
-
-						if (canceled) return;
-						if (bounceTime > 0) {
-							animation = line.animate(
-								[
-									{
-										transform: middle,
-									},
-									{
-										transform: dest,
-									},
-								],
-								{
-									easing: "cubic-bezier(0.46, 0, 0.07, 1)",
-									duration: Math.max(1, bounceTime),
-								},
-							);
-							animations.push(animation);
-							await animation.finished;
-
-							if (canceled) return;
-						}
-
-						line.style.transform = dest;
-					})();
-				} else {
-					line.style.transform = dest;
-				}
-
-				return () => {
-					prevTransform.current = dest;
-					prevTransformTop.current = lineTransform.top;
-					canceled = true;
-					animations.forEach((a) => {
-						try {
-							a.finish();
-						} catch {}
-						try {
-							a.cancel();
-						} catch {}
+	React.useEffect(() => {
+		if (!lineTransform.initialized && lineRef.current) {
+			if (visibilityRef.current !== "hidden") {
+				lineRef.current.style.visibility = "hidden";
+				visibilityRef.current = "hidden";
+			}
+		}
+		const { top, left } = lineTransform;
+		const { top: curTop, left: curLeft } = lastLineTransformRef.current;
+		const isTargetOutOfSight =
+			top > lyricViewSizeRef.current[1] ||
+			top < -selfSizeRef.current[1] ||
+			left > lyricViewSizeRef.current[0] ||
+			left < -selfSizeRef.current[0];
+		const currentOutOfSight =
+			curTop > lyricViewSizeRef.current[1] ||
+			curTop < -selfSizeRef.current[1] ||
+			curLeft > lyricViewSizeRef.current[0] ||
+			curLeft < -selfSizeRef.current[0];
+		if (isTargetOutOfSight && currentOutOfSight) {
+			if (visibilityRef.current !== "hidden" && lineRef.current) {
+				lineRef.current.style.visibility = "hidden";
+				visibilityRef.current = "hidden";
+			}
+			springRef.current
+				.set(
+					{
+						top: lineTransform.top,
+						left: lineTransform.left,
+						scale: lineTransform.scale,
+					},
+					{
+						hard: true,
+					},
+				)
+				.then(() => {
+					if (lineRef.current)
+						lineRef.current.style.transform = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}px) scale(${lineTransform.scale})`;
+				});
+		} else {
+			const h = setTimeout(() => {
+				springRef.current
+					.set(
+						{
+							top: lineTransform.top,
+							left: lineTransform.left,
+							scale: lineTransform.scale,
+						},
+						{
+							hard: !lineTransform.initialized,
+						},
+					)
+					.then(() => {
+						if (lineRef.current)
+							lineRef.current.style.transform = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}px) scale(${lineTransform.scale})`;
 					});
-					line.style.transform = dest;
-				};
-			}
+			}, lineTransform.delay);
+			return () => {
+				clearTimeout(h);
+			};
 		}
 	}, [lineTransform]);
 

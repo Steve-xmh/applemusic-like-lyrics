@@ -394,13 +394,11 @@ export function processLyric(lyric: LyricLine[]): LyricLine[] {
 			result.push(thisLyric);
 			const nextLyric = lyric[i + 1];
 			if (thisLyric.dynamicLyric) {
-				const lastWord =
-					thisLyric.dynamicLyric[thisLyric.dynamicLyric.length - 1];
-				if (lastWord) {
-					lastWord.shouldGlow =
-						/^([ 0-9a-zA-Z\.\?\,]+)$/.test(lastWord.word) &&
-						lastWord.duration > 1000;
-				}
+				thisLyric.dynamicLyric.forEach((word) => {
+					word.shouldGlow =
+						word.word.replace(/^([ 0-9a-zA-Z\.\?\,，。？；：]+)$/i, "")
+							.length === 0 && word.duration > 1000;
+				});
 			}
 			if (
 				nextLyric &&

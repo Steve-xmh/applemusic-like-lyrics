@@ -55,7 +55,15 @@ export const LyricDots: React.FC<
 		const dot1el = dot1.current;
 		const dot2el = dot2.current;
 		const dots = dotsRef.current;
-		if (dot0el && dot1el && dot2el && dots && selected && duration >= 5000 && Number.isFinite(duration)) {
+		if (
+			dot0el &&
+			dot1el &&
+			dot2el &&
+			dots &&
+			selected &&
+			duration >= 5000 &&
+			Number.isFinite(duration)
+		) {
 			let stopped = false;
 
 			try {

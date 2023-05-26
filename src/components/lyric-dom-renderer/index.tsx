@@ -18,6 +18,11 @@ import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
 import { eqSet } from "../../utils";
 
+export const LyricRendererContext = React.createContext({
+	lyricPageSize: [0, 0],
+	currentLyrics: [] as LyricLine[],
+});
+
 export interface LyricLineTransform {
 	top: number;
 	left: number;
@@ -25,6 +30,7 @@ export interface LyricLineTransform {
 	duration: number;
 	delay: number;
 	userScrolling?: boolean;
+	initialized: boolean;
 }
 
 export interface LyricLineMeta {
@@ -133,8 +139,7 @@ export const LyricDOMRenderer: React.FC = () => {
 				let scrollHeight = -lineHeights.current
 					.slice(0, Math.max(0, scrollToIndex))
 					.reduce(
-						(pv, cv) =>
-							pv + (cv.isDots || cv.isBGLyric ? 0 : cv.height * scaleRatio),
+						(pv, cv) => pv + (cv.isDots || cv.isBGLyric ? 0 : cv.height),
 						0,
 					);
 
@@ -166,6 +171,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						scale: scaleRatio,
 						duration: duration,
 						delay: mustScroll ? 0 : Math.max(0, Math.min(curDelay, 1000)),
+						initialized: true,
 					};
 					if (
 						scrollHeight > viewHeight.current[1] * 2 ||
@@ -181,7 +187,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						(isPrevDots ? i > 0 : true) &&
 						lastLyricTransform.current[i]?.top !== lineTransform.top
 					) {
-						curDelay += 100;
+						curDelay += 50;
 					}
 					if (
 						i === scrollToIndex ||
@@ -193,13 +199,12 @@ export const LyricDOMRenderer: React.FC = () => {
 							lineHeights.current[i].isDots ||
 							lineHeights.current[i].isBGLyric
 						) {
-							scrollHeight +=
-								lineHeights.current[i].height * lineTransform.scale;
+							scrollHeight += lineHeights.current[i].height;
 						}
 					}
 					i++;
 					if (!(height.isDots || height.isBGLyric)) {
-						scrollHeight += height.height * lineTransform.scale;
+						scrollHeight += height.height;
 					}
 					result.push(lineTransform);
 				}
@@ -416,6 +421,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						left: v.left,
 						scale: v.scale,
 						userScrolling: true,
+						initialized: true,
 					}));
 				});
 				return false;
@@ -436,6 +442,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			scale: 1,
 			duration: 750,
 			delay: 0,
+			initialized: true,
 		};
 		if (lineTransforms.length > 0) {
 			const lastLineTransform = lineTransforms[lineTransforms.length - 1];
@@ -447,85 +454,98 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, [lineTransforms]);
 
 	return (
-		<div
-			className={classname("am-lyric-view", {
-				"am-lyric-pause-all": playState === PlayState.Pausing,
-			})}
+		<LyricRendererContext.Provider
+			value={{
+				lyricPageSize: viewHeight.current,
+				currentLyrics: currentLyrics ?? [],
+			}}
 		>
-			<div ref={lyricListElement}>
-				{currentLyrics?.map(
-					(line: LyricLine, index: number, _lines: LyricLine[]) => {
-						const offset = index - firstLyricIndex;
-						if (line.originalLyric.trim().length > 0) {
-							return (
-								<LyricLineView
-									key={`${index}-${line.beginTime}-${line.originalLyric}`}
-									lineTransform={
-										lineTransforms[index] ??
-										({
-											top: 10000,
-											left: 0,
-											scale: 1,
-											duration: 0,
-											delay: 0,
-											opacity: 0,
-										} as LyricLineTransform)
-									}
-									onSizeChanged={() =>
-										requestAnimationFrame(recalculateLineHeights)
-									}
-									selected={cachedLyricIndexes.has(index)}
-									line={line}
-									translated={configTranslatedLyric}
-									dynamic={configDynamicLyric}
-									roman={configRomanLyric}
-									offset={offset}
-									onClickLyric={onSeekToLyric}
-								/>
-							);
-						} else {
-							return (
-								<LyricDots
-									onSizeChanged={() =>
-										requestAnimationFrame(recalculateLineHeights)
-									}
-									key={`${index}-dots`}
-									lineTransform={
-										lineTransforms[index] ??
-										({
-											top: 10000,
-											left: 0,
-											scale: 1,
-											duration: 0,
-											delay: 0,
-											opacity: 0,
-										} as LyricLineTransform)
-									}
-									selected={cachedLyricIndexes.has(index)}
-									time={line.beginTime}
-									offset={offset}
-									duration={line.duration}
-								/>
-							);
-						}
-					},
-				)}
-				<div
-					className="am-lyric-credits"
-					style={{
-						transform: `translateY(${creditLineTransform.top}px) translateX(${creditLineTransform.left}) scale(${creditLineTransform.scale})`,
-						transition: `all ${creditLineTransform.duration}ms cubic-bezier(0.46, 0, 0.07, 1) ${creditLineTransform.delay}ms`,
-					}}
-				>
-					<div>创作者：{songArtists.map((v) => v.name).join(", ")}</div>
-					{currentRawLyricResp.lyricUser && (
-						<div>原文歌词贡献者：{currentRawLyricResp.lyricUser.nickname}</div>
+			<div
+				className={classname("am-lyric-view", {
+					"am-lyric-pause-all": playState === PlayState.Pausing,
+				})}
+			>
+				<div ref={lyricListElement}>
+					{currentLyrics?.map(
+						(line: LyricLine, index: number, _lines: LyricLine[]) => {
+							const offset = index - firstLyricIndex;
+							if (line.originalLyric.trim().length > 0) {
+								return (
+									<LyricLineView
+										key={`${index}-${line.beginTime}-${line.originalLyric}`}
+										lineTransform={
+											lineTransforms[index] ??
+											({
+												top: 10000,
+												left: 0,
+												scale: 1,
+												duration: 0,
+												delay: 0,
+												opacity: 0,
+												initialized: false,
+											} as LyricLineTransform)
+										}
+										onSizeChanged={() =>
+											requestAnimationFrame(recalculateLineHeights)
+										}
+										selected={cachedLyricIndexes.has(index)}
+										line={line}
+										translated={configTranslatedLyric}
+										dynamic={configDynamicLyric}
+										roman={configRomanLyric}
+										offset={offset}
+										onClickLyric={onSeekToLyric}
+									/>
+								);
+							} else {
+								return (
+									<LyricDots
+										onSizeChanged={() =>
+											requestAnimationFrame(recalculateLineHeights)
+										}
+										key={`${index}-dots`}
+										lineTransform={
+											lineTransforms[index] ??
+											({
+												top: 10000,
+												left: 0,
+												scale: 1,
+												duration: 0,
+												delay: 0,
+												opacity: 0,
+												initialized: false,
+											} as LyricLineTransform)
+										}
+										selected={cachedLyricIndexes.has(index)}
+										time={line.beginTime}
+										offset={offset}
+										duration={line.duration}
+									/>
+								);
+							}
+						},
 					)}
-					{currentRawLyricResp.transUser && (
-						<div>翻译歌词贡献者：{currentRawLyricResp.transUser.nickname}</div>
-					)}
+					<div
+						className="am-lyric-credits"
+						style={{
+							transform: `translateY(${creditLineTransform.top}px) translateX(${creditLineTransform.left}) scale(${creditLineTransform.scale})`,
+							transition: `all ${creditLineTransform.duration}ms cubic-bezier(0.46, 0, 0.07, 1) ${creditLineTransform.delay}ms`,
+						}}
+					>
+						<div>创作者：{songArtists.map((v) => v.name).join(", ")}</div>
+						{currentRawLyricResp.lyricUser && (
+							<div>
+								原文歌词贡献者：{currentRawLyricResp.lyricUser.nickname}
+							</div>
+						)}
+						{currentRawLyricResp.transUser && (
+							<div>
+								翻译歌词贡献者：{currentRawLyricResp.transUser.nickname}
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
-		</div>
+		</LyricRendererContext.Provider>
 	);
 };
