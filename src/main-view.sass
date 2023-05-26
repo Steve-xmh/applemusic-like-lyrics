@@ -12,6 +12,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     margin: 0 5%
     padding: 60px 0
     z-index: 1
+    line-height: normal
 
     svg
         width: unset
@@ -337,13 +338,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     &.lyric-fixed-font-size
         .am-lyric-line
             font-size: max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px))
-        // .am-lyric-dots
-        //     &.am-lyric-dots-selected > *
-        //         height: min(30px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 2.5))
-        //     > * > *
-        //         margin-right: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 0.8333333333))
-        //         width: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
-        //         height: min(20px, calc(max(8px, var(--applemusic-like-lyrics-lyric-font-size, 16px)) * 1.25))
 
     &.hide-lyric-info-border
         .am-lyric-credits
@@ -477,7 +471,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                     $mask-img: linear-gradient(to right, #000 $i * 1%, rgba(0, 0, 0, 0.5) ($i + $fade-width) * 1%)
                     -webkit-mask-image: $mask-img
                     mask-image: $mask-img
-                    transform: translateY(calc(-2px * ($i + $fade-width) / (100 + $fade-width)))
 
     .am-lyric-dots
         position: absolute

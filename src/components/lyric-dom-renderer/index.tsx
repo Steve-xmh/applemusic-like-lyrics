@@ -187,7 +187,7 @@ export const LyricDOMRenderer: React.FC = () => {
 						(isPrevDots ? i > 0 : true) &&
 						lastLyricTransform.current[i]?.top !== lineTransform.top
 					) {
-						curDelay += 50;
+						curDelay += 75;
 					}
 					if (
 						i === scrollToIndex ||

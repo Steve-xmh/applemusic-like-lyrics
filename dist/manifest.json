@@ -10,7 +10,7 @@
 	"description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
 	"preview": "preview.svg",
 	"version": "2.0.2",
-	"commit": "da9a9b7a1723a56b824b916920fa6a96ee46c00e",
+	"commit": "3b7b88c1cd9d142ac5a67e6517179261a352528f",
 	"type": "extension",
 	"noDevReload": true,
 	"incompatible": [

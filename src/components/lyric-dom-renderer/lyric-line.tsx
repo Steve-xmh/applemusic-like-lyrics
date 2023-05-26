@@ -6,20 +6,56 @@ import { LyricLine } from "../../core/lyric-parser";
 import { rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
 import type { DynamicLyricWord } from "../../core/lyric-types";
-import { Spring } from "../../utils/spring";
 import { useSpring } from "../../utils/spring-svelte";
-import { log } from "../../utils/logger";
+import { warn } from "../../utils/logger";
 
 const LyricWord: React.FC<{
 	word: DynamicLyricWord;
 	delay: number;
 	index: number;
-}> = ({ word, delay, index }) => {
+	selected: boolean;
+}> = ({ word, delay, index, selected }) => {
+	const duration = Math.max(1000, Math.min(2500, word.duration));
+	const letters = React.useMemo(() => word.word.split(""), [word.word]);
+	const letterDuration = duration / letters.length / 2;
+	const floatDuration = Math.max(1000, word.duration);
+	const wordRef = React.useRef<HTMLSpanElement>(null);
+	const wordAnimationRef = React.useRef<Animation>();
+	React.useLayoutEffect(() => {
+		if (!wordAnimationRef.current && wordRef.current) {
+			try {
+				const a = wordRef.current.animate(
+					[
+						{
+							transform: "translateY(0px)",
+						},
+						{
+							transform: "translateY(-2px)",
+						},
+					],
+					{
+						duration: floatDuration,
+						delay,
+						fill: "both",
+					},
+				);
+				a.pause();
+				wordAnimationRef.current = a;
+			} catch (err) {
+				warn("应用单词悬浮动画失败", err);
+			}
+		}
+	}, [floatDuration]);
+	React.useLayoutEffect(() => {
+		if (wordRef.current && wordAnimationRef.current) {
+			if (selected) {
+				wordAnimationRef.current.play();
+			} else {
+				wordAnimationRef.current.reverse();
+			}
+		}
+	}, [wordRef.current, selected, wordAnimationRef.current]);
 	if (word.shouldGlow) {
-		const duration = Math.max(1000, Math.min(2500, word.duration));
-		const letters = React.useMemo(() => word.word.split(""), [word.word]);
-		const letterDuration = duration / letters.length / 2;
-
 		return (
 			<span
 				className="am-lyric-glow-word"
@@ -48,23 +84,13 @@ const LyricWord: React.FC<{
 					animationDelay: `${delay}ms`,
 					animationDuration: `${word.duration}ms`,
 				}}
+				ref={wordRef}
 			>
 				{word.word}
 			</span>
 		);
 	}
 };
-
-// const useSpring = (init: number, damper: number, speed: number) => {
-// 	const sprRef = React.useRef<Spring>() as React.MutableRefObject<Spring>;
-// 	if (!sprRef.current) {
-// 		const spring = new Spring(init);
-// 		spring.damper = damper;
-// 		spring.speed = speed;
-// 		sprRef.current = spring;
-// 	}
-// 	return sprRef;
-// };
 
 export const LyricLineView: React.FC<
 	{
@@ -140,8 +166,8 @@ export const LyricLineView: React.FC<
 			scale: lineTransform.scale,
 		},
 		{
-			stiffness: 0.023,
-			damping: 0.3,
+			stiffness: 0.1,
+			damping: 1,
 			precision: 0.001,
 		},
 		(value) => {
@@ -222,6 +248,7 @@ export const LyricLineView: React.FC<
 						},
 						{
 							hard: !lineTransform.initialized,
+							soft: 0.5,
 						},
 					)
 					.then(() => {
@@ -262,13 +289,14 @@ export const LyricLineView: React.FC<
 				{dynamic &&
 				line.dynamicLyric &&
 				line.dynamicLyricTime &&
-				(selected || forceDynamic || Math.abs(offset) < 5) ? (
+				(selected || forceDynamic || Math.abs(offset) < 20) ? (
 					<div className="am-lyric-line-dynamic">
 						{line.dynamicLyric.map((word, i) => (
 							<LyricWord
 								word={word}
 								delay={word.time - (line.dynamicLyricTime || 0)}
 								index={i}
+								selected={selected}
 							/>
 						))}
 					</div>
