@@ -6,11 +6,12 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     white-space: nowrap
     text-overflow: ellipsis
 @mixin applemusic-like-lyrics-view-style()
-    display: flex
-    height: calc(100% - 120px)
-    width: 90%
-    margin: 0 5%
-    padding: 60px 0
+    display: grid
+    grid-template-areas: "info lyrics"
+    grid-template-columns: 0.75fr 1fr
+    grid-template-rows: auto
+    height: 100%
+    width: 100%
     z-index: 1
     line-height: normal
 
@@ -37,18 +38,15 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         height: 5vh
         width: 100%
         display: flex
-        filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
+        // filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
 
     .am-lyric-background
         z-index: -1
-        position: fixed
-        left: 0
-        right: 0
-        top: 0
-        bottom: 0
-        width: 100vw
-        height: 100vh
+        display: contents
+        overflow: hidden
         transition: background-image 1s ease-in-out
+        > svg
+            position: absolute
         &.am-lyric-bg-album-image
             .am-lyric-bg-album-image-animated-0
                 animation: am-lyric-bg-album-image-animated-0 15s linear infinite
@@ -83,9 +81,9 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         line-height: 150%
 
     .am-player-song-info
-        flex: 0.75
+        grid-area: info
         height: 100%
-        padding-right: 5vw
+        padding: 0 5vw
         z-index: 2
         display: flex
         flex-direction: column
@@ -119,6 +117,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 aspect-ratio: 1 / 1
                 object-fit: cover
         .am-music-quality
+            mix-blend-mode: luminosity
             display: flex
             flex-direction: row
             justify-content: center
@@ -130,6 +129,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 fill: white
         > .am-music-sub-widget
             flex: 0
+            mix-blend-mode: luminosity
             > .am-music-info-with-menu
                 font-size: 200%
                 font-weight: 1000
@@ -153,8 +153,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 > .am-music-info
                     flex: 1
                     transition: flex 0.5s ease-out
-                    filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
-                    mix-blend-mode: soft-light
+                    // filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
                     width: calc(100% - 50px)
                     height: fit-content
                     min-width: 0
@@ -202,7 +201,6 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                                 &:last-child::after
                                     content: ""
             > .am-music-progress-control
-                mix-blend-mode: soft-light
                 display: flex
                 flex-direction: column
                 margin-top: 16px
@@ -223,7 +221,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         > .am-music-controls
             display: flex
             justify-content: space-between
-            mix-blend-mode: soft-light
+            mix-blend-mode: luminosity
             > .am-music-track-btn
                 opacity: 0.5
             > .am-music-track-prev,
@@ -245,9 +243,10 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 &:nth-child(2)
                     flex: 1
     .am-lyric
-        flex: 1
         z-index: 2
         display: flex
+        mix-blend-mode: luminosity
+        grid-area: lyrics
         flex-direction: column
         // 鼠标悬浮时显示所有歌词
         &:hover .am-lyric-line
@@ -283,7 +282,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         overflow-y: hidden
         -webkit-mask-image: linear-gradient(#0000, #000 5%, #000 95%, #0000)
         // filter: drop-shadow(0 0 var(--applemusic-like-lyrics-font-shadow-size, 2px) #0004)
-        filter: drop-shadow(0 0 0 #0004)
+        // filter: drop-shadow(0 0 0 #0004)
         box-sizing: content-box
         &.am-lyric-pause-all
             *
@@ -510,7 +509,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 width: max(0.5rem, 1vh)
                 height: max(0.5rem, 1vh)
                 background-color: var(--applemusic-like-lyrics-font-color, white)
-                box-shadow: 0 2px 5px #0008
+                // box-shadow: 0 2px 5px #0008
                 border-radius: 50%
 
         &.am-lyric-dots-selected
