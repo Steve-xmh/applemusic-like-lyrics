@@ -35,7 +35,7 @@ export const SongInfoTextMarquee: React.FC<React.PropsWithChildren> = (
 					iterations: 2,
 					direction: "alternate",
 					easing: "linear",
-					duration: Math.max(0, ((distance * 2) / 32) * 1000),
+					duration: Math.max(0, ((distance * 2) / 64) * 1000),
 				},
 			);
 

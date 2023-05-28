@@ -23,6 +23,15 @@ const BG_RENDERER_METHOD_DATA: BGRendererMethodData[] = [
 		...BlurAlbumMethod,
 	},
 	{
+		icon: () => <IconDisc />,
+		label: "动态模糊专辑图片效果",
+		description: "仅显示模糊的专辑图片并缓缓移动",
+		value: "blur-animated-album",
+		fragmentShaderCode: "",
+		afterDrawArray() {},
+		configurableUniforms: [""],
+	},
+	{
 		icon: () => <IconRipple />,
 		...FBMWaveMethod,
 	},
