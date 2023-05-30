@@ -1,6 +1,7 @@
 $tween-animation-duration: 500ms
 $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
-
+$global-mix-blend-mode: plus-lighter // luminosity
+    
 @mixin text-overflow-ellipsis()
     overflow: hidden
     white-space: nowrap
@@ -117,7 +118,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 aspect-ratio: 1 / 1
                 object-fit: cover
         .am-music-quality
-            mix-blend-mode: luminosity
+            mix-blend-mode: $global-mix-blend-mode
             display: flex
             flex-direction: row
             justify-content: center
@@ -129,7 +130,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
                 fill: white
         > .am-music-sub-widget
             flex: 0
-            mix-blend-mode: luminosity
+            mix-blend-mode: $global-mix-blend-mode
             > .am-music-info-with-menu
                 font-size: 200%
                 font-weight: 1000
@@ -221,7 +222,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
         > .am-music-controls
             display: flex
             justify-content: space-between
-            mix-blend-mode: luminosity
+            mix-blend-mode:  $global-mix-blend-mode
             > .am-music-track-btn
                 opacity: 0.5
             > .am-music-track-prev,
@@ -245,7 +246,7 @@ $tween-animation-timing: cubic-bezier(0.46, 0, 0.07, 1)
     .am-lyric
         z-index: 2
         display: flex
-        mix-blend-mode: luminosity
+        mix-blend-mode: $global-mix-blend-mode
         grid-area: lyrics
         flex-direction: column
         // 鼠标悬浮时显示所有歌词
