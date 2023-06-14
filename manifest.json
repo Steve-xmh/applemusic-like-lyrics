@@ -31,6 +31,12 @@
                 "id": "csp-worker",
                 "from": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src ",
                 "to": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src data: blob: "
+            },
+            "orpheus://orpheus/pub/hybrid/vendors": {
+                "type": "replace",
+                "id": "redux-dispatch-hook",
+                "from": "\"sagaEffects.put\"),",
+                "to": "\"sagaEffects.put\"),window?.amllDispatchHook?.(n),"
             }
         }
     }

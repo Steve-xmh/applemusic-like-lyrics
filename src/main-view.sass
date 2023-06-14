@@ -43,6 +43,12 @@ $global-mix-blend-mode: plus-lighter // luminosity
 
     .am-lyric-background
         z-index: -1
+        position: fixed
+        left: -5px
+        top: -5px
+        width: calc(100% + 10px)
+        height: calc(100% + 10px)
+        filter: blur(5px)
         display: contents
         overflow: hidden
         transition: background-image 1s ease-in-out
@@ -91,6 +97,8 @@ $global-mix-blend-mode: plus-lighter // luminosity
         align-items: center
         justify-content: space-around
         color: var(--applemusic-like-lyrics-font-color, unset)
+        button
+            cursor: pointer
         > *
             width: min(50vh, 40vw)
             align-self: center
@@ -192,6 +200,7 @@ $global-mix-blend-mode: plus-lighter // luminosity
                                 line-height: normal
                                 user-select: text
                                 color: var(--applemusic-like-lyrics-font-color, unset)
+                                text-decoration: none
                                 &:hover
                                     opacity: 0.75
                                 &:active

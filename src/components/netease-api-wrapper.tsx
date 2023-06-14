@@ -197,7 +197,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			})();
 			return () => {
 				canceled = true;
-				setCurrentLyrics(null);
+				// setCurrentLyrics(null);
 			};
 		}
 	}, [musicId, lyricForceReload, isLyricPageOpening, isFMPageOpening]);

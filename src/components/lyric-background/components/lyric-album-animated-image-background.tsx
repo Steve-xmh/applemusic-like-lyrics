@@ -33,11 +33,6 @@ export const LyricAlbumAnimatedImageBackground: React.FC = () => {
 		<div
 			className="am-lyric-background am-lyric-bg-album-image"
 			style={{
-				position: "fixed",
-				left: "0",
-				top: "0",
-				width: "100%",
-				height: "100%",
 				color: "yellow",
 				backgroundImage: `url(${currentBG})`,
 				backgroundPosition: "center",

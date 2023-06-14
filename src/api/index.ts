@@ -2,6 +2,7 @@ import { log, warn } from "../utils/logger";
 import { isNCMV3, genRandomString, normalizePath } from "../utils";
 import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
+import { songInfoPayload } from "../utils/page-injector/v3";
 const cachedFunctionMap: Map<string, Function> = new Map();
 
 export enum PlayState {
@@ -178,22 +179,9 @@ export async function getLyricCorrection(
  */
 export function getPlayingSong() {
 	if (isNCMV3()) {
-		const footer = document.querySelector("footer > div");
-		const pagePCMiniBarLog = JSON.parse(
-			footer?.getAttribute("data-log") || "{}",
-		);
 		return {
-			state: 2,
-			data: {
-				id: pagePCMiniBarLog?.params?.s_cid,
-				name: footer?.querySelector(".title > span:nth-child(1)")?.innerHTML,
-				album: {
-					picUrl: footer
-						?.querySelector(".cmd-image[data-src]")
-						?.getAttribute("data-src")
-						?.replace(/\?.*/, ""),
-				},
-			},
+			state: songInfoPayload?.playingState ?? 2,
+			data: songInfoPayload?.trackIn?.track,
 		};
 	} else if (APP_CONF.isOSX) {
 		return callCachedSearchFunction("baD", []);

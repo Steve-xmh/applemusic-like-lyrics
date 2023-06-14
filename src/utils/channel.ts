@@ -1,4 +1,4 @@
-import { log } from "./logger";
+import { log, warn } from "./logger";
 
 const registeredEvt = new Set<string>();
 const callbacks = new Map<string, Set<Function>>();
@@ -6,7 +6,11 @@ const callbacks = new Map<string, Set<Function>>();
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
 const onRegisterCallEvent = (name: string, args: any[]) => {
 	for (const callback of callbacks.get(name) ?? []) {
-		callback(...args);
+		try {
+			callback(...args);
+		} catch (err) {
+			warn("[AMLL] 处理原生回调时发生错误", err);
+		}
 	}
 };
 

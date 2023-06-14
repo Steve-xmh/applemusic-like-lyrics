@@ -12,6 +12,7 @@ import {
 import { SwitchConfigComponent } from "./config-components";
 import { Button } from "../components/appkit/button";
 import { GroupBox } from "../components/appkit/group-box";
+import { isNCMV3 } from "../utils";
 
 export const AboutPage: React.FC = () => {
 	const latestVersion = useLatestVersion();
@@ -20,7 +21,7 @@ export const AboutPage: React.FC = () => {
 	const enableUpdateBranch = useConfigValueBoolean("enableUpdateBranch", false);
 	const installableBranch = useInstallableBranches();
 	const [updating, setUpdating] = React.useState(false);
-	const isMRBNCM = React.useMemo(() => betterncm.isMRBNCM ?? false, []);
+	const isMRBNCM = React.useMemo(() => betterncm.isMRBNCM ?? isNCMV3(), []);
 	return (
 		<div className="amll-about">
 			<div className="amll-icon">

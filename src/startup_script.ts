@@ -14,3 +14,11 @@ channel.call = function AppleMusicLikeLyricCallHook(
 		return hookCall.apply(hookCall, [cmd, ...args]);
 	}
 };
+
+channel.registerCall = function AppleMusicLikeLyricRegisterCallHook(
+	cmd: string,
+	callback: Function,
+) {
+	log(cmd, [callback]);
+	return hookRegisterCall.apply(hookRegisterCall, [cmd, callback]);
+};

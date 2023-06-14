@@ -152,10 +152,26 @@
         top: 100vh
         border-radius: 16px 16px 0 0
         z-index: 998
-        transition: top 0.5s cubic-bezier(0.1,0.9,0.2,1), border-radius 0.25s ease-in-out
+        transition: top 0.5s cubic-bezier(0.8,0,0.1,1), border-radius 0.25s ease-in-out
+        background: var(--colorFunction3)
+        -webkit-backdrop-filter: blur(120px)
+        backdrop-filter: blur(120px)
+
+#amll-view-button
+    border: none
+    background: transparent
+    padding: 0
+    line-height: 0
+    cursor: pointer
+    fill: var(--colorBlack5)
+    &:hover
+        fill: var(--colorBlack3)
 
 footer
-    transition: bottom 0.5s cubic-bezier(0.1,0.9,0.2,1)
+    transition: bottom 0.5s cubic-bezier(0.8,0,0.1,1)
+    > * > * > *
+        transition: opacity 0.5s 0.5s ease-in-out
+        opacity: 1
 
 // 播放栏透明 + 模糊遮罩
 .m-player.z-shadow
@@ -239,6 +255,9 @@ header, .m-winctrl
 body.amll-lyric-page-open
     footer
         bottom: 100%
+        > * > * > *
+            transition: opacity 0.25s ease-in-out
+            opacity: 0
     #applemusic-like-lyrics-view.ncm-v3
         top: 0vh
         border-radius: 0 0 0 0

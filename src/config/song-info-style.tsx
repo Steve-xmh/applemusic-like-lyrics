@@ -7,6 +7,7 @@ import {
 	SwitchConfigComponent,
 	TextConfigComponent,
 } from "./config-components";
+import { isNCMV3 } from "../utils";
 
 const fftWeightingMethodData = [
 	{
@@ -103,7 +104,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 		},
 	];
 
-	if (betterncm.isMRBNCM) {
+	if (betterncm.isMRBNCM || isNCMV3()) {
 		widgetUnderProgressBarData.push({
 			label: "音频可视化 - 频谱",
 			value: "audio-viz-fft",
@@ -136,6 +137,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 				<SwitchConfigComponent
 					settingKey="hideMenuButton"
 					label="隐藏菜单按钮"
+					description="隐藏后，你依然可以通过右键左侧任意位置打开菜单"
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent

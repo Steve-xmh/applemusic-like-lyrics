@@ -13,8 +13,16 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 	} as unknown as T;
 }
 
-export const isNCMV3 = () =>
-	!semverLt(APP_CONF.appver.split(".").slice(0, 3).join("."), "3.0.0");
+let IS_NCMV3: boolean;
+export const isNCMV3 = () => {
+	if (typeof IS_NCMV3 === "undefined") {
+		IS_NCMV3 = !semverLt(
+			APP_CONF.appver.split(".").slice(0, 3).join("."),
+			"3.0.0",
+		);
+	}
+	return IS_NCMV3;
+};
 
 /* eslint-disable max-depth, max-statements, complexity, max-lines-per-function */
 const SLASH = 47;
