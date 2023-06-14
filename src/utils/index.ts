@@ -1,3 +1,5 @@
+import semverLt from "semver/functions/lt";
+
 export function debounce<T extends Function>(callback: T, waitTime: number): T {
 	let timer = 0;
 	return function debounceClosure() {
@@ -10,6 +12,9 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 		timer = setTimeout(callback.bind(self, args), waitTime);
 	} as unknown as T;
 }
+
+export const isNCMV3 = () =>
+	!semverLt(APP_CONF.appver.split(".").slice(0, 3).join("."), "3.0.0");
 
 /* eslint-disable max-depth, max-statements, complexity, max-lines-per-function */
 const SLASH = 47;

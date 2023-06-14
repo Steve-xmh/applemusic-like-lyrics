@@ -47,6 +47,7 @@ interface EAPILyricResponse extends EAPIResponse {
 declare namespace channel {
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	export function call(command: string, callback: Function, args: any[]);
+	export function registerCall(name: string, callback: Function);
 	export function encryptId(data: string): string;
 }
 type NCMInjectPlugin = import("plugin").NCMInjectPlugin;

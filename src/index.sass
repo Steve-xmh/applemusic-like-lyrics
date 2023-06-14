@@ -146,7 +146,14 @@
 
 #applemusic-like-lyrics-view
     @include applemusic-like-lyrics-view-style
-
+    &.ncm-v3
+        position: fixed
+        left: 0
+        top: 100vh
+        border-radius: 16px 16px 0 0
+        z-index: 998
+        transition: top 0.5s cubic-bezier(0.1,0.9,0.2,1), border-radius 0.25s ease-in-out
+    
 // 播放栏透明 + 模糊遮罩
 .m-player.z-shadow
     background: transparent !important
@@ -227,7 +234,24 @@ header, .m-winctrl
     display: none
 
 body.amll-lyric-page-open
+    #applemusic-like-lyrics-view.ncm-v3
+        top: 0vh
+        border-radius: 0 0 0 0
     header
+        .HeaderRow_h1n2o69r
+            grid-template-columns: unset
+            display: flex
+            flex-direction: row-reverse
+            .HistoryIconBackground_h1s4i8hh
+                display: none
+            .DomWarpper_dwvx1li
+                display: none
+            .Bar_b2jgnke
+                display: none
+            .IconBar_i1ueu1yn
+                flex: 0
+                .MiniModeIconBar_m1jn0mly, .Divider_d1jt85zx
+                    display: none
         .m-leftbox
             justify-content: flex-end
         .m-topbox, .msg, .itm2

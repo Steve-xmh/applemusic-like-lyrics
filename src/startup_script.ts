@@ -1,6 +1,7 @@
 import { log } from "./utils/logger";
 
 const hookCall = channel.call;
+const hookRegisterCall = channel.registerCall;
 
 channel.call = function AppleMusicLikeLyricCallHook(
 	cmd: string,

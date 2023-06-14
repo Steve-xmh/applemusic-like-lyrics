@@ -51,6 +51,7 @@ import {
 import { error, log, warn } from "../utils/logger";
 import { LyricEditorWSClient } from "../core/editor-client";
 import { eqSet, getCurrentPlayMode, PlayMode } from "../utils";
+import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
 
 export const NCMEnvWrapper: React.FC = () => {
 	const [playState, setPlayState] = useAtom(playStateAtom);
@@ -332,12 +333,8 @@ export const NCMEnvWrapper: React.FC = () => {
 			setPlayVolume(volume);
 		};
 
-		legacyNativeCmder.appendRegisterCall(
-			"Volume",
-			"audioplayer",
-			onVolumeChanged,
-		);
-		// legacyNativeCmder._envAdapter.callAdapter("audioplayer.setVolume", () => {}, [])
+		appendRegisterCall("Volume", "audioplayer", onVolumeChanged);
+		// _envAdapter.callAdapter("audioplayer.setVolume", () => {}, [])
 		try {
 			const nmSettings = JSON.parse(
 				localStorage.getItem("NM_SETTING_PLAYER") ?? "{}",
@@ -365,11 +362,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		} catch {}
 
 		return () => {
-			legacyNativeCmder.removeRegisterCall(
-				"Volume",
-				"audioplayer",
-				onVolumeChanged,
-			);
+			removeRegisterCall("Volume", "audioplayer", onVolumeChanged);
 		};
 	}, []);
 
@@ -498,6 +491,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		}
 
 		const onLoad = (audioId: string, info: AudioLoadInfo) => {
+			log(info);
 			setCurrentAudioDuration(((info?.duration || 0) * 1000) | 0);
 			setCurrentAudioId(audioId);
 			setPlayingSongData(getPlayingSong());
@@ -513,33 +507,17 @@ export const NCMEnvWrapper: React.FC = () => {
 		};
 
 		setIntervalGetSongData();
-		legacyNativeCmder.appendRegisterCall(
-			"PlayProgress",
-			"audioplayer",
-			onPlayProgress,
-		);
-		legacyNativeCmder.appendRegisterCall(
-			"PlayState",
-			"audioplayer",
-			onPlayStateChange,
-		);
-		legacyNativeCmder.appendRegisterCall("Load", "audioplayer", onLoad);
-		legacyNativeCmder.appendRegisterCall("End", "audioplayer", onEnd);
+		appendRegisterCall("PlayProgress", "audioplayer", onPlayProgress);
+		appendRegisterCall("PlayState", "audioplayer", onPlayStateChange);
+		appendRegisterCall("Load", "audioplayer", onLoad);
+		appendRegisterCall("End", "audioplayer", onEnd);
 
 		// log("歌词页面已打开，已挂载进度事件");
 		return () => {
-			legacyNativeCmder.removeRegisterCall(
-				"PlayProgress",
-				"audioplayer",
-				onPlayProgress,
-			);
-			legacyNativeCmder.removeRegisterCall(
-				"PlayState",
-				"audioplayer",
-				onPlayStateChange,
-			);
-			legacyNativeCmder.removeRegisterCall("Load", "audioplayer", onLoad);
-			legacyNativeCmder.removeRegisterCall("End", "audioplayer", onEnd);
+			removeRegisterCall("PlayProgress", "audioplayer", onPlayProgress);
+			removeRegisterCall("PlayState", "audioplayer", onPlayStateChange);
+			removeRegisterCall("Load", "audioplayer", onLoad);
+			removeRegisterCall("End", "audioplayer", onEnd);
 			clearInterval(onIntervalGettingSongData);
 			// log("进度事件已解除挂载");
 		};

@@ -35,6 +35,8 @@ import {
 import { getLyricCachePath, setClipboardData } from "../api";
 import { WindowedConfigComponent } from "../config";
 import exportTTMLText from "../core/ttml-writer";
+import { isNCMV3 } from "../utils";
+import { GLOBAL_EVENTS } from "../utils/global-events";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
@@ -467,6 +469,20 @@ const MainMenu: React.FC<{
 					setMenuOpened(false);
 				}}
 			/>
+			{isNCMV3() && (
+				<>
+					<MenuDevider />
+					<MenuItem
+						label="退出歌词页面"
+						onClick={() => {
+							GLOBAL_EVENTS.dispatchEvent(
+								new Event("lyric-page-hide", undefined),
+							);
+							setMenuOpened(false);
+						}}
+					/>
+				</>
+			)}
 		</Menu>
 	);
 };

@@ -1,5 +1,5 @@
 import { log, warn } from "../utils/logger";
-import { genRandomString, normalizePath } from "../utils";
+import { isNCMV3, genRandomString, normalizePath } from "../utils";
 import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 const cachedFunctionMap: Map<string, Function> = new Map();
@@ -177,7 +177,25 @@ export async function getLyricCorrection(
  * @returns 当前歌曲的播放信息
  */
 export function getPlayingSong() {
-	if (APP_CONF.isOSX) {
+	if (isNCMV3()) {
+		const footer = document.querySelector("footer > div");
+		const pagePCMiniBarLog = JSON.parse(
+			footer?.getAttribute("data-log") || "{}",
+		);
+		return {
+			state: 2,
+			data: {
+				id: pagePCMiniBarLog?.params?.s_cid,
+				name: footer?.querySelector(".title > span:nth-child(1)")?.innerHTML,
+				album: {
+					picUrl: footer
+						?.querySelector(".cmd-image[data-src]")
+						?.getAttribute("data-src")
+						?.replace(/\?.*/, ""),
+				},
+			},
+		};
+	} else if (APP_CONF.isOSX) {
 		return callCachedSearchFunction("baD", []);
 	} else {
 		return callCachedSearchFunction("getPlaying", []);

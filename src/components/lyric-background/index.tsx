@@ -223,10 +223,7 @@ const LyricCanvasBackground: React.FC = () => {
 	);
 };
 
-const speratedBackgroundMethods = [
-	"blur-album",
-	"blur-animated-album",
-]
+const speratedBackgroundMethods = ["blur-album", "blur-animated-album"];
 
 export const LyricBackground: React.FC = () => {
 	const backgroundRenderMethod = useConfigValue(

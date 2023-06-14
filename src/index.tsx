@@ -8,110 +8,18 @@ import * as React from "react";
 import { MantineProvider, createStyles, Title } from "@mantine/core";
 import { getConfig, getFullConfig, initConfig } from "./config/core";
 import { currentWorkerScript, restartWorker } from "./worker";
+import semverLt from "semver/functions/lt";
 
 export let cssContent = "";
 
 const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 
-export let mainViewElement: HTMLDivElement = document.createElement("div");
-mainViewElement.id = "applemusic-like-lyrics-view";
-let mainViewRoot: Root;
-export let fmViewElement: HTMLDivElement = document.createElement("div");
-fmViewElement.id = "applemusic-like-lyrics-view-fm";
-let fmViewRoot: Root;
-
-class ErrorBoundary extends React.Component<
-	{
-		children: React.ReactNode;
-	},
-	{
-		hasError: boolean;
-		error?: Error;
-	}
-> {
-	constructor(props) {
-		super(props);
-		this.state = { hasError: false };
-	}
-
-	static getDerivedStateFromError(error: Error) {
-		return { hasError: true, error: error };
-	}
-
-	componentDidCatch(error, errorInfo) {
-		warn(error, errorInfo);
-	}
-
-	render() {
-		if (this.state.hasError) {
-			// You can render any custom fallback UI
-			return (
-				<div className="amll-error-boundary">
-					<Title order={2}>哦不，出大事情了</Title>
-					<div>发生了不可恢复的错误，给作者送 Issue 吧（</div>
-					<pre>{this.state.error?.name}</pre>
-					<pre>{this.state.error?.message}</pre>
-					<pre>{this.state.error?.stack}</pre>
-				</div>
-			);
-		}
-
-		return this.props.children;
-	}
-}
-
-const FMPlayerWrapper: React.FC = () => {
-	const [height, setHeight] = React.useState(0);
-
-	React.useLayoutEffect(() => {
-		const mnView: HTMLElement | null = document.querySelector(".g-mn");
-		if (mnView) {
-			setHeight(mnView.getBoundingClientRect().height);
-
-			const resize = () => {
-				setHeight(mnView.getBoundingClientRect().height);
-			};
-
-			const mnViewObs = new MutationObserver(resize);
-
-			mnViewObs.observe(mnView, {
-				attributes: true,
-				attributeFilter: ["class"],
-			});
-
-			window.addEventListener("resize", resize);
-
-			return () => {
-				mnViewObs.disconnect();
-				window.removeEventListener("resize", resize);
-			};
-		}
-	}, []);
-
-	return (
-		<Provider>
-			<NCMEnvWrapper />
-			<div
-				style={{
-					height,
-				}}
-			>
-				<ErrorBoundary>
-					<ThemeProvider>
-						<LyricView isFM />
-					</ThemeProvider>
-				</ErrorBoundary>
-			</div>
-		</Provider>
-	);
-};
-
 function buildStylesheetFromConfig() {
 	const variableTable: Map<string, string> = new Map();
 	const result: string[] = [];
-	mainViewElement.setAttribute("class", "");
-	fmViewElement.setAttribute("class", "amll-fm-view");
+	// mainViewElement.setAttribute("class", "");
+	// fmViewElement.setAttribute("class", "amll-fm-view");
 	// 收集自己的变量
 	// 构造成全局变量选择器
 	result.push(":root {\n");
@@ -120,11 +28,11 @@ function buildStylesheetFromConfig() {
 		const snakeKey = camelToSnakeCase(key);
 		const value = fullConfig[key] || "";
 		if (value === "true") {
-			mainViewElement.classList.add(snakeKey);
-			fmViewElement.classList.add(snakeKey);
+			// mainViewElement.classList.add(snakeKey);
+			// fmViewElement.classList.add(snakeKey);
 		} else {
-			mainViewElement.classList.remove(snakeKey);
-			fmViewElement.classList.remove(snakeKey);
+			// mainViewElement.classList.remove(snakeKey);
+			// fmViewElement.classList.remove(snakeKey);
 		}
 		variableTable.set(key, value);
 		variableTable.set(snakeKey, value);
@@ -177,169 +85,21 @@ export function reloadStylesheet(content: string) {
 	}
 }
 
-let hideTimer: number = 0;
 plugin.onLoad(async () => {
 	// 加载配置
 	await initConfig();
 
-	const setControlsVisibility = (visible: boolean) => {
-		if (visible) {
-			document.body.classList.remove("amll-hide-controls");
-			// log("已显示控制按钮")
-		} else {
-			document.body.classList.add("amll-hide-controls");
-			// log("已隐藏控制按钮")
-		}
-	};
+	const isv3 = !semverLt(
+		APP_CONF.appver.split(".").slice(0, 3).join("."),
+		"3.0.0",
+	);
 
-	const onCheckHide = () => {
-		const autoEnabled = getConfig("autoHideControlBar", "false") !== "true";
-		const hideDuration = Number(getConfig("autoHideDuration", "5000"));
-		// log("正在检查移动", autoEnabled, hideDuration)
-		if (hideTimer !== 0) {
-			clearTimeout(hideTimer);
-			hideTimer = 0;
-		}
-		if (autoEnabled) {
-			return;
-		}
-		setControlsVisibility(true);
-		hideTimer = setTimeout(() => {
-			// const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
-			// if (lyricPageOpened) {
-			setControlsVisibility(false);
-			// }
-		}, (hideDuration || 5) * 1000);
-	};
+	if (isv3) {
+		initInjectorV3();
+	} else {
+		initInjectorV2();
+	}
 
-	GLOBAL_EVENTS.addEventListener("lyric-page-open", () => {
-		document.body.classList.add("amll-lyric-page-open");
-		const autoEnabled = getConfig("autoHideControlBar", "false") === "true";
-		if (autoEnabled) {
-			window.addEventListener("mousemove", onCheckHide);
-		}
-	});
-
-	GLOBAL_EVENTS.addEventListener("lyric-page-hide", () => {
-		document.body.classList.remove("amll-lyric-page-open");
-		if (hideTimer !== 0) {
-			clearTimeout(hideTimer);
-			hideTimer = 0;
-		}
-		window.removeEventListener("mousemove", onCheckHide);
-		setControlsVisibility(true);
-	});
-
-	// 监听歌词页面出现，然后添加功能
-	const lyricPageObserver = new MutationObserver((m) => {
-		for (const a of m) {
-			a.addedNodes.forEach((el) => {
-				if (el.nodeType === Node.ELEMENT_NODE) {
-					const element = el as HTMLElement;
-					const albumImageElement = element.querySelector(".cdimg > img");
-					const nowPlayingFrame = element.querySelector(".n-single");
-					if (albumImageElement && nowPlayingFrame) {
-						reloadStylesheet(cssContent);
-						nowPlayingFrame?.parentNode?.prepend(mainViewElement);
-						nowPlayingFrame?.setAttribute("style", "display:none;");
-						lyricPageObserver.disconnect();
-						GLOBAL_EVENTS.dispatchEvent(
-							new Event("lyric-page-open", undefined),
-						);
-					}
-				}
-			});
-		}
-	});
-	lyricPageObserver.observe(document.body, {
-		childList: true,
-	});
-
-	let injected = false;
-	let fmLyricPageObserver: MutationObserver | undefined;
-	window.addEventListener("hashchange", () => {
-		fmLyricPageObserver?.disconnect();
-		if (location.hash === "#/m/fm/") {
-			if (!injected) {
-				log("正在插入私人 FM 歌词显示");
-				const check = () => {
-					const element = document;
-					const fmPageEl = element.querySelector(".m-fm");
-					const playViewEl = element.querySelector(".g-play") ?? fmPageEl;
-					log("搜索 FM 歌词组件", fmPageEl, playViewEl);
-					if (fmPageEl && playViewEl) {
-						if (!fmViewRoot) {
-							fmViewRoot = createRoot(fmViewElement);
-							fmViewRoot.render(<FMPlayerWrapper />);
-						}
-						reloadStylesheet(cssContent);
-						playViewEl?.parentNode?.prepend(fmViewElement);
-						playViewEl?.setAttribute("style", "display:none;");
-						fmLyricPageObserver?.disconnect();
-						GLOBAL_EVENTS.dispatchEvent(
-							new Event("fm-lyric-page-open", undefined),
-						);
-					}
-				};
-				fmLyricPageObserver = new MutationObserver(check);
-				fmLyricPageObserver.observe(document.body, {
-					childList: true,
-					subtree: true,
-				});
-				check();
-			}
-		} else {
-			GLOBAL_EVENTS.dispatchEvent(new Event("fm-lyric-page-hide", undefined));
-		}
-	});
-
-	let nowPlayingElement: HTMLElement;
-	const lyricPageOpenObserver = new MutationObserver((m) => {
-		for (const a of m) {
-			a.addedNodes.forEach((el) => {
-				if (el.nodeType === Node.ELEMENT_NODE) {
-					const element = el as HTMLElement;
-					const albumImageElement = element.querySelector(".cdimg > img");
-					const lyricViewDiv = element.querySelector(
-						"#applemusic-like-lyrics-view",
-					);
-					if (albumImageElement && lyricViewDiv) {
-						if (!mainViewRoot) {
-							mainViewRoot = createRoot(mainViewElement);
-							mainViewRoot.render(
-								<Provider>
-									<ErrorBoundary>
-										<ThemeProvider>
-											<NCMEnvWrapper />
-											<LyricView />
-										</ThemeProvider>
-									</ErrorBoundary>
-								</Provider>,
-							);
-						}
-						nowPlayingElement = element;
-						GLOBAL_EVENTS.dispatchEvent(
-							new Event("lyric-page-open", undefined),
-						);
-					}
-				}
-			});
-
-			a.removedNodes.forEach((el) => {
-				if (el.nodeType === Node.ELEMENT_NODE) {
-					const element = el as HTMLElement;
-					if (nowPlayingElement === element) {
-						GLOBAL_EVENTS.dispatchEvent(
-							new Event("lyric-page-hide", undefined),
-						);
-					}
-				}
-			});
-		}
-	});
-	lyricPageOpenObserver.observe(document.body, {
-		childList: true,
-	});
 	GLOBAL_EVENTS.addEventListener("config-saved", () =>
 		reloadStylesheet(cssContent),
 	);
@@ -352,7 +112,10 @@ plugin.onLoad(async () => {
 	if (DEBUG) {
 		(async () => {
 			const debounceReload = betterncm.utils.debounce(
-				() => (betterncm_native?.app?.restart ?? betterncm.reload)(),
+				() =>
+					isv3
+						? location.reload()
+						: (betterncm_native?.app?.restart ?? betterncm.reload)(),
 				1000,
 			);
 
@@ -450,6 +213,7 @@ plugin.onLoad(async () => {
 				reloadStylesheet(cssContent);
 			}
 		});
+	log("AMLL 初始化完成！");
 });
 
 plugin.onAllPluginsLoaded(() => {
@@ -530,6 +294,7 @@ import { log, warn } from "./utils/logger";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 import { Provider } from "jotai";
 import { NCMEnvWrapper } from "./components/netease-api-wrapper";
+import { initInjectorV2, initInjectorV3 } from "./utils/page-injector";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
