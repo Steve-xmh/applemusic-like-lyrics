@@ -22,6 +22,7 @@ import {
 import { useReloadLyricByCurrentAudioId } from "../../api/react";
 import { musicIdAtom, selectMusicIdModalOpenedAtom } from "../../core/states";
 import { warn } from "../../utils/logger";
+import { isNCMV3 } from "../../utils";
 
 const SongView: React.FC<{ id?: number }> = (props) => {
 	const [songRes, setSongRes] = React.useState<SongDetailResponse>();
@@ -109,6 +110,7 @@ export const SelectMusicIdModal: React.FC = () => {
 
 	return (
 		<Modal
+			zIndex={isNCMV3() ? 999 : undefined}
 			title="输入音乐 ID 以加载对应的歌词"
 			opened={selectMusicIdModalOpened}
 			onClose={() => setSelectMusicIdModalOpened(false)}

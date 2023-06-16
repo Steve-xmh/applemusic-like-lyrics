@@ -69,11 +69,13 @@ if (process.argv.includes("--lyric-test")) {
 const buildOption = {
 	entryPoints,
 	bundle: true,
-	sourcemap: IS_DEV ? "inline" : false,
+	// sourcemap: IS_DEV ? "inline" : false,
+	sourcemap: false,
 	legalComments: "external",
-	minify: true,
+	minify: false,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
+	banner: { js: '"use strict";' },
 	logOverride: {
 		"empty-import-meta": "silent",
 	},

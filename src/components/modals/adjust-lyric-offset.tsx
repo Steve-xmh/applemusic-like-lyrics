@@ -9,6 +9,7 @@ import {
 	currentRawLyricRespAtom,
 } from "../../core/states";
 import { warn } from "../../utils/logger";
+import { isNCMV3 } from "../../utils";
 
 export const AdjustLyricOffsetModal: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -22,6 +23,7 @@ export const AdjustLyricOffsetModal: React.FC = () => {
 
 	return (
 		<Modal
+			zIndex={isNCMV3() ? 999 : undefined}
 			title="设置当前歌曲歌词时序位移"
 			opened={modalOpened}
 			closeOnClickOutside

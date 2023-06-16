@@ -5,17 +5,39 @@ import { isNCMV3 } from "../../utils";
 import { appendRegisterCall } from "../../utils/channel";
 import { log, warn } from "../../utils/logger";
 
-// audioplayer.enableAudioData boolean
+// AudioData 48000hz int16 2 channels
 
-// export const onAudioData = (
-// 	callback: (audioData: { data: ArrayBuffer; pts: number }) => void,
-// ) => {
-// 	appendRegisterCallRaw("audioplayer.onAudioData", callback);
-// };
+interface Complex {
+	real: number;
+	imag: number;
+}
 
-// channel.call("audioplayer.enableAudioData", ()=>{}, [0])
+const newComplex = (r: number, i: number): Complex => {
+	return {
+		real: r,
+		imag: i,
+	};
+};
 
-// 192k hz
+const dft = (samples: Complex[]): Complex[] => {
+	const len = samples.length;
+	const ilen = 1 / len;
+	const result: Complex[] = new Array(len);
+	const TAU = Math.PI * 2;
+	for (let i = 0; i < len; i++) {
+		result[i] = newComplex(0, 0);
+		for (let n = 0; n < len; n++) {
+			const theta = TAU * i * n * ilen;
+			const ctheta = Math.cos(theta);
+			const stheta = Math.sin(theta);
+			result[i].real += samples[n].real * ctheta - samples[n].imag * stheta;
+			result[i].imag += samples[n].imag * stheta + samples[n].real * ctheta;
+		}
+		result[i].real *= ilen;
+		result[i].imag *= ilen;
+	}
+	return result;
+};
 
 function* int16ToFloat32(buf: Int16Array, offset = 0) {
 	for (let i = offset; i < buf.length; i += 2) {

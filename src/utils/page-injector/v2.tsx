@@ -1,6 +1,6 @@
 import { Root, createRoot } from "react-dom/client";
 import { ThemeProvider, cssContent, reloadStylesheet } from "../..";
-import { getConfig } from "../../config/core";
+import { getConfig, getFullConfig } from "../../config/core";
 import { GLOBAL_EVENTS } from "../global-events";
 import { Provider } from "jotai";
 import React from "react";
@@ -64,6 +64,45 @@ let mainViewRoot: Root;
 export let fmViewElement: HTMLDivElement = document.createElement("div");
 fmViewElement.id = "applemusic-like-lyrics-view-fm";
 let fmViewRoot: Root;
+
+const camelToSnakeCase = (str: string) =>
+	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+
+export function buildStylesheetFromConfig() {
+	const variableTable: Map<string, string> = new Map();
+	const result: string[] = [];
+	mainViewElement.setAttribute("class", "");
+	fmViewElement.setAttribute("class", "amll-fm-view");
+	// 收集自己的变量
+	// 构造成全局变量选择器
+	result.push(":root {\n");
+	const fullConfig = getFullConfig();
+	for (const key in fullConfig) {
+		const snakeKey = camelToSnakeCase(key);
+		const value = fullConfig[key] || "";
+		if (value === "true") {
+			mainViewElement.classList.add(snakeKey);
+			fmViewElement.classList.add(snakeKey);
+		} else {
+			mainViewElement.classList.remove(snakeKey);
+			fmViewElement.classList.remove(snakeKey);
+		}
+		variableTable.set(key, value);
+		variableTable.set(snakeKey, value);
+		const varkey = `--applemusic-like-lyrics-${snakeKey}`;
+		if (String(Number(value)) === value) {
+			document.body.style.setProperty(varkey, `${value}px`);
+		} else if (typeof value === "string" && !value.includes("\n")) {
+			document.body.style.setProperty(varkey, value);
+		} else {
+			("true");
+		}
+		result.push(";\n");
+	}
+	result.push("}\n");
+	return result.join("");
+}
+
 export function initInjector() {
 	const setControlsVisibility = (visible: boolean) => {
 		if (visible) {

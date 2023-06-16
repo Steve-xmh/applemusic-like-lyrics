@@ -8,6 +8,7 @@ import {
 } from "../../core/states";
 import { warn } from "../../utils/logger";
 import { getLyricCachePath } from "../../api";
+import { isNCMV3 } from "../../utils";
 
 export const SelectLocalLyricModal: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -29,6 +30,7 @@ export const SelectLocalLyricModal: React.FC = () => {
 
 	return (
 		<Modal
+			zIndex={isNCMV3() ? 999 : undefined}
 			title="导入歌词文件"
 			opened={selectLocalLyricModalOpened}
 			closeOnClickOutside={!selectLocalLyricModalLoading}

@@ -3,7 +3,7 @@ import { isNCMV3, genRandomString, normalizePath } from "../utils";
 import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 import { songInfoPayload } from "../utils/page-injector/v3";
-const cachedFunctionMap: Map<string, Function> = new Map();
+let cachedFunctionMap: Map<string, Function> = new Map();
 
 export enum PlayState {
 	Playing = "playing",
@@ -38,6 +38,7 @@ export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
 	searchFunctionName: string | ((func: Function) => boolean),
 	args: Parameters<F>,
 ): ReturnType<F> {
+	cachedFunctionMap ??= new Map(); // 很神奇，不知道为什么此处会炸
 	if (!cachedFunctionMap.has(searchFunctionName.toString())) {
 		const findResult = betterncm.ncm.findApiFunction(searchFunctionName);
 		if (findResult) {

@@ -233,13 +233,9 @@ plugin.onConfig(() => {
 	root.style.height = "100%";
 
 	createRoot(root).render(
-		<Provider>
-			<ThemeProvider>
-				<NotificationsProvider className="amll-notifications-provider">
-					<ConfigComponent />
-				</NotificationsProvider>
-			</ThemeProvider>
-		</Provider>,
+		<div>
+			由于产生了奇怪的布局问题，请在歌词页面内打开插件设置，如有不便还请谅解！
+		</div>,
 	);
 
 	return root;

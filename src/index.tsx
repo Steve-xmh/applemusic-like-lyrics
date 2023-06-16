@@ -12,46 +12,14 @@ import semverLt from "semver/functions/lt";
 
 export let cssContent = "";
 
-const camelToSnakeCase = (str: string) =>
-	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-
-function buildStylesheetFromConfig() {
-	const variableTable: Map<string, string> = new Map();
-	const result: string[] = [];
-	// mainViewElement.setAttribute("class", "");
-	// fmViewElement.setAttribute("class", "amll-fm-view");
-	// 收集自己的变量
-	// 构造成全局变量选择器
-	result.push(":root {\n");
-	const fullConfig = getFullConfig();
-	for (const key in fullConfig) {
-		const snakeKey = camelToSnakeCase(key);
-		const value = fullConfig[key] || "";
-		if (value === "true") {
-			// mainViewElement.classList.add(snakeKey);
-			// fmViewElement.classList.add(snakeKey);
-		} else {
-			// mainViewElement.classList.remove(snakeKey);
-			// fmViewElement.classList.remove(snakeKey);
-		}
-		variableTable.set(key, value);
-		variableTable.set(snakeKey, value);
-		const varkey = `--applemusic-like-lyrics-${snakeKey}`;
-		if (String(Number(value)) === value) {
-			document.body.style.setProperty(varkey, `${value}px`);
-		} else if (!value.includes("\n")) {
-			document.body.style.setProperty(varkey, value);
-		} else {
-			("true");
-		}
-		result.push(";\n");
-	}
-	result.push("}\n");
-	return result.join("");
-}
-
 function buildVariableStylesheet() {
-	return buildStylesheetFromConfig() + "\n" + getConfig("customCssContent", "");
+	return (
+		(Utils.isNCMV3()
+			? buildStylesheetFromConfigV3()
+			: buildStylesheetFromConfigV2()) +
+		"\n" +
+		getConfig("customCssContent", "")
+	);
 }
 
 export function reloadStylesheet(content: string) {
@@ -89,12 +57,10 @@ plugin.onLoad(async () => {
 	// 加载配置
 	await initConfig();
 
-	const isv3 = !semverLt(
-		APP_CONF.appver.split(".").slice(0, 3).join("."),
-		"3.0.0",
-	);
+	while (!window?.APP_CONF?.appver)
+		await new Promise((resolve) => setTimeout(resolve, 100));
 
-	if (isv3) {
+	if (Utils.isNCMV3()) {
 		initInjectorV3();
 	} else {
 		initInjectorV2();
@@ -113,7 +79,7 @@ plugin.onLoad(async () => {
 		(async () => {
 			const debounceReload = betterncm.utils.debounce(
 				() =>
-					isv3
+					Utils.isNCMV3()
 						? location.reload()
 						: (betterncm_native?.app?.restart ?? betterncm.reload)(),
 				1000,
@@ -281,6 +247,8 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 			theme={{
 				colorScheme: "dark",
 			}}
+			withCSSVariables
+			withNormalizeCSS
 		>
 			{props.children}
 		</MantineProvider>
@@ -294,7 +262,12 @@ import { log, warn } from "./utils/logger";
 import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
 import { Provider } from "jotai";
 import { NCMEnvWrapper } from "./components/netease-api-wrapper";
-import { initInjectorV2, initInjectorV3 } from "./utils/page-injector";
+import {
+	buildStylesheetFromConfigV2,
+	buildStylesheetFromConfigV3,
+	initInjectorV2,
+	initInjectorV3,
+} from "./utils/page-injector";
 if (DEBUG) {
 	for (const key in APIs) {
 		// rome-ignore lint/suspicious/noExplicitAny: <explanation>

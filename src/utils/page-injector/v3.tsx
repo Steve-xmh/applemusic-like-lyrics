@@ -6,11 +6,47 @@ import { NCMEnvWrapper } from "../../components/netease-api-wrapper";
 import { LyricView } from "../../components/lyric-player";
 import { ThemeProvider } from "../..";
 import { GLOBAL_EVENTS } from "../global-events";
+import { getFullConfig } from "../../config/core";
 
 export let mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "applemusic-like-lyrics-view";
 mainViewElement.classList.add("ncm-v3");
 let mainViewRoot: Root;
+
+const camelToSnakeCase = (str: string) =>
+	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+
+export function buildStylesheetFromConfig() {
+	const variableTable: Map<string, string> = new Map();
+	const result: string[] = [];
+	mainViewElement.setAttribute("class", "ncm-v3");
+	// 收集自己的变量
+	// 构造成全局变量选择器
+	result.push(":root {\n");
+	const fullConfig = getFullConfig();
+	for (const key in fullConfig) {
+		const snakeKey = camelToSnakeCase(key);
+		const value = fullConfig[key] || "";
+		if (value === "true") {
+			mainViewElement.classList.add(snakeKey);
+		} else {
+			mainViewElement.classList.remove(snakeKey);
+		}
+		variableTable.set(key, value);
+		variableTable.set(snakeKey, value);
+		const varkey = `--applemusic-like-lyrics-${snakeKey}`;
+		if (String(Number(value)) === value) {
+			document.body.style.setProperty(varkey, `${value}px`);
+		} else if (typeof value === "string" && !value.includes("\n")) {
+			document.body.style.setProperty(varkey, value);
+		} else {
+			("true");
+		}
+		result.push(";\n");
+	}
+	result.push("}\n");
+	return result.join("");
+}
 
 export let songInfoPayload: any = {};
 export async function initInjector() {
