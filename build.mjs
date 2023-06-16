@@ -29,12 +29,49 @@ function getCommitHash() {
 	}
 }
 
+execSync("wasm-pack build --target web", {
+	cwd: "./amll-fft",
+	stdio: "inherit",
+});
+
 manifest.commit = getCommitHash();
 
-/** @type {any[]} */
+/** @type {import("esbuild").Plugin[]}*/
 const plugins = [
 	sassPlugin(),
 	svgrPlugin(),
+	{
+		name: "esbuild-embbed-wasm",
+		setup: (build) => {
+			const WASM_EMBEDDED_NAMESPACE = "wasm-embedded";
+			// Catch "*.wasm" files in the resolve phase and redirect them to our custom namespaces
+			build.onResolve({ filter: /\.(?:wasm)$/ }, (args) => {
+				// Ignore unresolvable paths
+				if (args.resolveDir === "") return;
+
+				// Redirect to the virtual module namespace
+				return {
+					path: path.isAbsolute(args.path)
+						? args.path
+						: path.join(args.resolveDir, args.path),
+					namespace: WASM_EMBEDDED_NAMESPACE,
+				};
+			});
+
+			// For embedded file loading, get the wasm binary data and pass it to esbuild's built-in `binary` loader
+			build.onLoad(
+				{ filter: /.*/, namespace: WASM_EMBEDDED_NAMESPACE },
+				async (args) => ({
+					contents: `
+					const WASM_BASE64_DATA = "${(await fs.promises.readFile(args.path)).toString("base64")}";
+					const WASM_DATA = Uint8Array.from(atob(WASM_BASE64_DATA), c => c.charCodeAt(0));
+					export default WASM_DATA;
+					`,
+					loader: "js",
+				}),
+			);
+		},
+	},
 	glsl({
 		minify: !IS_DEV,
 	}),
@@ -72,7 +109,7 @@ const buildOption = {
 	// sourcemap: IS_DEV ? "inline" : false,
 	sourcemap: false,
 	legalComments: "external",
-	minify: false,
+	minify: !IS_DEV,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
 	banner: { js: '"use strict";' },

@@ -4,55 +4,22 @@ import * as Weightings from "../../libs/a-weighting";
 import { isNCMV3 } from "../../utils";
 import { appendRegisterCall } from "../../utils/channel";
 import { log, warn } from "../../utils/logger";
+import AMLLFFTWASM from "../../../amll-fft/pkg/amll_fft_bg.wasm";
+import initFFT, { AMLLFFT } from "../../../amll-fft/pkg";
 
 // AudioData 48000hz int16 2 channels
-
-interface Complex {
-	real: number;
-	imag: number;
-}
-
-const newComplex = (r: number, i: number): Complex => {
-	return {
-		real: r,
-		imag: i,
-	};
-};
-
-const dft = (samples: Complex[]): Complex[] => {
-	const len = samples.length;
-	const ilen = 1 / len;
-	const result: Complex[] = new Array(len);
-	const TAU = Math.PI * 2;
-	for (let i = 0; i < len; i++) {
-		result[i] = newComplex(0, 0);
-		for (let n = 0; n < len; n++) {
-			const theta = TAU * i * n * ilen;
-			const ctheta = Math.cos(theta);
-			const stheta = Math.sin(theta);
-			result[i].real += samples[n].real * ctheta - samples[n].imag * stheta;
-			result[i].imag += samples[n].imag * stheta + samples[n].real * ctheta;
-		}
-		result[i].real *= ilen;
-		result[i].imag *= ilen;
-	}
-	return result;
-};
-
-function* int16ToFloat32(buf: Int16Array, offset = 0) {
-	for (let i = offset; i < buf.length; i += 2) {
-		yield buf[i] / 2 ** 16;
-	}
-}
+let fft: AMLLFFT;
+initFFT(AMLLFFTWASM).then(() => {
+	fft = AMLLFFT.new(48000);
+});
 
 let aly: AnalyserNode;
 
 function getFFTData() {
 	if (isNCMV3() && aly) {
-		const buf = new Uint8Array(aly.frequencyBinCount);
 		try {
-			aly.getByteFrequencyData(buf);
-			return [...buf];
+			const arr = fft?.process_fft() ?? new Float64Array();
+			return [...arr];
 		} catch (err) {
 			warn("getFFTData", err);
 			return [];
@@ -64,19 +31,19 @@ function getFFTData() {
 
 function enableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => {}, [1]);
+		channel.call("audioplayer.enableAudioData", () => { }, [1]);
 		log("enableFFT");
 	} else {
-		betterncm_native.audio.acquireFFTData();
+		betterncm_native?.audio?.acquireFFTData();
 	}
 }
 
 function disableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => {}, [0]);
+		channel.call("audioplayer.enableAudioData", () => { }, [0]);
 		log("disableFFT");
 	} else {
-		betterncm_native.audio.releaseFFTData();
+		betterncm_native?.audio?.releaseFFTData();
 	}
 }
 
@@ -89,16 +56,17 @@ if (isNCMV3()) {
 	// aly.connect(actx.destination);
 
 	appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
-		const abuf = actx.createBuffer(2, data.data.byteLength / 4, 48000);
-		const buf = new Int16Array(data.data);
-		abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 0)), 0);
-		abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 1)), 1);
-		const node = new AudioBufferSourceNode(actx, {
-			buffer: abuf,
-		});
-		node.connect(aly);
-		node.onended = () => node.disconnect();
-		node.start();
+		fft?.push_data(new Int16Array(data.data));
+		// const abuf = actx.createBuffer(2, data.data.byteLength / 4, 48000);
+		// const buf = new Int16Array(data.data);
+		// abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 0)), 0);
+		// abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 1)), 1);
+		// const node = new AudioBufferSourceNode(actx, {
+		// 	buffer: abuf,
+		// });
+		// node.connect(aly);
+		// node.onended = () => node.disconnect();
+		// node.start();
 	});
 }
 
@@ -154,31 +122,29 @@ export const AudioFFTControl: React.FC = () => {
 
 					let rawData = getFFTData();
 
-					if (!isNCMV3()) {
-						const weighting: ((f: number) => number) | undefined =
-							Weightings[fftWeightingMethod];
+					const weighting: ((f: number) => number) | undefined =
+						Weightings[fftWeightingMethod];
 
-						if (weighting) {
-							rawData.forEach((v, i, a) => {
-								a[i] = v * weighting(((i + 1) / a.length) ** 2 * 22000 + 50);
-							});
-						}
+					if (weighting) {
+						rawData.forEach((v, i, a) => {
+							a[i] = v * weighting(i / a.length * 24000);
+						});
 					}
 
 					const data: number[] = rawData;
 
-					// fftBarAmount
-					// const chunkSize = Math.ceil(rawData.length / fftBarAmount);
+					fftBarAmount
+					const chunkSize = Math.ceil(rawData.length / fftBarAmount);
 
-					// for (let i = 0; i < rawData.length; i += chunkSize) {
-					// 	let t = 0;
-					// 	for (let j = 0; j < chunkSize; j++) {
-					// 		t += rawData[Math.min(rawData.length - 1, i + j)];
-					// 	}
-					// 	data.push(t / chunkSize);
-					// }
+					for (let i = 0; i < rawData.length; i += chunkSize) {
+						let t = 0;
+						for (let j = 0; j < chunkSize; j++) {
+							t += rawData[Math.min(rawData.length - 1, i + j)];
+						}
+						data.push(t / chunkSize);
+					}
 
-					// data.splice(fftBarAmount);
+					data.splice(fftBarAmount);
 
 					const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
 
@@ -211,25 +177,27 @@ export const AudioFFTControl: React.FC = () => {
 						);
 					}
 
-					ctx.closePath();
 					ctx.stroke();
 
-					// ctx.strokeStyle = "red";
-					// const debugWidth = width / rawData.length;
-					// ctx.lineWidth = debugWidth;
-					// ctx.beginPath();
+					// if (isNCMV3()) {
+					// 	const weighting: ((f: number) => number) | undefined =
+					// 		Weightings[fftWeightingMethod];
 
-					// rawData.forEach((v, i, a) => {
-					// 	const x = debugWidth * (i + 0.5);
-					// 	ctx.moveTo(x, height - debugWidth / 2);
-					// 	ctx.lineTo(
-					// 		x,
-					// 		height - (debugWidth / 2 + (height - barWidth) * (v / 255)),
-					// 	);
-					// });
-
-					// ctx.closePath();
-					// ctx.stroke();
+					// 	if (weighting) {
+					// 		ctx.strokeStyle = "red";
+					// 		ctx.lineWidth = window.devicePixelRatio;
+					// 		ctx.beginPath();
+					// 		ctx.moveTo(0, 0);
+					// 		for (let i = 0; i < rawData.length; i++) {
+					// 			const x = (i / rawData.length) * width;
+					// 			ctx.lineTo(
+					// 				x,
+					// 				height * (1 - weighting(i / rawData.length * 10000)),
+					// 			);
+					// 		}
+					// 		ctx.stroke();
+					// 	}
+					// }
 
 					requestAnimationFrame(onFrame);
 				}
