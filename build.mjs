@@ -63,7 +63,9 @@ const plugins = [
 				{ filter: /.*/, namespace: WASM_EMBEDDED_NAMESPACE },
 				async (args) => ({
 					contents: `
-					const WASM_BASE64_DATA = "${(await fs.promises.readFile(args.path)).toString("base64")}";
+					const WASM_BASE64_DATA = "${(
+						await fs.promises.readFile(args.path)
+					).toString("base64")}";
 					const WASM_DATA = Uint8Array.from(atob(WASM_BASE64_DATA), c => c.charCodeAt(0));
 					export default WASM_DATA;
 					`,

@@ -29,7 +29,7 @@ function getFFTData() {
 
 function enableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => { }, [1]);
+		channel.call("audioplayer.enableAudioData", () => {}, [1]);
 		log("enableFFT");
 	} else {
 		betterncm_native?.audio?.acquireFFTData();
@@ -38,7 +38,7 @@ function enableFFT() {
 
 function disableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => { }, [0]);
+		channel.call("audioplayer.enableAudioData", () => {}, [0]);
 		log("disableFFT");
 	} else {
 		betterncm_native?.audio?.releaseFFTData();
