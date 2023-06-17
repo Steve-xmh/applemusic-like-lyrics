@@ -317,8 +317,11 @@ export const NCMEnvWrapper: React.FC = () => {
 	}, [reconnectCounter, musicId]);
 
 	React.useLayoutEffect(() => {
-		setPlayState(toPlayState(getPlayingSong().state));
-		setCurrentPlayMode(getCurrentPlayMode() || PlayMode.One);
+		if (isLyricPageOpening) {
+			setPlayState(toPlayState(getPlayingSong().state));
+			setCurrentPlayMode(getCurrentPlayMode() || PlayMode.One);
+			setPlayingSongData(getPlayingSong());
+		}
 	}, [isLyricPageOpening]);
 
 	React.useLayoutEffect(() => {

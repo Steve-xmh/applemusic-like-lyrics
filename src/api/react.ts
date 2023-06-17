@@ -107,11 +107,9 @@ export function useNowPlayingOpened(): boolean {
 	React.useEffect(() => {
 		setValue(!!document.getElementById("applemusic-like-lyrics-view"));
 		const onLyricPageOpen = () => {
-			log("歌词页面已显示");
 			setValue(true);
 		};
 		const onLyricPageHide = () => {
-			log("歌词页面已隐藏");
 			setValue(false);
 		};
 		GLOBAL_EVENTS.addEventListener("lyric-page-open", onLyricPageOpen);

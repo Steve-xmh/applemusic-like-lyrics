@@ -13,10 +13,8 @@ initFFT(AMLLFFTWASM).then(() => {
 	fft = AMLLFFT.new(48000);
 });
 
-let aly: AnalyserNode;
-
 function getFFTData() {
-	if (isNCMV3() && aly) {
+	if (isNCMV3()) {
 		try {
 			const arr = fft?.process_fft() ?? new Float64Array();
 			return [...arr];
@@ -31,7 +29,7 @@ function getFFTData() {
 
 function enableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => {}, [1]);
+		channel.call("audioplayer.enableAudioData", () => { }, [1]);
 		log("enableFFT");
 	} else {
 		betterncm_native?.audio?.acquireFFTData();
@@ -40,7 +38,7 @@ function enableFFT() {
 
 function disableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => {}, [0]);
+		channel.call("audioplayer.enableAudioData", () => { }, [0]);
 		log("disableFFT");
 	} else {
 		betterncm_native?.audio?.releaseFFTData();
@@ -48,25 +46,8 @@ function disableFFT() {
 }
 
 if (isNCMV3()) {
-	const actx = new AudioContext();
-	aly = new AnalyserNode(actx, {
-		smoothingTimeConstant: 0,
-		fftSize: 128,
-	});
-	// aly.connect(actx.destination);
-
 	appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
 		fft?.push_data(new Int16Array(data.data));
-		// const abuf = actx.createBuffer(2, data.data.byteLength / 4, 48000);
-		// const buf = new Int16Array(data.data);
-		// abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 0)), 0);
-		// abuf.copyToChannel(new Float32Array(int16ToFloat32(buf, 1)), 1);
-		// const node = new AudioBufferSourceNode(actx, {
-		// 	buffer: abuf,
-		// });
-		// node.connect(aly);
-		// node.onended = () => node.disconnect();
-		// node.start();
 	});
 }
 
