@@ -31,7 +31,7 @@ function getFFTData() {
 
 function enableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => { }, [1]);
+		channel.call("audioplayer.enableAudioData", () => {}, [1]);
 		log("enableFFT");
 	} else {
 		betterncm_native?.audio?.acquireFFTData();
@@ -40,7 +40,7 @@ function enableFFT() {
 
 function disableFFT() {
 	if (isNCMV3()) {
-		channel.call("audioplayer.enableAudioData", () => { }, [0]);
+		channel.call("audioplayer.enableAudioData", () => {}, [0]);
 		log("disableFFT");
 	} else {
 		betterncm_native?.audio?.releaseFFTData();
@@ -127,13 +127,19 @@ export const AudioFFTControl: React.FC = () => {
 
 					if (weighting) {
 						rawData.forEach((v, i, a) => {
-							a[i] = v * weighting(i / a.length * 24000);
+							a[i] = v * weighting((i / a.length) * 24000);
 						});
 					}
 
+					if (isNCMV3())
+						rawData = rawData.splice(
+							((rawData.length * 50) / 24000) | 0,
+							((rawData.length * 4000) / 24000) | 0,
+						);
+
 					const data: number[] = rawData;
 
-					fftBarAmount
+					fftBarAmount;
 					const chunkSize = Math.ceil(rawData.length / fftBarAmount);
 
 					for (let i = 0; i < rawData.length; i += chunkSize) {
@@ -141,14 +147,14 @@ export const AudioFFTControl: React.FC = () => {
 						for (let j = 0; j < chunkSize; j++) {
 							t += rawData[Math.min(rawData.length - 1, i + j)];
 						}
-						data.push(t / chunkSize);
+						data.push(20 * Math.log10(t / chunkSize));
 					}
 
 					data.splice(fftBarAmount);
 
 					const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
 
-					scale = (scale * 5 + Math.max(1, maxValue)) / 6;
+					scale = (scale * 5 + Math.max(5, maxValue)) / 6;
 					fftData = data.map(
 						(v, i) =>
 							((fftData[i] ?? 0) * fftBarTweenSoftness + v / scale) /
