@@ -56,16 +56,6 @@ react-is/cjs/react-is.development.js:
    * LICENSE file in the root directory of this source tree.
    */
 
-pangu/dist/browser/pangu.min.js:
-  /*!
-   * pangu.js
-   * --------
-   * @version: 4.0.7
-   * @homepage: https://github.com/vinta/pangu.js
-   * @license: MIT
-   * @author: Vinta Chen <vinta.chen@gmail.com> (https://github.com/vinta)
-   */
-
 react/cjs/react-jsx-runtime.development.js:
   /**
    * @license React
@@ -76,6 +66,19 @@ react/cjs/react-jsx-runtime.development.js:
    * This source code is licensed under the MIT license found in the
    * LICENSE file in the root directory of this source tree.
    */
+
+pangu/dist/browser/pangu.min.js:
+  /*!
+   * pangu.js
+   * --------
+   * @version: 4.0.7
+   * @homepage: https://github.com/vinta/pangu.js
+   * @license: MIT
+   * @author: Vinta Chen <vinta.chen@gmail.com> (https://github.com/vinta)
+   */
+
+punycode/punycode.js:
+  /*! https://mths.be/punycode v1.4.1 by @mathias */
 
 jszip/dist/jszip.min.js:
   /*!

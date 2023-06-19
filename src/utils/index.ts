@@ -1,4 +1,6 @@
 import semverLt from "semver/functions/lt";
+import { appStore } from "./page-injector/v3";
+import { IS_WORKER } from "./is-worker";
 
 export function debounce<T extends Function>(callback: T, waitTime: number): T {
 	let timer = 0;
@@ -14,7 +16,7 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 }
 
 let IS_NCMV3: boolean;
-export const isNCMV3 = () => {
+export function isNCMV3 () {
 	if (typeof IS_NCMV3 === "undefined") {
 		try {
 			IS_NCMV3 = !semverLt(
@@ -265,35 +267,75 @@ export enum PlayMode {
 }
 
 export function switchPlayMode(playMode: PlayMode) {
-	const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
-	while (playModeBtn) {
-		if (playModeBtn.classList.contains(playMode)) {
-			return;
+	if (isNCMV3()) {
+		if (playMode === PlayMode.AI) return; // 3.0.0 暂时没有心动模式
+		const playModeBtn = document.querySelector<HTMLButtonElement>(
+			"footer > * > * > .middle > *:nth-child(1) > button:nth-child(1)",
+		);
+		while (playModeBtn) {
+			const playingMode = appStore?.playingMode;
+			switch (playMode) {
+				case PlayMode.Order:
+					if (playingMode === "playOrder") return;
+					break;
+				case PlayMode.Repeat:
+					if (playingMode === "playCycle") return;
+					break;
+				case PlayMode.Random:
+					if (playingMode === "playRandom") return;
+					break;
+				case PlayMode.One:
+					if (playingMode === "playOneCycle") return;
+					break;
+			}
+			playModeBtn.click();
 		}
-		playModeBtn.click();
+	} else {
+		const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
+		while (playModeBtn) {
+			if (playModeBtn.classList.contains(playMode)) {
+				return;
+			}
+			playModeBtn.click();
+		}
 	}
 }
 
 export function getCurrentPlayMode(): PlayMode | undefined {
 	try {
-		const setting = JSON.parse(
-			localStorage.getItem("NM_SETTING_PLAYER") || "{}",
-		);
+		if (isNCMV3()) {
+			switch (appStore?.playingMode) {
+				case "playOrder":
+					return PlayMode.Order;
+				case "playCycle":
+					return PlayMode.Repeat;
+				case "playRandom":
+					return PlayMode.Random;
+				case "playOneCycle":
+					return PlayMode.One;
+				default:
+					return undefined;
+			}
+		} else {
+			const setting = JSON.parse(
+				localStorage.getItem("NM_SETTING_PLAYER") || "{}",
+			);
 
-		if (setting.mode2) {
-			return PlayMode.AI;
-		}
+			if (setting.mode2) {
+				return PlayMode.AI;
+			}
 
-		switch (setting?.mode) {
-			case "playonce":
-				return PlayMode.Order;
-			case "playorder":
-				return PlayMode.Repeat;
-			case "playcycle":
-				return PlayMode.One;
-			case "playrandom":
-				return PlayMode.Random;
-			default:
+			switch (setting?.mode) {
+				case "playonce":
+					return PlayMode.Order;
+				case "playorder":
+					return PlayMode.Repeat;
+				case "playcycle":
+					return PlayMode.One;
+				case "playrandom":
+					return PlayMode.Random;
+				default:
+			}
 		}
 	} catch {}
 	return undefined;
@@ -303,6 +345,3 @@ export const eqSet: <T>(xs: Set<T>, ys: Set<T>) => boolean = (
 	xs,
 	ys,
 ): boolean => xs.size === ys.size && [...xs].every((x) => ys.has(x));
-
-export const IS_WORKER =
-	typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;

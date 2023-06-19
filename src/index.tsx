@@ -1,20 +1,26 @@
 /// <reference types="./types/global" />
 import "./config";
-import { createRoot, Root } from "react-dom/client";
-import { LyricView } from "./components/lyric-player";
 import { GLOBAL_EVENTS } from "./utils/global-events";
 import { clearCache } from "canvas-hypertxt";
 import * as React from "react";
-import { MantineProvider, createStyles, Title } from "@mantine/core";
-import { getConfig, getFullConfig, initConfig } from "./config/core";
+import { MantineProvider, createStyles } from "@mantine/core";
+import { getConfig, initConfig } from "./config/core";
 import { currentWorkerScript, restartWorker } from "./worker";
-import semverLt from "semver/functions/lt";
+import { log, warn } from "./utils/logger";
+import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
+import {
+	buildStylesheetFromConfigV2,
+	buildStylesheetFromConfigV3,
+	initInjectorV2,
+	initInjectorV3,
+} from "./utils/page-injector";
+import { isNCMV3, normalizePath } from "./utils";
 
 export let cssContent = "";
 
 function buildVariableStylesheet() {
 	return (
-		(Utils.isNCMV3()
+		(isNCMV3()
 			? buildStylesheetFromConfigV3()
 			: buildStylesheetFromConfigV2()) +
 		"\n" +
@@ -54,13 +60,14 @@ export function reloadStylesheet(content: string) {
 }
 
 plugin.onLoad(async () => {
-	// 加载配置
+	try {
+		// 加载配置
 	await initConfig();
 
 	while (!window?.APP_CONF?.appver)
 		await new Promise((resolve) => setTimeout(resolve, 100));
 
-	if (Utils.isNCMV3()) {
+	if (isNCMV3()) {
 		initInjectorV3();
 	} else {
 		initInjectorV2();
@@ -79,7 +86,7 @@ plugin.onLoad(async () => {
 		(async () => {
 			const debounceReload = betterncm.utils.debounce(
 				() =>
-					Utils.isNCMV3()
+					isNCMV3()
 						? location.reload()
 						: (betterncm_native?.app?.restart ?? betterncm.reload)(),
 				1000,
@@ -118,9 +125,9 @@ plugin.onLoad(async () => {
 				);
 			}
 
-			const normalizedPluginPath = Utils.normalizePath(plugin.pluginPath);
+			const normalizedPluginPath = normalizePath(plugin.pluginPath);
 			for (const file of await betterncm.fs.readDir(plugin.pluginPath)) {
-				const relPath = Utils.normalizePath(file).replace(
+				const relPath = normalizePath(file).replace(
 					normalizedPluginPath,
 					"",
 				);
@@ -159,8 +166,8 @@ plugin.onLoad(async () => {
 			betterncm_native?.fs?.watchDirectory(
 				plugin.pluginPath,
 				(dirPath, filename) => {
-					const normalizedDirPath = Utils.normalizePath(dirPath);
-					const fullPath = Utils.normalizePath(`${dirPath}/${filename}`);
+					const normalizedDirPath = normalizePath(dirPath);
+					const fullPath = normalizePath(`${dirPath}/${filename}`);
 					const relPath = fullPath.replace(normalizedDirPath, "");
 					checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
 						() => checkFileOrReload(relPath),
@@ -180,6 +187,10 @@ plugin.onLoad(async () => {
 			}
 		});
 	log("AMLL 初始化完成！");
+	} catch (err) {
+		debugger;
+		throw err;
+	}
 });
 
 plugin.onAllPluginsLoaded(() => {
@@ -247,38 +258,8 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {
 			theme={{
 				colorScheme: "dark",
 			}}
-			withCSSVariables
-			withNormalizeCSS
 		>
 			{props.children}
 		</MantineProvider>
 	);
 };
-
-import * as APIs from "./api";
-import * as Utils from "./utils";
-import * as WorkerAPIs from "./worker";
-import { log, warn } from "./utils/logger";
-import { checkLibFrontendPlaySupport } from "./bindings/lib-frontend-play";
-import { Provider } from "jotai";
-import { NCMEnvWrapper } from "./components/netease-api-wrapper";
-import {
-	buildStylesheetFromConfigV2,
-	buildStylesheetFromConfigV3,
-	initInjectorV2,
-	initInjectorV3,
-} from "./utils/page-injector";
-if (DEBUG) {
-	for (const key in APIs) {
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(window as any)[key] = APIs[key];
-	}
-	for (const key in Utils) {
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(window as any)[key] = APIs[key];
-	}
-	for (const key in WorkerAPIs) {
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-		(window as any)[key] = WorkerAPIs[key];
-	}
-}

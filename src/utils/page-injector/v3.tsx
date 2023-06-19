@@ -49,6 +49,7 @@ export function buildStylesheetFromConfig() {
 }
 
 export let songInfoPayload: any = {};
+export let appStore: any = {};
 export async function initInjector() {
 	await betterncm.utils.waitForElement("#page_pc_mini_bar .miniVinylWrapper");
 	const footerRightButtons = await betterncm.utils.waitForElement(
@@ -61,9 +62,19 @@ export async function initInjector() {
 	footerRightButtons?.prepend(amllViewButton);
 
 	window.amllDispatchHook = function amllDispatchHook(payload) {
-		if (payload?.type === "setPlaying") {
+		if (
+			payload?.type === "setPlaying" ||
+			payload?.type === "playing/setPlaying"
+		) {
 			songInfoPayload = payload?.payload ?? {};
+		} else {
+			// log("amllDispatchHook", payload?.type, payload?.payload);
 		}
+		appStore = {
+			...appStore,
+			...(payload?.payload ?? {}),
+		};
+		// log(appStore)
 	};
 
 	mainViewRoot = createRoot(mainViewElement);

@@ -114,7 +114,6 @@ const buildOption = {
 	minify: !IS_DEV,
 	outdir: process.argv.includes("--dist") ? "dist" : devPath,
 	target: "safari11",
-	banner: { js: '"use strict";' },
 	logOverride: {
 		"empty-import-meta": "silent",
 	},

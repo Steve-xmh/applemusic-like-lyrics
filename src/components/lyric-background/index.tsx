@@ -16,6 +16,8 @@ import { getConfig } from "../../config/core";
 import { rgb } from "color-convert/conversions";
 import { LyricAlbumImageBackground } from "./components/lyric-album-image-background";
 import { LyricAlbumAnimatedImageBackground } from "./components/lyric-album-animated-image-background";
+import { BlurFilter, ColorMatrixFilter, Texture } from "pixi.js";
+import { PixiRenderer } from "./pixi-renderer";
 
 const LyricCanvasBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -223,23 +225,41 @@ const LyricCanvasBackground: React.FC = () => {
 	);
 };
 
-const speratedBackgroundMethods = ["blur-album", "blur-animated-album"];
+const LyricPixiBackground: React.FC = () => {
+	const musicId = useAtomValue(musicIdAtom);
+	const [albumImageLoaded, albumImage, albumImageUrl] = useAlbumImage(musicId);
+	const canvasRef = React.useRef<HTMLCanvasElement>(null);
+	const rendererRef = React.useRef<PixiRenderer | undefined>(undefined);
+	React.useLayoutEffect(() => {
+		if (rendererRef.current) {
+			rendererRef.current.dispose();
+		}
+		if (canvasRef.current) {
+			rendererRef.current = new PixiRenderer(canvasRef.current);
+		}
+	}, [canvasRef.current]);
+	React.useEffect(() => {
+		if (rendererRef.current && albumImageLoaded) {
+			rendererRef.current.updateAlbum(albumImageUrl);
+		}
+	}, [albumImageUrl, albumImageLoaded]);
+	return (
+		<canvas
+			ref={canvasRef}
+			className="am-lyric-background"
+			style={{
+				position: "fixed",
+				left: "0",
+				top: "0",
+				width: "100%",
+				height: "100%",
+				color: "yellow",
+				display: "block",
+			}}
+		/>
+	);
+};
 
 export const LyricBackground: React.FC = () => {
-	const backgroundRenderMethod = useConfigValue(
-		"backgroundRenderMethod",
-		BlurAlbumMethod.value,
-	);
-
-	if (speratedBackgroundMethods.includes(backgroundRenderMethod)) {
-		switch (backgroundRenderMethod) {
-			case "blur-animated-album":
-				return <LyricAlbumAnimatedImageBackground />;
-			case "blur-album":
-			default:
-				return <LyricAlbumImageBackground />;
-		}
-	} else {
-		return <LyricCanvasBackground />;
-	}
+	return <LyricPixiBackground />;
 };
