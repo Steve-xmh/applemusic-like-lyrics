@@ -3,7 +3,6 @@ import {
 	BlurFilter,
 	ColorMatrixFilter,
 	Container,
-	NoiseFilter,
 	Sprite,
 	Texture,
 } from "pixi.js";
@@ -88,15 +87,11 @@ export class PixiRenderer {
 		this.observer.observe(canvas);
 		this.app = new Application({
 			view: canvas,
-			// width: this.canvas.width,
-			// height: this.canvas.height,
 			resizeTo: this.canvas,
-            powerPreference: "low-power",
+			powerPreference: "low-power",
 			backgroundAlpha: 0,
 		});
 		this.rebuildFilters();
-		this.app.ticker.maxFPS = 15;
-		this.app.ticker.minFPS = 0;
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}
@@ -104,7 +99,7 @@ export class PixiRenderer {
 	rebuildFilters() {
 		const minBorder = Math.min(this.canvas.width, this.canvas.height);
 		const c0 = new ColorMatrixFilter();
-		c0.saturate(1.7, false);
+		c0.saturate(1.2, false);
 		const c1 = new ColorMatrixFilter();
 		c1.brightness(0.6, false);
 		const c2 = new ColorMatrixFilter();

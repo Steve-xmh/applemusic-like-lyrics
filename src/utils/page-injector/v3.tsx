@@ -68,7 +68,7 @@ export async function initInjector() {
 		) {
 			songInfoPayload = payload?.payload ?? {};
 		} else {
-			// log("amllDispatchHook", payload?.type, payload?.payload);
+			log("amllDispatchHook", payload?.type, payload?.payload);
 		}
 		appStore = {
 			...appStore,

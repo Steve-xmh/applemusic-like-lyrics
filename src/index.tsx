@@ -62,131 +62,128 @@ export function reloadStylesheet(content: string) {
 plugin.onLoad(async () => {
 	try {
 		// 加载配置
-	await initConfig();
+		await initConfig();
 
-	while (!window?.APP_CONF?.appver)
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		while (!window?.APP_CONF?.appver)
+			await new Promise((resolve) => setTimeout(resolve, 100));
 
-	if (isNCMV3()) {
-		initInjectorV3();
-	} else {
-		initInjectorV2();
-	}
+		if (isNCMV3()) {
+			initInjectorV3();
+		} else {
+			initInjectorV2();
+		}
 
-	GLOBAL_EVENTS.addEventListener("config-saved", () =>
-		reloadStylesheet(cssContent),
-	);
-	(async () => {
-		const workerScript = await betterncm.fs.readFileText(
-			`${plugin.pluginPath}/worker_script.js`,
+		GLOBAL_EVENTS.addEventListener("config-saved", () =>
+			reloadStylesheet(cssContent),
 		);
-		restartWorker(workerScript);
-	})();
-	if (DEBUG) {
 		(async () => {
-			const debounceReload = betterncm.utils.debounce(
-				() =>
-					isNCMV3()
-						? location.reload()
-						: (betterncm_native?.app?.restart ?? betterncm.reload)(),
-				1000,
+			const workerScript = await betterncm.fs.readFileText(
+				`${plugin.pluginPath}/worker_script.js`,
 			);
-
-			const debounceRefreshStyle = async function () {
-				const curStyle = await betterncm.fs.readFileText(
-					`${plugin.pluginPath}/index.css`,
+			restartWorker(workerScript);
+		})();
+		if (DEBUG) {
+			(async () => {
+				const debounceReload = betterncm.utils.debounce(
+					() =>
+						isNCMV3()
+							? location.reload()
+							: (betterncm_native?.app?.restart ?? betterncm.reload)(),
+					1000,
 				);
+
+				const debounceRefreshStyle = async function () {
+					const curStyle = await betterncm.fs.readFileText(
+						`${plugin.pluginPath}/index.css`,
+					);
+					if (cssContent !== curStyle) {
+						cssContent = curStyle;
+						reloadStylesheet(cssContent);
+					}
+				};
+
+				const debounceRefreshWorker = async function () {
+					const workerScript = await betterncm.fs.readFileText(
+						`${plugin.pluginPath}/worker_script.js`,
+					);
+					if (currentWorkerScript !== workerScript) {
+						restartWorker(workerScript);
+					}
+				};
+
+				const shouldReloadPaths = [
+					"/manifest.json",
+					"/index.js",
+					"/startup_script.js",
+				];
+
+				const currentOriginalFiles = {};
+
+				for (const file of shouldReloadPaths) {
+					currentOriginalFiles[file] = betterncm.fs.readFileText(
+						plugin.pluginPath + file,
+					);
+				}
+
+				const normalizedPluginPath = normalizePath(plugin.pluginPath);
+				for (const file of await betterncm.fs.readDir(plugin.pluginPath)) {
+					const relPath = normalizePath(file).replace(normalizedPluginPath, "");
+					currentOriginalFiles[relPath] = betterncm.fs.readFileText(file);
+				}
+
+				async function checkFileOrReload(relPath: string) {
+					const fileData = await betterncm.fs.readFileText(
+						plugin.pluginPath + relPath,
+					);
+					if (currentOriginalFiles[relPath] !== fileData) {
+						currentOriginalFiles[relPath] = fileData;
+						if (relPath === "/index.css") {
+							warn("检测到", relPath, "更新，正在热重载样式表");
+							debounceRefreshStyle();
+						} else if (relPath === "/worker_script.js") {
+							warn("检测到", relPath, "更新，正在热重载工作线程");
+							debounceRefreshWorker();
+						} else if (shouldReloadPaths.includes(relPath)) {
+							warn(
+								"检测到",
+								relPath,
+								"更新 (",
+								currentOriginalFiles[relPath]?.length,
+								"->",
+								fileData.length,
+								")正在重载",
+							);
+							debounceReload();
+						}
+					}
+				}
+
+				const checkFileOrReloadFunc = {};
+
+				betterncm_native?.fs?.watchDirectory(
+					plugin.pluginPath,
+					(dirPath, filename) => {
+						const normalizedDirPath = normalizePath(dirPath);
+						const fullPath = normalizePath(`${dirPath}/${filename}`);
+						const relPath = fullPath.replace(normalizedDirPath, "");
+						checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
+							() => checkFileOrReload(relPath),
+							1000,
+						);
+						checkFileOrReloadFunc[relPath]();
+					},
+				);
+			})();
+		}
+		betterncm.fs
+			.readFileText(`${plugin.pluginPath}/index.css`)
+			.then((curStyle) => {
 				if (cssContent !== curStyle) {
 					cssContent = curStyle;
 					reloadStylesheet(cssContent);
 				}
-			};
-
-			const debounceRefreshWorker = async function () {
-				const workerScript = await betterncm.fs.readFileText(
-					`${plugin.pluginPath}/worker_script.js`,
-				);
-				if (currentWorkerScript !== workerScript) {
-					restartWorker(workerScript);
-				}
-			};
-
-			const shouldReloadPaths = [
-				"/manifest.json",
-				"/index.js",
-				"/startup_script.js",
-			];
-
-			const currentOriginalFiles = {};
-
-			for (const file of shouldReloadPaths) {
-				currentOriginalFiles[file] = betterncm.fs.readFileText(
-					plugin.pluginPath + file,
-				);
-			}
-
-			const normalizedPluginPath = normalizePath(plugin.pluginPath);
-			for (const file of await betterncm.fs.readDir(plugin.pluginPath)) {
-				const relPath = normalizePath(file).replace(
-					normalizedPluginPath,
-					"",
-				);
-				currentOriginalFiles[relPath] = betterncm.fs.readFileText(file);
-			}
-
-			async function checkFileOrReload(relPath: string) {
-				const fileData = await betterncm.fs.readFileText(
-					plugin.pluginPath + relPath,
-				);
-				if (currentOriginalFiles[relPath] !== fileData) {
-					currentOriginalFiles[relPath] = fileData;
-					if (relPath === "/index.css") {
-						warn("检测到", relPath, "更新，正在热重载样式表");
-						debounceRefreshStyle();
-					} else if (relPath === "/worker_script.js") {
-						warn("检测到", relPath, "更新，正在热重载工作线程");
-						debounceRefreshWorker();
-					} else if (shouldReloadPaths.includes(relPath)) {
-						warn(
-							"检测到",
-							relPath,
-							"更新 (",
-							currentOriginalFiles[relPath]?.length,
-							"->",
-							fileData.length,
-							")正在重载",
-						);
-						debounceReload();
-					}
-				}
-			}
-
-			const checkFileOrReloadFunc = {};
-
-			betterncm_native?.fs?.watchDirectory(
-				plugin.pluginPath,
-				(dirPath, filename) => {
-					const normalizedDirPath = normalizePath(dirPath);
-					const fullPath = normalizePath(`${dirPath}/${filename}`);
-					const relPath = fullPath.replace(normalizedDirPath, "");
-					checkFileOrReloadFunc[relPath] ||= betterncm.utils.debounce(
-						() => checkFileOrReload(relPath),
-						1000,
-					);
-					checkFileOrReloadFunc[relPath]();
-				},
-			);
-		})();
-	}
-	betterncm.fs
-		.readFileText(`${plugin.pluginPath}/index.css`)
-		.then((curStyle) => {
-			if (cssContent !== curStyle) {
-				cssContent = curStyle;
-				reloadStylesheet(cssContent);
-			}
-		});
-	log("AMLL 初始化完成！");
+			});
+		log("AMLL 初始化完成！");
 	} catch (err) {
 		debugger;
 		throw err;

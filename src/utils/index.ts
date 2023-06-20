@@ -16,7 +16,7 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 }
 
 let IS_NCMV3: boolean;
-export function isNCMV3 () {
+export function isNCMV3() {
 	if (typeof IS_NCMV3 === "undefined") {
 		try {
 			IS_NCMV3 = !semverLt(
@@ -35,7 +35,7 @@ export function isNCMV3 () {
 		}
 	}
 	return IS_NCMV3;
-};
+}
 
 /* eslint-disable max-depth, max-statements, complexity, max-lines-per-function */
 const SLASH = 47;

@@ -1,4 +1,11 @@
-import { Text, Select, SelectItem, ThemeIcon, Group, Alert } from "@mantine/core";
+import {
+	Text,
+	Select,
+	SelectItem,
+	ThemeIcon,
+	Group,
+	Alert,
+} from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -75,11 +82,7 @@ export const BackgroundSettings: React.FC = () => {
 					defaultValue={true}
 				/>
 			</GroupBox>
-			<Alert
-				sx={{ margin: "16px 0" }}
-				color="yellow"
-				title="正在重构背景模块"
-			>
+			<Alert sx={{ margin: "16px 0" }} color="yellow" title="正在重构背景模块">
 				<div>下面的设置暂时没有效果</div>
 			</Alert>
 			{showBackground && (
