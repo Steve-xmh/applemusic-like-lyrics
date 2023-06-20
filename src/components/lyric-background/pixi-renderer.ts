@@ -3,6 +3,7 @@ import {
 	BlurFilter,
 	ColorMatrixFilter,
 	Container,
+	NoiseFilter,
 	Sprite,
 	Texture,
 } from "pixi.js";
@@ -75,12 +76,12 @@ export class PixiRenderer {
 	};
 	constructor(private canvas: HTMLCanvasElement) {
 		const bounds = canvas.getBoundingClientRect();
-		this.canvas.width = bounds.width;
-		this.canvas.height = bounds.height;
+		this.canvas.width = bounds.width * window.devicePixelRatio;
+		this.canvas.height = bounds.height * window.devicePixelRatio;
 		this.observer = new ResizeObserver(() => {
 			const bounds = canvas.getBoundingClientRect();
-			this.canvas.width = bounds.width;
-			this.canvas.height = bounds.height;
+			this.canvas.width = bounds.width * window.devicePixelRatio;
+			this.canvas.height = bounds.height * window.devicePixelRatio;
 			this.app.renderer.resize(this.canvas.width, this.canvas.height);
 			this.rebuildFilters();
 		});
@@ -90,9 +91,12 @@ export class PixiRenderer {
 			// width: this.canvas.width,
 			// height: this.canvas.height,
 			resizeTo: this.canvas,
+            powerPreference: "low-power",
 			backgroundAlpha: 0,
 		});
 		this.rebuildFilters();
+		this.app.ticker.maxFPS = 15;
+		this.app.ticker.minFPS = 0;
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}
@@ -118,6 +122,7 @@ export class PixiRenderer {
 			this.app.stage.filters.push(new BlurFilter(320, 4));
 		}
 		this.app.stage.filters.push(c0, c1, c2);
+		this.app.stage.filters.push(new BlurFilter(5, 5));
 	}
 
 	async updateAlbum(albumUrl: string) {
