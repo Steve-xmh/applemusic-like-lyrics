@@ -17,7 +17,13 @@
     }
   };
   channel.registerCall = function AppleMusicLikeLyricRegisterCallHook(cmd, callback) {
-    log(cmd, [callback]);
-    return hookRegisterCall.apply(hookRegisterCall, [cmd, callback]);
+    log("registerCall", cmd, [callback]);
+    return hookRegisterCall.apply(hookRegisterCall, [
+      cmd,
+      (...args) => {
+        log("registerCalled", cmd, args);
+        return callback(...args);
+      }
+    ]);
   };
 })();

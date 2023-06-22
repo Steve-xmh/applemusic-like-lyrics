@@ -13,6 +13,7 @@
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
+    "ncm3-compatible": true,
     "incompatible": [
         "RefinedNowPlaying"
     ],

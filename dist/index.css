@@ -828,50 +828,6 @@ pre[class*=language-] {
   width: 100%;
   display: flex;
 }
-#applemusic-like-lyrics-view-fm .am-lyric-background {
-  z-index: -1;
-  position: fixed;
-  left: -5px;
-  top: -5px;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
-  filter: blur(5px);
-  display: contents;
-  overflow: hidden;
-  transition: background-image 1s ease-in-out;
-}
-#applemusic-like-lyrics-view-fm .am-lyric-background > svg {
-  position: absolute;
-}
-#applemusic-like-lyrics-view-fm .am-lyric-background.am-lyric-bg-album-image .am-lyric-bg-album-image-animated-0 {
-  animation: am-lyric-bg-album-image-animated-0 15s linear infinite;
-}
-@keyframes am-lyric-bg-album-image-animated-0 {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate(720px, 0) rotate(90deg);
-  }
-  50% {
-    transform: translate(860px, 512px) rotate(180deg);
-  }
-  75% {
-    transform: translate(0, 922px) rotate(270deg);
-  }
-  75% {
-    transform: translate(0, 0) rotate(360deg);
-  }
-}
-#applemusic-like-lyrics-view-fm .am-lyric-background.am-lyric-bg-album-image::after {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  content: " ";
-  z-index: 2;
-  backdrop-filter: blur(180px) saturate(1.7) brightness(70%) contrast(130%);
-  -webkit-backdrop-filter: blur(180px) saturate(1.7) brightness(70%) contrast(130%);
-}
 #applemusic-like-lyrics-view-fm .am-lyric-view-loading {
   flex: 1;
 }
@@ -879,8 +835,8 @@ pre[class*=language-] {
   color: var(--applemusic-like-lyrics-font-color, unset);
   border-top: solid 1px var(--applemusic-like-lyrics-font-color, unset);
   padding-top: 8px;
-  font-size: 125%;
-  line-height: 150%;
+  opacity: 0.75;
+  font-size: 2.5vh;
 }
 #applemusic-like-lyrics-view-fm .am-player-song-info {
   grid-area: info;
@@ -2086,50 +2042,6 @@ pre[class*=language-] {
   width: 100%;
   display: flex;
 }
-#applemusic-like-lyrics-view .am-lyric-background {
-  z-index: -1;
-  position: fixed;
-  left: -5px;
-  top: -5px;
-  width: calc(100% + 10px);
-  height: calc(100% + 10px);
-  filter: blur(5px);
-  display: contents;
-  overflow: hidden;
-  transition: background-image 1s ease-in-out;
-}
-#applemusic-like-lyrics-view .am-lyric-background > svg {
-  position: absolute;
-}
-#applemusic-like-lyrics-view .am-lyric-background.am-lyric-bg-album-image .am-lyric-bg-album-image-animated-0 {
-  animation: am-lyric-bg-album-image-animated-0 15s linear infinite;
-}
-@keyframes am-lyric-bg-album-image-animated-0 {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate(720px, 0) rotate(90deg);
-  }
-  50% {
-    transform: translate(860px, 512px) rotate(180deg);
-  }
-  75% {
-    transform: translate(0, 922px) rotate(270deg);
-  }
-  75% {
-    transform: translate(0, 0) rotate(360deg);
-  }
-}
-#applemusic-like-lyrics-view .am-lyric-background.am-lyric-bg-album-image::after {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  content: " ";
-  z-index: 2;
-  backdrop-filter: blur(180px) saturate(1.7) brightness(70%) contrast(130%);
-  -webkit-backdrop-filter: blur(180px) saturate(1.7) brightness(70%) contrast(130%);
-}
 #applemusic-like-lyrics-view .am-lyric-view-loading {
   flex: 1;
 }
@@ -2137,8 +2049,8 @@ pre[class*=language-] {
   color: var(--applemusic-like-lyrics-font-color, unset);
   border-top: solid 1px var(--applemusic-like-lyrics-font-color, unset);
   padding-top: 8px;
-  font-size: 125%;
-  line-height: 150%;
+  opacity: 0.75;
+  font-size: 2.5vh;
 }
 #applemusic-like-lyrics-view .am-player-song-info {
   grid-area: info;

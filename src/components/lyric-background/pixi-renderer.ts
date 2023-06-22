@@ -3,12 +3,20 @@ import {
 	BlurFilter,
 	ColorMatrixFilter,
 	Container,
+	Filter,
 	Sprite,
 	Texture,
 } from "pixi.js";
+import colorDitheringFragment from "./color-dithering.frag"
 
 class TimedContainer extends Container {
 	public time: number = 0;
+}
+
+class ColorDitheringFilter extends Filter {
+	constructor() {
+		super(undefined, colorDitheringFragment)
+	}
 }
 
 export class PixiRenderer {
@@ -117,7 +125,8 @@ export class PixiRenderer {
 			this.app.stage.filters.push(new BlurFilter(320, 4));
 		}
 		this.app.stage.filters.push(c0, c1, c2);
-		this.app.stage.filters.push(new BlurFilter(5, 5));
+		this.app.stage.filters.push(new BlurFilter(5, 1));
+		this.app.stage.filters.push(new ColorDitheringFilter());
 	}
 
 	async updateAlbum(albumUrl: string) {

@@ -73897,11 +73897,19 @@ ${e4}`);
   HTMLText.defaultMaxHeight = 2024;
   HTMLText.defaultAutoResolution = true;
 
+  // src/components/lyric-background/color-dithering.frag
+  var color_dithering_default = "precision highp float;\nvarying vec2 vTextureCoord;\nuniform vec2 inputPixel;\nuniform sampler2D uSampler;\n\nconst float NOISE_GRANULARITY = 0.5 / 255.0;\n\nfloat random(vec2 coords) {\n    return fract(sin(dot(coords.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\n\nvoid main() {\n    vec2 coordinates = vTextureCoord;\n    vec4 fragmentColor = texture2D(uSampler, coordinates);\n    fragmentColor += mix(-NOISE_GRANULARITY, NOISE_GRANULARITY, random(coordinates));\n    gl_FragColor = fragmentColor;\n}";
+
   // src/components/lyric-background/pixi-renderer.ts
   var TimedContainer = class extends Container {
     constructor() {
       super(...arguments);
       __publicField(this, "time", 0);
+    }
+  };
+  var ColorDitheringFilter = class extends Filter {
+    constructor() {
+      super(void 0, color_dithering_default);
     }
   };
   var PixiRenderer = class {
@@ -73952,21 +73960,20 @@ ${e4}`);
         }
       });
       const bounds = canvas.getBoundingClientRect();
-      this.canvas.width = bounds.width;
-      this.canvas.height = bounds.height;
+      this.canvas.width = bounds.width * window.devicePixelRatio;
+      this.canvas.height = bounds.height * window.devicePixelRatio;
       this.observer = new ResizeObserver(() => {
         const bounds2 = canvas.getBoundingClientRect();
-        this.canvas.width = bounds2.width;
-        this.canvas.height = bounds2.height;
+        this.canvas.width = bounds2.width * window.devicePixelRatio;
+        this.canvas.height = bounds2.height * window.devicePixelRatio;
         this.app.renderer.resize(this.canvas.width, this.canvas.height);
         this.rebuildFilters();
       });
       this.observer.observe(canvas);
       this.app = new Application({
         view: canvas,
-        // width: this.canvas.width,
-        // height: this.canvas.height,
         resizeTo: this.canvas,
+        powerPreference: "low-power",
         backgroundAlpha: 0
       });
       this.rebuildFilters();
@@ -73976,7 +73983,7 @@ ${e4}`);
     rebuildFilters() {
       const minBorder = Math.min(this.canvas.width, this.canvas.height);
       const c0 = new ColorMatrixFilter();
-      c0.saturate(1.7, false);
+      c0.saturate(1.2, false);
       const c1 = new ColorMatrixFilter();
       c1.brightness(0.6, false);
       const c22 = new ColorMatrixFilter();
@@ -73994,6 +74001,8 @@ ${e4}`);
         this.app.stage.filters.push(new BlurFilter(320, 4));
       }
       this.app.stage.filters.push(c0, c1, c22);
+      this.app.stage.filters.push(new BlurFilter(5, 1));
+      this.app.stage.filters.push(new ColorDitheringFilter());
     }
     async updateAlbum(albumUrl) {
       const tex = await Texture.fromURL(albumUrl);
@@ -76263,6 +76272,7 @@ ${e4}`);
     currentLyrics: []
   });
   var LyricDOMRenderer = () => {
+    var _a2, _b;
     const currentAudioId = useAtomValue(currentAudioIdAtom);
     const currentAudioDuration = useAtomValue(currentAudioDurationAtom);
     const currentLyricsA = useAtomValue(currentLyricsAtom);
@@ -76314,7 +76324,7 @@ ${e4}`);
     const lastScrollTime = React115.useRef(Date.now());
     const scrollToLyric = React115.useCallback(
       (mustScroll = false, currentLyricIndexes2 = cachedLyricIndex.current) => {
-        var _a2, _b, _c, _d;
+        var _a3, _b2, _c, _d;
         cachedLyricIndex.current = currentLyricIndexes2;
         if (lyricListElement.current) {
           let scrollToIndex = Number.MAX_SAFE_INTEGER;
@@ -76331,7 +76341,7 @@ ${e4}`);
               scrollToIndex = i6;
             }
           }
-          const isPrevDots = (_b = (_a2 = lineHeights.current[scrollToIndex - 1]) == null ? void 0 : _a2.isDots) != null ? _b : false;
+          const isPrevDots = (_b2 = (_a3 = lineHeights.current[scrollToIndex - 1]) == null ? void 0 : _a3.isDots) != null ? _b2 : false;
           const curLine = lineHeights.current[scrollToIndex];
           let curLineHeight = (_c = curLine == null ? void 0 : curLine.height) != null ? _c : 0;
           if ((curLine == null ? void 0 : curLine.isDots) && lineHeights.current[scrollToIndex + 1]) {
@@ -76613,13 +76623,13 @@ ${e4}`);
             children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { ref: lyricListElement, children: [
               currentLyrics == null ? void 0 : currentLyrics.map(
                 (line2, index3, _lines) => {
-                  var _a2, _b;
+                  var _a3, _b2;
                   const offset = index3 - firstLyricIndex;
                   if (line2.originalLyric.trim().length > 0) {
                     return /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
                       LyricLineView,
                       {
-                        lineTransform: (_a2 = lineTransforms[index3]) != null ? _a2 : {
+                        lineTransform: (_a3 = lineTransforms[index3]) != null ? _a3 : {
                           top: 1e4,
                           left: 0,
                           scale: 1,
@@ -76644,7 +76654,7 @@ ${e4}`);
                       LyricDots,
                       {
                         onSizeChanged: () => requestAnimationFrame(recalculateLineHeights),
-                        lineTransform: (_b = lineTransforms[index3]) != null ? _b : {
+                        lineTransform: (_b2 = lineTransforms[index3]) != null ? _b2 : {
                           top: 1e4,
                           left: 0,
                           scale: 1,
@@ -76663,7 +76673,7 @@ ${e4}`);
                   }
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime37.jsx)(
                 "div",
                 {
                   className: "am-lyric-credits",
@@ -76671,20 +76681,16 @@ ${e4}`);
                     transform: `translateY(${creditLineTransform.top}px) translateX(${creditLineTransform.left}) scale(${creditLineTransform.scale})`,
                     transition: `all ${creditLineTransform.duration}ms cubic-bezier(0.46, 0, 0.07, 1) ${creditLineTransform.delay}ms`
                   },
-                  children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { children: [
-                      "创作者：",
-                      songArtists.map((v5) => v5.name).join(", ")
-                    ] }),
-                    currentRawLyricResp.lyricUser && /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { children: [
-                      "原文歌词贡献者：",
-                      currentRawLyricResp.lyricUser.nickname
-                    ] }),
-                    currentRawLyricResp.transUser && /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { children: [
-                      "翻译歌词贡献者：",
-                      currentRawLyricResp.transUser.nickname
-                    ] })
-                  ]
+                  children: /* @__PURE__ */ (0, import_jsx_runtime37.jsxs)("div", { children: [
+                    "创作者：",
+                    [
+                      .../* @__PURE__ */ new Set([
+                        ...songArtists.map((v5) => v5.name),
+                        (_a2 = currentRawLyricResp == null ? void 0 : currentRawLyricResp.lyricUser) == null ? void 0 : _a2.nickname,
+                        (_b = currentRawLyricResp == null ? void 0 : currentRawLyricResp.transUser) == null ? void 0 : _b.nickname
+                      ])
+                    ].filter((v5) => !!v5).join(", ")
+                  ] })
                 }
               )
             ] })
@@ -78393,15 +78399,7 @@ ${e4}`);
           defaultValue: true
         }
       ) }),
-      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
-        Alert,
-        {
-          sx: { margin: "16px 0" },
-          color: "yellow",
-          title: "正在重构背景模块",
-          children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { children: "下面的设置暂时没有效果" })
-        }
-      ),
+      /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(Alert, { sx: { margin: "16px 0" }, color: "yellow", title: "正在重构背景模块", children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)("div", { children: "下面的设置暂时没有效果" }) }),
       showBackground && /* @__PURE__ */ (0, import_jsx_runtime58.jsxs)(import_jsx_runtime58.Fragment, { children: [
         /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(GroupBox, { children: /* @__PURE__ */ (0, import_jsx_runtime58.jsx)(
           Select,
@@ -79781,10 +79779,7 @@ ${e4}`);
           }
           const normalizedPluginPath = normalizePath(plugin.pluginPath);
           for (const file of await betterncm.fs.readDir(plugin.pluginPath)) {
-            const relPath = normalizePath(file).replace(
-              normalizedPluginPath,
-              ""
-            );
+            const relPath = normalizePath(file).replace(normalizedPluginPath, "");
             currentOriginalFiles[relPath] = betterncm.fs.readFileText(file);
           }
           async function checkFileOrReload(relPath) {
@@ -79958,6 +79953,7 @@ ${e4}`);
       if ((payload == null ? void 0 : payload.type) === "setPlaying" || (payload == null ? void 0 : payload.type) === "playing/setPlaying") {
         songInfoPayload = (_a2 = payload == null ? void 0 : payload.payload) != null ? _a2 : {};
       } else {
+        log("amllDispatchHook", payload == null ? void 0 : payload.type, payload == null ? void 0 : payload.payload);
       }
       appStore = __spreadValues(__spreadValues({}, appStore), (_b = payload == null ? void 0 : payload.payload) != null ? _b : {});
     };
