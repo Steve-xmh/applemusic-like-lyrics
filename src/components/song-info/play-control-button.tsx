@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { currentPlayModeAtom } from "../../core/states";
-import { PlayMode, switchPlayMode } from "../../utils";
+import { PlayMode, isNCMV3, switchPlayMode } from "../../utils";
 import * as React from "react";
 
 import IconShuffle from "../../assets/icon_shuffle.svg";
@@ -130,21 +130,39 @@ export const PlayControlButton: React.FC<{
 			props.type === PlayControlButtonType.AddToFav ||
 			props.type === PlayControlButtonType.AddToFavHeart
 		) {
-			const pinfo = document.querySelector<HTMLDivElement>(".m-pinfo>*");
-			if (pinfo) {
-				const obz = new MutationObserver(() => {
-					setIsFavSong(
-						!!document
-							.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
-							?.classList.contains("loved"),
-					);
-				});
-				obz.observe(pinfo, {
-					childList: true,
-				});
-				return () => {
-					obz.disconnect();
-				};
+			if (isNCMV3()) {
+				const btnSpan = document.querySelector<HTMLSpanElement>(
+					"footer .left button:nth-child(1) > span > span",
+				);
+				if (btnSpan) {
+					const obz = new MutationObserver(() => {
+						setIsFavSong(!!btnSpan.title.startsWith("喜欢"));
+					});
+					obz.observe(btnSpan, {
+						attributes: true,
+						attributeFilter: ["title"],
+					});
+					return () => {
+						obz.disconnect();
+					};
+				}
+			} else {
+				const pinfo = document.querySelector<HTMLDivElement>(".m-pinfo>*");
+				if (pinfo) {
+					const obz = new MutationObserver(() => {
+						setIsFavSong(
+							!!document
+								.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
+								?.classList.contains("loved"),
+						);
+					});
+					obz.observe(pinfo, {
+						childList: true,
+					});
+					return () => {
+						obz.disconnect();
+					};
+				}
 			}
 		}
 	}, [props.type]);
@@ -274,6 +292,11 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						document
+							.querySelector<HTMLButtonElement>(
+								"footer .left button:nth-child(1)",
+							)
+							?.click();
+						document
 							.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
 							?.click();
 					}}
@@ -290,6 +313,11 @@ export const PlayControlButton: React.FC<{
 				<button
 					className="am-music-track-btn"
 					onClick={() => {
+						document
+							.querySelector<HTMLButtonElement>(
+								"footer .left button:nth-child(1)",
+							)
+							?.click();
 						document
 							.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
 							?.click();

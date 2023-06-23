@@ -6,8 +6,9 @@
 
 import { GLOBAL_EVENTS } from "../utils/global-events";
 import { log, warn } from "../utils/logger";
-import { debounce, IS_WORKER, normalizePath } from "../utils";
+import { debounce, normalizePath } from "../utils";
 import { setConfigFromMain } from "../worker";
+import { IS_WORKER } from "../utils/is-worker";
 
 export interface Config {
 	[key: string]: string | undefined;

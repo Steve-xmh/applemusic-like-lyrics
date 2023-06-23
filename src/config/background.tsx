@@ -1,4 +1,11 @@
-import { Text, Select, SelectItem, ThemeIcon, Group } from "@mantine/core";
+import {
+	Text,
+	Select,
+	SelectItem,
+	ThemeIcon,
+	Group,
+	Alert,
+} from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -21,6 +28,15 @@ const BG_RENDERER_METHOD_DATA: BGRendererMethodData[] = [
 	{
 		icon: () => <IconDisc />,
 		...BlurAlbumMethod,
+	},
+	{
+		icon: () => <IconDisc />,
+		label: "动态模糊专辑图片效果",
+		description: "仅显示模糊的专辑图片并缓缓移动",
+		value: "blur-animated-album",
+		fragmentShaderCode: "",
+		afterDrawArray() {},
+		configurableUniforms: [""],
 	},
 	{
 		icon: () => <IconRipple />,
@@ -66,6 +82,9 @@ export const BackgroundSettings: React.FC = () => {
 					defaultValue={true}
 				/>
 			</GroupBox>
+			<Alert sx={{ margin: "16px 0" }} color="yellow" title="正在重构背景模块">
+				<div>下面的设置暂时没有效果</div>
+			</Alert>
 			{showBackground && (
 				<>
 					<GroupBox>

@@ -1,6 +1,60 @@
 import * as React from "react";
 import { useConfigValue, useConfigValueNumber } from "../../api/react";
 import * as Weightings from "../../libs/a-weighting";
+import { isNCMV3 } from "../../utils";
+import { appendRegisterCall } from "../../utils/channel";
+import { log, warn } from "../../utils/logger";
+import AMLLFFTWASM from "../../../amll-fft/pkg/amll_fft_bg.wasm";
+import initFFT, { AMLLFFT } from "../../../amll-fft/pkg";
+
+// AudioData 48000hz int16 2 channels
+let fft: AMLLFFT;
+initFFT(AMLLFFTWASM).then(() => {
+	fft = AMLLFFT.new(48000);
+});
+
+function getFFTData() {
+	if (isNCMV3()) {
+		try {
+			const arr = fft?.process_fft() ?? new Float64Array();
+			return [...arr];
+		} catch (err) {
+			warn("getFFTData", err);
+			return [];
+		}
+	} else {
+		return betterncm_native?.audio?.getFFTData(64) ?? [];
+	}
+}
+
+function enableFFT() {
+	if (isNCMV3()) {
+		channel.call("audioplayer.enableAudioData", () => {}, [1]);
+		log("enableFFT");
+	} else {
+		betterncm_native?.audio?.acquireFFTData();
+	}
+}
+
+function disableFFT() {
+	if (isNCMV3()) {
+		channel.call("audioplayer.enableAudioData", () => {}, [0]);
+		log("disableFFT");
+	} else {
+		betterncm_native?.audio?.releaseFFTData();
+	}
+}
+
+if (isNCMV3()) {
+	appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
+		fft?.push_data(new Int16Array(data.data));
+	});
+}
+
+interface NCMV3AudioData {
+	data: ArrayBuffer;
+	pts: number;
+}
 
 export const AudioFFTControl: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -24,9 +78,8 @@ export const AudioFFTControl: React.FC = () => {
 
 		if (canvas) {
 			const ctx = canvas.getContext("2d");
-
 			if (ctx) {
-				betterncm_native.audio.acquireFFTData();
+				enableFFT();
 
 				const obs = new ResizeObserver((sizes) => {
 					for (const size of sizes) {
@@ -43,24 +96,31 @@ export const AudioFFTControl: React.FC = () => {
 				let fftData: number[] = [];
 
 				function onFrame() {
-					if (!(canvas && ctx) || stopped || !betterncm.isMRBNCM) return;
+					if (!(canvas && ctx) || stopped || !(betterncm.isMRBNCM || isNCMV3()))
+						return;
 					const width = canvas.width;
 					const height = canvas.height;
 
-					let rawData = betterncm_native?.audio?.getFFTData(64) ?? [];
+					let rawData = getFFTData();
 
 					const weighting: ((f: number) => number) | undefined =
 						Weightings[fftWeightingMethod];
 
 					if (weighting) {
 						rawData.forEach((v, i, a) => {
-							a[i] = v * weighting(((i + 1) / a.length) ** 2 * 22000 + 50);
+							a[i] = v * weighting((i / a.length) * 24000);
 						});
 					}
 
-					const data: number[] = [];
+					if (isNCMV3())
+						rawData = rawData.splice(
+							((rawData.length * 50) / 24000) | 0,
+							((rawData.length * 4000) / 24000) | 0,
+						);
 
-					// fftBarAmount
+					const data: number[] = rawData;
+
+					fftBarAmount;
 					const chunkSize = Math.ceil(rawData.length / fftBarAmount);
 
 					for (let i = 0; i < rawData.length; i += chunkSize) {
@@ -68,14 +128,14 @@ export const AudioFFTControl: React.FC = () => {
 						for (let j = 0; j < chunkSize; j++) {
 							t += rawData[Math.min(rawData.length - 1, i + j)];
 						}
-						data.push(t / chunkSize);
+						data.push(20 * Math.log10(t / chunkSize));
 					}
 
 					data.splice(fftBarAmount);
 
 					const maxValue = data.reduce((pv, cv) => (cv > pv ? cv : pv), 0);
 
-					scale = (scale * 5 + Math.max(1, maxValue)) / 6;
+					scale = (scale * 5 + Math.max(5, maxValue)) / 6;
 					fftData = data.map(
 						(v, i) =>
 							((fftData[i] ?? 0) * fftBarTweenSoftness + v / scale) /
@@ -104,8 +164,27 @@ export const AudioFFTControl: React.FC = () => {
 						);
 					}
 
-					ctx.closePath();
 					ctx.stroke();
+
+					// if (isNCMV3()) {
+					// 	const weighting: ((f: number) => number) | undefined =
+					// 		Weightings[fftWeightingMethod];
+
+					// 	if (weighting) {
+					// 		ctx.strokeStyle = "red";
+					// 		ctx.lineWidth = window.devicePixelRatio;
+					// 		ctx.beginPath();
+					// 		ctx.moveTo(0, 0);
+					// 		for (let i = 0; i < rawData.length; i++) {
+					// 			const x = (i / rawData.length) * width;
+					// 			ctx.lineTo(
+					// 				x,
+					// 				height * (1 - weighting(i / rawData.length * 10000)),
+					// 			);
+					// 		}
+					// 		ctx.stroke();
+					// 	}
+					// }
 
 					requestAnimationFrame(onFrame);
 				}
@@ -113,13 +192,19 @@ export const AudioFFTControl: React.FC = () => {
 				onFrame();
 
 				return () => {
-					betterncm_native.audio.releaseFFTData();
+					disableFFT();
 					obs.disconnect();
 					stopped = true;
 				};
 			}
 		}
-	}, [fftBarAmount, fftBarTweenSoftness, fftWeightingMethod, fftBarThinkness]);
+	}, [
+		fftBarAmount,
+		canvasRef.current,
+		fftBarTweenSoftness,
+		fftWeightingMethod,
+		fftBarThinkness,
+	]);
 
 	return <canvas className="am-audio-fft" ref={canvasRef} />;
 };

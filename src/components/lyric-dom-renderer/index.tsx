@@ -532,17 +532,18 @@ export const LyricDOMRenderer: React.FC = () => {
 							transition: `all ${creditLineTransform.duration}ms cubic-bezier(0.46, 0, 0.07, 1) ${creditLineTransform.delay}ms`,
 						}}
 					>
-						<div>创作者：{songArtists.map((v) => v.name).join(", ")}</div>
-						{currentRawLyricResp.lyricUser && (
-							<div>
-								原文歌词贡献者：{currentRawLyricResp.lyricUser.nickname}
-							</div>
-						)}
-						{currentRawLyricResp.transUser && (
-							<div>
-								翻译歌词贡献者：{currentRawLyricResp.transUser.nickname}
-							</div>
-						)}
+						<div>
+							创作者：
+							{[
+								...new Set([
+									...songArtists.map((v) => v.name),
+									currentRawLyricResp?.lyricUser?.nickname,
+									currentRawLyricResp?.transUser?.nickname,
+								]),
+							]
+								.filter((v) => !!v)
+								.join(", ")}
+						</div>
 					</div>
 				</div>
 			</div>

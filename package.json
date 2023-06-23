@@ -1,6 +1,6 @@
 {
   "name": "applemusic-like-lyrics",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "main": "index.js",
   "private": true,
   "license": "GPL-3.0",
@@ -30,13 +30,14 @@
     "jotai": "^2.0.0",
     "jszip": "^3.10.1",
     "pangu": "^4.0.7",
+    "pixi.js": "^7.2.4",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-simple-code-editor": "^0.13.1",
     "react-slider": "^2.0.4",
-    "semver": "^7.3.8",
+    "semver": "^7.5.1",
     "semver-compare": "^1.0.0",
     "typescript": "^4.9.4"
   },
@@ -47,6 +48,7 @@
     "@types/react-virtualized": "^9.21.21",
     "acron": "^1.0.5",
     "esbuild-plugin-svgr": "^1.0.1",
+    "esbuild-plugin-wasm": "^1.1.0",
     "rome": "^11.0.0"
   }
 }

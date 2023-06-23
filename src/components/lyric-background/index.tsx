@@ -14,6 +14,10 @@ import { normalizeColor } from "../../utils/color";
 import { BlurAlbumMethod } from "./blur-album";
 import { getConfig } from "../../config/core";
 import { rgb } from "color-convert/conversions";
+import { LyricAlbumImageBackground } from "./components/lyric-album-image-background";
+import { LyricAlbumAnimatedImageBackground } from "./components/lyric-album-animated-image-background";
+import { BlurFilter, ColorMatrixFilter, Texture } from "pixi.js";
+import { PixiRenderer } from "./pixi-renderer";
 
 const LyricCanvasBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -221,34 +225,28 @@ const LyricCanvasBackground: React.FC = () => {
 	);
 };
 
-const LyricAlbumImageBackground: React.FC = () => {
+const LyricPixiBackground: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
 	const [albumImageLoaded, albumImage, albumImageUrl] = useAlbumImage(musicId);
-	const [currentBG, setCurrentBG] = React.useState("");
-
+	const canvasRef = React.useRef<HTMLCanvasElement>(null);
+	const rendererRef = React.useRef<PixiRenderer | undefined>(undefined);
+	React.useLayoutEffect(() => {
+		if (rendererRef.current) {
+			rendererRef.current.dispose();
+		}
+		if (canvasRef.current) {
+			rendererRef.current = new PixiRenderer(canvasRef.current);
+		}
+	}, [canvasRef.current]);
 	React.useEffect(() => {
-		let canceled = false;
-		(async () => {
-			try {
-				if (albumImageLoaded && albumImage) {
-					try {
-						await albumImage.decode();
-					} catch (err) {
-						warn("图片解码失败，将直接设置", err);
-					}
-					setCurrentBG(albumImageUrl);
-				}
-			} catch (err) {
-				warn("更新专辑图片到背景时发生错误", err);
-			}
-		})();
-		return () => {
-			canceled = true;
-		};
-	}, [albumImageLoaded, albumImage, albumImageUrl]);
+		if (rendererRef.current && albumImageLoaded) {
+			rendererRef.current.updateAlbum(albumImageUrl);
+		}
+	}, [albumImageUrl, albumImageLoaded]);
 	return (
-		<div
-			className="am-lyric-background am-lyric-bg-album-image"
+		<canvas
+			ref={canvasRef}
+			className="am-lyric-background"
 			style={{
 				position: "fixed",
 				left: "0",
@@ -256,23 +254,12 @@ const LyricAlbumImageBackground: React.FC = () => {
 				width: "100%",
 				height: "100%",
 				color: "yellow",
-				backgroundImage: `url(${currentBG})`,
-				backgroundPosition: "center",
-				backgroundSize: "cover",
+				display: "block",
 			}}
 		/>
 	);
 };
 
 export const LyricBackground: React.FC = () => {
-	const backgroundRenderMethod = useConfigValue(
-		"backgroundRenderMethod",
-		BlurAlbumMethod.value,
-	);
-
-	if (backgroundRenderMethod === "blur-album") {
-		return <LyricAlbumImageBackground />;
-	} else {
-		return <LyricCanvasBackground />;
-	}
+	return <LyricPixiBackground />;
 };

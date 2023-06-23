@@ -35,6 +35,8 @@ import {
 import { getLyricCachePath, setClipboardData } from "../api";
 import { WindowedConfigComponent } from "../config";
 import exportTTMLText from "../core/ttml-writer";
+import { isNCMV3 } from "../utils";
+import { GLOBAL_EVENTS } from "../utils/global-events";
 
 export const LyricView: React.FC<{
 	isFM?: boolean;
@@ -188,20 +190,27 @@ const MainMenu: React.FC<{
 				label={isFavSong ? "取消喜欢歌曲" : "喜欢歌曲"}
 				onClick={() => {
 					document
+						.querySelector<HTMLButtonElement>(
+							"footer .left button:nth-child(1)",
+						)
+						?.click();
+					document
 						.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-love")
 						?.click();
 					setMenuOpened(false);
 				}}
 			/>
-			<MenuItem
-				label="收藏歌曲"
-				onClick={() => {
-					document
-						.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-fav")
-						?.click();
-					setMenuOpened(false);
-				}}
-			/>
+			{!isNCMV3() && (
+				<MenuItem
+					label="收藏歌曲"
+					onClick={() => {
+						document
+							.querySelector<HTMLDivElement>(".m-pinfo .btn.btn-fav")
+							?.click();
+						setMenuOpened(false);
+					}}
+				/>
+			)}
 			<MenuDevider />
 			{songArtists.length === 1 && (
 				<MenuItem
@@ -212,28 +221,32 @@ const MainMenu: React.FC<{
 					}}
 				/>
 			)}
-			{songArtists.length > 1 && (
-				<MenuItem label="查看歌手...">
-					{songArtists.map((a) => (
+			{!isNCMV3() && (
+				<>
+					{songArtists.length > 1 && (
+						<MenuItem label="查看歌手...">
+							{songArtists.map((a) => (
+								<MenuItem
+									label={a.name}
+									key={`song-artist-${a.id}`}
+									onClick={() => {
+										location.hash = `#/m/artist/?id=${a.id}`;
+										setMenuOpened(false);
+									}}
+								/>
+							))}
+						</MenuItem>
+					)}
+					{album && (
 						<MenuItem
-							label={a.name}
-							key={`song-artist-${a.id}`}
+							label={`查看专辑：${album.name}`}
 							onClick={() => {
-								location.hash = `#/m/artist/?id=${a.id}`;
+								location.hash = `#/m/album/?id=${album?.id}`;
 								setMenuOpened(false);
 							}}
 						/>
-					))}
-				</MenuItem>
-			)}
-			{album && (
-				<MenuItem
-					label={`查看专辑：${album.name}`}
-					onClick={() => {
-						location.hash = `#/m/album/?id=${album?.id}`;
-						setMenuOpened(false);
-					}}
-				/>
+					)}
+				</>
 			)}
 			<MenuItem label="复制音乐数据...">
 				<MenuItem
@@ -467,6 +480,20 @@ const MainMenu: React.FC<{
 					setMenuOpened(false);
 				}}
 			/>
+			{isNCMV3() && (
+				<>
+					<MenuDevider />
+					<MenuItem
+						label="退出歌词页面"
+						onClick={() => {
+							GLOBAL_EVENTS.dispatchEvent(
+								new Event("lyric-page-hide", undefined),
+							);
+							setMenuOpened(false);
+						}}
+					/>
+				</>
+			)}
 		</Menu>
 	);
 };

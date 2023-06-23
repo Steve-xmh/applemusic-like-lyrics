@@ -1,4 +1,4 @@
-import { Select } from "@mantine/core";
+import { Select, SelectItem } from "@mantine/core";
 import { useConfig } from "../api/react";
 import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 import { PlayControlButtonType } from "../components/song-info/play-control-button";
@@ -7,6 +7,8 @@ import {
 	SwitchConfigComponent,
 	TextConfigComponent,
 } from "./config-components";
+import { isNCMV3 } from "../utils";
+import React from "react";
 
 const fftWeightingMethodData = [
 	{
@@ -28,49 +30,6 @@ const fftWeightingMethodData = [
 	{
 		label: "D 权重算法",
 		value: "dWeighting",
-	},
-];
-
-const controlButtonTypeData = [
-	{
-		label: "切换顺序播放播放",
-		value: PlayControlButtonType.PlaybackOrder,
-	},
-	{
-		label: "切换列表循环播放",
-		value: PlayControlButtonType.PlaybackRepeat,
-	},
-	{
-		label: "切换单曲循环播放",
-		value: PlayControlButtonType.PlaybackOne,
-	},
-	{
-		label: "切换随机播放",
-		value: PlayControlButtonType.PlaybackRandom,
-	},
-	{
-		label: "切换心动模式播放",
-		value: PlayControlButtonType.PlaybackAI,
-	},
-	{
-		label: "收藏歌曲",
-		value: PlayControlButtonType.AddToPlaylist,
-	},
-	{
-		label: "喜欢/取消喜欢歌曲（星型样式）",
-		value: PlayControlButtonType.AddToFav,
-	},
-	{
-		label: "喜欢/取消喜欢歌曲（心型样式）",
-		value: PlayControlButtonType.AddToFavHeart,
-	},
-	{
-		label: "切换播放模式",
-		value: PlayControlButtonType.PlaybackSwitcher,
-	},
-	{
-		label: "切换播放模式（填充样式）",
-		value: PlayControlButtonType.PlaybackSwitcherFilled,
 	},
 ];
 
@@ -103,12 +62,63 @@ export const SongInfoStyleSettings: React.FC = () => {
 		},
 	];
 
-	if (betterncm.isMRBNCM) {
+	if (betterncm.isMRBNCM || isNCMV3()) {
 		widgetUnderProgressBarData.push({
 			label: "音频可视化 - 频谱",
 			value: "audio-viz-fft",
 		});
 	}
+
+	const controlButtonTypeData = React.useMemo(
+		() =>
+			[
+				{
+					label: "切换顺序播放播放",
+					value: PlayControlButtonType.PlaybackOrder,
+				},
+				{
+					label: "切换列表循环播放",
+					value: PlayControlButtonType.PlaybackRepeat,
+				},
+				{
+					label: "切换单曲循环播放",
+					value: PlayControlButtonType.PlaybackOne,
+				},
+				{
+					label: "切换随机播放",
+					value: PlayControlButtonType.PlaybackRandom,
+				},
+				isNCMV3()
+					? undefined
+					: {
+							label: "切换心动模式播放",
+							value: PlayControlButtonType.PlaybackAI,
+					  },
+				isNCMV3()
+					? undefined
+					: {
+							label: "收藏歌曲",
+							value: PlayControlButtonType.AddToPlaylist,
+					  },
+				{
+					label: "喜欢/取消喜欢歌曲（星型样式）",
+					value: PlayControlButtonType.AddToFav,
+				},
+				{
+					label: "喜欢/取消喜欢歌曲（心型样式）",
+					value: PlayControlButtonType.AddToFavHeart,
+				},
+				{
+					label: "切换播放模式",
+					value: PlayControlButtonType.PlaybackSwitcher,
+				},
+				{
+					label: "切换播放模式（填充样式）",
+					value: PlayControlButtonType.PlaybackSwitcherFilled,
+				},
+			].filter((v) => !!v) as SelectItem[],
+		[],
+	);
 
 	return (
 		<>
@@ -136,6 +146,7 @@ export const SongInfoStyleSettings: React.FC = () => {
 				<SwitchConfigComponent
 					settingKey="hideMenuButton"
 					label="隐藏菜单按钮"
+					description="隐藏后，你依然可以通过右键左侧任意位置打开菜单"
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent

@@ -33,11 +33,11 @@
 .am-lyrics-settings
     *
         @include pingfang-font
-    background: rgb(43,43,43)
-    min-height: 100%
-    margin: -1rem
-    padding: 1rem
-    color: white
+        background: rgb(43,43,43)
+        min-height: 100%
+        margin: -1rem
+        padding: 1rem
+        color: white
     // font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
     // *
     //     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
@@ -146,6 +146,32 @@
 
 #applemusic-like-lyrics-view
     @include applemusic-like-lyrics-view-style
+    &.ncm-v3
+        position: fixed
+        left: 0
+        top: 100vh
+        border-radius: 16px 16px 0 0
+        z-index: 998
+        transition: top 0.5s cubic-bezier(0.8,0,0.1,1), border-radius 0.25s ease-in-out
+        background: var(--colorFunction3)
+        -webkit-backdrop-filter: blur(120px)
+        backdrop-filter: blur(120px)
+
+#amll-view-button
+    border: none
+    background: transparent
+    padding: 0
+    line-height: 0
+    cursor: pointer
+    fill: var(--colorBlack5)
+    &:hover
+        fill: var(--colorBlack3)
+
+footer
+    transition: bottom 0.5s cubic-bezier(0.8,0,0.1,1)
+    > * > * > *
+        transition: opacity 0.5s 0.5s ease-in-out
+        opacity: 1
 
 // 播放栏透明 + 模糊遮罩
 .m-player.z-shadow
@@ -227,7 +253,29 @@ header, .m-winctrl
     display: none
 
 body.amll-lyric-page-open
+    footer
+        bottom: 100%
+        > * > * > *
+            transition: opacity 0.25s ease-in-out
+            opacity: 0
+    #applemusic-like-lyrics-view.ncm-v3
+        top: 0vh
+        border-radius: 0 0 0 0
     header
+        .HeaderRow_h1n2o69r
+            grid-template-columns: unset
+            display: flex
+            flex-direction: row-reverse
+            .HistoryIconBackground_h1s4i8hh
+                display: none
+            .DomWarpper_dwvx1li
+                display: none
+            .Bar_b2jgnke
+                display: none
+            .IconBar_i1ueu1yn
+                flex: 0
+                .MiniModeIconBar_m1jn0mly, .Divider_d1jt85zx
+                    display: none
         .m-leftbox
             justify-content: flex-end
         .m-topbox, .msg, .itm2

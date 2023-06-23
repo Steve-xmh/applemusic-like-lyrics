@@ -8,12 +8,11 @@
 
 这是你能在网易云上见到的最像 iPad Apple Music 的播放页面了。
 
-![](https://user-images.githubusercontent.com/39523898/230704437-9dd0a7f3-adcb-42e4-a19e-797e8abceb74.png)
-![](https://user-images.githubusercontent.com/39523898/230704176-610d4a64-b33f-4d3e-934a-4387bd9c81f5.png)
-![](https://user-images.githubusercontent.com/39523898/230704540-1b45fdab-be21-4285-a0f6-5abca75103e5.png)
-![](https://user-images.githubusercontent.com/39523898/230705199-002402ca-b18a-48d2-b4e7-54054d604af9.png)
-![](https://user-images.githubusercontent.com/39523898/230705314-44f28376-c3d8-4119-8482-f441565574db.png)
-![](https://user-images.githubusercontent.com/39523898/230705260-79b3c1cb-992f-4388-b3d0-cfb047155d4c.png)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b9dc5226-e08c-475c-a90d-1d1dbb3e0d70)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b26631f6-5925-4de9-ba9c-fc4d41bc14da)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/6a36d069-559e-4bce-8904-31a8f8648a0f)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8049da87-c6ef-4140-b324-e0f78a9c5ba4)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/e9cebc5b-9778-4914-9460-ebdcfa7f1e68)
 
 </div>
 
@@ -29,7 +28,7 @@
 
 ## 开发/构建/打包流程
 
-安装好 `nodejs` 和 `yarn`，克隆本仓库到任意文件夹后在终端输入以下指令即可构建：
+安装好 `nodejs`, `yarn`, `rustc`, `wasm-pack`，克隆本仓库到任意文件夹后在终端输入以下指令即可构建：
 
 ```bash
 yarn

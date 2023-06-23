@@ -185,6 +185,7 @@ export const LyricLineView: React.FC<
 				if (isOutOfSight) {
 					if (visibilityRef.current !== "hidden") {
 						lineRef.current.style.visibility = "hidden";
+						lineRef.current.style.transform = "translateY(-512px) scale(0)";
 						visibilityRef.current = "hidden";
 					}
 				} else {
@@ -220,6 +221,7 @@ export const LyricLineView: React.FC<
 		if (isTargetOutOfSight && currentOutOfSight) {
 			if (visibilityRef.current !== "hidden" && lineRef.current) {
 				lineRef.current.style.visibility = "hidden";
+				lineRef.current.style.transform = "translateY(-512px) scale(0)";
 				visibilityRef.current = "hidden";
 			}
 			springRef.current
@@ -247,7 +249,7 @@ export const LyricLineView: React.FC<
 							scale: lineTransform.scale,
 						},
 						{
-							hard: !lineTransform.initialized,
+							hard: !lineTransform.initialized || lineTransform.userScrolling,
 							soft: 0.5,
 						},
 					)

@@ -33,6 +33,11 @@ export const PlayControls: React.FC = () => {
 					document
 						.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
 						?.click();
+					document
+						.querySelector<HTMLButtonElement>(
+							"footer > * > * > .middle > *:nth-child(1) > button:nth-child(2)",
+						)
+						?.click();
 				}}
 			>
 				<IconRewind color="#FFFFFF" />
@@ -51,6 +56,11 @@ export const PlayControls: React.FC = () => {
 							.querySelector<HTMLButtonElement>("#main-player .btnp-pause")
 							?.click();
 					}
+					document
+						.querySelector<HTMLButtonElement>(
+							"footer > * > * > .middle > *:nth-child(1) > button:nth-child(3)",
+						)
+						?.click();
 				}}
 			>
 				{playState === PlayState.Playing ? (
@@ -64,6 +74,11 @@ export const PlayControls: React.FC = () => {
 				onClick={() => {
 					document
 						.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
+						?.click();
+					document
+						.querySelector<HTMLButtonElement>(
+							"footer > * > * > .middle > *:nth-child(1) > button:nth-child(4)",
+						)
 						?.click();
 				}}
 			>

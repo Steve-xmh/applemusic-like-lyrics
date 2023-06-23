@@ -18,6 +18,7 @@
         "module": "ESNext",
         "types": [],
         "jsx": "react-jsx",
+        "strict": true,
         // "jsxFactory": "h",
         // "jsxFragmentFactory": "f",
         "moduleResolution": "node",
