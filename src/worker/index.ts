@@ -1,6 +1,6 @@
 import { Config, GLOBAL_CONFIG, setConfig } from "../config/core";
 import { log, warn } from "../utils/logger";
-import { genRandomString } from "../utils";
+import { genRandomString } from "../utils/gen-random-string";
 import { quantize } from "../libs/color-quantize";
 import { Pixel } from "../libs/color-quantize/utils";
 import { IS_WORKER } from "../utils/is-worker";

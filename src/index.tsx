@@ -14,7 +14,8 @@ import {
 	initInjectorV2,
 	initInjectorV3,
 } from "./utils/page-injector";
-import { isNCMV3, normalizePath } from "./utils";
+import { isNCMV3 } from "./utils";
+import { normalizePath } from "./utils/path";
 
 export let cssContent = "";
 

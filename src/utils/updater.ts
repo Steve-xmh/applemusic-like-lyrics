@@ -1,6 +1,6 @@
 import * as React from "react";
 import semverGt from "semver/functions/gt";
-import { normalizePath } from ".";
+import { normalizePath } from "./path";
 import { useConfigValue, useConfigValueBoolean } from "../api/react";
 import { GLOBAL_EVENTS } from "./global-events";
 import { log } from "./logger";

@@ -7,7 +7,7 @@ import {
 	Sprite,
 	Texture,
 } from "pixi.js";
-import colorDitheringFragment from "./color-dithering.frag"
+import colorDitheringFragment from "./color-dithering.frag";
 
 class TimedContainer extends Container {
 	public time: number = 0;
@@ -15,7 +15,7 @@ class TimedContainer extends Container {
 
 class ColorDitheringFilter extends Filter {
 	constructor() {
-		super(undefined, colorDitheringFragment)
+		super(undefined, colorDitheringFragment);
 	}
 }
 

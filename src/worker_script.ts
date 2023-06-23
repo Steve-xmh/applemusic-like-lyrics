@@ -1,4 +1,3 @@
-import "./worker/index";
 import { error, log } from "./utils/logger";
 import {
 	definedFunctions,

@@ -1,8 +1,10 @@
 import { log, warn } from "../utils/logger";
-import { isNCMV3, genRandomString, normalizePath } from "../utils";
+import { isNCMV3 } from "../utils";
 import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
 import { songInfoPayload } from "../utils/page-injector/v3";
+import { genRandomString } from "../utils/gen-random-string";
+import { normalizePath } from "../utils/path";
 let cachedFunctionMap: Map<string, Function> = new Map();
 
 export enum PlayState {
