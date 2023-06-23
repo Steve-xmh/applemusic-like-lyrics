@@ -49,6 +49,7 @@ declare namespace channel {
 	export function call(command: string, callback: Function, args: any[]);
 	export function registerCall(name: string, callback: Function);
 	export function encryptId(data: string): string;
+	// export let registerCallbacks: Map<string, Set<Function>>;
 }
 type NCMInjectPlugin = import("plugin").NCMInjectPlugin;
 interface LFPNCMPlugin extends NCMInjectPlugin {

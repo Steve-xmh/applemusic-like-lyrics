@@ -1,7 +1,7 @@
 import { log } from "./utils/logger";
 
 const hookCall = channel.call;
-const hookRegisterCall = channel.registerCall;
+// const hookRegisterCall = channel.registerCall;
 
 channel.call = function AppleMusicLikeLyricCallHook(
 	cmd: string,
@@ -15,16 +15,18 @@ channel.call = function AppleMusicLikeLyricCallHook(
 	}
 };
 
-channel.registerCall = function AppleMusicLikeLyricRegisterCallHook(
-	cmd: string,
-	callback: Function,
-) {
-	log("registerCall", cmd, [callback]);
-	return hookRegisterCall.apply(hookRegisterCall, [
-		cmd,
-		(...args) => {
-			log("registerCalled", cmd, args);
-			return callback(...args);
-		},
-	]);
-};
+// channel.registerCall = function AppleMusicLikeLyricRegisterCallHook(
+// 	cmd: string,
+// 	callback: Function,
+// ) {
+// 	channel.registerCallbacks ??= new Map();
+// 	const hookedCallback = (...args) => {
+// 		log("registerCalled", cmd, this, args);
+// 		return callback(...args);
+// 	};
+// 	log("registerCall", cmd, [callback]);
+// 	if (!channel.registerCallbacks.has(cmd))
+// 		channel.registerCallbacks.set(cmd, new Set());
+// 	channel.registerCallbacks.get(cmd)!.add(hookedCallback.bind(this));
+// 	return hookRegisterCall.apply(hookRegisterCall, [cmd, hookedCallback]);
+// };

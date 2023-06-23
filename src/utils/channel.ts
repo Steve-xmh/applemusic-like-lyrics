@@ -1,3 +1,4 @@
+import { isNCMV3 } from ".";
 import { log, warn } from "./logger";
 
 const registeredEvt = new Set<string>();
@@ -43,3 +44,18 @@ export const removeRegisterCallRaw = (name: string, callback: Function) => {
 		if (callbacks.get(name)?.size === 0) callbacks.delete(name);
 	}
 };
+
+// export const emitRegisteredCallbacks = (cmd: string, ...args: any[]) => {
+// 	if (isNCMV3()) {
+// 		const cbs = channel.registerCallbacks.get(cmd);
+// 		if (cbs) {
+// 			for (const cb of cbs) {
+// 				try {
+// 					cb(...args);
+// 				} catch (err) {
+// 					warn(err);
+// 				}
+// 			}
+// 		}
+// 	}
+// };
