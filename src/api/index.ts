@@ -244,9 +244,8 @@ export const loadLyric = async (
 	} catch (err) {
 		warn("警告：加载已缓存歌词失败", err);
 	}
-	const nid = parseInt(String(id));
-	if (typeof id === "number" || !Number.isNaN(nid)) {
-		const data = await getLyric(parseInt(String(id)));
+	if (typeof id === "number" || /^\d+/.test(id)) {
+		const data = await getLyric(Number(id));
 		try {
 			if (!(await betterncm.fs.exists(lyricsPath))) {
 				betterncm.fs.mkdir(lyricsPath);
