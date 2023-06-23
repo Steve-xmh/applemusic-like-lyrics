@@ -67,6 +67,7 @@ export async function initInjector() {
 			payload?.type === "playing/setPlaying"
 		) {
 			songInfoPayload = payload?.payload ?? {};
+			log(songInfoPayload)
 		} else {
 			log("amllDispatchHook", payload?.type, payload?.payload);
 		}
