@@ -50,7 +50,7 @@ import {
 } from "../core/states";
 import { error, log, warn } from "../utils/logger";
 import { LyricEditorWSClient } from "../core/editor-client";
-import { eqSet, getCurrentPlayMode, PlayMode } from "../utils";
+import { eqSet, getCurrentPlayMode, isNCMV3, PlayMode } from "../utils";
 import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
 
 export const NCMEnvWrapper: React.FC = () => {
@@ -352,17 +352,19 @@ export const NCMEnvWrapper: React.FC = () => {
 			setCurrentAudioDuration(duration);
 		} catch {}
 
-		try {
-			const nmSettings = JSON.parse(
-				localStorage.getItem("NM_SETTING_USER") ?? "{}",
-			);
-			setPlayState(
-				nmSettings?.pauseStatus ? PlayState.Pausing : PlayState.Playing,
-			);
-			setPlayProgress(
-				(((nmSettings?.lastPlaying?.playPostion || 0) * duration) / 1000) | 0,
-			);
-		} catch {}
+		if (!isNCMV3()) {
+			try {
+				const nmSettings = JSON.parse(
+					localStorage.getItem("NM_SETTING_USER") ?? "{}",
+				);
+				setPlayState(
+					nmSettings?.pauseStatus ? PlayState.Pausing : PlayState.Playing,
+				);
+				setPlayProgress(
+					(((nmSettings?.lastPlaying?.playPostion || 0) * duration) / 1000) | 0,
+				);
+			} catch {}
+		}
 
 		return () => {
 			removeRegisterCall("Volume", "audioplayer", onVolumeChanged);

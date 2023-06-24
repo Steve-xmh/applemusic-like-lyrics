@@ -62,19 +62,32 @@ export async function initInjector() {
 	footerRightButtons?.prepend(amllViewButton);
 
 	window.amllDispatchHook = function amllDispatchHook(payload) {
+		// log("amllDispatchHook", payload?.type, payload?.payload);
 		if (
 			payload?.type === "setPlaying" ||
 			payload?.type === "playing/setPlaying"
 		) {
 			songInfoPayload = payload?.payload ?? {};
-			log(songInfoPayload)
-		} else {
+			log(songInfoPayload);
+		} else if (payload?.type === "playing/onCurPlayingTrackInfoUpdate") {
+			songInfoPayload.trackIn = payload?.payload?.track ?? {};
+			log(songInfoPayload);
+		} else if (payload?.type === "updateCurPlaying") {
+			songInfoPayload.trackIn = payload?.payload?.curPlaying ?? {};
+			log(songInfoPayload);
+		} else if (payload?.type === "onUpdate") {
 			log("amllDispatchHook", payload?.type, payload?.payload);
+			if (payload?.payload?.playingState !== undefined)
+				appStore.playingState = payload?.payload?.playingState;
+			if (payload?.payload?.lastPlayingMode !== undefined)
+				appStore.lastPlayingMode = payload?.payload?.lastPlayingMode;
+			if (payload?.payload?.playingMode !== undefined)
+				appStore.playingMode = payload?.payload?.playingMode;
 		}
-		appStore = {
-			...appStore,
-			...(payload?.payload ?? {}),
-		};
+		// appStore = {
+		// 	...appStore,
+		// 	...(payload?.payload ?? {}),
+		// };
 		// log(appStore)
 	};
 

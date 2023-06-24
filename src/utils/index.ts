@@ -125,30 +125,35 @@ export enum PlayMode {
 export function switchPlayMode(playMode: PlayMode) {
 	if (isNCMV3()) {
 		if (playMode === PlayMode.AI) return; // 3.0.0 暂时没有心动模式
-		const playModeBtn = document.querySelector<HTMLButtonElement>(
-			"footer > * > * > .middle > *:nth-child(1) > button:nth-child(1)",
-		);
-		while (playModeBtn) {
-			const playingMode = appStore?.playingMode;
+		let counter = 0;
+		while (counter++ < 4) {
+			const playModeBtn = document.querySelector<HTMLButtonElement>(
+				"footer > * > * > .middle > *:nth-child(1) > button:nth-child(1)",
+			);
+			const btnSpan = playModeBtn?.querySelector("span > span");
+			if (!(playModeBtn && btnSpan)) break;
+			playModeBtn.click();
+			const playingMode = btnSpan.ariaLabel;
+			console.log(btnSpan.ariaLabel);
 			switch (playMode) {
 				case PlayMode.Order:
-					if (playingMode === "playOrder") return;
+					if (playingMode === "shuffle") return;
 					break;
 				case PlayMode.Repeat:
-					if (playingMode === "playCycle") return;
+					if (playingMode === "order") return;
 					break;
 				case PlayMode.Random:
-					if (playingMode === "playRandom") return;
+					if (playingMode === "singleloop") return;
 					break;
 				case PlayMode.One:
-					if (playingMode === "playOneCycle") return;
+					if (playingMode === "loop") return;
 					break;
 			}
-			playModeBtn.click();
 		}
 	} else {
 		const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
-		while (playModeBtn) {
+		let counter = 0;
+		while (playModeBtn && counter++ < 5) {
 			if (playModeBtn.classList.contains(playMode)) {
 				return;
 			}

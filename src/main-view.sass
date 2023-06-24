@@ -267,6 +267,7 @@ $global-mix-blend-mode: plus-lighter // luminosity
             margin: auto
             width: 90%
             max-width: 100%
+            transform: translateZ(0) // 解决重绘问题 https://stackoverflow.com/a/27971913
             > *
                 transition: opacity $tween-animation-duration $tween-animation-timing
 

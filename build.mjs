@@ -176,6 +176,7 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 			}
 
 			if (process.argv.includes("--dist")) {
+				console.log("Packing plugin");
 				const plugin = new JSZip();
 				function addIfExist(filename, name = filename) {
 					if (fs.existsSync(filename))
@@ -194,22 +195,34 @@ if (IS_DEV && process.argv.includes("--lyric-test")) {
 					addIfExist("startup_script.js");
 					addIfExist("worker_script.js");
 				}
-				const output = plugin.generateNodeStream({
-					compression: "DEFLATE",
-					compressionOptions: {
-						level: 9,
-					},
-				});
-				output.pipe(fs.createWriteStream("Apple Music-like lyrics.plugin"));
-				output.pipe(
-					fs.createWriteStream(
-						`Apple Music-like lyrics-${getCommitHash()}.plugin`,
-					),
-				);
-				fs.writeFileSync(
-					"dist/manifest.json",
-					JSON.stringify(manifest, null, "\t"),
-				);
+				plugin
+					.generateAsync({
+						compression: "DEFLATE",
+						type: "nodebuffer",
+						compressionOptions: {
+							level: 9,
+						},
+					})
+					.then((data) => {
+						if (data.byteLength > 800 * 1024) {
+							console.log("Plugin Artifact is too big (>800KiB)");
+							return;
+						}
+						console.log(
+							"Plugin packed successfully (",
+							data.byteLength / 1024,
+							"KiB )",
+						);
+						fs.writeFileSync("Apple Music-like lyrics.plugin", data);
+						fs.writeFileSync(
+							"Apple Music-like lyrics-${getCommitHash()}.plugin",
+							data,
+						);
+						fs.writeFileSync(
+							"dist/manifest.json",
+							JSON.stringify(manifest, null, "\t"),
+						);
+					});
 			}
 		})
 		.catch((error) => {
