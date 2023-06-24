@@ -231,23 +231,6 @@ window.addEventListener(
 	},
 );
 
-if (OPEN_PAGE_DIRECTLY) {
-	window.addEventListener(
-		"load",
-		() => {
-			const btn = document.querySelector<HTMLAnchorElement>(
-				"a[data-action='max']",
-			);
-			btn?.click();
-		},
-		{
-			once: true,
-		},
-	);
-}
-
-reloadStylesheet(cssContent);
-
 export const useStyles = createStyles;
 
 export const ThemeProvider: React.FC<React.PropsWithChildren> = (props) => {

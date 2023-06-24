@@ -9,6 +9,16 @@ import { NCMEnvWrapper } from "../../components/netease-api-wrapper";
 import { LyricView } from "../../components/lyric-player";
 import { log } from "../logger";
 
+let hideTimer: number = 0;
+
+export let mainViewElement: HTMLDivElement = document.createElement("div");
+mainViewElement.id = "applemusic-like-lyrics-view";
+let mainViewRoot: Root;
+
+export let fmViewElement: HTMLDivElement = document.createElement("div");
+fmViewElement.id = "applemusic-like-lyrics-view-fm";
+let fmViewRoot: Root;
+
 const FMPlayerWrapper: React.FC = () => {
 	const [height, setHeight] = React.useState(0);
 
@@ -54,16 +64,6 @@ const FMPlayerWrapper: React.FC = () => {
 		</Provider>
 	);
 };
-
-let hideTimer: number = 0;
-
-export let mainViewElement: HTMLDivElement = document.createElement("div");
-mainViewElement.id = "applemusic-like-lyrics-view";
-let mainViewRoot: Root;
-
-export let fmViewElement: HTMLDivElement = document.createElement("div");
-fmViewElement.id = "applemusic-like-lyrics-view-fm";
-let fmViewRoot: Root;
 
 const camelToSnakeCase = (str: string) =>
 	str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -127,10 +127,7 @@ export function initInjector() {
 		}
 		setControlsVisibility(true);
 		hideTimer = setTimeout(() => {
-			// const lyricPageOpened = !!document.querySelector(".g-singlec-ct.j-fflag");
-			// if (lyricPageOpened) {
 			setControlsVisibility(false);
-			// }
 		}, (hideDuration || 5) * 1000);
 	};
 

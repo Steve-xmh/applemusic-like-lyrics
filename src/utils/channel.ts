@@ -1,5 +1,5 @@
 import { isNCMV3 } from ".";
-import { log, warn } from "./logger";
+import { warn } from "./logger";
 
 const registeredEvt = new Set<string>();
 const callbacks = new Map<string, Set<Function>>();
@@ -19,29 +19,43 @@ export const appendRegisterCall = (
 	name: string,
 	namespace: string,
 	callback: Function,
-) => appendRegisterCallRaw(`${namespace}.on${name}`, callback);
+) =>
+	isNCMV3()
+		? appendRegisterCallRaw(`${namespace}.on${name}`, callback)
+		: legacyNativeCmder.appendRegisterCall(name, namespace, callback);
 
 export const appendRegisterCallRaw = (name: string, callback: Function) => {
-	if (!registeredEvt.has(name)) {
-		registeredEvt.add(name);
-		channel.registerCall(name, (...args) => {
-			onRegisterCallEvent(name, args);
-		});
+	if (isNCMV3()) {
+		if (!registeredEvt.has(name)) {
+			registeredEvt.add(name);
+			channel.registerCall(name, (...args) => {
+				onRegisterCallEvent(name, args);
+			});
+		}
+		if (!callbacks.has(name)) callbacks.set(name, new Set());
+		callbacks.get(name)?.add(callback);
+	} else {
+		throw new TypeError("该功能在 3.0.0 之前不支持");
 	}
-	if (!callbacks.has(name)) callbacks.set(name, new Set());
-	callbacks.get(name)?.add(callback);
 };
 
 export const removeRegisterCall = (
 	name: string,
 	namespace: string,
 	callback: Function,
-) => removeRegisterCallRaw(`${namespace}.on${name}`, callback);
+) =>
+	isNCMV3()
+		? removeRegisterCallRaw(`${namespace}.on${name}`, callback)
+		: legacyNativeCmder.removeRegisterCall(name, namespace, callback);
 
 export const removeRegisterCallRaw = (name: string, callback: Function) => {
-	if (callbacks.has(name)) {
-		callbacks.get(name)?.delete(callback);
-		if (callbacks.get(name)?.size === 0) callbacks.delete(name);
+	if (isNCMV3()) {
+		if (callbacks.has(name)) {
+			callbacks.get(name)?.delete(callback);
+			if (callbacks.get(name)?.size === 0) callbacks.delete(name);
+		}
+	} else {
+		throw new TypeError("该功能在 3.0.0 之前不支持");
 	}
 };
 

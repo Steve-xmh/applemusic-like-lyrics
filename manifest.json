@@ -9,7 +9,7 @@
     ],
     "description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
     "preview": "preview.svg",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
@@ -29,7 +29,9 @@
                 "id": "csp-worker",
                 "from": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src ",
                 "to": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src data: blob: "
-            },
+            }
+        },
+        ">= 3.0.0": {
             "orpheus://orpheus/pub/hybrid/vendors": {
                 "type": "replace",
                 "id": "redux-dispatch-hook",
