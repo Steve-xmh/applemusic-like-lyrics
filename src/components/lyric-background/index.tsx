@@ -255,6 +255,7 @@ const LyricPixiBackground: React.FC = () => {
 				height: "100%",
 				color: "yellow",
 				display: "block",
+				zIndex: -1,
 			}}
 		/>
 	);
