@@ -110,7 +110,8 @@
         height: unset
 
 #applemusic-like-lyrics-view-fm
-    @include applemusic-like-lyrics-view-style
+    > *
+        @include applemusic-like-lyrics-view-style
     padding-top: 0
     .am-album-hide-sidebar
         width: 12px
@@ -138,11 +139,6 @@
                 @media screen and (min-height: 1024px)
                     font-size: 200%
 
-    > *
-        height: 100%
-        width: 100%
-        display: flex
-        flex-direction: row
 
 #applemusic-like-lyrics-view
     @include applemusic-like-lyrics-view-style

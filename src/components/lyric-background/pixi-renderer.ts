@@ -87,8 +87,8 @@ export class PixiRenderer {
 		this.canvas.height = bounds.height * window.devicePixelRatio;
 		this.observer = new ResizeObserver(() => {
 			const bounds = canvas.getBoundingClientRect();
-			this.canvas.width = bounds.width * window.devicePixelRatio;
-			this.canvas.height = bounds.height * window.devicePixelRatio;
+			this.canvas.width = Math.max(1, bounds.width * window.devicePixelRatio);
+			this.canvas.height = Math.max(1, bounds.height * window.devicePixelRatio);
 			this.app.renderer.resize(this.canvas.width, this.canvas.height);
 			this.rebuildFilters();
 		});
