@@ -175,7 +175,9 @@ export const NCMEnvWrapper: React.FC = () => {
 			(async () => {
 				setCurrentLyrics(null);
 				try {
-					const lyric = await loadLyric(musicId);
+					const lyric = await loadLyric(musicId, false, {
+						trackInfo: getPlayingSong().data,
+					});
 					if (!canceled) {
 						setCurrentRawLyricResp(lyric);
 					}

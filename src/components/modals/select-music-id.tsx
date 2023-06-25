@@ -16,6 +16,7 @@ import {
 	getLyric,
 	getLyricCachePath,
 	getNCMImageUrl,
+	getPlayingSong,
 	getSongDetail,
 	SongDetailResponse,
 } from "../../api";
@@ -142,7 +143,10 @@ export const SelectMusicIdModal: React.FC = () => {
 					if (selectMusicId) {
 						setSelectMusicIdModalLoading(true);
 						try {
-							const data = await getLyric(selectMusicId);
+							const data = {
+								...(await getLyric(selectMusicId)),
+								trackInfo: getPlayingSong().data,
+							};
 							const lyricsPath = getLyricCachePath();
 							const cachedLyricPath = `${lyricsPath}/${musicId}.json`;
 							if (!(await betterncm.fs.exists(lyricsPath))) {

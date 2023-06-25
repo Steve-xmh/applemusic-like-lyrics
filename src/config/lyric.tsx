@@ -28,6 +28,12 @@ export const LyricSettings: React.FC = () => {
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent
+					settingKey="reverse-lyric-order"
+					label="交换翻译和音译歌词顺序"
+					defaultValue={false}
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
 					settingKey="ttml-lyric"
 					label="可用时使用 TTML 歌词（实验性）"
 					description="TTML 歌词即 Apple Music 所使用的逐词歌词格式，可以提供更加精确的歌词和歌词效果，将 .ttml 格式的歌词文件以网易云音乐 ID 命名后放入 betterncm/amll-data/ttml-lyrics 后即可读取。"

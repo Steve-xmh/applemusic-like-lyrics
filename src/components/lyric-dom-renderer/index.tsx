@@ -17,10 +17,12 @@ import { LyricLine } from "../../core/lyric-parser";
 import { LyricLineView } from "./lyric-line";
 import { LyricDots } from "./lyric-dots";
 import { eqSet } from "../../utils";
+import { getConfig } from "../../config/core";
 
 export const LyricRendererContext = React.createContext({
 	lyricPageSize: [0, 0],
 	currentLyrics: [] as LyricLine[],
+	reverseLyricOrder: getConfig("reverse-lyric-order", "false") === "true",
 });
 
 export interface LyricLineTransform {
@@ -63,6 +65,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configTranslatedLyric = useConfigValueBoolean("translated-lyric", true);
 	const configDynamicLyric = useConfigValueBoolean("dynamic-lyric", false);
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
+	const reverseLyricOrder = useConfigValueBoolean("reverse-lyric-order", false);
 	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
 	const noCacheLyricState = useConfigValueBoolean("noCacheLyricState", false);
 
@@ -458,6 +461,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			value={{
 				lyricPageSize: viewHeight.current,
 				currentLyrics: currentLyrics ?? [],
+				reverseLyricOrder: reverseLyricOrder,
 			}}
 		>
 			<div

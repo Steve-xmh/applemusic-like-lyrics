@@ -129,6 +129,14 @@ export class PixiRenderer {
 		this.app.stage.filters.push(new ColorDitheringFilter());
 	}
 
+	pause() {
+		this.app.ticker.stop();
+	}
+
+	resume() {
+		this.app.ticker.start();
+	}
+
 	async updateAlbum(albumUrl: string) {
 		const tex = await Texture.fromURL(albumUrl);
 		const container = new TimedContainer();

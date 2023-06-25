@@ -310,12 +310,25 @@ export const LyricLineView: React.FC<
 							.trim() || line.originalLyric}
 					</div>
 				)}
-				<div className="am-lyric-line-translated">
-					{translated ? line.translatedLyric : ""}
-				</div>
-				<div className="am-lyric-line-roman">
-					{roman ? line.romanLyric : ""}
-				</div>
+				{lyricCtx.reverseLyricOrder ? (
+					<>
+						<div className="am-lyric-line-roman">
+							{roman ? line.romanLyric : ""}
+						</div>
+						<div className="am-lyric-line-translated">
+							{translated ? line.translatedLyric : ""}
+						</div>
+					</>
+				) : (
+					<>
+						<div className="am-lyric-line-translated">
+							{translated ? line.translatedLyric : ""}
+						</div>
+						<div className="am-lyric-line-roman">
+							{roman ? line.romanLyric : ""}
+						</div>
+					</>
+				)}
 			</div>
 		</div>
 	);

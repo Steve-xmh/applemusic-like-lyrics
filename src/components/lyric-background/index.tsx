@@ -7,17 +7,19 @@ import {
 } from "../../api/react";
 import { log, warn } from "../../utils/logger";
 import { BUILDIN_RENDER_METHODS, CanvasBackgroundRender } from "./render";
-import { albumImageMainColorsAtom, musicIdAtom } from "../../core/states";
+import {
+	albumImageMainColorsAtom,
+	musicIdAtom,
+	playStateAtom,
+} from "../../core/states";
 import { useAtomValue } from "jotai";
 import { Pixel } from "../../libs/color-quantize/utils";
 import { normalizeColor } from "../../utils/color";
 import { BlurAlbumMethod } from "./blur-album";
 import { getConfig } from "../../config/core";
 import { rgb } from "color-convert/conversions";
-import { LyricAlbumImageBackground } from "./components/lyric-album-image-background";
-import { LyricAlbumAnimatedImageBackground } from "./components/lyric-album-animated-image-background";
-import { BlurFilter, ColorMatrixFilter, Texture } from "pixi.js";
 import { PixiRenderer } from "./pixi-renderer";
+import { PlayState } from "../../api";
 
 const LyricCanvasBackground: React.FC = () => {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -227,7 +229,9 @@ const LyricCanvasBackground: React.FC = () => {
 
 const LyricPixiBackground: React.FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
-	const [albumImageLoaded, albumImage, albumImageUrl] = useAlbumImage(musicId);
+	const playState = useAtomValue(playStateAtom);
+	const lyricPageOpened = useNowPlayingOpened();
+	const [albumImageLoaded, , albumImageUrl] = useAlbumImage(musicId);
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 	const rendererRef = React.useRef<PixiRenderer | undefined>(undefined);
 	React.useLayoutEffect(() => {
@@ -243,6 +247,13 @@ const LyricPixiBackground: React.FC = () => {
 			rendererRef.current.updateAlbum(albumImageUrl);
 		}
 	}, [albumImageUrl, albumImageLoaded]);
+	React.useEffect(() => {
+		if (playState === PlayState.Playing && lyricPageOpened) {
+			rendererRef.current?.resume();
+		} else {
+			rendererRef.current?.pause();
+		}
+	}, [playState, lyricPageOpened]);
 	return (
 		<canvas
 			ref={canvasRef}

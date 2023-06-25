@@ -229,6 +229,7 @@ export const getLyricCachePath = () =>
 export const loadLyric = async (
 	id: string | number,
 	ignoreCache = false,
+	additionalData: any = {},
 ): Promise<LyricFile> => {
 	const lyricsPath = getLyricCachePath();
 	const cachedLyricPath = `${lyricsPath}/${id}.json`;
@@ -245,7 +246,7 @@ export const loadLyric = async (
 		warn("警告：加载已缓存歌词失败", err);
 	}
 	if (typeof id === "number" || /^\d+/.test(id)) {
-		const data = await getLyric(Number(id));
+		const data = { ...(await getLyric(Number(id))), ...additionalData };
 		try {
 			if (!(await betterncm.fs.exists(lyricsPath))) {
 				betterncm.fs.mkdir(lyricsPath);
