@@ -47,7 +47,13 @@ export function buildStylesheetFromConfig() {
 	result.push("}\n");
 	return result.join("");
 }
-
+let root: HTMLDivElement | null = null;
+export function getV3State() {
+	root ??= document.getElementById("root") as HTMLDivElement;
+	return (
+		root as any
+	)?._reactRootContainer?._internalRoot?.current?.child?.child?.memoizedState?.memoizedState[0]?.store?.getState();
+}
 export let songInfoPayload: any = {};
 export let appStore: any = {};
 export async function initInjector() {
@@ -68,15 +74,15 @@ export async function initInjector() {
 			payload?.type === "playing/setPlaying"
 		) {
 			songInfoPayload = payload?.payload ?? {};
-			log(songInfoPayload);
+			// log(songInfoPayload);
 		} else if (payload?.type === "playing/onCurPlayingTrackInfoUpdate") {
 			songInfoPayload.trackIn = payload?.payload?.track ?? {};
-			log(songInfoPayload);
+			// log(songInfoPayload);
 		} else if (payload?.type === "updateCurPlaying") {
 			songInfoPayload.trackIn = payload?.payload?.curPlaying ?? {};
-			log(songInfoPayload);
+			// log(songInfoPayload);
 		} else if (payload?.type === "onUpdate") {
-			log("amllDispatchHook", payload?.type, payload?.payload);
+			// log("amllDispatchHook", payload?.type, payload?.payload);
 			if (payload?.payload?.playingState !== undefined)
 				appStore.playingState = payload?.payload?.playingState;
 			if (payload?.payload?.lastPlayingMode !== undefined)
@@ -88,7 +94,7 @@ export async function initInjector() {
 		// 	...appStore,
 		// 	...(payload?.payload ?? {}),
 		// };
-		// log(appStore)
+		log("amllDispatchHook", payload?.type, payload?.payload)
 	};
 
 	mainViewRoot = createRoot(mainViewElement);

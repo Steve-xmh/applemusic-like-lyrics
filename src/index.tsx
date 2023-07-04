@@ -69,7 +69,7 @@ plugin.onLoad(async () => {
 			await new Promise((resolve) => setTimeout(resolve, 100));
 
 		if (isNCMV3()) {
-			initInjectorV3();
+			await initInjectorV3();
 		} else {
 			initInjectorV2();
 		}

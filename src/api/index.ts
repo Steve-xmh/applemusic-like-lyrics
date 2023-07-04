@@ -2,7 +2,7 @@ import { log, warn } from "../utils/logger";
 import { isNCMV3 } from "../utils";
 import type { LyricLine } from "../core/lyric-types";
 import { parseLyric as parseTTMLLyric } from "../core/ttml-lyric-parser";
-import { songInfoPayload } from "../utils/page-injector/v3";
+import { getV3State, songInfoPayload } from "../utils/page-injector/v3";
 import { genRandomString } from "../utils/gen-random-string";
 import { normalizePath } from "../utils/path";
 let cachedFunctionMap: Map<string, Function> = new Map();
@@ -182,9 +182,14 @@ export async function getLyricCorrection(
  */
 export function getPlayingSong() {
 	if (isNCMV3()) {
+		const state = getV3State()?.playing;
 		return {
-			state: songInfoPayload?.playingState ?? 2,
-			data: songInfoPayload?.trackIn?.track,
+			state: state?.playingState ?? 2,
+			data: {
+				...state ?? {},
+				...state?.curPlaying?.track ?? {},
+				...state?.curPlaying ?? {},
+			},
 		};
 	} else if (APP_CONF.isOSX) {
 		return callCachedSearchFunction("baD", []);

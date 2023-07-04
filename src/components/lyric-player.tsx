@@ -23,7 +23,6 @@ import {
 	windowedConfigOpenedAtom,
 } from "../core/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { NoLyricOptions } from "./no-lyric-options";
 import { PlayerSongInfo } from "./song-info";
 import { LyricRenderer } from "./lyric-renderer";
 import { Menu, MenuDevider, MenuItem } from "./appkit/menu";
@@ -109,22 +108,8 @@ export const LyricView: React.FC<{
 						<div>{error.stack}</div>
 					</div>
 				) : (
-					<>
-						<LyricRenderer />
-						{!currentLyrics && (
-							<Center className="am-lyric-view-loading">
-								<Loader
-									size={50}
-									style={{
-										width: "50px",
-										height: "50px",
-									}}
-								/>
-							</Center>
-						)}
-					</>
+					<LyricRenderer />
 				)}
-				{currentLyrics?.length === 0 && <NoLyricOptions />}
 			</div>
 			<ModalsWrapper />
 			<MainMenu
