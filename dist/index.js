@@ -50393,6 +50393,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_liter
         return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "amll-error-boundary", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, { order: 2, children: "哦不，出大事情了" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: "发生了不可恢复的错误，给作者送 Issue 吧（" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: "如果可以，请尝试使用开发版本复现这个错误，这样子下面的错误信息会更加准确。" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("pre", { children: (_a2 = this.state.error) == null ? void 0 : _a2.name }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("pre", { children: (_b = this.state.error) == null ? void 0 : _b.message }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("pre", { children: (_c = this.state.error) == null ? void 0 : _c.stack })
@@ -74126,7 +74127,7 @@ ${e4}`);
       const c1 = new ColorMatrixFilter();
       c1.brightness(0.6, false);
       const c22 = new ColorMatrixFilter();
-      c22.contrast(1.3, false);
+      c22.contrast(0.3, true);
       this.app.stage.filters = [];
       this.app.stage.filters.push(new BlurFilter(5, 1));
       this.app.stage.filters.push(new BlurFilter(10, 1));

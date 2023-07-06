@@ -111,7 +111,7 @@ export class PixiRenderer {
 		const c1 = new ColorMatrixFilter();
 		c1.brightness(0.6, false);
 		const c2 = new ColorMatrixFilter();
-		c2.contrast(1.3, false);
+		c2.contrast(0.3, true);
 		this.app.stage.filters = [];
 		this.app.stage.filters.push(new BlurFilter(5, 1));
 		this.app.stage.filters.push(new BlurFilter(10, 1));
