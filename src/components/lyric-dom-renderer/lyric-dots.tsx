@@ -39,7 +39,7 @@ export const LyricDots: React.FC<
 	const dot2 = React.useRef<HTMLDivElement>(null);
 	const dotsRef = React.useRef<HTMLDivElement>(null);
 
-	React.useLayoutEffect(() => {
+	React.useEffect(() => {
 		const dots = dotsRef.current;
 		if (dots) {
 			const obs = new ResizeObserver(onSizeChanged);
@@ -48,7 +48,8 @@ export const LyricDots: React.FC<
 				obs.disconnect();
 			};
 		}
-	}, []);
+		onSizeChanged?.();
+	}, [onSizeChanged]);
 
 	React.useLayoutEffect(() => {
 		const dot0el = dot0.current;

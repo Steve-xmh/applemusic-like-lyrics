@@ -186,9 +186,9 @@ export function getPlayingSong() {
 		return {
 			state: state?.playingState ?? 2,
 			data: {
-				...state ?? {},
-				...state?.curPlaying?.track ?? {},
-				...state?.curPlaying ?? {},
+				...(state ?? {}),
+				...(state?.curPlaying?.track ?? {}),
+				...(state?.curPlaying ?? {}),
 			},
 		};
 	} else if (APP_CONF.isOSX) {
@@ -336,9 +336,17 @@ export async function genBitmapImage(
 }
 
 export function setClipboardData(data: string) {
-	legacyNativeCmder._envAdapter.callAdapter(
-		"winhelper.setClipBoardData",
-		() => {},
-		[data],
-	);
+	if (APP_CONF.isOSX) {
+		legacyNativeCmder._envAdapter.callAdapter(
+			"bNKMscdeKkVadbampUsYWQAclGulPOYpdhiZXrhJqavAGsOG",
+			() => {},
+			[data],
+		);
+	} else {
+		legacyNativeCmder._envAdapter.callAdapter(
+			"winhelper.setClipBoardData",
+			() => {},
+			[data],
+		);
+	}
 }
