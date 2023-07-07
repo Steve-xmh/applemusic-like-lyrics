@@ -104,6 +104,8 @@ export function buildStylesheetFromConfig() {
 }
 
 export function initInjector() {
+	if (APP_CONF.isOSX) document.body.classList.add("amll-is-osx");
+
 	const setControlsVisibility = (visible: boolean) => {
 		if (visible) {
 			document.body.classList.remove("amll-hide-controls");
