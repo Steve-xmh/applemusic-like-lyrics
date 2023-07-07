@@ -27,7 +27,7 @@ export const OtherStyleSettings: React.FC = () => {
 				<SwitchConfigComponent
 					settingKey="usePingFangFont"
 					label="播放页面使用苹果系字体"
-					description="需要系统预先安装字体，安装后需要重启网易云客户端方可使用。英文部分将会使用 SF Pro，中文部分将会使用苹方。"
+					description="需要系统预先安装字体，安装后需要重启网易云客户端方可使用。英文部分将会使用 SF Pro，中文部分将会使用苹方。（下载链接感谢 Github 用户 @HIBIKl 提供的资源）"
 				/>
 				<GroupBoxDevider />
 				<div
@@ -39,7 +39,7 @@ export const OtherStyleSettings: React.FC = () => {
 					<Button
 						onClick={() => {
 							betterncm.ncm.openUrl(
-								"https://ghproxy.com/https://github.com/prchann/fonts/archive/refs/heads/main.zip",
+								"https://1drv.ms/f/s!Anmx7jZgAR8sr0TgWqv-FqMWtzaG?e=DboZ38",
 							);
 						}}
 					>

@@ -67,7 +67,6 @@ export const LyricDOMRenderer: React.FC = () => {
 	const configRomanLyric = useConfigValueBoolean("roman-lyric", true);
 	const reverseLyricOrder = useConfigValueBoolean("reverse-lyric-order", false);
 	const lyricScaleEffect = useConfigValueBoolean("lyricScaleEffect", false);
-	const noCacheLyricState = useConfigValueBoolean("noCacheLyricState", false);
 
 	const alignTopSelectedLyric = useConfigValueBoolean(
 		"alignTopSelectedLyric",
@@ -171,7 +170,7 @@ export const LyricDOMRenderer: React.FC = () => {
 					const lineTransform: LyricLineTransform = {
 						top: scrollHeight,
 						left: 0,
-						scale: scaleRatio,
+						scale: height.isDots ? 1 : scaleRatio,
 						duration: duration,
 						delay: mustScroll ? 0 : Math.max(0, Math.min(curDelay, 1000)),
 						initialized: true,
@@ -249,7 +248,7 @@ export const LyricDOMRenderer: React.FC = () => {
 	}, [cachedLyricIndexes]);
 
 	React.useLayoutEffect(() => {
-		if (currentLyricsA || noCacheLyricState) {
+		if (currentLyricsA) {
 			setCurrentLyrics(currentLyricsA);
 			setFirstLyricIndex(-1);
 		}

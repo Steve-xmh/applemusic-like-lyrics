@@ -83,12 +83,12 @@ export class PixiRenderer {
 	};
 	constructor(private canvas: HTMLCanvasElement) {
 		const bounds = canvas.getBoundingClientRect();
-		this.canvas.width = bounds.width * window.devicePixelRatio;
-		this.canvas.height = bounds.height * window.devicePixelRatio;
+		this.canvas.width = bounds.width;
+		this.canvas.height = bounds.height;
 		this.observer = new ResizeObserver(() => {
 			const bounds = canvas.getBoundingClientRect();
-			this.canvas.width = Math.max(1, bounds.width * window.devicePixelRatio);
-			this.canvas.height = Math.max(1, bounds.height * window.devicePixelRatio);
+			this.canvas.width = Math.max(1, bounds.width);
+			this.canvas.height = Math.max(1, bounds.height);
 			this.app.renderer.resize(this.canvas.width, this.canvas.height);
 			this.rebuildFilters();
 		});
@@ -100,6 +100,7 @@ export class PixiRenderer {
 			backgroundAlpha: 0,
 		});
 		this.rebuildFilters();
+		if (APP_CONF.isOSX) this.app.ticker.maxFPS = 30;
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}
@@ -131,6 +132,7 @@ export class PixiRenderer {
 
 	pause() {
 		this.app.ticker.stop();
+		this.app.render();
 	}
 
 	resume() {

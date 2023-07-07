@@ -119,41 +119,6 @@ export function parseLyric(
 			}
 		});
 
-		// 合并没有译文的歌词
-		if (getConfig("mergeOriginalOnlyLine", "false") === "true") {
-			if (translated.trim().length + roman.trim().length > 0) {
-				let i = 0;
-				while (processed[i]) {
-					if (
-						i &&
-						((translated.trim().length > 0 &&
-							processed[i].translatedLyric === undefined) ||
-							(roman.trim().length > 0 &&
-								processed[i].romanLyric === undefined))
-					) {
-						const mergeLine = processed.splice(i, 1)[0];
-						const dynamicLyric = mergeLine.dynamicLyric || [];
-						processed[i - 1].dynamicLyric?.push(
-							{
-								word: " ",
-								time: processed[i - 1].beginTime + processed[i - 1].duration,
-								duration: 0,
-								flag: 0,
-								shouldGlow: false,
-							},
-							...dynamicLyric,
-						);
-						processed[i - 1].duration =
-							mergeLine.duration +
-							mergeLine.beginTime -
-							processed[i - 1].beginTime;
-					} else {
-						i++;
-					}
-				}
-			}
-		}
-
 		// 插入空行
 		for (let i = 0; i < processed.length; i++) {
 			const thisLine = processed[i];

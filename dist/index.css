@@ -3344,6 +3344,9 @@ body.amll-lyric-page-open .g-single.z-show .g-bd2.f-cb * {
   color: var(--applemusic-like-lyrics-font-color, unset);
   fill: var(--applemusic-like-lyrics-font-color, unset);
 }
+body.amll-lyric-page-open.amll-is-osx header .m-topbox {
+  display: block;
+}
 body.amll-lyric-page-open #main-player,
 body.amll-lyric-page-open .m-pinfo {
   transform: translateY(100%);
