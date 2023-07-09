@@ -7,18 +7,23 @@
 import type { LyricLine } from "./lyric-types";
 
 function msToTimestamp(timeMS: number): string {
+	if (timeMS === Infinity) {
+		return "99:99.999";
+	}
 	timeMS = timeMS / 1000;
 	const secs = timeMS % 60;
 	timeMS = (timeMS - secs) / 60;
 	const mins = timeMS % 60;
 	const hrs = (timeMS - mins) / 60;
+	
+	const h = hrs.toString().padStart(2, "0");
+	const m = mins.toString().padStart(2, "0");
+	const s = secs.toFixed(3).padStart(6, "0");
 
 	if (hrs > 0) {
-		return `${hrs}:${mins}:${secs}`;
-	} else if (mins > 0) {
-		return `${mins}:${secs}`;
+		return `${h}:${m}:${s}`;
 	} else {
-		return secs.toString();
+		return `${m}:${s}`;
 	}
 }
 
