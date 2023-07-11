@@ -438,7 +438,7 @@ export const NCMEnvWrapper: React.FC = () => {
 						break;
 					}
 				}
-				if (curLyricIndex !== null) {
+				if (indexes.size > 0 && curLyricIndex !== null) {
 					const curLyricLine = currentLyrics[curLyricIndex];
 					if (
 						configDynamicLyric &&
@@ -461,6 +461,14 @@ export const NCMEnvWrapper: React.FC = () => {
 								Math.max(0, currentLyrics[curLyricIndex].duration - 100) ||
 						curLyricIndex === currentLyrics.length - 1
 					) {
+						if (!eqSet(lastIndexes, indexes)) {
+							lastIndexes = indexes;
+							setCurrentLyricsIndexes(indexes);
+						}
+					}
+				} else if (indexes.size === 0 && currentLyrics.length > 0) {
+					const lastLine = currentLyrics[currentLyrics.length - 1];
+					if (lastLine.beginTime + lastLine.duration < time) {
 						if (!eqSet(lastIndexes, indexes)) {
 							lastIndexes = indexes;
 							setCurrentLyricsIndexes(indexes);

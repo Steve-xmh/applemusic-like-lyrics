@@ -235,9 +235,9 @@ $global-mix-blend-mode: plus-lighter // luminosity
                 > .am-lyric-line-dynamic > *
                     opacity: 0.75
             &.am-lyric-line-bg-lyric
-                &.am-lyric-line-selected > * > *
-                    opacity: 0.5 !important
-            &.am-lyric-line-o0,
+                opacity: 0 !important
+                &.am-lyric-line-selected
+                    opacity: 1 !important
             &.am-lyric-line-selected > *
                 opacity: 1
                 > .am-lyric-line-dynamic > *
@@ -358,8 +358,10 @@ $global-mix-blend-mode: plus-lighter // luminosity
             padding-bottom: max(1rem, 3vh)
             > *
                 opacity: 0 !important
+                transition: all $tween-animation-duration $tween-animation-timing
             &.am-lyric-line-selected > *
                 opacity: 0.5 !important
+                transition: all $tween-animation-duration $tween-animation-timing 0.5s
         &.am-lyric-line-align-right
             text-align: right
             transform-origin: right
@@ -405,14 +407,14 @@ $global-mix-blend-mode: plus-lighter // luminosity
                 opacity: 0.5
                 transition: opacity calc($tween-animation-duration) $tween-animation-timing
             .am-lyric-line-dynamic > *
-                opacity: 0.5
+                opacity: 1
                 transition: opacity calc($tween-animation-duration) $tween-animation-timing
-        &.am-lyric-line-o0 > *,
         &.am-lyric-line-selected > *
             filter: blur(0px)
             opacity: 1
             .am-lyric-line-original
                 opacity: 1
+            &.am-lyric-line-before .am-lyric-line-dynamic,
             .am-lyric-line-dynamic
                 > *
                     opacity: 1

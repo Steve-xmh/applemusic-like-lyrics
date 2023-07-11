@@ -82,6 +82,8 @@ export const LyricDOMRenderer: React.FC = () => {
 		LyricLineTransform[]
 	>([]);
 
+	const scrollToIndexRef = React.useRef(0);
+	// 对交叉多行的歌词进行缓冲
 	React.useLayoutEffect(() => {
 		setCachedLyricIndexes((prev) => {
 			if (eqSet(prev, currentLyricIndexes)) {
@@ -108,27 +110,11 @@ export const LyricDOMRenderer: React.FC = () => {
 		(
 			mustScroll: boolean = false,
 			currentLyricIndexes = cachedLyricIndex.current,
+			scrollToIndex = scrollToIndexRef.current,
 		) => {
 			// log("触发滚动函数", lineHeights.current);
 			cachedLyricIndex.current = currentLyricIndexes;
 			if (lyricListElement.current) {
-				let scrollToIndex = Number.MAX_SAFE_INTEGER;
-				if (
-					cachedLyricIndex.current.size + keepSelectLyrics.current.size ===
-					0
-				) {
-					scrollToIndex = 0;
-				}
-				for (const i of cachedLyricIndex.current) {
-					if (scrollToIndex > i) {
-						scrollToIndex = i;
-					}
-				}
-				for (const i of keepSelectLyrics.current) {
-					if (scrollToIndex > i) {
-						scrollToIndex = i;
-					}
-				}
 				const isPrevDots =
 					lineHeights.current[scrollToIndex - 1]?.isDots ?? false;
 				const curLine = lineHeights.current[scrollToIndex];
@@ -192,7 +178,6 @@ export const LyricDOMRenderer: React.FC = () => {
 						curDelay += 75;
 					}
 					if (
-						i === scrollToIndex ||
 						keepSelectLyrics.current.has(i) ||
 						cachedLyricIndex.current.has(i)
 					) {
@@ -235,18 +220,6 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	const [firstLyricIndex, setFirstLyricIndex] = React.useState(-1);
 
-	React.useEffect(() => {
-		if (cachedLyricIndexes.size > 0) {
-			let i = -1;
-			for (const v of cachedLyricIndexes) {
-				if (i < v) {
-					i = v;
-				}
-			}
-			setFirstLyricIndex(i);
-		}
-	}, [cachedLyricIndexes]);
-
 	React.useLayoutEffect(() => {
 		if (currentLyricsA) {
 			setCurrentLyrics(currentLyricsA);
@@ -262,10 +235,11 @@ export const LyricDOMRenderer: React.FC = () => {
 
 	React.useLayoutEffect(() => {
 		scrollDelayRef.current = 0;
+		scrollToIndexRef.current = 0;
 		cachedLyricIndex.current = new Set();
 		keepSelectLyrics.current.clear();
 		recalculateLineHeights();
-		scrollToLyric(true, new Set());
+		scrollToLyric(true);
 	}, [
 		currentLyrics,
 		configTranslatedLyric,
@@ -301,6 +275,20 @@ export const LyricDOMRenderer: React.FC = () => {
 		}
 	}, [scrollToLyric, recalculateLineHeights, alignTopSelectedLyric]);
 
+	// 检测当前激活行数的变更，并滚动歌词
+	React.useLayoutEffect(() => {
+		if (
+			playState === PlayState.Playing &&
+			Date.now() - scrollDelayRef.current > 2000
+		) {
+			if (cachedLyricIndexes.size > 0) {
+				scrollToIndexRef.current = Math.min(...cachedLyricIndexes);
+				setFirstLyricIndex(scrollToIndexRef.current);
+			}
+			scrollToLyric(false, cachedLyricIndexes);
+		}
+	}, [scrollToLyric, cachedLyricIndexes, playState]);
+
 	React.useLayoutEffect(() => {
 		const btn = document.querySelector("a[data-action='max']");
 		const onWindowSizeChanged = () => {
@@ -308,7 +296,7 @@ export const LyricDOMRenderer: React.FC = () => {
 		};
 		const onLyricOpened = () => {
 			keepSelectLyrics.current.clear();
-			cachedLyricIndexes.forEach((v) => keepSelectLyrics.current.add(v));
+			currentLyricIndexes.forEach((v) => keepSelectLyrics.current.add(v));
 			scrollToLyric(true); // 触发歌词更新重新定位
 		};
 
@@ -320,7 +308,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			btn?.removeEventListener("click", onLyricOpened);
 			window.removeEventListener("resize", onWindowSizeChanged);
 		};
-	}, [scrollToLyric, cachedLyricIndexes]);
+	}, [scrollToLyric, currentLyricIndexes]);
 
 	const onSeekToLyric = React.useCallback(
 		(line: LyricLine, evt: React.MouseEvent) => {
@@ -394,19 +382,6 @@ export const LyricDOMRenderer: React.FC = () => {
 			currentAudioDuration,
 		],
 	);
-
-	const memoIndexes = React.useRef(new Set<number>());
-	React.useLayoutEffect(() => {
-		if (
-			playState === PlayState.Playing &&
-			Date.now() - scrollDelayRef.current > 2000
-		) {
-			if (!eqSet(memoIndexes.current, currentLyricIndexes)) {
-				scrollToLyric(false, cachedLyricIndexes);
-				memoIndexes.current = currentLyricIndexes;
-			}
-		}
-	}, [scrollToLyric, currentLyrics, cachedLyricIndexes, playState]);
 
 	React.useLayoutEffect(() => {
 		const el = lyricListElement.current;

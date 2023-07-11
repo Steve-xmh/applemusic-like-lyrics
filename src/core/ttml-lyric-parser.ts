@@ -118,69 +118,39 @@ export function parseLyric(ttmlText: string, strictMode = false): LyricLine[] {
 			const role = childEl.getAttribute("ttm:role");
 			if (childEl.nodeName === "span" && role) {
 				if (role === "x-bg") {
-					const bgLine = {
+					const bgLine: LyricLine = {
 						originalLyric: "",
-						translatedLyric: undefined as string | undefined,
-						romanLyric: undefined as string | undefined,
-						dynamicLyric: [] as DynamicLyricWord[] | undefined,
+						translatedLyric: undefined,
+						romanLyric: undefined,
+						dynamicLyric: [],
 						dynamicLyricTime: line.dynamicLyricTime,
 						isBackgroundLyric: true,
 						beginTime: line.beginTime,
 						duration: line.duration,
 						shouldAlignRight: line.shouldAlignRight,
-					} satisfies LyricLine;
+					};
 
-					if (strictMode) {
-						let wordTmp = "";
-						for (const wordNode of childEl.childNodes) {
-							if (wordNode.nodeType === Node.TEXT_NODE) {
-								wordTmp += wordNode.textContent;
-							} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
-								const wordEl = wordNode as Element;
-								if (
-									wordEl.hasAttribute("begin") &&
-									wordEl.hasAttribute("end")
-								) {
-									if (wordNode.textContent) {
-										wordTmp += wordNode.textContent;
-									}
-									const word = {
-										word: wordTmp,
-										time: parseTimespan(wordEl.getAttribute("begin")!!),
-										shouldGlow: false,
-										duration: 0,
-										flag: 0,
-									} satisfies DynamicLyricWord;
-									word.duration =
-										parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-									wordTmp = "";
-									line.dynamicLyric?.push(word);
-								}
+					let notFirst = false;
+					for (const wordEl of childEl.querySelectorAll(
+						"span>span[begin][end]",
+					)) {
+						const word: DynamicLyricWord = {
+							word: wordEl.innerHTML,
+							time: parseTimespan(wordEl.getAttribute("begin")!!),
+							shouldGlow: false,
+							duration: 0,
+							flag: 0,
+						};
+						if (notFirst) {
+							if (wordReg.test(wordEl.innerHTML)) {
+								word.word = ` ${word.word}`;
 							}
+						} else {
+							notFirst = true;
 						}
-					} else {
-						let notFirst = false;
-						for (const wordEl of childEl.querySelectorAll(
-							"span>span[begin][end]",
-						)) {
-							const word = {
-								word: wordEl.innerHTML,
-								time: parseTimespan(wordEl.getAttribute("begin")!!),
-								shouldGlow: false,
-								duration: 0,
-								flag: 0,
-							} satisfies DynamicLyricWord;
-							if (notFirst) {
-								if (wordReg.test(wordEl.innerHTML)) {
-									word.word = ` ${word.word}`;
-								}
-							} else {
-								notFirst = true;
-							}
-							word.duration =
-								parseTimespan(wordEl.getAttribute("end")!!) - word.time;
-							bgLine.dynamicLyric?.push(word);
-						}
+						word.duration =
+							parseTimespan(wordEl.getAttribute("end")!!) - word.time;
+						bgLine.dynamicLyric?.push(word);
 					}
 
 					const firstWord = bgLine.dynamicLyric?.[0];
@@ -257,8 +227,6 @@ export function parseLyric(ttmlText: string, strictMode = false): LyricLine[] {
 			result.push(line.backgroundLyric);
 		}
 	}
-
-	console.log(result);
 
 	return processLyric(result);
 }

@@ -124,6 +124,7 @@ export const LyricLineView: React.FC<
 	const lyricViewSizeRef = React.useRef(lyricCtx.lyricPageSize);
 	const selfSizeRef = React.useRef([0, 0]);
 	const visibilityRef = React.useRef("");
+	const [shouldKeepDynamic, setShouldKeepDynamic] = React.useState(selected);
 
 	React.useLayoutEffect(() => {
 		const line = lineRef.current;
@@ -147,6 +148,10 @@ export const LyricLineView: React.FC<
 			};
 		}
 	}, [onSizeChanged]);
+	
+	React.useLayoutEffect(() => {
+		setShouldKeepDynamic(v => v || selected);
+	}, [selected])
 
 	React.useLayoutEffect(() => {
 		if (lineRef.current) {
@@ -238,6 +243,7 @@ export const LyricLineView: React.FC<
 				.then(() => {
 					if (lineRef.current)
 						lineRef.current.style.transform = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}px) scale(${lineTransform.scale})`;
+					setShouldKeepDynamic(false);
 				});
 		} else {
 			const h = setTimeout(() => {
@@ -256,6 +262,7 @@ export const LyricLineView: React.FC<
 					.then(() => {
 						if (lineRef.current)
 							lineRef.current.style.transform = `translateY(${lineTransform.top}px) translateX(${lineTransform.left}px) scale(${lineTransform.scale})`;
+						setShouldKeepDynamic(false);
 					});
 			}, lineTransform.delay);
 			return () => {
@@ -291,7 +298,7 @@ export const LyricLineView: React.FC<
 				{dynamic &&
 				line.dynamicLyric &&
 				line.dynamicLyricTime &&
-				(selected || forceDynamic || Math.abs(offset) < 20) ? (
+				(selected || shouldKeepDynamic || forceDynamic || Math.abs(offset) < 20) ? (
 					<div className="am-lyric-line-dynamic">
 						{line.dynamicLyric.map((word, i) => (
 							<LyricWord
