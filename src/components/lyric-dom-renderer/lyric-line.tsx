@@ -1,29 +1,14 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { LyricLineTransform, LyricRendererContext } from ".";
 import { classname } from "../../api";
 import { useConfigValueBoolean } from "../../api/react";
 import { LyricLine } from "../../core/lyric-parser";
-import { rightClickedLyricAtom } from "../../core/states";
+import { playProgressAtom, rightClickedLyricAtom } from "../../core/states";
 import * as React from "react";
 import type { DynamicLyricWord } from "../../core/lyric-types";
 import { useSpring } from "../../utils/spring-svelte";
 import { log, warn } from "../../utils/logger";
 
-const FADE_FRAMES = 100;
-const FADE_WIDTH = 20;
-const LYRIC_WORD_ANIMATION: Keyframe[] = new Array(FADE_FRAMES + FADE_WIDTH)
-	.fill(0)
-	.map((_, i) => {
-		const maskImg = `linear-gradient(to right, #000 ${
-			i - FADE_WIDTH
-		}%, rgba(0, 0, 0, 0.5) ${i + FADE_WIDTH}%)`;
-		return {
-			webkitMaskImage: maskImg,
-			maskImage: maskImg,
-			offset: i / (FADE_FRAMES + FADE_WIDTH),
-		};
-	});
-log("LYRIC_WORD_ANIMATION", LYRIC_WORD_ANIMATION);
 const LYRIC_WORD_GLOW_ANIMATION: Keyframe[] = [
 	{
 		offset: 0,
@@ -48,6 +33,13 @@ const LYRIC_WORD_GLOW_ANIMATION: Keyframe[] = [
 	},
 ];
 
+function generateFadeGradient(width: number): string {
+	const totalAspect = 2 + width;
+	const widthInTotal = width / totalAspect;
+	const leftPos = (width - widthInTotal) / 2;
+	return `linear-gradient(to right, rgba(0,0,0,0.67) ${leftPos}%, rgba(0,0,0,0.2) ${leftPos + widthInTotal}%)`
+}
+
 const LyricWord: React.FC<{
 	word: DynamicLyricWord;
 	delay: number;
@@ -60,6 +52,8 @@ const LyricWord: React.FC<{
 	const floatDuration = Math.max(1000, word.duration);
 	const wordRef = React.useRef<HTMLSpanElement>(null);
 	const glowWordRef = React.useRef<HTMLSpanElement>(null);
+	const playProgress = useAtomValue(playProgressAtom);
+	const curTimeRef = React.useRef(playProgress);
 	const wordFloatAnimationRef = React.useRef<Animation>();
 	const wordMainAnimationRef = React.useRef<Animation[]>([]);
 	// 悬浮效果
@@ -94,6 +88,9 @@ const LyricWord: React.FC<{
 			}
 		}
 	}, [floatDuration]);
+	React.useEffect(() => {
+		curTimeRef.current = playProgress * 1000;
+	}, [playProgress]);
 	// 渐变效果或发光效果
 	React.useLayoutEffect(() => {
 		if (word.shouldGlow && glowWordRef.current) {
@@ -130,22 +127,49 @@ const LyricWord: React.FC<{
 				wordMainAnimationRef.current.length,
 			);
 			let canceled = false;
+			const width = wordRef.current.clientWidth;
+			const fadeWidth = 32 / width;
+			// 我们生成一个对称的渐变图像
+			// [---空白---][渐变][---空白---]
+			const maskImage = generateFadeGradient(fadeWidth);
+			wordRef.current.style.maskImage = maskImage;
+			wordRef.current.style.webkitMaskImage = maskImage;
+			wordRef.current.style.maskRepeat = "no-repeat";
+			// const a = wordRef.current.animate([{
+			// 	webkitMaskImagePosition: `${-width}px 0px`,
+			// 	maskImagePosition: `${-width}px 0px`,
+			// 	offset: 0,
+			// }, {
+			// 	webkitMaskImagePosition: `${width}px 0px`,
+			// 	maskImagePosition: `${width}px 0px`,
+			// 	offset: 1,
+			// }], {
+			// 	easing: "linear",
+			// 	delay,
+			// 	duration,
+			// 	id: "fade-word",
+			// 	composite: "add",
+			// 	fill: "both",
+			// });
+			// wordMainAnimationRef.current.push(a);
 			const onFrame = () => {
-				if (wordRef.current) {
-					const maskImage = ``;
-					wordRef.current.style.webkitMaskImage = maskImage;
-					wordRef.current.style.maskImage = maskImage;
+				if (wordRef.current && !canceled) {
+					const i = (curTimeRef.current - word.time) / duration * width;
+					const maskPos = `${i}px 0px`;
+					wordRef.current.style.webkitMaskPosition = maskPos;
+					wordRef.current.style.maskPosition = maskPos;
 					requestAnimationFrame(onFrame);
 				}
-			}
+			};
 			requestAnimationFrame(onFrame);
 			return () => {
 				canceled = true;
 				if (wordRef.current) {
 					wordRef.current.style.webkitMaskImage = "";
 					wordRef.current.style.maskImage = "";
+					wordRef.current.style.maskRepeat = "";
 				}
-			}
+			};
 		}
 	}, [
 		word.duration,
@@ -167,11 +191,6 @@ const LyricWord: React.FC<{
 					a.playbackRate = 1;
 					a.play();
 				});
-				log(
-					"播放动画",
-					wordFloatAnimationRef.current,
-					...wordMainAnimationRef.current,
-				);
 			} else {
 				if (wordFloatAnimationRef.current) {
 					wordFloatAnimationRef.current.updatePlaybackRate(-1);
@@ -183,11 +202,6 @@ const LyricWord: React.FC<{
 						a.play();
 					}
 				});
-				log(
-					"回滚动画",
-					wordFloatAnimationRef.current,
-					...wordMainAnimationRef.current,
-				);
 			}
 		}
 	}, [selected]);
