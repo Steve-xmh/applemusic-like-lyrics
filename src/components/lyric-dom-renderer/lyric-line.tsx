@@ -139,21 +139,18 @@ const LyricWord: React.FC<{
 				generateFadeGradient(fadeWidth);
 			wordRef.current.style.maskImage = maskImage;
 			wordRef.current.style.webkitMaskImage = maskImage;
-			wordRef.current.style.maskRepeat = "no-repeat";
 			wordRef.current.style.maskSize = `${totalAspect * 100}% 100%`;
-			wordRef.current.style.webkitMaskSize = "200% 100%";
+			wordRef.current.style.webkitMaskSize = `${totalAspect * 100}% 100%`;
 			wordRef.current.style.willChange = "mask-position, -webkit-mask-position";
 			const onFrame = () => {
 				if (wordRef.current && !canceled) {
+					const w = 1 + widthInTotal;
 					const i =
 						Math.min(
-							1,
+							w,
 							Math.max(
 								0,
-								1 +
-									widthInTotal -
-									((curTimeRef.current - word.time) / duration) *
-										(1 + widthInTotal),
+								w - ((curTimeRef.current - word.time) / word.duration) * w,
 							),
 						) * width;
 					const maskPos = `${-i}px 0px`;
@@ -168,7 +165,6 @@ const LyricWord: React.FC<{
 				if (wordRef.current) {
 					wordRef.current.style.maskImage = "";
 					wordRef.current.style.webkitMaskImage = "";
-					wordRef.current.style.maskRepeat = "";
 					wordRef.current.style.maskSize = "";
 					wordRef.current.style.webkitMaskSize = "";
 				}

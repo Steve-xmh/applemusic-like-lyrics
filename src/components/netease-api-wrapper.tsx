@@ -374,7 +374,7 @@ export const NCMEnvWrapper: React.FC = () => {
 	}, []);
 
 	React.useLayoutEffect(() => {
-		let tweenId = 0;
+		let tweenId = Symbol("tween-id");
 		let onIntervalGettingSongData = 0;
 		const setIntervalGetSongData = () => {
 			onIntervalGettingSongData = setInterval(() => {
@@ -397,15 +397,17 @@ export const NCMEnvWrapper: React.FC = () => {
 				},${Date.now()}]}`,
 			);
 			setPlayProgress(progress);
-			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
+			if (toPlayState(getPlayingSong().state) === PlayState.Playing && APP_CONF.isOSX && !isTween) {
 				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
 				// 我们自己要做一个时间补偿
 				const originalProgress = progress;
 				let prevTime;
+				const targetId = Symbol("tween-id");
+				tweenId = targetId;
 				const tweenPlayProgress = (timestamp: number) => {
 					prevTime ??= timestamp;
 					const delta = timestamp - prevTime;
-					if (playState === PlayState.Playing) {
+					if (toPlayState(getPlayingSong().state) === PlayState.Playing && targetId === tweenId) {
 						onPlayProgress(
 							audioId,
 							originalProgress + delta / 1000,
@@ -415,12 +417,10 @@ export const NCMEnvWrapper: React.FC = () => {
 						requestAnimationFrame(tweenPlayProgress);
 					}
 				};
-				if (tweenId) cancelAnimationFrame(tweenId);
-				tweenId = requestAnimationFrame(tweenPlayProgress);
+				requestAnimationFrame(tweenPlayProgress);
 			}
 			progress += configGlobalTimeStampOffset; // 全局位移
 			progress += curLyricOffset; // 当前歌曲位移
-			// setPlayState(toPlayState(getPlayingSong().state));
 			clearInterval(onIntervalGettingSongData);
 			setCurrentAudioId(audioId);
 			const time = (progress * 1000) | 0;
@@ -492,6 +492,7 @@ export const NCMEnvWrapper: React.FC = () => {
 		) => {
 			const state = stateId.split("|")[1];
 			setCurrentAudioId(audioId);
+			tweenId = Symbol("tween-id");
 			if (state === "pause") {
 				setPlayState(PlayState.Pausing);
 			} else if (state === "resume") {
@@ -518,6 +519,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			setCurrentAudioId(audioId);
 			setPlayingSongData(getPlayingSong());
 			setPlayState(toPlayState(getPlayingSong().state));
+			tweenId = Symbol("tween-id");
 			clearInterval(onIntervalGettingSongData);
 		};
 
@@ -525,6 +527,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			setCurrentAudioId(audioId);
 			setPlayingSongData(getPlayingSong());
 			setPlayState(toPlayState(getPlayingSong().state));
+			tweenId = Symbol("tween-id");
 			setIntervalGetSongData();
 		};
 
@@ -541,6 +544,7 @@ export const NCMEnvWrapper: React.FC = () => {
 			removeRegisterCall("Load", "audioplayer", onLoad);
 			removeRegisterCall("End", "audioplayer", onEnd);
 			clearInterval(onIntervalGettingSongData);
+			tweenId = Symbol("tween-id");
 			// log("进度事件已解除挂载");
 		};
 	}, [currentLyrics, playState, configGlobalTimeStampOffset, curLyricOffset]);
