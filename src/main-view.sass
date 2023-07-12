@@ -386,10 +386,11 @@ $global-mix-blend-mode: plus-lighter // luminosity
                 > *
                     opacity: calc(7 / 15)
                     display: inline-block
+                    overflow: visible
                     transition: transform $tween-animation-duration $tween-animation-timing
-                    animation-play-state: paused
-                    animation-timing-function: linear
-                    animation-fill-mode: both
+                    // animation-play-state: paused
+                    // animation-timing-function: linear
+                    // animation-fill-mode: both
 
         &:hover
             opacity: 1 !important
@@ -418,21 +419,21 @@ $global-mix-blend-mode: plus-lighter // luminosity
             .am-lyric-line-dynamic
                 > *
                     opacity: 1
-                    animation-name: am-lyric-word-animation
-                    animation-play-state: running
+                    // animation-name: am-lyric-word-animation
+                    // animation-play-state: running
                 > .am-lyric-glow-word
                     padding: 2vh
                     margin: -2vh
-                    animation-name: am-lyric-glow-word-animation
-                    animation-play-state: running
+                    // animation-name: am-lyric-glow-word-animation
+                    // animation-play-state: running
                     transform-style: preserve-3d
                     perspective: 50vw
                     > *
                         opacity: 0.5
                         transform: translate3d(0, 0, 0)
-                        animation-name: am-lyric-glow-letter-animation
-                        animation-play-state: running
-                        animation-fill-mode: forwards
+                        // animation-name: am-lyric-glow-letter-animation
+                        // animation-play-state: running
+                        // animation-fill-mode: forwards
                         position: relative
                         display: inline-block
                         z-index: 2
