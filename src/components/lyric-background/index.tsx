@@ -1,12 +1,6 @@
 import * as React from "react";
-import {
-	useAlbumImage,
-	useNowPlayingOpened,
-} from "../../api/react";
-import {
-	musicIdAtom,
-	playStateAtom,
-} from "../../core/states";
+import { useAlbumImage, useNowPlayingOpened } from "../../api/react";
+import { musicIdAtom, playStateAtom } from "../../core/states";
 import { useAtomValue } from "jotai";
 import { PixiRenderer } from "./pixi-renderer";
 import { PlayState } from "../../api";

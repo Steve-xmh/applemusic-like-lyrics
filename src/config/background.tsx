@@ -1,6 +1,4 @@
-import {
-	Alert,
-} from "@mantine/core";
+import { Alert } from "@mantine/core";
 import {
 	SliderConfigComponent,
 	SwitchConfigComponent,
@@ -10,7 +8,7 @@ import { useConfigValueBoolean } from "../api/react";
 import * as React from "react";
 import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 
-// type BGRendererMethodData = 
+// type BGRendererMethodData =
 // 	SelectItem & {
 // 		icon: () => JSX.Element;
 // 	};

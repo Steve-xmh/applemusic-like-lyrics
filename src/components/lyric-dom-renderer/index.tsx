@@ -389,6 +389,7 @@ export const LyricDOMRenderer: React.FC = () => {
 			const onLyricScroll = (evt: WheelEvent) => {
 				evt.preventDefault();
 				evt.stopPropagation();
+				evt.stopImmediatePropagation();
 				scrollDelayRef.current = Date.now();
 				setLineTransforms((list) => {
 					return list.map((v) => ({

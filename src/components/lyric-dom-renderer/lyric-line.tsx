@@ -33,11 +33,17 @@ const LYRIC_WORD_GLOW_ANIMATION: Keyframe[] = [
 	},
 ];
 
-function generateFadeGradient(width: number): string {
+function generateFadeGradient(width: number): [string, number, number] {
 	const totalAspect = 2 + width;
 	const widthInTotal = width / totalAspect;
-	const leftPos = (width - widthInTotal) / 2;
-	return `linear-gradient(to right, rgba(0,0,0,0.67) ${leftPos}%, rgba(0,0,0,0.2) ${leftPos + widthInTotal}%)`
+	const leftPos = (1 - widthInTotal) / 2;
+	return [
+		`linear-gradient(to right, rgba(0,0,0,1) ${
+			leftPos * 100
+		}%, rgba(0,0,0,0.5) ${(leftPos + widthInTotal) * 100}%)`,
+		widthInTotal,
+		totalAspect,
+	];
 }
 
 const LyricWord: React.FC<{
@@ -80,7 +86,6 @@ const LyricWord: React.FC<{
 						fill: "both",
 					},
 				);
-				a?.persist();
 				a?.pause();
 				wordFloatAnimationRef.current = a;
 			} catch (err) {
@@ -112,7 +117,6 @@ const LyricWord: React.FC<{
 					composite: "add",
 					fill: "both",
 				});
-				a.persist();
 				a.pause();
 				wordMainAnimationRef.current.push(a);
 				i++;
@@ -131,43 +135,42 @@ const LyricWord: React.FC<{
 			const fadeWidth = 32 / width;
 			// 我们生成一个对称的渐变图像
 			// [---空白---][渐变][---空白---]
-			const maskImage = generateFadeGradient(fadeWidth);
+			const [maskImage, widthInTotal, totalAspect] =
+				generateFadeGradient(fadeWidth);
 			wordRef.current.style.maskImage = maskImage;
 			wordRef.current.style.webkitMaskImage = maskImage;
 			wordRef.current.style.maskRepeat = "no-repeat";
-			// const a = wordRef.current.animate([{
-			// 	webkitMaskImagePosition: `${-width}px 0px`,
-			// 	maskImagePosition: `${-width}px 0px`,
-			// 	offset: 0,
-			// }, {
-			// 	webkitMaskImagePosition: `${width}px 0px`,
-			// 	maskImagePosition: `${width}px 0px`,
-			// 	offset: 1,
-			// }], {
-			// 	easing: "linear",
-			// 	delay,
-			// 	duration,
-			// 	id: "fade-word",
-			// 	composite: "add",
-			// 	fill: "both",
-			// });
-			// wordMainAnimationRef.current.push(a);
+			wordRef.current.style.maskSize = `${totalAspect * 100}% 100%`;
+			wordRef.current.style.webkitMaskSize = "200% 100%";
+			wordRef.current.style.willChange = "mask-position, -webkit-mask-position";
 			const onFrame = () => {
 				if (wordRef.current && !canceled) {
-					const i = (curTimeRef.current - word.time) / duration * width;
-					const maskPos = `${i}px 0px`;
+					const i =
+						Math.min(
+							1,
+							Math.max(
+								0,
+								1 +
+									widthInTotal -
+									((curTimeRef.current - word.time) / duration) *
+										(1 + widthInTotal),
+							),
+						) * width;
+					const maskPos = `${-i}px 0px`;
 					wordRef.current.style.webkitMaskPosition = maskPos;
 					wordRef.current.style.maskPosition = maskPos;
 					requestAnimationFrame(onFrame);
 				}
 			};
-			requestAnimationFrame(onFrame);
+			onFrame();
 			return () => {
 				canceled = true;
 				if (wordRef.current) {
-					wordRef.current.style.webkitMaskImage = "";
 					wordRef.current.style.maskImage = "";
+					wordRef.current.style.webkitMaskImage = "";
 					wordRef.current.style.maskRepeat = "";
+					wordRef.current.style.maskSize = "";
+					wordRef.current.style.webkitMaskSize = "";
 				}
 			};
 		}

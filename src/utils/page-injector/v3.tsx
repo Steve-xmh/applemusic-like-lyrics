@@ -94,7 +94,7 @@ export async function initInjector() {
 		// 	...appStore,
 		// 	...(payload?.payload ?? {}),
 		// };
-		log("amllDispatchHook", payload?.type, payload?.payload)
+		log("amllDispatchHook", payload?.type, payload?.payload);
 	};
 
 	mainViewRoot = createRoot(mainViewElement);

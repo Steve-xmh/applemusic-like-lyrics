@@ -15,7 +15,7 @@ function msToTimestamp(timeMS: number): string {
 	timeMS = (timeMS - secs) / 60;
 	const mins = timeMS % 60;
 	const hrs = (timeMS - mins) / 60;
-	
+
 	const h = hrs.toString().padStart(2, "0");
 	const m = mins.toString().padStart(2, "0");
 	const s = secs.toFixed(3).padStart(6, "0");

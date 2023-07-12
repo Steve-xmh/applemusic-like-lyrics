@@ -182,8 +182,8 @@ export const AudioFFTControl: React.FC = () => {
 
 					if (isNCMV3())
 						rawData = rawData.splice(
-							(rawData.length * 20 / 24000) | 0,
-							(rawData.length * 2000 / 24000) | 0,
+							((rawData.length * 20) / 24000) | 0,
+							((rawData.length * 2000) / 24000) | 0,
 						);
 
 					const data: number[] = zoomArray(rawData, fftBarAmount);

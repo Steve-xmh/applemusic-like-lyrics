@@ -397,22 +397,29 @@ export const NCMEnvWrapper: React.FC = () => {
 				},${Date.now()}]}`,
 			);
 			setPlayProgress(progress);
-			progress += configGlobalTimeStampOffset; // 全局位移
-			progress += curLyricOffset; // 当前歌曲位移
 			if (playState === PlayState.Playing && APP_CONF.isOSX && !isTween) {
 				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
 				// 我们自己要做一个时间补偿
-				let originalProgress = progress;
-				const curTweenId = tweenId++;
-				const tweenPlayProgress = (delta: number) => {
-					if (playState === PlayState.Playing && curTweenId === tweenId) {
-						originalProgress += delta / 1000;
-						onPlayProgress(audioId, originalProgress, loadProgress, true);
+				const originalProgress = progress;
+				let prevTime;
+				const tweenPlayProgress = (timestamp: number) => {
+					prevTime ??= timestamp;
+					const delta = timestamp - prevTime;
+					if (playState === PlayState.Playing) {
+						onPlayProgress(
+							audioId,
+							originalProgress + delta / 1000,
+							loadProgress,
+							true,
+						);
 						requestAnimationFrame(tweenPlayProgress);
 					}
 				};
-				requestAnimationFrame(tweenPlayProgress);
+				if (tweenId) cancelAnimationFrame(tweenId);
+				tweenId = requestAnimationFrame(tweenPlayProgress);
 			}
+			progress += configGlobalTimeStampOffset; // 全局位移
+			progress += curLyricOffset; // 当前歌曲位移
 			// setPlayState(toPlayState(getPlayingSong().state));
 			clearInterval(onIntervalGettingSongData);
 			setCurrentAudioId(audioId);
