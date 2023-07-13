@@ -62,6 +62,7 @@ const LyricWord: React.FC<{
 	const curTimeRef = React.useRef(playProgress);
 	const wordFloatAnimationRef = React.useRef<Animation>();
 	const wordMainAnimationRef = React.useRef<Animation[]>([]);
+	const [wordWidth, setWordWidth] = React.useState(0);
 	// 悬浮效果
 	React.useLayoutEffect(() => {
 		if (
@@ -94,6 +95,20 @@ const LyricWord: React.FC<{
 		}
 	}, [floatDuration]);
 	React.useEffect(() => {
+		if (wordRef.current) {
+			setWordWidth(wordRef.current.clientWidth);
+			const n = new ResizeObserver((entries) => {
+				if (wordRef.current) {
+					setWordWidth(wordRef.current.clientWidth);
+				}
+			});
+			n.observe(wordRef.current);
+			return () => {
+				n.disconnect();
+			}
+		}
+	}, [wordRef.current]);
+	React.useEffect(() => {
 		curTimeRef.current = playProgress * 1000;
 	}, [playProgress]);
 	// 渐变效果或发光效果
@@ -113,8 +128,8 @@ const LyricWord: React.FC<{
 					duration: duration - i * letterDuration,
 					delay: delay + i * letterDuration,
 					id: "glow-word",
-					easing: "ease-in-out",
-					composite: "add",
+					composite: "replace",
+					iterations: 1,
 					fill: "both",
 				});
 				a.pause();
@@ -131,11 +146,11 @@ const LyricWord: React.FC<{
 				wordMainAnimationRef.current.length,
 			);
 			let canceled = false;
-			const width = wordRef.current.clientWidth;
-			const fadeWidth = 32 / width;
+			const width = wordWidth;
+			const fadeWidth = 16 / width;
 			// 我们生成一个对称的渐变图像
 			// [---空白---][渐变][---空白---]
-			const [maskImage, widthInTotal, totalAspect] =
+			const [maskImage, , totalAspect] =
 				generateFadeGradient(fadeWidth);
 			wordRef.current.style.maskImage = maskImage;
 			wordRef.current.style.webkitMaskImage = maskImage;
@@ -144,7 +159,7 @@ const LyricWord: React.FC<{
 			wordRef.current.style.willChange = "mask-position, -webkit-mask-position";
 			const onFrame = () => {
 				if (wordRef.current && !canceled) {
-					const w = 1 + widthInTotal;
+					const w = 1 + fadeWidth;
 					const i =
 						Math.min(
 							w,
@@ -177,6 +192,7 @@ const LyricWord: React.FC<{
 		letterDuration,
 		glowWordRef.current,
 		wordRef.current,
+		wordWidth
 	]);
 	// 播放动画
 	React.useLayoutEffect(() => {
@@ -196,10 +212,7 @@ const LyricWord: React.FC<{
 					wordFloatAnimationRef.current.play();
 				}
 				wordMainAnimationRef.current.forEach((a) => {
-					a.playbackRate = -1;
-					if (a.playState === "finished") {
-						a.play();
-					}
+					a.finish();
 				});
 			}
 		}

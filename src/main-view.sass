@@ -353,6 +353,7 @@ $global-mix-blend-mode: plus-lighter // luminosity
         line-break: loose
         word-break: break-word
         box-sizing: border-box
+
         &.am-lyric-line-bg-lyric
             font-size: 3vh
             padding-bottom: max(1rem, 3vh)
@@ -388,9 +389,6 @@ $global-mix-blend-mode: plus-lighter // luminosity
                     display: inline-block
                     overflow: visible
                     transition: transform $tween-animation-duration $tween-animation-timing
-                    // animation-play-state: paused
-                    // animation-timing-function: linear
-                    // animation-fill-mode: both
 
         &:hover
             opacity: 1 !important
@@ -419,54 +417,19 @@ $global-mix-blend-mode: plus-lighter // luminosity
             .am-lyric-line-dynamic
                 > *
                     opacity: 1
-                    // animation-name: am-lyric-word-animation
-                    // animation-play-state: running
                 > .am-lyric-glow-word
                     padding: 2vh
                     margin: -2vh
-                    // animation-name: am-lyric-glow-word-animation
-                    // animation-play-state: running
                     transform-style: preserve-3d
                     perspective: 50vw
                     > *
                         opacity: 0.5
                         transform: translate3d(0, 0, 0)
-                        // animation-name: am-lyric-glow-letter-animation
-                        // animation-play-state: running
-                        // animation-fill-mode: forwards
                         position: relative
                         display: inline-block
                         z-index: 2
                         padding: 2vh
                         margin: -2vh
-
-        @keyframes am-lyric-glow-letter-animation
-            0%
-                opacity: 0.5
-                transform: translate3d(0, 0px, 0px)
-                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
-            50%
-                opacity: 1
-                transform: translate3d(0, -3px, 20px)
-                filter: drop-shadow(0 0 4px var(--applemusic-like-lyrics-font-color, white))
-            100%
-                opacity: 1
-                transform: translate3d(0, -2px, 0)
-                filter: drop-shadow(0 0 0 var(--applemusic-like-lyrics-font-color, white))
-
-        @keyframes am-lyric-float-animation
-            from
-                transform: translateY(0px)
-            to
-                transform: translateY(-50px)
-
-        @keyframes am-lyric-word-animation
-            $fade-width: 20
-            @for $i from -$fade-width through 100
-                #{calc(($i + $fade-width) / (100 + $fade-width)) * 100}%
-                    $mask-img: linear-gradient(to right, #000 $i * 1%, rgba(0, 0, 0, 0.5) ($i + $fade-width) * 1%)
-                    -webkit-mask-image: $mask-img
-                    mask-image: $mask-img
 
     .am-lyric-dots
         position: absolute
