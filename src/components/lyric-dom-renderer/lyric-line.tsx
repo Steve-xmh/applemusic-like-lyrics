@@ -211,9 +211,9 @@ const LyricWord: React.FC<{
 					wordFloatAnimationRef.current.updatePlaybackRate(-1);
 					wordFloatAnimationRef.current.play();
 				}
-				wordMainAnimationRef.current.forEach((a) => {
-					a.finish();
-				});
+				// wordMainAnimationRef.current.forEach((a) => {
+				// 	a.finish();
+				// });
 			}
 		}
 	}, [selected]);
