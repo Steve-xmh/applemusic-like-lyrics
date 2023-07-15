@@ -74803,7 +74803,7 @@ ${e4}`);
       totalAspect
     ];
   }
-  var LyricWord = ({ word, delay, index: index3, selected }) => {
+  var LyricWord = ({ word, delay, index: index3, selected, lineOffset }) => {
     const duration = Math.max(1e3, Math.min(2500, word.duration));
     const letters = React109.useMemo(() => word.word.split(""), [word.word]);
     const letterDuration = duration / letters.length / 2;
@@ -74957,6 +74957,18 @@ ${e4}`);
         }
       }
     }, [selected]);
+    React109.useLayoutEffect(() => {
+      if (lineOffset < 0) {
+        wordMainAnimationRef.current.forEach((a5) => {
+          a5.finish();
+        });
+      } else if (lineOffset > 0) {
+        wordMainAnimationRef.current.forEach((a5) => {
+          a5.currentTime = 0;
+          a5.pause();
+        });
+      }
+    }, [lineOffset]);
     if (word.shouldGlow) {
       return /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("span", { className: "am-lyric-glow-word", ref: glowWordRef, children: letters.map((v5) => /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("span", { children: v5 })) });
     } else {
@@ -75156,7 +75168,8 @@ ${e4}`);
               word,
               delay: word.time - (line2.dynamicLyricTime || 0),
               index: i5,
-              selected
+              selected,
+              lineOffset: offset
             }
           )) }) : /* @__PURE__ */ (0, import_jsx_runtime34.jsx)("div", { className: "am-lyric-line-original", children: ((_a3 = line2.dynamicLyric) == null ? void 0 : _a3.map((v5) => v5.word).join("").trim()) || line2.originalLyric }),
           lyricCtx.reverseLyricOrder ? /* @__PURE__ */ (0, import_jsx_runtime34.jsxs)(import_jsx_runtime34.Fragment, { children: [

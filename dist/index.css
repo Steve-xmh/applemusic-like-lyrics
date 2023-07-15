@@ -1333,7 +1333,6 @@ pre[class*=language-] {
 }
 #applemusic-like-lyrics-view-fm > * .am-lyric-line > * .am-lyric-line-dynamic {
   position: relative;
-  display: inline-block;
   white-space: break-spaces;
   transition: opacity 500ms cubic-bezier(0.46, 0, 0.07, 1);
 }
@@ -2022,7 +2021,6 @@ pre[class*=language-] {
 }
 #applemusic-like-lyrics-view .am-lyric-line > * .am-lyric-line-dynamic {
   position: relative;
-  display: inline-block;
   white-space: break-spaces;
   transition: opacity 500ms cubic-bezier(0.46, 0, 0.07, 1);
 }

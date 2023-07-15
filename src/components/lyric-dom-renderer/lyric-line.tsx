@@ -51,7 +51,8 @@ const LyricWord: React.FC<{
 	delay: number;
 	index: number;
 	selected: boolean;
-}> = ({ word, delay, index, selected }) => {
+	lineOffset: number;
+}> = ({ word, delay, index, selected, lineOffset }) => {
 	const duration = Math.max(1000, Math.min(2500, word.duration));
 	const letters = React.useMemo(() => word.word.split(""), [word.word]);
 	const letterDuration = duration / letters.length / 2;
@@ -211,12 +212,21 @@ const LyricWord: React.FC<{
 					wordFloatAnimationRef.current.updatePlaybackRate(-1);
 					wordFloatAnimationRef.current.play();
 				}
-				// wordMainAnimationRef.current.forEach((a) => {
-				// 	a.finish();
-				// });
 			}
 		}
 	}, [selected]);
+	React.useLayoutEffect(() => {
+		if (lineOffset < 0) {
+			wordMainAnimationRef.current.forEach((a) => {
+				a.finish();
+			});
+		} else if (lineOffset > 0) {
+			wordMainAnimationRef.current.forEach((a) => {
+				a.currentTime = 0;
+				a.pause();
+			});
+		}
+	}, [lineOffset])
 	if (word.shouldGlow) {
 		return (
 			<span className="am-lyric-glow-word" ref={glowWordRef}>
@@ -458,6 +468,7 @@ export const LyricLineView: React.FC<
 								delay={word.time - (line.dynamicLyricTime || 0)}
 								index={i}
 								selected={selected}
+								lineOffset={offset}
 							/>
 						))}
 					</div>
