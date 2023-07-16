@@ -4,6 +4,9 @@
   "main": "index.js",
   "private": true,
   "license": "GPL-3.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dist": "node build.mjs --dist",
     "build": "node build.mjs",
@@ -50,5 +53,6 @@
     "esbuild-plugin-svgr": "^1.0.1",
     "esbuild-plugin-wasm": "^1.1.0",
     "rome": "^11.0.0"
-  }
+  },
+  "packageManager": "yarn@3.6.1"
 }

@@ -1,0 +1,14 @@
+{
+  "name": "@applemusic-like-lyrics/core",
+  "packageManager": "yarn@3.6.1",
+  "devDependencies": {
+    "lil-gui": "^0.18.2",
+    "stats.js": "^0.17.0",
+    "vite": "^4.4.4"
+  },
+  "dependencies": {
+    "jss": "^10.10.0",
+    "jss-preset-default": "^10.10.0",
+    "pixi.js": "^7.2.4"
+  }
+}
