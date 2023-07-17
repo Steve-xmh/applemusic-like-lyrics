@@ -21,6 +21,7 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 		"application/xml",
 	);
 
+	console.log(ttmlDoc);
 	let mainAgentId = "v1";
 
 	for (const agent of ttmlDoc.querySelectorAll("ttm\\:agent")) {
@@ -42,16 +43,26 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 			translatedLyric: "",
 			romanLyric: "",
 			isBG: false,
-			isDuet: false,
+			isDuet: lineEl.getAttribute("ttm:agent") !== mainAgentId,
 		};
+		let curBGLine: LyricLine | null = null;
 
 		for (const wordNode of lineEl.childNodes) {
 			if (wordNode.nodeType === Node.TEXT_NODE) {
-				line.words.push({
-					word: wordNode.textContent ?? "",
-					startTime: 0,
-					endTime: 0,
-				});
+				const word = wordNode.textContent ?? "";
+				if (/^(\s+)$/.test(word)) {
+					line.words.push({
+						word: " ",
+						startTime: 0,
+						endTime: 0,
+					});
+				} else {
+					line.words.push({
+						word: word,
+						startTime: 0,
+						endTime: 0,
+					});
+				}
 			} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
 				const wordEl = wordNode as Element;
 				const role = wordEl.getAttribute("ttm:role");
@@ -70,11 +81,20 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 
 						for (const wordNode of wordEl.childNodes) {
 							if (wordNode.nodeType === Node.TEXT_NODE) {
-								bgLine.words.push({
-									word: wordNode.textContent ?? "",
-									startTime: 0,
-									endTime: 0,
-								});
+								const word = wordNode.textContent ?? "";
+								if (/^(\s+)$/.test(word)) {
+									bgLine.words.push({
+										word: " ",
+										startTime: 0,
+										endTime: 0,
+									});
+								} else {
+									bgLine.words.push({
+										word: word,
+										startTime: 0,
+										endTime: 0,
+									});
+								}
 							} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
 								const wordEl = wordNode as Element;
 								const role = wordEl.getAttribute("ttm:role");
@@ -99,11 +119,13 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 						}
 
 						const firstWord = bgLine.words[0];
+						bgLine.startTime = firstWord.startTime;
 						if (firstWord?.word.startsWith("(")) {
 							firstWord.word = firstWord.word.substring(1);
 						}
 
 						const lastWord = bgLine.words[bgLine.words.length - 1];
+						bgLine.endTime = lastWord.endTime;
 						if (lastWord?.word.endsWith(")")) {
 							lastWord.word = lastWord.word.substring(
 								0,
@@ -111,7 +133,7 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 							);
 						}
 
-						result.push(bgLine);
+						curBGLine = bgLine;
 					} else if (role === "x-translation") {
 						line.translatedLyric = wordEl.innerHTML;
 					} else if (role === "x-roman") {
@@ -120,8 +142,8 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 				} else if (wordEl.hasAttribute("begin") && wordEl.hasAttribute("end")) {
 					const word: LyricWord = {
 						word: wordNode.textContent ?? "",
-						startTime: parseTimespan(lineEl.getAttribute("begin")!!),
-						endTime: parseTimespan(lineEl.getAttribute("end")!!),
+						startTime: parseTimespan(wordEl.getAttribute("begin")!!),
+						endTime: parseTimespan(wordEl.getAttribute("end")!!),
 					};
 					line.words.push(word);
 				}
@@ -129,6 +151,13 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 		}
 
 		result.push(line);
+		if (curBGLine) {
+			// line.startTime = Math.min(line.startTime, curBGLine.startTime);
+			// line.endTime = Math.max(line.endTime, curBGLine.endTime);
+			// curBGLine.startTime = line.startTime;
+			// curBGLine.endTime = line.endTime;
+			result.push(curBGLine);
+		}
 	}
 
 	console.log(result);

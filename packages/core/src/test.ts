@@ -12,6 +12,7 @@ import { LyricPlayer } from "./lyric-player";
 import { parseTTML } from "./lyric/ttml";
 
 const audio = document.createElement("audio");
+audio.preload = "auto";
 
 const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
@@ -21,7 +22,7 @@ const debugValues = {
 	bgPlaying: true,
 	currentTime: 0,
 	play() {
-		if (!audio.src) audio.load();
+		audio.load();
 		audio.play();
 	},
 };
@@ -38,7 +39,10 @@ gui
 	.onFinishChange(async (url: string) => {
 		lyricPlayer.setLyricLines(parseTTML(await (await fetch(url)).text()));
 	});
-gui.add(debugValues, "music").name("歌曲");
+gui.add(debugValues, "music").name("歌曲")
+	.onFinishChange((v: string) => {
+		audio.src = v;
+	});
 gui
 	.add(debugValues, "album")
 	.name("专辑图片")
@@ -72,6 +76,7 @@ const progress = playerGui
 	.name("当前进度")
 	.onChange((v: number) => {
 		audio.currentTime = v;
+		lyricPlayer.setCurrentTime(v * 1000, true);
 	});
 playerGui.add(debugValues, "play");
 
@@ -80,16 +85,22 @@ const lyricPlayer = new LyricPlayer();
 const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
-const frame = () => {
+let lastTime: number = -1
+const frame = (time: number) => {
+	if (lastTime === -1) {
+		lastTime = time;
+	}
 	stats.end();
 	if (!audio.paused) {
-		const time = audio.currentTime | 0;
-		debugValues.currentTime = time;
+		const time = (audio.currentTime * 1000) | 0;
+		debugValues.currentTime = (time / 1000) | 0;
 		progress.max(audio.duration | 0);
 		progress.updateDisplay();
 		lyricPlayer.setCurrentTime(time);
 	}
+	lyricPlayer.update(time - lastTime);
 	stats.begin();
+	lastTime = time;
 	requestAnimationFrame(frame);
 };
 requestAnimationFrame(frame);
@@ -106,6 +117,8 @@ window.lyricPlayer = lyricPlayer;
 	bg.getElement().style.width = "100%";
 	bg.getElement().style.height = "100%";
 	bg.setAlbumImage(debugValues.album);
+	audio.style.display = "none";
+	document.body.appendChild(audio);
 	document.body.appendChild(bg.getElement());
 	document.body.appendChild(lyricPlayer.getElement());
 	lyricPlayer.setLyricLines(
