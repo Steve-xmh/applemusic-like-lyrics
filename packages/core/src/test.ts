@@ -19,6 +19,7 @@ const debugValues = {
 	music: new URL(location.href).searchParams.get("music") || "",
 	album: new URL(location.href).searchParams.get("album") || "",
 	bgFPS: 30,
+	bgScale: 0.5,
 	bgPlaying: true,
 	currentTime: 0,
 	play() {
@@ -60,6 +61,12 @@ bgGui
 		} else {
 			bg.pause();
 		}
+	});
+bgGui
+	.add(debugValues, "bgScale", 0.01, 1, 0.01)
+	.name("分辨率比率")
+	.onChange((v: number) => {
+		bg.setRenderScale(v);
 	});
 bgGui
 	.add(debugValues, "bgFPS", 1, 60, 1)

@@ -75,15 +75,19 @@ export class PixiRenderer implements Disposable {
 				Math.cos(this.curContainer.time * 0.006 * 0.75);
 		}
 	};
+	private currerntRenderScale = 0.75;
 	constructor(private canvas: HTMLCanvasElement) {
 		const bounds = canvas.getBoundingClientRect();
-		this.canvas.width = bounds.width;
-		this.canvas.height = bounds.height;
+		this.canvas.width = bounds.width * this.currerntRenderScale;
+		this.canvas.height = bounds.height * this.currerntRenderScale;
 		this.observer = new ResizeObserver(() => {
 			const bounds = canvas.getBoundingClientRect();
 			this.canvas.width = Math.max(1, bounds.width);
 			this.canvas.height = Math.max(1, bounds.height);
-			this.app.renderer.resize(this.canvas.width, this.canvas.height);
+			this.app.renderer.resize(
+				this.canvas.width * this.currerntRenderScale,
+				this.canvas.height * this.currerntRenderScale,
+			);
 			this.rebuildFilters();
 		});
 		this.observer.observe(canvas);
@@ -96,6 +100,18 @@ export class PixiRenderer implements Disposable {
 		this.rebuildFilters();
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
+	}
+
+	setRenderScale(scale: number) {
+		this.currerntRenderScale = scale;
+		const bounds = this.canvas.getBoundingClientRect();
+		this.canvas.width = Math.max(1, bounds.width);
+		this.canvas.height = Math.max(1, bounds.height);
+		this.app.renderer.resize(
+			this.canvas.width * this.currerntRenderScale,
+			this.canvas.height * this.currerntRenderScale,
+		);
+		this.rebuildFilters();
 	}
 
 	rebuildFilters() {
@@ -111,17 +127,15 @@ export class PixiRenderer implements Disposable {
 		this.app.stage.filters.push(new BlurFilter(10, 1));
 		this.app.stage.filters.push(new BlurFilter(20, 2));
 		this.app.stage.filters.push(new BlurFilter(40, 2));
-		this.app.stage.filters.push(new BlurFilter(80, 2));
-		if (minBorder > 768) {
-			this.app.stage.filters.push(new BlurFilter(160, 4));
-		}
-		if (minBorder > 768 * 2) {
+		if (minBorder > 512) this.app.stage.filters.push(new BlurFilter(80, 2));
+		if (minBorder > 768) this.app.stage.filters.push(new BlurFilter(160, 4));
+		if (minBorder > 768 * 2)
 			this.app.stage.filters.push(new BlurFilter(320, 4));
-		}
+
 		this.app.stage.filters.push(c0, c1, c2);
 		this.app.stage.filters.push(new BlurFilter(5, 1));
 	}
-	
+
 	setFPS(fps: number) {
 		this.app.ticker.maxFPS = fps;
 	}
