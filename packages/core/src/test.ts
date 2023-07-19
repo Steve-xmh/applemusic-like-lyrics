@@ -24,6 +24,7 @@ const debugValues = {
 	bgScale: 0.5,
 	bgPlaying: true,
 	currentTime: 0,
+	enableBlur: true,
 	play() {
 		audio.load();
 		audio.play();
@@ -37,13 +38,13 @@ const debugValues = {
 		} as SpringParams,
 		posY: {
 			mass: 1,
-			damping: 10,
+			damping: 15,
 			stiffness: 100,
 			soft: false,
 		} as SpringParams,
 		scale: {
 			mass: 1,
-			damping: 10,
+			damping: 20,
 			stiffness: 100,
 			soft: false,
 		} as SpringParams,
@@ -100,7 +101,13 @@ bgGui
 	});
 
 {
-	const animation = gui.addFolder("歌词行弹簧动画");
+	const animation = gui.addFolder("歌词行动画/效果");
+	animation
+		.add(debugValues, "enableBlur")
+		.name("启用歌词模糊")
+		.onChange((v: boolean) => {
+			lyricPlayer.setEnableBlur(v);
+		});
 	animation
 		.add(debugValues, "enableSpring")
 		.name("使用弹簧动画")
@@ -167,7 +174,7 @@ requestAnimationFrame(frame);
 const bg = new BackgroundRender();
 bg.setFPS(30);
 
-window.lyricPlayer = lyricPlayer;
+(window as any).lyricPlayer = lyricPlayer;
 
 (async () => {
 	bg.getElement().style.position = "absolute";

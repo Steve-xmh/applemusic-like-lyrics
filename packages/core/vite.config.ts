@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
 	build: {
@@ -8,12 +9,12 @@ export default defineConfig({
 			fileName: "amll-core",
 		},
 		rollupOptions: {
-			external: ["pixi.js"],
-			output: {
-				globals: {
-					"pixi.js": "PIXI",
-				},
-			},
+			external: ["pixi.js", "jss", "jss-preset-default"],
 		},
 	},
+	plugins: [dts({
+		exclude: [
+			"src/test.ts",
+		]
+	})],
 });

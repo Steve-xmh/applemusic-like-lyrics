@@ -33,6 +33,7 @@ export class LyricLineEl implements HasElement, Disposable {
 	private left: number = 0;
 	private top: number = 0;
 	private scale: number = 1;
+	private blur: number = 0;
 	private delay: number = 0;
 	private splittedWords: RealWord[] = [];
 	// 由 LyricPlayer 来设置
@@ -133,6 +134,7 @@ export class LyricLineEl implements HasElement, Disposable {
 		if (this.lyricPlayer.disableSpring && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
+		style += `filter:blur(${this.blur}px);`;
 		if (style !== this.lastStyle) {
 			this.lastStyle = style;
 			this.element.setAttribute("style", style);
@@ -230,23 +232,39 @@ export class LyricLineEl implements HasElement, Disposable {
 		left: number = this.left,
 		top: number = this.top,
 		scale: number = this.scale,
+		opacity: number = 1,
+		blur: number = 0,
 		force = false,
 		delay = 0,
 	) {
 		this.left = left;
 		this.top = top;
 		this.scale = scale;
+		this.blur = blur;
 		this.delay = (delay * 1000) | 0;
+		const main = this.element.children[0] as HTMLDivElement;
+		main.style.opacity = `${opacity}`;
 		if (force || this.lyricPlayer.disableSpring) {
+			if (force)
+				this.element.classList.add(
+					this.lyricPlayer.style.classes.tmpDisableTransition,
+				);
 			this.lineTransforms.posX.setPosition(left);
 			this.lineTransforms.posY.setPosition(top);
 			this.lineTransforms.scale.setPosition(scale);
 			if (this.lyricPlayer.disableSpring) this.show();
 			else this.rebuildStyle();
+			if (force)
+				requestAnimationFrame(() => {
+					this.element.classList.remove(
+						this.lyricPlayer.style.classes.tmpDisableTransition,
+					);
+				});
 		} else {
 			this.lineTransforms.posX.setTargetPosition(left, delay);
 			this.lineTransforms.posY.setTargetPosition(top, delay);
-			this.lineTransforms.scale.setTargetPosition(scale, delay);
+			this.lineTransforms.scale.setTargetPosition(scale);
+			this.element.style.filter = `blur(${blur}px)`;
 		}
 	}
 	update(delta: number = 0) {

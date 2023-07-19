@@ -32,13 +32,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.calcLayout(true);
 		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
 	});
-	private alignCenter = false;
+	private enableBlur = true;
 	size: [number, number] = [0, 0];
 	pos: [number, number] = [0, 0];
 	private interludeDots: InterludeDots;
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	disableSpring = false;
+	alignAnchor: "top" | "bottom" | number = 0.5;
 	/**
 	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
 	 *
@@ -72,17 +73,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
 		},
-		disableSpring: {
-			"& > *": {
-				transition: "transform 0.5s",
-			},
-		},
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
 			maxWidth: "65%",
 			padding: "2vh",
 			contain: "content",
+			transition: "filter 0.25s",
+		},
+		"@media (max-width: 1024px)": {
+			lyricLine: {
+				maxWidth: "75%",
+				padding: "1vh",
+			},
 		},
 		lyricDuetLine: {
 			textAlign: "right",
@@ -98,11 +101,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 		},
 		lyricMainLine: {
-			// opacity: 0.15,
-			// transition: "opacity 0.3s 0.25s",
-			// "&.active": {
-			// 	opacity: 1,
-			// },
+			transition: "opacity 0.3s 0.25s",
 			"& > *": {
 				display: "inline-block",
 				whiteSpace: "pre-wrap",
@@ -111,6 +110,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricSubLine: {
 			fontSize: "max(50%, 10px)",
 			opacity: 0.5,
+		},
+		disableSpring: {
+			"& > *": {
+				transition: "filter 0.25s, transform 0.5s",
+			},
 		},
 		interludeDots: {
 			fontSize: "max(50%, 10px)",
@@ -129,6 +133,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			lyricSubLine: {
 				opacity: 0.3,
 			},
+		},
+		tmpDisableTransition: {
+			transition: "none !important",
 		},
 	});
 	constructor() {
@@ -157,6 +164,15 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		style += this.currentTime;
 		style += ";";
 		this.element.setAttribute("style", style);
+	}
+	/**
+	 * 设置是否启用歌词行的模糊效果
+	 * @param enable 是否启用
+	 */
+	setEnableBlur(enable: boolean) {
+		if (this.enableBlur === enable) return;
+		this.enableBlur = enable;
+		this.calcLayout();
 	}
 	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
@@ -204,6 +220,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.lyricLinesEl.forEach(
 			(el) => (this.element.appendChild(el.getElement()), el.updateMaskImage()),
 		);
+		this.setLinePosXSpringParams({});
+		this.setLinePosYSpringParams({});
+		this.setLineScaleSpringParams({});
 		this.calcLayout(true);
 	}
 	calcLayout(reflow = false) {
@@ -225,16 +244,27 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				0,
 			);
 		let curPos = -scrollOffset;
-		if (this.alignCenter) {
+		if (this.alignAnchor === "bottom") {
 			curPos += this.element.clientHeight / 2;
 			const curLine = this.lyricLinesEl[this.scrollToIndex];
 			if (curLine) {
 				const lineHeight = this.lyricLinesSize.get(curLine)!![1];
 				curPos -= lineHeight / 2;
 			}
+		} else if (typeof this.alignAnchor === "number") {
+			curPos += this.element.clientHeight * this.alignAnchor;
+			const curLine = this.lyricLinesEl[this.scrollToIndex];
+			if (curLine) {
+				const lineHeight = this.lyricLinesSize.get(curLine)!![1];
+				curPos -= lineHeight;
+			}
 		}
+		const latestIndex = Math.max(...this.bufferedLines);
+		let delay = 0;
 		this.lyricLinesEl.forEach((el, i) => {
-			const isActive = this.bufferedLines.has(i);
+			const isActive =
+				this.bufferedLines.has(i) ||
+				(i >= this.scrollToIndex && i < latestIndex);
 			const line = el.getLine();
 			let left = 0;
 			if (line.isDuet) {
@@ -244,13 +274,26 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				left,
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
+				!isActive && i <= this.scrollToIndex ? 1 / 3 : 1,
+				this.enableBlur
+					? 3 *
+					  (isActive
+							? 0
+							: 1 +
+							  (i < this.scrollToIndex
+									? Math.abs(this.scrollToIndex - i)
+									: Math.abs(i - Math.max(this.scrollToIndex, latestIndex))))
+					: 0,
 				reflow,
-				Math.max(0, (i - this.scrollToIndex) * 0.05),
+				delay,
 			);
 			if (line.isBG && isActive) {
 				curPos += this.lyricLinesSize.get(el)!![1];
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)!![1];
+			}
+			if (curPos >= 0) {
+				delay += 0.05;
 			}
 		});
 	}
@@ -297,9 +340,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					const endTime = Math.max(line.endTime, nextLine?.endTime);
 					if (startTime > time || endTime <= time) {
 						this.hotLines.delete(lastHotId);
-						removedIds.add(lastHotId);
+						removedHotIds.add(lastHotId);
 						this.hotLines.delete(lastHotId + 1);
-						removedIds.add(lastHotId + 1);
+						removedHotIds.add(lastHotId + 1);
 						if (isSeek) {
 							this.lyricLinesEl[lastHotId].disable();
 							this.lyricLinesEl[lastHotId + 1].disable();
@@ -307,13 +350,20 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					}
 				} else if (line.startTime > time || line.endTime <= time) {
 					this.hotLines.delete(lastHotId);
-					removedIds.add(lastHotId);
+					removedHotIds.add(lastHotId);
 					if (isSeek) this.lyricLinesEl[lastHotId].disable();
 				}
 			} else {
 				this.hotLines.delete(lastHotId);
-				removedIds.add(lastHotId);
+				removedHotIds.add(lastHotId);
 				if (isSeek) this.lyricLinesEl[lastHotId].disable();
+			}
+		});
+		this.bufferedLines.forEach((v) => {
+			if (!this.hotLines.has(v)) {
+				this.bufferedLines.delete(v);
+				removedIds.add(v);
+				if (isSeek) this.lyricLinesEl[v].disable();
 			}
 		});
 		this.processedLines.forEach((line, id, arr) => {
@@ -357,13 +407,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						}
 					});
 				}
-			} else if (addedIds.size === 1 && eqSet(removedIds, this.bufferedLines)) {
-				this.bufferedLines.clear();
-				addedIds.forEach((v) => {
-					this.bufferedLines.add(v);
-					this.lyricLinesEl[v].enable();
-				});
-				this.scrollToIndex = Math.min(...this.bufferedLines);
 			} else {
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);
@@ -386,24 +429,47 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	update(delta: number = 0) {
 		delta /= 1000;
 		this.lyricLinesEl.forEach((line) => line.update(delta));
-		// this.bufferedLines.forEach((id) => {
-		// 	this.lyricLinesEl[id - 1]?.update(delta);
-		// 	this.lyricLinesEl[id]?.update(delta);
-		// });
 	}
+	private posXSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 10,
+		stiffness: 100,
+	};
+	private posYSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 15,
+		stiffness: 100,
+	};
+	private scaleSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 20,
+		stiffness: 100,
+	};
 	setLinePosXSpringParams(params: Partial<SpringParams>) {
+		this.posXSpringParams = {
+			...this.posXSpringParams,
+			...params,
+		};
 		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.posX.updateParams(params),
+			line.lineTransforms.posX.updateParams(this.posXSpringParams),
 		);
 	}
 	setLinePosYSpringParams(params: Partial<SpringParams>) {
+		this.posYSpringParams = {
+			...this.posYSpringParams,
+			...params,
+		};
 		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.posY.updateParams(params),
+			line.lineTransforms.posY.updateParams(this.posYSpringParams),
 		);
 	}
 	setLineScaleSpringParams(params: Partial<SpringParams>) {
+		this.scaleSpringParams = {
+			...this.scaleSpringParams,
+			...params,
+		};
 		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.scale.updateParams(params),
+			line.lineTransforms.scale.updateParams(this.scaleSpringParams),
 		);
 	}
 	dispose(): void {
