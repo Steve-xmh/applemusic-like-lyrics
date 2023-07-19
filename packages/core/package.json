@@ -3,6 +3,7 @@
   "packageManager": "yarn@3.6.1",
   "devDependencies": {
     "lil-gui": "^0.18.2",
+    "rome": "^12.1.3",
     "stats.js": "^0.17.0",
     "vite": "^4.4.4"
   },

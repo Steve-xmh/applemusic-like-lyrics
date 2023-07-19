@@ -6,6 +6,7 @@
 
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import { eqSet } from "../utils/eq-set";
+import { SpringParams } from "../utils/spring";
 import { InterludeDots } from "./interlude-dots";
 import { LyricLineEl } from "./lyric-line";
 import jss from "jss";
@@ -23,14 +24,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private hotLines: Set<number> = new Set();
 	private bufferedLines: Set<number> = new Set();
 	private scrollToIndex: number = 0;
-	private resizeObserver: ResizeObserver = new ResizeObserver(() => {
-		this.size = [this.element.clientWidth, this.element.clientHeight];
+	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
+		const rect = e[0].contentRect;
+		this.size = [rect.width, rect.height];
+		this.pos = [rect.left, rect.top];
 		this.rebuildStyle();
 		this.calcLayout(true);
 		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
 	});
 	private alignCenter = false;
-	private size: [number, number] = [0, 0];
+	size: [number, number] = [0, 0];
+	pos: [number, number] = [0, 0];
 	private interludeDots: InterludeDots;
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
@@ -53,7 +57,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
-			transition: "transform 0.5s",
+			// transition: "transform 0.5s",
 			maxWidth: "65%",
 			padding: "2vh",
 		},
@@ -179,10 +183,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	calcLayout(reflow = false) {
 		if (reflow)
 			this.lyricLinesEl.forEach((el) => {
-				this.lyricLinesSize.set(el, [
+				const size: [number, number] = [
 					el.getElement().clientWidth,
 					el.getElement().clientHeight,
-				]);
+				];
+				this.lyricLinesSize.set(el, size);
+				el.lineSize = size;
 			});
 		const SCALE_ASPECT = 0.95;
 		const scrollOffset = this.lyricLinesEl
@@ -332,9 +338,27 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
 	 */
 	update(delta: number = 0) {
-		this.bufferedLines.forEach((id) => {
-			this.lyricLinesEl[id]?.update(delta);
-		});
+		delta /= 1000;
+		this.lyricLinesEl.forEach((line) => line.update(delta));
+		// this.bufferedLines.forEach((id) => {
+		// 	this.lyricLinesEl[id - 1]?.update(delta);
+		// 	this.lyricLinesEl[id]?.update(delta);
+		// });
+	}
+	setLinePosXSpringParams(params: Partial<SpringParams>) {
+		this.lyricLinesEl.forEach((line) =>
+			line.lineTransforms.posX.updateParams(params),
+		);
+	}
+	setLinePosYSpringParams(params: Partial<SpringParams>) {
+		this.lyricLinesEl.forEach((line) =>
+			line.lineTransforms.posY.updateParams(params),
+		);
+	}
+	setLineScaleSpringParams(params: Partial<SpringParams>) {
+		this.lyricLinesEl.forEach((line) =>
+			line.lineTransforms.scale.updateParams(params),
+		);
 	}
 	dispose(): void {
 		this.element.remove();

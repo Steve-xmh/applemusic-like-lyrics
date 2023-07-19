@@ -10,6 +10,7 @@ import { BackgroundRender } from "./bg-render";
 import Stats from "stats.js";
 import { LyricPlayer } from "./lyric-player";
 import { parseTTML } from "./lyric/ttml";
+import { SpringParams } from "./utils/spring";
 
 const audio = document.createElement("audio");
 audio.preload = "auto";
@@ -26,6 +27,26 @@ const debugValues = {
 		audio.load();
 		audio.play();
 	},
+	lineSprings: {
+		posX: {
+			mass: 1,
+			damping: 10,
+			stiffness: 100,
+			soft: false,
+		} as SpringParams,
+		posY: {
+			mass: 1,
+			damping: 10,
+			stiffness: 100,
+			soft: false,
+		} as SpringParams,
+		scale: {
+			mass: 1,
+			damping: 10,
+			stiffness: 100,
+			soft: false,
+		} as SpringParams,
+	},
 };
 
 audio.src = debugValues.music;
@@ -40,7 +61,9 @@ gui
 	.onFinishChange(async (url: string) => {
 		lyricPlayer.setLyricLines(parseTTML(await (await fetch(url)).text()));
 	});
-gui.add(debugValues, "music").name("歌曲")
+gui
+	.add(debugValues, "music")
+	.name("歌曲")
 	.onFinishChange((v: string) => {
 		audio.src = v;
 	});
@@ -75,6 +98,28 @@ bgGui
 		bg.setFPS(v);
 	});
 
+{
+	const animation = gui.addFolder("歌词行弹簧动画");
+	function addSpringDbg(name: string, obj: SpringParams, onChange: () => void) {
+		const x = animation.addFolder(name);
+		x.add(obj, "mass").name("质量").onFinishChange(onChange);
+		x.add(obj, "damping").name("阻力").onFinishChange(onChange);
+		x.add(obj, "stiffness").name("弹性").onFinishChange(onChange);
+		x.add(obj, "soft")
+			.name("强制软弹簧（当阻力小于 1 时有用）")
+			.onFinishChange(onChange);
+	}
+	addSpringDbg("水平位移弹簧", debugValues.lineSprings.posX, () => {
+		lyricPlayer.setLinePosXSpringParams(debugValues.lineSprings.posX);
+	});
+	addSpringDbg("垂直位移弹簧", debugValues.lineSprings.posY, () => {
+		lyricPlayer.setLinePosYSpringParams(debugValues.lineSprings.posY);
+	});
+	addSpringDbg("缩放弹簧", debugValues.lineSprings.scale, () => {
+		lyricPlayer.setLineScaleSpringParams(debugValues.lineSprings.scale);
+	});
+}
+
 const playerGui = gui.addFolder("音乐播放器");
 const progress = playerGui
 	.add(debugValues, "currentTime")
@@ -92,7 +137,7 @@ const lyricPlayer = new LyricPlayer();
 const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
-let lastTime: number = -1
+let lastTime: number = -1;
 const frame = (time: number) => {
 	if (lastTime === -1) {
 		lastTime = time;

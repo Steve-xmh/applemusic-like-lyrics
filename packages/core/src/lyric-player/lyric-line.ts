@@ -1,5 +1,6 @@
 import { LyricPlayer } from ".";
 import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
+import { Spring } from "../utils/spring";
 
 const CJKEXP =
 	/^([\p{Unified_Ideograph}\u3006\u3007][\ufe00-\ufe0f\u{e0100}-\u{e01ef}]?)+$/u;
@@ -32,8 +33,14 @@ export class LyricLineEl implements HasElement, Disposable {
 	private left: number = 0;
 	private top: number = 0;
 	private scale: number = 1;
-	private shouldInstant = true;
 	private splittedWords: RealWord[] = [];
+	// 由 LyricPlayer 来设置
+	lineSize: number[] = [0, 0];
+	readonly lineTransforms = {
+		posX: new Spring(0),
+		posY: new Spring(0),
+		scale: new Spring(1),
+	};
 	constructor(
 		private lyricPlayer: LyricPlayer,
 		private lyricLine: LyricLine = {
@@ -98,9 +105,34 @@ export class LyricLineEl implements HasElement, Disposable {
 	getLine() {
 		return this.lyricLine;
 	}
+	private _hide = true;
+	private lastStyle = "";
+	show() {
+		this._hide = false;
+		this.rebuildStyle();
+	}
+	hide() {
+		this._hide = true;
+		this.rebuildStyle();
+	}
 	rebuildStyle() {
-		let style = `transform:translate(${this.left}px,${this.top}px) scale(${this.scale});`;
-		this.element.setAttribute("style", style);
+		if (this._hide) {
+			if (
+				this.lastStyle !== "visibility:hidden;transform:translate(0,-10000px);"
+			) {
+				this.lastStyle = "visibility:hidden;transform:translate(0,-10000px);";
+				this.element.setAttribute(
+					"style",
+					"visibility:hidden;transform:translate(0,-10000px);",
+				);
+			}
+			return;
+		}
+		let style = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
+		if (style !== this.lastStyle) {
+			this.lastStyle = style;
+			this.element.setAttribute("style", style);
+		}
 	}
 	rebuildElement() {
 		const main = this.element.children[0] as HTMLDivElement;
@@ -199,9 +231,38 @@ export class LyricLineEl implements HasElement, Disposable {
 		this.left = left;
 		this.top = top;
 		this.scale = scale;
-		this.rebuildStyle();
+		if (force) {
+			this.lineTransforms.posX.setPosition(left);
+			this.lineTransforms.posY.setPosition(top);
+			this.lineTransforms.scale.setPosition(scale);
+			this.rebuildStyle();
+		} else {
+			this.lineTransforms.posX.setTargetPosition(left);
+			this.lineTransforms.posY.setTargetPosition(top);
+			this.lineTransforms.scale.setTargetPosition(scale);
+		}
 	}
-	update(delta: number = 0) {}
+	update(delta: number = 0) {
+		this.lineTransforms.posX.update(delta);
+		this.lineTransforms.posY.update(delta);
+		this.lineTransforms.scale.update(delta);
+		if (this.isInSight) {
+			this.show();
+		} else {
+			this.hide();
+		}
+	}
+	get isInSight() {
+		const l = this.lineTransforms.posX.getCurrentPosition();
+		const t = this.lineTransforms.posY.getCurrentPosition();
+		const r = l + this.lineSize[0];
+		const b = t + this.lineSize[1];
+		const pl = this.lyricPlayer.pos[0];
+		const pt = this.lyricPlayer.pos[1];
+		const pr = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0];
+		const pb = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
+		return !(l > pr || t > pb || r < pl || b < pt);
+	}
 	dispose(): void {
 		this.element.remove();
 	}

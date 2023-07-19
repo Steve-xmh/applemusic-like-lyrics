@@ -7,7 +7,7 @@ export class InterludeDots implements HasElement, Disposable {
 	private dot1: HTMLElement = document.createElement("div");
 	private dot2: HTMLElement = document.createElement("div");
 	constructor(private lyricPlayer: LyricPlayer) {
-        this.element.className = lyricPlayer.style.classes.interludeDots;
+		this.element.className = lyricPlayer.style.classes.interludeDots;
 		this.element.appendChild(this.dot0);
 		this.element.appendChild(this.dot1);
 		this.element.appendChild(this.dot2);
