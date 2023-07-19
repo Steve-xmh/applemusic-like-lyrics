@@ -19,6 +19,7 @@ const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
 	music: new URL(location.href).searchParams.get("music") || "",
 	album: new URL(location.href).searchParams.get("album") || "",
+	enableSpring: true,
 	bgFPS: 30,
 	bgScale: 0.5,
 	bgPlaying: true,
@@ -100,6 +101,12 @@ bgGui
 
 {
 	const animation = gui.addFolder("歌词行弹簧动画");
+	animation
+		.add(debugValues, "enableSpring")
+		.name("使用弹簧动画")
+		.onChange((v: boolean) => {
+			lyricPlayer.setEnableSpring(v);
+		});
 	function addSpringDbg(name: string, obj: SpringParams, onChange: () => void) {
 		const x = animation.addFolder(name);
 		x.add(obj, "mass").name("质量").onFinishChange(onChange);
@@ -139,10 +146,10 @@ stats.showPanel(0);
 document.body.appendChild(stats.dom);
 let lastTime: number = -1;
 const frame = (time: number) => {
+	stats.end();
 	if (lastTime === -1) {
 		lastTime = time;
 	}
-	stats.end();
 	if (!audio.paused) {
 		const time = (audio.currentTime * 1000) | 0;
 		debugValues.currentTime = (time / 1000) | 0;
@@ -151,8 +158,8 @@ const frame = (time: number) => {
 		lyricPlayer.setCurrentTime(time);
 	}
 	lyricPlayer.update(time - lastTime);
-	stats.begin();
 	lastTime = time;
+	stats.begin();
 	requestAnimationFrame(frame);
 };
 requestAnimationFrame(frame);

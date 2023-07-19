@@ -33,6 +33,7 @@ export class LyricLineEl implements HasElement, Disposable {
 	private left: number = 0;
 	private top: number = 0;
 	private scale: number = 1;
+	private delay: number = 0;
 	private splittedWords: RealWord[] = [];
 	// 由 LyricPlayer 来设置
 	lineSize: number[] = [0, 0];
@@ -129,6 +130,9 @@ export class LyricLineEl implements HasElement, Disposable {
 			return;
 		}
 		let style = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
+		if (this.lyricPlayer.disableSpring && this.isInSight) {
+			style += `transition-delay:${this.delay}ms;`;
+		}
 		if (style !== this.lastStyle) {
 			this.lastStyle = style;
 			this.element.setAttribute("style", style);
@@ -227,22 +231,26 @@ export class LyricLineEl implements HasElement, Disposable {
 		top: number = this.top,
 		scale: number = this.scale,
 		force = false,
+		delay = 0,
 	) {
 		this.left = left;
 		this.top = top;
 		this.scale = scale;
-		if (force) {
+		this.delay = (delay * 1000) | 0;
+		if (force || this.lyricPlayer.disableSpring) {
 			this.lineTransforms.posX.setPosition(left);
 			this.lineTransforms.posY.setPosition(top);
 			this.lineTransforms.scale.setPosition(scale);
-			this.rebuildStyle();
+			if (this.lyricPlayer.disableSpring) this.show();
+			else this.rebuildStyle();
 		} else {
-			this.lineTransforms.posX.setTargetPosition(left);
-			this.lineTransforms.posY.setTargetPosition(top);
-			this.lineTransforms.scale.setTargetPosition(scale);
+			this.lineTransforms.posX.setTargetPosition(left, delay);
+			this.lineTransforms.posY.setTargetPosition(top, delay);
+			this.lineTransforms.scale.setTargetPosition(scale, delay);
 		}
 	}
 	update(delta: number = 0) {
+		if (this.lyricPlayer.disableSpring) return;
 		this.lineTransforms.posX.update(delta);
 		this.lineTransforms.posY.update(delta);
 		this.lineTransforms.scale.update(delta);

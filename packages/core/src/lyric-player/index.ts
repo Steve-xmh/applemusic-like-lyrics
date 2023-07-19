@@ -38,6 +38,23 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private interludeDots: InterludeDots;
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
+	disableSpring = false;
+	/**
+	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
+	 *
+	 * 如果启用，则会通过弹簧算法实时处理歌词位置，但是需要性能足够强劲的电脑方可流畅运行
+	 *
+	 * 如果不启用，则会回退到基于 `transition` 的过渡效果，对低性能的机器比较友好，但是效果会比较单一
+	 */
+	setEnableSpring(enable = true) {
+		this.disableSpring = !enable;
+		if (enable) {
+			this.element.classList.remove(this.style.classes.disableSpring);
+		} else {
+			this.element.classList.add(this.style.classes.disableSpring);
+		}
+		this.calcLayout(true);
+	}
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
@@ -53,13 +70,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			zIndex: 1,
 			color: "var(--amll-lyric-line-color)",
 			mixBlendMode: "plus-lighter",
+			contain: "strict",
+		},
+		disableSpring: {
+			"& > *": {
+				transition: "transform 0.5s",
+			},
 		},
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
-			// transition: "transform 0.5s",
 			maxWidth: "65%",
 			padding: "2vh",
+			contain: "content",
 		},
 		lyricDuetLine: {
 			textAlign: "right",
@@ -68,9 +91,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricBgLine: {
 			opacity: 0,
 			fontSize: "max(50%, 10px)",
-			transition: "transform 0.5s, opacity 0.25s",
+			transition: "opacity 0.25s",
 			"&.active": {
-				transition: "transform 0.5s, opacity 0.25s 0.25s",
+				transition: "opacity 0.25s 0.25s",
 				opacity: 1,
 			},
 		},
@@ -112,6 +135,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		super();
 		this.interludeDots = new InterludeDots(this);
 		this.element.setAttribute("class", this.style.classes.lyricPlayer);
+		if (this.disableSpring) {
+			this.element.classList.add(this.style.classes.disableSpring);
+		}
 		this.rebuildStyle();
 		this.resizeObserver.observe(this.element);
 		this.element.appendChild(this.interludeDots.getElement());
@@ -214,7 +240,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (line.isDuet) {
 				left = this.size[0] - this.lyricLinesSize.get(el)!![0];
 			}
-			el.setTransform(left, curPos, isActive ? 1 : SCALE_ASPECT, reflow);
+			el.setTransform(
+				left,
+				curPos,
+				isActive ? 1 : SCALE_ASPECT,
+				reflow,
+				Math.max(0, (i - this.scrollToIndex) * 0.05),
+			);
 			if (line.isBG && isActive) {
 				curPos += this.lyricLinesSize.get(el)!![1];
 			} else if (!line.isBG) {
@@ -239,30 +271,44 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param time 当前播放进度，单位为毫秒
 	 */
 	setCurrentTime(time: number, isSeek = false) {
+		// 我在这里定义了歌词的选择状态：
+		// 普通行：当前不处于时间范围内的歌词行
+		// 热行：当前绝对处于播放时间内的歌词行，且一般会被立刻加入到缓冲行中
+		// 缓冲行：一般处于播放时间后的歌词行，会因为当前播放状态的缘故推迟解除状态
+
+		// 然后我们需要让歌词行为如下：
+		// 如果当前仍有缓冲行的情况下加入新热行，则不会解除当前缓冲行，且也不会修改当前滚动位置
+		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
+		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.currentTime = time;
 		this.element.style.setProperty("--amll-player-time", `${time}`);
+		const removedHotIds = new Set<number>();
 		const removedIds = new Set<number>();
 		const addedIds = new Set<number>();
+
+		// 先检索当前已经超出时间范围的缓冲行，列入待删除集内
 		this.hotLines.forEach((lastHotId) => {
 			const line = this.processedLines[lastHotId];
+			if (line.isBG) return;
 			if (line) {
-				if (line.startTime > time || line.endTime <= time) {
-					if (line.isBG) {
-						this.hotLines.delete(lastHotId - 1);
-						removedIds.add(lastHotId - 1);
-						if (isSeek) this.lyricLinesEl[lastHotId - 1]?.disable();
+				const nextLine = this.processedLines[lastHotId + 1];
+				if (nextLine?.isBG) {
+					const startTime = Math.min(line.startTime, nextLine?.startTime);
+					const endTime = Math.max(line.endTime, nextLine?.endTime);
+					if (startTime > time || endTime <= time) {
 						this.hotLines.delete(lastHotId);
 						removedIds.add(lastHotId);
-						if (isSeek) this.lyricLinesEl[lastHotId].disable();
-					} else {
-						const nextLine = this.processedLines[lastHotId + 1];
-						if (nextLine?.isBG) {
-						} else {
-							this.hotLines.delete(lastHotId);
-							removedIds.add(lastHotId);
-							if (isSeek) this.lyricLinesEl[lastHotId].disable();
+						this.hotLines.delete(lastHotId + 1);
+						removedIds.add(lastHotId + 1);
+						if (isSeek) {
+							this.lyricLinesEl[lastHotId].disable();
+							this.lyricLinesEl[lastHotId + 1].disable();
 						}
 					}
+				} else if (line.startTime > time || line.endTime <= time) {
+					this.hotLines.delete(lastHotId);
+					removedIds.add(lastHotId);
+					if (isSeek) this.lyricLinesEl[lastHotId].disable();
 				}
 			} else {
 				this.hotLines.delete(lastHotId);
@@ -311,7 +357,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						}
 					});
 				}
-			} else if (addedIds.size === 1 && removedIds.size === 1) {
+			} else if (addedIds.size === 1 && eqSet(removedIds, this.bufferedLines)) {
 				this.bufferedLines.clear();
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);

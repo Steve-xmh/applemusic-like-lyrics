@@ -15,6 +15,13 @@ export class Spring {
 	private params: Partial<SpringParams> = {};
 	private currentSolver: (t: seconds) => number;
 	private getV: (t: seconds) => number;
+	private queueParams: (Partial<SpringParams> & {
+		time: number;
+	})[] = [];
+	private queuePosition: {
+		time: number;
+		position: number;
+	}[] = [];
 	constructor(currentPosition = 0) {
 		this.targetPosition = currentPosition;
 		this.currentPosition = this.targetPosition;
@@ -42,17 +49,58 @@ export class Spring {
 	update(delta = 0) {
 		this.currentTime += delta;
 		this.currentPosition = this.currentSolver(this.currentTime);
+		const nextParams = this.queueParams[0];
+		if (nextParams) {
+			this.queueParams.forEach((p) => {
+				p.time -= delta;
+			});
+			if (nextParams.time <= 0) {
+				this.updateParams({
+					mass: nextParams.mass,
+					damping: nextParams.damping,
+					stiffness: nextParams.stiffness,
+					soft: nextParams.soft,
+				});
+				this.queueParams.shift();
+			}
+		}
+		const nextPosition = this.queuePosition[0];
+		if (nextPosition) {
+			this.queuePosition.forEach((p) => {
+				p.time -= delta;
+			});
+			if (nextPosition.time <= 0) {
+				this.setTargetPosition(nextPosition.position);
+				this.queuePosition.shift();
+			}
+		}
 	}
-	updateParams(params: Partial<SpringParams>) {
-		this.params = {
-			...this.params,
-			...params,
-		};
-		this.resetSolver();
+	updateParams(params: Partial<SpringParams>, delay = 0) {
+		if (delay > 0) {
+			this.queueParams = this.queueParams.filter((v) => v.time < delay);
+			this.queueParams.push({
+				...params,
+				time: delay,
+			});
+		} else {
+			this.params = {
+				...this.params,
+				...params,
+			};
+			this.resetSolver();
+		}
 	}
-	setTargetPosition(targetPosition: number) {
-		this.targetPosition = targetPosition;
-		this.resetSolver();
+	setTargetPosition(targetPosition: number, delay = 0) {
+		if (delay > 0) {
+			this.queuePosition = this.queuePosition.filter((v) => v.time < delay);
+			this.queuePosition.push({
+				position: targetPosition,
+				time: delay,
+			});
+		} else {
+			this.targetPosition = targetPosition;
+			this.resetSolver();
+		}
 	}
 	getCurrentPosition() {
 		return this.currentPosition;
