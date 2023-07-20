@@ -6,6 +6,7 @@ const CJKEXP =
 	/^([\p{Unified_Ideograph}\u3006\u3007][\ufe00-\ufe0f\u{e0100}-\u{e01ef}]?)+$/u;
 
 interface RealWord extends LyricWord {
+	element?: HTMLSpanElement;
 	width: number;
 	height: number;
 }
@@ -147,8 +148,8 @@ export class LyricLineEl implements HasElement, Disposable {
 		this.splittedWords = [];
 		this.lyricLine.words.forEach((word) => {
 			if (CJKEXP.test(word.word)) {
-				this.splittedWords = this.splittedWords.concat(
-					word.word.split("").map((c, i, w) => ({
+				this.splittedWords.push(
+					...word.word.split("").map((c, i, w) => ({
 						word: c,
 						startTime:
 							word.startTime + (i * (word.endTime - word.startTime)) / w.length,
@@ -160,42 +161,76 @@ export class LyricLineEl implements HasElement, Disposable {
 					})),
 				);
 			} else {
-				this.splittedWords.push({
-					...word,
-					width: 0,
-					height: 0,
-				});
+				const splited = /(\s*)(\S*)(\s*)/.exec(word.word);
+				if (splited) {
+					if (splited[1].length > 0) {
+						this.splittedWords.push({
+							word: " ",
+							startTime: 0,
+							endTime: 0,
+							width: 0,
+							height: 0,
+						});
+					}
+					this.splittedWords.push({
+						word: splited[2],
+						startTime: word.startTime,
+						endTime: word.endTime,
+						width: 0,
+						height: 0,
+					});
+					if (splited[3].length > 0) {
+						this.splittedWords.push({
+							word: " ",
+							startTime: 0,
+							endTime: 0,
+							width: 0,
+							height: 0,
+						});
+					}
+				}
 			}
 		});
-		while (this.splittedWords.length > main.childElementCount) {
-			main.appendChild(document.createElement("span"));
+		while (main.hasChildNodes()) {
+			main.removeChild(main.firstChild!);
 		}
-		for (
-			let i = 0;
-			i < Math.max(main.childElementCount, this.splittedWords.length);
-			i++
-		) {
-			const word = this.splittedWords[i];
-			const wordEl = main.children[i] as HTMLSpanElement;
-			if (word) {
+		let lastWordEl: HTMLSpanElement | null = null;
+		this.splittedWords.forEach((word) => {
+			if (word.word.trim().length > 0) {
+				const wordEl = document.createElement("span");
 				wordEl.innerText = word.word;
+				word.element = wordEl;
+				if (lastWordEl) {
+					if (lastWordEl.childElementCount > 0) {
+						lastWordEl.appendChild(wordEl);
+					} else {
+						const wholeWordEl = document.createElement("span");
+						lastWordEl.remove();
+						wholeWordEl.appendChild(lastWordEl);
+						wholeWordEl.appendChild(wordEl);
+						main.appendChild(wholeWordEl);
+						lastWordEl = wholeWordEl
+					}
+				} else {
+					lastWordEl = wordEl;
+					main.appendChild(wordEl);
+				}
+			} else if (word.word.length > 0) {
+				const wordEl = document.createTextNode(" ");
+				main.appendChild(wordEl);
+				lastWordEl = null
 			} else {
-				wordEl.innerText = "";
+				lastWordEl = null
 			}
-		}
+		});
 		trans.innerText = this.lyricLine.translatedLyric;
 		roman.innerText = this.lyricLine.romanLyric;
 	}
 	updateMaskImage() {
 		const main = this.element.children[0] as HTMLDivElement;
-		for (
-			let i = 0;
-			i < Math.max(main.childElementCount, this.splittedWords.length);
-			i++
-		) {
-			const word = this.splittedWords[i];
-			const wordEl = main.children[i] as HTMLSpanElement;
-			if (word?.word?.trim()?.length > 0) {
+		this.splittedWords.forEach((word, i) => {
+			const wordEl = word.element;
+			if (wordEl) {
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
 				const [maskImage, widthInTotal, totalAspect] = generateFadeGradient(
@@ -223,7 +258,7 @@ export class LyricLineEl implements HasElement, Disposable {
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
-		}
+		});
 	}
 	getElement() {
 		return this.element;

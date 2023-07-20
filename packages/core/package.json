@@ -3,12 +3,12 @@
   "packageManager": "yarn@3.6.1",
   "version": "0.0.1",
   "files": ["dist"],
-  "main": "./dist/amll-core.umd.js",
+  "main": "./dist/amll-core.cjs",
   "module": "./dist/amll-core.mjs",
   "exports": {
     ".": {
       "import": "./dist/amll-core.mjs",
-      "require": "./dist/amll-core.umd.js"
+      "require": "./dist/amll-core.cjs"
     }
   },
   "devDependencies": {

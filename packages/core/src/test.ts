@@ -22,12 +22,20 @@ const debugValues = {
 	enableSpring: true,
 	bgFPS: 30,
 	bgScale: 0.5,
+	bgFlowSpeed: 2,
 	bgPlaying: true,
 	currentTime: 0,
 	enableBlur: true,
 	play() {
 		audio.load();
 		audio.play();
+	},
+	pause() {
+		if (audio.paused) {
+			audio.play();
+		} else {
+			audio.pause();
+		}
 	},
 	lineSprings: {
 		posX: {
@@ -55,6 +63,7 @@ audio.src = debugValues.music;
 audio.load();
 
 const gui = new GUI();
+gui.close();
 
 gui.title("AMLL 歌词测试页面");
 gui
@@ -99,6 +108,12 @@ bgGui
 	.onFinishChange((v: number) => {
 		bg.setFPS(v);
 	});
+bgGui
+	.add(debugValues, "bgFlowSpeed", 0, 10, 0.1)
+	.name("流动速度")
+	.onFinishChange((v: number) => {
+		bg.flowSpeed = v;
+	});
 
 {
 	const animation = gui.addFolder("歌词行动画/效果");
@@ -116,6 +131,7 @@ bgGui
 		});
 	function addSpringDbg(name: string, obj: SpringParams, onChange: () => void) {
 		const x = animation.addFolder(name);
+		x.close();
 		x.add(obj, "mass").name("质量").onFinishChange(onChange);
 		x.add(obj, "damping").name("阻力").onFinishChange(onChange);
 		x.add(obj, "stiffness").name("弹性").onFinishChange(onChange);
@@ -144,7 +160,8 @@ const progress = playerGui
 		audio.currentTime = v;
 		lyricPlayer.setCurrentTime(v * 1000, true);
 	});
-playerGui.add(debugValues, "play");
+playerGui.add(debugValues, "play").name("加载/播放");
+playerGui.add(debugValues, "pause").name("暂停/继续");
 
 const lyricPlayer = new LyricPlayer();
 

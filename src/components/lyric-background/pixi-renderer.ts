@@ -1,12 +1,9 @@
-import {
-	Application,
-	BlurFilter,
-	ColorMatrixFilter,
-	Container,
-	Filter,
-	Sprite,
-	Texture,
-} from "pixi.js";
+import { Container } from "@pixi/display";
+import { Application } from "@pixi/app";
+import { BlurFilter } from "@pixi/filter-blur";
+import { ColorMatrixFilter } from "@pixi/filter-color-matrix";
+import { Texture, Filter } from "@pixi/core";
+import { Sprite } from "@pixi/sprite";
 import colorDitheringFragment from "./color-dithering.frag";
 
 class TimedContainer extends Container {

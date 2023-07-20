@@ -6,6 +6,7 @@ export declare class PixiRenderer implements Disposable {
     private curContainer?;
     private lastContainer;
     private onTick;
+    flowSpeed: number;
     private currerntRenderScale;
     constructor(canvas: HTMLCanvasElement);
     setRenderScale(scale: number): void;

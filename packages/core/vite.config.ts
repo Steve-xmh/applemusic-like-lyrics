@@ -7,14 +7,24 @@ export default defineConfig({
 			entry: "src/index.ts",
 			name: "AppleMusicLikeLyricsCore",
 			fileName: "amll-core",
+			formats: ["es", "cjs"],
 		},
 		rollupOptions: {
-			external: ["pixi.js", "jss", "jss-preset-default"],
+			external: [
+				"@pixi/display",
+				"@pixi/app",
+				"@pixi/filter-blur",
+				"@pixi/filter-color-matrix",
+				"@pixi/core",
+				"@pixi/sprite",
+				"jss",
+				"jss-preset-default",
+			],
 		},
 	},
-	plugins: [dts({
-		exclude: [
-			"src/test.ts",
-		]
-	})],
+	plugins: [
+		dts({
+			exclude: ["src/test.ts"],
+		}),
+	],
 });

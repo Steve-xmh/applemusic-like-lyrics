@@ -1,11 +1,9 @@
-import {
-	Application,
-	BlurFilter,
-	ColorMatrixFilter,
-	Container,
-	Sprite,
-	Texture,
-} from "pixi.js";
+import { Container } from "@pixi/display";
+import { Application } from "@pixi/app";
+import { BlurFilter } from "@pixi/filter-blur";
+import { ColorMatrixFilter } from "@pixi/filter-color-matrix";
+import { Texture } from "@pixi/core";
+import { Sprite } from "@pixi/sprite";
 import { Disposable } from "../interfaces";
 
 class TimedContainer extends Container {
@@ -49,12 +47,12 @@ export class PixiRenderer implements Disposable {
 			s4.width = maxSize * 0.25;
 			s4.height = s4.width;
 
-			this.curContainer.time += delta;
+			this.curContainer.time += delta * this.flowSpeed;
 
-			s1.rotation += delta / 1000;
-			s2.rotation -= delta / 500;
-			s3.rotation += delta / 1000;
-			s4.rotation -= delta / 750;
+			s1.rotation += delta / 1000 * this.flowSpeed;
+			s2.rotation -= delta / 500 * this.flowSpeed;
+			s3.rotation += delta / 1000 * this.flowSpeed;
+			s4.rotation -= delta / 750 * this.flowSpeed;
 
 			s3.x =
 				this.app.screen.width / 2 +
@@ -75,6 +73,7 @@ export class PixiRenderer implements Disposable {
 				Math.cos(this.curContainer.time * 0.006 * 0.75);
 		}
 	};
+	flowSpeed = 2;
 	private currerntRenderScale = 0.75;
 	constructor(private canvas: HTMLCanvasElement) {
 		const bounds = canvas.getBoundingClientRect();

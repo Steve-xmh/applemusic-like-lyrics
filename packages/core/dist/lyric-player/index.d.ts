@@ -5,6 +5,9 @@
  */
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import { SpringParams } from "../utils/spring";
+/**
+ * 一个播放歌词的组件
+ */
 export declare class LyricPlayer extends EventTarget implements HasElement, Disposable {
     private element;
     private currentTime;
@@ -16,14 +19,18 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private bufferedLines;
     private scrollToIndex;
     private resizeObserver;
+    private posXSpringParams;
+    private posYSpringParams;
+    private scaleSpringParams;
     private enableBlur;
-    size: [number, number];
-    pos: [number, number];
     private interludeDots;
+    private interludeDotsSize;
     readonly supportPlusLighter: boolean;
     readonly supportMaskImage: boolean;
     disableSpring: boolean;
     alignAnchor: "top" | "bottom" | number;
+    readonly size: [number, number];
+    readonly pos: [number, number];
     /**
      * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
      *
@@ -34,6 +41,13 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     setEnableSpring(enable?: boolean): void;
     readonly style: import("jss").StyleSheet<"lyricPlayer" | "lyricLine" | "@media (max-width: 1024px)" | "lyricDuetLine" | "lyricBgLine" | "lyricMainLine" | "lyricSubLine" | "disableSpring" | "interludeDots" | "@supports (mix-blend-mode: plus-lighter)" | "tmpDisableTransition">;
     constructor();
+    /**
+     * 获取当前播放时间里是否处于间奏区间
+     * 如果是则会返回单位为毫秒的始末时间
+     * 否则返回 undefined
+     * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
+     */
+    getCurrentInterlude(): [number, number] | undefined;
     rebuildStyle(): void;
     /**
      * 设置是否启用歌词行的模糊效果
@@ -58,13 +72,10 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      */
     setCurrentTime(time: number, isSeek?: boolean): void;
     /**
-     * 更新动画，这个函数应该逐帧调用
+     * 更新动画，这个函数应该被逐帧调用
      * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
      */
     update(delta?: number): void;
-    private posXSpringParams;
-    private posYSpringParams;
-    private scaleSpringParams;
     setLinePosXSpringParams(params: Partial<SpringParams>): void;
     setLinePosYSpringParams(params: Partial<SpringParams>): void;
     setLineScaleSpringParams(params: Partial<SpringParams>): void;

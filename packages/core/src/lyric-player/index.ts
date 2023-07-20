@@ -9,11 +9,14 @@ import { eqSet } from "../utils/eq-set";
 import { SpringParams } from "../utils/spring";
 import { InterludeDots } from "./interlude-dots";
 import { LyricLineEl } from "./lyric-line";
-import jss from "jss";
+import { create } from "jss";
 import preset from "jss-preset-default";
 
-jss.setup(preset());
+const jss = create(preset());
 
+/**
+ * 一个播放歌词的组件
+ */
 export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
 	private currentTime: number = 0;
@@ -26,20 +29,38 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private scrollToIndex: number = 0;
 	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
 		const rect = e[0].contentRect;
-		this.size = [rect.width, rect.height];
-		this.pos = [rect.left, rect.top];
+		this.size[0] = rect.width;
+		this.size[1] = rect.height;
+		this.pos[0] = rect.left;
+		this.pos[1] = rect.top;
 		this.rebuildStyle();
 		this.calcLayout(true);
 		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
 	});
+	private posXSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 10,
+		stiffness: 100,
+	};
+	private posYSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 15,
+		stiffness: 100,
+	};
+	private scaleSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 20,
+		stiffness: 100,
+	};
 	private enableBlur = true;
-	size: [number, number] = [0, 0];
-	pos: [number, number] = [0, 0];
 	private interludeDots: InterludeDots;
+	private interludeDotsSize: [number, number] = [0, 0];
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	disableSpring = false;
 	alignAnchor: "top" | "bottom" | number = 0.5;
+	readonly size: [number, number] = [0, 0];
+	readonly pos: [number, number] = [0, 0];
 	/**
 	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
 	 *
@@ -77,14 +98,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			position: "absolute",
 			transformOrigin: "left",
 			maxWidth: "65%",
-			padding: "2vh",
+			padding: "2vh 0",
 			contain: "content",
 			transition: "filter 0.25s",
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
 				maxWidth: "75%",
-				padding: "1vh",
+				padding: "1vh 0",
 			},
 		},
 		lyricDuetLine: {
@@ -102,7 +123,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		lyricMainLine: {
 			transition: "opacity 0.3s 0.25s",
-			"& > *": {
+			"& span": {
 				display: "inline-block",
 				whiteSpace: "pre-wrap",
 			},
@@ -117,11 +138,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 		},
 		interludeDots: {
-			fontSize: "max(50%, 10px)",
-			opacity: 0.5,
-			"& > *": {
-				content: '"*"',
-			},
+			fontSize: "max(150%, 10px)",
+			transformOrigin: "left",
+			width: "fit-content",
+			position: "absolute",
+			opacity: 0.25,
 		},
 		"@supports (mix-blend-mode: plus-lighter)": {
 			lyricMainLine: {
@@ -149,6 +170,37 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.resizeObserver.observe(this.element);
 		this.element.appendChild(this.interludeDots.getElement());
 		this.style.attach();
+	}
+	/**
+	 * 获取当前播放时间里是否处于间奏区间
+	 * 如果是则会返回单位为毫秒的始末时间
+	 * 否则返回 undefined
+	 * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
+	 */
+	getCurrentInterlude(): [number, number] | undefined {
+		if (this.bufferedLines.size > 0) return undefined;
+		const i = this.scrollToIndex;
+		if (i === 0) {
+			if (this.processedLines[0]?.startTime) {
+				if (this.processedLines[0].startTime > this.currentTime) {
+					return [0, this.processedLines[0].startTime];
+				}
+			}
+		} else if (
+			this.processedLines[i]?.endTime &&
+			this.processedLines[i + 1]?.startTime
+		) {
+			if (
+				this.processedLines[i + 1].startTime > this.currentTime &&
+				this.processedLines[i].endTime < this.currentTime
+			) {
+				return [
+					this.processedLines[i].endTime,
+					this.processedLines[i + 1].startTime,
+				];
+			}
+		}
+		return undefined;
 	}
 	rebuildStyle() {
 		let style = "";
@@ -226,7 +278,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.calcLayout(true);
 	}
 	calcLayout(reflow = false) {
-		if (reflow)
+		if (reflow) {
 			this.lyricLinesEl.forEach((el) => {
 				const size: [number, number] = [
 					el.getElement().clientWidth,
@@ -235,6 +287,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.lyricLinesSize.set(el, size);
 				el.lineSize = size;
 			});
+			this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth;
+			this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight;
+		}
 		const SCALE_ASPECT = 0.95;
 		const scrollOffset = this.lyricLinesEl
 			.slice(0, this.scrollToIndex)
@@ -256,7 +311,22 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			const curLine = this.lyricLinesEl[this.scrollToIndex];
 			if (curLine) {
 				const lineHeight = this.lyricLinesSize.get(curLine)!![1];
-				curPos -= lineHeight;
+				curPos -= lineHeight / 2;
+			}
+		}
+		const interlude =
+			this.currentTime === 0 ? undefined : this.getCurrentInterlude();
+		let interludeDuration = 0;
+		if (interlude) {
+			interludeDuration = interlude[1] - interlude[0];
+			if (interludeDuration >= 5000) {
+				const nextLine =
+					this.currentTime === 0
+						? this.lyricLinesEl[0]
+						: this.lyricLinesEl[this.scrollToIndex + 1];
+				if (nextLine) {
+					curPos -= this.lyricLinesSize.get(nextLine)!![1];
+				}
 			}
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
@@ -269,6 +339,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			let left = 0;
 			if (line.isDuet) {
 				left = this.size[0] - this.lyricLinesSize.get(el)!![0];
+			}
+			if (i === this.scrollToIndex + 1 && interludeDuration >= 5000) {
+				curPos += this.interludeDotsSize[1];
 			}
 			el.setTransform(
 				left,
@@ -423,28 +496,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 	}
 	/**
-	 * 更新动画，这个函数应该逐帧调用
+	 * 更新动画，这个函数应该被逐帧调用
 	 * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
 	 */
 	update(delta: number = 0) {
 		delta /= 1000;
 		this.lyricLinesEl.forEach((line) => line.update(delta));
 	}
-	private posXSpringParams: Partial<SpringParams> = {
-		mass: 1,
-		damping: 10,
-		stiffness: 100,
-	};
-	private posYSpringParams: Partial<SpringParams> = {
-		mass: 1,
-		damping: 15,
-		stiffness: 100,
-	};
-	private scaleSpringParams: Partial<SpringParams> = {
-		mass: 1,
-		damping: 20,
-		stiffness: 100,
-	};
 	setLinePosXSpringParams(params: Partial<SpringParams>) {
 		this.posXSpringParams = {
 			...this.posXSpringParams,

@@ -21,7 +21,6 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 		"application/xml",
 	);
 
-	console.log(ttmlDoc);
 	let mainAgentId = "v1";
 
 	for (const agent of ttmlDoc.querySelectorAll("ttm\\:agent")) {
