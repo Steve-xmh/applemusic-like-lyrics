@@ -7,7 +7,7 @@ import { Sprite } from "@pixi/sprite";
 import { Disposable } from "../interfaces";
 
 class TimedContainer extends Container {
-	public time: number = 0;
+	public time = 0;
 }
 
 export class PixiRenderer implements Disposable {
@@ -49,10 +49,10 @@ export class PixiRenderer implements Disposable {
 
 			this.curContainer.time += delta * this.flowSpeed;
 
-			s1.rotation += delta / 1000 * this.flowSpeed;
-			s2.rotation -= delta / 500 * this.flowSpeed;
-			s3.rotation += delta / 1000 * this.flowSpeed;
-			s4.rotation -= delta / 750 * this.flowSpeed;
+			s1.rotation += (delta / 1000) * this.flowSpeed;
+			s2.rotation -= (delta / 500) * this.flowSpeed;
+			s3.rotation += (delta / 1000) * this.flowSpeed;
+			s4.rotation -= (delta / 750) * this.flowSpeed;
 
 			s3.x =
 				this.app.screen.width / 2 +
@@ -73,7 +73,7 @@ export class PixiRenderer implements Disposable {
 				Math.cos(this.curContainer.time * 0.006 * 0.75);
 		}
 	};
-	flowSpeed = 2;
+	private flowSpeed = 2;
 	private currerntRenderScale = 0.75;
 	constructor(private canvas: HTMLCanvasElement) {
 		const bounds = canvas.getBoundingClientRect();
@@ -100,7 +100,19 @@ export class PixiRenderer implements Disposable {
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}
-
+	/**
+	 * 修改背景的流动速度，数字越大越快，默认为 2
+	 * @param speed 背景的流动速度，默认为 2
+	 */
+	setFlowSpeed(speed: number) {
+		this.flowSpeed = speed;
+	}
+	/**
+	 * 修改背景的渲染比例，默认是 0.5
+	 *
+	 * 一般情况下这个程度既没有明显瑕疵也不会特别吃性能
+	 * @param scale 背景的渲染比例
+	 */
 	setRenderScale(scale: number) {
 		this.currerntRenderScale = scale;
 		const bounds = this.canvas.getBoundingClientRect();
@@ -112,8 +124,7 @@ export class PixiRenderer implements Disposable {
 		);
 		this.rebuildFilters();
 	}
-
-	rebuildFilters() {
+	private rebuildFilters() {
 		const minBorder = Math.min(this.canvas.width, this.canvas.height);
 		const c0 = new ColorMatrixFilter();
 		c0.saturate(1.2, false);
@@ -134,20 +145,32 @@ export class PixiRenderer implements Disposable {
 		this.app.stage.filters.push(c0, c1, c2);
 		this.app.stage.filters.push(new BlurFilter(5, 1));
 	}
-
+	/**
+	 * 修改背景动画帧率，默认是 30 FPS
+	 *
+	 * 如果设置成 0 则会停止动画
+	 * @param fps 目标帧率，默认 30 FPS
+	 */
 	setFPS(fps: number) {
 		this.app.ticker.maxFPS = fps;
 	}
-
+	/**
+	 * 暂停背景动画，画面即便是更新了图片也不会发生变化
+	 */
 	pause() {
 		this.app.ticker.stop();
 		this.app.render();
 	}
-
+	/**
+	 * 恢复播放背景动画
+	 */
 	resume() {
 		this.app.ticker.start();
 	}
-
+	/**
+	 * 设置背景专辑图片，图片材质加载并设置完成后会返回
+	 * @param albumUrl 图片的目标链接
+	 */
 	async setAlbumImage(albumUrl: string) {
 		const tex = await Texture.fromURL(albumUrl);
 		const container = new TimedContainer();

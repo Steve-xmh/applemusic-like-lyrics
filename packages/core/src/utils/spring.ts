@@ -15,13 +15,17 @@ export class Spring {
 	private params: Partial<SpringParams> = {};
 	private currentSolver: (t: seconds) => number;
 	private getV: (t: seconds) => number;
-	private queueParams: (Partial<SpringParams> & {
-		time: number;
-	})[] = [];
-	private queuePosition: {
-		time: number;
-		position: number;
-	}[] = [];
+	private queueParams:
+		| (Partial<SpringParams> & {
+				time: number;
+		  })
+		| undefined;
+	private queuePosition:
+		| {
+				time: number;
+				position: number;
+		  }
+		| undefined;
 	constructor(currentPosition = 0) {
 		this.targetPosition = currentPosition;
 		this.currentPosition = this.targetPosition;
@@ -40,6 +44,14 @@ export class Spring {
 		);
 		this.getV = getVelocity(this.currentSolver);
 	}
+	arrived() {
+		return (
+			Math.abs(this.targetPosition - this.currentPosition) < 0.01 &&
+			this.getV(this.currentTime) < 0.01 &&
+			this.queueParams === undefined &&
+			this.queuePosition === undefined
+		);
+	}
 	setPosition(targetPosition: number) {
 		this.targetPosition = targetPosition;
 		this.currentPosition = targetPosition;
@@ -49,39 +61,30 @@ export class Spring {
 	update(delta = 0) {
 		this.currentTime += delta;
 		this.currentPosition = this.currentSolver(this.currentTime);
-		const nextParams = this.queueParams[0];
-		if (nextParams) {
-			this.queueParams.forEach((p) => {
-				p.time -= delta;
-			});
-			if (nextParams.time <= 0) {
+		if (this.queueParams) {
+			this.queueParams.time -= delta;
+			if (this.queueParams.time <= 0) {
 				this.updateParams({
-					mass: nextParams.mass,
-					damping: nextParams.damping,
-					stiffness: nextParams.stiffness,
-					soft: nextParams.soft,
+					...this.queueParams,
 				});
-				this.queueParams.shift();
 			}
 		}
-		const nextPosition = this.queuePosition[0];
-		if (nextPosition) {
-			this.queuePosition.forEach((p) => {
-				p.time -= delta;
-			});
-			if (nextPosition.time <= 0) {
-				this.setTargetPosition(nextPosition.position);
-				this.queuePosition.shift();
+		if (this.queuePosition) {
+			this.queuePosition.time -= delta;
+			if (this.queuePosition.time <= 0) {
+				this.setTargetPosition(this.queuePosition.position);
 			}
+		}
+		if (this.arrived()) {
+			this.setPosition(this.targetPosition);
 		}
 	}
 	updateParams(params: Partial<SpringParams>, delay = 0) {
 		if (delay > 0) {
-			this.queueParams = this.queueParams.filter((v) => v.time < delay);
-			this.queueParams.push({
+			this.queueParams = {
 				...params,
 				time: delay,
-			});
+			};
 		} else {
 			this.params = {
 				...this.params,
@@ -92,12 +95,12 @@ export class Spring {
 	}
 	setTargetPosition(targetPosition: number, delay = 0) {
 		if (delay > 0) {
-			this.queuePosition = this.queuePosition.filter((v) => v.time < delay);
-			this.queuePosition.push({
+			this.queuePosition = {
 				position: targetPosition,
 				time: delay,
-			});
+			};
 		} else {
+			this.queuePosition = undefined;
 			this.targetPosition = targetPosition;
 			this.resetSolver();
 		}
@@ -112,12 +115,12 @@ function solveSpring(
 	velocity: number,
 	to: number,
 	delay: seconds = 0,
-	params: Partial<SpringParams>,
+	params?: Partial<SpringParams>,
 ): (t: seconds) => number {
-	const soft = params.soft ?? false;
-	const stiffness = params.stiffness ?? 100;
-	const damping = params.damping ?? 10;
-	const mass = params.mass ?? 1;
+	const soft = params?.soft ?? false;
+	const stiffness = params?.stiffness ?? 100;
+	const damping = params?.damping ?? 10;
+	const mass = params?.mass ?? 1;
 	const delta = to - from;
 	if (soft || 1.0 <= damping / (2.0 * Math.sqrt(stiffness * mass))) {
 		const angular_frequency = -Math.sqrt(stiffness / mass);

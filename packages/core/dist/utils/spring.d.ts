@@ -16,6 +16,7 @@ export declare class Spring {
     private queuePosition;
     constructor(currentPosition?: number);
     private resetSolver;
+    arrived(): boolean;
     setPosition(targetPosition: number): void;
     update(delta?: number): void;
     updateParams(params: Partial<SpringParams>, delay?: number): void;

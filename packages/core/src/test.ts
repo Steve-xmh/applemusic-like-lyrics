@@ -112,7 +112,7 @@ bgGui
 	.add(debugValues, "bgFlowSpeed", 0, 10, 0.1)
 	.name("流动速度")
 	.onFinishChange((v: number) => {
-		bg.flowSpeed = v;
+		bg.setFlowSpeed(v);
 	});
 
 {
@@ -168,7 +168,7 @@ const lyricPlayer = new LyricPlayer();
 const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
-let lastTime: number = -1;
+let lastTime = -1;
 const frame = (time: number) => {
 	stats.end();
 	if (lastTime === -1) {

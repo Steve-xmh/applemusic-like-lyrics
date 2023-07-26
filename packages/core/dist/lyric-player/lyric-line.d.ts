@@ -1,11 +1,11 @@
 import { LyricPlayer } from ".";
-import { Disposable, HasElement, LyricLine } from "../interfaces";
+import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
 import { Spring } from "../utils/spring";
+export declare function shouldEmphasize(word: LyricWord): boolean;
 export declare class LyricLineEl implements HasElement, Disposable {
     private lyricPlayer;
     private lyricLine;
     private element;
-    private currentTime;
     private left;
     private top;
     private scale;
@@ -19,7 +19,9 @@ export declare class LyricLineEl implements HasElement, Disposable {
         scale: Spring;
     };
     constructor(lyricPlayer: LyricPlayer, lyricLine?: LyricLine);
+    private isEnabled;
     enable(): void;
+    measureSize(): [number, number];
     disable(): void;
     setLine(line: LyricLine): void;
     getLine(): LyricLine;
@@ -29,6 +31,8 @@ export declare class LyricLineEl implements HasElement, Disposable {
     hide(): void;
     rebuildStyle(): void;
     rebuildElement(): void;
+    private initFloatAnimation;
+    private initEmphasizeAnimation;
     updateMaskImage(): void;
     getElement(): HTMLElement;
     setTransform(left?: number, top?: number, scale?: number, opacity?: number, blur?: number, force?: boolean, delay?: number): void;

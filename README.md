@@ -4,9 +4,11 @@
 
 # Apple Music-like Lyrics
 
-一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 的类 Apple Music 歌词显示插件。
+一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持 DOM 原生、React 和 Vue 绑定，并提供针对网易云音乐的插件支持。
 
-这是你能在网易云上见到的最像 iPad Apple Music 的播放页面了。
+前身是基于 NCM 插件加载器 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 实现的的类 Apple Music 歌词显示插件。
+
+这是你能在前端系里能见到的最像 iPad Apple Music 的播放页面了。
 
 **—— AMLL 生态作品 ——**
 

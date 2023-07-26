@@ -1,0 +1,22 @@
+{
+    "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable",
+            "WebWorker"
+        ],
+        "module": "ESNext",
+        "jsx": "react-jsx",
+        "types": [],
+        "strict": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
+        "allowJs": false,
+        "skipLibCheck": true
+    }
+}
