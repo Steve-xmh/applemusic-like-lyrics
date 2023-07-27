@@ -1,173 +1,166 @@
-var D = Object.defineProperty;
-var I = (c, t, e) => t in c ? D(c, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : c[t] = e;
-var h = (c, t, e) => (I(c, typeof t != "symbol" ? t + "" : t, e), e);
-import { Container as B } from "@pixi/display";
-import { Application as k } from "@pixi/app";
-import { BlurFilter as g } from "@pixi/filter-blur";
-import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
-import { Texture as N } from "@pixi/core";
-import { Sprite as S } from "@pixi/sprite";
-import { create as O } from "jss";
-import $ from "jss-preset-default";
-const q = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
-function b(c) {
-  var e, n, s;
-  const t = q.exec(c);
-  if (t) {
-    const a = Number(((e = t.groups) == null ? void 0 : e.hour) || "0"), l = Number(((n = t.groups) == null ? void 0 : n.min) || "0"), i = Number(((s = t.groups) == null ? void 0 : s.sec.replace(/:/, ".")) || "0");
-    return Math.floor((a * 3600 + l * 60 + i) * 1e3);
+import { Container as v } from "@pixi/display";
+import { Application as M } from "@pixi/app";
+import { BlurFilter as y } from "@pixi/filter-blur";
+import { ColorMatrixFilter as w } from "@pixi/filter-color-matrix";
+import { Texture as C } from "@pixi/core";
+import { Sprite as L } from "@pixi/sprite";
+import { create as z } from "jss";
+import A from "jss-preset-default";
+const D = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
+function T(c) {
+  const e = D.exec(c);
+  if (e) {
+    const t = Number(e.groups?.hour || "0"), i = Number(e.groups?.min || "0"), n = Number(e.groups?.sec.replace(/:/, ".") || "0");
+    return Math.floor((t * 3600 + i * 60 + n) * 1e3);
   } else
     throw new TypeError("时间戳字符串解析失败");
 }
-function R(c) {
-  const e = new DOMParser().parseFromString(
+function I(c) {
+  const t = new DOMParser().parseFromString(
     c,
     "application/xml"
   );
-  let n = "v1";
-  for (const a of e.querySelectorAll("ttm\\:agent"))
-    if (a.getAttribute("type") === "person") {
-      const l = a.getAttribute("xml:id");
-      l && (n = l);
+  let i = "v1";
+  for (const h of t.querySelectorAll("ttm\\:agent"))
+    if (h.getAttribute("type") === "person") {
+      const s = h.getAttribute("xml:id");
+      s && (i = s);
     }
-  const s = [];
-  for (const a of e.querySelectorAll("body p[begin][end]")) {
-    const l = {
+  const n = [];
+  for (const h of t.querySelectorAll("body p[begin][end]")) {
+    const s = {
       words: [],
-      startTime: b(a.getAttribute("begin") ?? "0:0"),
-      endTime: b(a.getAttribute("end") ?? "0:0"),
+      startTime: T(h.getAttribute("begin") ?? "0:0"),
+      endTime: T(h.getAttribute("end") ?? "0:0"),
       translatedLyric: "",
       romanLyric: "",
       isBG: !1,
-      isDuet: a.getAttribute("ttm:agent") !== n
+      isDuet: h.getAttribute("ttm:agent") !== i
     };
-    let i = null;
-    for (const r of a.childNodes)
-      if (r.nodeType === Node.TEXT_NODE) {
-        const o = r.textContent ?? "";
-        /^(\s+)$/.test(o) ? l.words.push({
+    let r = null;
+    for (const a of h.childNodes)
+      if (a.nodeType === Node.TEXT_NODE) {
+        const l = a.textContent ?? "";
+        /^(\s+)$/.test(l) ? s.words.push({
           word: " ",
           startTime: 0,
           endTime: 0
-        }) : l.words.push({
-          word: o,
+        }) : s.words.push({
+          word: l,
           startTime: 0,
           endTime: 0
         });
-      } else if (r.nodeType === Node.ELEMENT_NODE) {
-        const o = r, d = o.getAttribute("ttm:role");
-        if (o.nodeName === "span" && d)
-          if (d === "x-bg") {
-            const u = {
+      } else if (a.nodeType === Node.ELEMENT_NODE) {
+        const l = a, o = l.getAttribute("ttm:role");
+        if (l.nodeName === "span" && o)
+          if (o === "x-bg") {
+            const d = {
               words: [],
-              startTime: l.startTime,
-              endTime: l.endTime,
+              startTime: s.startTime,
+              endTime: s.endTime,
               translatedLyric: "",
               romanLyric: "",
               isBG: !0,
-              isDuet: l.isDuet
+              isDuet: s.isDuet
             };
-            for (const p of o.childNodes)
+            for (const p of l.childNodes)
               if (p.nodeType === Node.TEXT_NODE) {
-                const y = p.textContent ?? "";
-                /^(\s+)$/.test(y) ? u.words.push({
+                const f = p.textContent ?? "";
+                /^(\s+)$/.test(f) ? d.words.push({
                   word: " ",
                   startTime: 0,
                   endTime: 0
-                }) : u.words.push({
-                  word: y,
+                }) : d.words.push({
+                  word: f,
                   startTime: 0,
                   endTime: 0
                 });
               } else if (p.nodeType === Node.ELEMENT_NODE) {
-                const y = p, T = y.getAttribute("ttm:role");
-                if (y.nodeName === "span" && T)
-                  T === "x-translation" ? u.translatedLyric = y.innerHTML.trim() : T === "x-roman" && (u.romanLyric = y.innerHTML.trim());
-                else if (y.hasAttribute("begin") && y.hasAttribute("end")) {
-                  const E = {
+                const f = p, S = f.getAttribute("ttm:role");
+                if (f.nodeName === "span" && S)
+                  S === "x-translation" ? d.translatedLyric = f.innerHTML.trim() : S === "x-roman" && (d.romanLyric = f.innerHTML.trim());
+                else if (f.hasAttribute("begin") && f.hasAttribute("end")) {
+                  const x = {
                     word: p.textContent,
-                    startTime: b(y.getAttribute("begin")),
-                    endTime: b(y.getAttribute("end"))
+                    startTime: T(f.getAttribute("begin")),
+                    endTime: T(f.getAttribute("end"))
                   };
-                  u.words.push(E);
+                  d.words.push(x);
                 }
               }
-            const f = u.words[0];
-            u.startTime = f.startTime, f != null && f.word.startsWith("(") && (f.word = f.word.substring(1));
-            const m = u.words[u.words.length - 1];
-            u.endTime = m.endTime, m != null && m.word.endsWith(")") && (m.word = m.word.substring(
+            const m = d.words[0];
+            d.startTime = m.startTime, m?.word.startsWith("(") && (m.word = m.word.substring(1));
+            const u = d.words[d.words.length - 1];
+            d.endTime = u.endTime, u?.word.endsWith(")") && (u.word = u.word.substring(
               0,
-              m.word.length - 1
-            )), i = u;
+              u.word.length - 1
+            )), r = d;
           } else
-            d === "x-translation" ? l.translatedLyric = o.innerHTML : d === "x-roman" && (l.romanLyric = o.innerHTML);
-        else if (o.hasAttribute("begin") && o.hasAttribute("end")) {
-          const u = {
-            word: r.textContent ?? "",
-            startTime: b(o.getAttribute("begin")),
-            endTime: b(o.getAttribute("end"))
+            o === "x-translation" ? s.translatedLyric = l.innerHTML : o === "x-roman" && (s.romanLyric = l.innerHTML);
+        else if (l.hasAttribute("begin") && l.hasAttribute("end")) {
+          const d = {
+            word: a.textContent ?? "",
+            startTime: T(l.getAttribute("begin")),
+            endTime: T(l.getAttribute("end"))
           };
-          l.words.push(u);
+          s.words.push(d);
         }
       }
-    s.push(l), i && s.push(i);
+    n.push(s), r && n.push(r);
   }
-  return console.log(s), s;
+  return console.log(n), n;
 }
-const ae = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Q = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  parseTTML: R
+  parseTTML: I
 }, Symbol.toStringTag, { value: "Module" }));
-class F extends B {
-  constructor() {
-    super(...arguments);
-    h(this, "time", 0);
-  }
+class B extends v {
+  time = 0;
 }
-class _ {
-  constructor(t) {
-    h(this, "observer");
-    h(this, "app");
-    h(this, "curContainer");
-    h(this, "lastContainer", /* @__PURE__ */ new Set());
-    h(this, "onTick", (t) => {
-      for (const e of this.lastContainer)
-        e.alpha = Math.max(0, e.alpha - t / 60), e.alpha <= 0 && (this.app.stage.removeChild(e), this.lastContainer.delete(e));
-      if (this.curContainer) {
-        this.curContainer.alpha = Math.min(
-          1,
-          this.curContainer.alpha + t / 60
-        );
-        const [e, n, s, a] = this.curContainer.children, l = Math.max(this.app.screen.width, this.app.screen.height);
-        e.position.set(this.app.screen.width / 2, this.app.screen.height / 2), n.position.set(
-          this.app.screen.width / 2.5,
-          this.app.screen.height / 2.5
-        ), s.position.set(this.app.screen.width / 2, this.app.screen.height / 2), a.position.set(this.app.screen.width / 2, this.app.screen.height / 2), e.width = l * Math.sqrt(2), e.height = e.width, n.width = l * 0.8, n.height = n.width, s.width = l * 0.5, s.height = s.width, a.width = l * 0.25, a.height = a.width, this.curContainer.time += t * this.flowSpeed, e.rotation += t / 1e3 * this.flowSpeed, n.rotation -= t / 500 * this.flowSpeed, s.rotation += t / 1e3 * this.flowSpeed, a.rotation -= t / 750 * this.flowSpeed, s.x = this.app.screen.width / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), s.y = this.app.screen.height / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), a.x = this.app.screen.width / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), a.y = this.app.screen.height / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75);
-      }
-    });
-    h(this, "flowSpeed", 2);
-    h(this, "currerntRenderScale", 0.75);
-    this.canvas = t;
-    const e = t.getBoundingClientRect();
-    this.canvas.width = e.width * this.currerntRenderScale, this.canvas.height = e.height * this.currerntRenderScale, this.observer = new ResizeObserver(() => {
-      const n = t.getBoundingClientRect();
-      this.canvas.width = Math.max(1, n.width), this.canvas.height = Math.max(1, n.height), this.app.renderer.resize(
+class k {
+  constructor(e) {
+    this.canvas = e;
+    const t = e.getBoundingClientRect();
+    this.canvas.width = t.width * this.currerntRenderScale, this.canvas.height = t.height * this.currerntRenderScale, this.observer = new ResizeObserver(() => {
+      const i = e.getBoundingClientRect();
+      this.canvas.width = Math.max(1, i.width), this.canvas.height = Math.max(1, i.height), this.app.renderer.resize(
         this.canvas.width * this.currerntRenderScale,
         this.canvas.height * this.currerntRenderScale
       ), this.rebuildFilters();
-    }), this.observer.observe(t), this.app = new k({
-      view: t,
+    }), this.observer.observe(e), this.app = new M({
+      view: e,
       resizeTo: this.canvas,
       powerPreference: "low-power",
       backgroundAlpha: 0
     }), this.rebuildFilters(), this.app.ticker.add(this.onTick), this.app.ticker.start();
   }
+  observer;
+  app;
+  curContainer;
+  lastContainer = /* @__PURE__ */ new Set();
+  onTick = (e) => {
+    for (const t of this.lastContainer)
+      t.alpha = Math.max(0, t.alpha - e / 60), t.alpha <= 0 && (this.app.stage.removeChild(t), this.lastContainer.delete(t));
+    if (this.curContainer) {
+      this.curContainer.alpha = Math.min(
+        1,
+        this.curContainer.alpha + e / 60
+      );
+      const [t, i, n, h] = this.curContainer.children, s = Math.max(this.app.screen.width, this.app.screen.height);
+      t.position.set(this.app.screen.width / 2, this.app.screen.height / 2), i.position.set(
+        this.app.screen.width / 2.5,
+        this.app.screen.height / 2.5
+      ), n.position.set(this.app.screen.width / 2, this.app.screen.height / 2), h.position.set(this.app.screen.width / 2, this.app.screen.height / 2), t.width = s * Math.sqrt(2), t.height = t.width, i.width = s * 0.8, i.height = i.width, n.width = s * 0.5, n.height = n.width, h.width = s * 0.25, h.height = h.width, this.curContainer.time += e * this.flowSpeed, t.rotation += e / 1e3 * this.flowSpeed, i.rotation -= e / 500 * this.flowSpeed, n.rotation += e / 1e3 * this.flowSpeed, h.rotation -= e / 750 * this.flowSpeed, n.x = this.app.screen.width / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), n.y = this.app.screen.height / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), h.x = this.app.screen.width / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), h.y = this.app.screen.height / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75);
+    }
+  };
+  flowSpeed = 2;
+  currerntRenderScale = 0.75;
   /**
    * 修改背景的流动速度，数字越大越快，默认为 2
    * @param speed 背景的流动速度，默认为 2
    */
-  setFlowSpeed(t) {
-    this.flowSpeed = t;
+  setFlowSpeed(e) {
+    this.flowSpeed = e;
   }
   /**
    * 修改背景的渲染比例，默认是 0.5
@@ -175,21 +168,21 @@ class _ {
    * 一般情况下这个程度既没有明显瑕疵也不会特别吃性能
    * @param scale 背景的渲染比例
    */
-  setRenderScale(t) {
-    this.currerntRenderScale = t;
-    const e = this.canvas.getBoundingClientRect();
-    this.canvas.width = Math.max(1, e.width), this.canvas.height = Math.max(1, e.height), this.app.renderer.resize(
+  setRenderScale(e) {
+    this.currerntRenderScale = e;
+    const t = this.canvas.getBoundingClientRect();
+    this.canvas.width = Math.max(1, t.width), this.canvas.height = Math.max(1, t.height), this.app.renderer.resize(
       this.canvas.width * this.currerntRenderScale,
       this.canvas.height * this.currerntRenderScale
     ), this.rebuildFilters();
   }
   rebuildFilters() {
-    const t = Math.min(this.canvas.width, this.canvas.height), e = new P();
-    e.saturate(1.2, !1);
-    const n = new P();
-    n.brightness(0.6, !1);
-    const s = new P();
-    s.contrast(0.3, !0), this.app.stage.filters = [], this.app.stage.filters.push(new g(5, 1)), this.app.stage.filters.push(new g(10, 1)), this.app.stage.filters.push(new g(20, 2)), this.app.stage.filters.push(new g(40, 2)), t > 512 && this.app.stage.filters.push(new g(80, 2)), t > 768 && this.app.stage.filters.push(new g(160, 4)), t > 768 * 2 && this.app.stage.filters.push(new g(320, 4)), this.app.stage.filters.push(e, n, s), this.app.stage.filters.push(new g(5, 1));
+    const e = Math.min(this.canvas.width, this.canvas.height), t = new w();
+    t.saturate(1.2, !1);
+    const i = new w();
+    i.brightness(0.6, !1);
+    const n = new w();
+    n.contrast(0.3, !0), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), e > 512 && this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(t, i, n), this.app.stage.filters.push(new y(5, 1));
   }
   /**
    * 修改背景动画帧率，默认是 30 FPS
@@ -197,8 +190,8 @@ class _ {
    * 如果设置成 0 则会停止动画
    * @param fps 目标帧率，默认 30 FPS
    */
-  setFPS(t) {
-    this.app.ticker.maxFPS = t;
+  setFPS(e) {
+    this.app.ticker.maxFPS = e;
   }
   /**
    * 暂停背景动画，画面即便是更新了图片也不会发生变化
@@ -216,20 +209,19 @@ class _ {
    * 设置背景专辑图片，图片材质加载并设置完成后会返回
    * @param albumUrl 图片的目标链接
    */
-  async setAlbumImage(t) {
-    const e = await N.fromURL(t), n = new F(), s = new S(e), a = new S(e), l = new S(e), i = new S(e);
-    s.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), i.anchor.set(0.5, 0.5), s.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, i.rotation = Math.random() * Math.PI * 2, n.addChild(s, a, l, i), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = n, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0;
+  async setAlbumImage(e) {
+    const t = await C.fromURL(e), i = new B(), n = new L(t), h = new L(t), s = new L(t), r = new L(t);
+    n.anchor.set(0.5, 0.5), h.anchor.set(0.5, 0.5), s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, h.rotation = Math.random() * Math.PI * 2, s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, i.addChild(n, h, s, r), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = i, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0;
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick);
   }
 }
-class le extends _ {
+class Z extends k {
+  element;
   constructor() {
     const e = document.createElement("canvas");
-    super(e);
-    h(this, "element");
-    this.element = e, e.style.pointerEvents = "none", e.style.zIndex = "-1";
+    super(e), this.element = e, e.style.pointerEvents = "none", e.style.zIndex = "-1";
   }
   getElement() {
     return this.element;
@@ -238,171 +230,171 @@ class le extends _ {
     super.dispose(), this.element.remove();
   }
 }
-const W = (c, t) => c.size === t.size && [...c].every((e) => t.has(e));
-function G(c) {
-  const e = 2.5949095;
-  return c < 0.5 ? Math.pow(2 * c, 2) * ((e + 1) * 2 * c - e) / 2 : (Math.pow(2 * c - 2, 2) * ((e + 1) * (c * 2 - 2) + e) + 2) / 2;
+const N = (c, e) => c.size === e.size && [...c].every((t) => e.has(t));
+function O(c) {
+  const t = 2.5949095;
+  return c < 0.5 ? Math.pow(2 * c, 2) * ((t + 1) * 2 * c - t) / 2 : (Math.pow(2 * c - 2, 2) * ((t + 1) * (c * 2 - 2) + t) + 2) / 2;
 }
-const L = (c, t, e) => Math.max(c, Math.min(t, e));
-class X {
-  constructor(t) {
-    h(this, "element", document.createElement("div"));
-    h(this, "dot0", document.createElement("span"));
-    h(this, "dot1", document.createElement("span"));
-    h(this, "dot2", document.createElement("span"));
-    h(this, "left", 0);
-    h(this, "top", 0);
-    h(this, "scale", 1);
-    h(this, "lastStyle", "");
-    h(this, "currentInterlude");
-    h(this, "currentTime", 0);
-    h(this, "targetBreatheDuration", 1500);
-    this.lyricPlayer = t, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
+const g = (c, e, t) => Math.max(c, Math.min(e, t));
+class W {
+  constructor(e) {
+    this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
+  element = document.createElement("div");
+  dot0 = document.createElement("span");
+  dot1 = document.createElement("span");
+  dot2 = document.createElement("span");
+  left = 0;
+  top = 0;
+  scale = 1;
+  lastStyle = "";
+  currentInterlude;
+  currentTime = 0;
+  targetBreatheDuration = 1500;
   getElement() {
     return this.element;
   }
-  setTransform(t = this.left, e = this.top) {
-    this.left = t, this.top = e, this.update();
+  setTransform(e = this.left, t = this.top) {
+    this.left = e, this.top = t, this.update();
   }
-  setInterlude(t) {
-    this.currentInterlude = t, this.currentTime = (t == null ? void 0 : t[0]) ?? 0;
+  setInterlude(e) {
+    this.currentInterlude = e, this.currentTime = e?.[0] ?? 0;
   }
-  update(t = 0) {
-    this.currentTime += t;
-    let e = "";
-    if (e += `transform:translate(${this.left}px, ${this.top}px)`, this.currentInterlude) {
-      const n = this.currentInterlude[1] - this.currentInterlude[0], s = this.currentTime - this.currentInterlude[0];
-      if (s <= n) {
-        const a = n / Math.ceil(n / this.targetBreatheDuration);
-        let l = 1, i = 1;
-        l *= Math.sin(1.5 * Math.PI - s / a * 2) / 10 + 1, s < 1e3 && (l *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? i = 0 : s < 1e3 && (i *= (s - 500) / 500), n - s < 750 && (l *= 1 - G(
-          (750 - (n - s)) / 750 / 2
-        )), n - s < 375 && (i *= L(
+  update(e = 0) {
+    this.currentTime += e;
+    let t = "";
+    if (t += `transform:translate(${this.left}px, ${this.top}px)`, this.currentInterlude) {
+      const i = this.currentInterlude[1] - this.currentInterlude[0], n = this.currentTime - this.currentInterlude[0];
+      if (n <= i) {
+        const h = i / Math.ceil(i / this.targetBreatheDuration);
+        let s = 1, r = 1;
+        s *= Math.sin(1.5 * Math.PI - n / h * 2) / 10 + 1, n < 1e3 && (s *= 1 - Math.pow((1e3 - n) / 1e3, 2)), n < 500 ? r = 0 : n < 1e3 && (r *= (n - 500) / 500), i - n < 750 && (s *= 1 - O(
+          (750 - (i - n)) / 750 / 2
+        )), i - n < 375 && (r *= g(
           0,
-          (n - s) / 375,
+          (i - n) / 375,
           1
-        )), l = Math.max(0, l), e += ` scale(${l})`;
-        const r = L(
+        )), s = Math.max(0, s), t += ` scale(${s})`;
+        const a = g(
           0.25,
-          s * 3 / n * 0.75,
+          n * 3 / i * 0.75,
           1
-        ), o = L(
+        ), l = g(
           0.25,
-          (s - n / 3) * 3 / n * 0.75,
+          (n - i / 3) * 3 / i * 0.75,
           1
-        ), d = L(
+        ), o = g(
           0.25,
-          (s - n / 3 * 2) * 3 / n * 0.75,
+          (n - i / 3 * 2) * 3 / i * 0.75,
           1
         );
-        this.dot0.style.opacity = `${L(
+        this.dot0.style.opacity = `${g(
           0,
-          Math.max(0, i * r),
+          Math.max(0, r * a),
           1
-        )}`, this.dot1.style.opacity = `${L(
+        )}`, this.dot1.style.opacity = `${g(
           0,
-          Math.max(0, i * o),
+          Math.max(0, r * l),
           1
-        )}`, this.dot2.style.opacity = `${L(
+        )}`, this.dot2.style.opacity = `${g(
           0,
-          Math.max(0, i * d),
+          Math.max(0, r * o),
           1
         )}`;
       } else
-        e += " scale(0)", this.dot0.style.opacity = "0", this.dot1.style.opacity = "0", this.dot2.style.opacity = "0";
+        t += " scale(0)", this.dot0.style.opacity = "0", this.dot1.style.opacity = "0", this.dot2.style.opacity = "0";
     } else
-      e += " scale(0)", this.dot0.style.opacity = "0", this.dot1.style.opacity = "0", this.dot2.style.opacity = "0";
-    e += ";", this.lastStyle !== e && (this.element.setAttribute("style", e), this.lastStyle = e);
+      t += " scale(0)", this.dot0.style.opacity = "0", this.dot1.style.opacity = "0", this.dot2.style.opacity = "0";
+    t += ";", this.lastStyle !== t && (this.element.setAttribute("style", t), this.lastStyle = t);
   }
   dispose() {
     this.element.remove();
   }
 }
-class x {
-  constructor(t = 0) {
-    h(this, "currentPosition", 0);
-    h(this, "targetPosition", 0);
-    h(this, "currentTime", 0);
-    h(this, "params", {});
-    h(this, "currentSolver");
-    h(this, "getV");
-    h(this, "queueParams");
-    h(this, "queuePosition");
-    this.targetPosition = t, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+class P {
+  currentPosition = 0;
+  targetPosition = 0;
+  currentTime = 0;
+  params = {};
+  currentSolver;
+  getV;
+  queueParams;
+  queuePosition;
+  constructor(e = 0) {
+    this.targetPosition = e, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
   }
   resetSolver() {
-    const t = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = Y(
+    const e = this.getV(this.currentTime);
+    this.currentTime = 0, this.currentSolver = $(
       this.currentPosition,
-      t,
+      e,
       this.targetPosition,
       0,
       this.params
-    ), this.getV = j(this.currentSolver);
+    ), this.getV = R(this.currentSolver);
   }
   arrived() {
     return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
   }
-  setPosition(t) {
-    this.targetPosition = t, this.currentPosition = t, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+  setPosition(e) {
+    this.targetPosition = e, this.currentPosition = e, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
   }
-  update(t = 0) {
-    this.currentTime += t, this.currentPosition = this.currentSolver(this.currentTime), this.queueParams && (this.queueParams.time -= t, this.queueParams.time <= 0 && this.updateParams({
+  update(e = 0) {
+    this.currentTime += e, this.currentPosition = this.currentSolver(this.currentTime), this.queueParams && (this.queueParams.time -= e, this.queueParams.time <= 0 && this.updateParams({
       ...this.queueParams
-    })), this.queuePosition && (this.queuePosition.time -= t, this.queuePosition.time <= 0 && this.setTargetPosition(this.queuePosition.position)), this.arrived() && this.setPosition(this.targetPosition);
+    })), this.queuePosition && (this.queuePosition.time -= e, this.queuePosition.time <= 0 && this.setTargetPosition(this.queuePosition.position)), this.arrived() && this.setPosition(this.targetPosition);
   }
-  updateParams(t, e = 0) {
-    e > 0 ? this.queueParams = {
-      ...t,
-      time: e
+  updateParams(e, t = 0) {
+    t > 0 ? this.queueParams = {
+      ...e,
+      time: t
     } : (this.params = {
       ...this.params,
-      ...t
+      ...e
     }, this.resetSolver());
   }
-  setTargetPosition(t, e = 0) {
-    e > 0 ? this.queuePosition = {
-      position: t,
-      time: e
-    } : (this.queuePosition = void 0, this.targetPosition = t, this.resetSolver());
+  setTargetPosition(e, t = 0) {
+    t > 0 ? this.queuePosition = {
+      position: e,
+      time: t
+    } : (this.queuePosition = void 0, this.targetPosition = e, this.resetSolver());
   }
   getCurrentPosition() {
     return this.currentPosition;
   }
 }
-function Y(c, t, e, n = 0, s) {
-  const a = (s == null ? void 0 : s.soft) ?? !1, l = (s == null ? void 0 : s.stiffness) ?? 100, i = (s == null ? void 0 : s.damping) ?? 10, r = (s == null ? void 0 : s.mass) ?? 1, o = e - c;
-  if (a || 1 <= i / (2 * Math.sqrt(l * r))) {
-    const d = -Math.sqrt(l / r), u = -d * o - t;
-    return (f) => (f -= n, f < 0 ? c : e - (o + f * u) * Math.E ** (f * d));
+function $(c, e, t, i = 0, n) {
+  const h = n?.soft ?? !1, s = n?.stiffness ?? 100, r = n?.damping ?? 10, a = n?.mass ?? 1, l = t - c;
+  if (h || 1 <= r / (2 * Math.sqrt(s * a))) {
+    const o = -Math.sqrt(s / a), d = -o * l - e;
+    return (m) => (m -= i, m < 0 ? c : t - (l + m * d) * Math.E ** (m * o));
   } else {
-    const d = Math.sqrt(
-      4 * r * l - i ** 2
-    ), u = (i * o - 2 * r * t) / d, f = 0.5 * d / r, m = -(0.5 * i) / r;
-    return (p) => (p -= n, p < 0 ? c : e - (Math.cos(p * f) * o + Math.sin(p * f) * u) * Math.E ** (p * m));
+    const o = Math.sqrt(
+      4 * a * s - r ** 2
+    ), d = (r * l - 2 * a * e) / o, m = 0.5 * o / a, u = -(0.5 * r) / a;
+    return (p) => (p -= i, p < 0 ? c : t - (Math.cos(p * m) * l + Math.sin(p * m) * d) * Math.E ** (p * u));
   }
 }
-function V(c) {
-  return (e) => (c(e + 1e-3) - c(e - 1e-3)) / (2 * 1e-3);
+function q(c) {
+  return (t) => (c(t + 1e-3) - c(t - 1e-3)) / (2 * 1e-3);
 }
-function j(c) {
-  return V(c);
+function R(c) {
+  return q(c);
 }
-const w = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
-function U(c, t = "rgba(0,0,0,1)", e = "rgba(0,0,0,0.5)") {
-  const n = 2 + c, s = c / n, a = (1 - s) / 2;
+const b = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
+function F(c, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
+  const i = 2 + c, n = c / i, h = (1 - n) / 2;
   return [
-    `linear-gradient(to right,${t} ${a * 100}%,${e} ${(a + s) * 100}%)`,
-    s,
-    n
+    `linear-gradient(to right,${e} ${h * 100}%,${t} ${(h + n) * 100}%)`,
+    n,
+    i
   ];
 }
-function v(c) {
+function E(c) {
   return c.endTime - c.startTime >= 1e3 && c.word.length <= 7;
 }
-class H {
-  constructor(t, e = {
+class _ {
+  constructor(e, t = {
     words: [],
     translatedLyric: "",
     romanLyric: "",
@@ -411,64 +403,64 @@ class H {
     isBG: !1,
     isDuet: !1
   }) {
-    h(this, "element", document.createElement("div"));
-    h(this, "left", 0);
-    h(this, "top", 0);
-    h(this, "scale", 1);
-    h(this, "blur", 0);
-    h(this, "delay", 0);
-    h(this, "splittedWords", []);
-    // 由 LyricPlayer 来设置
-    h(this, "lineSize", [0, 0]);
-    h(this, "lineTransforms", {
-      posX: new x(0),
-      posY: new x(0),
-      scale: new x(1)
-    });
-    h(this, "isEnabled", !1);
-    h(this, "_hide", !0);
-    h(this, "lastStyle", "");
-    this.lyricPlayer = t, this.lyricLine = e, this.element.setAttribute(
+    this.lyricPlayer = e, this.lyricLine = t, this.element.setAttribute(
       "class",
       this.lyricPlayer.style.classes.lyricLine
     ), this.lyricLine.isBG && this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine), this.lyricLine.isDuet && this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div"));
-    const n = this.element.children[0], s = this.element.children[1], a = this.element.children[2];
-    n.setAttribute("class", this.lyricPlayer.style.classes.lyricMainLine), s.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), a.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), this.rebuildElement(), this.rebuildStyle();
+    const i = this.element.children[0], n = this.element.children[1], h = this.element.children[2];
+    i.setAttribute("class", this.lyricPlayer.style.classes.lyricMainLine), n.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), h.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), this.rebuildElement(), this.rebuildStyle();
   }
+  element = document.createElement("div");
+  left = 0;
+  top = 0;
+  scale = 1;
+  blur = 0;
+  delay = 0;
+  splittedWords = [];
+  // 由 LyricPlayer 来设置
+  lineSize = [0, 0];
+  lineTransforms = {
+    posX: new P(0),
+    posY: new P(0),
+    scale: new P(1)
+  };
+  isEnabled = !1;
   enable() {
     this.isEnabled = !0, this.element.classList.add("active");
-    const t = this.element.children[0];
-    this.splittedWords.forEach((e) => {
-      e.elementAnimations.forEach((n) => {
-        n.currentTime = 0, n.playbackRate = 1, n.play();
+    const e = this.element.children[0];
+    this.splittedWords.forEach((t) => {
+      t.elementAnimations.forEach((i) => {
+        i.currentTime = 0, i.playbackRate = 1, i.play();
       });
-    }), t.classList.add("active");
+    }), e.classList.add("active");
   }
   measureSize() {
     this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden");
-    const t = [
+    const e = [
       this.element.clientWidth,
       this.element.clientHeight
     ];
-    return this._hide && (this.element.style.display = "none", this.element.style.visibility = ""), t;
+    return this._hide && (this.element.style.display = "none", this.element.style.visibility = ""), e;
   }
   disable() {
     this.isEnabled = !1, this.element.classList.remove("active");
-    const t = this.element.children[0];
-    this.splittedWords.forEach((e) => {
-      e.elementAnimations.forEach((n) => {
-        n.id === "float-word" && (n.playbackRate = -1, n.play());
+    const e = this.element.children[0];
+    this.splittedWords.forEach((t) => {
+      t.elementAnimations.forEach((i) => {
+        i.id === "float-word" && (i.playbackRate = -1, i.play());
       });
-    }), t.classList.remove("active");
+    }), e.classList.remove("active");
   }
-  setLine(t) {
-    this.lyricLine = t, this.lyricLine.isBG ? this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine) : this.element.classList.remove(this.lyricPlayer.style.classes.lyricBgLine), this.lyricLine.isDuet ? this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine) : this.element.classList.remove(
+  setLine(e) {
+    this.lyricLine = e, this.lyricLine.isBG ? this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine) : this.element.classList.remove(this.lyricPlayer.style.classes.lyricBgLine), this.lyricLine.isDuet ? this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine) : this.element.classList.remove(
       this.lyricPlayer.style.classes.lyricDuetLine
     ), this.rebuildElement(), this.rebuildStyle();
   }
   getLine() {
     return this.lyricLine;
   }
+  _hide = !0;
+  lastStyle = "";
   show() {
     this._hide = !1, this.rebuildStyle();
   }
@@ -483,24 +475,24 @@ class H {
       ));
       return;
     }
-    let t = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
-    !this.lyricPlayer.getEnableSpring() && this.isInSight && (t += `transition-delay:${this.delay}ms;`), t += `filter:blur(${Math.min(32, this.blur)}px);`, t !== this.lastStyle && (this.lastStyle = t, this.element.setAttribute("style", t));
+    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
+    !this.lyricPlayer.getEnableSpring() && this.isInSight && (e += `transition-delay:${this.delay}ms;`), e += `filter:blur(${Math.min(32, this.blur)}px);`, e !== this.lastStyle && (this.lastStyle = e, this.element.setAttribute("style", e));
   }
   rebuildElement() {
-    const t = this.element.children[0], e = this.element.children[1], n = this.element.children[2];
-    this.splittedWords = [], this.lyricLine.words.forEach((r) => {
-      if (w.test(r.word))
+    const e = this.element.children[0], t = this.element.children[1], i = this.element.children[2];
+    this.splittedWords = [], this.lyricLine.words.forEach((a) => {
+      if (b.test(a.word))
         this.splittedWords.push({
-          ...r,
+          ...a,
           width: 0,
           height: 0,
           elements: [],
           elementAnimations: [],
-          shouldEmphasize: v(r)
+          shouldEmphasize: E(a)
         });
       else {
-        const o = /(\s*)(\S*)(\s*)/.exec(r.word);
-        o && (o[1].length > 0 && this.splittedWords.push({
+        const l = /^(\s*)(\S*)(\s*)$/.exec(a.word);
+        l ? (l[1].length > 0 && this.splittedWords.push({
           word: " ",
           startTime: 0,
           endTime: 0,
@@ -510,15 +502,15 @@ class H {
           elementAnimations: [],
           shouldEmphasize: !1
         }), this.splittedWords.push({
-          word: o[2],
-          startTime: r.startTime,
-          endTime: r.endTime,
+          word: l[2],
+          startTime: a.startTime,
+          endTime: a.endTime,
           width: 0,
           height: 0,
           elements: [],
           elementAnimations: [],
-          shouldEmphasize: v(r)
-        }), o[3].length > 0 && this.splittedWords.push({
+          shouldEmphasize: E(a)
+        }), l[3].length > 0 && this.splittedWords.push({
           word: " ",
           startTime: 0,
           endTime: 0,
@@ -527,55 +519,64 @@ class H {
           elements: [],
           elementAnimations: [],
           shouldEmphasize: !1
-        }));
+        })) : a.word.trim().length > 0 && this.splittedWords.push({
+          word: a.word.trim(),
+          startTime: a.startTime,
+          endTime: a.endTime,
+          width: 0,
+          height: 0,
+          elements: [],
+          elementAnimations: [],
+          shouldEmphasize: E(a)
+        });
       }
     });
-    const s = [], a = [];
-    function l(r) {
-      for (; r.firstChild; )
-        r.firstChild.nodeType === Node.ELEMENT_NODE ? s.push(t.firstChild) : r.firstChild.nodeType === Node.TEXT_NODE && a.push(t.firstChild), r.removeChild(r.firstChild), l(r.firstChild);
+    const n = [], h = [];
+    function s(a) {
+      for (; a.firstChild; )
+        a.firstChild.nodeType === Node.ELEMENT_NODE ? n.push(e.firstChild) : a.firstChild.nodeType === Node.TEXT_NODE && h.push(e.firstChild), a.removeChild(a.firstChild), s(a.firstChild);
     }
-    l(t);
-    let i = null;
-    this.splittedWords.forEach((r) => {
-      if (r.word.trim().length > 0)
-        if (r.shouldEmphasize) {
-          const o = s.pop() ?? document.createElement("span");
-          o.className = "emphasize", r.elements = [o];
-          for (const d of r.word) {
-            const u = s.pop() ?? document.createElement("span");
-            u.className = "", u.innerText = d, o.appendChild(u), r.elements.push(u);
+    s(e);
+    let r = null;
+    this.splittedWords.forEach((a) => {
+      if (a.word.trim().length > 0)
+        if (a.shouldEmphasize) {
+          const l = n.pop() ?? document.createElement("span");
+          l.className = "emphasize", a.elements = [l];
+          for (const o of a.word) {
+            const d = n.pop() ?? document.createElement("span");
+            d.className = "", d.innerText = o, l.appendChild(d), a.elements.push(d);
           }
-          if (r.elementAnimations = this.initEmphasizeAnimation(r), console.log(r.word, w.test(r.word)), i && !w.test(r.word))
-            if (i.childElementCount > 0)
-              i.appendChild(o);
+          if (a.elementAnimations = this.initEmphasizeAnimation(a), console.log(a.word, b.test(a.word)), r && !b.test(a.word))
+            if (r.childElementCount > 0)
+              r.appendChild(l);
             else {
-              const d = s.pop() ?? document.createElement("span");
-              d.className = "", i.remove(), d.appendChild(i), d.appendChild(o), t.appendChild(d), i = d;
+              const o = n.pop() ?? document.createElement("span");
+              o.className = "", r.remove(), o.appendChild(r), o.appendChild(l), e.appendChild(o), r = o;
             }
           else
-            i = w.test(r.word) ? null : o, t.appendChild(o);
+            r = b.test(a.word) ? null : l, e.appendChild(l);
         } else {
-          const o = s.pop() ?? document.createElement("span");
-          if (o.className = "", o.innerText = r.word, r.elements = [o], r.elementAnimations.push(this.initFloatAnimation(r, o)), i)
-            if (i.childElementCount > 0)
-              i.appendChild(o);
+          const l = n.pop() ?? document.createElement("span");
+          if (l.className = "", l.innerText = a.word, a.elements = [l], a.elementAnimations.push(this.initFloatAnimation(a, l)), r)
+            if (r.childElementCount > 0)
+              r.appendChild(l);
             else {
-              const d = s.pop() ?? document.createElement("span");
-              d.className = "", i.remove(), d.appendChild(i), d.appendChild(o), t.appendChild(d), i = d;
+              const o = n.pop() ?? document.createElement("span");
+              o.className = "", r.remove(), o.appendChild(r), o.appendChild(l), e.appendChild(o), r = o;
             }
           else
-            i = o, t.appendChild(o);
+            r = l, e.appendChild(l);
         }
-      else if (r.word.length > 0) {
-        const o = a.pop() ?? document.createTextNode(" ");
-        t.appendChild(o), i = null;
+      else if (a.word.length > 0) {
+        const l = h.pop() ?? document.createTextNode(" ");
+        e.appendChild(l), r = null;
       } else
-        i = null;
-    }), e.innerText = this.lyricLine.translatedLyric, n.innerText = this.lyricLine.romanLyric;
+        r = null;
+    }), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
   }
-  initFloatAnimation(t, e) {
-    const n = e.animate(
+  initFloatAnimation(e, t) {
+    const i = t.animate(
       [
         {
           transform: "translateY(0px)"
@@ -585,22 +586,22 @@ class H {
         }
       ],
       {
-        duration: Math.max(1e3, t.endTime - t.startTime),
-        delay: t.startTime - this.lyricLine.startTime,
+        duration: Math.max(1e3, e.endTime - e.startTime),
+        delay: e.startTime - this.lyricLine.startTime,
         id: "float-word",
         composite: "add",
         fill: "both"
       }
     );
-    return n.pause(), n;
+    return i.pause(), i;
   }
-  initEmphasizeAnimation(t) {
-    const e = t.startTime - this.lyricLine.startTime, n = t.endTime - t.startTime;
-    return t.elements.map((s, a, l) => {
-      if (a === 0)
-        return this.initFloatAnimation(t, s);
+  initEmphasizeAnimation(e) {
+    const t = e.startTime - this.lyricLine.startTime, i = e.endTime - e.startTime;
+    return e.elements.map((n, h, s) => {
+      if (h === 0)
+        return this.initFloatAnimation(e, n);
       {
-        const i = s.animate(
+        const r = n.animate(
           [
             {
               offset: 0,
@@ -619,211 +620,98 @@ class H {
             }
           ],
           {
-            duration: Math.max(1e3, t.endTime - t.startTime),
-            delay: e + n / (l.length - 1) * (a - 1),
+            duration: Math.max(1e3, e.endTime - e.startTime),
+            delay: t + i / (s.length - 1) * (h - 1),
             id: "glow-word",
             iterations: 1,
             composite: "replace",
             fill: "both"
           }
         );
-        return i.pause(), i;
+        return r.pause(), r;
       }
     });
   }
   updateMaskImage() {
-    this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden"), this.splittedWords.forEach((t) => {
-      const e = t.elements[0];
-      if (e) {
-        t.width = e.clientWidth, t.height = e.clientHeight;
-        const [n, s, a] = U(
-          16 / t.width,
+    this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden"), this.splittedWords.forEach((e) => {
+      const t = e.elements[0];
+      if (t) {
+        e.width = t.clientWidth, e.height = t.clientHeight;
+        const [i, n, h] = F(
+          16 / e.width,
           "rgba(0,0,0,0.75)",
           "rgba(0,0,0,0.25)"
-        ), l = `${a * 100}% 100%`;
-        this.lyricPlayer.supportMaskImage ? (e.style.maskImage = n, e.style.maskOrigin = "left", e.style.maskSize = l) : (e.style.webkitMaskImage = n, e.style.webkitMaskOrigin = "left", e.style.webkitMaskSize = l);
-        const i = t.width + 16, r = `clamp(${-i}px,calc(${-i}px + (var(--amll-player-time) - ${t.startTime})*${i / Math.abs(t.endTime - t.startTime)}px),0px) 0px, left top`;
-        e.style.maskPosition = r, e.style.webkitMaskPosition = r;
+        ), s = `${h * 100}% 100%`;
+        this.lyricPlayer.supportMaskImage ? (t.style.maskImage = i, t.style.maskOrigin = "left", t.style.maskSize = s) : (t.style.webkitMaskImage = i, t.style.webkitMaskOrigin = "left", t.style.webkitMaskSize = s);
+        const r = e.width + 16, a = `clamp(${-r}px,calc(${-r}px + (var(--amll-player-time) - ${e.startTime})*${r / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
+        t.style.maskPosition = a, t.style.webkitMaskPosition = a;
       }
     }), this._hide && (this.element.style.display = "none", this.element.style.visibility = "");
   }
   getElement() {
     return this.element;
   }
-  setTransform(t = this.left, e = this.top, n = this.scale, s = 1, a = 0, l = !1, i = 0) {
-    this.left = t, this.top = e, this.scale = n, this.delay = i * 1e3 | 0;
-    const r = this.element.children[0];
-    r.style.opacity = `${s}`, l || !this.lyricPlayer.getEnableSpring() ? (this.blur = Math.min(32, a), l && this.element.classList.add(
+  setTransform(e = this.left, t = this.top, i = this.scale, n = 1, h = 0, s = !1, r = 0) {
+    this.left = e, this.top = t, this.scale = i, this.delay = r * 1e3 | 0;
+    const a = this.element.children[0];
+    a.style.opacity = `${n}`, s || !this.lyricPlayer.getEnableSpring() ? (this.blur = Math.min(32, h), s && this.element.classList.add(
       this.lyricPlayer.style.classes.tmpDisableTransition
-    ), this.lineTransforms.posX.setPosition(t), this.lineTransforms.posY.setPosition(e), this.lineTransforms.scale.setPosition(n), this.lyricPlayer.getEnableSpring() ? this.rebuildStyle() : this.show(), l && requestAnimationFrame(() => {
+    ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(i), this.lyricPlayer.getEnableSpring() ? this.rebuildStyle() : this.show(), s && requestAnimationFrame(() => {
       this.element.classList.remove(
         this.lyricPlayer.style.classes.tmpDisableTransition
       );
-    })) : (this.lineTransforms.posX.setTargetPosition(t, i), this.lineTransforms.posY.setTargetPosition(e, i), this.lineTransforms.scale.setTargetPosition(n), this.blur !== Math.min(32, a) && (this.blur = Math.min(32, a), this.element.style.filter = `blur(${Math.min(32, a)}px)`));
+    })) : (this.lineTransforms.posX.setTargetPosition(e, r), this.lineTransforms.posY.setTargetPosition(t, r), this.lineTransforms.scale.setTargetPosition(i), this.blur !== Math.min(32, h) && (this.blur = Math.min(32, h), this.element.style.filter = `blur(${Math.min(32, h)}px)`));
   }
-  update(t = 0) {
-    this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(t), this.lineTransforms.posY.update(t), this.lineTransforms.scale.update(t), this.isInSight ? this.show() : this.hide());
+  update(e = 0) {
+    this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.lineTransforms.scale.update(e), this.isInSight ? this.show() : this.hide());
   }
   get isInSight() {
-    const t = this.lineTransforms.posX.getCurrentPosition(), e = this.lineTransforms.posY.getCurrentPosition(), n = t + this.lineSize[0], s = e + this.lineSize[1], a = this.lyricPlayer.pos[0], l = this.lyricPlayer.pos[1], i = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0], r = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
-    return !(t > i || e > r || n < a || s < l);
+    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], n = t + this.lineSize[1], h = this.lyricPlayer.pos[0], s = this.lyricPlayer.pos[1], r = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0], a = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
+    return !(e > r || t > a || i < h || n < s);
   }
   dispose() {
     this.element.remove();
   }
 }
-const J = O($());
-class he extends EventTarget {
-  constructor() {
-    super();
-    h(this, "element", document.createElement("div"));
-    h(this, "currentTime", 0);
-    h(this, "lyricLines", []);
-    h(this, "processedLines", []);
-    h(this, "lyricLinesEl", []);
-    h(this, "lyricLinesSize", /* @__PURE__ */ new Map());
-    h(this, "hotLines", /* @__PURE__ */ new Set());
-    h(this, "bufferedLines", /* @__PURE__ */ new Set());
-    h(this, "scrollToIndex", 0);
-    h(this, "resizeObserver", new ResizeObserver((e) => {
-      const n = e[0].contentRect;
-      this.size[0] = n.width, this.size[1] = n.height, this.pos[0] = n.left, this.pos[1] = n.top, this.rebuildStyle(), this.calcLayout(!0), this.lyricLinesEl.forEach((s) => s.updateMaskImage());
-    }));
-    h(this, "posXSpringParams", {
-      mass: 1,
-      damping: 10,
-      stiffness: 100
-    });
-    h(this, "posYSpringParams", {
-      mass: 1,
-      damping: 15,
-      stiffness: 100
-    });
-    h(this, "scaleSpringParams", {
-      mass: 1,
-      damping: 20,
-      stiffness: 100
-    });
-    h(this, "enableBlur", !0);
-    h(this, "interludeDots");
-    h(this, "interludeDotsSize", [0, 0]);
-    h(this, "supportPlusLighter", CSS.supports("mix-blend-mode", "plus-lighter"));
-    h(this, "supportMaskImage", CSS.supports("mask-image", "none"));
-    h(this, "disableSpring", !1);
-    h(this, "alignAnchor", 0.5);
-    h(this, "size", [0, 0]);
-    h(this, "pos", [0, 0]);
-    h(this, "style", J.createStyleSheet({
-      lyricPlayer: {
-        userSelect: "none",
-        padding: "1rem",
-        boxSizing: "border-box",
-        fontSize: "max(5vh, 12px)",
-        fontWeight: "bold",
-        width: "100%",
-        height: "100%",
-        overflow: "hidden",
-        maxWidth: "100%",
-        maxHeight: "100%",
-        zIndex: 1,
-        color: "var(--amll-lyric-line-color)",
-        mixBlendMode: "plus-lighter",
-        contain: "strict"
-      },
-      lyricLine: {
-        position: "absolute",
-        transformOrigin: "left",
-        maxWidth: "65%",
-        padding: "max(2vh, 1rem) 1rem",
-        contain: "content",
-        transition: "filter 0.25s",
-        margin: "max(2vh, 1rem) -1rem"
-      },
-      "@media (max-width: 1024px)": {
-        lyricLine: {
-          maxWidth: "75%",
-          padding: "max(1vh, 1rem) 1rem",
-          margin: "0 -1rem"
-        }
-      },
-      lyricDuetLine: {
-        textAlign: "right",
-        transformOrigin: "right"
-      },
-      lyricBgLine: {
-        opacity: 0,
-        fontSize: "max(50%, 10px)",
-        transition: "opacity 0.25s",
-        "&.active": {
-          transition: "opacity 0.25s 0.25s",
-          opacity: 1
-        }
-      },
-      lyricMainLine: {
-        transition: "opacity 0.3s 0.25s",
-        margin: "-1rem",
-        padding: "1rem",
-        "& span": {
-          display: "inline-block",
-          margin: "-1rem",
-          padding: "1rem"
-        },
-        "& > span": {
-          whiteSpace: "pre-wrap",
-          wordBreak: "keep-all",
-          maxLines: "1",
-          "&.emphasize": {
-            margin: "-1rem",
-            padding: "1rem",
-            transformStyle: "preserve-3d",
-            perspective: "50vw"
-          }
-        }
-      },
-      lyricSubLine: {
-        fontSize: "max(50%, 10px)",
-        opacity: 0.5
-      },
-      disableSpring: {
-        "& > *": {
-          transition: "filter 0.25s, transform 0.5s"
-        }
-      },
-      interludeDots: {
-        height: "min(1rem,2.5vh)",
-        transformOrigin: "center",
-        width: "fit-content",
-        padding: "2.5% 0",
-        position: "absolute",
-        display: "flex",
-        gap: "0.5rem",
-        "& > *": {
-          width: "100%",
-          display: "inline-block",
-          borderRadius: "50%",
-          aspectRatio: "1 / 1",
-          backgroundColor: "var(--amll-lyric-line-color)",
-          marginRight: "4px"
-        },
-        "&.duet": {
-          right: "1rem",
-          transformOrigin: "center"
-        }
-      },
-      "@supports (mix-blend-mode: plus-lighter)": {
-        lyricSubLine: {
-          opacity: 0.3
-        }
-      },
-      tmpDisableTransition: {
-        transition: "none !important"
-      }
-    }));
-    h(this, "onPageShow", () => {
-      this.calcLayout(!0);
-    });
-    this.interludeDots = new X(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
-  }
+const G = z(A());
+class ee extends EventTarget {
+  element = document.createElement("div");
+  currentTime = 0;
+  lyricLines = [];
+  processedLines = [];
+  lyricLinesEl = [];
+  lyricLinesSize = /* @__PURE__ */ new Map();
+  hotLines = /* @__PURE__ */ new Set();
+  bufferedLines = /* @__PURE__ */ new Set();
+  scrollToIndex = 0;
+  resizeObserver = new ResizeObserver((e) => {
+    const t = e[0].contentRect;
+    this.size[0] = t.width, this.size[1] = t.height, this.pos[0] = t.left, this.pos[1] = t.top, this.rebuildStyle(), this.calcLayout(!0), this.lyricLinesEl.forEach((i) => i.updateMaskImage());
+  });
+  posXSpringParams = {
+    mass: 1,
+    damping: 10,
+    stiffness: 100
+  };
+  posYSpringParams = {
+    mass: 1,
+    damping: 15,
+    stiffness: 100
+  };
+  scaleSpringParams = {
+    mass: 1,
+    damping: 20,
+    stiffness: 100
+  };
+  enableBlur = !0;
+  interludeDots;
+  interludeDotsSize = [0, 0];
+  supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
+  supportMaskImage = CSS.supports("mask-image", "none");
+  disableSpring = !1;
+  alignAnchor = 0.5;
+  size = [0, 0];
+  pos = [0, 0];
   /**
    * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
    *
@@ -841,6 +729,118 @@ class he extends EventTarget {
   getEnableSpring() {
     return !this.disableSpring;
   }
+  style = G.createStyleSheet({
+    lyricPlayer: {
+      userSelect: "none",
+      padding: "1rem",
+      boxSizing: "border-box",
+      fontSize: "max(5vh, 12px)",
+      fontWeight: "bold",
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+      maxWidth: "100%",
+      maxHeight: "100%",
+      zIndex: 1,
+      color: "var(--amll-lyric-line-color)",
+      mixBlendMode: "plus-lighter",
+      contain: "strict"
+    },
+    lyricLine: {
+      position: "absolute",
+      transformOrigin: "left",
+      maxWidth: "65%",
+      padding: "max(2vh, 1rem) 1rem",
+      contain: "content",
+      transition: "filter 0.25s",
+      margin: "max(2vh, 1rem) -1rem"
+    },
+    "@media (max-width: 1024px)": {
+      lyricLine: {
+        maxWidth: "75%",
+        padding: "max(1vh, 1rem) 1rem",
+        margin: "0 -1rem"
+      }
+    },
+    lyricDuetLine: {
+      textAlign: "right",
+      transformOrigin: "right"
+    },
+    lyricBgLine: {
+      opacity: 0,
+      fontSize: "max(50%, 10px)",
+      transition: "opacity 0.25s",
+      "&.active": {
+        transition: "opacity 0.25s 0.25s",
+        opacity: 1
+      }
+    },
+    lyricMainLine: {
+      transition: "opacity 0.3s 0.25s",
+      margin: "-1rem",
+      padding: "1rem",
+      "& span": {
+        display: "inline-block",
+        margin: "-1rem",
+        padding: "1rem"
+      },
+      "& > span": {
+        whiteSpace: "pre-wrap",
+        wordBreak: "keep-all",
+        maxLines: "1",
+        "&.emphasize": {
+          margin: "-1rem",
+          padding: "1rem",
+          transformStyle: "preserve-3d",
+          perspective: "50vw"
+        }
+      }
+    },
+    lyricSubLine: {
+      fontSize: "max(50%, 10px)",
+      opacity: 0.5
+    },
+    disableSpring: {
+      "& > *": {
+        transition: "filter 0.25s, transform 0.5s"
+      }
+    },
+    interludeDots: {
+      height: "min(1rem,2.5vh)",
+      transformOrigin: "center",
+      width: "fit-content",
+      padding: "2.5% 0",
+      position: "absolute",
+      display: "flex",
+      gap: "0.5rem",
+      "& > *": {
+        width: "100%",
+        display: "inline-block",
+        borderRadius: "50%",
+        aspectRatio: "1 / 1",
+        backgroundColor: "var(--amll-lyric-line-color)",
+        marginRight: "4px"
+      },
+      "&.duet": {
+        right: "1rem",
+        transformOrigin: "center"
+      }
+    },
+    "@supports (mix-blend-mode: plus-lighter)": {
+      lyricSubLine: {
+        opacity: 0.3
+      }
+    },
+    tmpDisableTransition: {
+      transition: "none !important"
+    }
+  });
+  onPageShow = () => {
+    this.calcLayout(!0);
+  };
+  constructor() {
+    super(), this.interludeDots = new W(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
+  }
   /**
    * 获取当前播放时间里是否处于间奏区间
    * 如果是则会返回单位为毫秒的始末时间
@@ -850,17 +850,16 @@ class he extends EventTarget {
    * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
    */
   getCurrentInterlude() {
-    var s, a, l;
     if (this.bufferedLines.size > 0)
       return;
-    const e = this.currentTime + 20, n = this.scrollToIndex;
-    if (n === 0) {
-      if ((s = this.processedLines[0]) != null && s.startTime && this.processedLines[0].startTime > e)
+    const e = this.currentTime + 20, t = this.scrollToIndex;
+    if (t === 0) {
+      if (this.processedLines[0]?.startTime && this.processedLines[0].startTime > e)
         return [0, this.processedLines[0].startTime];
-    } else if ((a = this.processedLines[n]) != null && a.endTime && ((l = this.processedLines[n + 1]) != null && l.startTime) && this.processedLines[n + 1].startTime > e && this.processedLines[n].endTime < e)
+    } else if (this.processedLines[t]?.endTime && this.processedLines[t + 1]?.startTime && this.processedLines[t + 1].startTime > e && this.processedLines[t].endTime < e)
       return [
-        this.processedLines[n].endTime,
-        this.processedLines[n + 1].startTime
+        this.processedLines[t].endTime,
+        this.processedLines[t + 1].startTime
       ];
   }
   /**
@@ -885,41 +884,41 @@ class he extends EventTarget {
    */
   setLyricLines(e) {
     this.lyricLines = e;
-    const n = 750;
-    this.processedLines = e.map((s, a, l) => {
-      if (s.isBG)
+    const t = 750;
+    this.processedLines = e.map((i, n, h) => {
+      if (i.isBG)
         return {
-          ...s
+          ...i
         };
       {
-        const i = l[a - 1], r = l[a - 2];
-        if (i != null && i.isBG && r) {
-          if (r.endTime < s.startTime)
+        const s = h[n - 1], r = h[n - 2];
+        if (s?.isBG && r) {
+          if (r.endTime < i.startTime)
             return {
-              ...s,
-              startTime: Math.max(r.endTime, s.startTime - n) || s.startTime
+              ...i,
+              startTime: Math.max(r.endTime, i.startTime - t) || i.startTime
             };
-        } else if (i != null && i.endTime && i.endTime < s.startTime)
+        } else if (s?.endTime && s.endTime < i.startTime)
           return {
-            ...s,
-            startTime: Math.max(i == null ? void 0 : i.endTime, s.startTime - n) || s.startTime
+            ...i,
+            startTime: Math.max(s?.endTime, i.startTime - t) || i.startTime
           };
         return {
-          ...s
+          ...i
         };
       }
-    }), this.processedLines.forEach((s, a, l) => {
-      const i = l[a + 1], r = s.words[s.words.length - 1];
-      r && v(r) && (i ? i.startTime > s.endTime && (s.endTime = Math.min(s.endTime + 1500, i.startTime)) : s.endTime = s.endTime + 1500);
-    }), this.processedLines.forEach((s, a, l) => {
-      if (s.isBG)
+    }), this.processedLines.forEach((i, n, h) => {
+      const s = h[n + 1], r = i.words[i.words.length - 1];
+      r && E(r) && (s ? s.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, s.startTime)) : i.endTime = i.endTime + 1500);
+    }), this.processedLines.forEach((i, n, h) => {
+      if (i.isBG)
         return;
-      const i = l[a + 1];
-      i != null && i.isBG && (i.startTime = Math.min(i.startTime, s.startTime));
-    }), this.lyricLinesEl.forEach((s) => s.dispose()), this.lyricLinesEl = this.processedLines.map(
-      (s) => new H(this, s)
-    ), this.lyricLinesEl.forEach((s) => {
-      this.element.appendChild(s.getElement()), s.updateMaskImage();
+      const s = h[n + 1];
+      s?.isBG && (s.startTime = Math.min(s.startTime, i.startTime));
+    }), this.lyricLinesEl.forEach((i) => i.dispose()), this.lyricLinesEl = this.processedLines.map(
+      (i) => new _(this, i)
+    ), this.lyricLinesEl.forEach((i) => {
+      this.element.appendChild(i.getElement()), i.updateMaskImage();
     }), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
   }
   /**
@@ -937,55 +936,50 @@ class he extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(e = !1) {
-    var d, u, f;
-    e && (this.lyricLinesEl.forEach((m) => {
-      const p = m.measureSize();
-      this.lyricLinesSize.set(m, p), m.lineSize = p;
+    e && (this.lyricLinesEl.forEach((l) => {
+      const o = l.measureSize();
+      this.lyricLinesSize.set(l, o), l.lineSize = o;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight);
-    const n = 0.95;
-    let a = -this.lyricLinesEl.slice(0, this.scrollToIndex).reduce(
-      (m, p) => {
-        var y;
-        return m + (p.getLine().isBG ? 0 : ((y = this.lyricLinesSize.get(p)) == null ? void 0 : y[1]) ?? 0);
-      },
+    const t = 0.95;
+    let n = -this.lyricLinesEl.slice(0, this.scrollToIndex).reduce(
+      (l, o) => l + (o.getLine().isBG ? 0 : this.lyricLinesSize.get(o)?.[1] ?? 0),
       0
     );
     if (this.alignAnchor === "bottom") {
-      a += this.element.clientHeight / 2;
-      const m = this.lyricLinesEl[this.scrollToIndex];
-      if (m) {
-        const p = ((d = this.lyricLinesSize.get(m)) == null ? void 0 : d[1]) ?? 0;
-        a -= p / 2;
+      n += this.element.clientHeight / 2;
+      const l = this.lyricLinesEl[this.scrollToIndex];
+      if (l) {
+        const o = this.lyricLinesSize.get(l)?.[1] ?? 0;
+        n -= o / 2;
       }
     } else if (typeof this.alignAnchor == "number") {
-      a += this.element.clientHeight * this.alignAnchor;
-      const m = this.lyricLinesEl[this.scrollToIndex];
-      if (m) {
-        const p = ((u = this.lyricLinesSize.get(m)) == null ? void 0 : u[1]) ?? 0;
-        a -= p / 2;
+      n += this.element.clientHeight * this.alignAnchor;
+      const l = this.lyricLinesEl[this.scrollToIndex];
+      if (l) {
+        const o = this.lyricLinesSize.get(l)?.[1] ?? 0;
+        n -= o / 2;
       }
     }
-    const l = this.currentTime === 0 ? void 0 : this.getCurrentInterlude();
-    let i = 0;
-    if (l && (i = l[1] - l[0], i >= 5e3)) {
-      const m = this.currentTime === 0 ? this.lyricLinesEl[0] : this.lyricLinesEl[this.scrollToIndex + 1];
-      m && (a -= ((f = this.lyricLinesSize.get(m)) == null ? void 0 : f[1]) ?? 0);
+    const h = this.currentTime === 0 ? void 0 : this.getCurrentInterlude();
+    let s = 0;
+    if (h && (s = h[1] - h[0], s >= 5e3)) {
+      const l = this.currentTime === 0 ? this.lyricLinesEl[0] : this.lyricLinesEl[this.scrollToIndex + 1];
+      l && (n -= this.lyricLinesSize.get(l)?.[1] ?? 0);
     }
     const r = Math.max(...this.bufferedLines);
-    let o = 0;
-    this.lyricLinesEl.forEach((m, p) => {
-      var C, z, A;
-      const y = this.bufferedLines.has(p), T = y || p >= this.scrollToIndex && p < r, E = m.getLine();
-      let M = 0;
-      E.isDuet && (M = this.size[0] - (((C = this.lyricLinesSize.get(m)) == null ? void 0 : C[0]) ?? 0)), p === this.scrollToIndex + 1 && i >= 5e3 && (this.interludeDots.setTransform(0, a), this.interludeDots.setInterlude(this.getCurrentInterlude()), a += this.interludeDotsSize[1]), m.setTransform(
-        M,
-        a,
-        T ? 1 : n,
-        y ? 1 : 1 / 3,
-        this.enableBlur ? 3 * (T ? 0 : 1 + (p < this.scrollToIndex ? Math.abs(this.scrollToIndex - p) : Math.abs(p - Math.max(this.scrollToIndex, r)))) : 0,
+    let a = 0;
+    this.lyricLinesEl.forEach((l, o) => {
+      const d = this.bufferedLines.has(o), m = d || o >= this.scrollToIndex && o < r, u = l.getLine();
+      let p = 0;
+      u.isDuet && (p = this.size[0] - (this.lyricLinesSize.get(l)?.[0] ?? 0)), o === this.scrollToIndex + 1 && s >= 5e3 && (this.interludeDots.setTransform(0, n), this.interludeDots.setInterlude(this.getCurrentInterlude()), n += this.interludeDotsSize[1]), l.setTransform(
+        p,
+        n,
+        m ? 1 : t,
+        d ? 1 : 1 / 3,
+        this.enableBlur ? 3 * (m ? 0 : 1 + (o < this.scrollToIndex ? Math.abs(this.scrollToIndex - o) : Math.abs(o - Math.max(this.scrollToIndex, r)))) : 0,
         e,
-        o
-      ), E.isBG && T ? a += ((z = this.lyricLinesSize.get(m)) == null ? void 0 : z[1]) ?? 0 : E.isBG || (a += ((A = this.lyricLinesSize.get(m)) == null ? void 0 : A[1]) ?? 0), a >= 0 && (o += 0.05);
+        a
+      ), u.isBG && m ? n += this.lyricLinesSize.get(l)?.[1] ?? 0 : u.isBG || (n += this.lyricLinesSize.get(l)?.[1] ?? 0), n >= 0 && (a += 0.05);
     });
   }
   /**
@@ -1027,36 +1021,35 @@ class he extends EventTarget {
    * 调用完成后，可以每帧调用 `update` 函数来执行歌词动画效果
    * @param time 当前播放进度，单位为毫秒
    */
-  setCurrentTime(e, n = !1) {
+  setCurrentTime(e, t = !1) {
     this.currentTime = e, this.element.style.setProperty("--amll-player-time", `${e}`);
-    const s = /* @__PURE__ */ new Set(), a = /* @__PURE__ */ new Set(), l = /* @__PURE__ */ new Set();
-    this.hotLines.forEach((i) => {
-      const r = this.processedLines[i];
+    const i = /* @__PURE__ */ new Set(), n = /* @__PURE__ */ new Set(), h = /* @__PURE__ */ new Set();
+    this.hotLines.forEach((s) => {
+      const r = this.processedLines[s];
       if (!r.isBG)
         if (r) {
-          const o = this.processedLines[i + 1];
-          if (o != null && o.isBG) {
-            const d = Math.min(r.startTime, o == null ? void 0 : o.startTime), u = Math.max(r.endTime, o == null ? void 0 : o.endTime);
-            (d > e || u <= e) && (this.hotLines.delete(i), s.add(i), this.hotLines.delete(i + 1), s.add(i + 1), n && (this.lyricLinesEl[i].disable(), this.lyricLinesEl[i + 1].disable()));
+          const a = this.processedLines[s + 1];
+          if (a?.isBG) {
+            const l = Math.min(r.startTime, a?.startTime), o = Math.max(r.endTime, a?.endTime);
+            (l > e || o <= e) && (this.hotLines.delete(s), i.add(s), this.hotLines.delete(s + 1), i.add(s + 1), t && (this.lyricLinesEl[s].disable(), this.lyricLinesEl[s + 1].disable()));
           } else
-            (r.startTime > e || r.endTime <= e) && (this.hotLines.delete(i), s.add(i), n && this.lyricLinesEl[i].disable());
+            (r.startTime > e || r.endTime <= e) && (this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable());
         } else
-          this.hotLines.delete(i), s.add(i), n && this.lyricLinesEl[i].disable();
-    }), this.processedLines.forEach((i, r, o) => {
-      var d;
-      !i.isBG && i.startTime <= e && i.endTime > e && (this.hotLines.has(r) || (this.hotLines.add(r), l.add(r), n && this.lyricLinesEl[r].enable(), (d = o[r + 1]) != null && d.isBG && (this.hotLines.add(r + 1), l.add(r + 1), n && this.lyricLinesEl[r + 1].enable())));
-    }), this.bufferedLines.forEach((i) => {
-      this.hotLines.has(i) || (a.add(i), n && this.lyricLinesEl[i].disable());
-    }), n ? (this.bufferedLines.size > 0 ? this.scrollToIndex = Math.min(...this.bufferedLines) : this.scrollToIndex = this.processedLines.findIndex(
-      (i) => i.startTime >= e
-    ), this.bufferedLines.clear(), this.hotLines.forEach((i) => this.bufferedLines.add(i)), this.calcLayout(!0)) : (a.size > 0 || l.size > 0) && (a.size === 0 && l.size > 0 ? (l.forEach((i) => {
-      this.bufferedLines.add(i), this.lyricLinesEl[i].enable();
-    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : l.size === 0 && a.size > 0 ? W(a, this.bufferedLines) && this.bufferedLines.forEach((i) => {
-      this.hotLines.has(i) || (this.bufferedLines.delete(i), this.lyricLinesEl[i].disable());
-    }) : (l.forEach((i) => {
-      this.bufferedLines.add(i), this.lyricLinesEl[i].enable();
-    }), a.forEach((i) => {
-      this.bufferedLines.delete(i), this.lyricLinesEl[i].disable();
+          this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable();
+    }), this.processedLines.forEach((s, r, a) => {
+      !s.isBG && s.startTime <= e && s.endTime > e && (this.hotLines.has(r) || (this.hotLines.add(r), h.add(r), t && this.lyricLinesEl[r].enable(), a[r + 1]?.isBG && (this.hotLines.add(r + 1), h.add(r + 1), t && this.lyricLinesEl[r + 1].enable())));
+    }), this.bufferedLines.forEach((s) => {
+      this.hotLines.has(s) || (n.add(s), t && this.lyricLinesEl[s].disable());
+    }), t ? (this.bufferedLines.size > 0 ? this.scrollToIndex = Math.min(...this.bufferedLines) : this.scrollToIndex = this.processedLines.findIndex(
+      (s) => s.startTime >= e
+    ), this.bufferedLines.clear(), this.hotLines.forEach((s) => this.bufferedLines.add(s)), this.calcLayout(!0)) : (n.size > 0 || h.size > 0) && (n.size === 0 && h.size > 0 ? (h.forEach((s) => {
+      this.bufferedLines.add(s), this.lyricLinesEl[s].enable();
+    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : h.size === 0 && n.size > 0 ? N(n, this.bufferedLines) && this.bufferedLines.forEach((s) => {
+      this.hotLines.has(s) || (this.bufferedLines.delete(s), this.lyricLinesEl[s].disable());
+    }) : (h.forEach((s) => {
+      this.bufferedLines.add(s), this.lyricLinesEl[s].enable();
+    }), n.forEach((s) => {
+      this.bufferedLines.delete(s), this.lyricLinesEl[s].disable();
     }), this.bufferedLines.size > 0 && (this.scrollToIndex = Math.min(...this.bufferedLines))), this.calcLayout());
   }
   /**
@@ -1066,8 +1059,8 @@ class he extends EventTarget {
    * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
    */
   update(e = 0) {
-    const n = e / 1e3;
-    this.interludeDots.update(e), this.lyricLinesEl.forEach((s) => s.update(n));
+    const t = e / 1e3;
+    this.interludeDots.update(e), this.lyricLinesEl.forEach((i) => i.update(t));
   }
   /**
    * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
@@ -1079,7 +1072,7 @@ class he extends EventTarget {
       ...this.posXSpringParams,
       ...e
     }, this.lyricLinesEl.forEach(
-      (n) => n.lineTransforms.posX.updateParams(this.posXSpringParams)
+      (t) => t.lineTransforms.posX.updateParams(this.posXSpringParams)
     );
   }
   /**
@@ -1092,7 +1085,7 @@ class he extends EventTarget {
       ...this.posYSpringParams,
       ...e
     }, this.lyricLinesEl.forEach(
-      (n) => n.lineTransforms.posY.updateParams(this.posYSpringParams)
+      (t) => t.lineTransforms.posY.updateParams(this.posYSpringParams)
     );
   }
   /**
@@ -1105,7 +1098,7 @@ class he extends EventTarget {
       ...this.scaleSpringParams,
       ...e
     }, this.lyricLinesEl.forEach(
-      (n) => n.lineTransforms.scale.updateParams(this.scaleSpringParams)
+      (t) => t.lineTransforms.scale.updateParams(this.scaleSpringParams)
     );
   }
   dispose() {
@@ -1113,8 +1106,8 @@ class he extends EventTarget {
   }
 }
 export {
-  le as BackgroundRender,
-  he as LyricPlayer,
-  ae as ttml
+  Z as BackgroundRender,
+  ee as LyricPlayer,
+  Q as ttml
 };
 //# sourceMappingURL=amll-core.mjs.map

@@ -22,10 +22,10 @@ export const LyricPlayer: FC = (props) => {
 						gridColumn: "1",
 						gridRow: "2",
 					}}
-                    type="button"
-                    onClick={() => {
-                        closeLyricPage();
-                    }}
+					type="button"
+					onClick={() => {
+						closeLyricPage();
+					}}
 				>
 					Back button
 				</button>
@@ -55,6 +55,19 @@ export const LyricPlayer: FC = (props) => {
 						gridRow: "1 / 6",
 						width: "100%",
 						height: "100%",
+					}}
+				/>
+				<div
+					style={{
+						height: "50px",
+						gridColumn: "1 / 3",
+						gridRow: "1",
+						zIndex: "1"
+					}}
+					onMouseDown={(evt) => {
+						evt.preventDefault();
+						evt.stopPropagation();
+						channel.call("winhelper.dragWindow", () => {}, []);
 					}}
 				/>
 			</div>

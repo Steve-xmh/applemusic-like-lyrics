@@ -19,7 +19,8 @@ function initStyle() {
 async function initDevelopmentReload() {
 	const debounceReload = betterncm.utils.debounce(
 		() =>
-			(betterncm_native?.app?.restart ?? betterncm.reload ?? location.reload)(),
+			// (betterncm_native?.app?.restart ?? betterncm.reload ?? location.reload)(),
+			location.reload(),
 		1000,
 	);
 

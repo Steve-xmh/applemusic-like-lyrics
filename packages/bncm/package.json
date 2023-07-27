@@ -8,6 +8,7 @@
     "dev": "vite build --watch --mode dev"
   },
   "dependencies": {
+    "@applemusic-like-lyrics/lyric": "^0.0.2",
     "@applemusic-like-lyrics/react": "workspace:^",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",

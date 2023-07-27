@@ -23,18 +23,25 @@ export async function injectLyricPage() {
 	)) as HTMLDivElement;
 	new MutationObserver((m) => {
 		m.forEach((m) => {
-			m.addedNodes.forEach((btn) => {
-				btn.addEventListener(
-					"click",
-					onLyricPageButtonClicked as EventListener,
-				);
-			});
+			for (const n of m.addedNodes) {
+				if (n.nodeType === Node.ELEMENT_NODE) {
+					const el = n as Element;
+					const cover = el.querySelector(".cover");
+					if (cover) {
+						cover.addEventListener(
+							"click",
+							onLyricPageButtonClicked as EventListener,
+						);
+						break;
+					}
+				}
+			}
 		});
 	}).observe(coverDiv, {
 		childList: true,
 	});
 	const lyricPageButton = (await betterncm.utils.waitForElement(
-		"#x-g-mn .m-pinfo .j-flag > .cover",
+		"#x-g-mn .m-pinfo .j-flag .cover",
 	)) as HTMLAnchorElement;
 	lyricPageButton.addEventListener("click", onLyricPageButtonClicked);
 	log("已找到歌词页面按钮", lyricPageButton);

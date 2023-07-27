@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
 	build: {
@@ -24,6 +26,8 @@ export default defineConfig({
 		},
 	},
 	plugins: [
+		wasm(),
+		topLevelAwait(),
 		dts({
 			exclude: ["src/test.ts"],
 		}),

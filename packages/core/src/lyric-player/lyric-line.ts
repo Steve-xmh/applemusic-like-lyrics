@@ -194,7 +194,7 @@ export class LyricLineEl implements HasElement, Disposable {
 					shouldEmphasize: shouldEmphasize(word),
 				});
 			} else {
-				const splited = /(\s*)(\S*)(\s*)/.exec(word.word);
+				const splited = /^(\s*)(\S*)(\s*)$/.exec(word.word);
 				if (splited) {
 					if (splited[1].length > 0) {
 						this.splittedWords.push({
@@ -230,6 +230,17 @@ export class LyricLineEl implements HasElement, Disposable {
 							shouldEmphasize: false,
 						});
 					}
+				} else if (word.word.trim().length > 0) {
+					this.splittedWords.push({
+						word: word.word.trim(),
+						startTime: word.startTime,
+						endTime: word.endTime,
+						width: 0,
+						height: 0,
+						elements: [],
+						elementAnimations: [],
+						shouldEmphasize: shouldEmphasize(word),
+					});
 				}
 			}
 		});
