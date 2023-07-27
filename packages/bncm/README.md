@@ -2,6 +2,16 @@
 
 AMLL 组件的 BetterNCM 插件实现，提供给 NCM 软件的歌词播放页面支持。
 
+<div align=center>
+
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b9dc5226-e08c-475c-a90d-1d1dbb3e0d70)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b26631f6-5925-4de9-ba9c-fc4d41bc14da)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/6a36d069-559e-4bce-8904-31a8f8648a0f)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8049da87-c6ef-4140-b324-e0f78a9c5ba4)
+![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/e9cebc5b-9778-4914-9460-ebdcfa7f1e68)
+
+</div>
+
 ## 安装说明
 
 你可以前往本仓库的 Release 下载对应的插件包，也可以通过 BetterNCM 的插件商店安装本插件。
