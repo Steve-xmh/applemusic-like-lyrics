@@ -5,6 +5,29 @@
 
 import { TypedEventTarget } from "typescript-event-target";
 
+export enum PlayState {
+	Playing = "playing",
+	Pausing = "pausing",
+}
+
+export enum AudioQualityType {
+	// 128
+	Normal = "normal",
+	// 320
+	High = "high",
+	// 999
+	Lossless = "lossless",
+	// 1999
+	HiRes = "hires",
+	DolbyAtmos = "dolbyatmos",
+	Local = "local",
+}
+
+export interface Artist {
+    name: string;
+    id: string;
+}
+
 /**
  * 音乐播放信息获取器的抽象
  *
@@ -12,8 +35,12 @@ import { TypedEventTarget } from "typescript-event-target";
  */
 export abstract class MusicStatusGetterBase extends TypedEventTarget<MusicStatusGetterEvents> {
 	abstract getMusicId(): string;
+	abstract getMusicDuration(): number;
 	abstract getMusicName(): string;
-	abstract getMusicArtists(): string;
+	abstract getMusicArtists(): Artist[];
+	abstract getMusicCoverImage(): string;
+	abstract getPlayState(): PlayState;
+	dispose(): void {}
 }
 
 export interface MusicStatusGetterEvents {
@@ -52,4 +79,10 @@ export interface MusicStatusGetterEvents {
 		 */
 		progress: number;
 	}>;
+	/**
+	 * 当音乐对应的封面图链接更新时触发
+	 * 
+	 * 此时调用 `getMusicCoverImage` 应当会获得一个能够稳定访问到歌曲封面图片数据的链接
+	 */
+	"album-updated": Event,
 }

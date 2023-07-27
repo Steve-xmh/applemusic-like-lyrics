@@ -1,33 +1,33 @@
 /// <reference types="./betterncm" />
 
 declare module "*.css" {
-	const value: string;
-	export default value;
+	const cssStyle: string;
+	export default cssStyle;
 }
 
 declare module "*.wgsl" {
-	const value: string;
-	export default value;
+	const wgslShader: string;
+	export default wgslShader;
 }
 
 declare module "*.glsl" {
-	const value: string;
-	export default value;
+	const glslShader: string;
+	export default glslShader;
 }
 
 declare module "*.frag" {
-	const value: string;
-	export default value;
+	const fragShader: string;
+	export default fragShader;
 }
 
 declare module "*.vert" {
-	const value: string;
-	export default value;
+	const vertShader: string;
+	export default vertShader;
 }
 
 declare module "*.svg" {
-	const value: React.FC<React.SVGProps<SVGSVGElement>>;
-	export default value;
+	const svgData: React.FC<React.SVGProps<SVGSVGElement>>;
+	export default svgData;
 }
 
 interface EAPIResponse {
@@ -76,11 +76,15 @@ interface LFPNCMPlugin extends NCMInjectPlugin {
 	};
 }
 
+interface AMLLInjectPlugin extends NCMInjectPlugin {
+	musicStatus: import("/Users/stevexmh/Documents/programs/applemusic-like-lyrics/packages/bncm/src/info/v2").MusicStatusGetterV2
+}
+
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-declare var APP_CONF: any;
-declare var pluginPath: string;
-declare var plugin: import("plugin").NCMInjectPlugin;
-declare var loadedPlugins: {
+declare let APP_CONF: any;
+declare let pluginPath: string;
+declare let plugin: AMLLInjectPlugin;
+declare let loadedPlugins: {
 	LibFrontendPlay: LFPNCMPlugin | undefined;
 	[pluginId: string]: import("plugin").NCMInjectPlugin | undefined;
 };

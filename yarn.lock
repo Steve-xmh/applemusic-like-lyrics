@@ -20,13 +20,15 @@ __metadata:
   resolution: "@applemusic-like-lyrics/bncm@workspace:packages/bncm"
   dependencies:
     "@applemusic-like-lyrics/react": "workspace:^"
+    "@types/react": ^18.2.17
+    "@types/react-dom": ^18.2.7
     "@types/semver": ^7.5.0
     "@vitejs/plugin-react": ^4.0.3
     jotai: ^2.2.2
     lightningcss: ^1.21.5
-    react: ^18.2.0
+    react: latest
     react-color: ^2.19.3
-    react-dom: ^18.2.0
+    react-dom: latest
     react-dropdown: ^1.11.0
     react-jss: ^10.10.0
     react-slider: ^2.0.6
@@ -2019,6 +2021,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-dom@npm:^18.2.7":
+  version: 18.2.7
+  resolution: "@types/react-dom@npm:18.2.7"
+  dependencies:
+    "@types/react": "*"
+  checksum: e02ea908289a7ad26053308248d2b87f6aeafd73d0e2de2a3d435947bcea0422599016ffd1c3e38ff36c42f5e1c87c7417f05b0a157e48649e4a02f21727d54f
+  languageName: node
+  linkType: hard
+
 "@types/react-slider@npm:^1.3.1":
   version: 1.3.1
   resolution: "@types/react-slider@npm:1.3.1"
@@ -2036,6 +2047,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: b62f0ea3cdfa68e106391728325057ad36f1bde7ba2dfae029472c47e01e482bc77c6ba4f1dad59f3f04ee81cb597618ff7c30a33c157c0a20462b6dd6aa2d4d
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^18.2.17":
+  version: 18.2.17
+  resolution: "@types/react@npm:18.2.17"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 150516b31bd98b635e4a56bcf2af007330b35cccb6e35e902f46a47f0e81e30c46cdacc095e91051bdf2f33e4846e7e62fd51b67e064dc7d15c00e15dfa449d5
   languageName: node
   linkType: hard
 
@@ -4601,7 +4623,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.2.0":
+"react-dom@npm:^18.2.0, react-dom@npm:latest":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
   dependencies:
@@ -4709,7 +4731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.2.0":
+"react@npm:^18.2.0, react@npm:latest":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:

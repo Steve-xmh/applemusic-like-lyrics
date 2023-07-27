@@ -1,6 +1,11 @@
-import style from "./index.css?inline";
+import style from "./index.sass?inline";
+import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
+import { isNCMV3 } from "./utils/is-ncm-v3";
 import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
+import { version } from "../public/manifest.json";
+import { configViewElement, initLyricPage } from "./injector";
+import { MusicStatusGetterV2 } from "./info/v2";
 
 // 注入样式
 function initStyle() {
@@ -86,13 +91,39 @@ async function initDevelopmentReload() {
 	log("已启用开发重载功能！");
 }
 
+// 配置页面
+plugin.onConfig(() => {
+	return configViewElement;
+});
+
 // 加载插件
 plugin.onLoad(async () => {
-	initStyle();
-	console.log("%cApple Music-like Lyrics%c for %cBetterNCM", "color:#2AF;font-weight:bold;", "color:unset;font-weight:normal;", "color:#F8878A;font-weight:bold;");
+	try {
+		initStyle();
+		console.log(
+			`%cApple Music-like Lyrics %c${version}%c for %cBetterNCM`,
+			"color:#2AF;font-weight:bold;",
+			"color:#2AF;font-weight:normal;",
+			"color:unset;font-weight:normal;",
+			"color:#F8878A;font-weight:bold;",
+		);
 
-	if (import.meta.env.AMLL_DEV) {
-		warn("正在以开发模式运行插件！");
-		initDevelopmentReload();
+		if (import.meta.env.AMLL_DEV) {
+			warn("正在以开发模式运行插件！");
+			initDevelopmentReload();
+		}
+
+		if (isNCMV3()) {
+			// TODO: 3.0 的注入支持
+		} else {
+			plugin.musicStatus = new MusicStatusGetterV2();
+			await injectLyricPageV2();
+		}
+
+		initLyricPage();
+
+		log("插件初始化完成！");
+	} catch (err) {
+		warn(err);
 	}
 });

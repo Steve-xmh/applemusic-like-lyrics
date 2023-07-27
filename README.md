@@ -1,6 +1,6 @@
 <div align=center>
 
-![](./src/assets/amll-icon.svg)
+![](./packages/bncm/src/assets/amll-icon.svg)
 
 # Apple Music-like Lyrics
 

@@ -389,7 +389,7 @@ declare module "plugin" {
 		constructor(manifest: PluginManifest, pluginPath: string, devMode: boolean);
 		haveConfigElement(): boolean;
 	}
-	export class NCMInjectPlugin extends EventTarget {
+	export interface NCMInjectPlugin extends EventTarget {
 		readonly filePath: string;
 		pluginPath: string;
 		manifest: PluginManifest;

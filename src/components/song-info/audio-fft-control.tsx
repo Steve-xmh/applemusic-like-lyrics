@@ -4,8 +4,8 @@ import * as Weightings from "../../libs/a-weighting";
 import { isNCMV3 } from "../../utils";
 import { appendRegisterCall } from "../../utils/channel";
 import { log, warn } from "../../utils/logger";
-import AMLLFFTWASM from "../../../amll-fft/pkg/amll_fft_bg.wasm";
-import initFFT, { AMLLFFT } from "../../../amll-fft/pkg";
+import AMLLFFTWASM from "../../../packages/fft/pkg/amll_fft_bg.wasm";
+import initFFT, { AMLLFFT } from "../../../packages/fft/pkg/amll_fft";
 
 // AudioData 48000hz int16 2 channels
 let fft: AMLLFFT;

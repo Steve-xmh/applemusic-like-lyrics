@@ -59,9 +59,13 @@ export default defineConfig(({ mode }) => {
 		},
 		plugins: [
 			react(),
-			env.AMLL_DEV && CopyBetterNCMPlugin({
-				name: "Apple-Musiclike-lyrics",
-			}),
+			env.AMLL_DEV &&
+				CopyBetterNCMPlugin({
+					name: "Apple-Musiclike-lyrics",
+				}),
 		],
+		define: {
+		  'process.env': "({})"
+		}
 	};
 });
