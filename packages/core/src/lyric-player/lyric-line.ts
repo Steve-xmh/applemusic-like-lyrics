@@ -184,65 +184,39 @@ export class LyricLineEl implements HasElement, Disposable {
 		const roman = this.element.children[2] as HTMLDivElement;
 		this.splittedWords = [];
 		this.lyricLine.words.forEach((word) => {
-			if (CJKEXP.test(word.word)) {
+			const splited = word.word.split(/\s+/);
+			const trimmedLength = splited.reduce((pv, cv) => pv + cv.length, 0);
+			let pos = 0;
+			splited.forEach((sub, i) => {
+				if (i > 0) {
+					this.splittedWords.push({
+						word: " ",
+						startTime: 0,
+						endTime: 0,
+						width: 0,
+						height: 0,
+						elements: [],
+						elementAnimations: [],
+						shouldEmphasize: false,
+					});
+				}
 				this.splittedWords.push({
-					...word,
+					word: sub,
+					startTime:
+						word.startTime +
+						((word.endTime - word.startTime) / trimmedLength) * pos,
+					endTime:
+						word.startTime +
+						((word.endTime - word.startTime) / trimmedLength) *
+							(pos + sub.length),
 					width: 0,
 					height: 0,
 					elements: [],
 					elementAnimations: [],
 					shouldEmphasize: shouldEmphasize(word),
 				});
-			} else {
-				const splited = /^(\s*)(\S*)(\s*)$/.exec(word.word);
-				if (splited) {
-					if (splited[1].length > 0) {
-						this.splittedWords.push({
-							word: " ",
-							startTime: 0,
-							endTime: 0,
-							width: 0,
-							height: 0,
-							elements: [],
-							elementAnimations: [],
-							shouldEmphasize: false,
-						});
-					}
-					this.splittedWords.push({
-						word: splited[2],
-						startTime: word.startTime,
-						endTime: word.endTime,
-						width: 0,
-						height: 0,
-						elements: [],
-						elementAnimations: [],
-						shouldEmphasize: shouldEmphasize(word),
-					});
-					if (splited[3].length > 0) {
-						this.splittedWords.push({
-							word: " ",
-							startTime: 0,
-							endTime: 0,
-							width: 0,
-							height: 0,
-							elements: [],
-							elementAnimations: [],
-							shouldEmphasize: false,
-						});
-					}
-				} else if (word.word.trim().length > 0) {
-					this.splittedWords.push({
-						word: word.word.trim(),
-						startTime: word.startTime,
-						endTime: word.endTime,
-						width: 0,
-						height: 0,
-						elements: [],
-						elementAnimations: [],
-						shouldEmphasize: shouldEmphasize(word),
-					});
-				}
-			}
+				pos += sub.length;
+			});
 		});
 		// 回收元素以复用
 		const reusableElements: HTMLElement[] = [];
@@ -330,6 +304,8 @@ export class LyricLineEl implements HasElement, Disposable {
 		roman.innerText = this.lyricLine.romanLyric;
 	}
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
+		const delay = word.startTime - this.lyricLine.startTime;
+		const duration = Math.max(1000, word.endTime - word.startTime);
 		const a = wordEl.animate(
 			[
 				{
@@ -340,8 +316,8 @@ export class LyricLineEl implements HasElement, Disposable {
 				},
 			],
 			{
-				duration: Math.max(1000, word.endTime - word.startTime),
-				delay: word.startTime - this.lyricLine.startTime,
+				duration: isFinite(duration) ? duration : 0,
+				delay: isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
 				fill: "both",

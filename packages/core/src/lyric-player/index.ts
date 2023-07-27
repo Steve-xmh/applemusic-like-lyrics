@@ -217,14 +217,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * 这个只允许内部调用
 	 * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
 	 */
-	getCurrentInterlude(): [number, number] | undefined {
+	getCurrentInterlude(): [number, number, number] | undefined {
 		if (this.bufferedLines.size > 0) return undefined;
 		const currentTime = this.currentTime + 20;
 		const i = this.scrollToIndex;
 		if (i === 0) {
 			if (this.processedLines[0]?.startTime) {
 				if (this.processedLines[0].startTime > currentTime) {
-					return [0, this.processedLines[0].startTime];
+					return [0, this.processedLines[0].startTime, -2];
 				}
 			}
 		} else if (
@@ -238,6 +238,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				return [
 					this.processedLines[i].endTime,
 					this.processedLines[i + 1].startTime,
+					i,
 				];
 			}
 		}
@@ -279,38 +280,43 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	setLyricLines(lines: LyricLine[]) {
 		this.lyricLines = lines;
 		const timeOffset = 750;
-		this.processedLines = lines.map((line, i, lines) => {
-			if (line.isBG)
-				return {
-					...line,
-				};
-			else {
-				const lastLine = lines[i - 1];
-				const pastLine = lines[i - 2];
-				if (lastLine?.isBG && pastLine) {
-					if (pastLine.endTime < line.startTime) {
-						return {
-							...line,
-							startTime:
-								Math.max(pastLine.endTime, line.startTime - timeOffset) ||
-								line.startTime,
-						};
+		this.processedLines = lines
+			.filter(
+				(line) =>
+					line.words.reduce((pv, cv) => pv + cv.word.trim().length, 0) > 0,
+			)
+			.map((line, i, lines) => {
+				if (line.isBG)
+					return {
+						...line,
+					};
+				else {
+					const lastLine = lines[i - 1];
+					const pastLine = lines[i - 2];
+					if (lastLine?.isBG && pastLine) {
+						if (pastLine.endTime < line.startTime) {
+							return {
+								...line,
+								startTime:
+									Math.max(pastLine.endTime, line.startTime - timeOffset) ||
+									line.startTime,
+							};
+						}
+					} else if (lastLine?.endTime) {
+						if (lastLine.endTime < line.startTime) {
+							return {
+								...line,
+								startTime:
+									Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
+									line.startTime,
+							};
+						}
 					}
-				} else if (lastLine?.endTime) {
-					if (lastLine.endTime < line.startTime) {
-						return {
-							...line,
-							startTime:
-								Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
-								line.startTime,
-						};
-					}
+					return {
+						...line,
+					};
 				}
-				return {
-					...line,
-				};
-			}
-		});
+			});
 		this.processedLines.forEach((line, i, lines) => {
 			const nextLine = lines[i + 1];
 			const lastWord = line.words[line.words.length - 1];
@@ -393,16 +399,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos -= lineHeight / 2;
 			}
 		}
-		const interlude =
-			this.currentTime === 0 ? undefined : this.getCurrentInterlude();
+		const interlude = this.getCurrentInterlude();
 		let interludeDuration = 0;
 		if (interlude) {
 			interludeDuration = interlude[1] - interlude[0];
 			if (interludeDuration >= 5000) {
-				const nextLine =
-					this.currentTime === 0
-						? this.lyricLinesEl[0]
-						: this.lyricLinesEl[this.scrollToIndex + 1];
+				const nextLine = this.lyricLinesEl[interlude[2] + 1];
 				if (nextLine) {
 					curPos -= this.lyricLinesSize.get(nextLine)?.[1] ?? 0;
 				}
@@ -410,6 +412,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
+		let setDots = false;
 		this.lyricLinesEl.forEach((el, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
@@ -419,9 +422,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (line.isDuet) {
 				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0);
 			}
-			if (i === this.scrollToIndex + 1 && interludeDuration >= 5000) {
+			if (
+				!setDots &&
+				interludeDuration >= 5000 &&
+				((i === this.scrollToIndex && interlude?.[2] === -2) ||
+					i === this.scrollToIndex + 1)
+			) {
+				setDots = true;
 				this.interludeDots.setTransform(0, curPos);
-				this.interludeDots.setInterlude(this.getCurrentInterlude());
+				if (interlude) {
+					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
+				}
 				curPos += this.interludeDotsSize[1];
 			}
 			el.setTransform(

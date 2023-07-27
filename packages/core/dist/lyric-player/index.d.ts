@@ -57,7 +57,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * 这个只允许内部调用
      * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
      */
-    getCurrentInterlude(): [number, number] | undefined;
+    getCurrentInterlude(): [number, number, number] | undefined;
     /**
      * 重建样式
      *

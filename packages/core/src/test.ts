@@ -11,6 +11,7 @@ import Stats from "stats.js";
 import { LyricPlayer } from "./lyric-player";
 import { parseTTML } from "./lyric/ttml";
 import { SpringParams } from "./utils/spring";
+import { parseLrc } from "@applemusic-like-lyrics/lyric";
 
 const audio = document.createElement("audio");
 audio.preload = "auto";
@@ -193,6 +194,32 @@ bg.setFPS(30);
 
 (window as any).lyricPlayer = lyricPlayer;
 
+async function loadLyric() {
+	const lyricFile = debugValues.lyric;
+	const content = await (await fetch(lyricFile)).text();
+	if (lyricFile.endsWith(".ttml")) {
+		lyricPlayer.setLyricLines(parseTTML(content));
+	} else if (lyricFile.endsWith(".lrc")) {
+		lyricPlayer.setLyricLines(
+			parseLrc(content).map((line, i, lines) => ({
+				words: [
+					{
+						word: line.words[0]?.word ?? "",
+						startTime: line.words[0]?.startTime ?? 0,
+						endTime: lines[i + 1]?.words?.[0]?.startTime ?? Infinity,
+					},
+				],
+				startTime: line.words[0]?.startTime ?? 0,
+				endTime: lines[i + 1]?.words?.[0]?.startTime ?? Infinity,
+				translatedLyric: "",
+				romanLyric: "",
+				isBG: false,
+				isDuet: false,
+			})),
+		);
+	}
+}
+
 (async () => {
 	bg.getElement().style.position = "absolute";
 	bg.getElement().style.top = "0";
@@ -204,8 +231,6 @@ bg.setFPS(30);
 	document.body.appendChild(audio);
 	document.body.appendChild(bg.getElement());
 	document.body.appendChild(lyricPlayer.getElement());
-	lyricPlayer.setLyricLines(
-		parseTTML(await (await fetch(debugValues.lyric)).text()),
-	);
+	await loadLyric();
 	debugValues.play();
 })();
