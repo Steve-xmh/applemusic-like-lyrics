@@ -1,6 +1,6 @@
 import { LyricPlayer } from "@applemusic-like-lyrics/core";
 declare const _default: import("vue").DefineComponent<{
-    enable: {
+    disabled: {
         type: import("vue").PropType<boolean>;
     };
     alignAnchor: {
@@ -31,7 +31,7 @@ declare const _default: import("vue").DefineComponent<{
     lyricPlayer: import("vue").Ref<LyricPlayer | undefined>;
     wrapperEl: import("vue").Ref<HTMLDivElement | undefined>;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
-    enable: {
+    disabled: {
         type: import("vue").PropType<boolean>;
     };
     alignAnchor: {

@@ -345,6 +345,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			this.element.appendChild(el.getElement());
 			el.updateMaskImage();
 		});
+		this.hotLines.clear();
+		this.bufferedLines.clear();
 		this.setLinePosXSpringParams({});
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
@@ -520,8 +522,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 先检索当前已经超出时间范围的缓冲行，列入待删除集内
 		this.hotLines.forEach((lastHotId) => {
 			const line = this.processedLines[lastHotId];
-			if (line.isBG) return;
 			if (line) {
+				if (line.isBG) return;
 				const nextLine = this.processedLines[lastHotId + 1];
 				if (nextLine?.isBG) {
 					const startTime = Math.min(line.startTime, nextLine?.startTime);

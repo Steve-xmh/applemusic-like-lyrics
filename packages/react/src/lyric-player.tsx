@@ -16,11 +16,11 @@ import {
  */
 export interface LyricPlayerProps {
 	/**
-	 * 是否启用歌词播放组件，默认为 `true`，设置为 `true` 将会开始逐帧更新歌词的动画效果，并对传入的其他参数变更做出反馈。
+	 * 是否禁用歌词播放组件，默认为 `false`，歌词组件启用后将会开始逐帧更新歌词的动画效果，并对传入的其他参数变更做出反馈。
 	 *
-	 * 如果不设置该选项，你也可以通过引用取得原始渲染组件实例，手动逐帧调用其 `update` 函数来更新动画效果。
+	 * 如果禁用了歌词组件动画，你也可以通过引用取得原始渲染组件实例，手动逐帧调用其 `update` 函数来更新动画效果。
 	 */
-	enable?: boolean;
+	disabled?: boolean;
 	/**
 	 * 设置歌词行的对齐方式，如果为 `undefined` 则默认为 `top`
 	 *
@@ -95,7 +95,7 @@ export const LyricPlayer = forwardRef<
 >(
 	(
 		{
-			enable,
+			disabled,
 			alignAnchor,
 			enableSpring,
 			enableBlur,
@@ -119,7 +119,7 @@ export const LyricPlayer = forwardRef<
 		}, []);
 
 		useEffect(() => {
-			if (enable !== undefined && enable) {
+			if (!disabled) {
 				let canceled = false;
 				let lastTime = -1;
 				const onFrame = (time: number) => {
@@ -136,7 +136,7 @@ export const LyricPlayer = forwardRef<
 					canceled = true;
 				};
 			}
-		}, [enable]);
+		}, [disabled]);
 
 		useEffect(() => {
 			if (corePlayerRef.current)

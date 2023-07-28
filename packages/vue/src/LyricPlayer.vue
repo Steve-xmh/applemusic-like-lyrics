@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { LyricPlayer } from "@applemusic-like-lyrics/core";
-import { onMounted, onUnmounted, ref, watchEffect } from "vue";
+import { onMounted, onUnmounted, ref, watchEffect, toRaw } from "vue";
 import type { LyricPlayerProps, LyricPlayerRef } from ".";
 
 const props = defineProps<LyricPlayerProps>();
@@ -25,7 +25,7 @@ onUnmounted(() => {
 });
 
 watchEffect((onCleanup) => {
-    if (props.enable) {
+    if (!props.disabled) {
         let canceled = false;
         let lastTime = -1;
         const onFrame = (time: number) => {

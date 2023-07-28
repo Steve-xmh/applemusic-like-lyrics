@@ -1,9 +1,9 @@
-import { defineComponent as m, ref as p, onMounted as g, onUnmounted as d, watchEffect as n, openBlock as v, createElementBlock as S } from "vue";
+import { defineComponent as m, ref as p, onMounted as d, onUnmounted as g, watchEffect as n, openBlock as v, createElementBlock as S } from "vue";
 import { LyricPlayer as P, BackgroundRender as y } from "@applemusic-like-lyrics/core";
 const _ = /* @__PURE__ */ m({
   __name: "LyricPlayer",
   props: {
-    enable: { type: Boolean },
+    disabled: { type: Boolean },
     alignAnchor: {},
     enableSpring: { type: Boolean },
     enableBlur: { type: Boolean },
@@ -15,12 +15,12 @@ const _ = /* @__PURE__ */ m({
   },
   setup(t, { expose: o }) {
     const a = t, l = p(), r = p();
-    return g(() => {
+    return d(() => {
       l.value && (r.value = new P(), l.value.appendChild(r.value.getElement()));
-    }), d(() => {
+    }), g(() => {
       r.value && r.value.dispose();
     }), n((e) => {
-      if (a.enable) {
+      if (!a.disabled) {
         let i = !1, s = -1;
         const c = (u) => {
           var f;
@@ -73,13 +73,13 @@ const _ = /* @__PURE__ */ m({
   },
   setup(t, { expose: o }) {
     const a = t, l = p(), r = p();
-    return g(() => {
+    return d(() => {
       if (l.value) {
         r.value = new y();
         const e = r.value.getElement();
         e.style.width = "100%", e.style.height = "100%", l.value.appendChild(e);
       }
-    }), d(() => {
+    }), g(() => {
       r.value && r.value.dispose();
     }), n(() => {
       var e;
