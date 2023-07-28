@@ -1,7 +1,7 @@
 {
   "name": "@applemusic-like-lyrics/vue",
   "packageManager": "yarn@3.6.1",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "AMLL 组件库的 Vue 绑定",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
@@ -39,6 +39,7 @@
     "typedoc": "^0.24.8",
     "typedoc-plugin-markdown": "^3.15.3",
     "vite": "^4.4.7",
-    "vite-plugin-dts": "^3.3.1"
+    "vite-plugin-dts": "^3.3.1",
+    "vue": "^3.3.4"
   }
 }
