@@ -1,7 +1,7 @@
 {
   "name": "@applemusic-like-lyrics/react",
   "packageManager": "yarn@3.6.1",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "AMLL 组件库的 React 绑定",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
