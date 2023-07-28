@@ -896,7 +896,7 @@ class ee extends EventTarget {
       (i) => new _(this, i)
     ), this.lyricLinesEl.forEach((i) => {
       this.element.appendChild(i.getElement()), i.updateMaskImage();
-    }), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
+    }), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
   }
   /**
    * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
@@ -1003,16 +1003,17 @@ class ee extends EventTarget {
     const i = /* @__PURE__ */ new Set(), n = /* @__PURE__ */ new Set(), a = /* @__PURE__ */ new Set();
     this.hotLines.forEach((s) => {
       const r = this.processedLines[s];
-      if (!r.isBG)
-        if (r) {
-          const l = this.processedLines[s + 1];
-          if (l?.isBG) {
-            const h = Math.min(r.startTime, l?.startTime), o = Math.max(r.endTime, l?.endTime);
-            (h > e || o <= e) && (this.hotLines.delete(s), i.add(s), this.hotLines.delete(s + 1), i.add(s + 1), t && (this.lyricLinesEl[s].disable(), this.lyricLinesEl[s + 1].disable()));
-          } else
-            (r.startTime > e || r.endTime <= e) && (this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable());
+      if (r) {
+        if (r.isBG)
+          return;
+        const l = this.processedLines[s + 1];
+        if (l?.isBG) {
+          const h = Math.min(r.startTime, l?.startTime), o = Math.max(r.endTime, l?.endTime);
+          (h > e || o <= e) && (this.hotLines.delete(s), i.add(s), this.hotLines.delete(s + 1), i.add(s + 1), t && (this.lyricLinesEl[s].disable(), this.lyricLinesEl[s + 1].disable()));
         } else
-          this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable();
+          (r.startTime > e || r.endTime <= e) && (this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable());
+      } else
+        this.hotLines.delete(s), i.add(s), t && this.lyricLinesEl[s].disable();
     }), this.processedLines.forEach((s, r, l) => {
       !s.isBG && s.startTime <= e && s.endTime > e && (this.hotLines.has(r) || (this.hotLines.add(r), a.add(r), t && this.lyricLinesEl[r].enable(), l[r + 1]?.isBG && (this.hotLines.add(r + 1), a.add(r + 1), t && this.lyricLinesEl[r + 1].enable())));
     }), this.bufferedLines.forEach((s) => {
