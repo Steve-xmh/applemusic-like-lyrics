@@ -7,12 +7,14 @@ import { MusicStatusGetterV2 } from "./v2";
 export const musicIdAtom = atom("");
 export const musicNameAtom = atom("");
 export const musicCoverAtom = atom("");
+export const currentTimeAtom = atom(0);
 
 export const MusicInfoWrapper: FC = () => {
 	const musicInfoGetter = useRef<MusicStatusGetterBase>();
 	const setMusicId = useSetAtom(musicIdAtom);
 	const setMusicName = useSetAtom(musicNameAtom);
 	const setMusicCover = useSetAtom(musicCoverAtom);
+	const setCurrentTime = useSetAtom(currentTimeAtom);
 
 	useEffect(() => {
 		if (isNCMV3()) {
@@ -31,6 +33,12 @@ export const MusicInfoWrapper: FC = () => {
 			"album-updated",
 			function (this: MusicStatusGetterBase) {
 				setMusicCover(this.getMusicCoverImage());
+			},
+		);
+		musicInfoGetter.current?.addEventListener(
+			"progress",
+			function (this: MusicStatusGetterBase, evt) {
+				setCurrentTime(evt.detail.progress);
 			},
 		);
 		return () => {

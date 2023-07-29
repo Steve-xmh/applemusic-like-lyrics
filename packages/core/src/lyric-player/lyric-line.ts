@@ -333,6 +333,8 @@ export class LyricLineEl implements HasElement, Disposable {
 			if (i === 0) {
 				return this.initFloatAnimation(word, el);
 			} else {
+				const du = Math.max(1000, word.endTime - word.startTime);
+				const de = delay + (duration / (arr.length - 1)) * (i - 1);
 				const a = el.animate(
 					[
 						{
@@ -352,8 +354,8 @@ export class LyricLineEl implements HasElement, Disposable {
 						},
 					],
 					{
-						duration: Math.max(1000, word.endTime - word.startTime),
-						delay: delay + (duration / (arr.length - 1)) * (i - 1),
+						duration: isFinite(du) ? du : 0,
+						delay: isFinite(de) ? de : 0,
 						id: "glow-word",
 						iterations: 1,
 						composite: "replace",

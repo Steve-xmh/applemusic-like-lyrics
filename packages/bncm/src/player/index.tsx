@@ -5,11 +5,14 @@ import {
 } from "@applemusic-like-lyrics/react";
 import { closeLyricPage } from "../injector";
 import { useAtomValue } from "jotai";
-import { musicCoverAtom, musicNameAtom } from "../info/wrapper";
+import { currentTimeAtom, musicCoverAtom, musicNameAtom } from "../info/wrapper";
 import { SongInfoTextMarquee } from "../components/song-info/song-info-text-marquee";
+import { lyricLinesAtom } from "../lyric/provider";
 export const LyricPlayer: FC = (props) => {
 	const musicCoverUrl = useAtomValue(musicCoverAtom);
 	const musicName = useAtomValue(musicNameAtom);
+	const lyricLines = useAtomValue(lyricLinesAtom);
+	const currentTime = useAtomValue(currentTimeAtom);
 	return (
 		<div className="lyric-player">
 			<BackgroundRender
@@ -85,6 +88,8 @@ export const LyricPlayer: FC = (props) => {
 					height: "100%",
 					mixBlendMode: "plus-lighter",
 				}}
+				currentTime={currentTime}
+				lyricLines={lyricLines}
 			/>
 			<div
 				style={{

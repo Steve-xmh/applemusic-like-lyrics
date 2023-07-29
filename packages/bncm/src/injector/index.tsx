@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Provider } from "jotai";
 import { LyricPlayer } from "../player";
 import { MusicInfoWrapper } from "../info/wrapper";
+import { LyricProvider } from "../lyric/provider";
 
 export const mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "amll-view";
@@ -13,6 +14,7 @@ export function initLyricPage() {
 	appRoot = createRoot(mainViewElement);
 	appRoot.render(
 		<Provider>
+			<LyricProvider />
 			<MusicInfoWrapper />
 			{createPortal(<LyricPlayer />, mainViewElement)}
 			{createPortal(<div>Config</div>, configViewElement)}

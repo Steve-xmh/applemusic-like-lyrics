@@ -3,7 +3,8 @@ import { Plugin, defineConfig, loadEnv } from "vite";
 import { resolve } from "path";
 import os from "os";
 import { cpSync, rmSync } from "fs";
-import { readFile } from "fs/promises";
+import wasm from "vite-plugin-wasm";
+import terser from "@rollup/plugin-terser";
 
 function getDefaultBetterNCMPath() {
 	if (os.type() === "Windows_NT") {
@@ -40,26 +41,9 @@ const CopyBetterNCMPlugin = ({
 	};
 };
 
-const WASMPlugin = (): Plugin => {
-	const fileRegex = /\.(wasm)$/;
-	return {
-		name: "wasm-plugin",
-		async load(id, _option) {
-			if (fileRegex.test(id)) {
-				return {
-					code: `
-					const WASM_BASE64_DATA = "${await readFile(id, "base64")}";
-					const WASM_INSTANCE = await WebAssembly.instantiateStreaming(await fetch("data:application/wasm;base64,"+WASM_BASE64_DATA));
-					export default WASM_INSTANCE;
-					`,
-				};
-			}
-		},
-	};
-};
-
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), "AMLL");
+	console.log(env);
 	return {
 		mode: env.AMLL_DEV ? "development" : "production",
 		envPrefix: ["AMLL_"],
@@ -73,16 +57,20 @@ export default defineConfig(({ mode }) => {
 				fileName: "amll-bncm",
 				formats: ["es"],
 			},
-			minify: env.AMLL_DEV ? false : "esbuild",
-			sourcemap: env.AMLL_DEV ? "inline" : true,
+			minify: env?.AMLL_DEV ? false : "esbuild",
+			sourcemap: env?.AMLL_DEV ? "inline" : true,
+			rollupOptions: {
+				plugins: [
+					!env.AMLL_DEV && terser()
+				]
+			}
 		},
 		plugins: [
 			react(),
-			WASMPlugin(),
-			env.AMLL_DEV &&
-				CopyBetterNCMPlugin({
-					name: "Apple-Musiclike-lyrics",
-				}),
+			wasm(),
+			CopyBetterNCMPlugin({
+				name: "Apple-Musiclike-lyrics",
+			}),
 		],
 		define: {
 			"process.env": "({})",

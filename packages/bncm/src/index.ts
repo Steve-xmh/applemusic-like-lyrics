@@ -24,7 +24,7 @@ async function initDevelopmentReload() {
 		1000,
 	);
 
-	const shouldReloadPaths = ["/manifest.json", "/amll-bncm.iife.js"];
+	const shouldReloadPaths = ["/manifest.json", "/amll-bncm.mjs"];
 
 	const currentOriginalFiles = new Map<string, string>();
 

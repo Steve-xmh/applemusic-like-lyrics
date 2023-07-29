@@ -345,6 +345,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			this.element.appendChild(el.getElement());
 			el.updateMaskImage();
 		});
+		this.interludeDots.setInterlude(undefined);
 		this.hotLines.clear();
 		this.bufferedLines.clear();
 		this.setLinePosXSpringParams({});

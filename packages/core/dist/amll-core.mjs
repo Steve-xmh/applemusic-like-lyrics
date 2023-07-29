@@ -236,7 +236,7 @@ function O(d) {
   return d < 0.5 ? Math.pow(2 * d, 2) * ((t + 1) * 2 * d - t) / 2 : (Math.pow(2 * d - 2, 2) * ((t + 1) * (d * 2 - 2) + t) + 2) / 2;
 }
 const g = (d, e, t) => Math.max(d, Math.min(e, t));
-class $ {
+class F {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -325,7 +325,7 @@ class S {
   }
   resetSolver() {
     const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = q(
+    this.currentTime = 0, this.currentSolver = $(
       this.currentPosition,
       e,
       this.targetPosition,
@@ -363,7 +363,7 @@ class S {
     return this.currentPosition;
   }
 }
-function q(d, e, t, i = 0, n) {
+function $(d, e, t, i = 0, n) {
   const a = n?.soft ?? !1, s = n?.stiffness ?? 100, r = n?.damping ?? 10, l = n?.mass ?? 1, h = t - d;
   if (a || 1 <= r / (2 * Math.sqrt(s * l))) {
     const o = -Math.sqrt(s / l), c = -o * h - e;
@@ -375,11 +375,11 @@ function q(d, e, t, i = 0, n) {
     return (u) => (u -= i, u < 0 ? d : t - (Math.cos(u * m) * h + Math.sin(u * m) * c) * Math.E ** (u * p));
   }
 }
-function F(d) {
+function q(d) {
   return (t) => (d(t + 1e-3) - d(t - 1e-3)) / (2 * 1e-3);
 }
 function R(d) {
-  return F(d);
+  return q(d);
 }
 const w = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 function W(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
@@ -575,7 +575,7 @@ class _ {
       if (a === 0)
         return this.initFloatAnimation(e, n);
       {
-        const r = n.animate(
+        const r = Math.max(1e3, e.endTime - e.startTime), l = t + i / (s.length - 1) * (a - 1), h = n.animate(
           [
             {
               offset: 0,
@@ -594,15 +594,15 @@ class _ {
             }
           ],
           {
-            duration: Math.max(1e3, e.endTime - e.startTime),
-            delay: t + i / (s.length - 1) * (a - 1),
+            duration: isFinite(r) ? r : 0,
+            delay: isFinite(l) ? l : 0,
             id: "glow-word",
             iterations: 1,
             composite: "replace",
             fill: "both"
           }
         );
-        return r.pause(), r;
+        return h.pause(), h;
       }
     });
   }
@@ -813,7 +813,7 @@ class ee extends EventTarget {
     this.calcLayout(!0);
   };
   constructor() {
-    super(), this.interludeDots = new $(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
+    super(), this.interludeDots = new F(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
   }
   /**
    * 获取当前播放时间里是否处于间奏区间
@@ -896,7 +896,7 @@ class ee extends EventTarget {
       (i) => new _(this, i)
     ), this.lyricLinesEl.forEach((i) => {
       this.element.appendChild(i.getElement()), i.updateMaskImage();
-    }), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
+    }), this.interludeDots.setInterlude(void 0), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
   }
   /**
    * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
