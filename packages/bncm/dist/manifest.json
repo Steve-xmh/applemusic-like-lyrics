@@ -18,7 +18,7 @@
     "injects": {
         "Main": [
             {
-                "file": "amll-bncm.iife.js"
+                "file": "amll-bncm.mjs"
             }
         ]
     },

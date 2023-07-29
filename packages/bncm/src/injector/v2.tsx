@@ -33,6 +33,12 @@ export async function injectLyricPage() {
 							onLyricPageButtonClicked as EventListener,
 						);
 						break;
+					} else if (el.classList.contains("cover")) {
+						el.addEventListener(
+							"click",
+							onLyricPageButtonClicked as EventListener,
+						);
+						break;
 					}
 				}
 			}

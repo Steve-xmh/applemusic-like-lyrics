@@ -77,7 +77,7 @@ interface LFPNCMPlugin extends NCMInjectPlugin {
 }
 
 interface AMLLInjectPlugin extends NCMInjectPlugin {
-	musicStatus: import("/Users/stevexmh/Documents/programs/applemusic-like-lyrics/packages/bncm/src/info/v2").MusicStatusGetterV2
+	musicStatus: import("/Users/stevexmh/Documents/programs/applemusic-like-lyrics/packages/bncm/src/info/v2").MusicStatusGetterV2;
 }
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>

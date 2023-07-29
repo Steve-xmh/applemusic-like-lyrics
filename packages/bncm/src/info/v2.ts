@@ -7,6 +7,7 @@ import { Artist, MusicStatusGetterBase, PlayState } from ".";
 import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
 import { callCachedSearchFunction } from "../utils/func";
 import { log } from "../utils/logger";
+import { getNCMImageUrl } from "../utils/ncm-url";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -19,13 +20,13 @@ interface AudioLoadInfo {
 export const EMPTY_IMAGE_URL =
 	"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
-
 export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 	private musicDuration = 0;
+	private musicPlayProgress = 0;
 	private playState = PlayState.Pausing;
 	private musicId = "";
 	private musicName = "未知歌名";
-	private musicAlbumImages = "";
+	private musicAlbumImage = "";
 	private artists: Artist[] = [];
 	private searchForAlbumCoverAtom = Symbol("search-for-album-cover-atom");
 	private readonly bindedOnMusicLoad: Function;
@@ -55,6 +56,8 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		log("音乐已加载", audioId, info);
 		const playing = this.getPlayingSong();
 		this.musicName = playing?.data?.name || "未知歌名";
+		this.musicPlayProgress = 0;
+		this.musicDuration = (info.duration * 1000) | 0;
 		this.musicId = String(
 			playing?.originFromTrack?.lrcid ||
 				playing?.originFromTrack?.track?.tid ||
@@ -62,39 +65,36 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 				"",
 		).trim();
 		this.dispatchTypedEvent("load", new Event("load"));
+		this.searchForAlbumCover();
 	}
 	private async searchForAlbumCover() {
 		this.searchForAlbumCoverAtom = Symbol("search-for-album-cover-atom");
-		const atom = this.searchForAlbumCoverAtom;
-		const songData = getPlayingSong();
-		
+		const songData = this.getPlayingSong();
+
+		// const prefix = "orpheus://cache/?"; // 如果加入缓存的话会导致部分情况下无法解码图片（但是可以加载显示）
+		const prefix = "";
+
 		const urls: string[] = [];
-		
+
 		// TODO: 增加自定义图片源
 
 		const originalTrackPic =
 			songData?.originFromTrack?.track?.track?.album?.picUrl;
 		if (originalTrackPic) {
 			const url = `${prefix}${originalTrackPic}`;
-			urls.push(
-				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
-			);
+			urls.push(`${url}?imageView&enlarge=1&thumbnail=64y64`);
 			urls.push(url);
 		}
 		const radioIntervenePic = songData?.data?.radio?.intervenePicUrl;
 		if (radioIntervenePic) {
 			const url = `${prefix}${radioIntervenePic}`;
-			urls.push(
-				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
-			);
+			urls.push(`${url}?imageView&enlarge=1&thumbnail=64y64`);
 			urls.push(url);
 		}
 		const picUrl = songData?.data?.album?.picUrl;
 		if (picUrl) {
 			const url = `${prefix}${picUrl}`;
-			urls.push(
-				`${url}?imageView&enlarge=1&thumbnail=${lowWidth}y${lowHeight}`,
-			);
+			urls.push(`${url}?imageView&enlarge=1&thumbnail=64y64`);
 			urls.push(url);
 		}
 		const playFile = songData?.from?.playFile;
@@ -106,6 +106,32 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		urls.push(noSongImage, noSongImage);
 		urls.push(EMPTY_IMAGE_URL);
 		urls.push(EMPTY_IMAGE_URL);
+
+		const atom = this.searchForAlbumCoverAtom;
+		for (let curIndex = 0; curIndex < urls.length; curIndex += 2) {
+			const fullReq = fetch(urls[curIndex + 1]);
+			const res = await fetch(urls[curIndex]);
+			if (atom !== this.searchForAlbumCoverAtom) return;
+			if (res.ok) {
+				const blob = await res.blob();
+				if (atom !== this.searchForAlbumCoverAtom) return;
+				if (this.musicAlbumImage.length)
+					URL.revokeObjectURL(this.musicAlbumImage);
+				this.musicAlbumImage = URL.createObjectURL(blob);
+				this.dispatchTypedEvent("album-updated", new Event("album-updated"));
+				const fullRes = await fullReq;
+				if (atom !== this.searchForAlbumCoverAtom) return;
+				if (fullRes.ok) {
+					const fullBlob = await fullRes.blob();
+					if (atom !== this.searchForAlbumCoverAtom) return;
+					if (this.musicAlbumImage.length)
+						URL.revokeObjectURL(this.musicAlbumImage);
+					this.musicAlbumImage = URL.createObjectURL(fullBlob);
+					this.dispatchTypedEvent("album-updated", new Event("album-updated"));
+					return;
+				}
+			}
+		}
 	}
 	private onMusicUnload(audioId: string) {
 		log("音乐已卸载", audioId);
@@ -116,16 +142,17 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		this.dispatchTypedEvent("unload", new Event("unload"));
 	}
 	private onPlayProgress(
-		audioId: string,
+		_audioId: string,
 		progress: number,
-		loadProgress: number,
+		_loadProgress: number,
 	) {
 		// log("音乐加载进度", audioId, progress, loadProgress);
+		this.musicPlayProgress = (progress * 1000) | 0;
 		this.dispatchTypedEvent(
 			"progress",
 			new CustomEvent("progress", {
 				detail: {
-					progress: (progress * 1000) | 0,
+					progress: this.musicPlayProgress,
 				},
 			}),
 		);
@@ -161,7 +188,7 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		return this.artists;
 	}
 	override getMusicCoverImage() {
-		return this.musicAlbumImages;
+		return this.musicAlbumImage;
 	}
 	override getPlayState() {
 		return this.playState;

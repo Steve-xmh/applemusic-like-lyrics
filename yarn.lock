@@ -21,6 +21,7 @@ __metadata:
   dependencies:
     "@applemusic-like-lyrics/lyric": ^0.0.2
     "@applemusic-like-lyrics/react": "workspace:^"
+    "@types/node": ^20.4.5
     "@types/react": ^18.2.17
     "@types/react-dom": ^18.2.7
     "@types/semver": ^7.5.0
@@ -38,6 +39,7 @@ __metadata:
     semver: ^7.5.4
     typescript-event-target: ^1.0.5
     vite: ^4.4.7
+    vite-plugin-top-level-await: ^1.3.1
   languageName: unknown
   linkType: soft
 
@@ -2127,6 +2129,13 @@ __metadata:
   version: 1.0.1
   resolution: "@types/estree@npm:1.0.1"
   checksum: e9aa175eacb797216fafce4d41e8202c7a75555bc55232dee0f9903d7171f8f19f0ae7d5191bb1a88cb90e65468be508c0df850a9fb81b4433b293a5a749899d
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.4.5":
+  version: 20.4.5
+  resolution: "@types/node@npm:20.4.5"
+  checksum: 36a0304a8dc346a1b2d2edac4c4633eecf70875793d61a5274d0df052d7a7af7a8e34f29884eac4fbd094c4f0201477dcb39c0ecd3307ca141688806538d1138
   languageName: node
   linkType: hard
 

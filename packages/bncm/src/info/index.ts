@@ -24,8 +24,8 @@ export enum AudioQualityType {
 }
 
 export interface Artist {
-    name: string;
-    id: string;
+	name: string;
+	id: string;
 }
 
 /**
@@ -81,8 +81,8 @@ export interface MusicStatusGetterEvents {
 	}>;
 	/**
 	 * 当音乐对应的封面图链接更新时触发
-	 * 
+	 *
 	 * 此时调用 `getMusicCoverImage` 应当会获得一个能够稳定访问到歌曲封面图片数据的链接
 	 */
-	"album-updated": Event,
+	"album-updated": Event;
 }
