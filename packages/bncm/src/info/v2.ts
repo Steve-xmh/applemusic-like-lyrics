@@ -14,7 +14,7 @@ interface AudioLoadInfo {
 	code: number;
 	duration: number; // 单位秒
 	errorCode: number;
-	errorString: number;
+	errorString: string;
 }
 
 export const EMPTY_IMAGE_URL =
@@ -28,6 +28,7 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 	private musicName = "未知歌名";
 	private musicAlbumImage = "";
 	private artists: Artist[] = [];
+	private tweenAtom = Symbol("tween-atom");
 	private searchForAlbumCoverAtom = Symbol("search-for-album-cover-atom");
 	private readonly bindedOnMusicLoad: Function;
 	private readonly bindedOnMusicUnload: Function;
@@ -51,11 +52,25 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 			"audioplayer",
 			this.bindedOnPlayStateChanged,
 		);
+		setTimeout(() => {
+			this.onMusicLoad("", {
+				code: 0,
+				activeCode: 0,
+				errorCode: 0,
+				errorString: "",
+				duration: 0,
+			});
+		}, 0);
 	}
 	private onMusicLoad(audioId: string, info: AudioLoadInfo) {
 		log("音乐已加载", audioId, info);
 		const playing = this.getPlayingSong();
 		this.musicName = playing?.data?.name || "未知歌名";
+		this.artists =
+			playing?.data?.artists?.map((v: Artist) => ({
+				id: v.id,
+				name: v.name,
+			})) || [];
 		this.musicPlayProgress = 0;
 		this.musicDuration = (info.duration * 1000) | 0;
 		this.musicId = String(
@@ -142,9 +157,10 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		this.dispatchTypedEvent("unload", new Event("unload"));
 	}
 	private onPlayProgress(
-		_audioId: string,
+		audioId: string,
 		progress: number,
-		_loadProgress: number,
+		loadProgress: number,
+		isTween = false,
 	) {
 		// log("音乐加载进度", audioId, progress, loadProgress);
 		this.musicPlayProgress = (progress * 1000) | 0;
@@ -156,6 +172,21 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 				},
 			}),
 		);
+		if (!isTween && APP_CONF.isOSX && this.playState === PlayState.Playing) {
+			this.tweenAtom = Symbol("tween-atom");
+			const curAtom = this.tweenAtom;
+			const baseTime = this.musicPlayProgress;
+			let curTime: number;
+			const onFrame = (time: number) => {
+				if (this.tweenAtom === curAtom) {
+					if (curTime === undefined) curTime = time;
+					const tweenTime = (baseTime + time - curTime) / 1000;
+					this.onPlayProgress(audioId, tweenTime, loadProgress, true);
+					requestAnimationFrame(onFrame);
+				}
+			};
+			requestAnimationFrame(onFrame);
+		}
 	}
 	private onPlayStateChanged(audioId: string, stateId: string) {
 		log("音乐播放状态", audioId, stateId);
@@ -163,6 +194,7 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 		if (state === "pause") {
 			this.playState = PlayState.Pausing;
 			this.dispatchTypedEvent("pause", new Event("pause"));
+			this.tweenAtom = Symbol("tween-atom");
 		} else if (state === "resume") {
 			this.playState = PlayState.Playing;
 			this.dispatchTypedEvent("resume", new Event("resume"));

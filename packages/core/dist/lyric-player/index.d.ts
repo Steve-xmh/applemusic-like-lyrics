@@ -31,8 +31,10 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     readonly supportMaskImage: boolean;
     private disableSpring;
     private alignAnchor;
+    private isNonDynamic;
     readonly size: [number, number];
     readonly pos: [number, number];
+    _getIsNonDynamic(): boolean;
     /**
      * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
      *

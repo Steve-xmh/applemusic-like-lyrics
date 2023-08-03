@@ -5,12 +5,18 @@ import {
 } from "@applemusic-like-lyrics/react";
 import { closeLyricPage } from "../injector";
 import { useAtomValue } from "jotai";
-import { currentTimeAtom, musicCoverAtom, musicNameAtom } from "../info/wrapper";
+import {
+	currentTimeAtom,
+	musicArtistsAtom,
+	musicCoverAtom,
+	musicNameAtom,
+} from "../info/wrapper";
 import { SongInfoTextMarquee } from "../components/song-info/song-info-text-marquee";
 import { lyricLinesAtom } from "../lyric/provider";
 export const LyricPlayer: FC = (props) => {
 	const musicCoverUrl = useAtomValue(musicCoverAtom);
 	const musicName = useAtomValue(musicNameAtom);
+	const artists = useAtomValue(musicArtistsAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 	const currentTime = useAtomValue(currentTimeAtom);
 	return (
@@ -77,7 +83,19 @@ export const LyricPlayer: FC = (props) => {
 					<div className="amll-music-name">{musicName}</div>
 				</SongInfoTextMarquee>
 				<SongInfoTextMarquee>
-					<div className="amll-music-name">{musicName}</div>
+					<div className="amll-music-artists">
+						{artists.map((artist) => (
+							<a
+								href={`#/m/artist/?id=${artist.id}`}
+								key={`artist-${artist.id}-${artist.name}`}
+								onMouseUp={() => {
+									closeLyricPage();
+								}}
+							>
+								{artist.name}
+							</a>
+						))}
+					</div>
 				</SongInfoTextMarquee>
 			</div>
 			<LyricPlayerComponent

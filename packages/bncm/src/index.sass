@@ -1,5 +1,5 @@
 @import "./components/appkit/appkit.sass"
-    
+
 #amll-view
     position: fixed
     left: 0
@@ -47,11 +47,28 @@ body.amll-lyric-page-open
         -webkit-mask-image: linear-gradient(to left, #0000, #000 5%, #000 95%, #0000)
     > *
         width: fit-content
-        
+
 .amll-music-name
     white-space: nowrap
     line-height: normal
     cursor: text
     user-select: text
     min-width: 0
-    
+
+.amll-music-artists
+    white-space: nowrap
+    text-align: center
+    opacity: 0.75
+    a
+        line-height: normal
+        text-decoration: none
+        user-select: text
+        &:hover
+            opacity: 0.75
+        &:active
+            opacity: 0.5
+        &::after
+            content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+            opacity: 0.5
+        &:last-child::after
+            content: ""

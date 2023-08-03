@@ -2,7 +2,11 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { FC, useEffect } from "react";
 import { musicIdAtom } from "../info/wrapper";
 import { LyricLine as CoreLyricLine } from "@applemusic-like-lyrics/core";
-import { parseLrc, parseYrc, type LyricLine } from "@applemusic-like-lyrics/lyric";
+import {
+	parseLrc,
+	parseYrc,
+	type LyricLine,
+} from "@applemusic-like-lyrics/lyric";
 import { log } from "../utils/logger";
 
 interface EAPILyric {
@@ -10,7 +14,6 @@ interface EAPILyric {
 	lyric: string;
 }
 
-// rome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
@@ -32,9 +35,13 @@ async function getLyric(songId: string): Promise<EAPILyricResponse> {
 	return await v.json();
 }
 
-export const lyricLinesAtom = atom<LyricLine[] | undefined>(undefined);
+export const lyricLinesAtom = atom<CoreLyricLine[] | undefined>(undefined);
 
-const transformDynamicLyricLine = (line: LyricLine, i: number, lines: LyricLine[]): CoreLyricLine => ({
+const transformDynamicLyricLine = (
+	line: LyricLine,
+	i: number,
+	lines: LyricLine[],
+): CoreLyricLine => ({
 	words: line.words,
 	startTime: line.words[0]?.startTime ?? 0,
 	endTime: line.words[line.words.length - 1]?.endTime ?? Infinity,
@@ -42,9 +49,13 @@ const transformDynamicLyricLine = (line: LyricLine, i: number, lines: LyricLine[
 	romanLyric: "",
 	isBG: false,
 	isDuet: false,
-})
+});
 
-const transformLyricLine = (line: LyricLine, i: number, lines: LyricLine[]): CoreLyricLine => ({
+const transformLyricLine = (
+	line: LyricLine,
+	i: number,
+	lines: LyricLine[],
+): CoreLyricLine => ({
 	words: [
 		{
 			word: line.words[0]?.word ?? "",
@@ -58,7 +69,7 @@ const transformLyricLine = (line: LyricLine, i: number, lines: LyricLine[]): Cor
 	romanLyric: "",
 	isBG: false,
 	isDuet: false,
-})
+});
 
 export const LyricProvider: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -81,7 +92,7 @@ export const LyricProvider: FC = () => {
 					(currentRawLyricResp?.romalrc?.lyric?.length ?? 0) > 0 &&
 					!currentRawLyricResp.yromalrc)
 			);
-			
+
 			if (currentRawLyricResp?.yrc?.lyric) {
 				const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
 				const converted = lines.map(transformDynamicLyricLine);

@@ -61,8 +61,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	private disableSpring = false;
 	private alignAnchor: "top" | "bottom" | number = 0.5;
+	private isNonDynamic = false;
 	readonly size: [number, number] = [0, 0];
 	readonly pos: [number, number] = [0, 0];
+	_getIsNonDynamic() {
+		return this.isNonDynamic;
+	}
 	/**
 	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
 	 *
@@ -317,6 +321,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					};
 				}
 			});
+		this.isNonDynamic = true;
+		for (const line of this.processedLines) {
+			if (line.words.length > 1) {
+				this.isNonDynamic = false;
+				break;
+			}
+		}
 		this.processedLines.forEach((line, i, lines) => {
 			const nextLine = lines[i + 1];
 			const lastWord = line.words[line.words.length - 1];
@@ -412,6 +423,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					curPos -= this.lyricLinesSize.get(nextLine)?.[1] ?? 0;
 				}
 			}
+		} else {
+			this.interludeDots.setInterlude(undefined);
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
@@ -444,7 +457,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				isActive ? 1 : SCALE_ASPECT,
 				hasBuffered ? 1 : 1 / 3,
 				this.enableBlur
-					? 3 *
+					? 2 *
 					  (isActive
 							? 0
 							: 1 +

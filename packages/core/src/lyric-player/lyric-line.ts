@@ -182,6 +182,16 @@ export class LyricLineEl implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
+		if (this.lyricPlayer._getIsNonDynamic()) {
+			while (main.firstChild) {
+				main.removeChild(main.firstChild);
+				collectNodes(main.firstChild);
+			}
+			main.innerText = this.lyricLine.words.map((w) => w.word).join("");
+			trans.innerText = this.lyricLine.translatedLyric;
+			roman.innerText = this.lyricLine.romanLyric;
+			return;
+		}
 		this.splittedWords = [];
 		this.lyricLine.words.forEach((word) => {
 			const splited = word.word.split(/\s+/);

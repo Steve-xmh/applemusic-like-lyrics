@@ -1,11 +1,12 @@
 import { FC, useEffect, useRef } from "react";
 import { atom, useSetAtom } from "jotai";
-import { MusicStatusGetterBase } from ".";
+import { Artist, MusicStatusGetterBase } from ".";
 import { isNCMV3 } from "../utils/is-ncm-v3";
 import { MusicStatusGetterV2 } from "./v2";
 
 export const musicIdAtom = atom("");
 export const musicNameAtom = atom("");
+export const musicArtistsAtom = atom<Artist[]>([]);
 export const musicCoverAtom = atom("");
 export const currentTimeAtom = atom(0);
 
@@ -13,6 +14,7 @@ export const MusicInfoWrapper: FC = () => {
 	const musicInfoGetter = useRef<MusicStatusGetterBase>();
 	const setMusicId = useSetAtom(musicIdAtom);
 	const setMusicName = useSetAtom(musicNameAtom);
+	const setMusicArtists = useSetAtom(musicArtistsAtom);
 	const setMusicCover = useSetAtom(musicCoverAtom);
 	const setCurrentTime = useSetAtom(currentTimeAtom);
 
@@ -27,6 +29,7 @@ export const MusicInfoWrapper: FC = () => {
 			function (this: MusicStatusGetterBase) {
 				setMusicId(this.getMusicId());
 				setMusicName(this.getMusicName());
+				setMusicArtists(this.getMusicArtists());
 			},
 		);
 		musicInfoGetter.current?.addEventListener(
