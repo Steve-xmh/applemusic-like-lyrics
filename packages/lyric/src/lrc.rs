@@ -13,9 +13,9 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
     let (src, _start) = tag("[")(src)?;
 
     let (src, min) = take_until1(":")(src)?;
-    let (src, _) = tag(":")(src)?;
-    let (src, sec) = take_until1(".")(src)?;
-    let (src, _) = tag(".")(src)?;
+    let (src, _) = take(1usize)(src)?;
+    let (src, sec) = take_till1(|c: char| c == ':' || c == '.')(src)?;
+    let (src, _) = take(1usize)(src)?;
     let (src, ms) = take_while_m_n(1, 3, |c: char| c.is_ascii_digit())(src)?;
 
     let min = u32::from_str(min).unwrap();

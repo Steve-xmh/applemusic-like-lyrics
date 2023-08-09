@@ -5,7 +5,8 @@
   "private": true,
   "license": "GPL-3.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/*/pkg"
   ],
   "scripts": {
     "dist": "node build.mjs --dist",

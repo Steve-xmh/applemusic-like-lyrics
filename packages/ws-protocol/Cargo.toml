@@ -1,0 +1,44 @@
+[package]
+name = "ws-protocol"
+version = "0.0.2"
+authors = ["SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"]
+edition = "2021"
+repository = ""
+description = "一个歌词解析/生成模块，着重于歌词内容解析，支持多种格式"
+license = "GPL-3.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+wasm-bindgen = "0.2.63"
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+wee_alloc = { version = "0.4.5", optional = true }
+js-sys = "0.3.64"
+serde = { version = "1.0.166", features = ["derive"] }
+serde-wasm-bindgen = "0.5.0"
+binrw = "0.11.2"
+serde_bytes = "0.11.12"
+anyhow = "1.0.72"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.13"
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = 3
+codegen-units = 1
+lto = true
+panic = "abort"

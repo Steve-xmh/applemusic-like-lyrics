@@ -1,9 +1,19 @@
-import * as React from "react";
+import "./window.sass";
+import {
+	FC,
+	HTMLProps,
+	MouseEventHandler,
+	PropsWithChildren,
+	ReactNode,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 
-export const SidebarItem: React.FC<
-	React.PropsWithChildren<{
+export const SidebarItem: FC<
+	PropsWithChildren<{
 		selected?: boolean;
-		onClick?: React.MouseEventHandler;
+		onClick?: MouseEventHandler;
 	}>
 > = (props) => {
 	return (
@@ -14,8 +24,56 @@ export const SidebarItem: React.FC<
 	);
 };
 
-export const AppKitWindow: React.FC<
-	React.PropsWithChildren<{
+export const AppKitWindowFrame: FC<
+	PropsWithChildren<
+		{
+			sidebarItems?: ReactNode;
+			sidebarBottomItems?: ReactNode;
+			title?: string;
+		} & HTMLProps<HTMLDivElement>
+	>
+> = ({
+	sidebarItems,
+	sidebarBottomItems,
+	title,
+	children,
+	className,
+	...props
+}) => {
+	return (
+		<div
+			className={
+				"appkit-window" + (title ? " " : " no-title ") + (className || "")
+			}
+			{...props}
+		>
+			<div>
+				<div className="window-sidebar">
+					{title && <div className="window-controls-content" />}
+					{sidebarItems}
+					<div className="spacer" />
+					{sidebarBottomItems}
+				</div>
+				<div className="window-sidebar-devider" />
+				<div className="window-content">
+					{title && (
+						<div className="window-controls-content">
+							<div className="title">{title}</div>
+						</div>
+					)}
+					<div className="window-content-inner">
+						<div>
+							<div>{children}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const AppKitWindow: FC<
+	PropsWithChildren<{
 		hideZoomBtn?: boolean;
 		hideMinimizeBtn?: boolean;
 		sidebarItems?: React.ReactNode;
@@ -27,10 +85,10 @@ export const AppKitWindow: React.FC<
 		height?: number;
 	}>
 > = (props) => {
-	const [pos, setPos] = React.useState([0, 0]);
-	const winRef = React.useRef<HTMLDivElement>(null);
+	const [pos, setPos] = useState([0, 0]);
+	const winRef = useRef<HTMLDivElement>(null);
 
-	React.useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		const win = winRef.current;
 		if (win) {
 			const rect = win.getBoundingClientRect();
@@ -61,7 +119,7 @@ export const AppKitWindow: React.FC<
 		}
 	}, []);
 
-	const onStartDraggingWindow: React.MouseEventHandler = (evt) => {
+	const onStartDraggingWindow: MouseEventHandler = (evt) => {
 		const win = winRef.current;
 		if (win) {
 			const rect = win.getBoundingClientRect();

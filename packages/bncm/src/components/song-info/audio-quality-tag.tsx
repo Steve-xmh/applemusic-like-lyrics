@@ -4,8 +4,9 @@ import { currentAudioQualityTypeAtom } from "../../core/states";
 import TagLossless from "../../assets/tag_lossless.svg";
 import TagHiresLossless from "../../assets/tag_hires_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
+import { FC } from "react";
 
-export const AudioQualityTag: React.FC = () => {
+export const AudioQualityTag: FC = () => {
 	const currentAudioQualityType = useAtomValue(currentAudioQualityTypeAtom);
 	return (
 		<div className="am-music-quality">

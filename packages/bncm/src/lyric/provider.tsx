@@ -7,7 +7,7 @@ import {
 	parseYrc,
 	type LyricLine,
 } from "@applemusic-like-lyrics/lyric";
-import { log } from "../utils/logger";
+import { log, warn } from "../utils/logger";
 
 interface EAPILyric {
 	version: number;
@@ -32,7 +32,8 @@ async function getLyric(songId: string): Promise<EAPILyricResponse> {
 	const v = await fetch(
 		`${APP_CONF.domain}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
 	);
-	return await v.json();
+	if (v.ok) return await v.json();
+	else throw v.statusText;
 }
 
 export const lyricLinesAtom = atom<CoreLyricLine[] | undefined>(undefined);
@@ -80,29 +81,34 @@ export const LyricProvider: FC = () => {
 		setLyricLines(undefined);
 
 		(async () => {
-			const currentRawLyricResp = await getLyric(musicId);
-			const configTranslatedLyric = false;
-			const configRomanLyric = false;
-			const canUseDynamicLyric = !(
-				!currentRawLyricResp?.yrc?.lyric ||
-				(configTranslatedLyric &&
-					(currentRawLyricResp?.tlyric?.lyric?.length ?? 0) > 0 &&
-					!currentRawLyricResp.ytlrc) ||
-				(configRomanLyric &&
-					(currentRawLyricResp?.romalrc?.lyric?.length ?? 0) > 0 &&
-					!currentRawLyricResp.yromalrc)
-			);
+			try {
+				const currentRawLyricResp = await getLyric(musicId);
+				const configTranslatedLyric = false;
+				const configRomanLyric = false;
+				const canUseDynamicLyric = !(
+					!currentRawLyricResp?.yrc?.lyric ||
+					(configTranslatedLyric &&
+						(currentRawLyricResp?.tlyric?.lyric?.length ?? 0) > 0 &&
+						!currentRawLyricResp.ytlrc) ||
+					(configRomanLyric &&
+						(currentRawLyricResp?.romalrc?.lyric?.length ?? 0) > 0 &&
+						!currentRawLyricResp.yromalrc)
+				);
 
-			if (currentRawLyricResp?.yrc?.lyric) {
-				const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
-				const converted = lines.map(transformDynamicLyricLine);
-				log(converted);
-				setLyricLines(converted);
-			} else {
-				const lines = parseLrc(currentRawLyricResp?.lrc?.lyric || "");
-				const converted = lines.map(transformLyricLine);
-				log(converted);
-				setLyricLines(converted);
+				if (currentRawLyricResp?.yrc?.lyric) {
+					const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
+					const converted = lines.map(transformDynamicLyricLine);
+					log("已加载逐词歌词", converted);
+					setLyricLines(converted);
+				} else {
+					log(currentRawLyricResp?.lrc?.lyric || "");
+					const lines = parseLrc(currentRawLyricResp?.lrc?.lyric || "");
+					const converted = lines.map(transformLyricLine);
+					log("已加载逐行歌词", lines, converted);
+					setLyricLines(converted);
+				}
+			} catch (err) {
+				warn("加载歌词失败", err);
 			}
 		})();
 

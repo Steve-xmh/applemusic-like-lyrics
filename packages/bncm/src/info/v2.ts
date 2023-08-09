@@ -130,18 +130,14 @@ export class MusicStatusGetterV2 extends MusicStatusGetterBase {
 			if (res.ok) {
 				const blob = await res.blob();
 				if (atom !== this.searchForAlbumCoverAtom) return;
-				if (this.musicAlbumImage.length)
-					URL.revokeObjectURL(this.musicAlbumImage);
-				this.musicAlbumImage = URL.createObjectURL(blob);
+				this.musicAlbumImage = urls[curIndex];
 				this.dispatchTypedEvent("album-updated", new Event("album-updated"));
 				const fullRes = await fullReq;
 				if (atom !== this.searchForAlbumCoverAtom) return;
 				if (fullRes.ok) {
 					const fullBlob = await fullRes.blob();
 					if (atom !== this.searchForAlbumCoverAtom) return;
-					if (this.musicAlbumImage.length)
-						URL.revokeObjectURL(this.musicAlbumImage);
-					this.musicAlbumImage = URL.createObjectURL(fullBlob);
+					this.musicAlbumImage = urls[curIndex + 1];
 					this.dispatchTypedEvent("album-updated", new Event("album-updated"));
 					return;
 				}

@@ -69,9 +69,7 @@ export interface MusicStatusGetterEvents {
 	 *
 	 * 在 Windows 上，这个的触发频率在 60hz 左右
 	 *
-	 * 在 macOS 上，这个的触发频率在 2hz 左右
-	 *
-	 * @todo 是否考虑统一触发频率
+	 * 在 macOS 上，这个的触发频率在 2hz 左右，但是会被补间到 60hz
 	 */
 	progress: CustomEvent<{
 		/**

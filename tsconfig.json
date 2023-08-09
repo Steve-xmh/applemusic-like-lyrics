@@ -1,9 +1,7 @@
 {
     "include": [
         "./src/**/*.ts",
-        "./src/**/*.tsx",
-        "./packages/*/src/**/*.ts",
-        "./packages/*/src/**/*.tsx",
+        "./src/**/*.tsx"
     ],
     "exclude": [
         "./node_modules/@types/node/**/*.ts",

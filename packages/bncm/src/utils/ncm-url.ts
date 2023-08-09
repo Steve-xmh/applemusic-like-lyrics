@@ -8,14 +8,18 @@ let selectIndex = 0;
 export function getNCMImageUrl(id: number | string) {
 	selectIndex++;
 	selectIndex %= NCM_IMAGE_CDNS.length;
-	if (APP_CONF.isOSX) {
-		return `${NCM_IMAGE_CDNS[selectIndex]}${callCachedSearchFunction(
-			"R$nameDo",
-			["encryptId", id.toString()],
-		)}/${id}.jpg`;
-	} else {
-		return `${NCM_IMAGE_CDNS[selectIndex]}${channel.encryptId(
-			id.toString(),
-		)}/${id}.jpg`;
+	try {
+		if (APP_CONF.isOSX) {
+			return `${NCM_IMAGE_CDNS[selectIndex]}${callCachedSearchFunction(
+				"R$nameDo",
+				["encryptId", id.toString()],
+			)}/${id}.jpg`;
+		} else {
+			return `${NCM_IMAGE_CDNS[selectIndex]}${channel.encryptId(
+				id.toString(),
+			)}/${id}.jpg`;
+		}
+	} catch {
+		return "";
 	}
 }

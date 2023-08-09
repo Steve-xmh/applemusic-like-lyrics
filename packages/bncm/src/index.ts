@@ -1,17 +1,20 @@
-import style from "./index.sass?inline";
-import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
+import "./index.sass";
 import { isNCMV3 } from "./utils/is-ncm-v3";
 import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
 import { version } from "../public/manifest.json";
 import { configViewElement, initLyricPage } from "./injector";
 import { MusicStatusGetterV2 } from "./info/v2";
+import { injectLyricPage } from "./injector/v2";
 
 // 注入样式
-function initStyle() {
+async function initStyle() {
 	const el = document.createElement("style");
+	el.id = "amll-styles";
 	el.setAttribute("type", "text/css");
-	el.innerHTML = style;
+	el.innerHTML = await betterncm.fs.readFileText(
+		plugin.pluginPath + "/style.css",
+	);
 	document.head.appendChild(el);
 }
 
@@ -24,7 +27,7 @@ async function initDevelopmentReload() {
 		1000,
 	);
 
-	const shouldReloadPaths = ["/manifest.json", "/amll-bncm.mjs"];
+	const shouldReloadPaths = ["/manifest.json", "/amll-bncm.js"];
 
 	const currentOriginalFiles = new Map<string, string>();
 
@@ -118,7 +121,7 @@ plugin.onLoad(async () => {
 			// TODO: 3.0 的注入支持
 		} else {
 			plugin.musicStatus = new MusicStatusGetterV2();
-			await injectLyricPageV2();
+			injectLyricPage();
 		}
 
 		initLyricPage();

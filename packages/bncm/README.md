@@ -26,6 +26,10 @@ yarn dev # 开发构建，每次修改保存代码都会自动重载 NCM 软件
 yarn build # 发行构建，会压缩代码，不包含 Source Map
 ```
 
+### 浏览器开发调试
+
+如果需要*更加方便（？）*的开发体验，可以设置 `NCM_COOKIE` 环境变量后使用 `yarn vite dev` 启动开发服务器，即可体验更加舒适的开发环境。
+
 ## 鸣谢
 
 - [MicroCBer/BetterNCM](https://github.com/MicroCBer/BetterNCM)

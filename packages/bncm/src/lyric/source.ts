@@ -28,7 +28,7 @@ export enum LyricFormat {
  * - 歌词源说明：将会显示在歌词源设置中的说明文本，需要进行 URI 编码，如果留空则默认为空
  * - 歌词类型：可以是上面 `LyricFormat` 枚举中的任意字符串字面量，例如 `ttml` `lys` 等
  * - 歌词源模板链接：用于获取歌词的一个模板链接，支持一些替换符号，详情见接口中的 `url` 属性
- * 
+ *
  * 以 Steve-xmh/amll-ttml-db 为例子，一种可能的歌词源链接格式可以是：
  * `b39e8a1d-5c17-4f03-907a-efbf612f19c4|AMLL%20%E6%AD%8C%E8%AF%8D%E6%95%B0%E6%8D%AE%E5%BA%93|%E4%BD%9C%E8%80%85%E7%89%B9%E4%BE%9B%E7%BB%99%20AMLL%20%E7%9A%84%20TTML%20%E9%80%90%E8%AF%8D%E6%AD%8C%E8%AF%8D%E5%BA%93|ttml|https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/[NCM_ID].ttml`
  */

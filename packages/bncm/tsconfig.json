@@ -1,5 +1,11 @@
 {
-    "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+    "include": [
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
+    ],
+    "exclude": [
+        "./node_modules/@types/node/**/*.ts",
+    ],
     "compilerOptions": {
         "target": "ESNext",
         "lib": [

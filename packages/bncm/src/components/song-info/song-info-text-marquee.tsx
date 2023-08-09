@@ -1,13 +1,12 @@
-import React from "react";
+import "./song-info-text-marquee.sass";
+import { FC, PropsWithChildren, useEffect, useRef } from "react";
 
-export const SongInfoTextMarquee: React.FC<React.PropsWithChildren> = (
-	props,
-) => {
-	const outerDiv = React.useRef<HTMLDivElement>(null);
-	const innerDiv = React.useRef<HTMLDivElement>(null);
-	const currentAnimationsRef = React.useRef(new Set<Animation>());
+export const SongInfoTextMarquee: FC<PropsWithChildren> = (props) => {
+	const outerDiv = useRef<HTMLDivElement>(null);
+	const innerDiv = useRef<HTMLDivElement>(null);
+	const currentAnimationsRef = useRef(new Set<Animation>());
 
-	React.useEffect(() => {}, []);
+	useEffect(() => {}, []);
 
 	const onMouseEnter = () => {
 		if (innerDiv.current && outerDiv.current) {
