@@ -5,7 +5,7 @@ import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
 import { version } from "../public/manifest.json";
 import { configViewElement, initLyricPage } from "./injector";
-import { MusicStatusGetterV2 } from "./info/v2";
+import { MusicContextV2 } from "./music-context/v2";
 import { openLyricPage } from "./injector";
 import { injectLyricPage } from "./injector/dev";
 

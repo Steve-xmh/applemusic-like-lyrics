@@ -1,6 +1,4 @@
 import { useAtom } from "jotai";
-import { currentPlayModeAtom } from "../../core/states";
-import { PlayMode, isNCMV3, switchPlayMode } from "../../utils";
 import * as React from "react";
 
 import IconShuffle from "../../assets/icon_shuffle.svg";
@@ -18,7 +16,9 @@ import IconFavoriteOn from "../../assets/icon_favorite_on.svg";
 import IconFavoriteHeart from "../../assets/icon_favorite_heart.svg";
 import IconFavoriteHeartOn from "../../assets/icon_favorite_heart_on.svg";
 import IconAddToPlaylist from "../../assets/icon_add_to_playlist.svg";
-import { getPlayingSong } from "../../api";
+import {playModeAtom} from "../../music-context/wrapper";
+import {PlayMode} from "../../music-context";
+import {isNCMV3} from "../../utils/is-ncm-v3";
 
 export enum PlayControlButtonType {
 	PlaybackSwitcher = "playback-switcher",
@@ -73,7 +73,7 @@ const getPlaybackModeIcon = (playMode: PlayMode, filled = false) => {
 const PlaybackSwitcherButton: React.FC<{
 	filled?: boolean;
 }> = (props) => {
-	const [currentPlayMode, setCurrentPlayMode] = useAtom(currentPlayModeAtom);
+	const [currentPlayMode, setCurrentPlayMode] = useAtom(playModeAtom);
 	return (
 		<button
 			className="am-music-track-btn"
@@ -86,11 +86,12 @@ const PlaybackSwitcherButton: React.FC<{
 						break;
 					case PlayMode.Repeat:
 						// 只有处于 我喜欢的音乐 歌单中才可以使用心动模式
-						if (getPlayingSong().originFromTrack.userId === "") {
-							nextPlayMode = PlayMode.One;
-						} else {
+
+						// if (getPlayingSong().originFromTrack.userId === "") {
+						// 	nextPlayMode = PlayMode.One;
+						// } else {
 							nextPlayMode = PlayMode.AI;
-						}
+						// }
 						break;
 					case PlayMode.AI:
 						nextPlayMode = PlayMode.One;
@@ -105,7 +106,6 @@ const PlaybackSwitcherButton: React.FC<{
 						throw new TypeError(`未知的播放类型：${currentPlayMode}`);
 				}
 
-				switchPlayMode(nextPlayMode);
 				setCurrentPlayMode(nextPlayMode);
 			}}
 		>
@@ -117,7 +117,7 @@ const PlaybackSwitcherButton: React.FC<{
 export const PlayControlButton: React.FC<{
 	type: PlayControlButtonType;
 }> = (props) => {
-	const [currentPlayMode, setCurrentPlayMode] = useAtom(currentPlayModeAtom);
+	const [currentPlayMode, setCurrentPlayMode] = useAtom(playModeAtom);
 	const [isFavSong, setIsFavSong] = React.useState(
 		() =>
 			!!document
@@ -136,7 +136,7 @@ export const PlayControlButton: React.FC<{
 				);
 				if (btnSpan) {
 					const obz = new MutationObserver(() => {
-						setIsFavSong(!!btnSpan.title.startsWith("喜欢"));
+						setIsFavSong(btnSpan.title.startsWith("喜欢"));
 					});
 					obz.observe(btnSpan, {
 						attributes: true,
@@ -174,10 +174,8 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						if (currentPlayMode === PlayMode.Order) {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						} else {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						}
 					}}
@@ -195,10 +193,8 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						if (currentPlayMode === PlayMode.Repeat) {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						} else {
-							switchPlayMode(PlayMode.Repeat);
 							setCurrentPlayMode(PlayMode.Repeat);
 						}
 					}}
@@ -216,10 +212,8 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						if (currentPlayMode === PlayMode.One) {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						} else {
-							switchPlayMode(PlayMode.One);
 							setCurrentPlayMode(PlayMode.One);
 						}
 					}}
@@ -237,10 +231,8 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						if (currentPlayMode === PlayMode.Random) {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						} else {
-							switchPlayMode(PlayMode.Random);
 							setCurrentPlayMode(PlayMode.Random);
 						}
 					}}
@@ -258,10 +250,8 @@ export const PlayControlButton: React.FC<{
 					className="am-music-track-btn"
 					onClick={() => {
 						if (currentPlayMode === PlayMode.AI) {
-							switchPlayMode(PlayMode.Order);
 							setCurrentPlayMode(PlayMode.Order);
 						} else {
-							switchPlayMode(PlayMode.AI);
 							setCurrentPlayMode(PlayMode.AI);
 						}
 					}}

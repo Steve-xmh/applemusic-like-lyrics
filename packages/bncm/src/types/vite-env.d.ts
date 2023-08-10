@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-declare module "*.svg?component" {
-	declare const svgComponent: import("react").FC;
+declare module "*.svg" {
+	declare const svgComponent: import("react").FC<import("react").HTMLProps<SVGElement>>;
 	export default svgComponent;
 }

@@ -720,6 +720,7 @@ class ee extends EventTarget {
       boxSizing: "border-box",
       fontSize: "max(5vh, 12px)",
       fontWeight: "bold",
+      lineHeight: "normal",
       width: "100%",
       height: "100%",
       overflow: "hidden",
@@ -733,17 +734,15 @@ class ee extends EventTarget {
     lyricLine: {
       position: "absolute",
       transformOrigin: "left",
-      maxWidth: "65%",
+      maxWidth: "100%",
       padding: "max(2vh, 1rem) 1rem",
       contain: "content",
       transition: "filter 0.25s",
-      margin: "max(2vh, 1rem) -1rem"
+      margin: "0 -1rem"
     },
     "@media (max-width: 1024px)": {
       lyricLine: {
-        maxWidth: "75%",
-        padding: "max(1vh, 1rem) 1rem",
-        margin: "0 -1rem"
+        padding: "max(1vh, 1rem) 1rem"
       }
     },
     lyricDuetLine: {
@@ -972,7 +971,7 @@ class ee extends EventTarget {
         n,
         p ? 1 : t,
         m ? 1 : 1 / 3,
-        this.enableBlur ? 2 * (p ? 0 : 1 + (c < this.scrollToIndex ? Math.abs(this.scrollToIndex - c) : Math.abs(c - Math.max(this.scrollToIndex, r)))) : 0,
+        this.enableBlur ? p ? 0 : 1 + (c < this.scrollToIndex ? Math.abs(this.scrollToIndex - c) : Math.abs(c - Math.max(this.scrollToIndex, r))) : 0,
         e,
         l
       ), u.isBG && p ? n += this.lyricLinesSize.get(o)?.[1] ?? 0 : u.isBG || (n += this.lyricLinesSize.get(o)?.[1] ?? 0), n >= 0 && (l += 0.05);

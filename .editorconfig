@@ -7,4 +7,4 @@ insert_final_newline = true
 [*.{js,json,yml}]
 charset = utf-8
 indent_style = space
-indent_size = 2
+indent_size = 4

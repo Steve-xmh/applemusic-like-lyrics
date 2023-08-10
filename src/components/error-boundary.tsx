@@ -20,7 +20,7 @@ export class ErrorBoundary extends React.Component<
 		return { hasError: true, error: error };
 	}
 
-	componentDidCatch(error, errorInfo) {
+	componentDidCatch(error: any, errorInfo: any) {
 		warn(error, errorInfo);
 	}
 
@@ -30,7 +30,7 @@ export class ErrorBoundary extends React.Component<
 			return (
 				<div className="amll-error-boundary">
 					<Title order={2}>哦不，出大事情了</Title>
-					<div>发生了不可恢复的错误，给作者送 Issue 吧（</div>
+					<div>发生了（可能）不可恢复的错误，给作者送 Issue 吧（</div>
 					<div>
 						如果可以，请尝试使用开发版本复现这个错误，这样子下面的错误信息会更加准确。
 					</div>

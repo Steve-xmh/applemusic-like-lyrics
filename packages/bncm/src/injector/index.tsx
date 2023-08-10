@@ -2,10 +2,10 @@ import { Root, createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
 import { Provider } from "jotai";
 import { LyricPlayer } from "../player";
-import { MusicInfoWrapper } from "../info/wrapper";
+import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
-import { WebSocketWrapper } from "../info/ws-wrapper";
-import AMLLIcon from "../assets/amll-icon.svg?component";
+import { WebSocketWrapper } from "../music-context/ws-wrapper";
+import AMLLIcon from "../assets/amll-icon.svg";
 import { Button } from "../components/appkit/button/button";
 import {
 	GroupBox,

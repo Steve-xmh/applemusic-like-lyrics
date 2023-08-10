@@ -36,6 +36,7 @@
     "typescript-event-target": "^1.0.5",
     "vite": "^4.4.7",
     "vite-plugin-react-svg": "^0.2.0",
+    "vite-plugin-svgr": "^3.2.0",
     "vite-plugin-wasm": "^3.2.2"
   }
 }

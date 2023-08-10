@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { FC, useEffect } from "react";
-import { musicIdAtom } from "../info/wrapper";
+import { musicIdAtom } from "../music-context/wrapper";
 import { LyricLine as CoreLyricLine } from "@applemusic-like-lyrics/core";
 import {
 	parseLrc,
@@ -8,6 +8,7 @@ import {
 	type LyricLine,
 } from "@applemusic-like-lyrics/lyric";
 import { log, warn } from "../utils/logger";
+import {showRomanLineAtom, showTranslatedLineAtom} from "../components/config/lyric";
 
 interface EAPILyric {
 	version: number;
@@ -52,6 +53,17 @@ const transformDynamicLyricLine = (
 	isDuet: false,
 });
 
+type TransLine = { [K in keyof CoreLyricLine]: CoreLyricLine[K] extends string ? K : never }[keyof CoreLyricLine];
+
+function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
+    if (line.words.length === 0) return;
+    for (const coreLine of lines) {
+        if (coreLine.words.length > 0 && (coreLine.startTime === line.words[0].startTime || coreLine.words[0].startTime === line.words[0].startTime)) {
+            coreLine[key] = line.words.map(w => w.word).join("");
+        }
+    }
+}
+
 const transformLyricLine = (
 	line: LyricLine,
 	i: number,
@@ -75,6 +87,8 @@ const transformLyricLine = (
 export const LyricProvider: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
 	const setLyricLines = useSetAtom(lyricLinesAtom);
+    const showTranslatedLine = useAtomValue(showTranslatedLineAtom);
+    const showRomanLine = useAtomValue(showRomanLineAtom);
 
 	useEffect(() => {
 		let canceled = false;
@@ -83,30 +97,48 @@ export const LyricProvider: FC = () => {
 		(async () => {
 			try {
 				const currentRawLyricResp = await getLyric(musicId);
-				const configTranslatedLyric = false;
-				const configRomanLyric = false;
 				const canUseDynamicLyric = !(
 					!currentRawLyricResp?.yrc?.lyric ||
-					(configTranslatedLyric &&
+					(showTranslatedLine &&
 						(currentRawLyricResp?.tlyric?.lyric?.length ?? 0) > 0 &&
 						!currentRawLyricResp.ytlrc) ||
-					(configRomanLyric &&
+					(showRomanLine &&
 						(currentRawLyricResp?.romalrc?.lyric?.length ?? 0) > 0 &&
 						!currentRawLyricResp.yromalrc)
 				);
 
-				if (currentRawLyricResp?.yrc?.lyric) {
+                let converted: CoreLyricLine[];
+
+				if (canUseDynamicLyric) {
 					const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
-					const converted = lines.map(transformDynamicLyricLine);
-					log("已加载逐词歌词", converted);
-					setLyricLines(converted);
+                    converted = lines.map(transformDynamicLyricLine);
+
+                    if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {
+                        const trans = parseLrc(currentRawLyricResp.ytlrc.lyric);
+                        trans.forEach(line => pairLyric(line, converted, "translatedLyric"));
+                    }
+                    if (showRomanLine && currentRawLyricResp?.yromalrc?.lyric) {
+                        const trans = parseLrc(currentRawLyricResp.yromalrc.lyric);
+                        trans.forEach(line => pairLyric(line, converted, "romanLyric"));
+                    }
+                    log("已加载逐词歌词", converted);
 				} else {
 					log(currentRawLyricResp?.lrc?.lyric || "");
 					const lines = parseLrc(currentRawLyricResp?.lrc?.lyric || "");
-					const converted = lines.map(transformLyricLine);
-					log("已加载逐行歌词", lines, converted);
-					setLyricLines(converted);
+                    converted = lines.map(transformLyricLine);
+
+                    if (showTranslatedLine && currentRawLyricResp?.tlyric?.lyric) {
+                        const trans = parseLrc(currentRawLyricResp.tlyric.lyric);
+                        trans.forEach(line => pairLyric(line, converted, "translatedLyric"));
+                    }
+                    if (showRomanLine && currentRawLyricResp?.romalrc?.lyric) {
+                        const trans = parseLrc(currentRawLyricResp.romalrc.lyric);
+                        trans.forEach(line => pairLyric(line, converted, "romanLyric"));
+                    }
+                    log("已加载逐行歌词", lines, converted);
 				}
+
+                setLyricLines(converted);
 			} catch (err) {
 				warn("加载歌词失败", err);
 			}
@@ -115,7 +147,7 @@ export const LyricProvider: FC = () => {
 		return () => {
 			canceled = true;
 		};
-	}, [musicId]);
+	}, [musicId, showTranslatedLine, showRomanLine]);
 
 	return <></>;
 };

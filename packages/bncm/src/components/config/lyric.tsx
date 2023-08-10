@@ -4,7 +4,7 @@ import { Switch } from "../appkit/switch/switch";
 import { TextField } from "../appkit/text-field";
 import { Button } from "../appkit/button/button";
 import { useAtom, useAtomValue } from "jotai";
-import { wsConnectionStatusAtom } from "../../info/ws-wrapper";
+import { wsConnectionStatusAtom } from "../../music-context/ws-wrapper";
 import { Spinner } from "../appkit/spinner/spinner";
 import { atomWithConfig } from "./atomWithConfig";
 import { SwitchConfigComponent } from "./common";

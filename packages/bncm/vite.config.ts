@@ -5,6 +5,7 @@ import os from "os";
 import { cpSync, mkdirSync, readdirSync, rmSync, statSync } from "fs";
 import wasm from "vite-plugin-wasm";
 import reactSvg from "vite-plugin-react-svg";
+import svgr from "vite-plugin-svgr";
 import terser from "@rollup/plugin-terser";
 import { buildSync } from "esbuild";
 
@@ -104,12 +105,15 @@ export default defineConfig(({ mode }) => {
 		plugins: [
 			react(),
 			wasm(),
-			reactSvg({
-				defaultExport: "component",
-				expandProps: "end",
-				svgo: true,
-				ref: true,
-			}),
+            svgr({
+                exportAsDefault: true,
+                include: ["./src/**/*.svg"]
+            }),
+			// reactSvg({
+			// 	defaultExport: "component",
+			// 	expandProps: "end",
+			// 	ref: true,
+			// }),
 			CopyBetterNCMPlugin({
 				name: "Apple-Musiclike-lyrics",
 				dev: !!env.AMLL_DEV,

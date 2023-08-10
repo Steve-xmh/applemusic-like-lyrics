@@ -24,12 +24,14 @@
         font-size: 14px
 
 #amll-view
+    @include pingfang-font
     position: fixed
     left: 0
     top: 100vh
     width: 100%
     height: 100%
     overflow: hidden
+    line-height: normal
     border-radius: 16px 16px 0 0
     z-index: 998
     transition: top 0.5s cubic-bezier(0.8,0,0.1,1), border-radius 0.25s ease-in-out
@@ -37,6 +39,12 @@
     background: #333
     -webkit-backdrop-filter: blur(120px)
     backdrop-filter: blur(120px)
+    button
+      background: transparent
+      border: none
+    svg
+        width: unset
+        height: unset
 #main-player, .m-pinfo
     transition: bottom 0.5s cubic-bezier(0.8,0,0.1,1), opacity 0.25s ease-in-out
 body.amll-lyric-page-open
@@ -54,3 +62,44 @@ body.amll-lyric-page-open
     #amll-view
         top: 0vh
         border-radius: 0 0 0 0
+
+.am-music-progress-control
+    display: flex
+    flex-direction: column
+    margin-top: 16px
+
+.am-music-progress-tips
+    display: flex
+    margin-top: 16px
+    font-weight: 1000
+    opacity: 0.5
+    align-items: center
+    font-size: 12px
+    > *
+        flex: 0
+        &:first-child
+            flex: 1
+        &:last-child
+            flex: 1
+            text-align: right
+
+.am-music-controls
+  display: flex
+  justify-content: space-between
+  > .am-music-track-btn
+    opacity: 0.5
+  > .am-music-track-prev,
+  > .am-music-play,
+  > .am-music-track-next
+    > *
+      height: 5vh
+      width: 5vh
+
+.am-music-volume-controls
+    display: flex
+    align-items: center
+    flex-direction: row
+    > *
+        margin: 8px
+        &:nth-child(2)
+            flex: 1

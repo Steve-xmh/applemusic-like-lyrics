@@ -4,7 +4,7 @@ import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
 import { version } from "../public/manifest.json";
 import { configViewElement, initLyricPage } from "./injector";
-import { MusicStatusGetterV2 } from "./info/v2";
+import { MusicContextV2 } from "./music-context/v2";
 import { injectLyricPage } from "./injector/v2";
 
 // 注入样式
@@ -120,7 +120,7 @@ plugin.onLoad(async () => {
 		if (isNCMV3()) {
 			// TODO: 3.0 的注入支持
 		} else {
-			plugin.musicStatus = new MusicStatusGetterV2();
+			plugin.musicStatus = new MusicContextV2();
 			injectLyricPage();
 		}
 

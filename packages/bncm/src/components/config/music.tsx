@@ -1,13 +1,8 @@
 import React, { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box/group-box";
-import { Switch } from "../appkit/switch/switch";
-import { TextField } from "../appkit/text-field";
-import { Button } from "../appkit/button/button";
-import { useAtom, useAtomValue } from "jotai";
-import { wsConnectionStatusAtom } from "../../info/ws-wrapper";
-import { Spinner } from "../appkit/spinner/spinner";
 import { atomWithConfig } from "./atomWithConfig";
 import { SwitchConfigComponent } from "./common";
+import {PlayControlButtonType} from "../song-info/play-control-button";
 
 export const showAudioQualityTagAtom = atomWithConfig({
 	key: "show-audio-quality-tag",
@@ -51,6 +46,18 @@ export const showControlThumbAtom = atomWithConfig({
 	desc: "显示控制横条",
 });
 
+export const leftControlButtonTypeAtom = atomWithConfig({
+    key: "left-control-button-type",
+    default: PlayControlButtonType.PlaybackRandom,
+    desc: "当使用播放控制栏时，左侧的按钮操作类型",
+})
+
+export const rightControlButtonTypeAtom = atomWithConfig({
+    key: "right-control-button-type",
+    default: PlayControlButtonType.PlaybackRepeat,
+    desc: "当使用播放控制栏时，右侧的按钮操作类型",
+})
+
 export const LyricStyleConfig: FC = () => {
 	return (
 		<>
@@ -72,13 +79,13 @@ export const LyricStyleConfig: FC = () => {
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent
-					atom={showMusicArtistsAtom}
+					atom={showMenuButtonAtom}
 					label="显示菜单按钮"
 					description="隐藏后，你依然可以通过右键左侧任意位置打开菜单"
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent
-					atom={showMusicArtistsAtom}
+					atom={showControlThumbAtom}
 					label="显示控制横条"
 					description="隐藏后，你依然可以通过菜单来关闭歌词页面"
 				/>

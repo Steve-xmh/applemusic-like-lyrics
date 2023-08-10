@@ -4,27 +4,74 @@ import {
 	LyricPlayer as LyricPlayerComponent,
 } from "@applemusic-like-lyrics/react";
 import { closeLyricPage } from "../injector";
-import { useAtomValue } from "jotai";
+import {atom, useAtom, useAtomValue} from "jotai";
 import {
-	currentTimeAtom,
-	lyricPageOpenedAtom,
-	musicArtistsAtom,
-	musicCoverAtom,
-	musicNameAtom,
-} from "../info/wrapper";
+    currentTimeAtom,
+    lyricPageOpenedAtom,
+    musicArtistsAtom,
+    musicCoverAtom, musicDurationAtom,
+    musicNameAtom,
+} from "../music-context/wrapper";
 import { SongInfoTextMarquee } from "../components/song-info/song-info-text-marquee";
 import { lyricLinesAtom } from "../lyric/provider";
-import { ConnectionColor, wsConnectionStatusAtom } from "../info/ws-wrapper";
+import { ConnectionColor, wsConnectionStatusAtom } from "../music-context/ws-wrapper";
 import "./index.sass";
+import {NowPlayingSlider} from "../components/appkit/np-slider";
+import {AudioQualityTag} from "../components/song-info/audio-quality-tag";
+import * as React from "react";
+import {showAudioQualityTagAtom} from "../components/config/music";
+import {PlayControls} from "../components/song-info/play-controls";
+import {useEffect, useLayoutEffect, useRef} from "react";
+import {VolumeControl} from "./volume-control";
+import IconMore from "../assets/icon_more.svg";
+
+function toDuration(duration: number) {
+    const isRemainTime = duration < 0;
+
+    const d = Math.abs(duration | 0);
+    const sec = d % 60;
+    const min = Math.floor((d - sec) / 60);
+    const secText = "0".repeat(2 - sec.toString().length) + sec;
+
+    return `${isRemainTime ? "-" : ""}${min}:${secText}`;
+}
+
+const alignPositionAtom = atom(0.5);
 
 export const LyricPlayer: FC = (props) => {
 	const musicCoverUrl = useAtomValue(musicCoverAtom);
 	const musicName = useAtomValue(musicNameAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
-	const currentTime = useAtomValue(currentTimeAtom);
+	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
+    const musicDuration = useAtomValue(musicDurationAtom);
+    const showQualityTag = useAtomValue(showAudioQualityTagAtom);
+
+    const playProgressText = toDuration(currentTime / 1000);
+    const remainText = toDuration((currentTime - musicDuration) / 1000);
+
+    const albumCoverRef = useRef<HTMLDivElement>(null);
+    const [alignPosition, setAlighPosition] = useAtom(alignPositionAtom);
+
+    useEffect(() => {
+        if (albumCoverRef.current) {
+            const el = albumCoverRef.current;
+            const onResize = () => {
+                setAlighPosition((el.offsetTop + el.clientHeight / 2) / window.innerHeight);
+            }
+            window.addEventListener("resize", onResize);
+            onResize();
+            requestAnimationFrame(onResize);
+            return () => {
+                window.removeEventListener("resize", onResize);
+            }
+        } else {
+            setAlighPosition(0.5);
+        }
+    }, [albumCoverRef.current])
+
 	return (
 		<>
 			<div className="lyric-player">
@@ -46,8 +93,9 @@ export const LyricPlayer: FC = (props) => {
 					style={{
 						gridColumn: "1",
 						gridRow: "2",
-						width: "32px",
-						height: "32px",
+						width: "50px",
+						height: "8px",
+                        margin: "2vh",
 						borderRadius: "4px",
 						border: "none",
 						backgroundColor: "#FFF3",
@@ -75,6 +123,7 @@ export const LyricPlayer: FC = (props) => {
 						backgroundSize: "cover",
 						borderRadius: "3%",
 					}}
+                    ref={albumCoverRef}
 				/>
 				<div
 					style={{
@@ -88,24 +137,55 @@ export const LyricPlayer: FC = (props) => {
 						fontWeight: "1000",
 					}}
 				>
-					<SongInfoTextMarquee>
-						<div className="amll-music-name">{musicName}</div>
-					</SongInfoTextMarquee>
-					<SongInfoTextMarquee>
-						<div className="amll-music-artists">
-							{artists.map((artist) => (
-								<a
-									href={`#/m/artist/?id=${artist.id}`}
-									key={`artist-${artist.id}-${artist.name}`}
-									onMouseUp={() => {
-										closeLyricPage();
-									}}
-								>
-									{artist.name}
-								</a>
-							))}
-						</div>
-					</SongInfoTextMarquee>
+					<div style={{
+                        display: "flex",
+                    }}>
+                        <div style={{
+                            display: "flex",
+                            flex: "1",
+                            flexDirection: "column",
+                            minWidth: "0",
+                        }}>
+                            <SongInfoTextMarquee>
+                                <div className="amll-music-name">{musicName}</div>
+                            </SongInfoTextMarquee>
+                            <SongInfoTextMarquee>
+                                <div className="amll-music-artists">
+                                    {artists.map((artist) => (
+                                        <a
+                                            href={`#/m/artist/?id=${artist.id}`}
+                                            key={`artist-${artist.id}-${artist.name}`}
+                                            onMouseUp={() => {
+                                                closeLyricPage();
+                                            }}
+                                        >
+                                            {artist.name}
+                                        </a>
+                                    ))}
+                                </div>
+                            </SongInfoTextMarquee>
+                        </div>
+                        <button
+                            className="am-music-main-menu"
+                        >
+                            <IconMore color="#FFFFFF" />
+                        </button>
+                    </div>
+                    <div className="am-music-progress-control">
+                        <NowPlayingSlider
+                            onChange={setCurrentTime}
+                            value={currentTime}
+                            min={0}
+                            max={musicDuration}
+                        />
+                        <div className="am-music-progress-tips">
+                            <div>{playProgressText}</div>
+                            {showQualityTag && <AudioQualityTag />}
+                            <div>{remainText}</div>
+                        </div>
+                    </div>
+                    <PlayControls />
+                    <VolumeControl />
 				</div>
 				{wsStatus.color === ConnectionColor.Active ? (
 					<div
@@ -134,8 +214,11 @@ export const LyricPlayer: FC = (props) => {
 							gridRow: "1 / 6",
 							width: "100%",
 							height: "100%",
+                            boxSizing: "border-box",
+                            paddingRight: "10%",
 							mixBlendMode: "plus-lighter",
 						}}
+                        alignAnchor={alignPosition}
 						currentTime={currentTime}
 						lyricLines={lyricLines}
 					/>

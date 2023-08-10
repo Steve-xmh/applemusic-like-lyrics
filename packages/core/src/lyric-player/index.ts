@@ -97,6 +97,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			boxSizing: "border-box",
 			fontSize: "max(5vh, 12px)",
 			fontWeight: "bold",
+            lineHeight: "normal",
 			width: "100%",
 			height: "100%",
 			overflow: "hidden",
@@ -110,17 +111,15 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
-			maxWidth: "65%",
+			maxWidth: "100%",
 			padding: "max(2vh, 1rem) 1rem",
 			contain: "content",
 			transition: "filter 0.25s",
-			margin: "max(2vh, 1rem) -1rem",
+			margin: "0 -1rem",
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
-				maxWidth: "75%",
 				padding: "max(1vh, 1rem) 1rem",
-				margin: "0 -1rem",
 			},
 		},
 		lyricDuetLine: {
@@ -457,7 +456,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				isActive ? 1 : SCALE_ASPECT,
 				hasBuffered ? 1 : 1 / 3,
 				this.enableBlur
-					? 2 *
+					?
 					  (isActive
 							? 0
 							: 1 +

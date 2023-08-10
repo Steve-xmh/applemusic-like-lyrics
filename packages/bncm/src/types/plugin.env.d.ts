@@ -1,5 +1,5 @@
-import { MusicStatusGetterBase } from "../info";
+import { MusicContextBase } from "../music-context";
 
 export interface NCMInjectPlugin {
-	musicStatus: MusicStatusGetterBase;
+	musicStatus: MusicContextBase;
 }
