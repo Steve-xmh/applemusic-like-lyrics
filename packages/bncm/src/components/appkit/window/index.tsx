@@ -42,9 +42,7 @@ export const AppKitWindowFrame: FC<
 }) => {
 	return (
 		<div
-			className={
-				"appkit-window" + (title ? " " : " no-title ") + (className || "")
-			}
+			className={`appkit-window${title ? " " : " no-title "}${className || ""}`}
 			{...props}
 		>
 			<div>
@@ -73,18 +71,34 @@ export const AppKitWindowFrame: FC<
 };
 
 export const AppKitWindow: FC<
-	PropsWithChildren<{
-		hideZoomBtn?: boolean;
-		hideMinimizeBtn?: boolean;
-		sidebarItems?: React.ReactNode;
-		sidebarBottomItems?: React.ReactNode;
-		onClose?: React.MouseEventHandler;
-		title?: string;
-		zIndex?: number;
-		width?: number;
-		height?: number;
-	}>
-> = (props) => {
+	PropsWithChildren<
+		{
+			hideZoomBtn?: boolean;
+			hideMinimizeBtn?: boolean;
+			sidebarItems?: React.ReactNode;
+			sidebarBottomItems?: React.ReactNode;
+			onClose?: React.MouseEventHandler;
+			title?: string;
+			zIndex?: number;
+			width?: number;
+			height?: number;
+		} & HTMLProps<HTMLDivElement>
+	>
+> = ({
+	hideZoomBtn,
+	hideMinimizeBtn,
+	sidebarItems,
+	sidebarBottomItems,
+	onClose,
+	title,
+	zIndex,
+	width,
+	height,
+	children,
+	className,
+	style,
+	...props
+}) => {
 	const [pos, setPos] = useState([0, 0]);
 	const winRef = useRef<HTMLDivElement>(null);
 
@@ -158,36 +172,38 @@ export const AppKitWindow: FC<
 
 	return (
 		<div
-			className="appkit-window"
+			className={`appkit-window ${className}`}
 			style={{
 				position: "fixed",
 				left: `${pos[0]}px`,
 				top: `${pos[1]}px`,
-				width: props.width ? `${props.width}px` : undefined,
-				height: props.height ? `${props.height}px` : undefined,
-				zIndex: props.zIndex ?? 999,
+				width: width ? `${width}px` : undefined,
+				height: height ? `${height}px` : undefined,
+				zIndex: zIndex ?? 999,
+				...style,
 			}}
 			ref={winRef}
+			{...props}
 		>
 			<div
 				style={{
-					width: props.width ? `${props.width}px` : undefined,
-					height: props.height ? `${props.height}px` : undefined,
+					width: width ? `${width}px` : undefined,
+					height: height ? `${height}px` : undefined,
 				}}
 			>
 				<div className="appkit-traffic-lights">
-					<button onClick={props.onClose} className="close" />
-					{!props.hideMinimizeBtn && <button className="minimize" />}
-					{!props.hideZoomBtn && <button className="zoom" />}
+					<button type="button" onClick={onClose} className="close" />
+					{!hideMinimizeBtn && <button type="button" className="minimize" />}
+					{!hideZoomBtn && <button type="button" className="zoom" />}
 				</div>
 				<div className="window-sidebar">
 					<div
 						className="window-controls-content"
 						onMouseDown={onStartDraggingWindow}
 					/>
-					{props.sidebarItems}
+					{sidebarItems}
 					<div className="spacer" />
-					{props.sidebarBottomItems}
+					{sidebarBottomItems}
 				</div>
 				<div className="window-sidebar-devider" />
 				<div className="window-content">
@@ -195,11 +211,11 @@ export const AppKitWindow: FC<
 						className="window-controls-content"
 						onMouseDown={onStartDraggingWindow}
 					>
-						<div className="title">{props.title}</div>
+						<div className="title">{title}</div>
 					</div>
 					<div className="window-content-inner">
 						<div>
-							<div>{props.children}</div>
+							<div>{children}</div>
 						</div>
 					</div>
 				</div>

@@ -106,7 +106,7 @@ const LyricWord: React.FC<{
 			n.observe(wordRef.current);
 			return () => {
 				n.disconnect();
-			}
+			};
 		}
 	}, [wordRef.current]);
 	React.useEffect(() => {
@@ -151,8 +151,7 @@ const LyricWord: React.FC<{
 			const fadeWidth = 16 / width;
 			// 我们生成一个对称的渐变图像
 			// [---空白---][渐变][---空白---]
-			const [maskImage, , totalAspect] =
-				generateFadeGradient(fadeWidth);
+			const [maskImage, , totalAspect] = generateFadeGradient(fadeWidth);
 			wordRef.current.style.maskImage = maskImage;
 			wordRef.current.style.webkitMaskImage = maskImage;
 			wordRef.current.style.maskSize = `${totalAspect * 100}% 100%`;
@@ -193,7 +192,7 @@ const LyricWord: React.FC<{
 		letterDuration,
 		glowWordRef.current,
 		wordRef.current,
-		wordWidth
+		wordWidth,
 	]);
 	// 播放动画
 	React.useLayoutEffect(() => {
@@ -226,7 +225,7 @@ const LyricWord: React.FC<{
 				a.pause();
 			});
 		}
-	}, [lineOffset])
+	}, [lineOffset]);
 	if (word.shouldGlow) {
 		return (
 			<span className="am-lyric-glow-word" ref={glowWordRef}>

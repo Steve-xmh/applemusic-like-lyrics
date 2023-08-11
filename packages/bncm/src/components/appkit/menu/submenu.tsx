@@ -1,8 +1,8 @@
-import * as React from "react";
-import { classname } from "../../../api";
+import { FC, PropsWithChildren } from "react";
+import classnames from "classnames";
 
-export const SubMenu: React.FC<
-	React.PropsWithChildren<{
+export const SubMenu: FC<
+	PropsWithChildren<{
 		checked?: boolean;
 		label: string;
 		onClick?: () => void;
@@ -11,7 +11,8 @@ export const SubMenu: React.FC<
 	return (
 		<>
 			<button
-				className={classname("appkit-menu-item", {
+				type="button"
+				className={classnames("appkit-menu-item", {
 					checked: !!props.checked,
 					"has-submenu": !!props.children,
 				})}

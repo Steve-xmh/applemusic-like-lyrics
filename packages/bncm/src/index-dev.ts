@@ -1,4 +1,4 @@
-import style from "./index.sass?inline";
+import style from "./index.sass";
 import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
 import { isNCMV3 } from "./utils/is-ncm-v3";
 import { log, warn } from "./utils/logger";

@@ -1,4 +1,4 @@
-import "./np-slider.sass"
+import "./np-slider.sass";
 import ReactSlider from "react-slider";
 import type { ReactSliderProps } from "react-slider";
 

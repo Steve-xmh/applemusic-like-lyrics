@@ -3,8 +3,8 @@ import TagLossless from "../../assets/tag_lossless.svg";
 import TagHiresLossless from "../../assets/tag_hires_lossless.svg";
 import IconDolbyAtmos from "../../assets/icon_dolby_atmos.svg";
 import { FC } from "react";
-import {AudioQualityType} from "../../music-context";
-import {musicQualityAtom} from "../../music-context/wrapper";
+import { AudioQualityType } from "../../music-context";
+import { musicQualityAtom } from "../../music-context/wrapper";
 
 export const AudioQualityTag: FC = () => {
 	const currentAudioQualityType = useAtomValue(musicQualityAtom);

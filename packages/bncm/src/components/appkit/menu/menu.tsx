@@ -1,39 +1,52 @@
-import { useMouse } from "@mantine/hooks";
-import * as React from "react";
+import "./menu.sass";
+import {
+	FC,
+	PropsWithChildren,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 
-export const Menu: React.FC<
-	React.PropsWithChildren<{
+export const Menu: FC<
+	PropsWithChildren<{
 		opened: boolean;
 		hasCheckBoxMenuItems?: boolean;
 		onClose: () => void;
 	}>
 > = (props) => {
-	const menuRef = React.useRef<HTMLDivElement>(null);
-	const mouse = useMouse();
-	const [pos, setPos] = React.useState([0, 0]);
+	const menuRef = useRef<HTMLDivElement>(null);
+	const posRef = useRef([0, 0]);
+	const [pos, setPos] = useState([0, 0]);
 
-	React.useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		const menu = menuRef.current;
 		if (menu) {
-			const box = menu.getBoundingClientRect();
-			let { x, y } = mouse;
-			if (
-				x > box.width &&
-				(x + box.width >= window.innerWidth || x > window.innerWidth / 2)
-			) {
-				x -= box.width;
-			}
-			if (
-				(y > box.height && y + box.height >= window.innerHeight) ||
-				y > window.innerHeight / 2
-			) {
-				y -= box.height;
-			}
-			setPos([x, y]);
+			const onRightClick = (evt: MouseEvent) => {
+				const box = menu.getBoundingClientRect();
+				let x = evt.clientX;
+				let y = evt.clientY;
+				if (x > box.width && x + box.width >= window.innerWidth) {
+					x -= box.width;
+				}
+				if (y > box.height && y + box.height >= window.innerHeight) {
+					y -= box.height;
+				}
+				posRef.current = [x, y];
+			};
+			window.addEventListener("mousemove", onRightClick);
+			return () => {
+				window.addEventListener("mousemove", onRightClick);
+			};
 		} else {
 			setPos([0, 0]);
 		}
 	}, [props.opened, menuRef.current]);
+
+	useLayoutEffect(() => {
+		if (props.opened) {
+			setPos(posRef.current);
+		}
+	}, [props.opened]);
 
 	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>

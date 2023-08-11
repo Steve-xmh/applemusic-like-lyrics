@@ -1,0 +1,36 @@
+
+.appkit-menu-item
+    padding: 2px (9px + 5px)
+    box-sizing: border-box
+    display: block
+    width: 100%
+    text-align: left
+    background: transparent
+    border: none
+    font-size: 13px
+    line-height: 18px
+    color: white
+    font-style: normal
+    font-weight: 400
+    user-select: none
+    cursor: default
+    pointer-events: visibleFill
+
+    &.has-submenu
+        position: relative
+
+    &.label-only
+        opacity: 0.75
+
+    &:hover
+        &:not(.label-only)::before
+            content: " "
+            position: absolute
+            z-index: -1
+            width: calc(100% - 10px)
+            left: 5px
+            margin-top: -3px
+            height: 18px + 5px
+            background: #0A84FF
+            border-radius: 4px
+            pointer-events: none

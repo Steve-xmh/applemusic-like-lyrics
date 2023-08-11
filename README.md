@@ -18,15 +18,13 @@
 
 </div>
 
-## 安装说明
+## 性能配置参考
 
-你可以前往本仓库的 Release 下载对应的插件包，也可以通过 BetterNCM 的插件商店安装本插件。
+经过性能基准测试，五年内的主流 CPU 处理器均可以正常带动歌词页面。
 
-请不要将本插件与其它同功能用途的插件混用，**作者不会为其做兼容工作**！以下是不兼容或有功能影响的插件清单：
-
-- [RefinedNowPlaying - 一个美化网易云音乐播放界面的 BetterNCM 插件](https://github.com/solstice23/refined-now-playing-netease)
-
-主题插件作者推荐使用 MoTheme 或 [Material You](https://github.com/solstice23/material-you-theme-netease)，其它主题插件作者没有使用过，可能需要你做一定的设置调整才能契合主题。
+GPU 性能在以下状况下能够以预期尺寸下满 60 帧运行：
+- `1080p (1920x1080)`: NVIDIA GTX 10 系列及以上
+- `2160p (3840x2160)`: NVIDIA RTX 2070 及以上
 
 ## 开发/构建/打包流程
 

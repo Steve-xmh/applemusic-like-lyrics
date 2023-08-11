@@ -3,12 +3,18 @@
  * 专门给 2.10.X 设计的播放状态获取对象
  */
 
-import {Artist, AudioQualityType, MusicContextBase, PlayState} from ".";
-import {appendRegisterCall, removeRegisterCall} from "../utils/channel";
-import {callCachedSearchFunction} from "../utils/func";
-import {log} from "../utils/logger";
-import {getNCMImageUrl} from "../utils/ncm-url";
-import {genRandomString} from "../utils/gen-random-string";
+import {
+	Artist,
+	AudioQualityType,
+	MusicContextBase,
+	PlayMode,
+	PlayState,
+} from ".";
+import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
+import { callCachedSearchFunction } from "../utils/func";
+import { log } from "../utils/logger";
+import { getNCMImageUrl } from "../utils/ncm-url";
+import { genRandomString } from "../utils/gen-random-string";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -22,16 +28,18 @@ export const EMPTY_IMAGE_URL =
 	"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 function genAudioPlayerCommand(audioId: string, command: string) {
-    return `${audioId}|${command}|${genRandomString(6)}`;
+	return `${audioId}|${command}|${genRandomString(6)}`;
 }
 
 export class MusicContextV2 extends MusicContextBase {
 	private musicDuration = 0;
 	private musicPlayProgress = 0;
-    private volume = 0.5;
+	private volume = 0.5;
 	private playState = PlayState.Pausing;
 	private musicId = "";
 	private musicName = "未知歌名";
+	private musicAlbumId = "";
+	private musicAlbumName = "";
 	private musicAlbumImage = "";
 	private artists: Artist[] = [];
 	private tweenAtom = Symbol("tween-atom");
@@ -41,7 +49,7 @@ export class MusicContextV2 extends MusicContextBase {
 	private readonly bindedOnPlayProgress: Function;
 	private readonly bindedOnPlayStateChanged: Function;
 	private readonly bindedOnVolumeChanged: Function;
-    private audioId: string = "";
+	private audioId = "";
 	constructor() {
 		super();
 		this.bindedOnMusicLoad = this.onMusicLoad.bind(this);
@@ -49,8 +57,10 @@ export class MusicContextV2 extends MusicContextBase {
 		this.bindedOnPlayProgress = this.onPlayProgress.bind(this);
 		this.bindedOnPlayStateChanged = this.onPlayStateChanged.bind(this);
 		this.bindedOnVolumeChanged = this.onVolumeChanged.bind(this);
-        appendRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
+		appendRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
 		appendRegisterCall("End", "audioplayer", this.bindedOnMusicUnload);
+		// 在 Windows 版本中，这个函数会逐帧强制调用，也就是说会强制占用阻塞渲染线程
+		// 过度处理可能会产生轻微卡顿，因此下面的回调要做缓冲二次回调
 		appendRegisterCall(
 			"PlayProgress",
 			"audioplayer",
@@ -60,11 +70,8 @@ export class MusicContextV2 extends MusicContextBase {
 			"PlayState",
 			"audioplayer",
 			this.bindedOnPlayStateChanged,
-		);		appendRegisterCall(
-			"Volume",
-			"audioplayer",
-			this.bindedOnVolumeChanged,
 		);
+		appendRegisterCall("Volume", "audioplayer", this.bindedOnVolumeChanged);
 		setTimeout(() => {
 			this.onMusicLoad("", {
 				code: 0,
@@ -73,32 +80,35 @@ export class MusicContextV2 extends MusicContextBase {
 				errorString: "",
 				duration: 0,
 			});
-            try {
-                const nmSettings = JSON.parse(
-                    localStorage.getItem("NM_SETTING_PLAYER") ?? "{}",
-                );
-                if (nmSettings?.volume) {
-                    this.onVolumeChanged("", 0, 0, nmSettings.volume);
-                }
-            } catch {}
+			try {
+				const nmSettings = JSON.parse(
+					localStorage.getItem("NM_SETTING_PLAYER") ?? "{}",
+				);
+				if (nmSettings?.volume) {
+					this.onVolumeChanged("", 0, 0, nmSettings.volume);
+				}
+			} catch {}
 		}, 0);
 	}
-    private onVolumeChanged(
-        _audioId: string,
-        _unknownArg0: number,
-        _unknownArg1: number,
-        volume: number, // [0.0-1.0]
-    ) {
-        this.volume = volume;
-        this.dispatchTypedEvent("volume", new CustomEvent("volume", {
-            detail: {
-                volume: this.volume,
-            },
-        }));
-    }
+	private onVolumeChanged(
+		_audioId: string,
+		_unknownArg0: number,
+		_unknownArg1: number,
+		volume: number, // [0.0-1.0]
+	) {
+		this.volume = volume;
+		this.dispatchTypedEvent(
+			"volume",
+			new CustomEvent("volume", {
+				detail: {
+					volume: this.volume,
+				},
+			}),
+		);
+	}
 	private onMusicLoad(audioId: string, info: AudioLoadInfo) {
 		log("音乐已加载", audioId, info);
-        this.audioId = audioId;
+		this.audioId = audioId;
 		const playing = this.getPlayingSong();
 		this.musicName = playing?.data?.name || "未知歌名";
 		this.artists =
@@ -114,6 +124,8 @@ export class MusicContextV2 extends MusicContextBase {
 				playing?.data?.id ||
 				"",
 		).trim();
+		this.musicAlbumId = String(playing?.data?.album?.id || "");
+		this.musicAlbumName = String(playing?.data?.album?.name || "");
 		this.dispatchTypedEvent("load", new Event("load"));
 		this.searchForAlbumCover();
 	}
@@ -159,18 +171,28 @@ export class MusicContextV2 extends MusicContextBase {
 
 		const atom = this.searchForAlbumCoverAtom;
 		for (let curIndex = 0; curIndex < urls.length; curIndex += 2) {
-			const fullReq = fetch(urls[curIndex + 1]);
+			let fullReqLoaded = false;
+			const fullReq = fetch(urls[curIndex + 1]).then((res) => {
+				fullReqLoaded = true;
+				return res;
+			});
 			const res = await fetch(urls[curIndex]);
 			if (atom !== this.searchForAlbumCoverAtom) return;
 			if (res.ok) {
-				const blob = await res.blob();
+				await res.blob();
 				if (atom !== this.searchForAlbumCoverAtom) return;
 				this.musicAlbumImage = urls[curIndex];
-				this.dispatchTypedEvent("album-updated", new Event("album-updated"));
+				if (!fullReqLoaded) {
+					this.dispatchTypedEvent("album-updated", new Event("album-updated"));
+				}
 				const fullRes = await fullReq;
 				if (atom !== this.searchForAlbumCoverAtom) return;
 				if (fullRes.ok) {
-					const fullBlob = await fullRes.blob();
+					await Promise.all([
+						!fullReqLoaded &&
+							new Promise((resolve) => setTimeout(resolve, 500)),
+						await fullRes.blob(),
+					]);
 					if (atom !== this.searchForAlbumCoverAtom) return;
 					this.musicAlbumImage = urls[curIndex + 1];
 					this.dispatchTypedEvent("album-updated", new Event("album-updated"));
@@ -187,6 +209,7 @@ export class MusicContextV2 extends MusicContextBase {
 		}
 		this.dispatchTypedEvent("unload", new Event("unload"));
 	}
+	private progressDispatchHandle = 0;
 	private onPlayProgress(
 		audioId: string,
 		progress: number,
@@ -195,14 +218,19 @@ export class MusicContextV2 extends MusicContextBase {
 	) {
 		// log("音乐加载进度", audioId, progress, loadProgress);
 		this.musicPlayProgress = (progress * 1000) | 0;
-		this.dispatchTypedEvent(
-			"progress",
-			new CustomEvent("progress", {
-				detail: {
-					progress: this.musicPlayProgress,
-				},
-			}),
-		);
+		if (this.progressDispatchHandle) {
+			cancelAnimationFrame(this.progressDispatchHandle);
+		}
+		this.progressDispatchHandle = requestAnimationFrame(() => {
+			this.dispatchTypedEvent(
+				"progress",
+				new CustomEvent("progress", {
+					detail: {
+						progress: this.musicPlayProgress,
+					},
+				}),
+			);
+		});
 		if (!isTween && APP_CONF.isOSX && this.playState === PlayState.Playing) {
 			this.tweenAtom = Symbol("tween-atom");
 			const curAtom = this.tweenAtom;
@@ -256,41 +284,76 @@ export class MusicContextV2 extends MusicContextBase {
 	override getPlayState() {
 		return this.playState;
 	}
-    override getMusicQuality(): AudioQualityType {
-        return AudioQualityType.Normal; // TODO: 提供正确的音频质量等级
-    }
-    override seekToPosition(timeMS: number): void {
-        legacyNativeCmder._envAdapter.callAdapter(
-            "audioplayer.seek",
-            () => {},
-            [
-                this.audioId,
-                genAudioPlayerCommand(this.audioId, "seek"),
-                timeMS / 1000,
-            ],
-        );
-    }
-    override setVolume(value: number): void {
-        legacyNativeCmder._envAdapter.callAdapter(
-            "audioplayer.setVolume",
-            () => {},
-            ["", "", value],
-        );
-    }
-    override getVolume(): number {
-        return 0;
-    }
+	override getMusicQuality(): AudioQualityType {
+		return AudioQualityType.Normal; // TODO: 提供正确的音频质量等级
+	}
+	override seekToPosition(timeMS: number): void {
+		legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {}, [
+			this.audioId,
+			genAudioPlayerCommand(this.audioId, "seek"),
+			timeMS / 1000,
+		]);
+	}
+	override setVolume(value: number): void {
+		legacyNativeCmder._envAdapter.callAdapter(
+			"audioplayer.setVolume",
+			() => {},
+			["", "", value],
+		);
+	}
+	override getVolume(): number {
+		return 0;
+	}
 
-    override pause(): void {
-        document
-            .querySelector<HTMLButtonElement>("#main-player .btnp-pause")
-            ?.click();
-    }
-    override resume(): void {
-        document
-            .querySelector<HTMLButtonElement>("#main-player .btnp-play")
-            ?.click();
-    }
+	override pause(): void {
+		document
+			.querySelector<HTMLButtonElement>("#main-player .btnp-pause")
+			?.click();
+	}
+	override resume(): void {
+		document
+			.querySelector<HTMLButtonElement>("#main-player .btnp-play")
+			?.click();
+	}
+
+	forwardSong(): void {
+		document
+			.querySelector<HTMLButtonElement>("#main-player .btnc-nxt")
+			?.click();
+		document
+			.querySelector<HTMLButtonElement>(
+				"footer > * > * > .middle > *:nth-child(1) > button:nth-child(4)",
+			)
+			?.click();
+	}
+
+	rewindSong(): void {
+		document
+			.querySelector<HTMLButtonElement>("#main-player .btnc-prv")
+			?.click();
+		document
+			.querySelector<HTMLButtonElement>(
+				"footer > * > * > .middle > *:nth-child(1) > button:nth-child(2)",
+			)
+			?.click();
+	}
+
+	getPlayMode(): PlayMode {
+		// TODO
+		return PlayMode.One;
+	}
+
+	setPlayMode(playMode: PlayMode): void {
+		// TODO
+	}
+
+	getMusicAlbumId(): string {
+		return this.musicAlbumId;
+	}
+
+	getMusicAlbumName(): string {
+		return this.musicAlbumName;
+	}
 	override dispose() {
 		removeRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
 		removeRegisterCall("End", "audioplayer", this.bindedOnMusicUnload);
@@ -304,10 +367,6 @@ export class MusicContextV2 extends MusicContextBase {
 			"audioplayer",
 			this.bindedOnPlayStateChanged,
 		);
-        removeRegisterCall(
-            "Volume",
-            "audioplayer",
-            this.bindedOnVolumeChanged,
-        );
+		removeRegisterCall("Volume", "audioplayer", this.bindedOnVolumeChanged);
 	}
 }

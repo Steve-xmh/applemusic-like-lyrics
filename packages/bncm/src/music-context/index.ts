@@ -24,11 +24,11 @@ export enum AudioQualityType {
 }
 
 export enum PlayMode {
-    Order = "type-order", // playonce 顺序播放
-    Repeat = "type-repeat", // playorder 列表循环
-    AI = "type-ai", // mode2 = true 心动模式
-    One = "type-one", // playcycle 单曲循环
-    Random = "type-random", // playrandom 随机播放
+	Order = "type-order", // playonce 顺序播放
+	Repeat = "type-repeat", // playorder 列表循环
+	AI = "type-ai", // mode2 = true 心动模式
+	One = "type-one", // playcycle 单曲循环
+	Random = "type-random", // playrandom 随机播放
 }
 
 export interface Artist {
@@ -46,18 +46,20 @@ export abstract class MusicContextBase extends TypedEventTarget<MusicStatusGette
 	abstract getMusicDuration(): number;
 	abstract getMusicName(): string;
 	abstract getMusicArtists(): Artist[];
-    abstract getMusicQuality(): AudioQualityType;
+	abstract getMusicQuality(): AudioQualityType;
 	abstract getMusicCoverImage(): string;
+	abstract getMusicAlbumId(): string;
+	abstract getMusicAlbumName(): string;
 	abstract getPlayState(): PlayState;
-    abstract getPlayMode(): PlayMode;
-    abstract setPlayMode(playMode: PlayMode): void;
-    abstract seekToPosition(timeMS: number): void;
-    abstract forwardSong(): void;
-    abstract rewindSong(): void;
-    abstract setVolume(value: number): void;
-    abstract getVolume(): number;
-    abstract pause(): void;
-    abstract resume(): void;
+	abstract getPlayMode(): PlayMode;
+	abstract setPlayMode(playMode: PlayMode): void;
+	abstract seekToPosition(timeMS: number): void;
+	abstract forwardSong(): void;
+	abstract rewindSong(): void;
+	abstract setVolume(value: number): void;
+	abstract getVolume(): number;
+	abstract pause(): void;
+	abstract resume(): void;
 	dispose(): void {}
 }
 
@@ -101,12 +103,18 @@ export interface MusicStatusGetterEvents {
 	 * 此时调用 `getMusicCoverImage` 应当会获得一个能够稳定访问到歌曲封面图片数据的链接
 	 */
 	"album-updated": Event;
-    /**
-     * 当播放音量更新时触发
-     *
-     * 音量大小取值范围在 [0.0-1.0] 之间
-     */
-    volume: CustomEvent<{
-        volume: number
-    }>
+	/**
+	 * 当播放音量更新时触发
+	 *
+	 * 音量大小取值范围在 [0.0-1.0] 之间
+	 */
+	volume: CustomEvent<{
+		volume: number;
+	}>;
+	/**
+	 * 当播放模式改变时触发，例如 单曲播放，单曲循环，随机播放 等
+	 */
+	"play-mode": CustomEvent<{
+		playMode: PlayMode;
+	}>;
 }

@@ -13,7 +13,7 @@ async function initStyle() {
 	el.id = "amll-styles";
 	el.setAttribute("type", "text/css");
 	el.innerHTML = await betterncm.fs.readFileText(
-		plugin.pluginPath + "/style.css",
+		`${plugin.pluginPath}/style.css`,
 	);
 	document.head.appendChild(el);
 }
@@ -103,7 +103,7 @@ plugin.onConfig(() => {
 // 加载插件
 plugin.onLoad(async () => {
 	try {
-		initStyle();
+		await initStyle();
 		console.log(
 			`%cApple Music-like Lyrics %c${version}%c for %cBetterNCM`,
 			"color:#2AF;font-weight:bold;",
@@ -121,7 +121,7 @@ plugin.onLoad(async () => {
 			// TODO: 3.0 的注入支持
 		} else {
 			plugin.musicStatus = new MusicContextV2();
-			injectLyricPage();
+			await injectLyricPage();
 		}
 
 		initLyricPage();

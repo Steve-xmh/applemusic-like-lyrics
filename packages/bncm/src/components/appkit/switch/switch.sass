@@ -7,13 +7,17 @@
     align-items: center
     font-size: 13px
     line-height: 16px
+
     &.selected > .appkit-switch-inner
         background: #007AFF
         justify-content: flex-end
+
         &:active
             background: linear-gradient(180deg, #155ECE 0%, #1868E5 100%)
+
             > *
                 background: #C8C8C8
+
     > .appkit-switch-inner
         // margin: 0 10px
         // width: 40px
@@ -28,11 +32,14 @@
         display: flex
         justify-content: flex-start
         cursor: pointer
+
         &:active
             background: rgba(0, 0, 0, 0.25)
             box-shadow: 0 0 1px rgba(0, 0, 0, 0.25), inset 0 0.5px 0 rgba(255, 255, 255, 0.15)
+
         > *
-            transform: translateY(0.5px) // 矫正居中位置
+            transform: translateY(0.5px)
+            // 矫正居中位置
             border-radius: 50%
             width: 13px
             height: 13px

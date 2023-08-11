@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { atomWithConfig } from "./atomWithConfig";
+import { atomWithConfig } from "./atom-with-config";
 import { useAtom } from "jotai";
 import { Switch } from "../appkit/switch/switch";
 

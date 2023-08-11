@@ -1,12 +1,12 @@
 import { FC } from "react";
-import { GroupBox, GroupBoxDevider } from "../appkit/group-box/group-box";
+import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
 import { Switch } from "../appkit/switch/switch";
 import { TextField } from "../appkit/text-field";
-import { Button } from "../appkit/button/button";
+import { Button } from "../appkit/button";
 import { useAtom, useAtomValue } from "jotai";
 import { wsConnectionStatusAtom } from "../../music-context/ws-wrapper";
 import { Spinner } from "../appkit/spinner/spinner";
-import { atomWithConfig } from "./atomWithConfig";
+import { atomWithConfig } from "./atom-with-config";
 
 export const enableWSPlayer = atomWithConfig({
 	key: "enable-ws-player",

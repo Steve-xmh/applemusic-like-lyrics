@@ -6,11 +6,8 @@ import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
 import { WebSocketWrapper } from "../music-context/ws-wrapper";
 import AMLLIcon from "../assets/amll-icon.svg";
-import { Button } from "../components/appkit/button/button";
-import {
-	GroupBox,
-	GroupBoxDevider,
-} from "../components/appkit/group-box/group-box";
+import { Button } from "../components/appkit/button";
+import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
 import { TextField } from "../components/appkit/text-field";
 import { Switch } from "../components/appkit/switch/switch";
 import { AppKitWindowFrame, SidebarItem } from "../components/appkit/window";

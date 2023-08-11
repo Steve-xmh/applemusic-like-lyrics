@@ -1,8 +1,8 @@
 import { Container as v } from "@pixi/display";
-import { Application as M } from "@pixi/app";
+import { Application as C } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
-import { ColorMatrixFilter as E } from "@pixi/filter-color-matrix";
-import { Texture as C } from "@pixi/core";
+import { ColorMatrixFilter as w } from "@pixi/filter-color-matrix";
+import { Texture as M } from "@pixi/core";
 import { Sprite as T } from "@pixi/sprite";
 import { create as z } from "jss";
 import A from "jss-preset-default";
@@ -127,7 +127,7 @@ class k {
         this.canvas.width * this.currerntRenderScale,
         this.canvas.height * this.currerntRenderScale
       ), this.rebuildFilters();
-    }), this.observer.observe(e), this.app = new M({
+    }), this.observer.observe(e), this.app = new C({
       view: e,
       resizeTo: this.canvas,
       powerPreference: "low-power",
@@ -177,11 +177,11 @@ class k {
     ), this.rebuildFilters();
   }
   rebuildFilters() {
-    const e = Math.min(this.canvas.width, this.canvas.height), t = new E();
+    const e = Math.min(this.canvas.width, this.canvas.height), t = new w();
     t.saturate(1.2, !1);
-    const i = new E();
+    const i = new w();
     i.brightness(0.6, !1);
-    const n = new E();
+    const n = new w();
     n.contrast(0.3, !0), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), e > 512 && this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(t, i, n), this.app.stage.filters.push(new y(5, 1));
   }
   /**
@@ -210,7 +210,7 @@ class k {
    * @param albumUrl 图片的目标链接
    */
   async setAlbumImage(e) {
-    const t = await C.fromURL(e), i = new B(), n = new T(t), a = new T(t), s = new T(t), r = new T(t);
+    const t = await M.fromURL(e), i = new B(), n = new T(t), a = new T(t), s = new T(t), r = new T(t);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, i.addChild(n, a, s, r), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = i, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0;
   }
   dispose() {
@@ -236,7 +236,7 @@ function O(d) {
   return d < 0.5 ? Math.pow(2 * d, 2) * ((t + 1) * 2 * d - t) / 2 : (Math.pow(2 * d - 2, 2) * ((t + 1) * (d * 2 - 2) + t) + 2) / 2;
 }
 const g = (d, e, t) => Math.max(d, Math.min(e, t));
-class F {
+class $ {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -311,7 +311,7 @@ class F {
     this.element.remove();
   }
 }
-class w {
+class E {
   currentPosition = 0;
   targetPosition = 0;
   currentTime = 0;
@@ -325,13 +325,13 @@ class w {
   }
   resetSolver() {
     const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = $(
+    this.currentTime = 0, this.currentSolver = q(
       this.currentPosition,
       e,
       this.targetPosition,
       0,
       this.params
-    ), this.getV = _(this.currentSolver);
+    ), this.getV = R(this.currentSolver);
   }
   arrived() {
     return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
@@ -363,7 +363,7 @@ class w {
     return this.currentPosition;
   }
 }
-function $(d, e, t, i = 0, n) {
+function q(d, e, t, i = 0, n) {
   const a = n?.soft ?? !1, s = n?.stiffness ?? 100, r = n?.damping ?? 10, l = n?.mass ?? 1, h = t - d;
   if (a || 1 <= r / (2 * Math.sqrt(s * l))) {
     const o = -Math.sqrt(s / l), c = -o * h - e;
@@ -375,14 +375,14 @@ function $(d, e, t, i = 0, n) {
     return (u) => (u -= i, u < 0 ? d : t - (Math.cos(u * m) * h + Math.sin(u * m) * c) * Math.E ** (u * p));
   }
 }
-function q(d) {
+function _(d) {
   return (t) => (d(t + 1e-3) - d(t - 1e-3)) / (2 * 1e-3);
 }
-function _(d) {
-  return q(d);
+function R(d) {
+  return _(d);
 }
 const S = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
-function R(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
+function W(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
   const i = 2 + d, n = d / i, a = (1 - n) / 2;
   return [
     `linear-gradient(to right,${e} ${a * 100}%,${t} ${(a + n) * 100}%)`,
@@ -393,7 +393,7 @@ function R(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
 function P(d) {
   return d.endTime - d.startTime >= 1e3 && d.word.length <= 7;
 }
-class W {
+class F {
   constructor(e, t = {
     words: [],
     translatedLyric: "",
@@ -420,9 +420,9 @@ class W {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new w(0),
-    posY: new w(0),
-    scale: new w(1)
+    posX: new E(0),
+    posY: new E(0),
+    scale: new E(1)
   };
   isEnabled = !1;
   enable() {
@@ -586,17 +586,17 @@ class W {
             {
               offset: 0,
               transform: "translate3d(0, 0px, 0px)",
-              filter: "drop-shadow(0 0 0 var(--amll-lyric-line-color))"
+              filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
             },
             {
               offset: 0.5,
               transform: "translate3d(0, -2%, 20px)",
-              filter: "drop-shadow(0 0 0.2rem var(--amll-lyric-line-color))"
+              filter: "drop-shadow(0 0 0.2rem var(--amll-lyric-view-color,white))"
             },
             {
               offset: 1,
               transform: "translate3d(0, 0px, 0)",
-              filter: "drop-shadow(0 0 0 var(--amll-lyric-line-color))"
+              filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
             }
           ],
           {
@@ -617,7 +617,7 @@ class W {
       const t = e.elements[0];
       if (t) {
         e.width = t.clientWidth, e.height = t.clientHeight;
-        const [i, n, a] = R(
+        const [i, n, a] = W(
           16 / e.width,
           "rgba(0,0,0,0.75)",
           "rgba(0,0,0,0.25)"
@@ -719,15 +719,13 @@ class ee extends EventTarget {
       padding: "1rem",
       boxSizing: "border-box",
       fontSize: "max(5vh, 12px)",
-      fontWeight: "bold",
-      lineHeight: "normal",
       width: "100%",
       height: "100%",
       overflow: "hidden",
       maxWidth: "100%",
       maxHeight: "100%",
       zIndex: 1,
-      color: "var(--amll-lyric-line-color)",
+      color: "var(--amll-lyric-view-color,white)",
       mixBlendMode: "plus-lighter",
       contain: "strict"
     },
@@ -737,6 +735,7 @@ class ee extends EventTarget {
       maxWidth: "100%",
       padding: "max(2vh, 1rem) 1rem",
       contain: "content",
+      willChange: "filter,transform,opacity",
       transition: "filter 0.25s",
       margin: "0 -1rem"
     },
@@ -760,6 +759,7 @@ class ee extends EventTarget {
     },
     lyricMainLine: {
       transition: "opacity 0.3s 0.25s",
+      willChange: "opacity",
       margin: "-1rem",
       padding: "1rem",
       "& span": {
@@ -771,6 +771,7 @@ class ee extends EventTarget {
         whiteSpace: "pre-wrap",
         wordBreak: "keep-all",
         maxLines: "1",
+        willChange: "transform,display,mask-image",
         "&.emphasize": {
           margin: "-1rem",
           padding: "1rem",
@@ -801,7 +802,7 @@ class ee extends EventTarget {
         display: "inline-block",
         borderRadius: "50%",
         aspectRatio: "1 / 1",
-        backgroundColor: "var(--amll-lyric-line-color)",
+        backgroundColor: "var(--amll-lyric-view-color,white)",
         marginRight: "4px"
       },
       "&.duet": {
@@ -822,7 +823,7 @@ class ee extends EventTarget {
     this.calcLayout(!0);
   };
   constructor() {
-    super(), this.interludeDots = new F(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
+    super(), this.interludeDots = new $(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
   }
   /**
    * 获取当前播放时间里是否处于间奏区间
@@ -853,7 +854,7 @@ class ee extends EventTarget {
    */
   rebuildStyle() {
     let e = "";
-    e += "--amll-lyric-player-width:", e += this.element.clientWidth, e += "px;", e += "--amll-lyric-player-height:", e += this.element.clientHeight, e += "px;", e += "--amll-lyric-line-color:", e += "#FFFFFF;", e += "--amll-player-time:", e += this.currentTime, e += ";", this.element.setAttribute("style", e);
+    e += "--amll-lyric-player-width:", e += this.element.clientWidth, e += "px;", e += "--amll-lyric-player-height:", e += this.element.clientHeight, e += "px;", e += "--amll-player-time:", e += this.currentTime, e += ";", this.element.setAttribute("style", e);
   }
   /**
    * 设置是否启用歌词行的模糊效果
@@ -908,7 +909,7 @@ class ee extends EventTarget {
       const s = a[n + 1];
       s?.isBG && (s.startTime = Math.min(s.startTime, i.startTime));
     }), this.lyricLinesEl.forEach((i) => i.dispose()), this.lyricLinesEl = this.processedLines.map(
-      (i) => new W(this, i)
+      (i) => new F(this, i)
     ), this.lyricLinesEl.forEach((i) => {
       this.element.appendChild(i.getElement()), i.updateMaskImage();
     }), this.interludeDots.setInterlude(void 0), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);

@@ -1,10 +1,19 @@
-import * as React from "react";
-import { classname } from "../../../api";
+import "./menu-item.sass";
+import {
+	FC,
+	PropsWithChildren,
+	createContext,
+	useContext,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
+import classnames from "classnames";
 
-const MenuLevelProvider = React.createContext(0);
+const MenuLevelProvider = createContext(0);
 
-export const MenuItem: React.FC<
-	React.PropsWithChildren<{
+export const MenuItem: FC<
+	PropsWithChildren<{
 		checked?: boolean;
 		label: string;
 		labelOnly?: boolean;
@@ -12,14 +21,14 @@ export const MenuItem: React.FC<
 		onClick?: () => void;
 	}>
 > = (props) => {
-	const zindex = React.useContext(MenuLevelProvider) || 999;
-	const menuItemRef = React.useRef<HTMLButtonElement>(null);
-	const subMenuRef = React.useRef<HTMLDivElement>(null);
-	const [buttonHover, setButtonHover] = React.useState(false);
-	const [subMenuHover, setSubMenuHover] = React.useState(false);
-	const [pos, setPos] = React.useState([0, 0]);
+	const zindex = useContext(MenuLevelProvider) || 999;
+	const menuItemRef = useRef<HTMLButtonElement>(null);
+	const subMenuRef = useRef<HTMLDivElement>(null);
+	const [buttonHover, setButtonHover] = useState(false);
+	const [subMenuHover, setSubMenuHover] = useState(false);
+	const [pos, setPos] = useState([0, 0]);
 
-	React.useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		const menuItem = menuItemRef.current;
 		const subMenu = subMenuRef.current;
 		if (menuItem && subMenu) {
@@ -49,7 +58,8 @@ export const MenuItem: React.FC<
 	return (
 		<button
 			ref={menuItemRef}
-			className={classname("appkit-menu-item", {
+			type="button"
+			className={classnames("appkit-menu-item", {
 				checked: !!props.checked,
 				"label-only": !!props.labelOnly,
 				"has-submenu": !!props.children,

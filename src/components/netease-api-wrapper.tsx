@@ -397,7 +397,11 @@ export const NCMEnvWrapper: React.FC = () => {
 				},${Date.now()}]}`,
 			);
 			setPlayProgress(progress);
-			if (toPlayState(getPlayingSong().state) === PlayState.Playing && APP_CONF.isOSX && !isTween) {
+			if (
+				toPlayState(getPlayingSong().state) === PlayState.Playing &&
+				APP_CONF.isOSX &&
+				!isTween
+			) {
 				// 因为 Mac 版本的网易云的播放进度回调是半秒一次，所以完全不够用
 				// 我们自己要做一个时间补偿
 				const originalProgress = progress;
@@ -407,7 +411,10 @@ export const NCMEnvWrapper: React.FC = () => {
 				const tweenPlayProgress = (timestamp: number) => {
 					prevTime ??= timestamp;
 					const delta = timestamp - prevTime;
-					if (toPlayState(getPlayingSong().state) === PlayState.Playing && targetId === tweenId) {
+					if (
+						toPlayState(getPlayingSong().state) === PlayState.Playing &&
+						targetId === tweenId
+					) {
 						onPlayProgress(
 							audioId,
 							originalProgress + delta / 1000,

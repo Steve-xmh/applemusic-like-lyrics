@@ -1,10 +1,11 @@
 import { FC } from "react";
-import { AppKitWindowFrame, SidebarItem } from "../appkit/window";
+import { AppKitWindow, AppKitWindowFrame, SidebarItem } from "../appkit/window";
 import { PlayerConfig } from "./player";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import "./config.sass";
 import { LyricConfig } from "./lyric";
 import { LyricStyleConfig } from "./music";
+import { AboutConfig } from "./about";
 
 export const configPageAtom = atom("lyric");
 
@@ -73,6 +74,7 @@ const ConfigContent: FC = () => {
 			{configPage === "player" && <PlayerConfig />}
 			{configPage === "lyric" && <LyricConfig />}
 			{configPage === "music" && <LyricStyleConfig />}
+			{configPage === "about" && <AboutConfig />}
 		</div>
 	);
 };
@@ -86,5 +88,23 @@ export const AMLLConfig: FC = () => {
 		>
 			<ConfigContent />
 		</AppKitWindowFrame>
+	);
+};
+
+export const amllConfigWindowedOpenedAtom = atom(false);
+
+export const AMLLConfigWindowed: FC = () => {
+	const setAMLLConfigWindowedOpened = useSetAtom(amllConfigWindowedOpenedAtom);
+	return (
+		<AppKitWindow
+			sidebarItems={<ConfigSidebarItems />}
+			sidebarBottomItems={<ConfigSidebarBottomItems />}
+			width={600}
+			height={350}
+			onClose={() => setAMLLConfigWindowedOpened(false)}
+			id="amll-config"
+		>
+			<ConfigContent />
+		</AppKitWindow>
 	);
 };

@@ -1,8 +1,8 @@
 import React, { FC } from "react";
-import { GroupBox, GroupBoxDevider } from "../appkit/group-box/group-box";
-import { atomWithConfig } from "./atomWithConfig";
+import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
+import { atomWithConfig } from "./atom-with-config";
 import { SwitchConfigComponent } from "./common";
-import {PlayControlButtonType} from "../song-info/play-control-button";
+import { PlayControlButtonType } from "../song-info/play-control-button";
 
 export const showAudioQualityTagAtom = atomWithConfig({
 	key: "show-audio-quality-tag",
@@ -47,16 +47,16 @@ export const showControlThumbAtom = atomWithConfig({
 });
 
 export const leftControlButtonTypeAtom = atomWithConfig({
-    key: "left-control-button-type",
-    default: PlayControlButtonType.PlaybackRandom,
-    desc: "当使用播放控制栏时，左侧的按钮操作类型",
-})
+	key: "left-control-button-type",
+	default: PlayControlButtonType.PlaybackRandom,
+	desc: "当使用播放控制栏时，左侧的按钮操作类型",
+});
 
 export const rightControlButtonTypeAtom = atomWithConfig({
-    key: "right-control-button-type",
-    default: PlayControlButtonType.PlaybackRepeat,
-    desc: "当使用播放控制栏时，右侧的按钮操作类型",
-})
+	key: "right-control-button-type",
+	default: PlayControlButtonType.PlaybackRepeat,
+	desc: "当使用播放控制栏时，右侧的按钮操作类型",
+});
 
 export const LyricStyleConfig: FC = () => {
 	return (

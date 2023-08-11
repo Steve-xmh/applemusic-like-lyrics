@@ -1,5 +1,6 @@
-import * as React from "react";
+import "./devider.sass";
+import { FC } from "react";
 
-export const MenuDevider: React.FC = () => {
+export const MenuDevider: FC = () => {
 	return <div className="appkit-menu-item-devider" />;
 };

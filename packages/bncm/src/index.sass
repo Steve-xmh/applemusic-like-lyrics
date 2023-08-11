@@ -2,29 +2,45 @@
 
 #amll-config
     @include pingfang-font
+
     svg
         width: unset
         height: unset
     box-shadow: 0 7px 10px rgba(0, 0, 0, 0.4), 0 0 3px rgba(0, 0, 0, 0.55)
     line-height: normal
+
     p
         margin-block: 1em
+
     del
         text-decoration: line-through
+
 #amll-config-content
     width: 100%
     display: flex
     flex-direction: column
     gap: 16px
 
+.amll-music-info
+    a
+        color: unset
+    button
+        background: transparent
+        border: none
+    svg
+        width: unset
+        height: unset
+
 #amll-reason
     text-wrap: normal
     word-break: normal
+
     > *:first-child
         font-size: 14px
 
 #amll-view
     @include pingfang-font
+    color: var(--amll-lyric-view-color, white)
     position: fixed
     left: 0
     top: 100vh
@@ -34,31 +50,31 @@
     line-height: normal
     border-radius: 16px 16px 0 0
     z-index: 998
-    transition: top 0.5s cubic-bezier(0.8,0,0.1,1), border-radius 0.25s ease-in-out
+    transition: top 0.5s cubic-bezier(0.8, 0, 0.1, 1), border-radius 0.25s ease-in-out
     background: var(--colorFunction3)
     background: #333
     -webkit-backdrop-filter: blur(120px)
     backdrop-filter: blur(120px)
-    button
-      background: transparent
-      border: none
-    svg
-        width: unset
-        height: unset
+
 #main-player, .m-pinfo
-    transition: bottom 0.5s cubic-bezier(0.8,0,0.1,1), opacity 0.25s ease-in-out
+    transition: bottom 0.5s cubic-bezier(0.8, 0, 0.1, 1), opacity 0.25s ease-in-out
+
 body.amll-lyric-page-open
     #main-player
         bottom: 100%
         opacity: 0
+
     .m-pinfo
         bottom: 100%
         opacity: 0
+
     footer
         bottom: 100%
+
         > * > * > *
             transition: opacity 0.25s ease-in-out
             opacity: 0
+
     #amll-view
         top: 0vh
         border-radius: 0 0 0 0
@@ -71,35 +87,42 @@ body.amll-lyric-page-open
 .am-music-progress-tips
     display: flex
     margin-top: 16px
-    font-weight: 1000
+    font-weight: 700
     opacity: 0.5
     align-items: center
     font-size: 12px
+
     > *
         flex: 0
+
         &:first-child
             flex: 1
+
         &:last-child
             flex: 1
             text-align: right
 
 .am-music-controls
-  display: flex
-  justify-content: space-between
-  > .am-music-track-btn
-    opacity: 0.5
-  > .am-music-track-prev,
-  > .am-music-play,
-  > .am-music-track-next
-    > *
-      height: 5vh
-      width: 5vh
+    display: flex
+    justify-content: space-between
+
+    > .am-music-track-btn
+        opacity: 0.5
+
+    > .am-music-track-prev,
+    > .am-music-play,
+    > .am-music-track-next
+        > *
+            height: 5vh !important
+            width: 5vh !important
 
 .am-music-volume-controls
     display: flex
     align-items: center
     flex-direction: row
+
     > *
         margin: 8px
+
         &:nth-child(2)
             flex: 1

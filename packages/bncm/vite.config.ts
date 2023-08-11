@@ -1,13 +1,12 @@
 import react from "@vitejs/plugin-react";
 import { Plugin, defineConfig, loadEnv } from "vite";
 import { resolve } from "path";
-import os from "os";
-import { cpSync, mkdirSync, readdirSync, rmSync, statSync } from "fs";
+import * as os from "os";
+import { cp, mkdir, readdir, rm, stat, writeFile, readFile } from "fs/promises";
 import wasm from "vite-plugin-wasm";
-import reactSvg from "vite-plugin-react-svg";
 import svgr from "vite-plugin-svgr";
 import terser from "@rollup/plugin-terser";
-import { buildSync } from "esbuild";
+import { minify } from "terser";
 
 function getDefaultBetterNCMPath() {
 	if (os.type() === "Windows_NT") {
@@ -30,41 +29,58 @@ const CopyBetterNCMPlugin = ({
 		buildStart() {
 			this.addWatchFile(manifestPath);
 		},
-		closeBundle() {
+		async closeBundle() {
 			const bncmPath =
 				process.env["BETTERNCM_PROFILE"] || getDefaultBetterNCMPath();
 			const devPath = resolve(bncmPath, "plugins_dev", name);
 			this.info(`copying ${fullDistDir} to ${devPath}`);
-			function copyDir(srcDir: string, destDir: string) {
-				mkdirSync(destDir, { recursive: true });
-				for (const file of readdirSync(srcDir)) {
+			async function copyDir(srcDir: string, destDir: string) {
+				const tasks = [];
+				await mkdir(destDir, { recursive: true });
+				for (const file of await readdir(srcDir)) {
 					const srcFile = resolve(srcDir, file);
 					const destFile = resolve(destDir, file.replace(
 						/\.mjs$/,
 						".js",
 					));
-					if (statSync(srcFile).isDirectory()) {
-						copyDir(srcFile, destFile);
+					if ((await stat(srcFile)).isDirectory()) {
+						tasks.push(copyDir(srcFile, destFile));
 					} else if (destFile.endsWith(".js") && !dev) {
-						buildSync({
-							entryPoints: [srcFile],
-							outfile: destFile,
-							minify: true,
-							define: {
-								"process.env.NODE_ENV": '"production"',
-							}
-						});
+						// buildSync({
+						// 	entryPoints: [srcFile],
+						// 	outfile: destFile,
+						// 	minify: true,
+						// 	define: {
+						// 		"process.env.NODE_ENV": '"production"',
+						// 	}
+						// });
+						tasks.push((async () => {
+							console.log("Compressing " + srcFile);
+							const srcCode = await readFile(srcFile, { encoding: "utf8" })
+							const result = await minify(srcCode, {
+								module: true,
+								compress: {
+									global_defs: {
+										"process.env.NODE_ENV": "production",
+									},
+									passes: 3
+								}
+							});
+							await writeFile(destFile, result.code);
+							console.log(`Compressed ${srcFile} to ${destFile} (${srcCode.length} -> ${result.code.length})`);
+						})())
 					} else {
-						cpSync(srcFile, destFile);
+						tasks.push(cp(srcFile, destFile));
 					}
 				}
+				await Promise.all(tasks);
 			}
 			try {
-				rmSync(devPath, {
+				await rm(devPath, {
 					recursive: true,
 				});
 			} catch {}
-			copyDir(fullDistDir, devPath);
+			await copyDir(fullDistDir, devPath);
 		},
 	};
 };
@@ -98,9 +114,9 @@ export default defineConfig(({ mode }) => {
 			},
 			minify: env?.AMLL_DEV ? false : "esbuild",
 			sourcemap: env?.AMLL_DEV ? "inline" : true,
-			rollupOptions: {
-				plugins: [!env.AMLL_DEV && terser()],
-			},
+			// rollupOptions: {
+			// 	plugins: [!env.AMLL_DEV && terser()],
+			// },
 		},
 		plugins: [
 			react(),

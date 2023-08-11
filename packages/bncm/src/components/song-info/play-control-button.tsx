@@ -16,9 +16,9 @@ import IconFavoriteOn from "../../assets/icon_favorite_on.svg";
 import IconFavoriteHeart from "../../assets/icon_favorite_heart.svg";
 import IconFavoriteHeartOn from "../../assets/icon_favorite_heart_on.svg";
 import IconAddToPlaylist from "../../assets/icon_add_to_playlist.svg";
-import {playModeAtom} from "../../music-context/wrapper";
-import {PlayMode} from "../../music-context";
-import {isNCMV3} from "../../utils/is-ncm-v3";
+import { playModeAtom } from "../../music-context/wrapper";
+import { PlayMode } from "../../music-context";
+import { isNCMV3 } from "../../utils/is-ncm-v3";
 
 export enum PlayControlButtonType {
 	PlaybackSwitcher = "playback-switcher",
@@ -90,7 +90,7 @@ const PlaybackSwitcherButton: React.FC<{
 						// if (getPlayingSong().originFromTrack.userId === "") {
 						// 	nextPlayMode = PlayMode.One;
 						// } else {
-							nextPlayMode = PlayMode.AI;
+						nextPlayMode = PlayMode.AI;
 						// }
 						break;
 					case PlayMode.AI:

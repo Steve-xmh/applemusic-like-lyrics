@@ -96,15 +96,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			padding: "1rem",
 			boxSizing: "border-box",
 			fontSize: "max(5vh, 12px)",
-			fontWeight: "bold",
-            lineHeight: "normal",
 			width: "100%",
 			height: "100%",
 			overflow: "hidden",
 			maxWidth: "100%",
 			maxHeight: "100%",
 			zIndex: 1,
-			color: "var(--amll-lyric-line-color)",
+			color: "var(--amll-lyric-view-color,white)",
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
 		},
@@ -114,6 +112,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			maxWidth: "100%",
 			padding: "max(2vh, 1rem) 1rem",
 			contain: "content",
+			willChange: "filter,transform,opacity",
 			transition: "filter 0.25s",
 			margin: "0 -1rem",
 		},
@@ -137,6 +136,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		lyricMainLine: {
 			transition: "opacity 0.3s 0.25s",
+			willChange: "opacity",
 			margin: "-1rem",
 			padding: "1rem",
 			"& span": {
@@ -148,6 +148,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				whiteSpace: "pre-wrap",
 				wordBreak: "keep-all",
 				maxLines: "1",
+				willChange: "transform,display,mask-image",
 				"&.emphasize": {
 					margin: "-1rem",
 					padding: "1rem",
@@ -178,7 +179,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				display: "inline-block",
 				borderRadius: "50%",
 				aspectRatio: "1 / 1",
-				backgroundColor: "var(--amll-lyric-line-color)",
+				backgroundColor: "var(--amll-lyric-view-color,white)",
 				marginRight: "4px",
 			},
 			"&.duet": {
@@ -260,8 +261,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		style += "--amll-lyric-player-height:";
 		style += this.element.clientHeight;
 		style += "px;";
-		style += "--amll-lyric-line-color:";
-		style += "#FFFFFF;";
 		style += "--amll-player-time:";
 		style += this.currentTime;
 		style += ";";
