@@ -82,6 +82,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@applemusic-like-lyrics/fft@workspace:packages/fft/pkg":
+  version: 0.0.0-use.local
+  resolution: "@applemusic-like-lyrics/fft@workspace:packages/fft/pkg"
+  languageName: unknown
+  linkType: soft
+
 "@applemusic-like-lyrics/lyric@^0.0.2, @applemusic-like-lyrics/lyric@workspace:^, @applemusic-like-lyrics/lyric@workspace:packages/lyric/pkg":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/lyric@workspace:packages/lyric/pkg"

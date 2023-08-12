@@ -2,7 +2,7 @@ import "./index.sass";
 import { isNCMV3 } from "./utils/is-ncm-v3";
 import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
-import { version } from "../public/manifest.json";
+import manifest from "virtual:bncm-plugin-manifest";
 import { configViewElement, initLyricPage } from "./injector";
 import { MusicContextV2 } from "./music-context/v2";
 import { injectLyricPage } from "./injector/v2";
@@ -105,7 +105,7 @@ plugin.onLoad(async () => {
 	try {
 		await initStyle();
 		console.log(
-			`%cApple Music-like Lyrics %c${version}%c for %cBetterNCM`,
+			`%cApple Music-like Lyrics %c${manifest.version}%c for %cBetterNCM`,
 			"color:#2AF;font-weight:bold;",
 			"color:#2AF;font-weight:normal;",
 			"color:unset;font-weight:normal;",

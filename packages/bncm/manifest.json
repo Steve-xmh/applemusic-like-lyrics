@@ -11,6 +11,7 @@
     "preview": "preview.svg",
     "version": "3.0.0",
     "commit": "!SET_BY_BUILD_SCRIPT!",
+    "branch": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
     "noDevReload": true,
     "ncm3-compatible": true,

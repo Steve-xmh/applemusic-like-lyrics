@@ -5,7 +5,7 @@ import { warn } from "../../utils/logger";
 import {
 	installLatestBranchVersion,
 	useHasUpdates,
-	useInstallableBranches,
+	installableBranchesAtom,
 	useLatestVersion,
 } from "../../utils/updater";
 import { SwitchConfigComponent } from "./common";
@@ -13,7 +13,7 @@ import { Button } from "../appkit/button";
 import { GroupBox } from "../appkit/group-box";
 import { isNCMV3 } from "../../utils/is-ncm-v3";
 import { atomWithConfig } from "./atom-with-config";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import "./about.sass";
 
 export const updateBranchAtom = atomWithConfig({
@@ -39,7 +39,7 @@ export const AboutConfig: FC = () => {
 	const hasUpdates = useHasUpdates();
 	const [updateBranch, setUpdateBranch] = useAtom(updateBranchAtom);
 	const enableUpdateBranch = useAtom(enableUpdateBranchAtom);
-	const installableBranch = useInstallableBranches();
+	const installableBranch = useAtomValue(installableBranchesAtom);
 	const [updating, setUpdating] = useState(false);
 	const isMRBNCM = useMemo(() => betterncm.isMRBNCM ?? isNCMV3(), []);
 	return (
@@ -181,6 +181,12 @@ export const AboutConfig: FC = () => {
 					disabled={updating}
 				/>
 			</GroupBox>
+			{enableUpdateBranch &&
+				installableBranch.map((v) => (
+					<div key={`${v.branch}-${v.path}`}>
+						{v.branch} - {v.path}
+					</div>
+				))}
 			{/* {enableUpdateBranch && (
 				<Select
 					label="更新分支"
