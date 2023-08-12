@@ -3,11 +3,11 @@ import { Application as C } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
 import { ColorMatrixFilter as w } from "@pixi/filter-color-matrix";
 import { Texture as M } from "@pixi/core";
-import { Sprite as T } from "@pixi/sprite";
+import { Sprite as b } from "@pixi/sprite";
 import { create as z } from "jss";
 import A from "jss-preset-default";
 const D = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
-function L(d) {
+function T(d) {
   const e = D.exec(d);
   if (e) {
     const t = Number(e.groups?.hour || "0"), i = Number(e.groups?.min || "0"), n = Number(e.groups?.sec.replace(/:/, ".") || "0");
@@ -30,8 +30,8 @@ function I(d) {
   for (const a of t.querySelectorAll("body p[begin][end]")) {
     const s = {
       words: [],
-      startTime: L(a.getAttribute("begin") ?? "0:0"),
-      endTime: L(a.getAttribute("end") ?? "0:0"),
+      startTime: T(a.getAttribute("begin") ?? "0:0"),
+      endTime: T(a.getAttribute("end") ?? "0:0"),
       translatedLyric: "",
       romanLyric: "",
       isBG: !1,
@@ -76,14 +76,14 @@ function I(d) {
                   endTime: 0
                 });
               } else if (u.nodeType === Node.ELEMENT_NODE) {
-                const f = u, b = f.getAttribute("ttm:role");
-                if (f.nodeName === "span" && b)
-                  b === "x-translation" ? c.translatedLyric = f.innerHTML.trim() : b === "x-roman" && (c.romanLyric = f.innerHTML.trim());
+                const f = u, S = f.getAttribute("ttm:role");
+                if (f.nodeName === "span" && S)
+                  S === "x-translation" ? c.translatedLyric = f.innerHTML.trim() : S === "x-roman" && (c.romanLyric = f.innerHTML.trim());
                 else if (f.hasAttribute("begin") && f.hasAttribute("end")) {
                   const x = {
                     word: u.textContent,
-                    startTime: L(f.getAttribute("begin")),
-                    endTime: L(f.getAttribute("end"))
+                    startTime: T(f.getAttribute("begin")),
+                    endTime: T(f.getAttribute("end"))
                   };
                   c.words.push(x);
                 }
@@ -100,17 +100,17 @@ function I(d) {
         else if (h.hasAttribute("begin") && h.hasAttribute("end")) {
           const c = {
             word: l.textContent ?? "",
-            startTime: L(h.getAttribute("begin")),
-            endTime: L(h.getAttribute("end"))
+            startTime: T(h.getAttribute("begin")),
+            endTime: T(h.getAttribute("end"))
           };
           s.words.push(c);
         }
       }
     n.push(s), r && n.push(r);
   }
-  return console.log(n), n;
+  return n;
 }
-const Q = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Z = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   parseTTML: I
 }, Symbol.toStringTag, { value: "Module" }));
@@ -210,14 +210,14 @@ class k {
    * @param albumUrl 图片的目标链接
    */
   async setAlbumImage(e) {
-    const t = await M.fromURL(e), i = new B(), n = new T(t), a = new T(t), s = new T(t), r = new T(t);
+    const t = await M.fromURL(e), i = new B(), n = new b(t), a = new b(t), s = new b(t), r = new b(t);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, i.addChild(n, a, s, r), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = i, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0;
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick);
   }
 }
-class Z extends k {
+class ee extends k {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -231,12 +231,139 @@ class Z extends k {
   }
 }
 const N = (d, e) => d.size === e.size && [...d].every((t) => e.has(t));
+class L {
+  currentPosition = 0;
+  targetPosition = 0;
+  currentTime = 0;
+  params = {};
+  currentSolver;
+  getV;
+  queueParams;
+  queuePosition;
+  constructor(e = 0) {
+    this.targetPosition = e, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+  }
+  resetSolver() {
+    const e = this.getV(this.currentTime);
+    this.currentTime = 0, this.currentSolver = $(
+      this.currentPosition,
+      e,
+      this.targetPosition,
+      0,
+      this.params
+    ), this.getV = q(this.currentSolver);
+  }
+  arrived() {
+    return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
+  }
+  setPosition(e) {
+    this.targetPosition = e, this.currentPosition = e, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+  }
+  update(e = 0) {
+    this.currentTime += e, this.currentPosition = this.currentSolver(this.currentTime), this.queueParams && (this.queueParams.time -= e, this.queueParams.time <= 0 && this.updateParams({
+      ...this.queueParams
+    })), this.queuePosition && (this.queuePosition.time -= e, this.queuePosition.time <= 0 && this.setTargetPosition(this.queuePosition.position)), this.arrived() && this.setPosition(this.targetPosition);
+  }
+  updateParams(e, t = 0) {
+    t > 0 ? this.queueParams = {
+      ...e,
+      time: t
+    } : (this.params = {
+      ...this.params,
+      ...e
+    }, this.resetSolver());
+  }
+  setTargetPosition(e, t = 0) {
+    t > 0 ? this.queuePosition = {
+      position: e,
+      time: t
+    } : (this.queuePosition = void 0, this.targetPosition = e, this.resetSolver());
+  }
+  getCurrentPosition() {
+    return this.currentPosition;
+  }
+}
+function $(d, e, t, i = 0, n) {
+  const a = n?.soft ?? !1, s = n?.stiffness ?? 100, r = n?.damping ?? 10, l = n?.mass ?? 1, h = t - d;
+  if (a || 1 <= r / (2 * Math.sqrt(s * l))) {
+    const o = -Math.sqrt(s / l), c = -o * h - e;
+    return (m) => (m -= i, m < 0 ? d : t - (h + m * c) * Math.E ** (m * o));
+  } else {
+    const o = Math.sqrt(
+      4 * l * s - r ** 2
+    ), c = (r * h - 2 * l * e) / o, m = 0.5 * o / l, p = -(0.5 * r) / l;
+    return (u) => (u -= i, u < 0 ? d : t - (Math.cos(u * m) * h + Math.sin(u * m) * c) * Math.E ** (u * p));
+  }
+}
 function O(d) {
+  return (t) => (d(t + 1e-3) - d(t - 1e-3)) / (2 * 1e-3);
+}
+function q(d) {
+  return O(d);
+}
+class X {
+  constructor(e) {
+    this.lyricPlayer = e, this.element.setAttribute(
+      "class",
+      this.lyricPlayer.style.classes.lyricLine
+    ), this.rebuildStyle();
+  }
+  element = document.createElement("div");
+  left = 0;
+  top = 0;
+  delay = 0;
+  // 由 LyricPlayer 来设置
+  lineSize = [0, 0];
+  lineTransforms = {
+    posX: new L(0),
+    posY: new L(0)
+  };
+  measureSize() {
+    return [
+      this.element.clientWidth,
+      this.element.clientHeight
+    ];
+  }
+  lastStyle = "";
+  show() {
+    this.rebuildStyle();
+  }
+  hide() {
+    this.rebuildStyle();
+  }
+  rebuildStyle() {
+    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px);`;
+    !this.lyricPlayer.getEnableSpring() && this.isInSight && (e += `transition-delay:${this.delay}ms;`), e !== this.lastStyle && (this.lastStyle = e, this.element.setAttribute("style", e));
+  }
+  getElement() {
+    return this.element;
+  }
+  setTransform(e = this.left, t = this.top, i = !1, n = 0) {
+    this.left = e, this.top = t, this.delay = n * 1e3 | 0, i || !this.lyricPlayer.getEnableSpring() ? (i && this.element.classList.add(
+      this.lyricPlayer.style.classes.tmpDisableTransition
+    ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lyricPlayer.getEnableSpring() ? this.rebuildStyle() : this.show(), i && requestAnimationFrame(() => {
+      this.element.classList.remove(
+        this.lyricPlayer.style.classes.tmpDisableTransition
+      );
+    })) : (this.lineTransforms.posX.setTargetPosition(e, n), this.lineTransforms.posY.setTargetPosition(t, n));
+  }
+  update(e = 0) {
+    this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.isInSight ? this.show() : this.hide());
+  }
+  get isInSight() {
+    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], n = t + this.lineSize[1], a = this.lyricPlayer.pos[0], s = this.lyricPlayer.pos[1], r = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0], l = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
+    return !(e > r || t > l || i < a || n < s);
+  }
+  dispose() {
+    this.element.remove();
+  }
+}
+function _(d) {
   const t = 2.5949095;
   return d < 0.5 ? Math.pow(2 * d, 2) * ((t + 1) * 2 * d - t) / 2 : (Math.pow(2 * d - 2, 2) * ((t + 1) * (d * 2 - 2) + t) + 2) / 2;
 }
 const g = (d, e, t) => Math.max(d, Math.min(e, t));
-class $ {
+class R {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -268,7 +395,7 @@ class $ {
       if (n <= i) {
         const a = i / Math.ceil(i / this.targetBreatheDuration);
         let s = 1, r = 1;
-        s *= Math.sin(1.5 * Math.PI - n / a * 2) / 10 + 1, n < 1e3 && (s *= 1 - Math.pow((1e3 - n) / 1e3, 2)), n < 500 ? r = 0 : n < 1e3 && (r *= (n - 500) / 500), i - n < 750 && (s *= 1 - O(
+        s *= Math.sin(1.5 * Math.PI - n / a * 2) / 10 + 1, n < 1e3 && (s *= 1 - Math.pow((1e3 - n) / 1e3, 2)), n < 500 ? r = 0 : n < 1e3 && (r *= (n - 500) / 500), i - n < 750 && (s *= 1 - _(
           (750 - (i - n)) / 750 / 2
         )), i - n < 375 && (r *= g(
           0,
@@ -311,77 +438,7 @@ class $ {
     this.element.remove();
   }
 }
-class E {
-  currentPosition = 0;
-  targetPosition = 0;
-  currentTime = 0;
-  params = {};
-  currentSolver;
-  getV;
-  queueParams;
-  queuePosition;
-  constructor(e = 0) {
-    this.targetPosition = e, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
-  }
-  resetSolver() {
-    const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = q(
-      this.currentPosition,
-      e,
-      this.targetPosition,
-      0,
-      this.params
-    ), this.getV = R(this.currentSolver);
-  }
-  arrived() {
-    return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
-  }
-  setPosition(e) {
-    this.targetPosition = e, this.currentPosition = e, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
-  }
-  update(e = 0) {
-    this.currentTime += e, this.currentPosition = this.currentSolver(this.currentTime), this.queueParams && (this.queueParams.time -= e, this.queueParams.time <= 0 && this.updateParams({
-      ...this.queueParams
-    })), this.queuePosition && (this.queuePosition.time -= e, this.queuePosition.time <= 0 && this.setTargetPosition(this.queuePosition.position)), this.arrived() && this.setPosition(this.targetPosition);
-  }
-  updateParams(e, t = 0) {
-    t > 0 ? this.queueParams = {
-      ...e,
-      time: t
-    } : (this.params = {
-      ...this.params,
-      ...e
-    }, this.resetSolver());
-  }
-  setTargetPosition(e, t = 0) {
-    t > 0 ? this.queuePosition = {
-      position: e,
-      time: t
-    } : (this.queuePosition = void 0, this.targetPosition = e, this.resetSolver());
-  }
-  getCurrentPosition() {
-    return this.currentPosition;
-  }
-}
-function q(d, e, t, i = 0, n) {
-  const a = n?.soft ?? !1, s = n?.stiffness ?? 100, r = n?.damping ?? 10, l = n?.mass ?? 1, h = t - d;
-  if (a || 1 <= r / (2 * Math.sqrt(s * l))) {
-    const o = -Math.sqrt(s / l), c = -o * h - e;
-    return (m) => (m -= i, m < 0 ? d : t - (h + m * c) * Math.E ** (m * o));
-  } else {
-    const o = Math.sqrt(
-      4 * l * s - r ** 2
-    ), c = (r * h - 2 * l * e) / o, m = 0.5 * o / l, p = -(0.5 * r) / l;
-    return (u) => (u -= i, u < 0 ? d : t - (Math.cos(u * m) * h + Math.sin(u * m) * c) * Math.E ** (u * p));
-  }
-}
-function _(d) {
-  return (t) => (d(t + 1e-3) - d(t - 1e-3)) / (2 * 1e-3);
-}
-function R(d) {
-  return _(d);
-}
-const S = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
+const P = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 function W(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
   const i = 2 + d, n = d / i, a = (1 - n) / 2;
   return [
@@ -390,10 +447,10 @@ function W(d, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
     i
   ];
 }
-function P(d) {
+function E(d) {
   return d.endTime - d.startTime >= 1e3 && d.word.length <= 7;
 }
-class F {
+class Y {
   constructor(e, t = {
     words: [],
     translatedLyric: "",
@@ -420,9 +477,9 @@ class F {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new E(0),
-    posY: new E(0),
-    scale: new E(1)
+    posX: new L(0),
+    posY: new L(0),
+    scale: new L(1)
   };
   isEnabled = !1;
   enable() {
@@ -507,7 +564,7 @@ class F {
           height: 0,
           elements: [],
           elementAnimations: [],
-          shouldEmphasize: P(l)
+          shouldEmphasize: E(l)
         }), c += m.length;
       });
     });
@@ -527,7 +584,7 @@ class F {
             const c = n.pop() ?? document.createElement("span");
             c.className = "", c.innerText = o, h.appendChild(c), l.elements.push(c);
           }
-          if (l.elementAnimations = this.initEmphasizeAnimation(l), console.log(l.word, S.test(l.word)), r && !S.test(l.word))
+          if (l.elementAnimations = this.initEmphasizeAnimation(l), r && !P.test(l.word))
             if (r.childElementCount > 0)
               r.appendChild(h);
             else {
@@ -535,7 +592,7 @@ class F {
               o.className = "", r.remove(), o.appendChild(r), o.appendChild(h), e.appendChild(o), r = o;
             }
           else
-            r = S.test(l.word) ? null : h, e.appendChild(h);
+            r = P.test(l.word) ? null : h, e.appendChild(h);
         } else {
           const h = n.pop() ?? document.createElement("span");
           if (h.className = "", h.innerText = l.word, l.elements = [h], l.elementAnimations.push(this.initFloatAnimation(l, h)), r)
@@ -653,8 +710,8 @@ class F {
     this.element.remove();
   }
 }
-const G = z(A());
-class ee extends EventTarget {
+const F = z(A());
+class te extends EventTarget {
   element = document.createElement("div");
   currentTime = 0;
   lyricLines = [];
@@ -686,6 +743,7 @@ class ee extends EventTarget {
   enableBlur = !0;
   interludeDots;
   interludeDotsSize = [0, 0];
+  bottomLine;
   supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
   supportMaskImage = CSS.supports("mask-image", "none");
   disableSpring = !1;
@@ -713,7 +771,7 @@ class ee extends EventTarget {
   getEnableSpring() {
     return !this.disableSpring;
   }
-  style = G.createStyleSheet({
+  style = F.createStyleSheet({
     lyricPlayer: {
       userSelect: "none",
       padding: "1rem",
@@ -823,7 +881,7 @@ class ee extends EventTarget {
     this.calcLayout(!0);
   };
   constructor() {
-    super(), this.interludeDots = new $(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
+    super(), this.interludeDots = new R(this), this.bottomLine = new X(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow);
   }
   /**
    * 获取当前播放时间里是否处于间奏区间
@@ -902,14 +960,14 @@ class ee extends EventTarget {
       }
     this.processedLines.forEach((i, n, a) => {
       const s = a[n + 1], r = i.words[i.words.length - 1];
-      r && P(r) && (s ? s.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, s.startTime)) : i.endTime = i.endTime + 1500);
+      r && E(r) && (s ? s.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, s.startTime)) : i.endTime = i.endTime + 1500);
     }), this.processedLines.forEach((i, n, a) => {
       if (i.isBG)
         return;
       const s = a[n + 1];
       s?.isBG && (s.startTime = Math.min(s.startTime, i.startTime));
     }), this.lyricLinesEl.forEach((i) => i.dispose()), this.lyricLinesEl = this.processedLines.map(
-      (i) => new F(this, i)
+      (i) => new Y(this, i)
     ), this.lyricLinesEl.forEach((i) => {
       this.element.appendChild(i.getElement()), i.updateMaskImage();
     }), this.interludeDots.setInterlude(void 0), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0);
@@ -932,7 +990,7 @@ class ee extends EventTarget {
     e && (this.lyricLinesEl.forEach((o) => {
       const c = o.measureSize();
       this.lyricLinesSize.set(o, c), o.lineSize = c;
-    }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight);
+    }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());
     const t = 0.95;
     let n = -this.lyricLinesEl.slice(0, this.scrollToIndex).reduce(
       (o, c) => o + (c.getLine().isBG ? 0 : this.lyricLinesSize.get(c)?.[1] ?? 0),
@@ -976,7 +1034,7 @@ class ee extends EventTarget {
         e,
         l
       ), u.isBG && p ? n += this.lyricLinesSize.get(o)?.[1] ?? 0 : u.isBG || (n += this.lyricLinesSize.get(o)?.[1] ?? 0), n >= 0 && (l += 0.05);
-    });
+    }), this.bottomLine.setTransform(0, n, e, l);
   }
   /**
    * 获取当前歌词的播放位置
@@ -998,6 +1056,18 @@ class ee extends EventTarget {
   }
   getElement() {
     return this.element;
+  }
+  /**
+   * 获取一个特殊的底栏元素，默认是空白的，可以往内部添加任意元素
+   *
+   * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+   *
+   * 但是请勿删除该元素，只能在内部存放元素
+   *
+   * @returns 一个元素，可以往内部添加任意元素
+   */
+  getBottomLineElement() {
+    return this.bottomLine.getElement();
   }
   /**
    * 设置歌词行的对齐方式，默认为 `top`
@@ -1057,7 +1127,7 @@ class ee extends EventTarget {
    */
   update(e = 0) {
     const t = e / 1e3;
-    this.interludeDots.update(e), this.lyricLinesEl.forEach((i) => i.update(t));
+    this.interludeDots.update(e), this.bottomLine.update(e), this.lyricLinesEl.forEach((i) => i.update(t));
   }
   /**
    * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
@@ -1068,7 +1138,7 @@ class ee extends EventTarget {
     this.posXSpringParams = {
       ...this.posXSpringParams,
       ...e
-    }, this.lyricLinesEl.forEach(
+    }, this.bottomLine.lineTransforms.posX.updateParams(this.posXSpringParams), this.lyricLinesEl.forEach(
       (t) => t.lineTransforms.posX.updateParams(this.posXSpringParams)
     );
   }
@@ -1081,7 +1151,7 @@ class ee extends EventTarget {
     this.posYSpringParams = {
       ...this.posYSpringParams,
       ...e
-    }, this.lyricLinesEl.forEach(
+    }, this.bottomLine.lineTransforms.posY.updateParams(this.posYSpringParams), this.lyricLinesEl.forEach(
       (t) => t.lineTransforms.posY.updateParams(this.posYSpringParams)
     );
   }
@@ -1099,12 +1169,12 @@ class ee extends EventTarget {
     );
   }
   dispose() {
-    this.element.remove(), this.resizeObserver.disconnect(), this.style.detach(), this.lyricLinesEl.forEach((e) => e.dispose()), window.removeEventListener("pageshow", this.onPageShow);
+    this.element.remove(), this.resizeObserver.disconnect(), this.style.detach(), this.lyricLinesEl.forEach((e) => e.dispose()), window.removeEventListener("pageshow", this.onPageShow), this.bottomLine.dispose(), this.interludeDots.dispose();
   }
 }
 export {
-  Z as BackgroundRender,
-  ee as LyricPlayer,
-  Q as ttml
+  ee as BackgroundRender,
+  te as LyricPlayer,
+  Z as ttml
 };
 //# sourceMappingURL=amll-core.mjs.map

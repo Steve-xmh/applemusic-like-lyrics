@@ -20,7 +20,13 @@
     display: flex
     flex-direction: column
     gap: 16px
-
+.amll-mouse-hover-show
+    opacity: 0
+    transition: opacity 1s
+    &:hover
+        opacity: 1
+        transition: opacity 1s 5s
+    
 .amll-music-info
     a
         color: unset

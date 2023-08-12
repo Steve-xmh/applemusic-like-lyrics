@@ -29,6 +29,7 @@ __metadata:
     "@types/semver": ^7.5.0
     "@vitejs/plugin-react": ^4.0.3
     classnames: ^2.3.2
+    driver.js: ^1.2.1
     esbuild: ^0.19.0
     jotai: ^2.2.2
     lightningcss: ^1.21.5
@@ -92,6 +93,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:
     "@applemusic-like-lyrics/core": "workspace:^"
+    "@types/react-dom": ^18.2.7
     "@vitejs/plugin-react": ^4.0.3
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -102,6 +104,7 @@ __metadata:
     vite-plugin-dts: ^3.3.1
   peerDependencies:
     react: "*"
+    react-dom: "*"
   languageName: unknown
   linkType: soft
 
@@ -3712,6 +3715,13 @@ __metadata:
     no-case: ^3.0.4
     tslib: ^2.0.3
   checksum: a65e3519414856df0228b9f645332f974f2bf5433370f544a681122eab59e66038fc3349b4be1cdc47152779dac71a5864f1ccda2f745e767c46e9c6543b1169
+  languageName: node
+  linkType: hard
+
+"driver.js@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "driver.js@npm:1.2.1"
+  checksum: 03d79d280618c5e17dcd3b36a5523169942c8dea1c58533782cf8230c035bbf9b913ed71dc46108c8bc1f1c3ef8511e252e568d8ac053e24820f264b691b7791
   languageName: node
   linkType: hard
 

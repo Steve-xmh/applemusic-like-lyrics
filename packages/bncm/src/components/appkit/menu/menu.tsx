@@ -1,3 +1,4 @@
+import { log } from "../../../utils/logger";
 import "./menu.sass";
 import {
 	FC,
@@ -19,32 +20,28 @@ export const Menu: FC<
 	const [pos, setPos] = useState([0, 0]);
 
 	useLayoutEffect(() => {
-		const menu = menuRef.current;
-		if (menu) {
-			const onRightClick = (evt: MouseEvent) => {
-				const box = menu.getBoundingClientRect();
-				let x = evt.clientX;
-				let y = evt.clientY;
-				if (x > box.width && x + box.width >= window.innerWidth) {
-					x -= box.width;
-				}
-				if (y > box.height && y + box.height >= window.innerHeight) {
-					y -= box.height;
-				}
-				posRef.current = [x, y];
-			};
+		const onRightClick = (evt: MouseEvent) => {
+			posRef.current = [evt.clientX, evt.clientY];
+		};
+		window.addEventListener("mousemove", onRightClick);
+		return () => {
 			window.addEventListener("mousemove", onRightClick);
-			return () => {
-				window.addEventListener("mousemove", onRightClick);
-			};
-		} else {
-			setPos([0, 0]);
-		}
-	}, [props.opened, menuRef.current]);
+		};
+	}, [menuRef.current]);
 
 	useLayoutEffect(() => {
-		if (props.opened) {
-			setPos(posRef.current);
+		const menu = menuRef.current;
+		if (props.opened && menu) {
+			const box = menu.getBoundingClientRect();
+			let [x, y] = posRef.current;
+			if (x + box.width >= window.innerWidth) {
+				x = window.innerWidth - box.width;
+			}
+			if (y + box.height >= window.innerHeight) {
+				y = window.innerHeight - box.height;
+			}
+			console.log(x, y);
+			setPos([x, y]);
 		}
 	}, [props.opened]);
 

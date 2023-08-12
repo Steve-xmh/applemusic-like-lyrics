@@ -45,24 +45,22 @@ export const AppKitWindowFrame: FC<
 			className={`appkit-window${title ? " " : " no-title "}${className || ""}`}
 			{...props}
 		>
-			<div>
-				<div className="window-sidebar">
-					{title && <div className="window-controls-content" />}
-					{sidebarItems}
-					<div className="spacer" />
-					{sidebarBottomItems}
-				</div>
-				<div className="window-sidebar-devider" />
-				<div className="window-content">
-					{title && (
-						<div className="window-controls-content">
-							<div className="title">{title}</div>
-						</div>
-					)}
-					<div className="window-content-inner">
-						<div>
-							<div>{children}</div>
-						</div>
+			<div className="window-sidebar">
+				{title && <div className="window-controls-content" />}
+				{sidebarItems}
+				<div className="spacer" />
+				{sidebarBottomItems}
+			</div>
+			<div className="window-sidebar-devider" />
+			<div className="window-content">
+				{title && (
+					<div className="window-controls-content">
+						<div className="title">{title}</div>
+					</div>
+				)}
+				<div className="window-content-inner">
+					<div>
+						<div>{children}</div>
 					</div>
 				</div>
 			</div>
@@ -185,38 +183,31 @@ export const AppKitWindow: FC<
 			ref={winRef}
 			{...props}
 		>
-			<div
-				style={{
-					width: width ? `${width}px` : undefined,
-					height: height ? `${height}px` : undefined,
-				}}
-			>
-				<div className="appkit-traffic-lights">
-					<button type="button" onClick={onClose} className="close" />
-					{!hideMinimizeBtn && <button type="button" className="minimize" />}
-					{!hideZoomBtn && <button type="button" className="zoom" />}
+			<div className="appkit-traffic-lights">
+				<button type="button" onClick={onClose} className="close" />
+				{!hideMinimizeBtn && <button type="button" className="minimize" />}
+				{!hideZoomBtn && <button type="button" className="zoom" />}
+			</div>
+			<div className="window-sidebar">
+				<div
+					className="window-controls-content"
+					onMouseDown={onStartDraggingWindow}
+				/>
+				{sidebarItems}
+				<div className="spacer" />
+				{sidebarBottomItems}
+			</div>
+			<div className="window-sidebar-devider" />
+			<div className="window-content">
+				<div
+					className="window-controls-content"
+					onMouseDown={onStartDraggingWindow}
+				>
+					<div className="title">{title}</div>
 				</div>
-				<div className="window-sidebar">
-					<div
-						className="window-controls-content"
-						onMouseDown={onStartDraggingWindow}
-					/>
-					{sidebarItems}
-					<div className="spacer" />
-					{sidebarBottomItems}
-				</div>
-				<div className="window-sidebar-devider" />
-				<div className="window-content">
-					<div
-						className="window-controls-content"
-						onMouseDown={onStartDraggingWindow}
-					>
-						<div className="title">{title}</div>
-					</div>
-					<div className="window-content-inner">
-						<div>
-							<div>{children}</div>
-						</div>
+				<div className="window-content-inner">
+					<div>
+						<div>{children}</div>
 					</div>
 				</div>
 			</div>

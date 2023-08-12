@@ -7,6 +7,7 @@
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import { eqSet } from "../utils/eq-set";
 import { SpringParams } from "../utils/spring";
+import { BottomLineEl } from "./bottom-line";
 import { InterludeDots } from "./interlude-dots";
 import { LyricLineEl, shouldEmphasize } from "./lyric-line";
 import { create } from "jss";
@@ -57,6 +58,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private enableBlur = true;
 	private interludeDots: InterludeDots;
 	private interludeDotsSize: [number, number] = [0, 0];
+	private bottomLine: BottomLineEl;
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	private disableSpring = false;
@@ -202,6 +204,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	constructor() {
 		super();
 		this.interludeDots = new InterludeDots(this);
+		this.bottomLine = new BottomLineEl(this);
 		this.element.setAttribute("class", this.style.classes.lyricPlayer);
 		if (this.disableSpring) {
 			this.element.classList.add(this.style.classes.disableSpring);
@@ -209,6 +212,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.rebuildStyle();
 		this.resizeObserver.observe(this.element);
 		this.element.appendChild(this.interludeDots.getElement());
+		this.element.appendChild(this.bottomLine.getElement());
 		this.style.attach();
 		this.interludeDots.setTransform(0, 200);
 		window.addEventListener("pageshow", this.onPageShow);
@@ -386,6 +390,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			});
 			this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth;
 			this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight;
+
+			this.bottomLine.lineSize = this.bottomLine.measureSize();
 		}
 		const SCALE_ASPECT = 0.95;
 		const scrollOffset = this.lyricLinesEl
@@ -455,13 +461,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				isActive ? 1 : SCALE_ASPECT,
 				hasBuffered ? 1 : 1 / 3,
 				this.enableBlur
-					?
-					  (isActive
-							? 0
-							: 1 +
-							  (i < this.scrollToIndex
-									? Math.abs(this.scrollToIndex - i)
-									: Math.abs(i - Math.max(this.scrollToIndex, latestIndex))))
+					? isActive
+						? 0
+						: 1 +
+						  (i < this.scrollToIndex
+								? Math.abs(this.scrollToIndex - i)
+								: Math.abs(i - Math.max(this.scrollToIndex, latestIndex)))
 					: 0,
 				reflow,
 				delay,
@@ -475,6 +480,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				delay += 0.05;
 			}
 		});
+		this.bottomLine.setTransform(0, curPos, reflow, delay);
 	}
 	/**
 	 * 获取当前歌词的播放位置
@@ -496,6 +502,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	}
 	getElement(): HTMLElement {
 		return this.element;
+	}
+	/**
+	 * 获取一个特殊的底栏元素，默认是空白的，可以往内部添加任意元素
+	 *
+	 * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+	 *
+	 * 但是请勿删除该元素，只能在内部存放元素
+	 *
+	 * @returns 一个元素，可以往内部添加任意元素
+	 */
+	getBottomLineElement(): HTMLElement {
+		return this.bottomLine.getElement();
 	}
 	/**
 	 * 设置歌词行的对齐方式，默认为 `top`
@@ -632,6 +650,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	update(delta = 0) {
 		const deltaS = delta / 1000;
 		this.interludeDots.update(delta);
+		this.bottomLine.update(delta);
 		this.lyricLinesEl.forEach((line) => line.update(deltaS));
 	}
 	/**
@@ -644,6 +663,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...this.posXSpringParams,
 			...params,
 		};
+		this.bottomLine.lineTransforms.posX.updateParams(this.posXSpringParams);
 		this.lyricLinesEl.forEach((line) =>
 			line.lineTransforms.posX.updateParams(this.posXSpringParams),
 		);
@@ -658,6 +678,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...this.posYSpringParams,
 			...params,
 		};
+		this.bottomLine.lineTransforms.posY.updateParams(this.posYSpringParams);
 		this.lyricLinesEl.forEach((line) =>
 			line.lineTransforms.posY.updateParams(this.posYSpringParams),
 		);
@@ -682,5 +703,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.style.detach();
 		this.lyricLinesEl.forEach((el) => el.dispose());
 		window.removeEventListener("pageshow", this.onPageShow);
+		this.bottomLine.dispose();
+		this.interludeDots.dispose();
 	}
 }

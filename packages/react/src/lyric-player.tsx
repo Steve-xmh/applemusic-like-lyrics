@@ -9,7 +9,9 @@ import {
 	forwardRef,
 	useImperativeHandle,
 	type HTMLProps,
+	type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * 歌词播放组件的属性
@@ -68,6 +70,12 @@ export interface LyricPlayerProps {
 	 * @param params 需要设置的弹簧属性，提供的属性将会覆盖原来的属性，未提供的属性将会保持原样
 	 */
 	lineScaleSpringParams?: Partial<spring.SpringParams>;
+	/**
+	 * 在一个特殊的底栏元素内加入指定元素，默认是空白的，可以往内部添加任意元素
+	 *
+	 * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+	 */
+	bottomLine?: ReactNode;
 }
 
 /**
@@ -195,6 +203,16 @@ export const LyricPlayer = forwardRef<
 			[wrapperRef.current, corePlayerRef.current],
 		);
 
-		return <div {...props} ref={wrapperRef} />;
+		return (
+			<>
+				<div {...props} ref={wrapperRef} />
+				{corePlayerRef.current?.getBottomLineElement() && props.bottomLine
+					? createPortal(
+							props.bottomLine,
+							corePlayerRef.current?.getBottomLineElement(),
+					  )
+					: null}
+			</>
+		);
 	},
 );

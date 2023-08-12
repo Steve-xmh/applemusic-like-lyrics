@@ -1,6 +1,6 @@
-import { defineComponent as m, ref as p, onMounted as d, onUnmounted as g, watchEffect as n, openBlock as v, createElementBlock as S } from "vue";
-import { LyricPlayer as P, BackgroundRender as y } from "@applemusic-like-lyrics/core";
-const _ = /* @__PURE__ */ m({
+import { defineComponent as g, ref as s, onMounted as d, onUnmounted as v, watchEffect as n, openBlock as m, createElementBlock as S, Fragment as P, createElementVNode as y, createBlock as b, Teleport as B, createCommentVNode as L } from "vue";
+import { LyricPlayer as w, BackgroundRender as _ } from "@applemusic-like-lyrics/core";
+const E = /* @__PURE__ */ g({
   __name: "LyricPlayer",
   props: {
     disabled: { type: Boolean },
@@ -11,22 +11,23 @@ const _ = /* @__PURE__ */ m({
     currentTime: {},
     linePosXSpringParams: {},
     linePosYSpringParams: {},
-    lineScaleSpringParams: {}
+    lineScaleSpringParams: {},
+    bottomLine: {}
   },
-  setup(t, { expose: o }) {
-    const a = t, l = p(), r = p();
+  setup(p, { expose: u }) {
+    const a = p, l = s(), r = s();
     return d(() => {
-      l.value && (r.value = new P(), l.value.appendChild(r.value.getElement()));
-    }), g(() => {
+      l.value && (r.value = new w(), l.value.appendChild(r.value.getElement()));
+    }), v(() => {
       r.value && r.value.dispose();
     }), n((e) => {
       if (!a.disabled) {
-        let i = !1, s = -1;
-        const c = (u) => {
+        let i = !1, t = -1;
+        const o = (c) => {
           var f;
-          i || (s === -1 && (s = u), (f = r.value) == null || f.update(u - s), s = u, requestAnimationFrame(c));
+          i || (t === -1 && (t = c), (f = r.value) == null || f.update(c - t), t = c, requestAnimationFrame(o));
         };
-        requestAnimationFrame(c), e(() => {
+        requestAnimationFrame(o), e(() => {
           i = !0;
         });
       }
@@ -54,15 +55,24 @@ const _ = /* @__PURE__ */ m({
     }), n(() => {
       var e;
       a.lineScaleSpringParams && ((e = r.value) == null || e.setLineScaleSpringParams(a.lineScaleSpringParams));
-    }), o({
+    }), u({
       lyricPlayer: r,
       wrapperEl: l
-    }), (e, i) => (v(), S("div", {
-      ref_key: "wrapperRef",
-      ref: l
-    }, null, 512));
+    }), (e, i) => {
+      var t, o;
+      return m(), S(P, null, [
+        y("div", {
+          ref_key: "wrapperRef",
+          ref: l
+        }, null, 512),
+        (t = r.value) != null && t.getBottomLineElement() && a.bottomLine ? (m(), b(B, {
+          key: 0,
+          to: (o = r.value) == null ? void 0 : o.getBottomLineElement()
+        }, null, 8, ["to"])) : L("", !0)
+      ], 64);
+    };
   }
-}), B = /* @__PURE__ */ m({
+}), k = /* @__PURE__ */ g({
   __name: "BackgroundRender",
   props: {
     albumImageUrl: {},
@@ -71,15 +81,15 @@ const _ = /* @__PURE__ */ m({
     flowSpeed: {},
     renderScale: {}
   },
-  setup(t, { expose: o }) {
-    const a = t, l = p(), r = p();
+  setup(p, { expose: u }) {
+    const a = p, l = s(), r = s();
     return d(() => {
       if (l.value) {
-        r.value = new y();
+        r.value = new _();
         const e = r.value.getElement();
         e.style.width = "100%", e.style.height = "100%", l.value.appendChild(e);
       }
-    }), g(() => {
+    }), v(() => {
       r.value && r.value.dispose();
     }), n(() => {
       var e;
@@ -96,17 +106,17 @@ const _ = /* @__PURE__ */ m({
     }), n(() => {
       var e;
       a.renderScale && ((e = r.value) == null || e.setRenderScale(a.renderScale));
-    }), o({
+    }), u({
       bgRender: r,
       wrapperEl: l
-    }), (e, i) => (v(), S("div", {
+    }), (e, i) => (m(), S("div", {
       ref_key: "wrapperRef",
       ref: l
     }, null, 512));
   }
 });
 export {
-  B as BackgroundRender,
-  _ as LyricPlayer
+  k as BackgroundRender,
+  E as LyricPlayer
 };
 //# sourceMappingURL=amll-vue.mjs.map

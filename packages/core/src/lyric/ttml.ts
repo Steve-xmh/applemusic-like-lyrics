@@ -159,7 +159,5 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 		}
 	}
 
-	console.log(result);
-
 	return result;
 }

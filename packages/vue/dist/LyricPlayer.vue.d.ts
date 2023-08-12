@@ -27,6 +27,11 @@ declare const _default: import("vue").DefineComponent<{
     lineScaleSpringParams: {
         type: import("vue").PropType<Partial<import("@applemusic-like-lyrics/core/dist/utils/spring").SpringParams>>;
     };
+    bottomLine: {
+        type: import("vue").PropType<import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, {
+            [key: string]: any;
+        }>[]>;
+    };
 }, {
     lyricPlayer: import("vue").Ref<LyricPlayer | undefined>;
     wrapperEl: import("vue").Ref<HTMLDivElement | undefined>;
@@ -57,6 +62,11 @@ declare const _default: import("vue").DefineComponent<{
     };
     lineScaleSpringParams: {
         type: import("vue").PropType<Partial<import("@applemusic-like-lyrics/core/dist/utils/spring").SpringParams>>;
+    };
+    bottomLine: {
+        type: import("vue").PropType<import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, {
+            [key: string]: any;
+        }>[]>;
     };
 }>>, {}, {}>;
 export default _default;

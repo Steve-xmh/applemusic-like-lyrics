@@ -27,6 +27,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private enableBlur;
     private interludeDots;
     private interludeDotsSize;
+    private bottomLine;
     readonly supportPlusLighter: boolean;
     readonly supportMaskImage: boolean;
     private disableSpring;
@@ -106,6 +107,16 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      */
     getLyricLines(): LyricLine[];
     getElement(): HTMLElement;
+    /**
+     * 获取一个特殊的底栏元素，默认是空白的，可以往内部添加任意元素
+     *
+     * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+     *
+     * 但是请勿删除该元素，只能在内部存放元素
+     *
+     * @returns 一个元素，可以往内部添加任意元素
+     */
+    getBottomLineElement(): HTMLElement;
     /**
      * 设置歌词行的对齐方式，默认为 `top`
      *

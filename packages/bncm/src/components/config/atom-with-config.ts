@@ -1,67 +1,73 @@
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import type { AsyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 import { normalizePath } from "../../utils/path";
 import { debounce } from "../../utils/debounce";
+import { warn } from "../../utils/logger";
+import { Getter, atom } from "jotai";
+import { AMLLConfig } from ".";
 
-class AMLLConfigStorage<Value> implements AsyncStorage<Value> {
-	private currentValue: Map<string, Value> = new Map();
-	private loaded = false;
-	private readonly saveConfig: () => void;
-	constructor() {
-		this.saveConfig = debounce(async () => {
-			const storeValue: any = {};
-			this.currentValue.forEach((v, k) => {
-				storeValue[k] = v;
-			});
-			if ("betterncm" in window) {
-				const configPath = normalizePath(
-					`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
-				);
-				await betterncm.fs.writeFile(
-					configPath,
-					JSON.stringify(storeValue, null, 4),
-				);
-			} else {
-				localStorage.setItem("amll-config", JSON.stringify(storeValue));
-			}
-		}, 1000);
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+type AMLLStorage = Map<string, any>;
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+async function loadConfig(): Promise<Map<string, any>> {
+	try {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		let storeValue: any;
+		if ("betterncm" in window) {
+			const configPath = normalizePath(
+				`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
+			);
+			storeValue = JSON.parse(await betterncm.fs.readFileText(configPath));
+		} else {
+			// rome-ignore lint/style/noNonNullAssertion: <explanation>
+			// rome-ignore lint/suspicious/noExtraNonNullAssertion: <explanation>
+			storeValue = JSON.parse(localStorage.getItem("amll-config")!!);
+		}
+		return new Map(Object.entries(storeValue));
+	} catch (err) {
+		warn("配置文件加载失败", err);
 	}
-
-	private async loadConfig() {
-		if (this.loaded) return;
-		try {
-			let storeValue: any;
-			if ("betterncm" in window) {
-				const configPath = normalizePath(
-					`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
-				);
-				storeValue = JSON.parse(await betterncm.fs.readFileText(configPath));
-			} else {
-				storeValue = JSON.parse(localStorage.getItem("amll-config")!!);
-			}
-			this.currentValue = new Map(Object.entries(storeValue));
-		} catch {}
-		this.loaded = true;
-	}
-
-	async getItem(key: string, initialValue: Value): Promise<Value> {
-		await this.loadConfig();
-		if (this.currentValue.has(key)) return this.currentValue.get(key)!!;
-		else return initialValue;
-	}
-
-	async removeItem(key: string): Promise<void> {
-		this.currentValue.delete(key);
-		this.saveConfig();
-	}
-
-	async setItem(key: string, newValue: Value): Promise<void> {
-		this.currentValue.set(key, newValue);
-		this.saveConfig();
-	}
+	return new Map();
 }
 
-const storage = new AMLLConfigStorage();
+// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+const saveConfig = debounce(async (config: Map<string, any>) => {
+	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	const storeValue: any = {};
+	config.forEach((v, k) => {
+		storeValue[k] = v;
+	});
+	if ("betterncm" in window) {
+		const configPath = normalizePath(
+			`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
+		);
+		await betterncm.fs.writeFile(
+			configPath,
+			JSON.stringify(storeValue, null, 4),
+		);
+	} else {
+		localStorage.setItem("amll-config", JSON.stringify(storeValue));
+	}
+}, 1000);
+
+const amllStorageLoadedAtom = atom(false);
+const rawAMLLStorageAtom = atom<AMLLStorage>(new Map());
+const amllStorageAtom = atom<Promise<AMLLStorage>, [AMLLStorage], void>(
+	async (get, opt) => {
+		if (!get(amllStorageLoadedAtom)) {
+			opt.setSelf(await loadConfig());
+		}
+		return get(rawAMLLStorageAtom);
+	},
+	(get, set, update: AMLLStorage) => {
+		if (get(amllStorageLoadedAtom)) {
+			saveConfig(update);
+		} else {
+			set(amllStorageLoadedAtom, true);
+		}
+		set(rawAMLLStorageAtom, new Map(update.entries()));
+	},
+);
 
 export interface ConfigInfo<Value> {
 	key: string;
@@ -70,10 +76,16 @@ export interface ConfigInfo<Value> {
 }
 
 function atomWithConfigInner<Value>(info: ConfigInfo<Value>) {
-	return atomWithStorage(
-		info.key,
-		info.default,
-		storage as AMLLConfigStorage<Value>,
+	return atom<Promise<Value>, [Value], Promise<void>>(
+		async (get) => {
+			const storage = await get(amllStorageAtom);
+			return storage.get(info.key) ?? info.default;
+		},
+		async (get, set, update) => {
+			const map = await get(amllStorageAtom);
+			map.set(info.key, update);
+			set(amllStorageAtom, map);
+		},
 	);
 }
 

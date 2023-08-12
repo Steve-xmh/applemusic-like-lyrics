@@ -259,7 +259,6 @@ export class LyricLineEl implements HasElement, Disposable {
 						word.elements.push(charEl);
 					}
 					word.elementAnimations = this.initEmphasizeAnimation(word);
-					console.log(word.word, CJKEXP.test(word.word));
 					if (lastWordEl && !CJKEXP.test(word.word)) {
 						if (lastWordEl.childElementCount > 0) {
 							lastWordEl.appendChild(wordEl);

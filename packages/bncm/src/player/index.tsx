@@ -124,6 +124,7 @@ export const LyricPlayer: FC = (props) => {
 						justifySelf: "center",
 						mixBlendMode: "plus-lighter",
 					}}
+					className="amll-control-thumb"
 					type="button"
 					onClick={() => {
 						closeLyricPage();
@@ -195,7 +196,13 @@ export const LyricPlayer: FC = (props) => {
 								</div>
 							</SongInfoTextMarquee>
 						</div>
-						<button type="button" className="am-music-main-menu">
+						<button
+							type="button"
+							className="am-music-main-menu"
+							onClick={() => {
+								setMenuOpened(true);
+							}}
+						>
 							<IconMore color="#FFFFFF" />
 						</button>
 					</div>
@@ -251,6 +258,7 @@ export const LyricPlayer: FC = (props) => {
 						alignAnchor={alignPosition}
 						currentTime={currentTime}
 						lyricLines={lyricLines}
+						bottomLine={<div>Test Bottom Line</div>}
 					/>
 				)}
 				<div

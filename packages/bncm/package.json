@@ -18,6 +18,7 @@
     "@types/semver": "^7.5.0",
     "@vitejs/plugin-react": "^4.0.3",
     "classnames": "^2.3.2",
+    "driver.js": "^1.2.1",
     "esbuild": "^0.19.0",
     "jotai": "^2.2.2",
     "lightningcss": "^1.21.5",

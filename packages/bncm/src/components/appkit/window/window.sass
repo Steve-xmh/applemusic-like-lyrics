@@ -1,19 +1,24 @@
 @import "../common.sass"
 
+@mixin appkit-window-frame()
+    @include blur-behind(40.7742px, 10px)
+    border-radius: 10px
+    box-shadow: 0px 36px 100px rgba(0, 0, 0, 0.4), 0px 0px 3px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.2)
+    border: solid 0.5px rgba(0, 0, 0, 0.2)
+    background: rgba(44, 44, 44, 0.8)
+    
 .appkit-window
     @include pingfang-font
-    border-radius: 10px
-    box-shadow: 0px 36px 100px rgba(0, 0, 0, 0.4), 0px 0px 3px rgba(0, 0, 0, 0.55)
-    border: solid 0.5px rgba(0, 0, 0, 0.2)
+    @include appkit-window-frame
     display: flex
     color: #F0F0F0EE
     user-select: none
     font-style: normal
-    background: rgba(44, 44, 44, 0.8)
     font-size: 11px
     font-weight: 400
     max-height: 100vh
     max-width: 100vw
+    overflow: hidden
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
     
@@ -34,119 +39,110 @@
         &:hover
             background: transparent
 
-    > *
-        @include blur-behind(40.7742px, 10px)
-        border: solid 1px rgba(255, 255, 255, 0.2)
-        border-radius: 10px
-        overflow: hidden
+    .spacer
+        flex: 1
+
+    .window-sidebar
+        flex: 0
         display: flex
-        width: 100%
-        height: 100%
+        flex-direction: column
+        margin-bottom: 17px
 
-        .spacer
+        .sidebar-item
+            font-weight: 400
+            font-size: 13px
+            line-height: 16px
+            margin: 0px 17px
+            white-space: nowrap
+
+            > *
+                padding: 6px 7px
+                border-radius: 5px
+
+            &.selected > *
+                background: linear-gradient(0deg, rgba(10, 130, 255, 0.75), rgba(10, 130, 255, 0.75)), #0A82FF
+
+    .window-sidebar-devider
+        width: 1px
+        min-width: 1px
+        background: rgba(255, 255, 255, 0.1)
+        box-shadow: -1px 0px 0.5px rgba(0, 0, 0, 0.05)
+
+    .window-content
+        background: #2c2c2c
+        flex: 1
+        min-width: 0
+        min-height: 0
+        display: flex
+        flex-direction: column
+
+        .window-content-inner
             flex: 1
-
-        .window-sidebar
-            flex: 0
-            display: flex
-            flex-direction: column
-            margin-bottom: 17px
-
-            .sidebar-item
-                font-weight: 400
-                font-size: 13px
-                line-height: 16px
-                margin: 0px 17px
-                white-space: nowrap
-
-                > *
-                    padding: 6px 7px
-                    border-radius: 5px
-
-                &.selected > *
-                    background: linear-gradient(0deg, rgba(10, 130, 255, 0.75), rgba(10, 130, 255, 0.75)), #0A82FF
-
-        .window-sidebar-devider
-            width: 1px
-            min-width: 1px
-            background: rgba(255, 255, 255, 0.1)
-            box-shadow: -1px 0px 0.5px rgba(0, 0, 0, 0.05)
-
-        .window-content
-            background: #2c2c2c
-            flex: 1
-            min-width: 0
             min-height: 0
-            display: flex
-            flex-direction: column
+            min-width: 0
 
-            .window-content-inner
-                flex: 1
-                min-height: 0
-                min-width: 0
+            > *
+                position: relative
+                overflow: hidden scroll
+                width: 100%
+                height: 100%
 
                 > *
-                    position: relative
-                    overflow: hidden scroll
-                    width: 100%
-                    height: 100%
+                    max-width: 100%
+                    height: fit-content
+                    margin: 0 0 20px 20px
 
-                    > *
-                        max-width: 100%
-                        height: fit-content
-                        margin: 0 0 20px 20px
+    .window-controls-content
+        flex: 0
+        display: flex
+        min-height: 52px
+        align-items: center
 
-        .window-controls-content
-            flex: 0
-            display: flex
-            min-height: 52px
-            align-items: center
+        &.small
+            min-height: 24px
+    // 小窗口
+    .title
+        margin: 0 30px
+        font-size: 15px
+        font-weight: 590
 
-            &.small
-                min-height: 24px
+    .appkit-traffic-lights
+        position: absolute
+        display: flex
+        margin: 20px
+        // 大窗口
+        &:hover > button
+            &.close
+                background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+
+            &.minimize
+                background-image: url("data:image/svg+xml,%3Csvg width='8' height='2' viewBox='0 0 8 2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.75 1H7.25' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+
+            &.zoom
+                background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.49999 -1.35601e-05L-6.78003e-06 4.49999V-6.78003e-06L4.49999 -1.35601e-05Z' fill='black' fill-opacity='0.5'/%3E%3Cpath d='M1.49999 5.99999L5.99999 1.49999L6 6L1.49999 5.99999Z' fill='black' fill-opacity='0.5'/%3E%3C/svg%3E%0A")
+
+        &.small
+            margin: 6px
         // 小窗口
-        .title
-            margin: 0 30px
-            font-size: 15px
-            font-weight: 590
+        button
+            display: block
+            border: 0.5px solid rgba(0, 0, 0, 0.2)
+            height: 12px
+            width: 12px
+            margin-right: 8px
+            border-radius: 6px
+            background-position: center
+            background-repeat: no-repeat
+            padding: 0
 
-        .appkit-traffic-lights
-            position: absolute
-            display: flex
-            margin: 20px
-            // 大窗口
-            &:hover > button
-                &.close
-                    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.5 0.5L5.5 5.5M5.5 0.5L0.5 5.5' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+            &.close
+                background-color: #FF5F57
 
-                &.minimize
-                    background-image: url("data:image/svg+xml,%3Csvg width='8' height='2' viewBox='0 0 8 2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.75 1H7.25' stroke='black' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A")
+            &.minimize
+                background-color: #FEBC2E
 
-                &.zoom
-                    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.49999 -1.35601e-05L-6.78003e-06 4.49999V-6.78003e-06L4.49999 -1.35601e-05Z' fill='black' fill-opacity='0.5'/%3E%3Cpath d='M1.49999 5.99999L5.99999 1.49999L6 6L1.49999 5.99999Z' fill='black' fill-opacity='0.5'/%3E%3C/svg%3E%0A")
-
-            &.small
-                margin: 6px
-            // 小窗口
-            button
-                display: block
-                border: 0.5px solid rgba(0, 0, 0, 0.2)
-                height: 12px
-                width: 12px
-                margin-right: 8px
-                border-radius: 6px
-                background-position: center
-                background-repeat: no-repeat
-                padding: 0
-
-                &.close
-                    background-color: #FF5F57
-
-                &.minimize
-                    background-color: #FEBC2E
-
-                &.zoom
-                    background-color: #28C840
+            &.zoom
+                background-color: #28C840
 
     &.no-title
         .window-sidebar

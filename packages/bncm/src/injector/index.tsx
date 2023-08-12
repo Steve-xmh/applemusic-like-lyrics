@@ -5,13 +5,9 @@ import { LyricPlayer } from "../player";
 import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
 import { WebSocketWrapper } from "../music-context/ws-wrapper";
-import AMLLIcon from "../assets/amll-icon.svg";
-import { Button } from "../components/appkit/button";
-import { GroupBox, GroupBoxDevider } from "../components/appkit/group-box";
-import { TextField } from "../components/appkit/text-field";
-import { Switch } from "../components/appkit/switch/switch";
-import { AppKitWindowFrame, SidebarItem } from "../components/appkit/window";
 import { AMLLConfig } from "../components/config";
+import { AMLLGuide } from "../player/guide";
+import { Suspense } from "react";
 
 export const mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "amll-view";
@@ -23,11 +19,14 @@ export function initLyricPage() {
 	appRoot = createRoot(mainViewElement);
 	appRoot.render(
 		<Provider>
-			<MusicInfoWrapper />
-			<WebSocketWrapper />
-			<LyricProvider />
-			{createPortal(<LyricPlayer />, mainViewElement)}
-			{createPortal(<AMLLConfig />, configViewElement)}
+			<Suspense>
+				<AMLLGuide />
+				<MusicInfoWrapper />
+				<WebSocketWrapper />
+				<LyricProvider />
+				{createPortal(<LyricPlayer />, mainViewElement)}
+				{createPortal(<AMLLConfig />, configViewElement)}
+			</Suspense>
 		</Provider>,
 	);
 	document.body.appendChild(mainViewElement);

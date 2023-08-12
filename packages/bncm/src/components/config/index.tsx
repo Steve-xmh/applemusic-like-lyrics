@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, Suspense } from "react";
 import { AppKitWindow, AppKitWindowFrame, SidebarItem } from "../appkit/window";
 import { PlayerConfig } from "./player";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -6,6 +6,8 @@ import "./config.sass";
 import { LyricConfig } from "./lyric";
 import { LyricStyleConfig } from "./music";
 import { AboutConfig } from "./about";
+import { OtherConfig } from "./other";
+import { Spinner } from "../appkit/spinner/spinner";
 
 export const configPageAtom = atom("lyric");
 
@@ -71,10 +73,26 @@ const ConfigContent: FC = () => {
 	const configPage = useAtomValue(configPageAtom);
 	return (
 		<div id="amll-config-content">
-			{configPage === "player" && <PlayerConfig />}
-			{configPage === "lyric" && <LyricConfig />}
-			{configPage === "music" && <LyricStyleConfig />}
-			{configPage === "about" && <AboutConfig />}
+			<Suspense
+				fallback={
+					<div
+						style={{
+							display: "flex",
+							height: "100%",
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+					>
+						<Spinner />
+					</div>
+				}
+			>
+				{configPage === "player" && <PlayerConfig />}
+				{configPage === "lyric" && <LyricConfig />}
+				{configPage === "music" && <LyricStyleConfig />}
+				{configPage === "other" && <OtherConfig />}
+				{configPage === "about" && <AboutConfig />}
+			</Suspense>
 		</div>
 	);
 };

@@ -7,6 +7,6 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 		if (timer) {
 			clearTimeout(timer);
 		}
-		timer = setTimeout(callback.bind(self, args), waitTime);
+		timer = setTimeout(callback.bind(self, ...args), waitTime);
 	} as unknown as T;
 }

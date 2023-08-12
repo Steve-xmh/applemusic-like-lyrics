@@ -1,5 +1,6 @@
 <template>
     <div ref="wrapperRef"></div>
+    <Teleport v-if="playerRef?.getBottomLineElement() && props.bottomLine" :to="playerRef?.getBottomLineElement()" />
 </template>
 
 <script setup lang="ts">

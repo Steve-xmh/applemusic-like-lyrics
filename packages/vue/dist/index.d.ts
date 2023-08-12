@@ -1,5 +1,5 @@
 import type { spring, LyricLine, LyricPlayer as CoreLyricPlayer, BackgroundRender as CoreBackgroundRender } from "@applemusic-like-lyrics/core";
-import type { Ref } from "vue";
+import type { Ref, VNode } from "vue";
 import LyricPlayer from "./LyricPlayer.vue";
 import BackgroundRender from "./BackgroundRender.vue";
 export { LyricPlayer, BackgroundRender };
@@ -60,6 +60,12 @@ export interface LyricPlayerProps {
      * @param params 需要设置的弹簧属性，提供的属性将会覆盖原来的属性，未提供的属性将会保持原样
      */
     lineScaleSpringParams?: Partial<spring.SpringParams>;
+    /**
+     * 在一个特殊的底栏元素内加入指定元素，默认是空白的，可以往内部添加任意元素
+     *
+     * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+     */
+    bottomLine?: VNode[];
 }
 /**
  * 歌词播放组件的引用
