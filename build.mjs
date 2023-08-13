@@ -29,12 +29,24 @@ function getCommitHash() {
 	}
 }
 
+function getBranchName() {
+	try {
+		return execSync("git branch --show-current", { stdio: "pipe" })
+			.toString("utf8")
+			.trim();
+	} catch (err) {
+		console.warn("警告：获取 Git Branch Name 失败", err);
+		return "";
+	}
+}
+
 execSync("wasm-pack build --target web", {
 	cwd: "./amll-fft",
 	stdio: "inherit",
 });
 
 manifest.commit = getCommitHash();
+manifest.branch = getBranchName();
 
 /** @type {import("esbuild").Plugin[]}*/
 const plugins = [

@@ -65,7 +65,15 @@ export const AboutPage: React.FC = () => {
 									autoClose: false,
 								});
 
-								await installLatestBranchVersion(updateBranch);
+								const targetBranch = installableBranch.find(
+									(b) => b.branch === updateBranch,
+								);
+
+								if (targetBranch)
+									await installLatestBranchVersion(
+										targetBranch.branch,
+										targetBranch.path,
+									);
 
 								showNotification({
 									title: "AMLL 更新成功！",
@@ -169,8 +177,8 @@ export const AboutPage: React.FC = () => {
 					disabled={updating}
 					onChange={setUpdateBranch}
 					data={installableBranch.map((v) => ({
-						label: v === "main" ? "正式稳定版本分支" : `${v} 分支`,
-						value: v,
+						label: v.branch === "main" ? "正式稳定版本分支" : `${v.branch} 分支（位于 ${v.path}）`,
+						value: v.branch,
 					}))}
 				/>
 			)}

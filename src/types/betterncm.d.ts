@@ -366,6 +366,7 @@ declare module "plugin" {
 		slug: string;
 		/** 是否禁用自带的开发重载功能，适用于那些需要自制热重载的插件开发者们，默认不禁用 */
 		noDevReload?: boolean;
+		branch: string;
 		commit: string;
 		incompatible: string[];
 		loadAfter?: string[];
