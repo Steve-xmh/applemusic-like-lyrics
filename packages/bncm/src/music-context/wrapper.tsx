@@ -1,5 +1,5 @@
 import { type FC, useEffect, useRef } from "react";
-import { atom, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
 	Artist,
 	AudioQualityType,
@@ -20,9 +20,11 @@ export const musicDurationAtom = atom(0);
 export const musicQualityAtom = atom(AudioQualityType.Normal);
 export const playModeAtom = atom(
 	(get) => get(rawPlayModeAtom),
-	(get, _set, update: PlayMode) => {
+	(get, set, update: PlayMode) => {
 		const musicCtx = get(rawMusicContextAtom);
 		musicCtx?.setPlayMode(update);
+		const mode = musicCtx?.getPlayMode();
+		if (mode) set(rawPlayModeAtom, mode);
 	},
 );
 const rawPlayModeAtom = atom(PlayMode.One);
@@ -69,6 +71,7 @@ const rawMusicContextAtom = atom<MusicContextBase | undefined>(undefined);
 
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
+	const [lyricPageOpened, setLyricPageOpened] = useAtom(lyricPageOpenedAtom);
 	const setMusicId = useSetAtom(musicIdAtom);
 	const setMusicName = useSetAtom(musicNameAtom);
 	const setMusicArtists = useSetAtom(musicArtistsAtom);
@@ -76,12 +79,12 @@ export const MusicInfoWrapper: FC = () => {
 	const setMusicAlbumId = useSetAtom(musicAlbumIdAtom);
 	const setMusicAlbumName = useSetAtom(musicAlbumNameAtom);
 	const setCurrentTime = useSetAtom(rawCurrentTimeAtom);
-	const setLyricPageOpened = useSetAtom(lyricPageOpenedAtom);
 	const setPlayStatus = useSetAtom(rawPlayStatusAtom);
 	const setVolume = useSetAtom(rawCurrentVolumeAtom);
 	const setMusicContext = useSetAtom(rawMusicContextAtom);
 	const setMusicDuration = useSetAtom(musicDurationAtom);
 	const setMusicQuality = useSetAtom(musicQualityAtom);
+	const setCurrentPlayMode = useSetAtom(rawPlayModeAtom);
 
 	useEffect(() => {
 		if (location.hostname === "localhost") return;
@@ -149,6 +152,12 @@ export const MusicInfoWrapper: FC = () => {
 			window.removeEventListener("amll-lyric-page-closed", onPageClosed);
 		};
 	}, []);
+
+	useEffect(() => {
+		if (musicCtx.current) {
+			setCurrentPlayMode(musicCtx.current.getPlayMode());
+		}
+	}, [lyricPageOpened]);
 
 	return <></>;
 };

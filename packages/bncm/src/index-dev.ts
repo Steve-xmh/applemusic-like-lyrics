@@ -1,9 +1,9 @@
-import style from "./index.sass";
+import "./index.sass";
 import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
 import { isNCMV3 } from "./utils/is-ncm-v3";
 import { log, warn } from "./utils/logger";
 import { normalizePath } from "./utils/path";
-import { version } from "virtual:bncm-plugin-manifest";
+import manifest from "virtual:bncm-plugin-manifest";
 import { configViewElement, initLyricPage } from "./injector";
 import { MusicContextV2 } from "./music-context/v2";
 import { openLyricPage } from "./injector";
@@ -13,18 +13,9 @@ import { injectLyricPage } from "./injector/dev";
 	domain: `${location.origin}/ncmapi`,
 };
 
-// 注入样式
-function initStyle() {
-	const el = document.createElement("style");
-	el.setAttribute("type", "text/css");
-	el.innerHTML = style;
-	document.head.appendChild(el);
-}
-
 try {
-	initStyle();
 	console.log(
-		`%cApple Music-like Lyrics %c${version}%c for %cBetterNCM %c(Dev Mode)`,
+		`%cApple Music-like Lyrics %c${manifest.version}%c for %cBetterNCM %c(Dev Mode)`,
 		"color:#2AF;font-weight:bold;",
 		"color:#2AF;font-weight:normal;",
 		"color:unset;font-weight:normal;",

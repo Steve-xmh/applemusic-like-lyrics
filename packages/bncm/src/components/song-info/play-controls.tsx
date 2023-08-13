@@ -9,7 +9,7 @@ import { PlayState } from "../../music-context";
 import {
 	leftControlButtonTypeAtom,
 	rightControlButtonTypeAtom,
-} from "../config/music";
+} from "../config/atoms";
 import { FC } from "react";
 
 export const PlayControls: FC = () => {

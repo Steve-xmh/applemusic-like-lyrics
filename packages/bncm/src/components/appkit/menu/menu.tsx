@@ -62,6 +62,7 @@ export const Menu: FC<
 			onClick={(evt) => {
 				if (evt.target === evt.currentTarget) {
 					props.onClose();
+					evt.stopPropagation();
 				}
 			}}
 		>

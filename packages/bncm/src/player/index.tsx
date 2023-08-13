@@ -22,8 +22,7 @@ import {
 import "./index.sass";
 import { NowPlayingSlider } from "../components/appkit/np-slider";
 import { AudioQualityTag } from "../components/song-info/audio-quality-tag";
-import * as React from "react";
-import { showAudioQualityTagAtom } from "../components/config/music";
+import { showAudioQualityTagAtom } from "../components/config/atoms";
 import { PlayControls } from "../components/song-info/play-controls";
 import { useEffect, useRef } from "react";
 import { VolumeControl } from "./volume-control";
@@ -47,7 +46,7 @@ function toDuration(duration: number) {
 
 const alignPositionAtom = atom(0.5);
 
-export const LyricPlayer: FC = (props) => {
+export const LyricPlayer: FC = () => {
 	const musicCoverUrl = useAtomValue(musicCoverAtom);
 	const musicName = useAtomValue(musicNameAtom);
 	const artists = useAtomValue(musicArtistsAtom);
@@ -263,7 +262,7 @@ export const LyricPlayer: FC = (props) => {
 				)}
 				<div
 					style={{
-						height: "50px",
+						height: "30px",
 						gridColumn: "1 / 3",
 						gridRow: "1",
 						zIndex: "1",

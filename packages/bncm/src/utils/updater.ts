@@ -1,13 +1,10 @@
-import * as React from "react";
 import semverGt from "semver/functions/gt";
 import { normalizePath } from "./path";
 import { log, warn } from "./logger";
 import JSZip from "jszip";
-import { atom, useAtomValue } from "jotai";
-import {
-	enableUpdateBranchAtom,
-	updateBranchAtom,
-} from "../components/config/about";
+import { atom } from "jotai";
+import { updateBranchAtom } from "../components/config/atoms";
+import manifest from "virtual:bncm-plugin-manifest";
 
 interface RepoTreeEntry {
 	id: string;
@@ -49,7 +46,7 @@ export async function getInstallableBranches(force = false) {
 	const result: InstallableBranch[] = [];
 	await Promise.all(
 		branches.map(async (branch) => {
-			console.log(branch);
+			log(branch);
 			try {
 				const res = await fetch(
 					`https://gitcode.net/api/v4/projects/228337/repository/tree?path=packages%2Fbncm%2Fdist&ref=${encodeURIComponent(
@@ -82,7 +79,9 @@ export async function getInstallableBranches(force = false) {
 					{ cache: "no-store" },
 				);
 				if (oldRes.ok) {
-					entries = ((await oldRes.json()) as RepoTreeEntry[]).map((v) => v.name);
+					entries = ((await oldRes.json()) as RepoTreeEntry[]).map(
+						(v) => v.name,
+					);
 					containsAllFiles = ["index.js", "manifest.json"].every((v) =>
 						entries.includes(v),
 					);
@@ -106,9 +105,14 @@ export async function getInstallableBranches(force = false) {
 
 export async function installLatestBranchVersion(
 	branchName: string,
-	path = "packages/bncm/dist",
+	path: string,
 ) {
-	log("正在更新版本到", branchName, "分支的最新版本，位于远程路径", path);
+	log(
+		"正在更新版本到",
+		branchName,
+		"分支的最新版本，位于远程路径",
+		path,
+	);
 	const entries: RepoTreeEntry[] = await fetch(
 		`https://gitcode.net/api/v4/projects/228337/repository/tree?path=${encodeURIComponent(
 			path,
@@ -123,9 +127,15 @@ export async function installLatestBranchVersion(
 					branchName,
 				)}/${entry.path}?inline=false`;
 				log("正在下载更新文件", entry.path);
-				const data = await fetch(downloadLink, { cache: "no-store" }).then(
-					(v) => v.blob(),
-				);
+				const res = await fetch(downloadLink, {
+					cache: "no-store",
+				});
+				if (!res.ok) {
+					throw new Error(
+						`更新文件 ${entry.path} 下载失败：${res.status} ${res.statusText}`,
+					);
+				}
+				const data = await res.blob();
 				return {
 					name: entry.name,
 					data,
@@ -188,102 +198,78 @@ export async function installLatestBranchVersion(
 	await betterncm.fs.writeFile(outputPluginPath, data);
 }
 
-let cachedLatestVersion: string | undefined;
 async function checkLatestVersion(
 	branch: string,
-	force = false,
-	path = "",
-): Promise<string> {
-	if (force) cachedLatestVersion = undefined;
+	path: string,
+): Promise<[string, string, string, string]> {
+	log("正在检查更新", branch, path);
 
-	if (cachedLatestVersion !== undefined) return cachedLatestVersion;
+	let latestManifest: BNCMManifest | undefined;
 
-	let manifest: BNCMManifest | undefined;
-
-	// 根据版本号 检查正式版本
-	const GITHUB_DIST_MANIFEST_URLS = [
-		`https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${encodeURIComponent(
-			branch,
-		)}/${path
-			.split("/")
-			.map((v) => encodeURIComponent(v))
-			.join("/")}/manifest.json?inline=false`,
-		`https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${encodeURIComponent(
-			branch,
-		)}/packages/bncm/dist/manifest.json?inline=false`,
-		`https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${encodeURIComponent(
-			branch,
-		)}/dist/manifest.json?inline=false`,
-	];
-
-	for (const url of GITHUB_DIST_MANIFEST_URLS) {
-		try {
-			const res = await fetch(url);
-			if (res.ok) {
-				manifest = await res.json();
-				break;
-			}
-		} catch {}
-	}
-
-	if (manifest) {
-		if (branch === "main") {
-			if (cachedLatestVersion !== manifest.version) {
-				window.dispatchEvent(new Event("amll-latest-version-updated"));
-			}
-			cachedLatestVersion = manifest.version;
-		} else {
-			if (cachedLatestVersion !== manifest.commit) {
-				window.dispatchEvent(new Event("amll-latest-version-updated"));
-			}
-			cachedLatestVersion = manifest.commit;
+	try {
+		const res = await fetch(
+			`https://gitcode.net/sn/applemusic-like-lyrics/-/raw/${encodeURIComponent(
+				branch,
+			)}/${path
+				.split("/")
+				.map((v) => encodeURIComponent(v))
+				.join("/")}/manifest.json?inline=false`,
+			{ cache: "no-store" },
+		);
+		if (res.ok) {
+			latestManifest = await res.json();
 		}
-	}
+	} catch {}
 
-	return cachedLatestVersion || "";
+	if (latestManifest) {
+		return [
+			latestManifest?.branch ?? branch,
+			latestManifest.version,
+			latestManifest?.commit?.slice(0, 8) ?? "",
+			path,
+		];
+	} else {
+		return [
+			manifest.branch,
+			manifest.version,
+			manifest?.commit?.slice(0, 8) ?? "",
+			"packages/bncm/dist",
+		];
+	}
 }
 
 export const installableBranchesAtom = atom(() => getInstallableBranches());
-
-export function useLatestVersion(): string {
-	const [version, setVersion] = React.useState("");
-	const branch = useAtomValue(updateBranchAtom);
-	const enableUpdateBranch = useAtomValue(enableUpdateBranchAtom);
-
-	React.useLayoutEffect(() => {
-		const checkUpdate = () =>
-			checkLatestVersion(enableUpdateBranch ? branch : "main").then(setVersion);
-		checkUpdate();
-		window.addEventListener("amll-latest-version-updated", checkUpdate);
-		return () => {
-			window.removeEventListener("amll-latest-version-updated", checkUpdate);
-		};
-	}, [branch, enableUpdateBranch]);
-
-	React.useLayoutEffect(() => {
-		setVersion("");
-		checkLatestVersion(enableUpdateBranch ? branch : "main", true).then(
-			setVersion,
-		);
-	}, [branch, enableUpdateBranch]);
-
-	return version;
-}
-
-export function useHasUpdates(): boolean {
-	const latestVersion = useLatestVersion();
-	const branch = useAtomValue(updateBranchAtom);
-	const enableUpdateBranch = useAtomValue(enableUpdateBranchAtom);
-	return React.useMemo(() => {
-		if (latestVersion !== "") {
-			if (branch === "main" || !enableUpdateBranch) {
-				try {
-					return semverGt(latestVersion, plugin.mainPlugin.manifest.version);
-				} catch {}
-			}
-			return latestVersion !== plugin.mainPlugin.manifest.commit;
+export const selectedBranchLatestVersionAtom = atom(async (get) => {
+	const installableBranches = await get(installableBranchesAtom);
+	const branch = await get(updateBranchAtom);
+	const targetBranch = installableBranches.find((b) => b.branch === branch);
+	return targetBranch
+		? await checkLatestVersion(targetBranch.branch, targetBranch.path)
+		: [
+				manifest.branch,
+				manifest.version,
+				manifest?.commit?.slice(0, 8) ?? "",
+				"packages/bncm/dist",
+		  ];
+});
+export const hasUpdateAtom = atom(async (get) => {
+	const [latestBranch, latestVersion, latestCommit] = await get(
+		selectedBranchLatestVersionAtom,
+	);
+	const branch = await get(updateBranchAtom);
+	if (
+		latestBranch === manifest.branch &&
+		latestVersion === manifest.version &&
+		latestCommit === manifest.commit.slice(0, 8)
+	)
+		return false;
+	if (branch === manifest.branch) {
+		if (manifest.branch === "main") {
+			return semverGt(latestVersion, manifest.version);
 		} else {
-			return false;
+			return manifest.commit.slice(0, 8) !== latestCommit;
 		}
-	}, [latestVersion, branch]);
-}
+	} else {
+		return true;
+	}
+});

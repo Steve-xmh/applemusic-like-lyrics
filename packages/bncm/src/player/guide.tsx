@@ -4,7 +4,7 @@ import { FC, useEffect, useRef } from "react";
 import {
 	neverGonnaGiveYouUpAtom,
 	showTutoialAtom,
-} from "../components/config/other";
+} from "../components/config/atoms";
 import "./guide.sass";
 import { closeLyricPage, openLyricPage } from "../injector";
 import { loadable } from "jotai/utils";

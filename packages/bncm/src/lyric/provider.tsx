@@ -11,7 +11,7 @@ import { log, warn } from "../utils/logger";
 import {
 	showRomanLineAtom,
 	showTranslatedLineAtom,
-} from "../components/config/lyric";
+} from "../components/config/atoms";
 
 interface EAPILyric {
 	version: number;

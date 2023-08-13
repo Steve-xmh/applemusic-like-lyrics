@@ -1,0 +1,39 @@
+@use "sass:color"
+
+$info-color: rgb(10, 132, 255)
+$success-color: rgb(48, 209, 88)
+$warning-color: rgb(255, 159, 10)
+$error-color: rgb(255, 69, 58)
+@function transparentify($base-color, $alpha: 0.05)
+    @return color.adjust($base-color, $alpha: $alpha - color.alpha($base-color))
+.appkit-alert
+    background: rgba(255, 255, 255, 0.05)
+    border: 1px solid rgba(255, 255, 255, 0.05)
+    border-radius: 6px
+    padding: 10px
+    font-size: 13px
+    line-height: normal
+    &.info
+        background: transparentify($info-color)
+        border: 1px solid transparentify($info-color)
+        > .appkit-alert-title
+            color: $info-color
+    &.success
+        background: transparentify($success-color)
+        border: 1px solid transparentify($success-color)
+        > .appkit-alert-title
+            color: $success-color
+    &.warning
+        background: transparentify($warning-color)
+        border: 1px solid transparentify($warning-color)
+        > .appkit-alert-title
+            color: $warning-color
+    &.error
+        background: transparentify($error-color)
+        border: 1px solid transparentify($error-color)
+        > .appkit-alert-title
+            color: $error-color
+
+.appkit-alert-title
+    font-weight: 700
+    margin-bottom: 8px

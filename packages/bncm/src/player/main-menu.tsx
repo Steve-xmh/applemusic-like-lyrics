@@ -3,7 +3,7 @@ import { Menu, MenuDevider, MenuItem } from "../components/appkit/menu";
 import {
 	showRomanLineAtom,
 	showTranslatedLineAtom,
-} from "../components/config/lyric";
+} from "../components/config/atoms";
 import { FC, useMemo } from "react";
 import {
 	musicAlbumIdAtom,

@@ -13,6 +13,7 @@ export const mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "amll-view";
 export const configViewElement: HTMLDivElement = document.createElement("div");
 configViewElement.id = "amll-config-view";
+configViewElement.style.height = "100%";
 let appRoot: Root;
 
 export function initLyricPage() {

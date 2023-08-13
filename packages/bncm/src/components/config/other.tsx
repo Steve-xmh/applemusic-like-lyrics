@@ -1,19 +1,7 @@
 import { FC } from "react";
-import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
-import { atomWithConfig } from "./atom-with-config";
+import { GroupBox } from "../appkit/group-box";
 import { SwitchConfigComponent } from "./common";
-
-export const neverGonnaGiveYouUpAtom = atomWithConfig({
-	key: "never-gonna-give-you-up",
-	default: false,
-	desc: "不再显示开发警告",
-});
-
-export const showTutoialAtom = atomWithConfig({
-	key: "show-tutoial",
-	default: true,
-	desc: "显示使用教程",
-});
+import { neverGonnaGiveYouUpAtom, showTutoialAtom } from "./atoms";
 
 export const OtherConfig: FC = () => {
 	return (

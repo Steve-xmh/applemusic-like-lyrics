@@ -6,18 +6,7 @@ import { Button } from "../appkit/button";
 import { useAtom, useAtomValue } from "jotai";
 import { wsConnectionStatusAtom } from "../../music-context/ws-wrapper";
 import { Spinner } from "../appkit/spinner/spinner";
-import { atomWithConfig } from "./atom-with-config";
-
-export const enableWSPlayer = atomWithConfig({
-	key: "enable-ws-player",
-	default: false,
-	desc: "是否启用歌词播放器连接",
-});
-export const wsPlayerURL = atomWithConfig({
-	key: "ws-player-url",
-	default: "ws://localhost:11444",
-	desc: "将会连接到的歌词播放器的地址",
-});
+import { enableWSPlayer, wsPlayerURL } from "./atoms";
 
 export const PlayerConfig: FC = () => {
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);

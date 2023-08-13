@@ -9,7 +9,7 @@ import {
 } from "./wrapper";
 import { log, warn } from "../utils/logger";
 import { toBody } from "@applemusic-like-lyrics/ws-protocol";
-import { enableWSPlayer, wsPlayerURL } from "../components/config/player";
+import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
 
 export enum ConnectionColor {
 	Disabled = "#aaaaaa",

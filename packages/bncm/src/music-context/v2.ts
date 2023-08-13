@@ -339,12 +339,91 @@ export class MusicContextV2 extends MusicContextBase {
 	}
 
 	getPlayMode(): PlayMode {
-		// TODO
-		return PlayMode.One;
+		return this.getCurrentPlayMode() ?? PlayMode.One;
 	}
 
 	setPlayMode(playMode: PlayMode): void {
-		// TODO
+		this.switchPlayMode(playMode);
+	}
+
+	private getCurrentPlayMode(): PlayMode | undefined {
+		try {
+			// if (isNCMV3()) { // TODO: 在隔壁增加 3.0 支持
+			// 	switch (appStore?.playingMode) {
+			// 		case "playOrder":
+			// 			return PlayMode.Order;
+			// 		case "playCycle":
+			// 			return PlayMode.Repeat;
+			// 		case "playRandom":
+			// 			return PlayMode.Random;
+			// 		case "playOneCycle":
+			// 			return PlayMode.One;
+			// 		default:
+			// 			return undefined;
+			// 	}
+			// } else {
+			const setting = JSON.parse(
+				localStorage.getItem("NM_SETTING_PLAYER") || "{}",
+			);
+
+			if (setting.mode2) {
+				return PlayMode.AI;
+			}
+
+			switch (setting?.mode) {
+				case "playonce":
+					return PlayMode.Order;
+				case "playorder":
+					return PlayMode.Repeat;
+				case "playcycle":
+					return PlayMode.One;
+				case "playrandom":
+					return PlayMode.Random;
+				default:
+			}
+			// }
+		} catch {}
+		return undefined;
+	}
+
+	private switchPlayMode(playMode: PlayMode) {
+		// if (isNCMV3()) {
+		// 	if (playMode === PlayMode.AI) return; // 3.0.0 暂时没有心动模式 // TODO: 在隔壁增加 3.0 支持
+		// 	let counter = 0;
+		// 	while (counter++ < 4) {
+		// 		const playModeBtn = document.querySelector<HTMLButtonElement>(
+		// 			"footer > * > * > .middle > *:nth-child(1) > button:nth-child(1)",
+		// 		);
+		// 		const btnSpan = playModeBtn?.querySelector("span > span");
+		// 		if (!(playModeBtn && btnSpan)) break;
+		// 		playModeBtn.click();
+		// 		const playingMode = btnSpan.ariaLabel;
+		// 		console.log(btnSpan.ariaLabel);
+		// 		switch (playMode) {
+		// 			case PlayMode.Order:
+		// 				if (playingMode === "shuffle") return;
+		// 				break;
+		// 			case PlayMode.Repeat:
+		// 				if (playingMode === "order") return;
+		// 				break;
+		// 			case PlayMode.Random:
+		// 				if (playingMode === "singleloop") return;
+		// 				break;
+		// 			case PlayMode.One:
+		// 				if (playingMode === "loop") return;
+		// 				break;
+		// 		}
+		// 	}
+		// } else {
+		const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
+		let counter = 0;
+		while (playModeBtn && counter++ < 5) {
+			if (playModeBtn.classList.contains(playMode)) {
+				return;
+			}
+			playModeBtn.click();
+		}
+		// }
 	}
 
 	getMusicAlbumId(): string {
