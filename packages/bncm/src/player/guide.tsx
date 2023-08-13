@@ -19,12 +19,6 @@ export const AMLLGuide: FC = () => {
     const displayed = useRef(false);
 
 	useEffect(() => {
-		console.log(
-			"showTutoial",
-			showTutoial.state,
-			"neverGonnaGiveYouUp",
-			neverGonnaGiveYouUp.state,
-		);
 		if (
 			showTutoial.state !== "hasData" ||
 			neverGonnaGiveYouUp.state !== "hasData" ||

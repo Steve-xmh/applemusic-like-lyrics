@@ -62,7 +62,8 @@ const UpdateInfo: FC = () => {
 											"看起来网易云没有自动重启，请手动重启网易云以完成更新！",
 									});
 
-									// betterncm_native?.app?.restart();
+									if ("betterncm_native" in window)
+										betterncm_native?.app?.restart();
 								} catch (err) {
 									warn(err);
 									setUpdateResult({
