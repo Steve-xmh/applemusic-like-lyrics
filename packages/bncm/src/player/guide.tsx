@@ -16,13 +16,13 @@ export const AMLLGuide: FC = () => {
 	const neverGonnaGiveYouUp = useAtomValue(neverGonnaGiveYouUpLoadableAtom);
 	const showTutoial = useAtomValue(showTutoialLoadabltAtom);
 	const setShowTutoial = useSetAtom(showTutoialAtom);
-    const displayed = useRef(false);
+	const displayed = useRef(false);
 
 	useEffect(() => {
 		if (
 			showTutoial.state !== "hasData" ||
 			neverGonnaGiveYouUp.state !== "hasData" ||
-            displayed.current
+			displayed.current
 		)
 			return;
 		const driverObj = driver({
@@ -43,13 +43,13 @@ export const AMLLGuide: FC = () => {
 							"一切开发中的功能均有可能随时改变或无法工作或原地爆炸",
 							"故在进入测试（Beta）阶段前暂不接受任何形式的 BUG 提交！",
 						].join("\n"),
-                        onNextClick: () => {
-                            if (showTutoial.data) {
-                                driverObj.moveNext();
-                            } else {
-                                driverObj.destroy();
-                            }
-                        },
+						onNextClick: () => {
+							if (showTutoial.data) {
+								driverObj.moveNext();
+							} else {
+								driverObj.destroy();
+							}
+						},
 					},
 				},
 				{
@@ -140,7 +140,7 @@ export const AMLLGuide: FC = () => {
 				driverObj.drive();
 			}
 		}
-        displayed.current = true;
+		displayed.current = true;
 	}, [neverGonnaGiveYouUp, showTutoial]);
 
 	return <></>;

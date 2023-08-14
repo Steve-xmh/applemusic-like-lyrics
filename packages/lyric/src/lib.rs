@@ -1,9 +1,9 @@
+mod ass;
 mod lrc;
+mod lys;
 mod qrc;
 mod utils;
 mod yrc;
-mod lys;
-mod ass;
 
 use std::borrow::Cow;
 

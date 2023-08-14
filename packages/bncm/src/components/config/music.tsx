@@ -1,7 +1,15 @@
-import React, { FC } from "react";
+import type { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
 import { SwitchConfigComponent } from "./common";
-import { showAudioQualityTagAtom, showAlbumImageAtom, showMusicNameAtom, showAlbumNameAtom, showMusicArtistsAtom, showMenuButtonAtom, showControlThumbAtom } from "./atoms";
+import {
+	showAudioQualityTagAtom,
+	showAlbumImageAtom,
+	showMusicNameAtom,
+	showAlbumNameAtom,
+	showMusicArtistsAtom,
+	showMenuButtonAtom,
+	showControlThumbAtom,
+} from "./atoms";
 
 export const LyricStyleConfig: FC = () => {
 	return (

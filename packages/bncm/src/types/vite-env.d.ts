@@ -12,4 +12,5 @@ declare module "virtual:bncm-plugin-manifest" {
 	export default manifest;
 }
 
-declare type BNCMManifest = typeof import("virtual:bncm-plugin-manifest").default;
+declare type BNCMManifest =
+	typeof import("virtual:bncm-plugin-manifest").default;

@@ -1,38 +1,36 @@
-import type { FC, HTMLProps } from "react";
+import type { FunctionComponent, HTMLProps, Key, ReactNode } from "react";
 import { useState } from "react";
 import "./select.sass";
 import classNames from "classnames";
 import { Menu, MenuItem } from "../menu";
 
-export interface SelectProps {
-	value: string;
+export interface SelectProps<T extends Key> {
+	value: T;
 	data: {
-		value: string;
+		value: T;
 		label: string;
 	}[];
-	onChange: (key: string) => void;
-};
+	onChange: (key: T) => void;
+}
 
-export const Select: FC<SelectProps & Omit<HTMLProps<HTMLDivElement>, keyof SelectProps>> = ({
-	className,
-	value,
-	data,
-	onChange,
-	...props
-}) => {
+type ComposedSelectProps<T extends Key> = SelectProps<T> &
+	Omit<HTMLProps<HTMLDivElement>, keyof SelectProps<T>>;
+
+export function Select<T extends Key>(props: ComposedSelectProps<T>): ReactNode {
+	const { className, value, data, onChange, ...otherProps } = props;
 	const [opened, setOpened] = useState(false);
 	return (
 		<div
 			className={classNames("appkit-select", className)}
 			onClick={(evt) => {
-                if (evt.target === evt.currentTarget) {
-                    setOpened(true);
-                    evt.stopPropagation();
-                }
-            }}
-			{...props}
+				if (evt.target === evt.currentTarget) {
+					setOpened(true);
+					evt.stopPropagation();
+				}
+			}}
+			{...otherProps}
 		>
-			{value}
+			{data.find((v) => v.value === value)?.label ?? String(value)}
 			<div className="appkit-select-stepper">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -53,12 +51,16 @@ export const Select: FC<SelectProps & Omit<HTMLProps<HTMLDivElement>, keyof Sele
 			</div>
 			<Menu opened={opened} onClose={() => setOpened(false)}>
 				{data.map((item) => (
-					<MenuItem key={item.value} onClick={() => {
-                        onChange(item.value);
-                        setOpened(false);
-                    }} label={item.label} />
+					<MenuItem
+						key={item.value}
+						onClick={() => {
+							onChange(item.value);
+							setOpened(false);
+						}}
+						label={item.label}
+					/>
 				))}
 			</Menu>
 		</div>
 	);
-};
+}

@@ -207,5 +207,8 @@ fn test_props() {
     let line = parse_line("[8]Test(1234,567)").unwrap().1;
     assert!(line.is_bg);
     assert!(line.is_duet);
-    assert_eq!("[8]Test(1234,567)\n", stringify_lys(&parse_lys("[8]Test(1234,567)")));
+    assert_eq!(
+        "[8]Test(1234,567)\n",
+        stringify_lys(&parse_lys("[8]Test(1234,567)"))
+    );
 }

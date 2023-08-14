@@ -91,14 +91,26 @@ pub fn parse_line(src: &str) -> IResult<&str, LyricLine<'_>> {
         Ok((src, line)) => {
             let (src, _) = opt(line_ending)(src)?;
             let (_, words) = parse_words(line)?;
-            Ok((src, LyricLine { words, ..Default::default() }))
+            Ok((
+                src,
+                LyricLine {
+                    words,
+                    ..Default::default()
+                },
+            ))
         }
         Err(nom::Err::Error(nom::error::Error {
             code: nom::error::ErrorKind::IsNot,
             ..
         })) => {
             let (src, words) = parse_words(src)?;
-            Ok((src, LyricLine { words, ..Default::default() }))
+            Ok((
+                src,
+                LyricLine {
+                    words,
+                    ..Default::default()
+                },
+            ))
         }
         Err(e) => Err(e),
     }

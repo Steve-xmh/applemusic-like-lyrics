@@ -1,4 +1,3 @@
-import { log } from "../../../utils/logger";
 import "./menu.sass";
 import {
 	FC,
@@ -7,6 +6,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { createPortal } from "react-dom";
 
 export const Menu: FC<
 	PropsWithChildren<{
@@ -40,49 +40,51 @@ export const Menu: FC<
 			if (y + box.height >= window.innerHeight) {
 				y = window.innerHeight - box.height;
 			}
-			console.log(x, y);
 			setPos([x, y]);
 		}
 	}, [props.opened]);
 
 	return (
 		// rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-		<div
-			style={{
-				display: props.opened ? "block" : "none",
-				position: "fixed",
-				left: "0",
-				top: "0",
-				width: "100%",
-				height: "100%",
-				zIndex: "999",
-				backgroundColor: "transparent",
-			}}
-			className="amll-menu-wrapper"
-			onClick={(evt) => {
-				if (evt.target === evt.currentTarget) {
-					props.onClose();
-					evt.stopPropagation();
-				}
-			}}
-		>
-			{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+		createPortal(
 			<div
 				style={{
+					display: props.opened ? "block" : "none",
 					position: "fixed",
-					left: `${pos[0]}px`,
-					top: `${pos[1]}px`,
+					left: "0",
+					top: "0",
+					width: "100%",
+					height: "100%",
+					zIndex: "2000",
+					backgroundColor: "transparent",
 				}}
-				className={
-					props.hasCheckBoxMenuItems
-						? "appkit-menu with-checkbox"
-						: "appkit-menu"
-				}
-				ref={menuRef}
-				onClick={(evt) => evt.stopPropagation()}
+				className="amll-menu-wrapper"
+				onClick={(evt) => {
+					if (evt.target === evt.currentTarget) {
+						props.onClose();
+						evt.stopPropagation();
+					}
+				}}
 			>
-				<div>{props.children}</div>
-			</div>
-		</div>
+				{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+				<div
+					style={{
+						position: "fixed",
+						left: `${pos[0]}px`,
+						top: `${pos[1]}px`,
+					}}
+					className={
+						props.hasCheckBoxMenuItems
+							? "appkit-menu with-checkbox"
+							: "appkit-menu"
+					}
+					ref={menuRef}
+					onClick={(evt) => evt.stopPropagation()}
+				>
+					<div>{props.children}</div>
+				</div>
+			</div>,
+			document.body,
+		)
 	);
 };

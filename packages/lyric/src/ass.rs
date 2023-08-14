@@ -1,7 +1,7 @@
 //! ASS 字幕文件的导出
-//! 
+//!
 //! 注意导出会损失 10 毫秒以内的精度
-//! 
+//!
 //! 主唱名称会变为 `v1`，对唱会变为 `v2`
 //! 如果是背景歌词则会在名称后面加上后缀 `-bg`
 //! 如果是译文则会在名称后面加上后缀 `-trans`
@@ -26,11 +26,13 @@ pub fn stringify_ass(lines: &[LyricLine]) -> String {
             .map(|x| x.words.iter().map(|x| x.word.len() + 20).sum::<usize>())
             .sum(),
     );
-    
+
     result.push_str("[Script Info]\n");
     result.push_str("[Events]\n");
-    result.push_str("Formats: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n");
-    
+    result.push_str(
+        "Formats: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n",
+    );
+
     for line in lines {
         result.push_str("Dialogue: 0,");
         let start_time = line.words.iter().map(|x| x.start_time).min();

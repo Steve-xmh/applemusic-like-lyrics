@@ -5,7 +5,7 @@ import { normalizePath } from "./utils/path";
 import manifest from "virtual:bncm-plugin-manifest";
 import { configViewElement, initLyricPage } from "./injector";
 import { MusicContextV2 } from "./music-context/v2";
-import { injectLyricPage } from "./injector/v2";
+import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
 
 // 注入样式
 async function initStyle() {
@@ -117,14 +117,14 @@ plugin.onLoad(async () => {
 			initDevelopmentReload();
 		}
 
+		initLyricPage();
+
 		if (isNCMV3()) {
 			// TODO: 3.0 的注入支持
 		} else {
 			plugin.musicStatus = new MusicContextV2();
-			await injectLyricPage();
+			injectLyricPageV2();
 		}
-
-		initLyricPage();
 
 		log("插件初始化完成！");
 	} catch (err) {

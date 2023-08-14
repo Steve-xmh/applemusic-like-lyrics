@@ -1,7 +1,12 @@
 import manifest from "virtual:bncm-plugin-manifest";
 import { PlayControlButtonType } from "../song-info/play-control-button";
 import { atomWithConfig } from "./atom-with-config";
-
+import {
+	LYRIC_SOURCE_UUID_BUILTIN_AMLL_TTML_DB,
+	LYRIC_SOURCE_UUID_BUILTIN_NCM,
+	LyricFormat,
+	type LyricSource,
+} from "../../lyric/source";
 
 export const updateBranchAtom = atomWithConfig({
 	key: "update-branch",
@@ -132,3 +137,30 @@ export const wsPlayerURL = atomWithConfig({
 	desc: "将会连接到的歌词播放器的地址",
 });
 
+export const enableBackgroundAtom = atomWithConfig({
+	key: "enable-background",
+	default: true,
+	desc: "是否启用歌词背景",
+});
+
+export const lyricSourcesAtom = atomWithConfig<LyricSource[]>({
+	key: "lyric-sources",
+	default: [
+		{
+			type: "builtin:amll-ttml-db",
+			id: LYRIC_SOURCE_UUID_BUILTIN_AMLL_TTML_DB,
+			url: "",
+			website: "https://github.com/Steve-xmh/amll-ttml-db",
+			desc: "内置歌词源，会寻找来自 AMLL TTML 歌词数据库的逐词歌词",
+			format: LyricFormat.TTML,
+		},
+		{
+			type: "builtin:ncm",
+			id: LYRIC_SOURCE_UUID_BUILTIN_NCM,
+			url: "",
+			desc: "内置歌词源，会寻找来自网易云的歌词",
+			format: LyricFormat.YRC,
+		},
+	],
+	desc: "歌词源清单，在加载歌词时将会从头开始依次尝试寻找歌词",
+});

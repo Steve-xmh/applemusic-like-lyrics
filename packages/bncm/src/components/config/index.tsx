@@ -8,6 +8,8 @@ import { LyricStyleConfig } from "./music";
 import { AboutConfig } from "./about";
 import { OtherConfig } from "./other";
 import { FullSpinner, Spinner } from "../appkit/spinner/spinner";
+import { BackgroundConfig } from "./background";
+import { LyricSourceConfig } from "./lyric-source";
 
 export const configPageAtom = atom("lyric");
 
@@ -73,14 +75,12 @@ const ConfigContent: FC = () => {
 	const configPage = useAtomValue(configPageAtom);
 	return (
 		<div id="amll-config-content">
-			<Suspense
-				fallback={
-					<FullSpinner />
-				}
-			>
-				{configPage === "player" && <PlayerConfig />}
+			<Suspense fallback={<FullSpinner />}>
 				{configPage === "lyric" && <LyricConfig />}
 				{configPage === "music" && <LyricStyleConfig />}
+				{configPage === "background" && <BackgroundConfig />}
+				{configPage === "lyric-source" && <LyricSourceConfig />}
+				{configPage === "player" && <PlayerConfig />}
 				{configPage === "other" && <OtherConfig />}
 				{configPage === "about" && <AboutConfig />}
 			</Suspense>

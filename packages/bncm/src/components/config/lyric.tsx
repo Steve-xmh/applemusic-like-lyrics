@@ -1,7 +1,14 @@
 import { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
 import { SwitchConfigComponent } from "./common";
-import { showTranslatedLineAtom, showRomanLineAtom, swapTranslatedRomanLineAtom, lyricBlurEffectAtom, lyricScaleEffectAtom, lyricHidePassedAtom } from "./atoms";
+import {
+	showTranslatedLineAtom,
+	showRomanLineAtom,
+	swapTranslatedRomanLineAtom,
+	lyricBlurEffectAtom,
+	lyricScaleEffectAtom,
+	lyricHidePassedAtom,
+} from "./atoms";
 
 export const LyricConfig: FC = () => {
 	return (

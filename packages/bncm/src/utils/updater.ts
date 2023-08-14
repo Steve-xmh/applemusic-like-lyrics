@@ -107,12 +107,7 @@ export async function installLatestBranchVersion(
 	branchName: string,
 	path: string,
 ) {
-	log(
-		"正在更新版本到",
-		branchName,
-		"分支的最新版本，位于远程路径",
-		path,
-	);
+	log("正在更新版本到", branchName, "分支的最新版本，位于远程路径", path);
 	const entries: RepoTreeEntry[] = await fetch(
 		`https://gitcode.net/api/v4/projects/228337/repository/tree?path=${encodeURIComponent(
 			path,

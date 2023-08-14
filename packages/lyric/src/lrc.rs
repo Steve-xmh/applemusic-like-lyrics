@@ -16,17 +16,25 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
     let (src, _) = take(1usize)(src)?;
     let (src, sec) = take_till1(|c: char| c == ':' || c == '.')(src)?;
     let (src, _) = take(1usize)(src)?;
-    let (src, ms) = take_while_m_n(1, 3, |c: char| c.is_ascii_digit())(src)?;
+    let (src, mss) = take_while_m_n(1, 3, |c: char| c.is_ascii_digit())(src)?;
 
     let min = u32::from_str(min).unwrap();
     let sec = u32::from_str(sec).unwrap();
-    let mst = ms.trim_start_matches('0');
-    let msl = mst.len();
-    let ms = u32::from_str(ms).unwrap();
+    let mut ms = u32::from_str(mss).unwrap_or_default();
 
-    let time = min as usize * 60 * 1000
-        + sec as usize * 1000
-        + ms as usize * (10usize).pow(3 - msl as u32);
+    match mss.len() {
+        0 => {}
+        1 => {
+            ms *= 100;
+        }
+        2 => {
+            ms *= 10;
+        }
+        3 => {}
+        _ => unreachable!(),
+    }
+
+    let time = min as usize * 60 * 1000 + sec as usize * 1000 + ms as usize;
 
     let (src, _) = tag("]")(src)?;
     Ok((src, time))
