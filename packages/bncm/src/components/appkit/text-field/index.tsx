@@ -9,18 +9,18 @@ export const TextField: FC<
 > = ({ className, errorText, ...props }) => {
 	return (
 		<>
-		<input
-			className={classNames(
-				"appkit-text-field ",
-				{
-					"error": !!errorText,
-				},
-				className,
-			)}
-			data-error-text={errorText}
-			{...props}
-		/>
-		{errorText && <div className="appkit-text-field-error">{errorText}</div>}
+			<input
+				className={classNames(
+					"appkit-text-field ",
+					{
+						error: !!errorText,
+					},
+					className,
+				)}
+				data-error-text={errorText}
+				{...props}
+			/>
+			{errorText && <div className="appkit-text-field-error">{errorText}</div>}
 		</>
 	);
 };

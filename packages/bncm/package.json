@@ -10,6 +10,7 @@
   "dependencies": {
     "@applemusic-like-lyrics/lyric": "workspace:^",
     "@applemusic-like-lyrics/react": "workspace:^",
+    "@applemusic-like-lyrics/ttml": "workspace:^",
     "@applemusic-like-lyrics/ws-protocol": "workspace:^",
     "@rollup/plugin-terser": "^0.4.3",
     "@types/node": "^20.4.5",

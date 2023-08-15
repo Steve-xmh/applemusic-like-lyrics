@@ -16,7 +16,9 @@ export interface SelectProps<T extends Key> {
 type ComposedSelectProps<T extends Key> = SelectProps<T> &
 	Omit<HTMLProps<HTMLDivElement>, keyof SelectProps<T>>;
 
-export function Select<T extends Key>(props: ComposedSelectProps<T>): ReactNode {
+export function Select<T extends Key>(
+	props: ComposedSelectProps<T>,
+): ReactNode {
 	const { className, value, data, onChange, ...otherProps } = props;
 	const [opened, setOpened] = useState(false);
 	return (

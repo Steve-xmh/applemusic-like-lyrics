@@ -55,11 +55,11 @@ export interface LyricSource {
 	 * - `[NCM_ID]`: 网易云的音乐ID
 	 * - `[SONG_NAME]`: 歌名
 	 * - `[SONG_NAME_URI]`: 歌名，但是会先经过 `encodeURIComponent` 编码
-	 * - `[SONG_ARTIST]`: 以 `,` 分隔的歌手名称
-	 * - `[SONG_ARTIST_URI]`: 以 `,` 分隔的歌手名称，但是会先经过 `encodeURIComponent` 编码
+	 * - `[SONG_ARTISTS]`: 以 `,` 分隔的歌手名称
+	 * - `[SONG_ARTISTS_URI]`: 以 `,` 分隔的歌手名称，但是会先经过 `encodeURIComponent` 编码
 	 * - `[SONG_ALIAS]`: 歌名的其他称谓，如果没有则为空
 	 * - `[SONG_ALIAS_URI]`: 歌名的其他称谓，但是会先经过 `encodeURIComponent` 编码，如果没有则为空
-	 * 如果链接协议是 `file://` 则通过 BetterNCM 的文件读取接口尝试读取相应的本地歌词文件
+	 * 如果链接协议是 `file:///` 则通过 BetterNCM 的文件读取接口尝试读取相应的本地歌词文件
 	 */
 	url: string;
 	/**

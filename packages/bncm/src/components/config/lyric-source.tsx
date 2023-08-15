@@ -1,15 +1,21 @@
 import { useMemo, type FC, useState } from "react";
 import { GroupBox } from "../appkit/group-box";
-import { atom, useAtom, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { lyricSourcesAtom } from "./atoms";
 import { ReactSortable, type ItemInterface } from "react-sortablejs";
-import { LyricFormat, LyricSource } from "../../lyric/source";
+import {
+	LyricFormat,
+	LyricSource,
+	parseSourceString,
+	stringifySourceString,
+} from "../../lyric/source";
 import IconHandle from "../../assets/icon_handle.svg";
 import IconMoreCircle from "../../assets/icon_more_circle.svg";
 import { TextField } from "../appkit/text-field";
 import { Button } from "../appkit/button";
 import { Select } from "../appkit/select";
 import { Menu, MenuDevider, MenuItem } from "../appkit/menu";
+import { lyricProviderLogsAtom } from "../../lyric/provider";
 
 const sourceItemMenuAtom = atom<number | undefined>(undefined);
 
@@ -37,24 +43,30 @@ const sortableSourcesAtom = atom<
 	},
 );
 
+function getDisplayNameForSource(source: LyricSource | undefined) {
+	if (source === undefined) return "未知歌词源";
+	if (source.type === "external") {
+		try {
+			return source.name ?? `来自 ${new URL(source.url).host} 的歌词源`;
+		} catch {}
+		return `无名歌词源 (${source.id})`;
+	} else if (source.type === "builtin:amll-ttml-db") {
+		return "AMLL TTML 逐词歌词数据库 (Github)";
+	} else if (source.type === "builtin:ncm") {
+		return "网易云歌词源";
+	} else {
+		return "未知歌词源";
+	}
+}
+
 const LyricSourceItem: FC<{
 	source: LyricSource;
 	index: number;
 }> = ({ source, index }) => {
-	const displayName = useMemo<string>(() => {
-		if (source.type === "external") {
-			try {
-				return source.name ?? `来自 ${new URL(source.url).host} 的歌词源`;
-			} catch {}
-			return `无名歌词源 (${source.id})`;
-		} else if (source.type === "builtin:amll-ttml-db") {
-			return "AMLL TTML 逐词歌词数据库 (Github)";
-		} else if (source.type === "builtin:ncm") {
-			return "网易云歌词源";
-		} else {
-			return "未知歌词源";
-		}
-	}, [source]);
+	const displayName = useMemo<string>(
+		() => getDisplayNameForSource(source),
+		[source],
+	);
 	const setSourceItemMenu = useSetAtom(sourceItemMenuAtom);
 	return (
 		<div
@@ -82,6 +94,16 @@ const LyricSourceItem: FC<{
 
 const LyricSourceAddFromString: FC = () => {
 	const [sourceString, setSourceString] = useState("");
+	const [lyricSources, setLyricSources] = useAtom(lyricSourcesAtom);
+	const sourceStringErr = useMemo(() => {
+		if (sourceString.length === 0) return undefined;
+		try {
+			parseSourceString(sourceString);
+			return undefined;
+		} catch (err) {
+			return `不是正确的歌词源字符串：${err}`;
+		}
+	}, [sourceString]);
 	return (
 		<GroupBox className="amll-lyric-source-add-group">
 			<div>从歌词源字符串添加：</div>
@@ -89,8 +111,18 @@ const LyricSourceAddFromString: FC = () => {
 				value={sourceString}
 				onInput={(evt) => setSourceString(evt.currentTarget.value)}
 				placeholder="歌词源字符串"
+				errorText={sourceStringErr}
 			/>
-			<Button>添加</Button>
+			<Button
+				onClick={() => {
+					const parsed = parseSourceString(sourceString);
+					setLyricSources([parsed, ...lyricSources]);
+					setSourceString("");
+				}}
+				disabled={!(sourceStringErr === undefined && sourceString.length > 0)}
+			>
+				添加
+			</Button>
 		</GroupBox>
 	);
 };
@@ -102,6 +134,7 @@ const LyricSourceAddManual: FC = () => {
 	const [lyricType, setLyricType] = useState(LyricFormat.LRC);
 	const [lyricSources, setLyricSources] = useAtom(lyricSourcesAtom);
 	const isCorrectUrl = useMemo(() => {
+		if (sourceUrl.length === 0) return true;
 		try {
 			new URL(sourceUrl);
 			return true;
@@ -165,18 +198,24 @@ const LyricSourceAddManual: FC = () => {
 				placeholder="歌词源网站"
 			/>
 			<Button
+				disabled={!(sourceUrl.length > 0 && isCorrectUrl)}
 				onClick={() => {
-					setLyricSources([
-						{
-							id: crypto.randomUUID(),
-							type: "external",
-							name: sourceName.trim() || undefined,
-							url: sourceUrl.trim(),
-							format: lyricType,
-							website: sourceWebsite.trim() || undefined,
-						},
-						...lyricSources,
-					]);
+					if (sourceUrl.length > 0 && isCorrectUrl) {
+						setSourceName("");
+						setSourceUrl("");
+						setSourceWebsite("");
+						setLyricSources([
+							{
+								id: crypto.randomUUID(),
+								type: "external",
+								name: sourceName.trim() || undefined,
+								url: sourceUrl.trim(),
+								format: lyricType,
+								website: sourceWebsite.trim() || undefined,
+							},
+							...lyricSources,
+						]);
+					}
 				}}
 			>
 				添加
@@ -238,6 +277,15 @@ const LyricSourceMenu: FC = () => {
 								label="导出歌词源字符串"
 								onClick={() => {
 									setSourceItemMenu(undefined);
+									const source = lyricSources[sourceItemMenu];
+									if (source) {
+										// TODO: 复制到剪切板
+										console.log(
+											source,
+											"的歌词源字符串为",
+											stringifySourceString(source),
+										);
+									}
 								}}
 							/>
 							<MenuDevider />
@@ -259,6 +307,27 @@ const LyricSourceMenu: FC = () => {
 	);
 };
 
+const LyricSourceSearchLogs: FC = () => {
+	const lyricSearchLogs = useAtomValue(lyricProviderLogsAtom);
+	const sources = useAtomValue(lyricSourcesAtom);
+	return (
+		<GroupBox className="lyric-search-logs">
+			<div className="lyric-search-logs-title">当前歌曲歌词搜索日志</div>
+			<div className="logs">
+				{lyricSearchLogs.map((log, i) => (
+					<div key={`${log.sourceId}-${i}`}>
+						<div className="source">
+							{getDisplayNameForSource(
+								sources.find((s) => s.id === log.sourceId),
+							)}
+						</div>
+						<div className="log">{log.log}</div>
+					</div>
+				))}
+			</div>
+		</GroupBox>
+	);
+};
 export const LyricSourceConfig: FC = () => {
 	const [lyricSources, setLyricSources] = useAtom(sortableSourcesAtom);
 	return (
@@ -278,6 +347,7 @@ export const LyricSourceConfig: FC = () => {
 			<LyricSourceAddFromString />
 			<LyricSourceAddManual />
 			<LyricSourceMenu />
+			<LyricSourceSearchLogs />
 		</>
 	);
 };

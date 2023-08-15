@@ -164,3 +164,9 @@ export const lyricSourcesAtom = atomWithConfig<LyricSource[]>({
 	],
 	desc: "歌词源清单，在加载歌词时将会从头开始依次尝试寻找歌词",
 });
+
+export const cacheLyricAtom = atomWithConfig({
+	key: "cache-lyric",
+	default: true,
+	desc: "是否缓存歌词文件以便快速读取",
+});

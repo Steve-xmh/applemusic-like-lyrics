@@ -23,6 +23,7 @@
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/amll-core.mjs",
       "require": "./dist/amll-core.cjs"
     }
