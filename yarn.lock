@@ -28,6 +28,7 @@ __metadata:
     "@types/react": ^18.2.17
     "@types/react-dom": ^18.2.7
     "@types/semver": ^7.5.0
+    "@types/uuid": ^9.0.2
     "@vitejs/plugin-react": ^4.0.3
     classnames: ^2.3.2
     driver.js: ^1.2.1
@@ -52,6 +53,7 @@ __metadata:
     terser: ^5.19.2
     typescript: ^5.1.6
     typescript-event-target: ^1.0.5
+    uuid: ^9.0.0
     vite: ^4.4.7
     vite-plugin-svgr: ^3.2.0
     vite-plugin-wasm: ^3.2.2
@@ -82,12 +84,6 @@ __metadata:
     "@pixi/sprite": "*"
     jss: "*"
     jss-preset-default: "*"
-  languageName: unknown
-  linkType: soft
-
-"@applemusic-like-lyrics/fft@workspace:packages/fft/pkg":
-  version: 0.0.0-use.local
-  resolution: "@applemusic-like-lyrics/fft@workspace:packages/fft/pkg"
   languageName: unknown
   linkType: soft
 
@@ -2742,6 +2738,13 @@ __metadata:
   version: 0.17.0
   resolution: "@types/stats.js@npm:0.17.0"
   checksum: ac8dc5e622fa3b7cc37b9e21663193a2f171a4f5896285e4dfc04f2874acbb75edc958f077bffbd85b0ae358daa5bf4ecbc71210386a4300bff05d09435e35f9
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^9.0.2":
+  version: 9.0.2
+  resolution: "@types/uuid@npm:9.0.2"
+  checksum: 1754bcf3444e1e3aeadd6e774fc328eb53bc956665e2e8fb6ec127aa8e1f43d9a224c3d22a9a6233dca8dd81a12dc7fed4d84b8876dd5ec82d40f574f7ff8b68
   languageName: node
   linkType: hard
 

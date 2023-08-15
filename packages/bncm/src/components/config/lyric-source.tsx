@@ -16,6 +16,7 @@ import { Button } from "../appkit/button";
 import { Select } from "../appkit/select";
 import { Menu, MenuDevider, MenuItem } from "../appkit/menu";
 import { lyricProviderLogsAtom } from "../../lyric/provider";
+import { v1 as uuidv1 } from "uuid";
 
 const sourceItemMenuAtom = atom<number | undefined>(undefined);
 
@@ -206,7 +207,7 @@ const LyricSourceAddManual: FC = () => {
 						setSourceWebsite("");
 						setLyricSources([
 							{
-								id: crypto.randomUUID(),
+								id: uuidv1(),
 								type: "external",
 								name: sourceName.trim() || undefined,
 								url: sourceUrl.trim(),

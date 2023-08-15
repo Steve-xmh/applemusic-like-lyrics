@@ -3,6 +3,8 @@
  * 一个统一的歌词来源结构
  */
 
+import { v1 as uuidv1 } from "uuid";
+
 /**
  * 歌词文件格式
  */
@@ -107,7 +109,7 @@ export function parseSourceString(sourceStr: string): LyricSource {
 			`错误的歌词模板链接格式或模板链接未提供 ${err}`,
 		);
 	}
-	if (source.id.length === 0) source.id = crypto.randomUUID();
+	if (source.id.length === 0) source.id = uuidv1();
 	if (source.name?.length === 0) source.name = undefined;
 	if (source.desc?.length === 0) source.desc = undefined;
 	if (source.website?.length === 0) source.website = undefined;
@@ -116,7 +118,7 @@ export function parseSourceString(sourceStr: string): LyricSource {
 
 export function stringifySourceString(source: LyricSource): string {
 	const params = [
-		source.id || crypto.randomUUID(),
+		source.id || uuidv1(),
 		encodeURIComponent(source.name || ""),
 		encodeURIComponent(source.desc || ""),
 		source.format || LyricFormat.LRC,

@@ -38,10 +38,6 @@ import {
 } from "../components/config";
 import Stats from "stats.js";
 
-const statsObj = new Stats();
-statsObj.dom.style.display = "none";
-statsObj.dom.style.top = "50px";
-
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
 
@@ -97,6 +93,9 @@ export const LyricPlayer: FC = () => {
 
 	useEffect(() => {
 		if (showStats) {
+			const statsObj = new Stats();
+			statsObj.dom.style.display = "none";
+			statsObj.dom.style.top = "50px";
 			statsObj.dom.style.display = "";
 			document.body.appendChild(statsObj.dom);
 			let canceled = false;
@@ -114,10 +113,6 @@ export const LyricPlayer: FC = () => {
 				statsObj.dom.style.display = "none";
 				statsObj.end();
 			};
-		} else {
-			statsObj.dom.style.display = "none";
-			statsObj.dom.remove();
-			statsObj.end();
 		}
 	}, [showStats]);
 
