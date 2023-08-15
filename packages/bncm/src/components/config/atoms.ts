@@ -126,6 +126,12 @@ export const showTutoialAtom = atomWithConfig({
 	desc: "显示使用教程",
 });
 
+export const showStatsAtom = atomWithConfig({
+	key: "show-stats",
+	default: false,
+	desc: "显示实时帧数统计数据",
+});
+
 export const enableWSPlayer = atomWithConfig({
 	key: "enable-ws-player",
 	default: false,
@@ -141,6 +147,12 @@ export const enableBackgroundAtom = atomWithConfig({
 	key: "enable-background",
 	default: true,
 	desc: "是否启用歌词背景",
+});
+
+export const backgroundTypeAtom = atomWithConfig({
+	key: "background-type",
+	default: "fake-liquid",
+	desc: "背景类型",
 });
 
 export const lyricSourcesAtom = atomWithConfig<LyricSource[]>({

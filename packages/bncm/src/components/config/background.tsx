@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
 import { SwitchConfigComponent } from "./common";
 import { enableBackgroundAtom } from "./atoms";
+import { Select } from "../appkit/select";
 
 export const BackgroundConfig: FC = () => {
 	return (
@@ -12,6 +13,7 @@ export const BackgroundConfig: FC = () => {
 					label="显示歌词背景"
 				/>
 			</GroupBox>
+			<GroupBox></GroupBox>
 		</>
 	);
 };

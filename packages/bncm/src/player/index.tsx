@@ -22,7 +22,11 @@ import {
 import "./index.sass";
 import { NowPlayingSlider } from "../components/appkit/np-slider";
 import { AudioQualityTag } from "../components/song-info/audio-quality-tag";
-import { showAudioQualityTagAtom } from "../components/config/atoms";
+import {
+	enableBackgroundAtom,
+	showAudioQualityTagAtom,
+	showStatsAtom,
+} from "../components/config/atoms";
 import { PlayControls } from "../components/song-info/play-controls";
 import { useEffect, useRef } from "react";
 import { VolumeControl } from "./volume-control";
@@ -32,6 +36,11 @@ import {
 	AMLLConfigWindowed,
 	amllConfigWindowedOpenedAtom,
 } from "../components/config";
+import Stats from "stats.js";
+
+const statsObj = new Stats();
+statsObj.dom.style.display = "none";
+statsObj.dom.style.top = "50px";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -57,7 +66,8 @@ export const LyricPlayer: FC = () => {
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
-
+	const enableBackground = useAtomValue(enableBackgroundAtom);
+	const showStats = useAtomValue(showStatsAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
 	const playProgressText = toDuration(currentTime / 1000);
@@ -85,6 +95,32 @@ export const LyricPlayer: FC = () => {
 		}
 	}, [albumCoverRef.current]);
 
+	useEffect(() => {
+		if (showStats) {
+			statsObj.dom.style.display = "";
+			document.body.appendChild(statsObj.dom);
+			let canceled = false;
+			const onFrame = () => {
+				statsObj.end();
+				if (!canceled) {
+					statsObj.begin();
+					requestAnimationFrame(onFrame);
+				}
+			};
+			requestAnimationFrame(onFrame);
+			return () => {
+				canceled = true;
+				statsObj.dom.remove();
+				statsObj.dom.style.display = "none";
+				statsObj.end();
+			};
+		} else {
+			statsObj.dom.style.display = "none";
+			statsObj.dom.remove();
+			statsObj.end();
+		}
+	}, [showStats]);
+
 	return (
 		<>
 			<div
@@ -95,7 +131,7 @@ export const LyricPlayer: FC = () => {
 					evt.stopPropagation();
 				}}
 			>
-				{wsStatus.color !== ConnectionColor.Active && (
+				{wsStatus.color !== ConnectionColor.Active && enableBackground && (
 					<BackgroundRender
 						style={{
 							gridColumn: "1 / 3",

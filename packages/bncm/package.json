@@ -36,6 +36,7 @@
     "sass": "^1.64.1",
     "semver": "^7.5.4",
     "sortablejs": "^1.15.0",
+    "stats.js": "^0.17.0",
     "svgo": "^3.0.2",
     "terser": "^5.19.2",
     "typescript": "^5.1.6",

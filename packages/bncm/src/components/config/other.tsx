@@ -1,11 +1,21 @@
 import { FC } from "react";
 import { GroupBox } from "../appkit/group-box";
 import { SwitchConfigComponent } from "./common";
-import { neverGonnaGiveYouUpAtom, showTutoialAtom } from "./atoms";
+import {
+	neverGonnaGiveYouUpAtom,
+	showStatsAtom,
+	showTutoialAtom,
+} from "./atoms";
 
 export const OtherConfig: FC = () => {
 	return (
 		<>
+			<GroupBox>
+				<SwitchConfigComponent
+					atom={showStatsAtom}
+					label="显示实时帧数统计数据"
+				/>
+			</GroupBox>
 			<GroupBox>
 				<SwitchConfigComponent
 					atom={showTutoialAtom}
