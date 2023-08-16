@@ -23,6 +23,7 @@ interface RepoBranch {
 	default: boolean;
 }
 
+const AMLL_GITCODE_PROJECT_ID = "353255";
 const UPDATE_FILES = ["index.js", "manifest.json"];
 
 let cachedInstallableBranches: string[] | undefined;
@@ -36,7 +37,7 @@ export async function getInstallableBranches(force = false) {
 	}
 
 	const branches: RepoBranch[] = await fetch(
-		"https://gitcode.net/api/v4/projects/228337/repository/branches",
+		`https://gitcode.net/api/v4/projects/${AMLL_GITCODE_PROJECT_ID}/repository/branches`,
 		{ cache: "no-store" },
 	).then((v) => v.json());
 
@@ -46,7 +47,7 @@ export async function getInstallableBranches(force = false) {
 			try {
 				// https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=
 				const entries: RepoTreeEntry[] = await fetch(
-					`https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=${branch.name}`,
+					`https://gitcode.net/api/v4/projects/${AMLL_GITCODE_PROJECT_ID}/repository/tree?path=dist&ref=${branch.name}`,
 					{ cache: "no-store" },
 				).then((v) => v.json());
 
@@ -73,7 +74,7 @@ export async function getInstallableBranches(force = false) {
 export async function installLatestBranchVersion(branchName: string) {
 	log("正在更新版本到", branchName, "分支的最新版本");
 	const entries: RepoTreeEntry[] = await fetch(
-		`https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=${branchName}`,
+		`https://gitcode.net/api/v4/projects/${AMLL_GITCODE_PROJECT_ID}/repository/tree?path=dist&ref=${branchName}`,
 		{ cache: "no-store" },
 	).then((v) => v.json());
 
