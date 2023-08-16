@@ -37,11 +37,13 @@ export const AMLLGuide: FC = () => {
 			steps: [
 				{
 					popover: {
-						title: "开发版本警告",
+						title: "AMLL 开发版本警告",
 						description: [
 							"此为 Apple Music-like Lyrics 的 3.0.0 开发（Dev）版本",
 							"一切开发中的功能均有可能随时改变或无法工作或原地爆炸",
 							"故在进入测试（Beta）阶段前暂不接受任何形式的 BUG 提交！",
+							"（如果有功能点了没用那就是没做）",
+							"（本通知将在每次开启时显示且不可关闭）",
 						].join("\n"),
 						onNextClick: () => {
 							if (showTutoial.data) {
@@ -56,7 +58,7 @@ export const AMLLGuide: FC = () => {
 					popover: {
 						title: "欢迎！",
 						description: [
-							"使用 Apple Music-like Lyrics 插件！",
+							"欢迎使用 Apple Music-like Lyrics 插件！",
 							"接下来是一个简短的使用流程！",
 						].join("\n"),
 					},
