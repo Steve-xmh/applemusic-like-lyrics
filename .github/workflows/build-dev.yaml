@@ -24,6 +24,8 @@ jobs:
         working-directory: packages/fft
       - name: 安装依赖
         run: yarn
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: 构建 Core 模块
         run: yarn build
         working-directory: packages/core
