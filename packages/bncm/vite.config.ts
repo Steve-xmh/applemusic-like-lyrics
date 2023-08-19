@@ -2,11 +2,19 @@ import react from "@vitejs/plugin-react";
 import { Plugin, defineConfig, loadEnv } from "vite";
 import { resolve } from "path";
 import * as os from "os";
-import { cp, mkdir, readdir, rm, stat, writeFile, readFile } from "fs/promises";
+import {
+	cp,
+	mkdir,
+	readdir,
+	rename,
+	rm,
+	stat,
+	writeFile,
+	readFile,
+} from "fs/promises";
 import wasm from "vite-plugin-wasm";
 import svgr from "vite-plugin-svgr";
-import terser from "@rollup/plugin-terser";
-import { minify } from "terser";
+import { minify as terserMinify } from "terser";
 import { execSync } from "child_process";
 
 function getDefaultBetterNCMPath() {
@@ -79,7 +87,8 @@ const CopyBetterNCMPlugin = ({
 	distDir = "dist",
 	manifestPath = "manifest.json",
 	name = "ncm-plugin",
-	dev = false,
+	minify = false,
+	packPlugin = false,
 }): Plugin => {
 	const fullDistDir = resolve(__dirname, distDir);
 	return {
@@ -101,20 +110,12 @@ const CopyBetterNCMPlugin = ({
 					const destFile = resolve(destDir, newName);
 					if ((await stat(srcFile)).isDirectory()) {
 						tasks.push(copyDir(srcFile, destFile));
-					} else if (destFile.endsWith(".js") && !dev) {
-						// buildSync({
-						// 	entryPoints: [srcFile],
-						// 	outfile: destFile,
-						// 	minify: true,
-						// 	define: {
-						// 		"process.env.NODE_ENV": '"production"',
-						// 	}
-						// });
+					} else if (destFile.endsWith(".js") && minify) {
 						tasks.push(
 							(async () => {
 								console.log(`Compressing ${srcFile}`);
 								const srcCode = await readFile(srcFile, { encoding: "utf8" });
-								const result = await minify(srcCode, {
+								const result = await terserMinify(srcCode, {
 									module: true,
 									compress: {
 										global_defs: {
@@ -132,6 +133,8 @@ const CopyBetterNCMPlugin = ({
 								);
 							})(),
 						);
+					} else if (destFile.endsWith(".js")) {
+						tasks.push(rename(srcFile, resolve(srcDir, newName)));
 					} else {
 						tasks.push(cp(srcFile, destFile));
 					}
@@ -143,15 +146,20 @@ const CopyBetterNCMPlugin = ({
 					recursive: true,
 				});
 			} catch {}
-			await copyDir(fullDistDir, devPath);
+			try {
+				await copyDir(fullDistDir, devPath);
+			} catch (err) {
+				this.warn(`Copy failed ${err}`);
+			}
 		},
 	};
 };
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), "AMLL");
+	console.log(env);
 	return {
-		mode: env.AMLL_DEV ? "development" : "production",
+		mode: env.AMLL_DEV === "true" ? "development" : "production",
 		envPrefix: ["AMLL_"],
 		server: {
 			proxy: {
@@ -167,7 +175,7 @@ export default defineConfig(({ mode }) => {
 		},
 		build: {
 			target: ["chrome91", "safari15"],
-			cssMinify: env.AMLL_DEV ? false : "lightningcss",
+			cssMinify: env.AMLL_DEV === "true" ? false : "lightningcss",
 			emptyOutDir: true,
 			lib: {
 				entry: "./src/index.ts",
@@ -175,11 +183,7 @@ export default defineConfig(({ mode }) => {
 				fileName: "amll-bncm",
 				formats: ["es"],
 			},
-			minify: env?.AMLL_DEV ? false : "esbuild",
-			sourcemap: env?.AMLL_DEV ? "inline" : true,
-			// rollupOptions: {
-			// 	plugins: [!env.AMLL_DEV && terser()],
-			// },
+			minify: env.AMLL_MINIFY === "true" ? false : "esbuild",
 		},
 		plugins: [
 			react(),
@@ -188,21 +192,18 @@ export default defineConfig(({ mode }) => {
 				exportAsDefault: true,
 				include: ["./src/**/*.svg"],
 			}),
-			// reactSvg({
-			// 	defaultExport: "component",
-			// 	expandProps: "end",
-			// 	ref: true,
-			// }),
 			CopyBetterNCMPlugin({
 				name: "Apple-Musiclike-lyrics",
-				dev: !!env.AMLL_DEV,
+				minify: env.AMLL_MINIFY === "true",
+				packPlugin: env.AMLL_PACK_PLUGIN === "true",
 			}),
 			BNCMManifestPlugin({}),
 		],
-		define: env.AMLL_DEV
-			? {
-					"process.env.NODE_ENV": '"development"',
-			  }
-			: undefined,
+		define:
+			env.AMLL_DEV === "true"
+				? {
+						"process.env.NODE_ENV": '"development"',
+				  }
+				: undefined,
 	};
 });

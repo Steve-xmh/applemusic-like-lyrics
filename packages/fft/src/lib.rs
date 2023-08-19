@@ -62,7 +62,11 @@ impl AMLLFFT {
         self.fft.process(self.buf.as_mut_slice());
 
         self.last_call_time = Instant::now();
-        self.buf.iter().map(|x| x.re.abs()).take(self.buf.len() / 2).collect()
+        self.buf
+            .iter()
+            .map(|x| x.re.abs())
+            .take(self.buf.len() / 2)
+            .collect()
     }
 }
 

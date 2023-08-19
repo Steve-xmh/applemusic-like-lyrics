@@ -3,6 +3,9 @@ name = "fft"
 version = "0.0.1"
 authors = ["SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"]
 edition = "2021"
+repository = "https://github.com/Steve-xmh/applemusic-like-lyrics"
+description = "一个简易的音频可视化模块"
+license = "GPL-3.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -28,7 +31,3 @@ instant = { version = "0.1.12", features = ["wasm-bindgen", "inaccurate"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
-
-[profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"

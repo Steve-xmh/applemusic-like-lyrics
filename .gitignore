@@ -10,3 +10,4 @@ lyrics/
 /startup_script.js
 /worker_script.js
 .DS_Store
+target/

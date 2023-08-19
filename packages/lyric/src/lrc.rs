@@ -45,7 +45,7 @@ fn time_test() {
     assert_eq!(parse_time("[00:01.12]"), Ok(("", 1120)));
     assert_eq!(parse_time("[00:10.254]"), Ok(("", 10254)));
     assert_eq!(parse_time("[01:10.1]"), Ok(("", 70100)));
-    assert_eq!(parse_time("[168:10.254]"), Ok(("", 10090254)));
+    assert_eq!(parse_time("[168:10:254]"), Ok(("", 10090254)));
     assert!(parse_time("[168:10.254233]").is_err());
 }
 
@@ -107,6 +107,7 @@ fn lyric_line_test() {
             }]
         ))
     );
+    parse_lrc("[by: username]\n[00:01.00] \n");
     assert_eq!(
         parse_line("[00:10.254][00:10.254] sssxxx\nrestline"),
         Ok((
@@ -203,7 +204,10 @@ fn stringify_lrc_test() {
 
 #[wasm_bindgen(js_name = "parseLrc", skip_typescript)]
 pub fn parse_lrc_js(src: &str) -> JsValue {
-    serde_wasm_bindgen::to_value(&parse_lrc(src)).unwrap()
+    match serde_wasm_bindgen::to_value(&parse_lrc(src)) {
+        Ok(v) => v,
+        Err(err) => JsValue::from_str(&format!("Can't serialize lyric lines: {err:?}")),
+    }
 }
 
 #[wasm_bindgen(js_name = "stringifyLrc", skip_typescript)]

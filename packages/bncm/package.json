@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build",
     "fmt": "rome format --write ./src",
-    "dev": "vite build --watch --mode dev"
+    "dev": "node ./scripts/dev.js"
   },
   "dependencies": {
     "@applemusic-like-lyrics/lyric": "workspace:^",

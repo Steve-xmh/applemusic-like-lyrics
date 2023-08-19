@@ -791,11 +791,12 @@ class te extends EventTarget {
       position: "absolute",
       transformOrigin: "left",
       maxWidth: "100%",
+      width: "100%",
       padding: "max(2vh, 1rem) 1rem",
       contain: "content",
       willChange: "filter,transform,opacity",
       transition: "filter 0.25s",
-      margin: "0 -1rem"
+      boxSizing: "border-box"
     },
     "@media (max-width: 1024px)": {
       lyricLine: {

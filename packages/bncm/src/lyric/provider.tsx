@@ -51,7 +51,9 @@ async function getLyric(
 		{
 			signal,
 		},
-	);
+	).catch((v) => {
+		throw v;
+	});
 	if (v.ok) return await v.json();
 	else throw v.statusText;
 }
@@ -151,6 +153,8 @@ async function getLyricFromExternal(
 	} else {
 		const res = await fetch(finalUrl, {
 			signal: abortSignal,
+		}).catch((v) => {
+			throw v;
 		});
 		if (res.ok) {
 			rawLyricData = await res.text();
@@ -199,12 +203,34 @@ async function getLyricFromDB(
 	showRomanLine: boolean,
 	abortSignal: AbortSignal,
 ) {
-	const res = await fetch(
-		`https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/${musicId}.ttml`,
-		{
-			signal: abortSignal,
-		},
-	);
+	const res = await Promise.any([
+		fetch(
+			`https://gitcode.net/sn/amll-ttml-db/-/raw/main/lyrics/${musicId}.ttml?inline=false`,
+			{
+				signal: abortSignal,
+			},
+		)
+			.then((res) => {
+				if (res.ok) return res;
+				else throw res;
+			})
+			.catch((v) => {
+				throw v;
+			}),
+		fetch(
+			`https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/${musicId}.ttml`,
+			{
+				signal: abortSignal,
+			},
+		)
+			.then((res) => {
+				if (res.ok) return res;
+				else throw res;
+			})
+			.catch((v) => {
+				throw v;
+			}),
+	]);
 	if (res.ok) {
 		const lines = parseTTML(await res.text());
 		if (!showTranslatedLine)

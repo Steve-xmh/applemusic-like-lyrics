@@ -1,10 +1,6 @@
----
-name: "调试开发构建"
+name: "调试开发构建 BNCM 插件"
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   pre-release:
@@ -17,17 +13,37 @@ jobs:
         uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: latest
-      - name: 构建插件包
-        run: |
-          yarn global add sass
-          yarn
-          yarn dist --dev
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: 安装依赖
+        run: yarn
+      - name: 构建 Core 模块
+        run: yarn build
+        working-directory: packages/core
+      - name: 构建 React 模块
+        run: yarn build
+        working-directory: packages/react
+      - name: 构建 Vue 模块
+        run: yarn build
+        working-directory: packages/vue
+      - name: 构建 TTML 模块
+        run: yarn build
+        working-directory: packages/ttml
+      - name: 构建 WS Protocol 模块
+        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
+        working-directory: packages/ws-protocol
+      - name: 构建 Lyric 模块
+        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
+        working-directory: packages/lyric
+      - name: 构建 FFT 模块
+        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
+        working-directory: packages/fft
+      - name: 构建 BNCM 插件
+        run: yarn build --mode packdev
+        working-directory: packages/bncm
+      - uses: marvinpinto/action-automatic-releases@latest
         name: 发布到 Github Release
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "dev-nightly"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ github.ref_name }}-nightly
           prerelease: true
-          title: "最新开发调试构建"
+          title: 最新 ${{ github.ref_name }} 分支开发调试构建
           files: Apple Music-like lyrics.plugin

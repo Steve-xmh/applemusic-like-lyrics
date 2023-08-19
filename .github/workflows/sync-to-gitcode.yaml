@@ -1,0 +1,22 @@
+name: "同步仓库至 GitCode"
+
+on: push
+
+jobs:
+  pre-release:
+    name: 同步仓库至 GitCode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: 克隆仓库
+      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+        with:
+            ssh-private-key: ${{ secrets.AMLL_PUSH_KEY }}
+            ssh-host: gitcode.net
+      - name: 强制推送至 GitCode
+        run: |
+          git fetch --all
+          git pull --all --unshallow
+          git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
+          git push --force -u gitcode --all
+          git push --force -u gitcode --tags
