@@ -39,7 +39,11 @@ jobs:
         run: yarn build
         working-directory: packages/ttml
       - name: 构建 BNCM 插件
-        run: yarn build --mode packdev
+        run: |
+          yarn
+          yarn build --mode packdev
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
         working-directory: packages/bncm
       - uses: marvinpinto/action-automatic-releases@latest
         name: 发布到 Github Release
