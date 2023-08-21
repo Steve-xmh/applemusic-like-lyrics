@@ -30,14 +30,30 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private hotLines: Set<number> = new Set();
 	private bufferedLines: Set<number> = new Set();
 	private scrollToIndex = 0;
+	private allowScroll = true;
+	private scrolledHandler = 0;
+	private isScrolled = false;
+	private invokedByScrollEvent = false;
+	private scrollOffset = 0;
 	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
 		const rect = e[0].contentRect;
 		this.size[0] = rect.width;
 		this.size[1] = rect.height;
 		this.pos[0] = rect.left;
 		this.pos[1] = rect.top;
+		const styles = getComputedStyle(e[0].target);
+		const innerWidth =
+			this.element.clientWidth -
+			parseFloat(styles.paddingLeft) -
+			parseFloat(styles.paddingRight);
+		const innerHeight =
+			this.element.clientHeight -
+			parseFloat(styles.paddingTop) -
+			parseFloat(styles.paddingBottom);
+		this.innerSize[0] = innerWidth;
+		this.innerSize[1] = innerHeight;
 		this.rebuildStyle();
-		this.calcLayout(true);
+		this.calcLayout(true, true);
 		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
 	});
 	private posXSpringParams: Partial<SpringParams> = {
@@ -65,6 +81,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private alignAnchor: "top" | "bottom" | number = 0.5;
 	private isNonDynamic = false;
 	readonly size: [number, number] = [0, 0];
+	readonly innerSize: [number, number] = [0, 0];
 	readonly pos: [number, number] = [0, 0];
 	_getIsNonDynamic() {
 		return this.isNonDynamic;
@@ -95,9 +112,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
+			fontSize: "var(--amll-lyric-player-font-size,max(5vh, 12px))",
 			padding: "1rem",
-			boxSizing: "border-box",
-			fontSize: "max(5vh, 12px)",
 			width: "100%",
 			height: "100%",
 			overflow: "hidden",
@@ -107,12 +123,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			color: "var(--amll-lyric-view-color,white)",
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
+			boxSizing: "border-box",
 		},
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
-			maxWidth: "100%",
-			width: "100%",
+			maxWidth: "var(--amll-lyric-player-width,100%)",
+			minWidth: "var(--amll-lyric-player-width,100%)",
+			width: "var(--amll-lyric-player-width,100%)",
 			padding: "max(2vh, 1rem) 1rem",
 			contain: "content",
 			willChange: "filter,transform,opacity",
@@ -121,7 +139,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
-				padding: "max(1vh, 1rem) 1rem",
+				padding: "max(1vh, 1rem) 0",
 			},
 		},
 		lyricDuetLine: {
@@ -134,7 +152,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transition: "opacity 0.25s",
 			"&.active": {
 				transition: "opacity 0.25s 0.25s",
-				opacity: 1,
+				opacity: 0.75,
 			},
 		},
 		lyricMainLine: {
@@ -200,7 +218,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 	});
 	private onPageShow = () => {
-		this.calcLayout(true);
+		this.calcLayout(true, true);
 	};
 	constructor() {
 		super();
@@ -217,6 +235,25 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.style.attach();
 		this.interludeDots.setTransform(0, 200);
 		window.addEventListener("pageshow", this.onPageShow);
+		this.element.addEventListener("wheel", (evt) => {
+			if (this.allowScroll) {
+				this.isScrolled = true;
+				clearTimeout(this.scrolledHandler);
+				this.scrolledHandler = setTimeout(() => {
+					this.isScrolled = false;
+					this.scrollOffset = 0;
+				}, 5000);
+				this.invokedByScrollEvent = true;
+				if (evt.deltaMode === evt.DOM_DELTA_PIXEL) {
+					this.scrollOffset += evt.deltaY;
+					this.calcLayout(true);
+				} else {
+					this.scrollOffset += evt.deltaY * 50;
+					this.calcLayout(false);
+				}
+				this.invokedByScrollEvent = false;
+			}
+		});
 	}
 	/**
 	 * 获取当前播放时间里是否处于间奏区间
@@ -224,16 +261,21 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * 否则返回 undefined
 	 *
 	 * 这个只允许内部调用
-	 * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
+	 * @returns [开始时间,结束时间,大概处于的歌词行ID,下一句是否为对唱歌词] 或 undefined 如果不处于间奏区间
 	 */
-	getCurrentInterlude(): [number, number, number] | undefined {
+	getCurrentInterlude(): [number, number, number, boolean] | undefined {
 		if (this.bufferedLines.size > 0) return undefined;
 		const currentTime = this.currentTime + 20;
 		const i = this.scrollToIndex;
 		if (i === 0) {
 			if (this.processedLines[0]?.startTime) {
 				if (this.processedLines[0].startTime > currentTime) {
-					return [0, this.processedLines[0].startTime, -2];
+					return [
+						0,
+						this.processedLines[0].startTime,
+						-2,
+						this.processedLines[0].isDuet,
+					];
 				}
 			}
 		} else if (
@@ -248,6 +290,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					this.processedLines[i].endTime,
 					this.processedLines[i + 1].startTime,
 					i,
+					this.processedLines[i + 1].isDuet,
 				];
 			}
 		}
@@ -261,10 +304,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	rebuildStyle() {
 		let style = "";
 		style += "--amll-lyric-player-width:";
-		style += this.element.clientWidth;
+		style += this.innerSize[0];
 		style += "px;";
 		style += "--amll-lyric-player-height:";
-		style += this.element.clientHeight;
+		style += this.innerSize[1];
 		style += "px;";
 		style += "--amll-player-time:";
 		style += this.currentTime;
@@ -366,11 +409,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
 		this.setCurrentTime(0, true);
-		this.calcLayout(true);
+		this.calcLayout(true, true);
 	}
 	/**
 	 * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
 	 * 函数即可让歌词通过动画移动到目标位置。
+	 *
+	 * 函数有一个 `force` 参数，用于指定是否强制修改布局，也就是不经过动画直接调整元素位置和大小。
 	 *
 	 * 此函数还有一个 `reflow` 参数，用于指定是否需要重新计算布局
 	 *
@@ -380,9 +425,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * 2. 加载了新的歌词时（不论前后歌词是否完全一样）
 	 * 3. 用户自行跳转了歌曲播放位置（不论距离远近）
 	 *
+	 * @param force 是否不经过动画直接修改布局定位
 	 * @param reflow 是否进行重新布局（重新计算每行歌词大小）
 	 */
-	calcLayout(reflow = false) {
+	calcLayout(force = false, reflow = false) {
 		if (reflow) {
 			this.lyricLinesEl.forEach((el) => {
 				const size: [number, number] = el.measureSize();
@@ -402,7 +448,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					acc + (el.getLine().isBG ? 0 : this.lyricLinesSize.get(el)?.[1] ?? 0),
 				0,
 			);
-		let curPos = -scrollOffset;
+		let curPos = -scrollOffset - this.scrollOffset;
 		if (this.alignAnchor === "bottom") {
 			curPos += this.element.clientHeight / 2;
 			const curLine = this.lyricLinesEl[this.scrollToIndex];
@@ -450,18 +496,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(0, curPos);
+				this.interludeDots.setTransform(32, curPos);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
 				curPos += this.interludeDotsSize[1];
 			}
 			el.setTransform(
-				left,
+				0,
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
 				hasBuffered ? 1 : 1 / 3,
-				this.enableBlur
+				!this.invokedByScrollEvent && this.enableBlur
 					? isActive
 						? 0
 						: 1 +
@@ -469,7 +515,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 								? Math.abs(this.scrollToIndex - i)
 								: Math.abs(i - Math.max(this.scrollToIndex, latestIndex)))
 					: 0,
-				reflow,
+				force,
 				delay,
 			);
 			if (line.isBG && isActive) {
@@ -481,7 +527,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				delay += 0.05;
 			}
 		});
-		this.bottomLine.setTransform(0, curPos, reflow, delay);
+		this.bottomLine.setTransform(0, curPos, force, delay);
 	}
 	/**
 	 * 获取当前歌词的播放位置
@@ -546,6 +592,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.currentTime = time;
 		this.element.style.setProperty("--amll-player-time", `${time}`);
+		if (this.isScrolled) return;
 		const removedHotIds = new Set<number>();
 		const removedIds = new Set<number>();
 		const addedIds = new Set<number>();
@@ -651,7 +698,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	update(delta = 0) {
 		const deltaS = delta / 1000;
 		this.interludeDots.update(delta);
-		this.bottomLine.update(delta);
+		this.bottomLine.update(deltaS);
 		this.lyricLinesEl.forEach((line) => line.update(deltaS));
 	}
 	/**

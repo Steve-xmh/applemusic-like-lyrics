@@ -20,6 +20,11 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private hotLines;
     private bufferedLines;
     private scrollToIndex;
+    private allowScroll;
+    private scrolledHandler;
+    private isScrolled;
+    private invokedByScrollEvent;
+    private scrollOffset;
     private resizeObserver;
     private posXSpringParams;
     private posYSpringParams;
@@ -34,6 +39,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private alignAnchor;
     private isNonDynamic;
     readonly size: [number, number];
+    readonly innerSize: [number, number];
     readonly pos: [number, number];
     _getIsNonDynamic(): boolean;
     /**
@@ -58,9 +64,9 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * 否则返回 undefined
      *
      * 这个只允许内部调用
-     * @returns [开始时间,结束时间] 或 undefined 如果不处于间奏区间
+     * @returns [开始时间,结束时间,大概处于的歌词行ID,下一句是否为对唱歌词] 或 undefined 如果不处于间奏区间
      */
-    getCurrentInterlude(): [number, number, number] | undefined;
+    getCurrentInterlude(): [number, number, number, boolean] | undefined;
     /**
      * 重建样式
      *
@@ -81,6 +87,8 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
      * 函数即可让歌词通过动画移动到目标位置。
      *
+     * 函数有一个 `force` 参数，用于指定是否强制修改布局，也就是不经过动画直接调整元素位置和大小。
+     *
      * 此函数还有一个 `reflow` 参数，用于指定是否需要重新计算布局
      *
      * 因为计算布局必定会导致浏览器重排布局，所以会大幅度影响流畅度和性能，故请只在以下情况下将其​设置为 true：
@@ -89,9 +97,10 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * 2. 加载了新的歌词时（不论前后歌词是否完全一样）
      * 3. 用户自行跳转了歌曲播放位置（不论距离远近）
      *
+     * @param force 是否不经过动画直接修改布局定位
      * @param reflow 是否进行重新布局（重新计算每行歌词大小）
      */
-    calcLayout(reflow?: boolean): void;
+    calcLayout(force?: boolean, reflow?: boolean): void;
     /**
      * 获取当前歌词的播放位置
      *

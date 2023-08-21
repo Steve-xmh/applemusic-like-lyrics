@@ -25,6 +25,7 @@ const debugValues = {
 	bgScale: 0.5,
 	bgFlowSpeed: 2,
 	bgPlaying: true,
+	bgStaticMode: false,
 	currentTime: 0,
 	enableBlur: true,
 	play() {
@@ -114,6 +115,12 @@ bgGui
 	.name("流动速度")
 	.onFinishChange((v: number) => {
 		bg.setFlowSpeed(v);
+	});
+bgGui
+	.add(debugValues, "bgStaticMode")
+	.name("静态模式")
+	.onFinishChange((v: boolean) => {
+		bg.setStaticMode(v);
 	});
 
 {
@@ -228,6 +235,7 @@ async function loadLyric() {
 	bg.getElement().style.height = "100%";
 	bg.setAlbumImage(debugValues.album);
 	audio.style.display = "none";
+	lyricPlayer.getBottomLineElement().innerHTML = "Test Bottom Line";
 	document.body.appendChild(audio);
 	document.body.appendChild(bg.getElement());
 	document.body.appendChild(lyricPlayer.getElement());

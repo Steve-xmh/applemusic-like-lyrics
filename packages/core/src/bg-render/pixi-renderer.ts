@@ -14,6 +14,7 @@ export class PixiRenderer implements Disposable {
 	private observer: ResizeObserver;
 	private app: Application;
 	private curContainer?: TimedContainer;
+	private staticMode = false;
 	private lastContainer: Set<TimedContainer> = new Set();
 	private onTick = (delta: number): void => {
 		for (const lastContainer of this.lastContainer) {
@@ -71,6 +72,14 @@ export class PixiRenderer implements Disposable {
 				this.app.screen.height / 2 +
 				(this.app.screen.width / 4) * 0.1 +
 				Math.cos(this.curContainer.time * 0.006 * 0.75);
+
+			if (
+				this.curContainer.alpha >= 1 &&
+				this.lastContainer.size === 0 &&
+				this.staticMode
+			) {
+				this.app.ticker.stop();
+			}
 		}
 	};
 	private flowSpeed = 2;
@@ -87,6 +96,7 @@ export class PixiRenderer implements Disposable {
 				this.canvas.width * this.currerntRenderScale,
 				this.canvas.height * this.currerntRenderScale,
 			);
+			this.app.ticker.start();
 			this.rebuildFilters();
 		});
 		this.observer.observe(canvas);
@@ -146,6 +156,14 @@ export class PixiRenderer implements Disposable {
 		this.app.stage.filters.push(new BlurFilter(5, 1));
 	}
 	/**
+	 * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
+	 * @param enable 是否启用静态模式
+	 */
+	setStaticMode(enable = false) {
+		this.staticMode = enable;
+		this.app.ticker.start();
+	}
+	/**
 	 * 修改背景动画帧率，默认是 30 FPS
 	 *
 	 * 如果设置成 0 则会停止动画
@@ -191,6 +209,7 @@ export class PixiRenderer implements Disposable {
 		this.curContainer = container;
 		this.app.stage.addChild(this.curContainer);
 		this.curContainer.alpha = 0;
+		this.app.ticker.start();
 	}
 
 	dispose() {

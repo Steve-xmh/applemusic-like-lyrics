@@ -12,6 +12,7 @@ import {
 	musicCoverAtom,
 	musicDurationAtom,
 	musicNameAtom,
+	playStatusAtom,
 } from "../music-context/wrapper";
 import { SongInfoTextMarquee } from "../components/song-info/song-info-text-marquee";
 import { lyricLinesAtom } from "../lyric/provider";
@@ -23,6 +24,7 @@ import "./index.sass";
 import { NowPlayingSlider } from "../components/appkit/np-slider";
 import { AudioQualityTag } from "../components/song-info/audio-quality-tag";
 import {
+	backgroundFakeLiquidStaticModeAtom,
 	enableBackgroundAtom,
 	showAudioQualityTagAtom,
 	showStatsAtom,
@@ -37,6 +39,7 @@ import {
 	amllConfigWindowedOpenedAtom,
 } from "../components/config";
 import Stats from "stats.js";
+import { PlayState } from "../music-context";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -59,11 +62,15 @@ export const LyricPlayer: FC = () => {
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const amllConfigWindowedOpened = useAtomValue(amllConfigWindowedOpenedAtom);
+	const backgroundFakeLiquidStaticMode = useAtomValue(
+		backgroundFakeLiquidStaticModeAtom,
+	);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
 	const enableBackground = useAtomValue(enableBackgroundAtom);
 	const showStats = useAtomValue(showStatsAtom);
+	const playStatus = useAtomValue(playStatusAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
 	const playProgressText = toDuration(currentTime / 1000);
@@ -137,6 +144,7 @@ export const LyricPlayer: FC = () => {
 							pointerEvents: "none",
 							zIndex: "-1",
 						}}
+						staticMode={backgroundFakeLiquidStaticMode}
 						disabled={!lyricPageOpened}
 						albumImageUrl={musicCoverUrl}
 					/>
@@ -174,6 +182,7 @@ export const LyricPlayer: FC = () => {
 						backgroundImage: `url(${musicCoverUrl})`,
 						backgroundPosition: "center",
 						backgroundSize: "cover",
+						transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
 						borderRadius: "3%",
 					}}
 					ref={albumCoverRef}
@@ -288,7 +297,11 @@ export const LyricPlayer: FC = () => {
 						alignAnchor={alignPosition}
 						currentTime={currentTime}
 						lyricLines={lyricLines}
-						bottomLine={<div>Test Bottom Line</div>}
+						bottomLine={
+							<div className="amll-contributors">
+								贡献者：{artists.map((v) => v.name).join(", ")}
+							</div>
+						}
 					/>
 				)}
 				<div

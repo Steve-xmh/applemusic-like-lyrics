@@ -112,6 +112,7 @@ export const LyricPlayer = forwardRef<
 			linePosXSpringParams,
 			linePosYSpringParams,
 			lineScaleSpringParams,
+			bottomLine,
 			...props
 		},
 		ref,
@@ -206,9 +207,9 @@ export const LyricPlayer = forwardRef<
 		return (
 			<>
 				<div {...props} ref={wrapperRef} />
-				{corePlayerRef.current?.getBottomLineElement() && props.bottomLine
+				{corePlayerRef.current?.getBottomLineElement() && bottomLine
 					? createPortal(
-							props.bottomLine,
+							bottomLine,
 							corePlayerRef.current?.getBottomLineElement(),
 					  )
 					: null}

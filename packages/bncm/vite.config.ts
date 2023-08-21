@@ -134,7 +134,11 @@ const CopyBetterNCMPlugin = ({
 							})(),
 						);
 					} else if (destFile.endsWith(".js")) {
-						tasks.push(rename(srcFile, resolve(srcDir, newName)));
+						tasks.push(
+							cp(srcFile, destFile).then(() =>
+								rename(srcFile, resolve(srcDir, newName)),
+							),
+						);
 					} else {
 						tasks.push(cp(srcFile, destFile));
 					}
@@ -204,6 +208,8 @@ export default defineConfig(({ mode }) => {
 				? {
 						"process.env.NODE_ENV": '"development"',
 				  }
-				: undefined,
+				: {
+						"process.env.NODE_ENV": '"production"',
+				  },
 	};
 });

@@ -4,6 +4,7 @@ export declare class PixiRenderer implements Disposable {
     private observer;
     private app;
     private curContainer?;
+    private staticMode;
     private lastContainer;
     private onTick;
     private flowSpeed;
@@ -22,6 +23,11 @@ export declare class PixiRenderer implements Disposable {
      */
     setRenderScale(scale: number): void;
     private rebuildFilters;
+    /**
+     * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
+     * @param enable 是否启用静态模式
+     */
+    setStaticMode(enable?: boolean): void;
     /**
      * 修改背景动画帧率，默认是 30 FPS
      *

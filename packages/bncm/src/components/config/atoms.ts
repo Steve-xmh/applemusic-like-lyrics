@@ -155,6 +155,12 @@ export const backgroundTypeAtom = atomWithConfig({
 	desc: "背景类型",
 });
 
+export const backgroundFakeLiquidStaticModeAtom = atomWithConfig({
+	key: "background-fake-liquid-static-mode",
+	default: false,
+	desc: "伪流体动画 - 静态背景模式",
+});
+
 export const lyricSourcesAtom = atomWithConfig<LyricSource[]>({
 	key: "lyric-sources",
 	default: [

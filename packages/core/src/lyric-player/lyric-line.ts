@@ -354,7 +354,8 @@ export class LyricLineEl implements HasElement, Disposable {
 						{
 							offset: 0.5,
 							transform: "translate3d(0, -2%, 20px)",
-							filter: "drop-shadow(0 0 0.2rem var(--amll-lyric-view-color,white))",
+							filter:
+								"drop-shadow(0 0 0.2rem var(--amll-lyric-view-color,white))",
 						},
 						{
 							offset: 1,

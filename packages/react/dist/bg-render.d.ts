@@ -24,6 +24,11 @@ export interface BackgroundRenderProps {
      * 设置当前渲染缩放比例，如果为 `undefined` 则默认为 `0.5`
      */
     renderScale?: number;
+    /**
+     * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
+     * 默认为 `false`
+     */
+    staticMode?: boolean;
 }
 /**
  * 背景渲染组件的引用
