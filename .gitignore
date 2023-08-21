@@ -11,3 +11,5 @@ lyrics/
 /worker_script.js
 .DS_Store
 target/
+.yarn/cache/
+.yarn/install-state.gz
