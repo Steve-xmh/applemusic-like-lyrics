@@ -17,7 +17,8 @@ import svgr from "vite-plugin-svgr";
 import { minify as terserMinify } from "terser";
 import { execSync } from "child_process";
 import JSZip from "jszip";
-import { createReadStream, createWriteStream } from "fs";
+import lightningcss from "vite-plugin-lightningcss";
+import { createReadStream } from "fs";
 
 function getDefaultBetterNCMPath() {
 	if (os.type() === "Windows_NT") {
@@ -204,7 +205,6 @@ export default defineConfig(({ mode }) => {
 		},
 		build: {
 			target: ["chrome91", "safari15"],
-			cssMinify: env.AMLL_DEV === "true" ? false : "lightningcss",
 			emptyOutDir: true,
 			lib: {
 				entry: "./src/index.ts",
@@ -227,6 +227,9 @@ export default defineConfig(({ mode }) => {
 				packPlugin: env.AMLL_PACK_PLUGIN === "true",
 			}),
 			BNCMManifestPlugin({}),
+			lightningcss({
+				browserslist: "safari >= 10.13, chrome >= 91",
+			}),
 		],
 		define:
 			env.AMLL_DEV === "true"

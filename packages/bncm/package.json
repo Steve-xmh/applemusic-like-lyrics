@@ -22,6 +22,7 @@
     "@rollup/plugin-terser": "^0.4.3",
     "@types/node": "^20.4.5",
     "@types/react": "^18.2.17",
+    "@types/react-color": "^3.0.6",
     "@types/react-dom": "^18.2.7",
     "@types/semver": "^7.5.0",
     "@types/sortablejs": "^1.15.1",
@@ -54,6 +55,7 @@
     "typescript-event-target": "^1.0.5",
     "uuid": "^9.0.0",
     "vite": "^4.4.7",
+    "vite-plugin-lightningcss": "^0.0.5",
     "vite-plugin-svgr": "^3.2.0",
     "vite-plugin-wasm": "^3.2.2"
   }

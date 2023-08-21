@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
-import { SwitchConfigComponent } from "./common";
+import { ColorConfigComponent, SwitchConfigComponent } from "./common";
 import {
 	showTranslatedLineAtom,
 	showRomanLineAtom,
@@ -8,6 +8,7 @@ import {
 	lyricBlurEffectAtom,
 	lyricScaleEffectAtom,
 	lyricHidePassedAtom,
+	fontColorAtom,
 } from "./atoms";
 
 export const LyricConfig: FC = () => {
@@ -41,6 +42,9 @@ export const LyricConfig: FC = () => {
 					atom={lyricHidePassedAtom}
 					label="已播放歌词隐藏效果"
 				/>
+			</GroupBox>
+			<GroupBox>
+				<ColorConfigComponent atom={fontColorAtom} label="字体颜色" />
 			</GroupBox>
 		</>
 	);

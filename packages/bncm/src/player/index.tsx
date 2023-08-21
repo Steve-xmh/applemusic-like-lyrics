@@ -1,8 +1,5 @@
 import type { FC } from "react";
-import {
-	BackgroundRender,
-	LyricPlayer as LyricPlayerComponent,
-} from "@applemusic-like-lyrics/react";
+import { LyricPlayer as LyricPlayerComponent } from "@applemusic-like-lyrics/react";
 import { closeLyricPage } from "../injector";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
@@ -24,10 +21,9 @@ import "./index.sass";
 import { NowPlayingSlider } from "../components/appkit/np-slider";
 import { AudioQualityTag } from "../components/song-info/audio-quality-tag";
 import {
-	backgroundFakeLiquidStaticModeAtom,
-	enableBackgroundAtom,
 	showAudioQualityTagAtom,
 	showStatsAtom,
+	fontColorAtom,
 } from "../components/config/atoms";
 import { PlayControls } from "../components/song-info/play-controls";
 import { useEffect, useRef } from "react";
@@ -40,6 +36,7 @@ import {
 } from "../components/config";
 import Stats from "stats.js";
 import { PlayState } from "../music-context";
+import { Background } from "./background";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -62,14 +59,11 @@ export const LyricPlayer: FC = () => {
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const amllConfigWindowedOpened = useAtomValue(amllConfigWindowedOpenedAtom);
-	const backgroundFakeLiquidStaticMode = useAtomValue(
-		backgroundFakeLiquidStaticModeAtom,
-	);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
-	const enableBackground = useAtomValue(enableBackgroundAtom);
 	const showStats = useAtomValue(showStatsAtom);
+	const fontColor = useAtomValue(fontColorAtom);
 	const playStatus = useAtomValue(playStatusAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 
@@ -127,28 +121,19 @@ export const LyricPlayer: FC = () => {
 		<>
 			<div
 				className="lyric-player"
+				style={
+					{
+						"--amll-lyric-view-color": fontColor,
+						color: fontColor,
+					} as any
+				}
 				onContextMenu={(evt) => {
 					setMenuOpened(true);
 					evt.preventDefault();
 					evt.stopPropagation();
 				}}
 			>
-				{wsStatus.color !== ConnectionColor.Active && enableBackground && (
-					<BackgroundRender
-						style={{
-							gridColumn: "1 / 3",
-							gridRow: "1 / 7",
-							position: "absolute",
-							width: "100%",
-							height: "100%",
-							pointerEvents: "none",
-							zIndex: "-1",
-						}}
-						staticMode={backgroundFakeLiquidStaticMode}
-						disabled={!lyricPageOpened}
-						albumImageUrl={musicCoverUrl}
-					/>
-				)}
+				<Background />
 				<button
 					style={{
 						gridColumn: "1",

@@ -33,6 +33,7 @@ __metadata:
     "@rollup/plugin-terser": ^0.4.3
     "@types/node": ^20.4.5
     "@types/react": ^18.2.17
+    "@types/react-color": ^3.0.6
     "@types/react-dom": ^18.2.7
     "@types/semver": ^7.5.0
     "@types/sortablejs": ^1.15.1
@@ -65,6 +66,7 @@ __metadata:
     typescript-event-target: ^1.0.5
     uuid: ^9.0.0
     vite: ^4.4.7
+    vite-plugin-lightningcss: ^0.0.5
     vite-plugin-svgr: ^3.2.0
     vite-plugin-wasm: ^3.2.2
   languageName: unknown
@@ -1677,6 +1679,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-color@npm:^3.0.6":
+  version: 3.0.6
+  resolution: "@types/react-color@npm:3.0.6"
+  dependencies:
+    "@types/react": "*"
+    "@types/reactcss": "*"
+  checksum: 8cd881d6eb725190be942c1d71f7917d3dd1b418417740f64fa6c03ae3ba16cb91d07c4b3b348cf5bae20071c8ca5d4aaf514c9a5318077d5e50bd782a5e8da2
+  languageName: node
+  linkType: hard
+
 "@types/react-dom@npm:^18.2.7":
   version: 18.2.7
   resolution: "@types/react-dom@npm:18.2.7"
@@ -1716,6 +1728,15 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 150516b31bd98b635e4a56bcf2af007330b35cccb6e35e902f46a47f0e81e30c46cdacc095e91051bdf2f33e4846e7e62fd51b67e064dc7d15c00e15dfa449d5
+  languageName: node
+  linkType: hard
+
+"@types/reactcss@npm:*":
+  version: 1.2.6
+  resolution: "@types/reactcss@npm:1.2.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: f4711d707a1af653178c8941080e989a945feb0c529d848fed36687ee5e8a462cda183383caadf8848497b5c03bec16e6cdf22fc70462913d8d706cabb597130
   languageName: node
   linkType: hard
 
@@ -2164,6 +2185,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"browserslist@npm:^4.21.5":
+  version: 4.21.10
+  resolution: "browserslist@npm:4.21.10"
+  dependencies:
+    caniuse-lite: ^1.0.30001517
+    electron-to-chromium: ^1.4.477
+    node-releases: ^2.0.13
+    update-browserslist-db: ^1.0.11
+  bin:
+    browserslist: cli.js
+  checksum: 1e27c0f111a35d1dd0e8fc2c61781b0daefabc2c9471b0b10537ce54843014bceb2a1ce4571af1a82b2bf1e6e6e05d38865916689a158f03bc2c7a4ec2577db8
+  languageName: node
+  linkType: hard
+
 "browserslist@npm:^4.21.9":
   version: 4.21.9
   resolution: "browserslist@npm:4.21.9"
@@ -2233,6 +2268,13 @@ __metadata:
   version: 1.0.30001517
   resolution: "caniuse-lite@npm:1.0.30001517"
   checksum: e4e87436ae1c4408cf4438aac22902b31eb03f3f5bad7f33bc518d12ffb35f3fd9395ccf7efc608ee046f90ce324ec6f7f26f8a8172b8c43c26a06ecee612a29
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001517":
+  version: 1.0.30001522
+  resolution: "caniuse-lite@npm:1.0.30001522"
+  checksum: 56e3551c02ae595085114073cf242f7d9d54d32255c80893ca9098a44f44fc6eef353936f234f31c7f4cb894dd2b6c9c4626e30649ee29e04d70aa127eeefeb0
   languageName: node
   linkType: hard
 
@@ -2638,6 +2680,13 @@ __metadata:
   version: 1.4.468
   resolution: "electron-to-chromium@npm:1.4.468"
   checksum: 3da242381c95286a928ef03501c0fdcc71b773e382cc8574aa998562ae8c9b14712c910879b41d6184fd954ccecc2424865754a86e20d83077a35a0b75a1cfea
+  languageName: node
+  linkType: hard
+
+"electron-to-chromium@npm:^1.4.477":
+  version: 1.4.498
+  resolution: "electron-to-chromium@npm:1.4.498"
+  checksum: 01962ae42e9097c321cb6ff63ca97dfd36457050727893d1768e6eb1b7d5a48ece568b94b1128fd0211f7ce3a31aca0c17eb72b1292d9b5ef7b0664d90dfe3aa
   languageName: node
   linkType: hard
 
@@ -3710,6 +3759,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lightningcss-darwin-arm64@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-darwin-arm64@npm:1.21.7"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "lightningcss-darwin-x64@npm:1.21.5":
   version: 1.21.5
   resolution: "lightningcss-darwin-x64@npm:1.21.5"
@@ -3717,9 +3773,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lightningcss-darwin-x64@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-darwin-x64@npm:1.21.7"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lightningcss-freebsd-x64@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-freebsd-x64@npm:1.21.7"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
 "lightningcss-linux-arm-gnueabihf@npm:1.21.5":
   version: 1.21.5
   resolution: "lightningcss-linux-arm-gnueabihf@npm:1.21.5"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"lightningcss-linux-arm-gnueabihf@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-linux-arm-gnueabihf@npm:1.21.7"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
@@ -3731,9 +3808,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lightningcss-linux-arm64-gnu@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-linux-arm64-gnu@npm:1.21.7"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
 "lightningcss-linux-arm64-musl@npm:1.21.5":
   version: 1.21.5
   resolution: "lightningcss-linux-arm64-musl@npm:1.21.5"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"lightningcss-linux-arm64-musl@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-linux-arm64-musl@npm:1.21.7"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
@@ -3745,9 +3836,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lightningcss-linux-x64-gnu@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-linux-x64-gnu@npm:1.21.7"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
 "lightningcss-linux-x64-musl@npm:1.21.5":
   version: 1.21.5
   resolution: "lightningcss-linux-x64-musl@npm:1.21.5"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"lightningcss-linux-x64-musl@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-linux-x64-musl@npm:1.21.7"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
@@ -3756,6 +3861,50 @@ __metadata:
   version: 1.21.5
   resolution: "lightningcss-win32-x64-msvc@npm:1.21.5"
   conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lightningcss-win32-x64-msvc@npm:1.21.7":
+  version: 1.21.7
+  resolution: "lightningcss-win32-x64-msvc@npm:1.21.7"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lightningcss@npm:^1.19.0":
+  version: 1.21.7
+  resolution: "lightningcss@npm:1.21.7"
+  dependencies:
+    detect-libc: ^1.0.3
+    lightningcss-darwin-arm64: 1.21.7
+    lightningcss-darwin-x64: 1.21.7
+    lightningcss-freebsd-x64: 1.21.7
+    lightningcss-linux-arm-gnueabihf: 1.21.7
+    lightningcss-linux-arm64-gnu: 1.21.7
+    lightningcss-linux-arm64-musl: 1.21.7
+    lightningcss-linux-x64-gnu: 1.21.7
+    lightningcss-linux-x64-musl: 1.21.7
+    lightningcss-win32-x64-msvc: 1.21.7
+  dependenciesMeta:
+    lightningcss-darwin-arm64:
+      optional: true
+    lightningcss-darwin-x64:
+      optional: true
+    lightningcss-freebsd-x64:
+      optional: true
+    lightningcss-linux-arm-gnueabihf:
+      optional: true
+    lightningcss-linux-arm64-gnu:
+      optional: true
+    lightningcss-linux-arm64-musl:
+      optional: true
+    lightningcss-linux-x64-gnu:
+      optional: true
+    lightningcss-linux-x64-musl:
+      optional: true
+    lightningcss-win32-x64-msvc:
+      optional: true
+  checksum: 354e3549cc3942ba2369871473cc6ff7b63f09ccf1ca2d6f52b809f97e59acc8c091c227df41dc135034e70f281f94a25b0847e18de619c12552a8cb9a246406
   languageName: node
   linkType: hard
 
@@ -4156,7 +4305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-releases@npm:^2.0.12":
+"node-releases@npm:^2.0.12, node-releases@npm:^2.0.13":
   version: 2.0.13
   resolution: "node-releases@npm:2.0.13"
   checksum: 17ec8f315dba62710cae71a8dad3cd0288ba943d2ece43504b3b1aa8625bf138637798ab470b1d9035b0545996f63000a8a926e0f6d35d0996424f8b6d36dda3
@@ -5490,6 +5639,16 @@ __metadata:
     vite:
       optional: true
   checksum: 09fe0f5d246c875e3c21856844c5501b7f81cd9f5cdfa7456dc10888425f84a8faefc6fb2781701110ee55c7217616679dfa5df53175a0327616ec305e94803f
+  languageName: node
+  linkType: hard
+
+"vite-plugin-lightningcss@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "vite-plugin-lightningcss@npm:0.0.5"
+  dependencies:
+    browserslist: ^4.21.5
+    lightningcss: ^1.19.0
+  checksum: b5eecb5e1bfc4ef62775658a8d1c1d8a15ad09ff16fb516a729e149533fc18ba3a9e5e1cdf4f680f35429d9c9e6f1956658d0661523cfa014e17df2f43241ce8
   languageName: node
   linkType: hard
 

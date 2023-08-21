@@ -3,6 +3,39 @@ import { atomWithConfig } from "./atom-with-config";
 import { useAtom } from "jotai";
 import { Switch } from "../appkit/switch/switch";
 
+export const ColorConfigComponent: FC<{
+	atom: ReturnType<typeof atomWithConfig<string>>;
+	label: string;
+	description?: string;
+	disabled?: boolean;
+}> = (props) => {
+	const [configValue, setConfigValue] = useAtom(props.atom);
+	return (
+		<div
+			style={{
+				display: "flex",
+				gap: "8px",
+				justifyContent: "space-between",
+				alignItems: "center",
+			}}
+		>
+			<div className="amll-config-text">
+				<div className="amll-config-label">{props.label}</div>
+				<div className="amll-config-description">{props.description}</div>
+			</div>
+			<input
+				type="color"
+				style={{
+					background: "none",
+					border: "none",
+				}}
+				value={configValue}
+				onInput={(e) => setConfigValue(e.currentTarget.value)}
+			/>
+		</div>
+	);
+};
+
 export const SwitchConfigComponent: FC<{
 	atom: ReturnType<typeof atomWithConfig<boolean>>;
 	label: string;

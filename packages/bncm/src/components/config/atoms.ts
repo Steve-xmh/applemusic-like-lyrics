@@ -114,6 +114,12 @@ export const lyricHidePassedAtom = atomWithConfig({
 	desc: "是否隐藏当前进度之后播放完成的歌词行，而不是降低不透明度",
 });
 
+export const fontColorAtom = atomWithConfig({
+	key: "font-color",
+	default: "#FFFFFF",
+	desc: "字体颜色",
+});
+
 export const neverGonnaGiveYouUpAtom = atomWithConfig({
 	key: "never-gonna-give-you-up",
 	default: false,
@@ -149,9 +155,14 @@ export const enableBackgroundAtom = atomWithConfig({
 	desc: "是否启用歌词背景",
 });
 
+export enum BackgroundType {
+	FakeLiquid = "fake-liquid",
+	CustomSolidColor = "custom-solid-color",
+}
+
 export const backgroundTypeAtom = atomWithConfig({
 	key: "background-type",
-	default: "fake-liquid",
+	default: BackgroundType.FakeLiquid,
 	desc: "背景类型",
 });
 
@@ -159,6 +170,12 @@ export const backgroundFakeLiquidStaticModeAtom = atomWithConfig({
 	key: "background-fake-liquid-static-mode",
 	default: false,
 	desc: "伪流体动画 - 静态背景模式",
+});
+
+export const backgroundCustomSolidColorAtom = atomWithConfig({
+	key: "background-custom-solid-color",
+	default: "#222222",
+	desc: "自定义纯颜色背景下的背景颜色",
 });
 
 export const lyricSourcesAtom = atomWithConfig<LyricSource[]>({
