@@ -52,4 +52,4 @@ jobs:
           automatic_release_tag: ${{ github.ref_name }}-nightly
           prerelease: true
           title: 最新 ${{ github.ref_name }} 分支开发调试构建
-          files: Apple Music-like lyrics.plugin
+          files: packages/bncm/dist/*.plugin

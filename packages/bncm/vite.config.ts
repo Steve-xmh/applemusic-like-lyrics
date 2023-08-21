@@ -16,6 +16,8 @@ import wasm from "vite-plugin-wasm";
 import svgr from "vite-plugin-svgr";
 import { minify as terserMinify } from "terser";
 import { execSync } from "child_process";
+import JSZip from "jszip";
+import { createReadStream, createWriteStream } from "fs";
 
 function getDefaultBetterNCMPath() {
 	if (os.type() === "Windows_NT") {
@@ -150,10 +152,34 @@ const CopyBetterNCMPlugin = ({
 					recursive: true,
 				});
 			} catch {}
-			try {
-				await copyDir(fullDistDir, devPath);
-			} catch (err) {
-				this.warn(`Copy failed ${err}`);
+			if (packPlugin) {
+				const zip = new JSZip();
+				for (const file of await readdir(fullDistDir)) {
+					const newName = file.replace(/\.mjs$/, ".js");
+					if (newName.endsWith(".js")) {
+						await rename(
+							resolve(fullDistDir, file),
+							resolve(fullDistDir, newName),
+						);
+					}
+					zip.file(file, createReadStream(resolve(fullDistDir, newName)));
+				}
+				await writeFile(
+					resolve(fullDistDir, "Apple Music-like lyrics.plugin"),
+					await zip.generateAsync({
+						type: "nodebuffer",
+						compression: "DEFLATE",
+						compressionOptions: {
+							level: 9,
+						},
+					}),
+				);
+			} else {
+				try {
+					await copyDir(fullDistDir, devPath);
+				} catch (err) {
+					this.warn(`Copy failed ${err}`);
+				}
 			}
 		},
 	};
@@ -161,7 +187,6 @@ const CopyBetterNCMPlugin = ({
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), "AMLL");
-	console.log(env);
 	return {
 		mode: env.AMLL_DEV === "true" ? "development" : "production",
 		envPrefix: ["AMLL_"],
