@@ -22,6 +22,7 @@ import {
 import { useAtomCallback } from "jotai/utils";
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { LyricFormat, LyricSource, SourceStringError } from "./source";
+import { processLyric } from "./processor";
 
 interface EAPILyric {
 	version: number;
@@ -269,6 +270,7 @@ async function getLyricFromNCM(
 	if (canUseDynamicLyric) {
 		const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
 		converted = lines.map(transformDynamicLyricLine);
+		processLyric(converted);
 
 		if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {
 			const trans = parseLrc(currentRawLyricResp.ytlrc.lyric);
