@@ -1,5 +1,5 @@
 <template>
-    <div ref="wrapperRef"></div>
+    <div ref="wrapperRef" v-bind="$attrs"></div>
     <Teleport v-if="playerRef?.getBottomLineElement() && props.bottomLine" :to="playerRef?.getBottomLineElement()" />
 </template>
 
@@ -7,6 +7,10 @@
 import { LyricPlayer } from "@applemusic-like-lyrics/core";
 import { onMounted, onUnmounted, ref, watchEffect, toRaw } from "vue";
 import type { LyricPlayerProps, LyricPlayerRef } from ".";
+
+defineOptions({
+    inheritAttrs: false,
+});
 
 const props = defineProps<LyricPlayerProps>();
 const wrapperRef = ref<HTMLDivElement>();

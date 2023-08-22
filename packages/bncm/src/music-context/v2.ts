@@ -50,6 +50,7 @@ export class MusicContextV2 extends MusicContextBase {
 	private readonly bindedOnPlayStateChanged: Function;
 	private readonly bindedOnVolumeChanged: Function;
 	private audioId = "";
+	private audioQuality = AudioQualityType.Normal;
 	constructor() {
 		super();
 		this.bindedOnMusicLoad = this.onMusicLoad.bind(this);
@@ -110,6 +111,23 @@ export class MusicContextV2 extends MusicContextBase {
 		log("音乐已加载", audioId, info);
 		this.audioId = audioId;
 		const playing = this.getPlayingSong();
+
+		const bitrate: number | undefined = playing?.from?.lastPlayInfo?.bitrate;
+		const envSound: string | undefined = playing?.from?.lastPlayInfo?.envSound;
+		if (envSound === "dolby") {
+			this.audioQuality = AudioQualityType.DolbyAtmos;
+		} else if (bitrate === undefined) {
+			this.audioQuality = AudioQualityType.Local;
+		} else if (bitrate <= 192) {
+			this.audioQuality = AudioQualityType.Normal;
+		} else if (bitrate <= 320) {
+			this.audioQuality = AudioQualityType.High;
+		} else if (bitrate <= 999) {
+			this.audioQuality = AudioQualityType.Lossless;
+		} else if (bitrate <= 1999) {
+			this.audioQuality = AudioQualityType.HiRes;
+		}
+
 		this.musicName = playing?.data?.name || "未知歌名";
 		this.artists =
 			playing?.data?.artists?.map((v: Artist) => ({
@@ -285,7 +303,7 @@ export class MusicContextV2 extends MusicContextBase {
 		return this.playState;
 	}
 	override getMusicQuality(): AudioQualityType {
-		return AudioQualityType.Normal; // TODO: 提供正确的音频质量等级
+		return this.audioQuality;
 	}
 	override seekToPosition(timeMS: number): void {
 		legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {}, [
