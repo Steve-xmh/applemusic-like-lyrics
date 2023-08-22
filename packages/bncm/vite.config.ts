@@ -163,7 +163,7 @@ const CopyBetterNCMPlugin = ({
 							resolve(fullDistDir, newName),
 						);
 					}
-					zip.file(file, createReadStream(resolve(fullDistDir, newName)));
+					zip.file(newName, createReadStream(resolve(fullDistDir, newName)));
 				}
 				await writeFile(
 					resolve(fullDistDir, "Apple Music-like lyrics.plugin"),
