@@ -65,11 +65,11 @@ export const MusicInfo: FC = () => {
 				width: "min(50vh,40vw)",
 				justifySelf: "center",
 				mixBlendMode: "plus-lighter",
-				fontSize: "200%",
-				fontWeight: "700",
+				fontSize: "166%",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-around",
+				marginTop: "3.5vh",
 			}}
 		>
 			<div

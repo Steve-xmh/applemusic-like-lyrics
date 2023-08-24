@@ -88,15 +88,16 @@ body.amll-lyric-page-open
 .am-music-progress-control
     display: flex
     flex-direction: column
-    margin-top: 16px
+    margin-top: 2vh
 
 .am-music-progress-tips
     display: flex
     margin-top: 16px
-    font-weight: 700
+    font-weight: 400
     opacity: 0.5
     align-items: center
     font-size: 12px
+    letter-spacing: 0.5px
 
     > *
         flex: 0
@@ -108,9 +109,14 @@ body.amll-lyric-page-open
             flex: 1
             text-align: right
 
+    > .am-music-quality
+        height: 10px
+        transform: translateY(-9px)
+
 .am-music-controls
     display: flex
     justify-content: space-between
+    margin-top: 2vh
 
     > .am-music-track-btn
         opacity: 0.5
@@ -119,13 +125,20 @@ body.amll-lyric-page-open
     > .am-music-play,
     > .am-music-track-next
         > *
-            height: 5vh !important
-            width: 5vh !important
+            height: 4vh !important
+            width: 4vh !important
+
+    > .am-music-track-next
+        margin-right: 16px
+
+    > .am-music-track-prev
+        margin-left: 16px
 
 .am-music-volume-controls
     display: flex
     align-items: center
     flex-direction: row
+    margin-top: 3vh
 
     > *
         margin: 8px
