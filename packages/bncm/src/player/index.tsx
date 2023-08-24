@@ -114,12 +114,13 @@ export const LyricPlayer: FC = () => {
 							width: "min(50vh,40vw)",
 							height: "min(50vh,40vw)",
 							transition:
-								"background-image 0.5s linear, transform 0.5s ease-in-out",
+								"background-image 0.5s linear, transform 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)",
 							backgroundImage: `url(${musicCoverUrl})`,
 							backgroundPosition: "center",
 							backgroundSize: "cover",
 							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
-							borderRadius: "3%",
+							borderRadius: "2%",
+							boxShadow: "rgba(0,0,0,0.4) 0px 16px 32px",
 						}}
 						ref={albumCoverRef}
 					/>
