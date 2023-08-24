@@ -18,7 +18,7 @@
 @mixin appkit-styles()
     .appkit-now-playing-slider
         cursor: pointer
-        height: 16px
+        height: 8px
 
         &:hover
             .thumb
@@ -32,15 +32,16 @@
             box-shadow: 0 0 3px #0008
             background: #FFFFFF
             visibility: hidden
+            transform: translateY(-6px)
 
         .track
             height: 8px
-            transform: translateY(6px)
             border-radius: 4px
             background: #FFF7
 
             &.track-0
                 background: #FFFFFFCC
+
     .appkit-slider
         height: 16px
 
