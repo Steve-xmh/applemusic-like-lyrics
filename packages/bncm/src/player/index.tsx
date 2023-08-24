@@ -120,7 +120,7 @@ export const LyricPlayer: FC = () => {
 							backgroundSize: "cover",
 							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
 							borderRadius: "2%",
-							boxShadow: "rgba(0,0,0,0.4) 0px 16px 32px",
+							boxShadow: "rgba(0,0,0,0.2) 0px 16px 32px",
 						}}
 						ref={albumCoverRef}
 					/>
