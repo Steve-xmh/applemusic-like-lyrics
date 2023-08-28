@@ -5,13 +5,14 @@ import {
 	backgroundTypeAtom,
 	enableBackgroundAtom,
 	backgroundCustomSolidColorAtom,
-} from "../components/config/atoms";
+} from "../../components/config/atoms";
 import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
-} from "../music-context/ws-wrapper";
+} from "../../music-context/ws-wrapper";
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
-import { lyricPageOpenedAtom, musicCoverAtom } from "../music-context/wrapper";
+import { lyricPageOpenedAtom, musicCoverAtom } from "../../music-context/wrapper";
+import "./background.sass";
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -29,15 +30,7 @@ export const Background: FC = () => {
 		if (backgroundType === "fake-liquid") {
 			return (
 				<BackgroundRender
-					style={{
-						gridColumn: "1 / 3",
-						gridRow: "1 / 7",
-						position: "absolute",
-						width: "100%",
-						height: "100%",
-						pointerEvents: "none",
-						zIndex: "-1",
-					}}
+					className="amll-background-render-wrapper"
 					staticMode={backgroundFakeLiquidStaticMode}
 					disabled={!lyricPageOpened}
 					albumImageUrl={musicCoverUrl}

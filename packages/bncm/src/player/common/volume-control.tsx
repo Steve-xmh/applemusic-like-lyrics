@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { NowPlayingSlider } from "../components/appkit/np-slider";
-import IconSpeaker from "../assets/icon_speaker.svg";
-import IconSpeaker3 from "../assets/icon_speaker_3.svg";
+import { NowPlayingSlider } from "../../components/appkit/np-slider";
+import IconSpeaker from "../../assets/icon_speaker.svg";
+import IconSpeaker3 from "../../assets/icon_speaker_3.svg";
 import { useAtom } from "jotai";
-import { currentVolumeAtom } from "../music-context/wrapper";
+import { currentVolumeAtom } from "../../music-context/wrapper";
 
 export const VolumeControl: FC = () => {
 	const [volume, setVolume] = useAtom(currentVolumeAtom);

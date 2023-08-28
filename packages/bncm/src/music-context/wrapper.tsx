@@ -10,12 +10,15 @@ import {
 import { isNCMV3 } from "../utils/is-ncm-v3";
 import { MusicContextV2 } from "./v2";
 
-export const musicIdAtom = atom("");
-export const musicNameAtom = atom("");
-export const musicArtistsAtom = atom<Artist[]>([]);
+export const musicIdAtom = atom("0");
+export const musicNameAtom = atom("未知歌名");
+export const musicArtistsAtom = atom<Artist[]>([{
+	id: "0",
+	name: "未知作者"
+}]);
 export const musicCoverAtom = atom("");
-export const musicAlbumIdAtom = atom("");
-export const musicAlbumNameAtom = atom("");
+export const musicAlbumIdAtom = atom("0");
+export const musicAlbumNameAtom = atom("未知专辑");
 export const musicDurationAtom = atom(0);
 export const musicQualityAtom = atom(AudioQualityType.Normal);
 export const playModeAtom = atom(
@@ -159,5 +162,5 @@ export const MusicInfoWrapper: FC = () => {
 		}
 	}, [lyricPageOpened]);
 
-	return <></>;
+	return null;
 };

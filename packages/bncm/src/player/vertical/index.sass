@@ -1,0 +1,79 @@
+.lyric-player-vertical
+    display: grid
+    grid-template-columns: 0.1fr [cover-side] 0fr [info-side] 1fr 0.1fr
+    grid-template-rows: [drag-area] 30px [thumb] 0fr [music-info] 0fr [cover-middle] 0fr [lyric-player] 1fr [control] 0fr
+    gap: 8px
+    width: 100%
+    height: 100%
+    .amll-cover-image
+        aspect-ratio: 1/1
+        align-self: center
+        justify-self: center
+        transition: background-image 0.5s linear, transform 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)
+        background-position: center
+        background-size: cover
+        border-radius: 8%
+        $lyric-enabled: true
+        @if ($lyric-enabled == true)
+            grid-column: cover-side
+            grid-row: music-info
+            width: min(10vh,20vw)
+            height: min(10vh,20vw)
+            box-shadow: rgba(0,0,0,0.2) 0px 8px 16px
+        @else
+            grid-column: 2 / 4
+            grid-row: music-info / span cover-middle
+            width: min(50vh,80vw)
+            height: min(50vh,80vw)
+            box-shadow: rgba(0,0,0,0.2) 0px 16px 32px
+    .am-music-main-menu
+        aspect-ratio: 1 / 1
+        position: relative
+        border: none
+        background: #FFF3 !important
+        width: 50px
+        margin-left: 16px
+        border-radius: 50%
+        align-self: center
+        display: flex
+        align-items: center
+        justify-content: center
+        > *
+            width: 50%
+            height: 50%
+    .amll-lyric-player-wrapper
+        grid-column: 2 / 4
+        grid-row: lyric-player
+        width: 100%
+        height: 100%
+        font-weight: 700
+        box-sizing: border-box
+        mix-blend-mode: plus-lighter
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        gap: 16px
+        mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)
+        -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)
+    .amll-contributors
+        font-size: 50%
+        opacity: 0.5
+    .amll-control-thumb
+        grid-column: 2 / 4
+        grid-row: thumb
+        width: 50px
+        height: 8px
+        margin: 2vh
+        border-radius: 4px
+        border: none
+        background-color: #FFF3
+        justify-self: center
+        mix-blend-mode: plus-lighter
+    .amll-music-info
+        margin-left: 2vh
+        font-size: min(2vh,4vw)
+        grid-column: info-side
+        grid-row: music-info
+        display: flex
+        align-items: center

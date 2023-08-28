@@ -4,9 +4,9 @@ import { FC, useEffect, useRef } from "react";
 import {
 	neverGonnaGiveYouUpAtom,
 	showTutoialAtom,
-} from "../components/config/atoms";
+} from "../../components/config/atoms";
 import "./guide.sass";
-import { closeLyricPage, openLyricPage } from "../injector";
+import { closeLyricPage, openLyricPage } from "../../injector";
 import { loadable } from "jotai/utils";
 
 const neverGonnaGiveYouUpLoadableAtom = loadable(neverGonnaGiveYouUpAtom);
@@ -145,5 +145,5 @@ export const AMLLGuide: FC = () => {
 		displayed.current = true;
 	}, [neverGonnaGiveYouUp, showTutoial]);
 
-	return <></>;
+	return null;
 };

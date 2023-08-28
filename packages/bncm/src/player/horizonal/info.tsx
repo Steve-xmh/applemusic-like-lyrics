@@ -1,13 +1,12 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import type { FC } from "react";
 import {
-	showAlbumImageAtom,
 	showAlbumNameAtom,
 	showAudioQualityTagAtom,
 	showMenuButtonAtom,
 	showMusicArtistsAtom,
 	showMusicNameAtom,
-} from "../components/config/atoms";
+} from "../../components/config/atoms";
 import {
 	currentTimeAtom,
 	musicAlbumIdAtom,
@@ -15,15 +14,15 @@ import {
 	musicArtistsAtom,
 	musicDurationAtom,
 	musicNameAtom,
-} from "../music-context/wrapper";
-import IconMore from "../assets/icon_more.svg";
-import { SongInfoTextMarquee } from "../components/song-info/song-info-text-marquee";
-import { closeLyricPage } from "../injector";
-import { NowPlayingSlider } from "../components/appkit/np-slider";
-import { topbarMenuOpenedAtom } from "./main-menu";
-import { AudioQualityTag } from "../components/song-info/audio-quality-tag";
-import { PlayControls } from "../components/song-info/play-controls";
-import { VolumeControl } from "./volume-control";
+} from "../../music-context/wrapper";
+import IconMore from "../../assets/icon_more.svg";
+import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
+import { closeLyricPage } from "../../injector";
+import { NowPlayingSlider } from "../../components/appkit/np-slider";
+import { topbarMenuOpenedAtom } from "../common/main-menu";
+import { AudioQualityTag } from "../../components/song-info/audio-quality-tag";
+import { PlayControls } from "../../components/song-info/play-controls";
+import { VolumeControl } from "../common/volume-control";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -56,22 +55,7 @@ export const MusicInfo: FC = () => {
 	const remainText = toDuration((currentTime - musicDuration) / 1000);
 
 	return (
-		<div
-			className="amll-music-info"
-			style={{
-				gridColumn: "1",
-				gridRow: "4",
-				maxWidth: "min(50vh,40vw)",
-				width: "min(50vh,40vw)",
-				justifySelf: "center",
-				mixBlendMode: "plus-lighter",
-				fontSize: "166%",
-				display: "flex",
-				flexDirection: "column",
-				justifyContent: "space-around",
-				marginTop: "3.5vh",
-			}}
-		>
+		<div className="amll-music-info">
 			<div
 				style={{
 					display: "flex",

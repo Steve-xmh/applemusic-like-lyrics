@@ -2,44 +2,54 @@ import { jsx as v, jsxs as k, Fragment as x } from "react/jsx-runtime";
 import { BackgroundRender as A, LyricPlayer as j } from "@applemusic-like-lyrics/core";
 import { forwardRef as C, useRef as w, useEffect as n, useImperativeHandle as g } from "react";
 import { createPortal as q } from "react-dom";
-const T = C(({ albumImageUrl: a, fps: i, playing: f, flowSpeed: l, renderScale: o, staticMode: m, ...R }, E) => {
-  const u = w(), d = w(null);
-  return n(() => (u.current = new A(), () => {
-    var r;
-    (r = u.current) == null || r.dispose();
-  }), []), n(() => {
-    var r;
-    a && ((r = u.current) == null || r.setAlbumImage(a));
-  }, [a]), n(() => {
-    var r;
-    i && ((r = u.current) == null || r.setFPS(i));
-  }, [i]), n(() => {
-    var r, s, t;
-    f === void 0 ? (r = u.current) == null || r.resume() : f ? (s = u.current) == null || s.resume() : (t = u.current) == null || t.pause();
-  }, [f]), n(() => {
-    var r;
-    l && ((r = u.current) == null || r.setFlowSpeed(l));
-  }, [l]), n(() => {
-    var r;
-    (r = u.current) == null || r.setStaticMode(m);
-  }, [m]), n(() => {
-    var r;
-    o && ((r = u.current) == null || r.setRenderScale(o));
-  }, [o]), n(() => {
-    var r;
-    if (u.current) {
-      const s = u.current.getElement();
-      s.style.width = "100%", s.style.height = "100%", (r = d.current) == null || r.appendChild(s);
-    }
-  }), g(
-    E,
-    () => ({
-      wrapperEl: d.current,
-      bgRender: u.current
-    }),
-    [d.current, u.current]
-  ), /* @__PURE__ */ v("div", { ...R, ref: d });
-}), z = C(
+const T = C(
+  ({
+    albumImageUrl: a,
+    fps: i,
+    playing: f,
+    flowSpeed: l,
+    renderScale: o,
+    staticMode: m,
+    ...R
+  }, E) => {
+    const u = w(), d = w(null);
+    return n(() => (u.current = new A(), () => {
+      var r;
+      (r = u.current) == null || r.dispose();
+    }), []), n(() => {
+      var r;
+      a && ((r = u.current) == null || r.setAlbumImage(a));
+    }, [a]), n(() => {
+      var r;
+      i && ((r = u.current) == null || r.setFPS(i));
+    }, [i]), n(() => {
+      var r, s, t;
+      f === void 0 ? (r = u.current) == null || r.resume() : f ? (s = u.current) == null || s.resume() : (t = u.current) == null || t.pause();
+    }, [f]), n(() => {
+      var r;
+      l && ((r = u.current) == null || r.setFlowSpeed(l));
+    }, [l]), n(() => {
+      var r;
+      (r = u.current) == null || r.setStaticMode(m);
+    }, [m]), n(() => {
+      var r;
+      o && ((r = u.current) == null || r.setRenderScale(o));
+    }, [o]), n(() => {
+      var r;
+      if (u.current) {
+        const s = u.current.getElement();
+        s.style.width = "100%", s.style.height = "100%", (r = d.current) == null || r.appendChild(s);
+      }
+    }), g(
+      E,
+      () => ({
+        wrapperEl: d.current,
+        bgRender: u.current
+      }),
+      [d.current, u.current]
+    ), /* @__PURE__ */ v("div", { ...R, ref: d });
+  }
+), z = C(
   ({
     disabled: a,
     alignAnchor: i,

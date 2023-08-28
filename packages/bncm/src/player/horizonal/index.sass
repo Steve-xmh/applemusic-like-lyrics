@@ -1,0 +1,111 @@
+.lyric-player-horizonal
+    display: grid
+    grid-template-columns: [info-side] 0.75fr [player-side] 1fr
+    gap: 8px
+    grid-template-rows: [drag-area] minmax(30px, 1fr) [thumb] auto [cover] auto [music-info] 3fr 1fr
+    width: 100%
+    height: 100%
+    .amll-control-thumb
+        grid-column: info-side
+        grid-row: thumb
+        width: 50px
+        height: 8px
+        margin: 2vh
+        border-radius: 4px
+        border: none
+        background-color: #FFF3
+        justify-self: center
+        mix-blend-mode: plus-lighter
+    .amll-lyric-player-wrapper
+        grid-column: player-side
+        grid-row: 1 / 7
+        width: 100%
+        height: 100%
+        font-weight: 700
+        box-sizing: border-box
+        padding-right: 10%
+        mix-blend-mode: plus-lighter
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        gap: 16px
+    .amll-music-info
+        grid-column: info-side
+        gridRow: music-info
+        max-width: min(50vh, 40vw)
+        width: min(50vh, 40vw)
+        justify-self: center
+        mix-blend-mode: plus-lighter
+        font-size: 166%
+        display: flex
+        flex-direction: column
+        justify-content: space-around
+        margin-top: 3.5vh
+    .amll-cover-image
+        aspect-ratio: 1/1
+        grid-column: info-side
+        grid-row: cover
+        align-self: center
+        justify-self: center
+        width: min(50vh,40vw)
+        height: min(50vh,40vw)
+        transition: background-image 0.5s linear, transform 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)
+        background-position: center
+        background-size: cover
+        border-radius: 2%
+        box-shadow: rgba(0,0,0,0.2) 0px 16px 32px
+    .amll-music-name
+        white-space: nowrap
+        line-height: normal
+        cursor: text
+        user-select: text
+        min-width: 0
+        font-weight: 600
+        letter-spacing: 0.3px
+
+    .am-music-main-menu
+        aspect-ratio: 1 / 1
+        position: relative
+        border: none
+        background: #FFF3 !important
+        width: 32px
+        margin-left: 16px
+        border-radius: 50%
+        align-self: center
+        display: flex
+        align-items: center
+        justify-content: center
+
+    .amll-contributors
+        font-size: 50%
+        opacity: 0.5
+
+    .am-music-play
+        $base-scale: 1.05
+        transform: scale($base-scale, calc($base-scale * 1.1))
+
+    .amll-music-artists
+        white-space: nowrap
+        text-align: center
+        opacity: 0.75
+        font-weight: 400
+        letter-spacing: 0.3px
+
+        a
+            line-height: normal
+            text-decoration: none
+            user-select: text
+
+            &:hover
+                opacity: 0.75
+
+            &:active
+                opacity: 0.5
+
+            &::after
+                content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+                opacity: 0.5
+
+            &:last-child::after
+                content: ""

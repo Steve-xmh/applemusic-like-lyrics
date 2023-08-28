@@ -41,6 +41,7 @@
     "react-dom": "^18.2.0",
     "react-dropdown": "^1.11.0",
     "react-jss": "^10.10.0",
+    "react-media": "^1.10.0",
     "react-slider": "^2.0.6",
     "react-sortablejs": "^6.1.4",
     "react-use": "^17.4.0",

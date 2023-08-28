@@ -419,5 +419,5 @@ export const LyricProvider: FC = () => {
 		};
 	}, [musicId, showTranslatedLine, showRomanLine]);
 
-	return <></>;
+	return null;
 };

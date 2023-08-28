@@ -140,5 +140,5 @@ export const WebSocketWrapper: FC = () => {
 		};
 	}, [enabled, url]);
 
-	return <></>;
+	return null;
 };

@@ -25,6 +25,7 @@ try {
 
 	initLyricPage();
 	document.body.appendChild(configViewElement);
+	openLyricPage();
 
 	log("插件初始化完成！");
 } catch (err) {

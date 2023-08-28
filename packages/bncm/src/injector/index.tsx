@@ -6,7 +6,7 @@ import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
 import { WebSocketWrapper } from "../music-context/ws-wrapper";
 import { AMLLConfig } from "../components/config";
-import { AMLLGuide } from "../player/guide";
+import { AMLLGuide } from "../player/common/guide";
 import { Suspense } from "react";
 
 export const mainViewElement: HTMLDivElement = document.createElement("div");

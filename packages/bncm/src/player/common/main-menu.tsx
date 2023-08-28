@@ -1,9 +1,9 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { Menu, MenuDevider, MenuItem } from "../components/appkit/menu";
+import { Menu, MenuDevider, MenuItem } from "../../components/appkit/menu";
 import {
 	showRomanLineAtom,
 	showTranslatedLineAtom,
-} from "../components/config/atoms";
+} from "../../components/config/atoms";
 import { FC, useMemo } from "react";
 import {
 	musicAlbumIdAtom,
@@ -12,9 +12,9 @@ import {
 	musicCoverAtom,
 	musicIdAtom,
 	musicNameAtom,
-} from "../music-context/wrapper";
-import { closeLyricPage } from "../injector";
-import { amllConfigWindowedOpenedAtom } from "../components/config";
+} from "../../music-context/wrapper";
+import { closeLyricPage } from "../../injector";
+import { amllConfigWindowedOpenedAtom } from "../../components/config";
 
 export const topbarMenuOpenedAtom = atom(false);
 
