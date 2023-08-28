@@ -839,9 +839,7 @@ class te extends EventTarget {
       margin: "-1rem",
       padding: "1rem",
       "& span": {
-        display: "inline-block",
-        margin: "-1rem",
-        padding: "1rem"
+        display: "inline-block"
       },
       "& > span": {
         whiteSpace: "pre-wrap",
@@ -849,8 +847,6 @@ class te extends EventTarget {
         maxLines: "1",
         willChange: "transform,display,mask-image",
         "&.emphasize": {
-          margin: "-1rem",
-          padding: "1rem",
           transformStyle: "preserve-3d",
           perspective: "50vw"
         }
@@ -919,7 +915,12 @@ class te extends EventTarget {
     const e = this.currentTime + 20, t = this.scrollToIndex;
     if (t === 0) {
       if (this.processedLines[0]?.startTime && this.processedLines[0].startTime > e)
-        return [0, this.processedLines[0].startTime, -2, this.processedLines[0].isDuet];
+        return [
+          0,
+          this.processedLines[0].startTime,
+          -2,
+          this.processedLines[0].isDuet
+        ];
     } else if (this.processedLines[t]?.endTime && this.processedLines[t + 1]?.startTime && this.processedLines[t + 1].startTime > e && this.processedLines[t].endTime < e)
       return [
         this.processedLines[t].endTime,

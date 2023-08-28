@@ -162,8 +162,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			padding: "1rem",
 			"& span": {
 				display: "inline-block",
-				margin: "-1rem",
-				padding: "1rem",
 			},
 			"& > span": {
 				whiteSpace: "pre-wrap",
@@ -171,8 +169,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				maxLines: "1",
 				willChange: "transform,display,mask-image",
 				"&.emphasize": {
-					margin: "-1rem",
-					padding: "1rem",
 					transformStyle: "preserve-3d",
 					perspective: "50vw",
 				},
