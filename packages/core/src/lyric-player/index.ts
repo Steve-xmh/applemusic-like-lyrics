@@ -167,10 +167,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				whiteSpace: "pre-wrap",
 				wordBreak: "keep-all",
 				maxLines: "1",
-				willChange: "transform,display,mask-image",
+				// willChange: "transform,display,mask-image",
 				"&.emphasize": {
 					transformStyle: "preserve-3d",
 					perspective: "50vw",
+					padding: "1rem",
+					margin: "-1rem",
 				},
 			},
 		},
