@@ -56,7 +56,7 @@ export const CoreLyricPlayer: FC<{
 			<LyricPlayerComponent
 				className="amll-lyric-player-wrapper"
 				disabled={!lyricPageOpened}
-				alignAnchor="top"
+				alignAnchor={props.albumCoverRef ? alignPosition : "top"}
 				currentTime={currentTime}
 				lyricLines={lyricLines}
 				bottomLine={
