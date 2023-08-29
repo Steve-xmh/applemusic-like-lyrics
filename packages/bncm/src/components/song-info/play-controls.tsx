@@ -11,6 +11,7 @@ import {
 	rightControlButtonTypeAtom,
 } from "../config/atoms";
 import { FC } from "react";
+import "./play-controls.sass";
 
 export const PlayControls: FC = () => {
 	const [playStatus, setPlayStatus] = useAtom(playStatusAtom);

@@ -113,62 +113,6 @@ body.amll-lyric-page-open
         height: 10px
         transform: translateY(-9px)
 
-.am-music-controls
-    display: flex
-    align-items: center
-    justify-content: space-between
-    margin-top: 2vh
-
-    > .am-music-track-btn
-        opacity: 0.5
-        aspect-ratio: 1/1
-        display: flex
-        justify-content: center
-        align-items: center
-        border-radius: 50%
-        position: relative
-
-    > .am-music-track-prev,
-    > .am-music-play,
-    > .am-music-track-next
-        aspect-ratio: 1/1
-        height: 6vh !important
-        width: 6vh !important
-        display: flex
-        justify-content: center
-        align-items: center
-        border-radius: 50%
-        position: relative
-        background-color: #FFF0
-        // TODO: 使用 JS 完成这样的动画吧，有些特殊情况不是很好写
-        transition: background-color 0.5s, transform 0.5s
-        animation: pressed-animation 0.7s
-        animation-composition: accumulate
-        @keyframes pressed-animation
-            0%
-                transform: scale(1)
-                background-color: #FFF2
-            20%
-                transform: scale(0.85)
-                background-color: #FFF4
-            50%
-                transform: scale(1.1)
-            100%
-                transform: scale(1)
-                background-color: #FFF0
-        &:hover
-            background-color: #FFF2
-        &:active
-            animation-name: none
-        > *
-            height: 60%
-
-    > .am-music-track-next
-        margin-right: 16px
-
-    > .am-music-track-prev
-        margin-left: 16px
-
 .am-music-volume-controls
     display: flex
     align-items: center
