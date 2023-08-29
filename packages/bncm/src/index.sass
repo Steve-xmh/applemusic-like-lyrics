@@ -6,8 +6,8 @@
     svg
         width: unset
         height: unset
-    box-shadow: 0 7px 10px rgba(0, 0, 0, 0.4), 0 0 3px rgba(0, 0, 0, 0.55)
-    line-height: normal
+        box-shadow: 0 7px 10px rgba(0, 0, 0, 0.4), 0 0 3px rgba(0, 0, 0, 0.55)
+        line-height: normal
 
     p
         margin-block: 1em
@@ -26,7 +26,7 @@
     &:hover
         opacity: 1
         transition: opacity 1s 5s
-    
+
 .amll-music-info
     a
         color: unset
@@ -115,18 +115,53 @@ body.amll-lyric-page-open
 
 .am-music-controls
     display: flex
+    align-items: center
     justify-content: space-between
     margin-top: 2vh
 
     > .am-music-track-btn
         opacity: 0.5
+        aspect-ratio: 1/1
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 50%
+        position: relative
 
     > .am-music-track-prev,
     > .am-music-play,
     > .am-music-track-next
+        aspect-ratio: 1/1
+        height: 6vh !important
+        width: 6vh !important
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 50%
+        position: relative
+        background-color: #FFF0
+        // TODO: 使用 JS 完成这样的动画吧，有些特殊情况不是很好写
+        transition: background-color 0.5s, transform 0.5s
+        animation: pressed-animation 0.7s
+        animation-composition: accumulate
+        @keyframes pressed-animation
+            0%
+                transform: scale(1)
+                background-color: #FFF2
+            20%
+                transform: scale(0.85)
+                background-color: #FFF4
+            50%
+                transform: scale(1.1)
+            100%
+                transform: scale(1)
+                background-color: #FFF0
+        &:hover
+            background-color: #FFF2
+        &:active
+            animation-name: none
         > *
-            height: 4vh !important
-            width: 4vh !important
+            height: 60%
 
     > .am-music-track-next
         margin-right: 16px
