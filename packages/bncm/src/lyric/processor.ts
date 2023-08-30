@@ -31,6 +31,9 @@ export function processLyric(original: LyricLine[]) {
 				newWords.push(word);
 			}
 		});
+		if (prependWord) {
+			newWords.push(prependWord);
+		}
 		origLine.words = newWords;
 	}
 }

@@ -11,10 +11,6 @@ import {
 } from "../../components/config/atoms";
 import { useEffect, useRef } from "react";
 import { topbarMenuOpenedAtom } from "../common/main-menu";
-import {
-	AMLLConfigWindowed,
-	amllConfigWindowedOpenedAtom,
-} from "../../components/config";
 import Stats from "stats.js";
 import { PlayState } from "../../music-context";
 import { MusicInfo } from "./info";

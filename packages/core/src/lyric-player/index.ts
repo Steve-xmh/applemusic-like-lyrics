@@ -392,10 +392,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				nextLine.startTime = Math.min(nextLine.startTime, line.startTime);
 			}
 		});
-		this.lyricLinesEl.forEach((el) => el.dispose());
-		this.lyricLinesEl = this.processedLines.map(
-			(line) => new LyricLineEl(this, line),
-		);
+		const prevLinesEl = this.lyricLinesEl;
+		this.lyricLinesEl = this.processedLines.map((line, i) => {
+			return this.lyricLinesEl[i] ?? new LyricLineEl(this, line);
+		});
+		while (prevLinesEl.length > this.processedLines.length) {
+			prevLinesEl.pop()?.dispose();
+		}
 		this.lyricLinesEl.forEach((el) => {
 			this.element.appendChild(el.getElement());
 			el.updateMaskImage();
