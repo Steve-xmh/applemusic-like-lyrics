@@ -32,61 +32,61 @@ export const MusicInfo: FC = () => {
 
 	return (
 		<div className="amll-music-info">
-		<div
-			style={{
-				display: "flex",
-				flex: "1",
-				flexDirection: "column",
-				minWidth: "0",
-			}}
-		>
-			{showMusicName && (
-				<SongInfoTextMarquee>
-					<div className="amll-music-name">{musicName}</div>
-				</SongInfoTextMarquee>
-			)}
-			{showAlbumName && (
-				<SongInfoTextMarquee>
-					<a
-						className="amll-music-album"
-						href={`#/m/album/?id=${musicAlbumId}`}
-						onMouseUp={() => {
-							closeLyricPage();
-						}}
-					>
-						{musicAlbumName}
-					</a>
-				</SongInfoTextMarquee>
-			)}
-			{showMusicArtists && (
-				<SongInfoTextMarquee>
-					<div className="amll-music-artists">
-						{artists.map((artist) => (
-							<a
-								href={`#/m/artist/?id=${artist.id}`}
-								key={`artist-${artist.id}-${artist.name}`}
-								onMouseUp={() => {
-									closeLyricPage();
-								}}
-							>
-								{artist.name}
-							</a>
-						))}
-					</div>
-				</SongInfoTextMarquee>
-			)}
-		</div>
-		{showMenuButton && (
-			<button
-				type="button"
-				className="am-music-main-menu"
-				onClick={() => {
-					setMenuOpened(true);
+			<div
+				style={{
+					display: "flex",
+					flex: "1",
+					flexDirection: "column",
+					minWidth: "0",
 				}}
 			>
-				<IconMore color="#FFFFFF" />
-			</button>
-		)}
+				{showMusicName && (
+					<SongInfoTextMarquee>
+						<div className="amll-music-name">{musicName}</div>
+					</SongInfoTextMarquee>
+				)}
+				{showAlbumName && (
+					<SongInfoTextMarquee>
+						<a
+							className="amll-music-album"
+							href={`#/m/album/?id=${musicAlbumId}`}
+							onMouseUp={() => {
+								closeLyricPage();
+							}}
+						>
+							{musicAlbumName}
+						</a>
+					</SongInfoTextMarquee>
+				)}
+				{showMusicArtists && (
+					<SongInfoTextMarquee>
+						<div className="amll-music-artists">
+							{artists.map((artist) => (
+								<a
+									href={`#/m/artist/?id=${artist.id}`}
+									key={`artist-${artist.id}-${artist.name}`}
+									onMouseUp={() => {
+										closeLyricPage();
+									}}
+								>
+									{artist.name}
+								</a>
+							))}
+						</div>
+					</SongInfoTextMarquee>
+				)}
+			</div>
+			{showMenuButton && (
+				<button
+					type="button"
+					className="am-music-main-menu"
+					onClick={() => {
+						setMenuOpened(true);
+					}}
+				>
+					<IconMore color="#FFFFFF" />
+				</button>
+			)}
 		</div>
 	);
 };

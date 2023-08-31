@@ -451,6 +451,23 @@ export class MusicContextV2 extends MusicContextBase {
 	getMusicAlbumName(): string {
 		return this.musicAlbumName;
 	}
+	override setClipboard(data: string): Promise<void> {
+		return new Promise((resolve) => {
+			if (APP_CONF?.isOSX) {
+				legacyNativeCmder._envAdapter.callAdapter(
+					"thChJqtrtqOiiDkAfkWlwiGyNQHgZBZyuATPItNQRowZuzkkraM",
+					resolve,
+					[data],
+				);
+			} else {
+				legacyNativeCmder._envAdapter.callAdapter(
+					"winhelper.setClipBoardData",
+					resolve,
+					[data],
+				);
+			}
+		});
+	}
 	override dispose() {
 		removeRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
 		removeRegisterCall("End", "audioplayer", this.bindedOnMusicUnload);

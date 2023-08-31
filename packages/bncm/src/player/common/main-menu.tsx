@@ -12,6 +12,7 @@ import {
 	musicCoverAtom,
 	musicIdAtom,
 	musicNameAtom,
+	setClipboardAtom,
 } from "../../music-context/wrapper";
 import { closeLyricPage } from "../../injector";
 import { amllConfigWindowedOpenedAtom } from "../../components/config";
@@ -27,6 +28,7 @@ export const MainMenu: FC = () => {
 	const albumName = useAtomValue(musicAlbumNameAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
 	const setWindowedConfigOpened = useSetAtom(amllConfigWindowedOpenedAtom);
+	const setClipboardData = useSetAtom(setClipboardAtom);
 
 	const [configTranslatedLyric, setConfigTranslatedLyric] = useAtom(
 		showTranslatedLineAtom,
@@ -107,7 +109,7 @@ export const MainMenu: FC = () => {
 					<MenuItem
 						label={`复制音乐 ID：${musicId}`}
 						onClick={() => {
-							// TODO: setClipboardData(String(musicId));
+							setClipboardData(String(musicId));
 							setMenuOpened(false);
 						}}
 					/>
@@ -115,7 +117,7 @@ export const MainMenu: FC = () => {
 				<MenuItem
 					label={`复制音乐名称：${musicName}`}
 					onClick={() => {
-						// TODO: setClipboardData(musicName);
+						setClipboardData(musicName);
 						setMenuOpened(false);
 					}}
 				/>
@@ -186,7 +188,7 @@ export const MainMenu: FC = () => {
 					<MenuItem
 						label={`复制专辑名称：${albumName}`}
 						onClick={() => {
-							// TODO: setClipboardData(albumName);
+							setClipboardData(albumName);
 							setMenuOpened(false);
 						}}
 					/>
@@ -195,7 +197,7 @@ export const MainMenu: FC = () => {
 					<MenuItem
 						label={`复制作者名称：${artists.map((v) => v.name).join()}`}
 						onClick={() => {
-							// TODO: setClipboardData(artists.map(v => v.name).join());
+							setClipboardData(artists.map((v) => v.name).join());
 							setMenuOpened(false);
 						}}
 					/>
@@ -210,7 +212,7 @@ export const MainMenu: FC = () => {
 							if (t.startsWith("orpheus://cache/?")) {
 								t = t.slice(17);
 							}
-							// TODO: setClipboardData(t);
+							setClipboardData(t);
 							setMenuOpened(false);
 						}
 					}}

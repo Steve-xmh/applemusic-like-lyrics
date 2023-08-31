@@ -11,7 +11,10 @@ import {
 	wsConnectionStatusAtom,
 } from "../../music-context/ws-wrapper";
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
-import { lyricPageOpenedAtom, musicCoverAtom } from "../../music-context/wrapper";
+import {
+	lyricPageOpenedAtom,
+	musicCoverAtom,
+} from "../../music-context/wrapper";
 import "./background.sass";
 
 export const Background: FC = () => {

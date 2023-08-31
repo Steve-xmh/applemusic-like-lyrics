@@ -17,6 +17,7 @@ import { Select } from "../appkit/select";
 import { Menu, MenuDevider, MenuItem } from "../appkit/menu";
 import { lyricProviderLogsAtom } from "../../lyric/provider";
 import { v1 as uuidv1 } from "uuid";
+import { setClipboardAtom } from "../../music-context/wrapper";
 
 const sourceItemMenuAtom = atom<number | undefined>(undefined);
 
@@ -228,6 +229,7 @@ const LyricSourceAddManual: FC = () => {
 const LyricSourceMenu: FC = () => {
 	const [lyricSources, setLyricSources] = useAtom(sortableSourcesAtom);
 	const [sourceItemMenu, setSourceItemMenu] = useAtom(sourceItemMenuAtom);
+	const setClipboardData = useSetAtom(setClipboardAtom);
 	return (
 		<Menu
 			opened={sourceItemMenu !== undefined}
@@ -280,7 +282,7 @@ const LyricSourceMenu: FC = () => {
 									setSourceItemMenu(undefined);
 									const source = lyricSources[sourceItemMenu];
 									if (source) {
-										// TODO: 复制到剪切板
+										setClipboardData(stringifySourceString(source));
 										console.log(
 											source,
 											"的歌词源字符串为",

@@ -12,10 +12,12 @@ import { MusicContextV2 } from "./v2";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
-export const musicArtistsAtom = atom<Artist[]>([{
-	id: "0",
-	name: "未知作者"
-}]);
+export const musicArtistsAtom = atom<Artist[]>([
+	{
+		id: "0",
+		name: "未知作者",
+	},
+]);
 export const musicCoverAtom = atom("");
 export const musicAlbumIdAtom = atom("0");
 export const musicAlbumNameAtom = atom("未知专辑");
@@ -71,6 +73,10 @@ export const currentVolumeAtom = atom(
 export const lyricPageOpenedAtom = atom(false);
 export const musicContextAtom = atom((get) => get(rawMusicContextAtom));
 const rawMusicContextAtom = atom<MusicContextBase | undefined>(undefined);
+export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
+	const musicCtx = get(rawMusicContextAtom);
+	await musicCtx?.setClipboard(data);
+});
 
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();

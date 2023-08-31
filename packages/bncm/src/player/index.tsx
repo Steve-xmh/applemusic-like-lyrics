@@ -4,7 +4,10 @@ import { LyricPlayerHorizonal } from "./horizonal";
 import { Background } from "./common/background";
 import { LyricPlayerVertical } from "./vertical";
 import { MainMenu } from "./common/main-menu";
-import { AMLLConfigWindowed, amllConfigWindowedOpenedAtom } from "../components/config";
+import {
+	AMLLConfigWindowed,
+	amllConfigWindowedOpenedAtom,
+} from "../components/config";
 import { useAtomValue } from "jotai";
 
 export const LyricPlayer: FC = () => {
