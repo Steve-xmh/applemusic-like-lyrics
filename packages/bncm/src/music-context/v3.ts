@@ -240,7 +240,14 @@ export class MusicContextV3 extends MusicContextBase {
 		isTween = false,
 	) {
 		// log("音乐加载进度", audioId, progress, loadProgress);
-		this.musicPlayProgress = (progress * 1000) | 0;
+		if (this.playState === PlayState.Playing) {
+			this.musicPlayProgress = Math.max(
+				(progress * 1000) | 0,
+				this.musicPlayProgress,
+			);
+		} else {
+			this.musicPlayProgress = (progress * 1000) | 0;
+		}
 		if (this.progressDispatchHandle) {
 			cancelAnimationFrame(this.progressDispatchHandle);
 		}

@@ -4,7 +4,10 @@ declare const _default: import("vue").DefineComponent<{
         type: import("vue").PropType<boolean>;
     };
     alignAnchor: {
-        type: import("vue").PropType<number | "top" | "bottom">;
+        type: import("vue").PropType<"top" | "bottom" | "center">;
+    };
+    alignPosition: {
+        type: import("vue").PropType<number>;
     };
     enableSpring: {
         type: import("vue").PropType<boolean>;
@@ -40,7 +43,10 @@ declare const _default: import("vue").DefineComponent<{
         type: import("vue").PropType<boolean>;
     };
     alignAnchor: {
-        type: import("vue").PropType<number | "top" | "bottom">;
+        type: import("vue").PropType<"top" | "bottom" | "center">;
+    };
+    alignPosition: {
+        type: import("vue").PropType<number>;
     };
     enableSpring: {
         type: import("vue").PropType<boolean>;

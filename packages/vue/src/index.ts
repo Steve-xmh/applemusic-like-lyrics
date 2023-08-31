@@ -20,13 +20,20 @@ export interface LyricPlayerProps {
 	 */
 	disabled?: boolean;
 	/**
-	 * 设置歌词行的对齐方式，如果为 `undefined` 则默认为 `top`
+	 * 设置歌词行的对齐方式，如果为 `undefined` 则默认为 `center`
 	 *
-	 * - 设置成 `top` 的话歌词将会向组件顶部对齐
-	 * - 设置成 `bottom` 的话歌词将会向组件底部对齐
-	 * - 设置成 [0.0-1.0] 之间任意数字的话则会根据当前组件高度从顶部向下位移为对齐位置垂直居中对齐
+	 * - 设置成 `top` 的话将会向目标歌词行的顶部对齐
+	 * - 设置成 `bottom` 的话将会向目标歌词行的底部对齐
+	 * - 设置成 `center` 的话将会向目标歌词行的垂直中心对齐
 	 */
-	alignAnchor?: "top" | "bottom" | number;
+	alignAnchor?: "top" | "bottom" | "center";
+	/**
+	 * 设置默认的歌词行对齐位置，相对于整个歌词播放组件的大小位置，如果为 `undefined`
+	 * 则默认为 `0.5`
+	 *
+	 * 可以设置一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置
+	 */
+	alignPosition?: number;
 	/**
 	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
 	 *

@@ -15,6 +15,8 @@ import preset from "jss-preset-default";
 
 const jss = create(preset());
 
+export class LyricLineClickedEvent extends MouseEvent {}
+
 /**
  * 歌词播放组件，本框架的核心组件
  *
@@ -78,7 +80,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	readonly supportPlusLighter = CSS.supports("mix-blend-mode", "plus-lighter");
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	private disableSpring = false;
-	private alignAnchor: "top" | "bottom" | number = 0.5;
+	private alignAnchor: "top" | "bottom" | "center" = "center";
+	private alignPosition = 0.5;
 	private isNonDynamic = false;
 	readonly size: [number, number] = [0, 0];
 	readonly innerSize: [number, number] = [0, 0];
@@ -124,7 +127,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			color: "var(--amll-lyric-view-color,white)",
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
-			// boxSizing: "border-box",
 		},
 		lyricLine: {
 			position: "absolute",
@@ -132,7 +134,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			maxWidth: "var(--amll-lyric-player-width,100%)",
 			minWidth: "var(--amll-lyric-player-width,100%)",
 			width: "var(--amll-lyric-player-width,100%)",
-			padding: "2vh 0",
+			padding: "2vh 0.05em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
 			transition: "filter 0.25s",
@@ -194,6 +196,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			position: "absolute",
 			display: "flex",
 			gap: "0.25em",
+			left: "1em",
 			"& > *": {
 				height: "100%",
 				display: "inline-block",
@@ -442,45 +445,48 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 
 			this.bottomLine.lineSize = this.bottomLine.measureSize();
 		}
-		const SCALE_ASPECT = 0.95;
-		const scrollOffset = this.lyricLinesEl
-			.slice(0, this.scrollToIndex)
-			.reduce(
-				(acc, el) =>
-					acc + (el.getLine().isBG ? 0 : this.lyricLinesSize.get(el)?.[1] ?? 0),
-				0,
-			);
-		let curPos = -scrollOffset - this.scrollOffset;
-		if (this.alignAnchor === "bottom") {
-			curPos += this.element.clientHeight / 2;
-			const curLine = this.lyricLinesEl[this.scrollToIndex];
-			if (curLine) {
-				const lineHeight = this.lyricLinesSize.get(curLine)?.[1] ?? 0;
-				curPos -= lineHeight / 2;
-			}
-		} else if (typeof this.alignAnchor === "number") {
-			curPos += this.element.clientHeight * this.alignAnchor;
-			const curLine = this.lyricLinesEl[this.scrollToIndex];
-			if (curLine) {
-				const lineHeight = this.lyricLinesSize.get(curLine)?.[1] ?? 0;
-				curPos -= lineHeight / 2;
-			}
-		}
 		const interlude = this.getCurrentInterlude();
+		let curPos = -this.scrollOffset;
+		let targetAlignIndex = this.scrollToIndex;
 		let interludeDuration = 0;
 		if (interlude) {
 			interludeDuration = interlude[1] - interlude[0];
 			if (interludeDuration >= 5000) {
 				const nextLine = this.lyricLinesEl[interlude[2] + 1];
 				if (nextLine) {
-					curPos -= this.lyricLinesSize.get(nextLine)?.[1] ?? 0;
+					targetAlignIndex = interlude[2] + 1;
 				}
 			}
 		} else {
 			this.interludeDots.setInterlude(undefined);
 		}
+		const SCALE_ASPECT = 0.95;
+		const scrollOffset = this.lyricLinesEl
+			.slice(0, targetAlignIndex)
+			.reduce(
+				(acc, el) =>
+					acc + (el.getLine().isBG ? 0 : this.lyricLinesSize.get(el)?.[1] ?? 0),
+				0,
+			);
+		curPos -= scrollOffset;
+		curPos += this.size[1] * this.alignPosition;
+		const curLine = this.lyricLinesEl[targetAlignIndex];
+		if (curLine) {
+			const lineHeight = this.lyricLinesSize.get(curLine)?.[1] ?? 0;
+			switch (this.alignAnchor) {
+				case "bottom":
+					curPos -= lineHeight;
+					break;
+				case "center":
+					curPos -= lineHeight / 2;
+					break;
+				case "top":
+					break;
+			}
+		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
+		let baseDelay = 0.05;
 		let setDots = false;
 		this.lyricLinesEl.forEach((el, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
@@ -526,7 +532,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
 			if (curPos >= 0) {
-				delay += 0.05;
+				delay += baseDelay;
+				baseDelay /= 1.2;
 			}
 		});
 		this.bottomLine.setTransform(0, curPos, force, delay);
@@ -565,15 +572,22 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		return this.bottomLine.getElement();
 	}
 	/**
-	 * 设置歌词行的对齐方式，默认为 `top`
+	 * 设置目标歌词行的对齐方式，默认为 `center`
 	 *
-	 * - 设置成 `top` 的话歌词将会向组件顶部对齐
-	 * - 设置成 `bottom` 的话歌词将会向组件底部对齐
-	 * - 设置成 [0.0-1.0] 之间任意数字的话则会根据当前组件高度从顶部向下位移为对齐位置垂直居中对齐
+	 * - 设置成 `top` 的话将会向目标歌词行的顶部对齐
+	 * - 设置成 `bottom` 的话将会向目标歌词行的底部对齐
+	 * - 设置成 `center` 的话将会向目标歌词行的垂直中心对齐
 	 * @param alignAnchor 歌词行对齐方式，详情见函数说明
 	 */
-	setAlignAnchor(alignAnchor: "top" | "bottom" | number) {
+	setAlignAnchor(alignAnchor: "top" | "bottom" | "center") {
 		this.alignAnchor = alignAnchor;
+	}
+	/**
+	 * 设置默认的歌词行对齐位置，相对于整个歌词播放组件的大小位置，默认为 `0.5`
+	 * @param alignPosition 一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置
+	 */
+	setAlignPosition(alignPosition: number) {
+		this.alignPosition = alignPosition;
 	}
 	/**
 	 * 设置当前播放进度，单位为毫秒且**必须是整数**，此时将会更新内部的歌词进度信息

@@ -55,6 +55,11 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
+    if (props.alignPosition)
+        playerRef.value?.setAlignPosition(props.alignPosition);
+});
+
+watchEffect(() => {
     if (props.enableSpring)
         playerRef.value?.setEnableSpring(props.enableSpring);
 });

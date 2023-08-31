@@ -1,10 +1,12 @@
-import { defineComponent as g, ref as s, onMounted as d, onUnmounted as v, watchEffect as n, openBlock as m, createElementBlock as S, Fragment as P, createElementVNode as y, createBlock as b, Teleport as B, createCommentVNode as L } from "vue";
-import { LyricPlayer as w, BackgroundRender as _ } from "@applemusic-like-lyrics/core";
-const E = /* @__PURE__ */ g({
+import { defineComponent as g, ref as s, onMounted as d, onUnmounted as v, watchEffect as r, openBlock as m, createElementBlock as P, Fragment as S, createElementVNode as y, mergeProps as b, createBlock as B, Teleport as L, createCommentVNode as w } from "vue";
+import { LyricPlayer as h, BackgroundRender as _ } from "@applemusic-like-lyrics/core";
+const A = /* @__PURE__ */ g({
+  inheritAttrs: !1,
   __name: "LyricPlayer",
   props: {
     disabled: { type: Boolean },
     alignAnchor: {},
+    alignPosition: {},
     enableSpring: { type: Boolean },
     enableBlur: { type: Boolean },
     lyricLines: {},
@@ -15,60 +17,63 @@ const E = /* @__PURE__ */ g({
     bottomLine: {}
   },
   setup(p, { expose: u }) {
-    const a = p, l = s(), r = s();
+    const a = p, l = s(), n = s();
     return d(() => {
-      l.value && (r.value = new w(), l.value.appendChild(r.value.getElement()));
+      l.value && (n.value = new h(), l.value.appendChild(n.value.getElement()));
     }), v(() => {
-      r.value && r.value.dispose();
-    }), n((e) => {
+      n.value && n.value.dispose();
+    }), r((e) => {
       if (!a.disabled) {
         let i = !1, t = -1;
         const o = (c) => {
           var f;
-          i || (t === -1 && (t = c), (f = r.value) == null || f.update(c - t), t = c, requestAnimationFrame(o));
+          i || (t === -1 && (t = c), (f = n.value) == null || f.update(c - t), t = c, requestAnimationFrame(o));
         };
         requestAnimationFrame(o), e(() => {
           i = !0;
         });
       }
-    }), n(() => {
+    }), r(() => {
       var e;
-      a.alignAnchor && ((e = r.value) == null || e.setAlignAnchor(a.alignAnchor));
-    }), n(() => {
+      a.alignAnchor && ((e = n.value) == null || e.setAlignAnchor(a.alignAnchor));
+    }), r(() => {
       var e;
-      a.enableSpring && ((e = r.value) == null || e.setEnableSpring(a.enableSpring));
-    }), n(() => {
+      a.alignPosition && ((e = n.value) == null || e.setAlignPosition(a.alignPosition));
+    }), r(() => {
       var e;
-      a.enableBlur && ((e = r.value) == null || e.setEnableBlur(a.enableBlur));
-    }), n(() => {
+      a.enableSpring && ((e = n.value) == null || e.setEnableSpring(a.enableSpring));
+    }), r(() => {
       var e;
-      a.lyricLines && ((e = r.value) == null || e.setLyricLines(a.lyricLines));
-    }), n(() => {
+      a.enableBlur && ((e = n.value) == null || e.setEnableBlur(a.enableBlur));
+    }), r(() => {
       var e;
-      a.currentTime && ((e = r.value) == null || e.setCurrentTime(a.currentTime));
-    }), n(() => {
+      a.lyricLines && ((e = n.value) == null || e.setLyricLines(a.lyricLines));
+    }), r(() => {
       var e;
-      a.linePosXSpringParams && ((e = r.value) == null || e.setLinePosXSpringParams(a.linePosXSpringParams));
-    }), n(() => {
+      a.currentTime && ((e = n.value) == null || e.setCurrentTime(a.currentTime));
+    }), r(() => {
       var e;
-      a.linePosYSpringParams && ((e = r.value) == null || e.setLinePosYSpringParams(a.linePosYSpringParams));
-    }), n(() => {
+      a.linePosXSpringParams && ((e = n.value) == null || e.setLinePosXSpringParams(a.linePosXSpringParams));
+    }), r(() => {
       var e;
-      a.lineScaleSpringParams && ((e = r.value) == null || e.setLineScaleSpringParams(a.lineScaleSpringParams));
+      a.linePosYSpringParams && ((e = n.value) == null || e.setLinePosYSpringParams(a.linePosYSpringParams));
+    }), r(() => {
+      var e;
+      a.lineScaleSpringParams && ((e = n.value) == null || e.setLineScaleSpringParams(a.lineScaleSpringParams));
     }), u({
-      lyricPlayer: r,
+      lyricPlayer: n,
       wrapperEl: l
     }), (e, i) => {
       var t, o;
-      return m(), S(P, null, [
-        y("div", {
+      return m(), P(S, null, [
+        y("div", b({
           ref_key: "wrapperRef",
           ref: l
-        }, null, 512),
-        (t = r.value) != null && t.getBottomLineElement() && a.bottomLine ? (m(), b(B, {
+        }, e.$attrs), null, 16),
+        (t = n.value) != null && t.getBottomLineElement() && a.bottomLine ? (m(), B(L, {
           key: 0,
-          to: (o = r.value) == null ? void 0 : o.getBottomLineElement()
-        }, null, 8, ["to"])) : L("", !0)
+          to: (o = n.value) == null ? void 0 : o.getBottomLineElement()
+        }, null, 8, ["to"])) : w("", !0)
       ], 64);
     };
   }
@@ -82,34 +87,34 @@ const E = /* @__PURE__ */ g({
     renderScale: {}
   },
   setup(p, { expose: u }) {
-    const a = p, l = s(), r = s();
+    const a = p, l = s(), n = s();
     return d(() => {
       if (l.value) {
-        r.value = new _();
-        const e = r.value.getElement();
+        n.value = new _();
+        const e = n.value.getElement();
         e.style.width = "100%", e.style.height = "100%", l.value.appendChild(e);
       }
     }), v(() => {
-      r.value && r.value.dispose();
-    }), n(() => {
+      n.value && n.value.dispose();
+    }), r(() => {
       var e;
-      a.albumImageUrl && ((e = r.value) == null || e.setAlbumImage(a.albumImageUrl));
-    }), n(() => {
+      a.albumImageUrl && ((e = n.value) == null || e.setAlbumImage(a.albumImageUrl));
+    }), r(() => {
       var e;
-      a.fps && ((e = r.value) == null || e.setFPS(a.fps));
-    }), n(() => {
+      a.fps && ((e = n.value) == null || e.setFPS(a.fps));
+    }), r(() => {
       var e, i;
-      a.playing ? (e = r.value) == null || e.pause() : (i = r.value) == null || i.resume();
-    }), n(() => {
+      a.playing ? (e = n.value) == null || e.pause() : (i = n.value) == null || i.resume();
+    }), r(() => {
       var e;
-      a.flowSpeed && ((e = r.value) == null || e.setFlowSpeed(a.flowSpeed));
-    }), n(() => {
+      a.flowSpeed && ((e = n.value) == null || e.setFlowSpeed(a.flowSpeed));
+    }), r(() => {
       var e;
-      a.renderScale && ((e = r.value) == null || e.setRenderScale(a.renderScale));
+      a.renderScale && ((e = n.value) == null || e.setRenderScale(a.renderScale));
     }), u({
-      bgRender: r,
+      bgRender: n,
       wrapperEl: l
-    }), (e, i) => (m(), S("div", {
+    }), (e, i) => (m(), P("div", {
       ref_key: "wrapperRef",
       ref: l
     }, null, 512));
@@ -117,6 +122,6 @@ const E = /* @__PURE__ */ g({
 });
 export {
   k as BackgroundRender,
-  E as LyricPlayer
+  A as LyricPlayer
 };
 //# sourceMappingURL=amll-vue.mjs.map

@@ -5,6 +5,8 @@
  */
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import { SpringParams } from "../utils/spring";
+export declare class LyricLineClickedEvent extends MouseEvent {
+}
 /**
  * 歌词播放组件，本框架的核心组件
  *
@@ -37,6 +39,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     readonly supportMaskImage: boolean;
     private disableSpring;
     private alignAnchor;
+    private alignPosition;
     private isNonDynamic;
     readonly size: [number, number];
     readonly innerSize: [number, number];
@@ -127,14 +130,19 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      */
     getBottomLineElement(): HTMLElement;
     /**
-     * 设置歌词行的对齐方式，默认为 `top`
+     * 设置目标歌词行的对齐方式，默认为 `center`
      *
-     * - 设置成 `top` 的话歌词将会向组件顶部对齐
-     * - 设置成 `bottom` 的话歌词将会向组件底部对齐
-     * - 设置成 [0.0-1.0] 之间任意数字的话则会根据当前组件高度从顶部向下位移为对齐位置垂直居中对齐
+     * - 设置成 `top` 的话将会向目标歌词行的顶部对齐
+     * - 设置成 `bottom` 的话将会向目标歌词行的底部对齐
+     * - 设置成 `center` 的话将会向目标歌词行的垂直中心对齐
      * @param alignAnchor 歌词行对齐方式，详情见函数说明
      */
-    setAlignAnchor(alignAnchor: "top" | "bottom" | number): void;
+    setAlignAnchor(alignAnchor: "top" | "bottom" | "center"): void;
+    /**
+     * 设置默认的歌词行对齐位置，相对于整个歌词播放组件的大小位置，默认为 `0.5`
+     * @param alignPosition 一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置
+     */
+    setAlignPosition(alignPosition: number): void;
     /**
      * 设置当前播放进度，单位为毫秒且**必须是整数**，此时将会更新内部的歌词进度信息
      * 内部会根据调用间隔和播放进度自动决定如何滚动和显示歌词，所以这个的调用频率越快越准确越好
