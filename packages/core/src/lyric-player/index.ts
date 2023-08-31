@@ -113,7 +113,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricPlayer: {
 			userSelect: "none",
 			fontSize: "var(--amll-lyric-player-font-size,max(5vh, 12px))",
-			padding: "1rem",
+			padding: "1em",
+			margin: "-1em",
 			width: "100%",
 			height: "100%",
 			overflow: "hidden",
@@ -123,7 +124,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			color: "var(--amll-lyric-view-color,white)",
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
-			boxSizing: "border-box",
+			// boxSizing: "border-box",
 		},
 		lyricLine: {
 			position: "absolute",
@@ -131,7 +132,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			maxWidth: "var(--amll-lyric-player-width,100%)",
 			minWidth: "var(--amll-lyric-player-width,100%)",
 			width: "var(--amll-lyric-player-width,100%)",
-			padding: "max(2vh, 1rem) 1rem",
+			padding: "2vh 0",
 			contain: "content",
 			willChange: "filter,transform,opacity",
 			transition: "filter 0.25s",
@@ -139,7 +140,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
-				padding: "max(1vh, 1rem) 0",
+				padding: "1vh 0",
 			},
 		},
 		lyricDuetLine: {
@@ -158,8 +159,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricMainLine: {
 			transition: "opacity 0.3s 0.25s",
 			willChange: "opacity",
-			margin: "-1rem",
-			padding: "1rem",
+			margin: "-1em",
+			padding: "1em",
 			"& span": {
 				display: "inline-block",
 			},
@@ -171,8 +172,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				"&.emphasize": {
 					transformStyle: "preserve-3d",
 					perspective: "50vw",
-					padding: "1rem",
-					margin: "-1rem",
+					padding: "1em",
+					margin: "-1em",
 				},
 			},
 		},
@@ -186,15 +187,15 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 		},
 		interludeDots: {
-			height: "min(1rem,2.5vh)",
+			height: "clamp(0.5em,1vh,3em)",
 			transformOrigin: "center",
 			width: "fit-content",
 			padding: "2.5% 0",
 			position: "absolute",
 			display: "flex",
-			gap: "0.5rem",
+			gap: "0.25em",
 			"& > *": {
-				width: "100%",
+				height: "100%",
 				display: "inline-block",
 				borderRadius: "50%",
 				aspectRatio: "1 / 1",
@@ -202,7 +203,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				marginRight: "4px",
 			},
 			"&.duet": {
-				right: "1rem",
+				right: "1em",
 				transformOrigin: "center",
 			},
 		},
@@ -269,7 +270,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (this.processedLines[0]?.startTime) {
 				if (this.processedLines[0].startTime > currentTime) {
 					return [
-						0,
+						currentTime,
 						this.processedLines[0].startTime,
 						-2,
 						this.processedLines[0].isDuet,
@@ -285,7 +286,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.processedLines[i].endTime < currentTime
 			) {
 				return [
-					this.processedLines[i].endTime,
+					Math.max(this.processedLines[i].endTime, currentTime),
 					this.processedLines[i + 1].startTime,
 					i,
 					this.processedLines[i + 1].isDuet,

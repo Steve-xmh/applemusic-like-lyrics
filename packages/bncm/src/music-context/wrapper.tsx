@@ -9,6 +9,7 @@ import {
 } from ".";
 import { isNCMV3 } from "../utils/is-ncm-v3";
 import { MusicContextV2 } from "./v2";
+import { MusicContextV3 } from "./v3";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -97,8 +98,10 @@ export const MusicInfoWrapper: FC = () => {
 
 	useEffect(() => {
 		if (location.hostname === "localhost") return;
-		if (isNCMV3()) {
-			// TODO: 制作 NCM v3 接口
+		if (plugin.musicStatus) {
+			musicCtx.current = plugin.musicStatus;
+		} else if (isNCMV3()) {
+			musicCtx.current = new MusicContextV3();
 		} else {
 			musicCtx.current = new MusicContextV2();
 		}

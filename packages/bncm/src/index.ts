@@ -5,7 +5,9 @@ import { normalizePath } from "./utils/path";
 import manifest from "virtual:bncm-plugin-manifest";
 import { configViewElement, initLyricPage } from "./injector";
 import { MusicContextV2 } from "./music-context/v2";
+import { MusicContextV3 } from "./music-context/v3";
 import { injectLyricPage as injectLyricPageV2 } from "./injector/v2";
+import { injectLyricPage as injectLyricPageV3 } from "./injector/v3";
 
 // 注入样式
 async function initStyle() {
@@ -117,14 +119,16 @@ plugin.onLoad(async () => {
 			initDevelopmentReload();
 		}
 
-		initLyricPage();
-
 		if (isNCMV3()) {
-			// TODO: 3.0 的注入支持
+			await betterncm.utils.waitForElement("#root");
+			plugin.musicStatus = new MusicContextV3();
+			injectLyricPageV3();
 		} else {
 			plugin.musicStatus = new MusicContextV2();
 			injectLyricPageV2();
 		}
+
+		initLyricPage();
 
 		log("插件初始化完成！");
 	} catch (err) {

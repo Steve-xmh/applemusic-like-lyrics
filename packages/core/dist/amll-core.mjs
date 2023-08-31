@@ -1,4 +1,4 @@
-import { Container as v } from "@pixi/display";
+import { Container as x } from "@pixi/display";
 import { Application as C } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
 import { ColorMatrixFilter as w } from "@pixi/filter-color-matrix";
@@ -80,12 +80,12 @@ function I(c) {
                 if (u.nodeName === "span" && S)
                   S === "x-translation" ? h.translatedLyric = u.innerHTML.trim() : S === "x-roman" && (h.romanLyric = u.innerHTML.trim());
                 else if (u.hasAttribute("begin") && u.hasAttribute("end")) {
-                  const x = {
+                  const v = {
                     word: p.textContent,
                     startTime: L(u.getAttribute("begin")),
                     endTime: L(u.getAttribute("end"))
                   };
-                  h.words.push(x);
+                  h.words.push(v);
                 }
               }
             const d = h.words[0];
@@ -114,7 +114,7 @@ const Z = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   parseTTML: I
 }, Symbol.toStringTag, { value: "Module" }));
-class B extends v {
+class B extends x {
   time = 0;
 }
 class k {
@@ -656,7 +656,7 @@ class W {
             {
               offset: 0.5,
               transform: "translate3d(0, -2%, 20px)",
-              filter: "drop-shadow(0 0 0.2rem var(--amll-lyric-view-color,white))"
+              filter: "drop-shadow(0 0 0.2em var(--amll-lyric-view-color,white))"
             },
             {
               offset: 1,
@@ -791,7 +791,8 @@ class te extends EventTarget {
     lyricPlayer: {
       userSelect: "none",
       fontSize: "var(--amll-lyric-player-font-size,max(5vh, 12px))",
-      padding: "1rem",
+      padding: "1em",
+      margin: "-1em",
       width: "100%",
       height: "100%",
       overflow: "hidden",
@@ -800,8 +801,8 @@ class te extends EventTarget {
       zIndex: 1,
       color: "var(--amll-lyric-view-color,white)",
       mixBlendMode: "plus-lighter",
-      contain: "strict",
-      boxSizing: "border-box"
+      contain: "strict"
+      // boxSizing: "border-box",
     },
     lyricLine: {
       position: "absolute",
@@ -809,7 +810,7 @@ class te extends EventTarget {
       maxWidth: "var(--amll-lyric-player-width,100%)",
       minWidth: "var(--amll-lyric-player-width,100%)",
       width: "var(--amll-lyric-player-width,100%)",
-      padding: "max(2vh, 1rem) 1rem",
+      padding: "2vh 0",
       contain: "content",
       willChange: "filter,transform,opacity",
       transition: "filter 0.25s",
@@ -817,7 +818,7 @@ class te extends EventTarget {
     },
     "@media (max-width: 1024px)": {
       lyricLine: {
-        padding: "max(1vh, 1rem) 0"
+        padding: "1vh 0"
       }
     },
     lyricDuetLine: {
@@ -836,8 +837,8 @@ class te extends EventTarget {
     lyricMainLine: {
       transition: "opacity 0.3s 0.25s",
       willChange: "opacity",
-      margin: "-1rem",
-      padding: "1rem",
+      margin: "-1em",
+      padding: "1em",
       "& span": {
         display: "inline-block"
       },
@@ -849,8 +850,8 @@ class te extends EventTarget {
         "&.emphasize": {
           transformStyle: "preserve-3d",
           perspective: "50vw",
-          padding: "1rem",
-          margin: "-1rem"
+          padding: "1em",
+          margin: "-1em"
         }
       }
     },
@@ -864,15 +865,15 @@ class te extends EventTarget {
       }
     },
     interludeDots: {
-      height: "min(1rem,2.5vh)",
+      height: "clamp(0.5em,1vh,3em)",
       transformOrigin: "center",
       width: "fit-content",
       padding: "2.5% 0",
       position: "absolute",
       display: "flex",
-      gap: "0.5rem",
+      gap: "0.25em",
       "& > *": {
-        width: "100%",
+        height: "100%",
         display: "inline-block",
         borderRadius: "50%",
         aspectRatio: "1 / 1",
@@ -880,7 +881,7 @@ class te extends EventTarget {
         marginRight: "4px"
       },
       "&.duet": {
-        right: "1rem",
+        right: "1em",
         transformOrigin: "center"
       }
     },
@@ -918,14 +919,14 @@ class te extends EventTarget {
     if (t === 0) {
       if (this.processedLines[0]?.startTime && this.processedLines[0].startTime > e)
         return [
-          0,
+          e,
           this.processedLines[0].startTime,
           -2,
           this.processedLines[0].isDuet
         ];
     } else if (this.processedLines[t]?.endTime && this.processedLines[t + 1]?.startTime && this.processedLines[t + 1].startTime > e && this.processedLines[t].endTime < e)
       return [
-        this.processedLines[t].endTime,
+        Math.max(this.processedLines[t].endTime, e),
         this.processedLines[t + 1].startTime,
         t,
         this.processedLines[t + 1].isDuet
