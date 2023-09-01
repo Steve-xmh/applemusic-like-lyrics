@@ -120,7 +120,13 @@ plugin.onLoad(async () => {
 		}
 
 		if (isNCMV3()) {
-			await betterncm.utils.waitForElement("#root");
+			await betterncm.utils.waitForFunction(() => {
+				return (
+					document.getElementById("root") as any
+				)
+					?._reactRootContainer
+					?._internalRoot?.current?.child?.child?.memoizedProps?.store;
+			});
 			plugin.musicStatus = new MusicContextV3();
 			injectLyricPageV3();
 		} else {
