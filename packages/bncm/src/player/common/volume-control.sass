@@ -1,0 +1,27 @@
+@keyframes speaker-bounce-part1
+    to
+        transform: scale(1.2)
+@keyframes speaker-bounce-part2
+    to
+        transform: scale(0.85)
+@keyframes speaker-bounce-part3
+    to
+        transform: scale(1)
+
+.am-music-volume-controls
+    display: flex
+    align-items: center
+    flex-direction: row
+    transition: margin-top 0.25s
+    margin-top: 3vh
+    > svg
+        opacity: 0.5
+    @media screen and (max-height: 900px)
+        margin-top: unset
+
+.speaker-animate
+    @for $i from 1 through 4
+        > .speaker-bounce-#{$i}
+            $delay: 0.05s * ($i - 1)
+            animation: speaker-bounce-part1 0.2s ease-in-out $delay forwards, speaker-bounce-part2 0.2s ease-in-out calc(0.2s + $delay) forwards, speaker-bounce-part3 0.2s ease-in-out calc(0.4s + $delay) forwards
+            transform-origin: center

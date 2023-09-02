@@ -219,6 +219,9 @@ export default defineConfig(({ mode }) => {
 			wasm(),
 			svgr({
 				exportAsDefault: true,
+				svgrOptions: {
+					ref: true,
+				},
 				include: ["./src/**/*.svg"],
 			}),
 			CopyBetterNCMPlugin({

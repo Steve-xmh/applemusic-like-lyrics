@@ -18,7 +18,7 @@ import {
 import IconMore from "../../assets/icon_more.svg";
 import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
 import { closeLyricPage } from "../../injector";
-import { NowPlayingSlider } from "../../components/appkit/np-slider";
+import { Slider } from "../../components/appkit/np-slider";
 import { topbarMenuOpenedAtom } from "../common/main-menu";
 import { AudioQualityTag } from "../../components/song-info/audio-quality-tag";
 import { PlayControls } from "../../components/song-info/play-controls";
@@ -118,7 +118,7 @@ export const MusicInfo: FC = () => {
 				)}
 			</div>
 			<div className="am-music-progress-control">
-				<NowPlayingSlider
+				<Slider
 					onChange={setCurrentTime}
 					value={currentTime}
 					min={0}

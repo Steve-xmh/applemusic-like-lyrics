@@ -3,7 +3,13 @@
  * 专门给开发环境设计的播放状态获取对象
  */
 
-import { Artist, MusicContextBase, PlayState } from ".";
+import {
+	Artist,
+	AudioQualityType,
+	MusicContextBase,
+	PlayMode,
+	PlayState,
+} from ".";
 import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
 import { callCachedSearchFunction } from "../utils/func";
 import { log } from "../utils/logger";
@@ -223,6 +229,26 @@ export class MusicStatusGetterDev extends MusicContextBase {
 	override getPlayState() {
 		return this.playState;
 	}
+	override getMusicQuality(): AudioQualityType {
+		return AudioQualityType.DolbyAtmos;
+	}
+	override getMusicAlbumId(): string {
+		return "";
+	}
+	override getMusicAlbumName(): string {
+		return "";
+	}
+	override getPlayMode(): PlayMode {
+		return PlayMode.Order;
+	}
+	override setPlayMode(playMode: PlayMode): void {}
+	override seekToPosition(timeMS: number): void {}
+	override forwardSong(): void {}
+	override rewindSong(): void {}
+	override setVolume(value: number): void {}
+	override getVolume(): number {}
+	override pause(): void {}
+	override resume(): void {}
 	override dispose() {
 		this.audioEl.pause();
 		this.audioEl.remove();

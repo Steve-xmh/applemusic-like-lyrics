@@ -21,7 +21,7 @@ import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
 import { AudioFFTControl } from "./audio-fft-control";
 import { PlayControls } from "./play-controls";
-import { NowPlayingSlider } from "../appkit/np-slider";
+import { Slider } from "../appkit/np-slider";
 import { AudioQualityTag } from "./audio-quality-tag";
 import { SongInfoTextMarquee } from "./song-info-text-marquee";
 
@@ -169,7 +169,7 @@ export const PlayerSongInfo: React.FC<{
 
 						{!hidePlayProgressBar && (
 							<div className="am-music-progress-control">
-								<NowPlayingSlider
+								<Slider
 									onAfterChange={(v) => {
 										setPlayProgress(v);
 										setLockPlayProgress(false);
@@ -209,8 +209,9 @@ export const PlayerSongInfo: React.FC<{
 
 					{widgetUnderProgressBar === "play-controls" && (
 						<div className="am-music-volume-controls">
-							<IconVolume2 color="#FFFFFF" />
-							<NowPlayingSlider
+							<Slider
+								beforeIcon={() => <IconVolume2 color="#FFFFFF" />}
+								afterIcon={() => <IconVolume color="#FFFFFF" />}
 								onAfterChange={(v) => {
 									setPlayVolume(v);
 									setLockPlayVolume(false);
@@ -236,7 +237,6 @@ export const PlayerSongInfo: React.FC<{
 								min={0.0}
 								max={1.0}
 							/>
-							<IconVolume color="#FFFFFF" />
 						</div>
 					)}
 
