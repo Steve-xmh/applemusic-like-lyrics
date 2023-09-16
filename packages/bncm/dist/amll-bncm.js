@@ -301,7 +301,7 @@ const us = 47, XC = 46, y1 = (e) => {
     return ".";
   const t = A.charCodeAt(0) === us, i = A.charCodeAt(A.length - 1) === us;
   return A = m1(A), A = p1(A, !t), A.length === 0 && !t && (A = "."), A.length > 0 && i && (A += "/"), t ? `/${A}` : A;
-}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "a57663fd320bb4b4a80dd83dd377d1f6b6752231", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
+}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "55f9135c4367d98253dc7fcc984db8be0aade32c", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
 var Lf = { exports: {} }, CC = {}, Jf = { exports: {} }, FA = {};
 /**
  * @license React
@@ -7325,7 +7325,7 @@ class nD extends eD {
     return this.audioQuality;
   }
   seekToPosition(A) {
-    legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {
+    this.musicPlayProgress = A, legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {
     }, [
       this.audioId,
       MN(this.audioId, "seek"),
@@ -7603,7 +7603,7 @@ class rD extends eD {
     return this.audioQuality;
   }
   seekToPosition(A) {
-    legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {
+    this.musicPlayProgress = A, legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {
     }, [
       this.audioId,
       SN(this.audioId, "seek"),
@@ -15981,7 +15981,7 @@ const Ey = (e) => {
     g,
     s
   ]), L.useEffect(() => {
-    console.log(r), B(r);
+    B(r);
   }, [r]), /* @__PURE__ */ D.jsxs(
     "div",
     {
@@ -27037,7 +27037,7 @@ let NU = class {
   lastContainer = /* @__PURE__ */ new Set();
   onTick = (A) => {
     for (const t of this.lastContainer)
-      t.alpha = Math.max(0, t.alpha - A / 60), t.alpha <= 0 && (this.app.stage.removeChild(t), this.lastContainer.delete(t));
+      t.alpha = Math.max(0, t.alpha - A / 60), t.alpha <= 0 && (this.app.stage.removeChild(t), this.lastContainer.delete(t), t.destroy(!0));
     if (this.curContainer) {
       this.curContainer.alpha = Math.min(
         1,
@@ -27079,7 +27079,9 @@ let NU = class {
     const i = new _s();
     i.brightness(0.6, !1);
     const n = new _s();
-    n.contrast(0.3, !0), this.app.stage.filters = [], this.app.stage.filters.push(new Oi(5, 1)), this.app.stage.filters.push(new Oi(10, 1)), this.app.stage.filters.push(new Oi(20, 2)), this.app.stage.filters.push(new Oi(40, 2)), A > 512 && this.app.stage.filters.push(new Oi(80, 2)), A > 768 && this.app.stage.filters.push(new Oi(160, 4)), A > 768 * 2 && this.app.stage.filters.push(new Oi(320, 4)), this.app.stage.filters.push(t, i, n), this.app.stage.filters.push(new Oi(5, 1));
+    n.contrast(0.3, !0), this.app.stage.filters?.forEach((r) => {
+      r.destroy();
+    }), this.app.stage.filters = [], this.app.stage.filters.push(new Oi(5, 1)), this.app.stage.filters.push(new Oi(10, 1)), this.app.stage.filters.push(new Oi(20, 2)), this.app.stage.filters.push(new Oi(40, 2)), this.app.stage.filters.push(new Oi(80, 2)), A > 768 && this.app.stage.filters.push(new Oi(160, 4)), A > 768 * 2 && this.app.stage.filters.push(new Oi(320, 4)), this.app.stage.filters.push(t, i, n), this.app.stage.filters.push(new Oi(5, 1));
   }
   /**
    * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
@@ -27545,17 +27547,17 @@ let UU = class {
           [
             {
               offset: 0,
-              transform: "translate3d(0, 0px, 0px)",
+              transform: "translate3d(0, 0, 0px)",
               filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
             },
             {
               offset: 0.5,
-              transform: "translate3d(0, -2%, 20px)",
+              transform: "translate3d(0, -1%, 20px)",
               filter: "drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))"
             },
             {
               offset: 1,
-              transform: "translate3d(0, 0px, 0)",
+              transform: "translate3d(0, 0, 0)",
               filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
             }
           ],

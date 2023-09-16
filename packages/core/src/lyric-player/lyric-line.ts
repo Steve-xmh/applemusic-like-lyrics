@@ -29,6 +29,54 @@ function generateFadeGradient(
 	];
 }
 
+// 将输入的单词重新分组，之间没有空格的单词将会组合成一个单词数组
+// 例如输入：["Life", " ", "is", " a", " su", "gar"]
+// 应该返回：["Life", " ", "is", " a", [" su", "gar"]]
+function chunkLyricWords<T>(
+	words: T[],
+	wordGetter: (word: T) => string,
+): (T | T[])[] {
+	let wordChunk: string[] = [];
+	let wChunk: T[] = [];
+	const result: (T | T[])[] = [];
+
+	for (const w of words) {
+		const word = wordGetter(w);
+		wordChunk.push(word);
+		wChunk.push(w);
+		if (word.length > 0 && word.trim().length === 0) {
+			wordChunk.pop();
+			wChunk.pop();
+			if (wChunk.length === 1) {
+				result.push(wChunk[0]);
+			} else if (wChunk.length > 1) {
+				result.push(wChunk);
+			}
+			result.push(w);
+			wordChunk = [];
+			wChunk = [];
+		} else if (!/^\s*[^\s]*\s*$/.test(wordChunk.join(""))) {
+			wordChunk.pop();
+			wChunk.pop();
+			if (wChunk.length === 1) {
+				result.push(wChunk[0]);
+			} else if (wChunk.length > 1) {
+				result.push(wChunk);
+			}
+			wordChunk = [word];
+			wChunk = [w];
+		}
+	}
+
+	if (wChunk.length === 1) {
+		result.push(wChunk[0]);
+	} else {
+		result.push(wChunk);
+	}
+
+	return result;
+}
+
 // 果子在对辉光效果的解释是一种强调（emphasized）效果
 // 条件是一个单词时长大于等于 1s 且长度小于等于 7
 export function shouldEmphasize(word: LyricWord): boolean {
@@ -348,18 +396,18 @@ export class LyricLineEl implements HasElement, Disposable {
 					[
 						{
 							offset: 0,
-							transform: "translate3d(0, 0px, 0px)",
+							transform: "translate3d(0, 0, 0px)",
 							filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))",
 						},
 						{
 							offset: 0.5,
-							transform: "translate3d(0, -2%, 20px)",
+							transform: "translate3d(0, -1%, 20px)",
 							filter:
 								"drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))",
 						},
 						{
 							offset: 1,
-							transform: "translate3d(0, 0px, 0)",
+							transform: "translate3d(0, 0, 0)",
 							filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))",
 						},
 					],

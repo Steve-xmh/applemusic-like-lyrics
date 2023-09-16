@@ -311,6 +311,7 @@ export class MusicContextV3 extends MusicContextBase {
 		return this.audioQuality;
 	}
 	override seekToPosition(timeMS: number): void {
+		this.musicPlayProgress = timeMS;
 		legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {}, [
 			this.audioId,
 			genAudioPlayerCommand(this.audioId, "seek"),

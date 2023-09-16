@@ -22,6 +22,7 @@ export class PixiRenderer implements Disposable {
 			if (lastContainer.alpha <= 0) {
 				this.app.stage.removeChild(lastContainer);
 				this.lastContainer.delete(lastContainer);
+				lastContainer.destroy(true);
 			}
 		}
 
@@ -142,12 +143,15 @@ export class PixiRenderer implements Disposable {
 		c1.brightness(0.6, false);
 		const c2 = new ColorMatrixFilter();
 		c2.contrast(0.3, true);
+		this.app.stage.filters?.forEach((filter) => {
+			filter.destroy();
+		});
 		this.app.stage.filters = [];
 		this.app.stage.filters.push(new BlurFilter(5, 1));
 		this.app.stage.filters.push(new BlurFilter(10, 1));
 		this.app.stage.filters.push(new BlurFilter(20, 2));
 		this.app.stage.filters.push(new BlurFilter(40, 2));
-		if (minBorder > 512) this.app.stage.filters.push(new BlurFilter(80, 2));
+		this.app.stage.filters.push(new BlurFilter(80, 2));
 		if (minBorder > 768) this.app.stage.filters.push(new BlurFilter(160, 4));
 		if (minBorder > 768 * 2)
 			this.app.stage.filters.push(new BlurFilter(320, 4));

@@ -125,7 +125,6 @@ export const Slider: React.FC<
 		max,
 	]);
 	useEffect(() => {
-		console.log(value);
 		setCurValue(value);
 	}, [value]);
 	return (
