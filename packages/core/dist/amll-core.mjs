@@ -876,7 +876,7 @@ class ie extends EventTarget {
       gap: "0.25em",
       left: "1em",
       "& > *": {
-        height: "100%",
+        height: "clamp(0.5em,1vh,3em)",
         display: "inline-block",
         borderRadius: "50%",
         aspectRatio: "1 / 1",

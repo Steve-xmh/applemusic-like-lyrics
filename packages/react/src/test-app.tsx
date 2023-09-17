@@ -123,13 +123,13 @@ export const App: FC = () => {
 					right: "0",
 					bottom: "0",
 					backgroundColor: "#0004",
-					margin: "1em",
-					padding: "1em",
-					borderRadius: "0.5em",
+					margin: "1rem",
+					padding: "1rem",
+					borderRadius: "0.5rem",
 					color: "white",
 					display: "flex",
 					flexDirection: "column",
-					gap: "0.5em",
+					gap: "0.5rem",
 				}}
 			>
 				<div>AMLL React 绑定调试页面</div>

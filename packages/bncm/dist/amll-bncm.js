@@ -301,7 +301,7 @@ const us = 47, XC = 46, y1 = (e) => {
     return ".";
   const t = A.charCodeAt(0) === us, i = A.charCodeAt(A.length - 1) === us;
   return A = m1(A), A = p1(A, !t), A.length === 0 && !t && (A = "."), A.length > 0 && i && (A += "/"), t ? `/${A}` : A;
-}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "55f9135c4367d98253dc7fcc984db8be0aade32c", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
+}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "8413502e394dcc9a74a288433e46e22d43a38ebe", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
 var Lf = { exports: {} }, CC = {}, Jf = { exports: {} }, FA = {};
 /**
  * @license React
@@ -27771,7 +27771,7 @@ let YU = class extends EventTarget {
       gap: "0.25em",
       left: "1em",
       "& > *": {
-        height: "100%",
+        height: "clamp(0.5em,1vh,3em)",
         display: "inline-block",
         borderRadius: "50%",
         aspectRatio: "1 / 1",
