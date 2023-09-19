@@ -16,6 +16,7 @@ import {
 } from "../../music-context/wrapper";
 import { closeLyricPage } from "../../injector";
 import { amllConfigWindowedOpenedAtom } from "../../components/config";
+import { musicOverrideWindowOpenedAtom } from "./music-override-window";
 
 export const topbarMenuOpenedAtom = atom(false);
 
@@ -29,6 +30,9 @@ export const MainMenu: FC = () => {
 	const musicCover = useAtomValue(musicCoverAtom);
 	const setWindowedConfigOpened = useSetAtom(amllConfigWindowedOpenedAtom);
 	const setClipboardData = useSetAtom(setClipboardAtom);
+	const setMusicOverrideWindowOpened = useSetAtom(
+		musicOverrideWindowOpenedAtom,
+	);
 
 	const [configTranslatedLyric, setConfigTranslatedLyric] = useAtom(
 		showTranslatedLineAtom,
@@ -232,6 +236,13 @@ export const MainMenu: FC = () => {
 					}}
 				/>
 			</MenuItem>
+			<MenuItem
+				label="编辑音乐数据"
+				onClick={() => {
+					setMusicOverrideWindowOpened(true);
+					setMenuOpened(false);
+				}}
+			/>
 			<MenuDevider />
 			<MenuItem
 				label="显示翻译歌词"

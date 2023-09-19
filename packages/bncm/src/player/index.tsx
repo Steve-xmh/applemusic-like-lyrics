@@ -9,6 +9,7 @@ import {
 	amllConfigWindowedOpenedAtom,
 } from "../components/config";
 import { useAtomValue } from "jotai";
+import { MusicOverrideWindow } from "./common/music-override-window";
 
 export const LyricPlayer: FC = () => {
 	const amllConfigWindowedOpened = useAtomValue(amllConfigWindowedOpenedAtom);
@@ -30,6 +31,7 @@ export const LyricPlayer: FC = () => {
 				)}
 			</Media>
 			{amllConfigWindowedOpened && <AMLLConfigWindowed />}
+			<MusicOverrideWindow />
 		</>
 	);
 };

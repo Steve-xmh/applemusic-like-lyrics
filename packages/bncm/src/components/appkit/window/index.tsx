@@ -188,21 +188,28 @@ export const AppKitWindow: FC<
 				{!hideMinimizeBtn && <button type="button" className="minimize" />}
 				{!hideZoomBtn && <button type="button" className="zoom" />}
 			</div>
-			<div className="window-sidebar">
-				<div
-					className="window-controls-content"
-					onMouseDown={onStartDraggingWindow}
-				/>
-				{sidebarItems}
-				<div className="spacer" />
-				{sidebarBottomItems}
-			</div>
-			<div className="window-sidebar-devider" />
+			{(sidebarItems || sidebarBottomItems) && (
+				<>
+					<div className="window-sidebar">
+						<div
+							className="window-controls-content"
+							onMouseDown={onStartDraggingWindow}
+						/>
+						{sidebarItems}
+						<div className="spacer" />
+						{sidebarBottomItems}
+					</div>
+					<div className="window-sidebar-devider" />
+				</>
+			)}
 			<div className="window-content">
 				<div
 					className="window-controls-content"
 					onMouseDown={onStartDraggingWindow}
 				>
+					{!(sidebarItems || sidebarBottomItems) && (
+						<div className="window-traffic-lights-spacer" />
+					)}
 					<div className="title">{title}</div>
 				</div>
 				<div className="window-content-inner">

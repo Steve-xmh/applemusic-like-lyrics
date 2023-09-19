@@ -6,9 +6,10 @@ export const TextField: FC<
 	{
 		errorText?: string;
 	} & PropsWithRef<HTMLProps<HTMLInputElement>>
-> = ({ className, errorText, ...props }) => {
+> = ({ className, errorText, label, ...props }) => {
 	return (
 		<>
+			{label && <div className="appkit-text-field-label">{label}</div>}
 			<input
 				className={classNames(
 					"appkit-text-field ",
