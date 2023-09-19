@@ -9,9 +9,14 @@ import {
 	showMusicArtistsAtom,
 	showMenuButtonAtom,
 	showControlThumbAtom,
+	musicControlTypeAtom,
+	MusicControlType,
 } from "./atoms";
+import { Select } from "../appkit/select";
+import { useAtom } from "jotai";
 
 export const LyricStyleConfig: FC = () => {
+	const [musicControlType, setMusicControlType] = useAtom(musicControlTypeAtom);
 	return (
 		<>
 			<GroupBox>
@@ -42,6 +47,36 @@ export const LyricStyleConfig: FC = () => {
 					label="显示控制横条"
 					description="隐藏后，你依然可以通过菜单来关闭歌词页面"
 				/>
+			</GroupBox>
+			<GroupBox>
+				<div
+					style={{
+						display: "flex",
+						gap: "8px",
+						justifyContent: "space-between",
+						alignItems: "center",
+					}}
+				>
+					<div>音乐控制组件类型</div>
+					<Select
+						onChange={(value) => setMusicControlType(value)}
+						value={musicControlType}
+						data={[
+							{
+								label: "无",
+								value: MusicControlType.None,
+							},
+							{
+								label: "默认",
+								value: MusicControlType.Default,
+							},
+							{
+								label: "线条音频可视化",
+								value: MusicControlType.BarVisualizer,
+							},
+						]}
+					/>
+				</div>
 			</GroupBox>
 		</>
 	);

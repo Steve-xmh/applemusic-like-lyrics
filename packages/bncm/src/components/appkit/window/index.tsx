@@ -138,14 +138,15 @@ export const AppKitWindow: FC<
 			const offsetX = evt.clientX - rect.left;
 			const offsetY = evt.clientY - rect.top;
 			const onMove = (evt: MouseEvent) => {
-				win.style.left = `${Math.max(
+				const x = Math.max(
 					0,
 					Math.min(window.innerWidth - rect.width, evt.clientX - offsetX),
-				)}px`;
-				win.style.top = `${Math.max(
+				);
+				const y = Math.max(
 					60,
 					Math.min(window.innerHeight - rect.height, evt.clientY - offsetY),
-				)}px`;
+				);
+				win.style.transform = `translate(${x}px, ${y}px)`;
 			};
 			window.addEventListener("mousemove", onMove);
 			window.addEventListener(
@@ -173,8 +174,10 @@ export const AppKitWindow: FC<
 			className={`appkit-window ${className}`}
 			style={{
 				position: "fixed",
-				left: `${pos[0]}px`,
-				top: `${pos[1]}px`,
+				left: "0",
+				top: "0",
+				transform: `translate(${pos[0]}px, ${pos[1]}px)`,
+				backfaceVisibility: "hidden",
 				width: width ? `${width}px` : undefined,
 				height: height ? `${height}px` : undefined,
 				zIndex: zIndex ?? 999,

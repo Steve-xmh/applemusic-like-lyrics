@@ -205,3 +205,15 @@ export const cacheLyricAtom = atomWithConfig({
 	default: true,
 	desc: "是否缓存歌词文件以便快速读取",
 });
+
+export enum MusicControlType {
+	None = "none",
+	Default = "default",
+	BarVisualizer = "bar-visualizer",
+}
+
+export const musicControlTypeAtom = atomWithConfig({
+	key: "music-control-type",
+	default: MusicControlType.Default,
+	desc: "音乐控制组件的类型",
+});

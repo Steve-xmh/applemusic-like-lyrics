@@ -240,5 +240,13 @@ export const AudioFFTControl: React.FC = () => {
 		fftBarThinkness,
 	]);
 
-	return <canvas className="am-audio-fft" ref={canvasRef} />;
+	return (
+		<canvas
+			style={{
+				width: "100%",
+				height: "100%",
+			}}
+			ref={canvasRef}
+		/>
+	);
 };
