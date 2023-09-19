@@ -44,6 +44,7 @@ yarn dist # 在发行构建的基础上打包 .plugin 插件文件
 - [Steve-xmh/mmbncm](https://github.com/Steve-xmh/mmbncm)
 - [solstice23/refined-now-playing-netease](https://github.com/solstice23/refined-now-playing-netease)
 - [Barba828/color-quantize](https://github.com/Barba828/color-quantize)
+- [woshizja/sound-processor](https://github.com/woshizja/sound-processor)
 
 ### 特别鸣谢
 
