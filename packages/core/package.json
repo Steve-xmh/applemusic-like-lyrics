@@ -43,11 +43,11 @@
     "vite-plugin-wasm": "^3.2.2"
   },
   "peerDependencies": {
-    "@pixi/filter-bulge-pinch": "*",
     "@pixi/app": "*",
     "@pixi/core": "*",
     "@pixi/display": "*",
     "@pixi/filter-blur": "*",
+    "@pixi/filter-bulge-pinch": "*",
     "@pixi/filter-color-matrix": "*",
     "@pixi/sprite": "*",
     "jss": "*",

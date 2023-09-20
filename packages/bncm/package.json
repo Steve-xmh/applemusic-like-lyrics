@@ -17,6 +17,7 @@
     "@pixi/core": "^7.2.4",
     "@pixi/display": "^7.2.4",
     "@pixi/filter-blur": "^7.2.4",
+    "@pixi/filter-bulge-pinch": "^5.1.1",
     "@pixi/filter-color-matrix": "^7.2.4",
     "@pixi/sprite": "^7.2.4",
     "@rollup/plugin-terser": "^0.4.3",
