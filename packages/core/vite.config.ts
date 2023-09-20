@@ -18,6 +18,7 @@ export default defineConfig({
 				"@pixi/app",
 				"@pixi/filter-blur",
 				"@pixi/filter-color-matrix",
+				"@pixi/filter-bulge-pinch",
 				"@pixi/core",
 				"@pixi/sprite",
 				"jss",
