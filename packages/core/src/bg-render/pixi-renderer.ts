@@ -4,6 +4,7 @@ import { BlurFilter } from "@pixi/filter-blur";
 import { ColorMatrixFilter } from "@pixi/filter-color-matrix";
 import { Texture } from "@pixi/core";
 import { Sprite } from "@pixi/sprite";
+import { BulgePinchFilter } from "@pixi/filter-bulge-pinch";
 import { Disposable } from "../interfaces";
 
 class TimedContainer extends Container {
@@ -137,6 +138,7 @@ export class PixiRenderer implements Disposable {
 	}
 	private rebuildFilters() {
 		const minBorder = Math.min(this.canvas.width, this.canvas.height);
+		const maxBorder = Math.max(this.canvas.width, this.canvas.height);
 		const c0 = new ColorMatrixFilter();
 		c0.saturate(1.2, false);
 		const c1 = new ColorMatrixFilter();
@@ -158,6 +160,20 @@ export class PixiRenderer implements Disposable {
 
 		this.app.stage.filters.push(c0, c1, c2);
 		this.app.stage.filters.push(new BlurFilter(5, 1));
+		this.app.stage.filters.push(
+			new BulgePinchFilter({
+				radius: (maxBorder + minBorder) / 2,
+				strength: 1,
+				center: [0.25, 1],
+			}),
+		);
+		this.app.stage.filters.push(
+			new BulgePinchFilter({
+				radius: (maxBorder + minBorder) / 2,
+				strength: 1,
+				center: [0.75, 0],
+			}),
+		);
 	}
 	/**
 	 * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能

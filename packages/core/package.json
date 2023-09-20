@@ -43,6 +43,7 @@
     "vite-plugin-wasm": "^3.2.2"
   },
   "peerDependencies": {
+    "@pixi/filter-bulge-pinch": "*",
     "@pixi/app": "*",
     "@pixi/core": "*",
     "@pixi/display": "*",
@@ -53,7 +54,6 @@
     "jss-preset-default": "*"
   },
   "dependencies": {
-    "node-vibrant": "^3.2.1-alpha.1",
-    "twgl.js": "^5.5.3"
+    "node-vibrant": "^3.2.1-alpha.1"
   }
 }

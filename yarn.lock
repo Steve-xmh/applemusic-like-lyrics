@@ -78,6 +78,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/core@workspace:packages/core"
   dependencies:
     "@applemusic-like-lyrics/lyric": ^0.0.2
+    "@pixi/filter-bulge-pinch": ^5.1.1
     "@types/stats.js": ^0.17.0
     lil-gui: ^0.18.2
     node-vibrant: ^3.2.1-alpha.1
@@ -1199,6 +1200,15 @@ __metadata:
   peerDependencies:
     "@pixi/core": 7.2.4
   checksum: 2d2c55e8bda675548fd926e0edea51605cd51d632e9c6b55b747f406d57606f1859c0d7da85a77f96253ac46aa48c150677f11bedb5936373e544d7745b3f828
+  languageName: node
+  linkType: hard
+
+"@pixi/filter-bulge-pinch@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@pixi/filter-bulge-pinch@npm:5.1.1"
+  peerDependencies:
+    "@pixi/core": ^7.0.0-X
+  checksum: 96143573f7dcaf236b12aa8a2c93220f9bd36c1fe22112f946adf0548b9ea0a42fed0d2b468b7cce754d88f8b6671a21d1e7c69e745477a8f8e0c846b14e7502
   languageName: node
   linkType: hard
 
