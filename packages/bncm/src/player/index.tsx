@@ -4,15 +4,10 @@ import { LyricPlayerHorizonal } from "./horizonal";
 import { Background } from "./common/background";
 import { LyricPlayerVertical } from "./vertical";
 import { MainMenu } from "./common/main-menu";
-import {
-	AMLLConfigWindowed,
-	amllConfigWindowedOpenedAtom,
-} from "../components/config";
-import { useAtomValue } from "jotai";
+import { AMLLConfigWindowed } from "../components/config";
 import { MusicOverrideWindow } from "./common/music-override-window";
 
 export const LyricPlayer: FC = () => {
-	const amllConfigWindowedOpened = useAtomValue(amllConfigWindowedOpenedAtom);
 	return (
 		<>
 			<Background />
@@ -30,7 +25,7 @@ export const LyricPlayer: FC = () => {
 					</>
 				)}
 			</Media>
-			{amllConfigWindowedOpened && <AMLLConfigWindowed />}
+			<AMLLConfigWindowed />
 			<MusicOverrideWindow />
 		</>
 	);

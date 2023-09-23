@@ -5,6 +5,7 @@ import {
 	MouseEventHandler,
 	PropsWithChildren,
 	ReactNode,
+	Suspense,
 	useLayoutEffect,
 	useRef,
 	useState,
@@ -80,6 +81,7 @@ export const AppKitWindow: FC<
 			zIndex?: number;
 			width?: number;
 			height?: number;
+			open?: boolean;
 		} & HTMLProps<HTMLDivElement>
 	>
 > = ({
@@ -95,19 +97,16 @@ export const AppKitWindow: FC<
 	children,
 	className,
 	style,
+	open,
 	...props
 }) => {
 	const [pos, setPos] = useState([0, 0]);
 	const winRef = useRef<HTMLDivElement>(null);
+	const shouldRecenterRef = useRef(true);
 
 	useLayoutEffect(() => {
 		const win = winRef.current;
 		if (win) {
-			const rect = win.getBoundingClientRect();
-			setPos([
-				(window.innerWidth - rect.width) / 2,
-				(window.innerHeight - rect.height) / 2,
-			]);
 			const onResize = () => {
 				const rect = win.getBoundingClientRect();
 				setPos((oldPos) => {
@@ -130,6 +129,20 @@ export const AppKitWindow: FC<
 			};
 		}
 	}, []);
+
+	useLayoutEffect(() => {
+		const win = winRef.current;
+		if (win && open && shouldRecenterRef.current) {
+			const rect = win.getBoundingClientRect();
+			setPos([
+				(window.innerWidth - rect.width) / 2,
+				(window.innerHeight - rect.height) / 2,
+			]);
+			shouldRecenterRef.current = false;
+		} else if (!open) {
+			shouldRecenterRef.current = true;
+		}
+	}, [open]);
 
 	const onStartDraggingWindow: MouseEventHandler = (evt) => {
 		const win = winRef.current;
@@ -170,57 +183,63 @@ export const AppKitWindow: FC<
 	};
 
 	return (
-		<div
-			className={`appkit-window ${className}`}
-			style={{
-				position: "fixed",
-				left: "0",
-				top: "0",
-				transform: `translate(${pos[0]}px, ${pos[1]}px)`,
-				backfaceVisibility: "hidden",
-				width: width ? `${width}px` : undefined,
-				height: height ? `${height}px` : undefined,
-				zIndex: zIndex ?? 999,
-				...style,
-			}}
-			ref={winRef}
-			{...props}
-		>
-			<div className="appkit-traffic-lights">
-				<button type="button" onClick={onClose} className="close" />
-				{!hideMinimizeBtn && <button type="button" className="minimize" />}
-				{!hideZoomBtn && <button type="button" className="zoom" />}
-			</div>
-			{(sidebarItems || sidebarBottomItems) && (
-				<>
-					<div className="window-sidebar">
-						<div
-							className="window-controls-content"
-							onMouseDown={onStartDraggingWindow}
-						/>
-						{sidebarItems}
-						<div className="spacer" />
-						{sidebarBottomItems}
-					</div>
-					<div className="window-sidebar-devider" />
-				</>
-			)}
-			<div className="window-content">
-				<div
-					className="window-controls-content"
-					onMouseDown={onStartDraggingWindow}
-				>
-					{!(sidebarItems || sidebarBottomItems) && (
-						<div className="window-traffic-lights-spacer" />
-					)}
-					<div className="title">{title}</div>
+		open && (
+			<div
+				className={`appkit-window ${className}`}
+				style={{
+					position: "fixed",
+					left: "0",
+					top: "0",
+					transform: `translate(${pos[0]}px, ${pos[1]}px)`,
+					backfaceVisibility: "hidden",
+					width: width ? `${width}px` : undefined,
+					height: height ? `${height}px` : undefined,
+					zIndex: zIndex ?? 999,
+					...style,
+				}}
+				ref={winRef}
+				{...props}
+			>
+				<div className="appkit-traffic-lights">
+					<button type="button" onClick={onClose} className="close" />
+					{!hideMinimizeBtn && <button type="button" className="minimize" />}
+					{!hideZoomBtn && <button type="button" className="zoom" />}
 				</div>
-				<div className="window-content-inner">
-					<div>
-						<div>{children}</div>
+				{(sidebarItems || sidebarBottomItems) && (
+					<>
+						<div className="window-sidebar">
+							<div
+								className="window-controls-content"
+								onMouseDown={onStartDraggingWindow}
+							/>
+							<Suspense>{sidebarItems}</Suspense>
+							<div className="spacer" />
+							<Suspense>{sidebarBottomItems}</Suspense>
+						</div>
+						<div className="window-sidebar-devider" />
+					</>
+				)}
+				<div className="window-content">
+					<div
+						className="window-controls-content"
+						onMouseDown={onStartDraggingWindow}
+					>
+						{!(sidebarItems || sidebarBottomItems) && (
+							<div className="window-traffic-lights-spacer" />
+						)}
+						<div className="title">
+							<Suspense>{title}</Suspense>
+						</div>
+					</div>
+					<div className="window-content-inner">
+						<div>
+							<div>
+								<Suspense>{children}</Suspense>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		)
 	);
 };

@@ -14,6 +14,7 @@ import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
 import { log, warn } from "../utils/logger";
 import { getNCMImageUrl } from "../utils/ncm-url";
 import { genRandomString } from "../utils/gen-random-string";
+import { normalizePath } from "../utils/path";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -404,6 +405,33 @@ export class MusicContextV3 extends MusicContextBase {
 			// }
 		} catch {}
 		return undefined;
+	}
+
+	override getDataDir(): string {
+		return normalizePath(`${plugin.pluginPath}/../../amll-data`);
+	}
+
+	override setClipboard(data: string): Promise<void> {
+		return new Promise((resolve) => {
+			legacyNativeCmder._envAdapter.callAdapter(
+				"winhelper.setClipBoardData",
+				resolve,
+				[data],
+			);
+		});
+	}
+
+	override isFileExists(path: string): Promise<boolean> {
+		return betterncm.fs.exists(path);
+	}
+
+	override async readFileText(path: string): Promise<string> {
+		const data = await betterncm.fs.readFile(path);
+		return data.text();
+	}
+
+	override async writeFileText(path: string, data: string): Promise<void> {
+		await betterncm.fs.writeFile(path, data);
 	}
 
 	private switchPlayMode(playMode: PlayMode) {

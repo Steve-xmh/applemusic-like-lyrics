@@ -15,6 +15,7 @@ import { callCachedSearchFunction } from "../utils/func";
 import { log } from "../utils/logger";
 import { getNCMImageUrl } from "../utils/ncm-url";
 import { genRandomString } from "../utils/gen-random-string";
+import { normalizePath } from "../utils/path";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -412,35 +413,24 @@ export class MusicContextV2 extends MusicContextBase {
 		return undefined;
 	}
 
+	override getDataDir(): string {
+		return normalizePath(`${plugin.pluginPath}/../../amll-data`);
+	}
+
+	override isFileExists(path: string): Promise<boolean> {
+		return betterncm.fs.exists(path);
+	}
+
+	override async readFileText(path: string): Promise<string> {
+		const data = await betterncm.fs.readFile(path);
+		return data.text();
+	}
+
+	override async writeFileText(path: string, data: string): Promise<void> {
+		await betterncm.fs.writeFileText(path, data);
+	}
+
 	private switchPlayMode(playMode: PlayMode) {
-		// if (isNCMV3()) {
-		// 	if (playMode === PlayMode.AI) return; // 3.0.0 暂时没有心动模式 // TODO: 在隔壁增加 3.0 支持
-		// 	let counter = 0;
-		// 	while (counter++ < 4) {
-		// 		const playModeBtn = document.querySelector<HTMLButtonElement>(
-		// 			"footer > * > * > .middle > *:nth-child(1) > button:nth-child(1)",
-		// 		);
-		// 		const btnSpan = playModeBtn?.querySelector("span > span");
-		// 		if (!(playModeBtn && btnSpan)) break;
-		// 		playModeBtn.click();
-		// 		const playingMode = btnSpan.ariaLabel;
-		// 		console.log(btnSpan.ariaLabel);
-		// 		switch (playMode) {
-		// 			case PlayMode.Order:
-		// 				if (playingMode === "shuffle") return;
-		// 				break;
-		// 			case PlayMode.Repeat:
-		// 				if (playingMode === "order") return;
-		// 				break;
-		// 			case PlayMode.Random:
-		// 				if (playingMode === "singleloop") return;
-		// 				break;
-		// 			case PlayMode.One:
-		// 				if (playingMode === "loop") return;
-		// 				break;
-		// 		}
-		// 	}
-		// } else {
 		const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
 		let counter = 0;
 		while (playModeBtn && counter++ < 5) {

@@ -10,6 +10,8 @@ import {
 import { isNCMV3 } from "../utils/is-ncm-v3";
 import { MusicContextV2 } from "./v2";
 import { MusicContextV3 } from "./v3";
+import { normalizePath } from "../utils/path";
+import { warn } from "../utils/logger";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -79,6 +81,49 @@ export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
 	await musicCtx?.setClipboard(data);
 });
 
+export interface MusicOverrideData {
+	musicName: string;
+	musicArtists: string;
+	musicCoverUrl: string;
+}
+
+const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));
+
+export const musicOverrideDataAtom = atom<
+	Promise<Partial<MusicOverrideData>>,
+	[Partial<MusicOverrideData>],
+	void
+>(
+	async (get) => {
+		get(musicOverrideDataUpdateAtom);
+		const id = get(musicIdAtom);
+		const ctx = get(musicContextAtom);
+		let data: Partial<MusicOverrideData> = {};
+
+		if (ctx) {
+			const overrideJsonPath = normalizePath(
+				`${ctx.getDataDir()}/music-override-data/${id}.json`,
+			);
+			try {
+				if (await ctx.isFileExists(overrideJsonPath)) {
+					const overrideJson = JSON.parse(
+						await ctx.readFileText(overrideJsonPath),
+					);
+					data = overrideJson;
+					if (typeof data !== "object") data = {};
+				}
+			} catch (err) {
+				warn("加载音乐覆盖信息出错", id, overrideJsonPath, err);
+			}
+		}
+
+		return data;
+	},
+	async (get, set, data: Partial<MusicOverrideData>) => {
+		set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
+	},
+);
+
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
 	const [lyricPageOpened, setLyricPageOpened] = useAtom(lyricPageOpenedAtom);
@@ -106,6 +151,7 @@ export const MusicInfoWrapper: FC = () => {
 			musicCtx.current = new MusicContextV2();
 		}
 		if (musicCtx.current) {
+			plugin.musicStatus = musicCtx.current;
 			musicCtx.current.addEventListener(
 				"load",
 				function (this: MusicContextBase) {

@@ -10,6 +10,7 @@ import { OtherConfig } from "./other";
 import { FullSpinner, Spinner } from "../appkit/spinner/spinner";
 import { BackgroundConfig } from "./background";
 import { LyricSourceConfig } from "./lyric-source";
+import { DebugConfig } from "./debug";
 
 export const configPageAtom = atom("lyric");
 
@@ -53,6 +54,12 @@ const ConfigSidebarItems: FC = () => {
 			>
 				杂项
 			</SidebarItem>
+			<SidebarItem
+				selected={configPage === "debug"}
+				onClick={() => setConfigPage("debug")}
+			>
+				调试
+			</SidebarItem>
 		</>
 	);
 };
@@ -83,6 +90,7 @@ const ConfigContent: FC = () => {
 				{configPage === "player" && <PlayerConfig />}
 				{configPage === "other" && <OtherConfig />}
 				{configPage === "about" && <AboutConfig />}
+				{configPage === "debug" && <DebugConfig />}
 			</Suspense>
 		</div>
 	);
@@ -103,17 +111,22 @@ export const AMLLConfig: FC = () => {
 export const amllConfigWindowedOpenedAtom = atom(false);
 
 export const AMLLConfigWindowed: FC = () => {
-	const setAMLLConfigWindowedOpened = useSetAtom(amllConfigWindowedOpenedAtom);
+	const [amllConfigWindowedOpened, setAMLLConfigWindowedOpened] = useAtom(
+		amllConfigWindowedOpenedAtom,
+	);
 	return (
 		<AppKitWindow
 			sidebarItems={<ConfigSidebarItems />}
 			sidebarBottomItems={<ConfigSidebarBottomItems />}
 			width={600}
 			height={350}
+			open={amllConfigWindowedOpened}
 			onClose={() => setAMLLConfigWindowedOpened(false)}
 			id="amll-config"
 		>
-			<ConfigContent />
+			<Suspense>
+				<ConfigContent />
+			</Suspense>
 		</AppKitWindow>
 	);
 };

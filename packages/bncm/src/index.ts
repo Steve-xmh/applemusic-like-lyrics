@@ -127,10 +127,8 @@ plugin.onLoad(async () => {
 					?._reactRootContainer
 					?._internalRoot?.current?.child?.child?.memoizedProps?.store;
 			});
-			plugin.musicStatus = new MusicContextV3();
 			injectLyricPageV3();
 		} else {
-			plugin.musicStatus = new MusicContextV2();
 			injectLyricPageV2();
 		}
 

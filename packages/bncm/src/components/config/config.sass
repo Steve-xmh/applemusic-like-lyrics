@@ -68,3 +68,33 @@
             font-size: 13px
         > .log
             font-size: 11px
+.amll-debug-states
+    display: grid
+    grid-template-columns: 0fr 1fr
+    grid-auto-columns: max-content
+    gap: 4px
+    column-gap: 1em
+    > *
+        align-self: baseline
+        line-height: 16px
+        min-height: 1em
+        box-sizing: content-box
+        &:nth-child(odd)
+            white-space: nowrap
+            justify-self: end
+        &:nth-child(even)
+            user-select: text
+            cursor: text
+            font-family: 'Fira Code', 'Courier New', Courier, 'PingFang SC', monospace
+            border: solid 1px #FFFFFF0D
+            border-radius: 6px
+            background: #FFFFFF0D
+            font-size: 13px
+            font-weight: 400
+            color: white
+            padding: 3.5px 7px
+            white-space: pre
+            max-height: 10em
+            overflow: auto
+            &::after
+                content: " "
