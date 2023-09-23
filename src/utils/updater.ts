@@ -39,7 +39,7 @@ export async function getInstallableBranches(force = false) {
 	}
 
 	const branches: RepoBranch[] = await fetch(
-		"https://gitcode.net/api/v4/projects/228337/repository/branches",
+		"https://gitcode.net/api/v4/projects/sn%2Fapplemusic-like-lyrics/repository/branches",
 		{ cache: "no-store" },
 	).then((v) => v.json());
 
@@ -49,7 +49,7 @@ export async function getInstallableBranches(force = false) {
 			log(branch);
 			try {
 				const res = await fetch(
-					`https://gitcode.net/api/v4/projects/228337/repository/tree?path=packages%2Fbncm%2Fdist&ref=${encodeURIComponent(
+					`https://gitcode.net/api/v4/projects/sn%2Fapplemusic-like-lyrics/repository/tree?path=packages%2Fbncm%2Fdist&ref=${encodeURIComponent(
 						branch.name,
 					)}`,
 					{ cache: "no-store" },
@@ -73,7 +73,7 @@ export async function getInstallableBranches(force = false) {
 					}
 				}
 				const oldRes = await fetch(
-					`https://gitcode.net/api/v4/projects/228337/repository/tree?path=dist&ref=${encodeURIComponent(
+					`https://gitcode.net/api/v4/projects/sn%2Fapplemusic-like-lyrics/repository/tree?path=dist&ref=${encodeURIComponent(
 						branch.name,
 					)}`,
 					{ cache: "no-store" },
@@ -109,7 +109,7 @@ export async function installLatestBranchVersion(
 ) {
 	log("正在更新版本到", branchName, "分支的最新版本，位于远程路径", path);
 	const entries: RepoTreeEntry[] = await fetch(
-		`https://gitcode.net/api/v4/projects/228337/repository/tree?path=${encodeURIComponent(
+		`https://gitcode.net/api/v4/projects/sn%2Fapplemusic-like-lyrics/repository/tree?path=${encodeURIComponent(
 			path,
 		)}&ref=${encodeURIComponent(branchName)}`,
 		{ cache: "no-store" },
