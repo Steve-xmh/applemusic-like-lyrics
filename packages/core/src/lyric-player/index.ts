@@ -28,7 +28,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private lyricLines: LyricLine[] = [];
 	private processedLines: LyricLine[] = [];
 	private lyricLinesEl: LyricLineEl[] = [];
-	private lyricLinesSize: Map<LyricLineEl, [number, number]> = new Map();
+	private lyricLinesSize: WeakMap<LyricLineEl, [number, number]> =
+		new WeakMap();
 	private hotLines: Set<number> = new Set();
 	private bufferedLines: Set<number> = new Set();
 	private scrollToIndex = 0;
@@ -435,7 +436,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
-			this.lyricLinesSize.clear();
 			this.lyricLinesEl.forEach((el) => {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);

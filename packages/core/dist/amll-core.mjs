@@ -324,7 +324,7 @@ function _(h) {
 function q(h) {
   return _(h);
 }
-class X {
+class W {
   constructor(e) {
     this.lyricPlayer = e, this.element.setAttribute(
       "class",
@@ -381,12 +381,12 @@ class X {
     this.element.remove();
   }
 }
-function R(h) {
+function X(h) {
   const t = 2.5949095;
   return h < 0.5 ? Math.pow(2 * h, 2) * ((t + 1) * 2 * h - t) / 2 : (Math.pow(2 * h - 2, 2) * ((t + 1) * (h * 2 - 2) + t) + 2) / 2;
 }
 const g = (h, e, t) => Math.max(h, Math.min(e, t));
-class W {
+class R {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -418,7 +418,7 @@ class W {
       if (i <= n) {
         const a = n / Math.ceil(n / this.targetBreatheDuration);
         let s = 1, r = 1;
-        s *= Math.sin(1.5 * Math.PI - i / a * 2) / 10 + 1, i < 1e3 && (s *= 1 - Math.pow((1e3 - i) / 1e3, 2)), i < 500 ? r = 0 : i < 1e3 && (r *= (i - 500) / 500), n - i < 750 && (s *= 1 - R(
+        s *= Math.sin(1.5 * Math.PI - i / a * 2) / 10 + 1, i < 1e3 && (s *= 1 - Math.pow((1e3 - i) / 1e3, 2)), i < 500 ? r = 0 : i < 1e3 && (r *= (i - 500) / 500), n - i < 750 && (s *= 1 - X(
           (750 - (n - i)) / 750 / 2
         )), n - i < 375 && (r *= g(
           0,
@@ -740,7 +740,7 @@ class ne extends EventTarget {
   lyricLines = [];
   processedLines = [];
   lyricLinesEl = [];
-  lyricLinesSize = /* @__PURE__ */ new Map();
+  lyricLinesSize = /* @__PURE__ */ new WeakMap();
   hotLines = /* @__PURE__ */ new Set();
   bufferedLines = /* @__PURE__ */ new Set();
   scrollToIndex = 0;
@@ -914,7 +914,7 @@ class ne extends EventTarget {
     this.calcLayout(!0, !0);
   };
   constructor() {
-    super(), this.interludeDots = new W(this), this.bottomLine = new X(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
+    super(), this.interludeDots = new R(this), this.bottomLine = new W(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
       this.allowScroll && (this.isScrolled = !0, clearTimeout(this.scrolledHandler), this.scrolledHandler = setTimeout(() => {
         this.isScrolled = !1, this.scrollOffset = 0;
       }, 5e3), this.invokedByScrollEvent = !0, e.deltaMode === e.DOM_DELTA_PIXEL ? (this.scrollOffset += e.deltaY, this.calcLayout(!0)) : (this.scrollOffset += e.deltaY * 50, this.calcLayout(!1)), this.invokedByScrollEvent = !1);
@@ -1035,7 +1035,7 @@ class ne extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(e = !1, t = !1) {
-    t && (this.lyricLinesSize.clear(), this.lyricLinesEl.forEach((m) => {
+    t && (this.lyricLinesEl.forEach((m) => {
       const p = m.measureSize();
       this.lyricLinesSize.set(m, p), m.lineSize = p;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());
