@@ -301,7 +301,7 @@ const ds = 47, VC = 46, M1 = (e) => {
     return ".";
   const t = A.charCodeAt(0) === ds, i = A.charCodeAt(A.length - 1) === ds;
   return A = F1(A), A = S1(A, !t), A.length === 0 && !t && (A = "."), A.length > 0 && i && (A += "/"), t ? `/${A}` : A;
-}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "fc2e80e072c364b28afedc11b8ffa45809f8da8c", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
+}, We = { manifest_version: 1, name: "类苹果歌词", slug: "Apple-Musiclike-lyrics", author: "SteveXMH", author_links: ["https://github.com/Steve-xmh", "https://github.com/Steve-xmh/applemusic-like-lyrics"], description: "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验", preview: "preview.svg", version: "3.0.0", commit: "5925066222e6324a992018e0080231d3a53dbc3c", branch: "3.0-dev", type: "extension", noDevReload: !0, "ncm3-compatible": !0, betterncm_version: ">=1.0.0", injects: { Main: [{ file: "amll-bncm.js" }] }, hijacks: { ">= 1.0.0": { "orpheus://orpheus/pub/app.html": { type: "replace", id: "csp-worker", from: '<meta http-equiv="Content-Security-Policy" content="script-src ', to: '<meta http-equiv="Content-Security-Policy" content="script-src data: blob: ' } }, ">= 3.0.0": { "orpheus://orpheus/pub/hybrid/vendors": { type: "replace", id: "redux-dispatch-hook", from: '"sagaEffects.put"),', to: '"sagaEffects.put"),window?.amllDispatchHook?.(n),' } } } };
 var Uf = { exports: {} }, aC = {}, xf = { exports: {} }, FA = {};
 /**
  * @license React
@@ -28194,7 +28194,7 @@ class OU extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(A = !1, t = !1) {
-    t && (this.lyricLinesEl.forEach((E) => {
+    t && (this.lyricLinesSize.clear(), this.lyricLinesEl.forEach((E) => {
       const c = E.measureSize();
       this.lyricLinesSize.set(E, c), E.lineSize = c;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());

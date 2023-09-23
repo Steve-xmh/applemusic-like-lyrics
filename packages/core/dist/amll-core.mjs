@@ -1035,7 +1035,7 @@ class ne extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(e = !1, t = !1) {
-    t && (this.lyricLinesEl.forEach((m) => {
+    t && (this.lyricLinesSize.clear(), this.lyricLinesEl.forEach((m) => {
       const p = m.measureSize();
       this.lyricLinesSize.set(m, p), m.lineSize = p;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());

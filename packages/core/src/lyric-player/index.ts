@@ -435,6 +435,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
+			this.lyricLinesSize.clear();
 			this.lyricLinesEl.forEach((el) => {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);
