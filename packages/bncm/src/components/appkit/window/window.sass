@@ -1,3 +1,4 @@
+@use "sass:color"
 @import "../common.sass"
 
 @mixin appkit-window-frame()
@@ -6,7 +7,7 @@
     box-shadow: 0px 36px 100px rgba(0, 0, 0, 0.4), 0px 0px 3px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.2)
     border: solid 0.5px rgba(0, 0, 0, 0.2)
     background: rgba(44, 44, 44, 0.8)
-    
+
 .appkit-window
     @include pingfang-font
     @include appkit-window-frame
@@ -21,7 +22,7 @@
     overflow: hidden
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
-    
+
     ::-webkit-scrollbar-track
         background: transparent
         &:hover
@@ -113,7 +114,7 @@
 
     .window-traffic-lights-spacer
         width: 64px
-    
+
     .appkit-traffic-lights
         position: absolute
         display: flex
@@ -142,15 +143,25 @@
             background-position: center
             background-repeat: no-repeat
             padding: 0
+            cursor: pointer
+
+            $close-color: #FF5F57
+            $minimize-color: #FEBC2E
+            $zoom-color: #28C840
+
+            @mixin btn($btn-color)
+                background-color: $btn-color
+                &:active
+                    background-color: color.adjust($btn-color, $blackness: 20%)
 
             &.close
-                background-color: #FF5F57
+                @include btn($close-color)
 
             &.minimize
-                background-color: #FEBC2E
+                @include btn($minimize-color)
 
             &.zoom
-                background-color: #28C840
+                @include btn($zoom-color)
 
     &.no-title
         .window-sidebar

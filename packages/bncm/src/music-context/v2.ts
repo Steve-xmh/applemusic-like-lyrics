@@ -421,6 +421,10 @@ export class MusicContextV2 extends MusicContextBase {
 		return betterncm.fs.exists(path);
 	}
 
+	override async makeDirectory(path: string): Promise<void> {
+		await betterncm.fs.mkdir(path);
+	}
+
 	override async readFileText(path: string): Promise<string> {
 		const data = await betterncm.fs.readFile(path);
 		return data.text();

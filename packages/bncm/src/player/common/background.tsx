@@ -12,15 +12,15 @@ import {
 } from "../../music-context/ws-wrapper";
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
 import {
+	displayMusicCoverAtom,
 	lyricPageOpenedAtom,
-	musicCoverAtom,
 } from "../../music-context/wrapper";
 import "./background.sass";
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
-	const musicCoverUrl = useAtomValue(musicCoverAtom);
+	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const backgroundCustomSolidColor = useAtomValue(
 		backgroundCustomSolidColorAtom,
 	);

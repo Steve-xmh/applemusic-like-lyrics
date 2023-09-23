@@ -1,5 +1,5 @@
 import { type FC, useEffect, useRef } from "react";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useSetAtom } from "jotai";
 import {
 	Artist,
 	AudioQualityType,
@@ -12,16 +12,49 @@ import { MusicContextV2 } from "./v2";
 import { MusicContextV3 } from "./v3";
 import { normalizePath } from "../utils/path";
 import { warn } from "../utils/logger";
+import { loadable } from "jotai/utils";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
+export const displayMusicNameAtom = atom((get) => {
+	const overrideData = get(loadableMusicOverrideDataAtom);
+	if (overrideData.state === "hasData") {
+		return overrideData.data.musicName || get(musicNameAtom);
+	} else {
+		return get(musicNameAtom);
+	}
+});
 export const musicArtistsAtom = atom<Artist[]>([
 	{
 		id: "0",
 		name: "未知作者",
 	},
 ]);
+export const displayMusicArtistsAtom = atom((get) => {
+	const overrideData = get(loadableMusicOverrideDataAtom);
+	if (overrideData.state === "hasData") {
+		return overrideData.data.musicArtists
+			? ([
+					{
+						id: "0",
+						name: overrideData.data.musicArtists,
+					},
+			  ] as Artist[])
+			: get(musicArtistsAtom);
+	} else {
+		return get(musicArtistsAtom);
+	}
+});
 export const musicCoverAtom = atom("");
+export const displayMusicCoverAtom = atom((get) => {
+	const overrideData = get(loadableMusicOverrideDataAtom);
+	if (overrideData.state === "hasData") {
+		return overrideData.data.musicCoverUrl || get(musicCoverAtom);
+	} else {
+		return get(musicCoverAtom);
+	}
+});
+
 export const musicAlbumIdAtom = atom("0");
 export const musicAlbumNameAtom = atom("未知专辑");
 export const musicDurationAtom = atom(0);
@@ -89,15 +122,11 @@ export interface MusicOverrideData {
 
 const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));
 
-export const musicOverrideDataAtom = atom<
-	Promise<Partial<MusicOverrideData>>,
-	[Partial<MusicOverrideData>],
-	void
->(
+export const musicOverrideDataAtom = atom(
 	async (get) => {
 		get(musicOverrideDataUpdateAtom);
 		const id = get(musicIdAtom);
-		const ctx = get(musicContextAtom);
+		const ctx = get(rawMusicContextAtom);
 		let data: Partial<MusicOverrideData> = {};
 
 		if (ctx) {
@@ -120,9 +149,26 @@ export const musicOverrideDataAtom = atom<
 		return data;
 	},
 	async (get, set, data: Partial<MusicOverrideData>) => {
-		set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
+		const id = get(musicIdAtom);
+		const ctx = get(rawMusicContextAtom);
+		if (ctx) {
+			const overrideDirPath = normalizePath(
+				`${ctx.getDataDir()}/music-override-data`,
+			);
+			const overrideJsonPath = normalizePath(`${overrideDirPath}/${id}.json`);
+			if (!(await ctx.isFileExists(overrideDirPath))) {
+				await ctx.makeDirectory(overrideDirPath);
+			}
+			try {
+				await ctx.writeFileText(overrideJsonPath, JSON.stringify(data));
+				set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
+			} catch (err) {
+				warn("保存音乐覆盖信息出错", id, overrideJsonPath, err);
+			}
+		}
 	},
 );
+export const loadableMusicOverrideDataAtom = loadable(musicOverrideDataAtom);
 
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();

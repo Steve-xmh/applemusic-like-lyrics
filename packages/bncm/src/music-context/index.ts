@@ -62,6 +62,7 @@ export abstract class MusicContextBase extends TypedEventTarget<MusicStatusGette
 	abstract resume(): void;
 	abstract getDataDir(): string;
 	abstract isFileExists(path: string): Promise<boolean>;
+	abstract makeDirectory(path: string): Promise<void>;
 	abstract readFileText(path: string): Promise<string>;
 	abstract writeFileText(path: string, data: string): Promise<void>;
 	async setClipboard(data: string): Promise<void> {

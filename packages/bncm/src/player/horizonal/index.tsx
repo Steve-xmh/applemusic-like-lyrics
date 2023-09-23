@@ -1,7 +1,10 @@
 import type { FC } from "react";
 import { closeLyricPage } from "../../injector";
 import { useAtomValue, useSetAtom } from "jotai";
-import { musicCoverAtom, playStatusAtom } from "../../music-context/wrapper";
+import {
+	displayMusicCoverAtom,
+	playStatusAtom,
+} from "../../music-context/wrapper";
 import "./index.sass";
 import {
 	showStatsAtom,
@@ -17,7 +20,7 @@ import { MusicInfo } from "./info";
 import { CoreLyricPlayer } from "../common/player";
 
 export const LyricPlayerHorizonal: FC = () => {
-	const musicCoverUrl = useAtomValue(musicCoverAtom);
+	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const showStats = useAtomValue(showStatsAtom);
 	const fontColor = useAtomValue(fontColorAtom);
 	const playStatus = useAtomValue(playStatusAtom);

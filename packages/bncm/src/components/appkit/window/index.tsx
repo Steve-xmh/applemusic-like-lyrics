@@ -212,9 +212,9 @@ export const AppKitWindow: FC<
 								className="window-controls-content"
 								onMouseDown={onStartDraggingWindow}
 							/>
-							<Suspense>{sidebarItems}</Suspense>
+							<Suspense fallback={<></>}>{sidebarItems}</Suspense>
 							<div className="spacer" />
-							<Suspense>{sidebarBottomItems}</Suspense>
+							<Suspense fallback={<></>}>{sidebarBottomItems}</Suspense>
 						</div>
 						<div className="window-sidebar-devider" />
 					</>
@@ -228,13 +228,13 @@ export const AppKitWindow: FC<
 							<div className="window-traffic-lights-spacer" />
 						)}
 						<div className="title">
-							<Suspense>{title}</Suspense>
+							<Suspense fallback={<></>}>{title}</Suspense>
 						</div>
 					</div>
 					<div className="window-content-inner">
 						<div>
 							<div>
-								<Suspense>{children}</Suspense>
+								<Suspense fallback={<></>}>{children}</Suspense>
 							</div>
 						</div>
 					</div>

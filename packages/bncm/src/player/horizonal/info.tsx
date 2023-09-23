@@ -9,11 +9,11 @@ import {
 } from "../../components/config/atoms";
 import {
 	currentTimeAtom,
+	displayMusicArtistsAtom,
+	displayMusicNameAtom,
 	musicAlbumIdAtom,
 	musicAlbumNameAtom,
-	musicArtistsAtom,
 	musicDurationAtom,
-	musicNameAtom,
 } from "../../music-context/wrapper";
 import IconMore from "../../assets/icon_more.svg";
 import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
@@ -37,10 +37,10 @@ function toDuration(duration: number) {
 
 export const MusicInfo: FC = () => {
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
-	const musicName = useAtomValue(musicNameAtom);
+	const musicName = useAtomValue(displayMusicNameAtom);
 	const musicAlbumName = useAtomValue(musicAlbumNameAtom);
 	const musicAlbumId = useAtomValue(musicAlbumIdAtom);
-	const artists = useAtomValue(musicArtistsAtom);
+	const artists = useAtomValue(displayMusicArtistsAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
 

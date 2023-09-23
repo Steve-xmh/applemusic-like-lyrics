@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { Suspense, type FC } from "react";
 import Media from "react-media";
 import { LyricPlayerHorizonal } from "./horizonal";
 import { Background } from "./common/background";
@@ -11,7 +11,9 @@ export const LyricPlayer: FC = () => {
 	return (
 		<>
 			<Background />
-			<MainMenu />
+			<Suspense>
+				<MainMenu />
+			</Suspense>
 			<Media
 				queries={{
 					vertical: "(orientation: portrait)",
@@ -25,8 +27,12 @@ export const LyricPlayer: FC = () => {
 					</>
 				)}
 			</Media>
-			<AMLLConfigWindowed />
-			<MusicOverrideWindow />
+			<Suspense>
+				<AMLLConfigWindowed />
+			</Suspense>
+			<Suspense>
+				<MusicOverrideWindow />
+			</Suspense>
 		</>
 	);
 };

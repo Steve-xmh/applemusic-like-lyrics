@@ -10,10 +10,10 @@ import "./index.sass";
 import { closeLyricPage } from "../../injector";
 import { MusicInfo } from "./info";
 import { CoreLyricPlayer } from "../common/player";
-import { musicCoverAtom } from "../../music-context/wrapper";
+import { displayMusicCoverAtom } from "../../music-context/wrapper";
 
 export const LyricPlayerVertical: FC = () => {
-	const musicCoverUrl = useAtomValue(musicCoverAtom);
+	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const fontColor = useAtomValue(fontColorAtom);
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
