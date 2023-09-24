@@ -118,6 +118,7 @@ export interface MusicOverrideData {
 	musicName: string;
 	musicArtists: string;
 	musicCoverUrl: string;
+	musicCoverIsVideo: boolean;
 }
 
 const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));

@@ -4,13 +4,14 @@ import { TextField } from "../../components/appkit/text-field";
 import { AppKitWindow } from "../../components/appkit/window";
 import "./music-override-window.sass";
 import {
+	MusicOverrideData,
 	loadableMusicOverrideDataAtom,
 	musicArtistsAtom,
 	musicNameAtom,
 	musicOverrideDataAtom,
 } from "../../music-context/wrapper";
-import { Alert } from "../../components/appkit/alert";
 import { useLayoutEffect, useState } from "react";
+import { Switch } from "../../components/appkit/switch/switch";
 
 export const musicOverrideWindowOpenedAtom = atom(false);
 
@@ -25,16 +26,21 @@ export const MusicOverrideWindow = () => {
 	const [overrideMusicName, setOverrideMusicName] = useState("");
 	const [overrideMusicArtists, setOverrideMusicArtists] = useState("");
 	const [overrideMusicCoverUrl, setOverrideMusicCoverUrl] = useState("");
+	const [overrideCoverIsVideo, setOverrideCoverIsVideo] = useState(false);
 	const [saving, setSaving] = useState(false);
 	useLayoutEffect(() => {
 		if (musicOverrideWindowOpened && musicOverrideData.state === "hasData") {
 			setOverrideMusicName(musicOverrideData.data.musicName || "");
 			setOverrideMusicArtists(musicOverrideData.data.musicArtists || "");
 			setOverrideMusicCoverUrl(musicOverrideData.data.musicCoverUrl || "");
+			setOverrideCoverIsVideo(
+				musicOverrideData.data.musicCoverIsVideo || false,
+			);
 		} else {
 			setOverrideMusicName("");
 			setOverrideMusicArtists("");
 			setOverrideMusicCoverUrl("");
+			setOverrideCoverIsVideo(false);
 		}
 	}, [musicOverrideWindowOpened, musicOverrideData.state]);
 	const shouldDisable = saving || musicOverrideData.state === "loading";
@@ -80,16 +86,20 @@ export const MusicOverrideWindow = () => {
 						}}
 					>
 						<div style={{ flex: "1" }}>
-							<TextField
-								style={{ width: "100%", boxSizing: "border-box" }}
-								label="图片链接"
-								placeholder="留空以保持默认"
-								value={overrideMusicCoverUrl}
-								disabled={shouldDisable}
-								onChange={(e) =>
-									setOverrideMusicCoverUrl(e.currentTarget.value)
-								}
-							/>
+							{overrideMusicCoverUrl.length < 1024 ? (
+								<TextField
+									style={{ width: "100%", boxSizing: "border-box" }}
+									label="专辑图片链接"
+									placeholder="留空以保持默认"
+									value={overrideMusicCoverUrl}
+									disabled={shouldDisable}
+									onChange={(e) =>
+										setOverrideMusicCoverUrl(e.currentTarget.value)
+									}
+								/>
+							) : (
+								<div>图片较大，请直接更换图片或还原</div>
+							)}
 							<Button
 								style={{ marginBlock: "0.5em" }}
 								disabled={shouldDisable}
@@ -114,22 +124,59 @@ export const MusicOverrideWindow = () => {
 							>
 								打开本地图片
 							</Button>
+							<Switch
+								disabled={shouldDisable}
+								selected={overrideCoverIsVideo}
+								onClick={() => setOverrideCoverIsVideo(!overrideCoverIsVideo)}
+								beforeSwitch={
+									<div>专题图格式为视频（警告：在网易云上不支持视频解码）</div>
+								}
+							/>
 						</div>
 						<div>
 							<div style={{ marginBlock: "0.5em" }}>专辑图片示例</div>
-							<div
-								style={{
-									width: "100px",
-									height: "100px",
-									aspectRatio: "1/1",
-									background: "white",
-									backgroundImage: `url(${overrideMusicCoverUrl})`,
-									backgroundPosition: "center",
-									backgroundSize: "cover",
-									border: "1px solid #ccc7",
-									borderRadius: "4px",
-								}}
-							/>
+							{overrideCoverIsVideo ? (
+								<div
+									style={{
+										width: "100px",
+										height: "100px",
+										aspectRatio: "1/1",
+										overflow: "hidden",
+										border: "1px solid #ccc7",
+										borderRadius: "4px",
+									}}
+								>
+									<video
+										playsInline
+										autoPlay
+										loop
+										muted
+										preload="auto"
+										crossOrigin="anonymous"
+										style={{
+											width: "100%",
+											height: "100%",
+											objectPosition: "center",
+											objectFit: "cover",
+										}}
+										src={overrideMusicCoverUrl}
+									/>
+								</div>
+							) : (
+								<div
+									style={{
+										width: "100px",
+										height: "100px",
+										aspectRatio: "1/1",
+										background: "white",
+										backgroundImage: `url(${overrideMusicCoverUrl})`,
+										backgroundPosition: "center",
+										backgroundSize: "cover",
+										border: "1px solid #ccc7",
+										borderRadius: "4px",
+									}}
+								/>
+							)}
 						</div>
 					</div>
 				</div>
@@ -155,10 +202,11 @@ export const MusicOverrideWindow = () => {
 						disabled={shouldDisable}
 						onClick={async () => {
 							setSaving(true);
-							const data = {
+							const data: Partial<MusicOverrideData> = {
 								musicName: overrideMusicName || undefined,
 								musicArtists: overrideMusicArtists || undefined,
 								musicCoverUrl: overrideMusicCoverUrl || undefined,
+								musicCoverIsVideo: overrideCoverIsVideo || undefined,
 							};
 							setMusicOverrideData(data);
 							setSaving(false);

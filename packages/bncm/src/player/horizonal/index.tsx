@@ -3,6 +3,7 @@ import { closeLyricPage } from "../../injector";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
 	displayMusicCoverAtom,
+	musicOverrideDataAtom,
 	playStatusAtom,
 } from "../../music-context/wrapper";
 import "./index.sass";
@@ -28,6 +29,7 @@ export const LyricPlayerHorizonal: FC = () => {
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
+	const musicOverrideData = useAtomValue(musicOverrideDataAtom);
 
 	useEffect(() => {
 		if (showStats) {
@@ -79,16 +81,42 @@ export const LyricPlayerHorizonal: FC = () => {
 						}}
 					/>
 				)}
-				{showAlbumImage && (
-					<div
-						style={{
-							backgroundImage: `url(${musicCoverUrl})`,
-							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
-						}}
-						className="amll-cover-image"
-						ref={albumCoverRef}
-					/>
-				)}
+				{showAlbumImage &&
+					(musicOverrideData.musicCoverIsVideo ? (
+						<div
+							style={{
+								transform:
+									playStatus === PlayState.Playing ? "" : "scale(0.75)",
+							}}
+							className="amll-cover-image amll-cover-image-video"
+							ref={albumCoverRef}
+						>
+							<video
+								playsInline
+								autoPlay
+								loop
+								muted
+								crossOrigin="anonymous"
+								style={{
+									width: "100%",
+									height: "100%",
+									objectPosition: "center",
+									objectFit: "cover",
+								}}
+								src={musicOverrideData.musicCoverUrl}
+							/>
+						</div>
+					) : (
+						<div
+							style={{
+								backgroundImage: `url(${musicCoverUrl})`,
+								transform:
+									playStatus === PlayState.Playing ? "" : "scale(0.75)",
+							}}
+							className="amll-cover-image"
+							ref={albumCoverRef}
+						/>
+					))}
 				<MusicInfo />
 				<CoreLyricPlayer albumCoverRef={albumCoverRef.current} />
 				<div
