@@ -1,4 +1,4 @@
-import { LyricPlayer } from "@applemusic-like-lyrics/core";
+import { LyricPlayer, type LyricLineMouseEvent } from "@applemusic-like-lyrics/core";
 declare const _default: import("vue").DefineComponent<{
     disabled: {
         type: import("vue").PropType<boolean>;
@@ -38,7 +38,10 @@ declare const _default: import("vue").DefineComponent<{
 }, {
     lyricPlayer: import("vue").Ref<LyricPlayer | undefined>;
     wrapperEl: import("vue").Ref<HTMLDivElement | undefined>;
-}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {
+    "line-click": (line: LyricLineMouseEvent) => void;
+    "line-contextmenu": (line: LyricLineMouseEvent) => void;
+}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     disabled: {
         type: import("vue").PropType<boolean>;
     };
@@ -74,5 +77,8 @@ declare const _default: import("vue").DefineComponent<{
             [key: string]: any;
         }>[]>;
     };
-}>>, {}, {}>;
+}>> & {
+    "onLine-click"?: ((line: LyricLineMouseEvent) => any) | undefined;
+    "onLine-contextmenu"?: ((line: LyricLineMouseEvent) => any) | undefined;
+}, {}, {}>;
 export default _default;

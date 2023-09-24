@@ -9,13 +9,34 @@ import { eqSet } from "../utils/eq-set";
 import { SpringParams } from "../utils/spring";
 import { BottomLineEl } from "./bottom-line";
 import { InterludeDots } from "./interlude-dots";
-import { LyricLineEl, shouldEmphasize } from "./lyric-line";
+import {
+	LyricLineEl,
+	RawLyricLineMouseEvent,
+	shouldEmphasize,
+} from "./lyric-line";
 import { create } from "jss";
 import preset from "jss-preset-default";
 
 const jss = create(preset());
 
-export class LyricLineClickedEvent extends MouseEvent {}
+/**
+ * 歌词行鼠标相关事件，可以获取到歌词行的索引和歌词行元素
+ */
+export class LyricLineMouseEvent extends MouseEvent {
+	constructor(
+		/**
+		 * 歌词行索引
+		 */
+		public readonly lineIndex: number,
+		/**
+		 * 歌词行元素
+		 */
+		public readonly line: LyricLineEl,
+		event: MouseEvent,
+	) {
+		super(`line-${event.type}`, event);
+	}
+}
 
 /**
  * 歌词播放组件，本框架的核心组件
@@ -30,6 +51,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private lyricLinesEl: LyricLineEl[] = [];
 	private lyricLinesSize: WeakMap<LyricLineEl, [number, number]> =
 		new WeakMap();
+	private lyricLinesIndexes: WeakMap<LyricLineEl, number> = new WeakMap();
 	private hotLines: Set<number> = new Set();
 	private bufferedLines: Set<number> = new Set();
 	private scrollToIndex = 0;
@@ -87,6 +109,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	readonly size: [number, number] = [0, 0];
 	readonly innerSize: [number, number] = [0, 0];
 	readonly pos: [number, number] = [0, 0];
+	private readonly onLineClickedHandler = (e: RawLyricLineMouseEvent) => {
+		const evt = new LyricLineMouseEvent(
+			this.lyricLinesIndexes.get(e.line) ?? -1,
+			e.line,
+			e,
+		);
+		if (!this.dispatchEvent(evt)) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+		}
+	};
 	_getIsNonDynamic() {
 		return this.isNonDynamic;
 	}
@@ -128,6 +162,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			color: "var(--amll-lyric-view-color,white)",
 			mixBlendMode: "plus-lighter",
 			contain: "strict",
+			"&:hover": {
+				"& $lyricLine": {
+					filter: "unset !important",
+				},
+			},
 		},
 		lyricLine: {
 			position: "absolute",
@@ -138,8 +177,16 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			padding: "2vh 0.05em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
-			transition: "filter 0.25s",
+			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "border-box",
+			borderRadius: "8px",
+			"&:hover": {
+				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
+				boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)",
+			},
+			"&:active": {
+				boxShadow: "0 0 0 4px var(--amll-lyric-view-hover-bg-color,#fff1)",
+			},
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
@@ -399,13 +446,24 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		});
 		const prevLinesEl = this.lyricLinesEl;
 		this.lyricLinesEl = this.processedLines.map((line, i) => {
-			return this.lyricLinesEl[i] ?? new LyricLineEl(this, line);
+			if (this.lyricLinesEl[i]) {
+				return this.lyricLinesEl[i];
+			} else {
+				const lineEl = new LyricLineEl(this, line);
+				lineEl.addEventListener("click", this.onLineClickedHandler);
+				lineEl.addEventListener("contextmenu", this.onLineClickedHandler);
+				return lineEl;
+			}
 		});
 		while (prevLinesEl.length > this.processedLines.length) {
-			prevLinesEl.pop()?.dispose();
+			const rest = prevLinesEl.pop();
+			rest?.removeEventListener("click", this.onLineClickedHandler);
+			rest?.removeEventListener("contextmenu", this.onLineClickedHandler);
+			rest?.dispose();
 		}
-		this.lyricLinesEl.forEach((el) => {
+		this.lyricLinesEl.forEach((el, i) => {
 			this.element.appendChild(el.getElement());
+			this.lyricLinesIndexes.set(el, i);
 			el.updateMaskImage();
 		});
 		this.interludeDots.setInterlude(undefined);
@@ -416,6 +474,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLineScaleSpringParams({});
 		this.setCurrentTime(0, true);
 		this.calcLayout(true, true);
+	}
+	/**
+	 * 重置用户滚动状态
+	 *
+	 * 请在用户完成滚动点击跳转歌词时调用本事件再调用 `calcLayout` 以正确滚动到目标位置
+	 */
+	resetScroll() {
+		this.isScrolled = false;
+		this.scrollOffset = 0;
+		this.invokedByScrollEvent = false;
+		clearTimeout(this.scrolledHandler);
+		this.scrolledHandler = 0;
 	}
 	/**
 	 * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`

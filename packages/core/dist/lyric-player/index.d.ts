@@ -5,7 +5,28 @@
  */
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import { SpringParams } from "../utils/spring";
-export declare class LyricLineClickedEvent extends MouseEvent {
+import { LyricLineEl } from "./lyric-line";
+/**
+ * 歌词行鼠标相关事件，可以获取到歌词行的索引和歌词行元素
+ */
+export declare class LyricLineMouseEvent extends MouseEvent {
+    /**
+     * 歌词行索引
+     */
+    readonly lineIndex: number;
+    /**
+     * 歌词行元素
+     */
+    readonly line: LyricLineEl;
+    constructor(
+    /**
+     * 歌词行索引
+     */
+    lineIndex: number, 
+    /**
+     * 歌词行元素
+     */
+    line: LyricLineEl, event: MouseEvent);
 }
 /**
  * 歌词播放组件，本框架的核心组件
@@ -19,6 +40,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private processedLines;
     private lyricLinesEl;
     private lyricLinesSize;
+    private lyricLinesIndexes;
     private hotLines;
     private bufferedLines;
     private scrollToIndex;
@@ -44,6 +66,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     readonly size: [number, number];
     readonly innerSize: [number, number];
     readonly pos: [number, number];
+    private readonly onLineClickedHandler;
     _getIsNonDynamic(): boolean;
     /**
      * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
@@ -86,6 +109,12 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * @param lines 歌词数组
      */
     setLyricLines(lines: LyricLine[]): void;
+    /**
+     * 重置用户滚动状态
+     *
+     * 请在用户完成滚动点击跳转歌词时调用本事件再调用 `calcLayout` 以正确滚动到目标位置
+     */
+    resetScroll(): void;
     /**
      * 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
      * 函数即可让歌词通过动画移动到目标位置。

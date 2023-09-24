@@ -1,25 +1,31 @@
-import { useAtom, useAtomValue } from "jotai";
-import { useState, type FC, useEffect } from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useState, type FC, useEffect, useRef } from "react";
 import {
 	currentTimeAtom,
 	lyricPageOpenedAtom,
 	musicArtistsAtom,
 } from "../../music-context/wrapper";
-import { LyricPlayer as LyricPlayerComponent } from "@applemusic-like-lyrics/react";
+import {
+	LyricPlayer as LyricPlayerComponent,
+	type LyricPlayerRef,
+} from "@applemusic-like-lyrics/react";
 import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
 } from "../../music-context/ws-wrapper";
 import { lyricLinesAtom } from "../../lyric/provider";
+import { rightClickedLyricAtom } from "./lyric-line-menu";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef: HTMLElement | null;
 }> = (props) => {
+	const playerRef = useRef<LyricPlayerRef>(null);
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
+	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 
 	const [alignPosition, setAlighPosition] = useState(0.5);
 
@@ -60,6 +66,21 @@ export const CoreLyricPlayer: FC<{
 				alignPosition={props.albumCoverRef ? alignPosition : 0.2}
 				currentTime={currentTime}
 				lyricLines={lyricLines}
+				ref={playerRef}
+				onLyricLineClick={(line) => {
+					line.preventDefault();
+					line.stopPropagation();
+					line.stopImmediatePropagation();
+					setCurrentTime(line.line.getLine().startTime);
+					playerRef.current?.lyricPlayer?.resetScroll();
+					playerRef.current?.lyricPlayer?.calcLayout();
+				}}
+				onLyricLineContextMenu={(line) => {
+					line.preventDefault();
+					line.stopPropagation();
+					line.stopImmediatePropagation();
+					setRightClickedLyric(line.line.getLine());
+				}}
 				bottomLine={
 					<div className="amll-contributors">
 						贡献者：{artists.map((v) => v.name).join(", ")}

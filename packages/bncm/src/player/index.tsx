@@ -6,6 +6,7 @@ import { LyricPlayerVertical } from "./vertical";
 import { MainMenu } from "./common/main-menu";
 import { AMLLConfigWindowed } from "../components/config";
 import { MusicOverrideWindow } from "./common/music-override-window";
+import { RightClickLyricMenu } from "./common/lyric-line-menu";
 
 export const LyricPlayer: FC = () => {
 	return (
@@ -13,6 +14,9 @@ export const LyricPlayer: FC = () => {
 			<Background />
 			<Suspense>
 				<MainMenu />
+			</Suspense>
+			<Suspense>
+				<RightClickLyricMenu />
 			</Suspense>
 			<Media
 				queries={{

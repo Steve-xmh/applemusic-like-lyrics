@@ -1,5 +1,6 @@
 import {
 	LyricPlayer as CoreLyricPlayer,
+	type LyricLineMouseEvent,
 	type LyricLine,
 	type spring,
 } from "@applemusic-like-lyrics/core";
@@ -83,6 +84,16 @@ export interface LyricPlayerProps {
 	 * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
 	 */
 	bottomLine?: ReactNode;
+	/**
+	 * 当某个歌词行被左键点击时触发的事件
+	 * @param line 歌词行的事件对象，可以访问到对应的歌词行信息和歌词行索引
+	 */
+	onLyricLineClick?: (line: LyricLineMouseEvent) => void;
+	/**
+	 * 当某个歌词行被右键点击时触发的事件
+	 * @param line 歌词行的事件对象，可以访问到对应的歌词行信息和歌词行索引
+	 */
+	onLyricLineContextMenu?: (line: LyricLineMouseEvent) => void;
 }
 
 /**
@@ -121,6 +132,8 @@ export const LyricPlayer = forwardRef<
 			linePosYSpringParams,
 			lineScaleSpringParams,
 			bottomLine,
+			onLyricLineClick,
+			onLyricLineContextMenu,
 			...props
 		},
 		ref,
@@ -206,6 +219,29 @@ export const LyricPlayer = forwardRef<
 			if (lineScaleSpringParams)
 				corePlayerRef.current?.setLineScaleSpringParams(lineScaleSpringParams);
 		}, [lineScaleSpringParams]);
+
+		useEffect(() => {
+			if (onLyricLineClick) {
+				const handler = (e: Event) =>
+					onLyricLineClick(e as LyricLineMouseEvent);
+				corePlayerRef.current?.addEventListener("line-click", handler);
+				return () =>
+					corePlayerRef.current?.removeEventListener("line-click", handler);
+			}
+		}, [onLyricLineClick]);
+
+		useEffect(() => {
+			if (onLyricLineContextMenu) {
+				const handler = (e: Event) =>
+					onLyricLineContextMenu(e as LyricLineMouseEvent);
+				corePlayerRef.current?.addEventListener("line-contextmenu", handler);
+				return () =>
+					corePlayerRef.current?.removeEventListener(
+						"line-contextmenu",
+						handler,
+					);
+			}
+		}, [onLyricLineContextMenu]);
 
 		useImperativeHandle(
 			ref,

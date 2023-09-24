@@ -2,7 +2,16 @@ import { LyricPlayer } from ".";
 import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
 import { Spring } from "../utils/spring";
 export declare function shouldEmphasize(word: LyricWord): boolean;
-export declare class LyricLineEl implements HasElement, Disposable {
+export declare class RawLyricLineMouseEvent extends MouseEvent {
+    readonly line: LyricLineEl;
+    constructor(line: LyricLineEl, event: MouseEvent);
+}
+type MouseEventMap = {
+    [evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent ? evt : never;
+};
+type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
+type MouseEventListener = (this: LyricLineEl, ev: RawLyricLineMouseEvent) => void;
+export declare class LyricLineEl extends EventTarget implements HasElement, Disposable {
     private lyricPlayer;
     private lyricLine;
     private element;
@@ -19,6 +28,10 @@ export declare class LyricLineEl implements HasElement, Disposable {
         scale: Spring;
     };
     constructor(lyricPlayer: LyricPlayer, lyricLine?: LyricLine);
+    private listenersMap;
+    private readonly onMouseEvent;
+    addEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | AddEventListenerOptions | undefined): void;
+    removeEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | EventListenerOptions | undefined): void;
     private isEnabled;
     enable(): void;
     measureSize(): [number, number];
@@ -40,3 +53,4 @@ export declare class LyricLineEl implements HasElement, Disposable {
     get isInSight(): boolean;
     dispose(): void;
 }
+export {};

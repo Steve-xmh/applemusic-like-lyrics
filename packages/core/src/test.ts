@@ -8,7 +8,7 @@
 import GUI from "lil-gui";
 import { BackgroundRender } from "./bg-render";
 import Stats from "stats.js";
-import { LyricPlayer } from "./lyric-player";
+import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
 import { parseTTML } from "./lyric/ttml";
 import { SpringParams } from "./utils/spring";
 import { parseLrc } from "@applemusic-like-lyrics/lyric";
@@ -172,6 +172,14 @@ playerGui.add(debugValues, "play").name("加载/播放");
 playerGui.add(debugValues, "pause").name("暂停/继续");
 
 const lyricPlayer = new LyricPlayer();
+
+lyricPlayer.addEventListener("line-click", (evt) => {
+	const e = evt as LyricLineMouseEvent;
+	evt.preventDefault();
+	evt.stopImmediatePropagation();
+	evt.stopPropagation();
+	console.log(e.line, e.lineIndex);
+});
 
 const stats = new Stats();
 stats.showPanel(0);

@@ -1,4 +1,4 @@
-import type { spring, LyricLine, LyricPlayer as CoreLyricPlayer, BackgroundRender as CoreBackgroundRender } from "@applemusic-like-lyrics/core";
+import type { spring, LyricLine, LyricPlayer as CoreLyricPlayer, BackgroundRender as CoreBackgroundRender, LyricLineMouseEvent } from "@applemusic-like-lyrics/core";
 import type { Ref, VNode } from "vue";
 import LyricPlayer from "./LyricPlayer.vue";
 import BackgroundRender from "./BackgroundRender.vue";
@@ -73,6 +73,18 @@ export interface LyricPlayerProps {
      * 这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
      */
     bottomLine?: VNode[];
+}
+export interface LyricPlayerEmits {
+    /**
+     * 当某个歌词行被左键点击时触发的事件
+     * @param line 歌词行的事件对象，可以访问到对应的歌词行信息和歌词行索引
+     */
+    (e: "line-click", line: LyricLineMouseEvent): void;
+    /**
+     * 当某个歌词行被右键点击时触发的事件
+     * @param line 歌词行的事件对象，可以访问到对应的歌词行信息和歌词行索引
+     */
+    (e: "line-contextmenu", line: LyricLineMouseEvent): void;
 }
 /**
  * 歌词播放组件的引用

@@ -4,27 +4,37 @@
 </template>
 
 <script setup lang="ts">
-import { LyricPlayer } from "@applemusic-like-lyrics/core";
-import { onMounted, onUnmounted, ref, watchEffect, toRaw } from "vue";
-import type { LyricPlayerProps, LyricPlayerRef } from ".";
+import { LyricPlayer, type LyricLineMouseEvent } from "@applemusic-like-lyrics/core";
+import { onMounted, onUnmounted, ref, watchEffect } from "vue";
+import type { LyricPlayerProps, LyricPlayerEmits, LyricPlayerRef } from ".";
 
 defineOptions({
     inheritAttrs: false,
 });
 
 const props = defineProps<LyricPlayerProps>();
+const emits = defineEmits<LyricPlayerEmits>();
 const wrapperRef = ref<HTMLDivElement>();
 const playerRef = ref<LyricPlayer>();
+
+const lineClickHandler = (e: Event) =>
+    emits("line-click", e as LyricLineMouseEvent);
+const lineContextMenuHandler = (e: Event) =>
+    emits("line-contextmenu", e as LyricLineMouseEvent);
 
 onMounted(() => {
     if (wrapperRef.value) {
         playerRef.value = new LyricPlayer();
         wrapperRef.value.appendChild(playerRef.value.getElement());
+        playerRef.value.addEventListener("line-click", lineClickHandler);
+        playerRef.value.addEventListener("line-contextmenu", lineContextMenuHandler);
     }
 });
 
 onUnmounted(() => {
     if (playerRef.value) {
+        playerRef.value.removeEventListener("line-click", lineClickHandler);
+        playerRef.value.removeEventListener("line-contextmenu", lineContextMenuHandler);
         playerRef.value.dispose();
     }
 });

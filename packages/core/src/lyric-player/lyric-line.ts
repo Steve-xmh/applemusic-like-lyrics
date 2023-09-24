@@ -83,7 +83,25 @@ export function shouldEmphasize(word: LyricWord): boolean {
 	return word.endTime - word.startTime >= 1000 && word.word.length <= 7;
 }
 
-export class LyricLineEl implements HasElement, Disposable {
+export class RawLyricLineMouseEvent extends MouseEvent {
+	constructor(public readonly line: LyricLineEl, event: MouseEvent) {
+		super(event.type, event);
+	}
+}
+
+type MouseEventMap = {
+	[evt in
+		keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
+		? evt
+		: never;
+};
+type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
+type MouseEventListener = (
+	this: LyricLineEl,
+	ev: RawLyricLineMouseEvent,
+) => void;
+
+export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -98,6 +116,7 @@ export class LyricLineEl implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(1),
 	};
+	// rome-ignore lint/correctness/noUnreachableSuper: <explanation>
 	constructor(
 		private lyricPlayer: LyricPlayer,
 		private lyricLine: LyricLine = {
@@ -110,6 +129,7 @@ export class LyricLineEl implements HasElement, Disposable {
 			isDuet: false,
 		},
 	) {
+		super();
 		this.element.setAttribute(
 			"class",
 			this.lyricPlayer.style.classes.lyricLine,
@@ -131,6 +151,44 @@ export class LyricLineEl implements HasElement, Disposable {
 		roman.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine);
 		this.rebuildElement();
 		this.rebuildStyle();
+	}
+	private listenersMap = new Map<string, Set<MouseEventListener>>();
+	private readonly onMouseEvent = (e: MouseEvent) => {
+		if (!this.dispatchEvent(new RawLyricLineMouseEvent(this, e))) {
+			e.preventDefault();
+			e.stopPropagation();
+			e.stopImmediatePropagation();
+			return false;
+		}
+	};
+	override addEventListener(
+		type: MouseEventTypes,
+		callback: MouseEventListener | null,
+		options?: boolean | AddEventListenerOptions | undefined,
+	): void {
+		super.addEventListener(type, callback, options);
+		if (callback) {
+			const listeners = this.listenersMap.get(type) ?? new Set();
+			if (listeners.size === 0)
+				this.element.addEventListener(type, this.onMouseEvent);
+			listeners.add(callback);
+			this.listenersMap.set(type, listeners);
+		}
+	}
+	override removeEventListener(
+		type: MouseEventTypes,
+		callback: MouseEventListener | null,
+		options?: boolean | EventListenerOptions | undefined,
+	): void {
+		super.removeEventListener(type, callback, options);
+		if (callback) {
+			const listeners = this.listenersMap.get(type);
+			if (listeners) {
+				listeners.delete(callback);
+				if (listeners.size === 0)
+					this.element.removeEventListener(type, this.onMouseEvent);
+			}
+		}
 	}
 	private isEnabled = false;
 	enable() {
@@ -531,7 +589,7 @@ export class LyricLineEl implements HasElement, Disposable {
 		const pt = this.lyricPlayer.pos[1];
 		const pr = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0];
 		const pb = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
-		return !(l > pr || t > pb || r < pl || b < pt);
+		return !(l > pr || r < pl || t > pb || b < pt);
 	}
 	dispose(): void {
 		this.element.remove();
