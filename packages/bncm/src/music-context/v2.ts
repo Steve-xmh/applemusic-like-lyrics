@@ -16,6 +16,7 @@ import { log } from "../utils/logger";
 import { getNCMImageUrl } from "../utils/ncm-url";
 import { genRandomString } from "../utils/gen-random-string";
 import { normalizePath } from "../utils/path";
+import { V2_MAC_TRACKMAPPING } from "./v2-mac-mapping";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -287,7 +288,15 @@ export class MusicContextV2 extends MusicContextBase {
 	}
 	private getPlayingSong() {
 		if (APP_CONF.isOSX) {
-			return callCachedSearchFunction("baD", []);
+			return callCachedSearchFunction(
+				APP_CONF.packageVersion in V2_MAC_TRACKMAPPING
+					? (V2_MAC_TRACKMAPPING[APP_CONF.packageVersion as string] as string)
+					: function (v) {
+							const source = v.toString();
+							return /\("track-playing"\)/.test(source);
+					  },
+				[],
+			);
 		} else {
 			return callCachedSearchFunction("getPlaying", []);
 		}
