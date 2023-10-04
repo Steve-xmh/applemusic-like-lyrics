@@ -3,7 +3,7 @@ import { Application as z } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
 import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
 import { Texture as D } from "@pixi/core";
-import { Sprite as E } from "@pixi/sprite";
+import { Sprite as S } from "@pixi/sprite";
 import { BulgePinchFilter as v } from "@pixi/filter-bulge-pinch";
 import { create as A } from "jss";
 import I from "jss-preset-default";
@@ -115,10 +115,10 @@ const ne = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   parseTTML: B
 }, Symbol.toStringTag, { value: "Module" }));
-class N extends C {
+class O extends C {
   time = 0;
 }
-class O {
+class N {
   constructor(e) {
     this.canvas = e;
     const t = e.getBoundingClientRect();
@@ -233,14 +233,33 @@ class O {
    * @param albumUrl 图片的目标链接
    */
   async setAlbumImage(e) {
-    const t = await D.fromURL(e), n = new N(), i = new E(t), a = new E(t), s = new E(t), r = new E(t);
-    i.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), i.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, n.addChild(i, a, s, r), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = n, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
+    const t = new Image();
+    t.src = e;
+    let n = 5, i;
+    for (; !i?.baseTexture?.resource?.valid && n > 0; )
+      try {
+        await t.decode(), i = D.from(t, {
+          resourceOptions: {
+            autoLoad: !1
+          }
+        }), await i.baseTexture.resource.load();
+      } catch (c) {
+        console.warn(
+          `failed on loading album image, retrying (${n})`,
+          e,
+          c
+        ), i = void 0, n--;
+      }
+    if (!i)
+      return;
+    const a = new O(), s = new S(i), r = new S(i), l = new S(i), o = new S(i);
+    s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, a.addChild(s, r, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = a, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick);
   }
 }
-class re extends O {
+class re extends N {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -254,7 +273,7 @@ class re extends O {
   }
 }
 const $ = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
-class S {
+class w {
   currentPosition = 0;
   targetPosition = 0;
   currentTime = 0;
@@ -338,8 +357,8 @@ class _ {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new S(0),
-    posY: new S(0)
+    posX: new w(0),
+    posY: new w(0)
   };
   measureSize() {
     return [
@@ -506,9 +525,9 @@ class H extends EventTarget {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new S(0),
-    posY: new S(0),
-    scale: new S(1)
+    posX: new w(0),
+    posY: new w(0),
+    scale: new w(1)
   };
   listenersMap = /* @__PURE__ */ new Map();
   onMouseEvent = (e) => {
@@ -1129,8 +1148,8 @@ class ae extends EventTarget {
     const c = Math.max(...this.bufferedLines);
     let d = 0, u = 0.05, f = !1;
     this.lyricLinesEl.forEach((m, p) => {
-      const L = this.bufferedLines.has(p), b = L || p >= this.scrollToIndex && p < c, w = m.getLine();
-      w.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && s >= 5e3 && (p === this.scrollToIndex && n?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, i), n && this.interludeDots.setInterlude([n[0], n[1]]), i += this.interludeDotsSize[1]), m.setTransform(
+      const L = this.bufferedLines.has(p), b = L || p >= this.scrollToIndex && p < c, E = m.getLine();
+      E.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && s >= 5e3 && (p === this.scrollToIndex && n?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, i), n && this.interludeDots.setInterlude([n[0], n[1]]), i += this.interludeDotsSize[1]), m.setTransform(
         0,
         i,
         b ? 1 : r,
@@ -1138,7 +1157,7 @@ class ae extends EventTarget {
         !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (p < this.scrollToIndex ? Math.abs(this.scrollToIndex - p) : Math.abs(p - Math.max(this.scrollToIndex, c))) : 0,
         e,
         d
-      ), w.isBG && b ? i += this.lyricLinesSize.get(m)?.[1] ?? 0 : w.isBG || (i += this.lyricLinesSize.get(m)?.[1] ?? 0), i >= 0 && (d += u, u /= 1.2);
+      ), E.isBG && b ? i += this.lyricLinesSize.get(m)?.[1] ?? 0 : E.isBG || (i += this.lyricLinesSize.get(m)?.[1] ?? 0), i >= 0 && (d += u, u /= 1.2);
     }), this.bottomLine.setTransform(0, i, e, d);
   }
   /**

@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { atomWithConfig } from "./atom-with-config";
-import { useAtom } from "jotai";
+import { WritableAtom, useAtom } from "jotai";
 import { Switch } from "../appkit/switch/switch";
 
 export const ColorConfigComponent: FC<{
@@ -37,7 +37,7 @@ export const ColorConfigComponent: FC<{
 };
 
 export const SwitchConfigComponent: FC<{
-	atom: ReturnType<typeof atomWithConfig<boolean>>;
+	atom: WritableAtom<Promise<boolean> | boolean, [boolean], any>;
 	label: string;
 	description?: string;
 	disabled?: boolean;

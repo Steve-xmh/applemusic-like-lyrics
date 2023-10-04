@@ -13,16 +13,17 @@ import {
 	parseLys,
 	type LyricLine,
 } from "@applemusic-like-lyrics/lyric";
-import { log, warn } from "../utils/logger";
+import { log } from "../utils/logger";
 import {
 	lyricSourcesAtom,
 	showRomanLineAtom,
 	showTranslatedLineAtom,
 } from "../components/config/atoms";
-import { useAtomCallback } from "jotai/utils";
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { LyricFormat, LyricSource, SourceStringError } from "./source";
 import { processLyric } from "./processor";
+import { Loadable } from "jotai/vanilla/utils/loadable";
+import { raceLoad } from "../utils/race-load";
 
 interface EAPILyric {
 	version: number;
@@ -59,7 +60,7 @@ async function getLyric(
 	else throw v.statusText;
 }
 
-export const lyricLinesAtom = atom<CoreLyricLine[] | undefined>(undefined);
+// export const lyricLinesAtom = atom<CoreLyricLine[] | undefined>(undefined);
 
 export const lyricProviderLogsAtom = atom(
 	[] as {
@@ -302,122 +303,131 @@ async function getLyricFromNCM(
 	return converted;
 }
 
-const searchLyricTaskAtom = atom(Symbol("search-lyric-task-atom"));
+class LyricNotExistError extends Error {}
+
+export const lyricLinesAtom = atom({
+	state: "loading",
+} as Loadable<CoreLyricLine[]>);
+
 export const LyricProvider: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
+	const songName = useAtomValue(musicNameAtom);
+	const artists = useAtomValue(musicArtistsAtom);
+	const lyricSources = useAtomValue(lyricSourcesAtom);
+	const allowTranslatedLine = useAtomValue(showTranslatedLineAtom);
+	const allowRomanLine = useAtomValue(showRomanLineAtom);
+	const setLyricProviderLogs = useSetAtom(lyricProviderLogsAtom);
 	const setLyricLines = useSetAtom(lyricLinesAtom);
-	const showTranslatedLine = useAtomValue(showTranslatedLineAtom);
-	const showRomanLine = useAtomValue(showRomanLineAtom);
-	const setSearchLyricTask = useSetAtom(searchLyricTaskAtom);
 
-	const searchLyric = useAtomCallback(
-		async (
-			get,
-			set,
-			allowTranslatedLine: boolean,
-			allowRomanLine: boolean,
-			abortSignal: AbortSignal,
-		): Promise<CoreLyricLine[] | undefined> => {
-			const curTask = Symbol("search-lyric-task-atom");
-			set(searchLyricTaskAtom, curTask);
-			const musicId = get(musicIdAtom);
-			const songName = get(musicNameAtom);
-			const artists = get(musicArtistsAtom);
-			const artistsParam = artists.map((v) => v.name).join(",");
-			const sources = await get(lyricSourcesAtom);
-			set(lyricProviderLogsAtom, []);
-			let loadedLyrics: CoreLyricLine[] | undefined = undefined;
+	useEffect(() => {
+		setLyricProviderLogs([]);
+		setLyricLines({
+			state: "loading",
+		});
 
-			for (const source of sources) {
-				if (get(searchLyricTaskAtom) !== curTask) return;
-				try {
-					switch (source.type) {
-						case "external": {
-							loadedLyrics = await getLyricFromExternal(
-								source,
-								{
-									NCM_ID: musicId,
-									SONG_NAME: songName,
-									SONG_NAME_URI: encodeURIComponent(songName),
-									SONG_ARTISTS: artistsParam,
-									SONG_ARTISTS_URI: encodeURIComponent(artistsParam),
-									SONG_ALIAS: "", // TODO: 其他称谓
-									SONG_ALIAS_URI: "",
-								},
-								allowTranslatedLine,
-								allowRomanLine,
-								abortSignal,
-							);
-							break;
-						}
-						case "builtin:amll-ttml-db": {
-							loadedLyrics = await getLyricFromDB(
-								musicId,
-								allowTranslatedLine,
-								allowRomanLine,
-								abortSignal,
-							);
-							break;
-						}
-						case "builtin:ncm": {
-							loadedLyrics = await getLyricFromNCM(
-								musicId,
-								allowTranslatedLine,
-								allowRomanLine,
-								abortSignal,
-							);
-							break;
+		const cancel = raceLoad(
+			lyricSources,
+			async (source, { signal }): Promise<CoreLyricLine[]> => {
+				// log("正在搜索歌词源", source, musicId);
+
+				switch (source.type) {
+					case "external": {
+						const artistsParam = artists.map((v) => v.name).join(",");
+						const lines = await getLyricFromExternal(
+							source,
+							{
+								NCM_ID: musicId,
+								SONG_NAME: songName,
+								SONG_NAME_URI: encodeURIComponent(songName),
+								SONG_ARTISTS: artistsParam,
+								SONG_ARTISTS_URI: encodeURIComponent(artistsParam),
+								SONG_ALIAS: "", // TODO: 其他称谓
+								SONG_ALIAS_URI: "",
+							},
+							allowTranslatedLine,
+							allowRomanLine,
+							signal,
+						);
+						if (lines) {
+							return lines;
+						} else {
+							throw new LyricNotExistError();
 						}
 					}
-				} catch (err) {
-					if (get(searchLyricTaskAtom) !== curTask) return;
-					set(lyricProviderLogsAtom, (v) => [
-						...v,
-						{
-							sourceId: source.id,
-							log: `查询该歌词源时发生错误： ${err}`,
-						},
-					]);
-					continue;
+					case "builtin:amll-ttml-db": {
+						const lines = await getLyricFromDB(
+							musicId,
+							allowTranslatedLine,
+							allowRomanLine,
+							signal,
+						);
+						if (lines) {
+							return lines;
+						} else {
+							throw new LyricNotExistError();
+						}
+					}
+					case "builtin:ncm": {
+						const lines = await getLyricFromNCM(
+							musicId,
+							allowTranslatedLine,
+							allowRomanLine,
+							signal,
+						);
+						if (lines) {
+							return lines;
+						} else {
+							throw new LyricNotExistError();
+						}
+					}
 				}
-
-				if (get(searchLyricTaskAtom) !== curTask) return;
-				if (loadedLyrics === undefined) {
-					set(lyricProviderLogsAtom, (v) => [
-						...v,
-						{
-							sourceId: source.id,
-							log: "未找到歌词",
-						},
-					]);
-				} else {
-					set(lyricProviderLogsAtom, (v) => [
+			},
+			(source, _index, result) => {
+				// log("已设置歌词为来自歌词源", source, "的", result);
+				setLyricLines(result);
+			},
+			(source, _index, result) => {
+				if (result.state === "hasData") {
+					setLyricProviderLogs((v) => [
 						...v,
 						{
 							sourceId: source.id,
 							log: "已找到歌词",
 						},
 					]);
-					break;
+				} else if (result.state === "hasError") {
+					if (result.error instanceof LyricNotExistError) {
+						setLyricProviderLogs((v) => [
+							...v,
+							{
+								sourceId: source.id,
+								log: "未找到歌词",
+							},
+						]);
+					} else {
+						setLyricProviderLogs((v) => [
+							...v,
+							{
+								sourceId: source.id,
+								log: `查询该歌词源时发生错误： ${result.error}`,
+							},
+						]);
+					}
 				}
-			}
-
-			set(lyricLinesAtom, loadedLyrics);
-		},
-	);
-
-	useEffect(() => {
-		setLyricLines(undefined);
-
-		const ac = new AbortController();
-
-		searchLyric(showTranslatedLine, showRomanLine, ac.signal);
+			},
+		);
 
 		return () => {
-			setSearchLyricTask(Symbol("search-lyric-task-atom"));
-			ac.abort("effect-destoryed");
+			cancel();
 		};
-	}, [musicId, showTranslatedLine, showRomanLine]);
+	}, [
+		musicId,
+		lyricSources,
+		allowTranslatedLine,
+		allowRomanLine,
+		artists,
+		songName,
+	]);
 
-	return null;
+	return <></>;
 };

@@ -1,5 +1,5 @@
 import { driver } from "driver.js";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { FC, useEffect, useRef } from "react";
 import {
 	neverGonnaGiveYouUpAtom,
@@ -10,12 +10,10 @@ import { closeLyricPage, openLyricPage } from "../../injector";
 import { loadable } from "jotai/utils";
 
 const neverGonnaGiveYouUpLoadableAtom = loadable(neverGonnaGiveYouUpAtom);
-const showTutoialLoadabltAtom = loadable(showTutoialAtom);
 
 export const AMLLGuide: FC = () => {
 	const neverGonnaGiveYouUp = useAtomValue(neverGonnaGiveYouUpLoadableAtom);
-	const showTutoial = useAtomValue(showTutoialLoadabltAtom);
-	const setShowTutoial = useSetAtom(showTutoialAtom);
+	const [showTutoial, setShowTutoial] = useAtom(showTutoialAtom);
 	const displayed = useRef(false);
 
 	useEffect(() => {

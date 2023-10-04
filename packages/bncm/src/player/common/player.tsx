@@ -15,6 +15,11 @@ import {
 } from "../../music-context/ws-wrapper";
 import { lyricLinesAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
+import {
+	lyricBlurEffectAtom,
+	// lyricScaleEffectAtom,
+	lyricSpringEffectAtom,
+} from "../../components/config/atoms";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef: HTMLElement | null;
@@ -25,6 +30,9 @@ export const CoreLyricPlayer: FC<{
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
+	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
+	// const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom); // TODO
+	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 
 	const [alignPosition, setAlighPosition] = useState(0.5);
@@ -59,34 +67,51 @@ export const CoreLyricPlayer: FC<{
 		);
 	} else {
 		return (
-			<LyricPlayerComponent
-				className="amll-lyric-player-wrapper"
-				disabled={!lyricPageOpened}
-				alignAnchor={props.albumCoverRef ? "center" : "top"}
-				alignPosition={props.albumCoverRef ? alignPosition : 0.2}
-				currentTime={currentTime}
-				lyricLines={lyricLines}
-				ref={playerRef}
-				onLyricLineClick={(line) => {
-					line.preventDefault();
-					line.stopPropagation();
-					line.stopImmediatePropagation();
-					setCurrentTime(line.line.getLine().startTime);
-					playerRef.current?.lyricPlayer?.resetScroll();
-					playerRef.current?.lyricPlayer?.calcLayout();
-				}}
-				onLyricLineContextMenu={(line) => {
-					line.preventDefault();
-					line.stopPropagation();
-					line.stopImmediatePropagation();
-					setRightClickedLyric(line.line.getLine());
-				}}
-				bottomLine={
-					<div className="amll-contributors">
-						贡献者：{artists.map((v) => v.name).join(", ")}
+			<>
+				<LyricPlayerComponent
+					className="amll-lyric-player-wrapper"
+					disabled={!lyricPageOpened}
+					alignAnchor={props.albumCoverRef ? "center" : "top"}
+					alignPosition={props.albumCoverRef ? alignPosition : 0.2}
+					currentTime={currentTime}
+					enableBlur={lyricBlurEffect}
+					enableSpring={lyricSpringEffect}
+					lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
+					ref={playerRef}
+					onLyricLineClick={(line) => {
+						line.preventDefault();
+						line.stopPropagation();
+						line.stopImmediatePropagation();
+						setCurrentTime(line.line.getLine().startTime);
+						playerRef.current?.lyricPlayer?.resetScroll();
+						playerRef.current?.lyricPlayer?.calcLayout();
+					}}
+					onLyricLineContextMenu={(line) => {
+						line.preventDefault();
+						line.stopPropagation();
+						line.stopImmediatePropagation();
+						setRightClickedLyric(line.line.getLine());
+					}}
+					bottomLine={
+						lyricLines.state === "hasData" ? (
+							<div className="amll-contributors">
+								贡献者：{artists.map((v) => v.name).join(", ")}
+							</div>
+						) : null
+					}
+				/>
+				{lyricLines.state === "loading" && (
+					<div className="amll-lyric-player-wrapper load-status">
+						<div>歌词加载中</div>
 					</div>
-				}
-			/>
+				)}
+				{lyricLines.state === "hasError" && (
+					<div className="amll-lyric-player-wrapper load-status">
+						<div>歌词加载失败或歌词不存在</div>
+						<div>可前往设置页 - 歌词源设置下查询搜索日志分析原因</div>
+					</div>
+				)}
+			</>
 		);
 	}
 };

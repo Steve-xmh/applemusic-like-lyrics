@@ -107,6 +107,11 @@ export const lyricScaleEffectAtom = atomWithConfig({
 	default: true,
 	desc: "是否应用歌词行的缩放效果",
 });
+export const lyricSpringEffectAtom = atomWithConfig({
+	key: "lyric-spring-effect",
+	default: true,
+	desc: "是否使用物理弹簧动画效果于歌词行上",
+});
 
 export const lyricHidePassedAtom = atomWithConfig({
 	key: "lyric-hide-passed",
@@ -130,6 +135,7 @@ export const showTutoialAtom = atomWithConfig({
 	key: "show-tutoial",
 	default: true,
 	desc: "显示使用教程",
+	loadable: true,
 });
 
 export const showStatsAtom = atomWithConfig({

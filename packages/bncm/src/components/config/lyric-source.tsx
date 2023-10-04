@@ -27,7 +27,7 @@ const sortableSourcesAtom = atom<
 	void
 >(
 	async (get) => {
-		const lyricSources = await get(lyricSourcesAtom);
+		const lyricSources = get(lyricSourcesAtom);
 		return lyricSources;
 	},
 	(_get, set, update) => {

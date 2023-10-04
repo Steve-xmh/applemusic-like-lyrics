@@ -1,6 +1,6 @@
 import { Root, createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
-import { Provider } from "jotai";
+import { Provider, createStore } from "jotai";
 import { LyricPlayer } from "../player";
 import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
@@ -16,10 +16,12 @@ configViewElement.id = "amll-config-view";
 configViewElement.style.height = "100%";
 let appRoot: Root;
 
+export const globalStore = createStore();
+
 export function initLyricPage() {
 	appRoot = createRoot(mainViewElement);
 	appRoot.render(
-		<Provider>
+		<Provider store={globalStore}>
 			<Suspense>
 				<AMLLGuide />
 				<MusicInfoWrapper />

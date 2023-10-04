@@ -243,7 +243,7 @@ export const installableBranchesAtom = atom(async () => {
 });
 export const selectedBranchLatestVersionAtom = atom(async (get) => {
 	const installableBranches = await get(installableBranchesAtom);
-	const branch = await get(updateBranchAtom);
+	const branch = get(updateBranchAtom);
 	const targetBranch = installableBranches.find((b) => b.branch === branch);
 	return targetBranch
 		? await checkLatestVersion(targetBranch.branch, targetBranch.path)
@@ -258,7 +258,7 @@ export const hasUpdateAtom = atom(async (get) => {
 	const [latestBranch, latestVersion, latestCommit] = await get(
 		selectedBranchLatestVersionAtom,
 	);
-	const branch = await get(updateBranchAtom);
+	const branch = get(updateBranchAtom);
 	if (
 		latestBranch === manifest.branch &&
 		latestVersion === manifest.version &&

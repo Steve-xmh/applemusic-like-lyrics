@@ -210,7 +210,30 @@ export class PixiRenderer implements Disposable {
 	 * @param albumUrl 图片的目标链接
 	 */
 	async setAlbumImage(albumUrl: string) {
-		const tex = await Texture.fromURL(albumUrl);
+		const img = new Image();
+		img.src = albumUrl;
+		let remainRetryTimes = 5;
+		let tex;
+		while (!tex?.baseTexture?.resource?.valid && remainRetryTimes > 0) {
+			try {
+				await img.decode();
+				tex = Texture.from(img, {
+					resourceOptions: {
+						autoLoad: false,
+					},
+				});
+				await tex.baseTexture.resource.load();
+			} catch (error) {
+				console.warn(
+					`failed on loading album image, retrying (${remainRetryTimes})`,
+					albumUrl,
+					error,
+				);
+				tex = undefined;
+				remainRetryTimes--;
+			}
+		}
+		if (!tex) return;
 		const container = new TimedContainer();
 		const s1 = new Sprite(tex);
 		const s2 = new Sprite(tex);

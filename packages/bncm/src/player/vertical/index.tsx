@@ -47,6 +47,7 @@ export const LyricPlayerVertical: FC = () => {
 				<div
 					style={{
 						backgroundImage: `url(${musicCoverUrl})`,
+						imageRendering: "auto",
 					}}
 					className="amll-cover-image"
 					ref={albumCoverRef}

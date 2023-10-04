@@ -112,6 +112,7 @@ export class MusicContextV2 extends MusicContextBase {
 	private onMusicLoad(audioId: string, info: AudioLoadInfo) {
 		log("音乐已加载", audioId, info);
 		this.audioId = audioId;
+		this.tweenAtom = Symbol("tween-atom");
 		const playing = this.getPlayingSong();
 
 		const bitrate: number | undefined = playing?.from?.lastPlayInfo?.bitrate;
@@ -227,6 +228,7 @@ export class MusicContextV2 extends MusicContextBase {
 			this.playState = PlayState.Pausing;
 			this.dispatchTypedEvent("pause", new Event("pause"));
 		}
+		this.tweenAtom = Symbol("tween-atom");
 		this.dispatchTypedEvent("unload", new Event("unload"));
 	}
 	private progressDispatchHandle = 0;
@@ -324,6 +326,7 @@ export class MusicContextV2 extends MusicContextBase {
 	}
 	override seekToPosition(timeMS: number): void {
 		this.musicPlayProgress = timeMS;
+		this.tweenAtom = Symbol("tween-atom");
 		legacyNativeCmder._envAdapter.callAdapter("audioplayer.seek", () => {}, [
 			this.audioId,
 			genAudioPlayerCommand(this.audioId, "seek"),

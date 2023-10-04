@@ -110,6 +110,7 @@ export const LyricPlayerHorizonal: FC = () => {
 						<div
 							style={{
 								backgroundImage: `url(${musicCoverUrl})`,
+								imageRendering: "auto",
 								transform:
 									playStatus === PlayState.Playing ? "" : "scale(0.75)",
 							}}
