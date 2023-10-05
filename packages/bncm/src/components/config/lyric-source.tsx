@@ -18,30 +18,45 @@ import { Menu, MenuDevider, MenuItem } from "../appkit/menu";
 import { lyricProviderLogsAtom } from "../../lyric/provider";
 import { v1 as uuidv1 } from "uuid";
 import { setClipboardAtom } from "../../music-context/wrapper";
+import { warn } from "../../utils/logger";
 
 const sourceItemMenuAtom = atom<number | undefined>(undefined);
 
-const sortableSourcesAtom = atom<
-	Promise<(ItemInterface & LyricSource)[]>,
-	[(ItemInterface & LyricSource)[]],
-	void
->(
-	async (get) => {
+const sortableSourcesAtom = atom(
+	(get): (ItemInterface & LyricSource)[] => {
 		const lyricSources = get(lyricSourcesAtom);
 		return lyricSources;
 	},
-	(_get, set, update) => {
-		set(
-			lyricSourcesAtom,
-			update.map((v) => ({
-				type: v.type,
-				id: v.id,
-				url: v.url,
-				format: v.format,
-				name: v.name,
-				website: v.website,
-			})),
-		);
+	(get, set, update: (ItemInterface & LyricSource)[]) => {
+		console.warn("updateSource", update);
+		const old = get(lyricSourcesAtom);
+		if (
+			!old.every((a, index) => {
+				const b = update[index];
+				return (
+					a.id === b.id &&
+					a.type === b.type &&
+					a.desc === b.desc &&
+					a.url === b.url &&
+					a.format === b.format &&
+					a.name === b.name &&
+					a.website === b.website
+				);
+			})
+		) {
+			set(
+				lyricSourcesAtom,
+				update.map((v) => ({
+					type: v.type,
+					id: v.id,
+					desc: v.desc,
+					url: v.url,
+					format: v.format,
+					name: v.name,
+					website: v.website,
+				})),
+			);
+		}
 	},
 );
 

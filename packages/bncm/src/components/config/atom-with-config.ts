@@ -64,7 +64,8 @@ const amllStorageAtom = atom<Promise<AMLLStorage>, [AMLLStorage], void>(
 		} else {
 			set(amllStorageLoadedAtom, true);
 		}
-		set(rawAMLLStorageAtom, new Map(update.entries()));
+		const cloned = new Map(update.entries());
+		set(rawAMLLStorageAtom, cloned);
 	},
 );
 
@@ -90,14 +91,15 @@ function atomWithConfigInner<Value>(
 	const select = selectAtom(
 		amllStorageAtom,
 		(v): Value => v.get(info.key) ?? info.default,
-		(a, b) => a === b,
+		(a, b) => (a !== b && log("compare", info.key, a, b), a === b),
 	);
-	const orig = atom<Promise<Value>, [Value], Promise<void>>(
+	const orig = atom<Promise<Value>, [Value], void>(
 		(get) => get(select),
-		async (get, set, update) => {
-			const map = await get(amllStorageAtom);
-			map.set(info.key, update);
-			set(amllStorageAtom, map);
+		(get, set, update) => {
+			get(amllStorageAtom).then((map) => {
+				map.set(info.key, update);
+				set(amllStorageAtom, map);
+			});
 		},
 	);
 	const load = loadable(orig);
