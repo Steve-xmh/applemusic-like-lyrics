@@ -54,6 +54,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private posYSpringParams;
     private scaleSpringParams;
     private enableBlur;
+    private enableScale;
     private interludeDots;
     private interludeDotsSize;
     private bottomLine;
@@ -81,6 +82,20 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * @returns 是否启用物理弹簧
      */
     getEnableSpring(): boolean;
+    /**
+     * 是否启用歌词行缩放效果，默认启用
+     *
+     * 如果启用，非选中的歌词行会轻微缩小以凸显当前播放歌词行效果
+     *
+     * 此效果对性能影响微乎其微，推荐启用
+     * @param enable 是否启用歌词行缩放效果
+     */
+    setEnableScale(enable?: boolean): void;
+    /**
+     * 获取当前是否启用了歌词行缩放效果
+     * @returns 是否启用歌词行缩放效果
+     */
+    getEnableScale(): boolean;
     readonly style: import("jss").StyleSheet<"lyricPlayer" | "lyricLine" | "@media (max-width: 1024px)" | "lyricDuetLine" | "lyricBgLine" | "lyricMainLine" | "lyricSubLine" | "disableSpring" | "interludeDots" | "@supports (mix-blend-mode: plus-lighter)" | "tmpDisableTransition">;
     private onPageShow;
     constructor();

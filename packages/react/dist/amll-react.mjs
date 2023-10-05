@@ -1,8 +1,8 @@
-import { jsx as A, jsxs as q, Fragment as $ } from "react/jsx-runtime";
-import { BackgroundRender as G, LyricPlayer as H } from "@applemusic-like-lyrics/core";
-import { forwardRef as k, useRef as B, useEffect as n, useImperativeHandle as x } from "react";
-import { createPortal as P } from "react-dom";
-const I = k(
+import { jsx as k, jsxs as $, Fragment as G } from "react/jsx-runtime";
+import { BackgroundRender as H, LyricPlayer as P } from "@applemusic-like-lyrics/core";
+import { forwardRef as x, useRef as B, useEffect as n, useImperativeHandle as g } from "react";
+import { createPortal as T } from "react-dom";
+const J = x(
   ({
     albumImageUrl: a,
     fps: d,
@@ -10,10 +10,10 @@ const I = k(
     flowSpeed: l,
     renderScale: m,
     staticMode: p,
-    ...v
+    ...R
   }, h) => {
     const c = B(), i = B(null);
-    return n(() => (c.current = new G(), () => {
+    return n(() => (c.current = new H(), () => {
       var t;
       (t = c.current) == null || t.dispose();
     }), []), n(() => {
@@ -40,43 +40,44 @@ const I = k(
         const f = c.current.getElement();
         f.style.width = "100%", f.style.height = "100%", (t = i.current) == null || t.appendChild(f);
       }
-    }), x(
+    }), g(
       h,
       () => ({
         wrapperEl: i.current,
         bgRender: c.current
       }),
       [i.current, c.current]
-    ), /* @__PURE__ */ A("div", { ...v, ref: i });
+    ), /* @__PURE__ */ k("div", { ...R, ref: i });
   }
-), J = k(
+), K = x(
   ({
     disabled: a,
     alignAnchor: d,
     alignPosition: o,
     enableSpring: l,
     enableBlur: m,
-    lyricLines: p,
-    currentTime: v,
-    linePosXSpringParams: h,
-    linePosYSpringParams: c,
-    lineScaleSpringParams: i,
-    bottomLine: t,
-    onLyricLineClick: f,
-    onLyricLineContextMenu: E,
-    ...g
-  }, j) => {
-    var F, y;
+    enableScale: p,
+    lyricLines: R,
+    currentTime: h,
+    linePosXSpringParams: c,
+    linePosYSpringParams: i,
+    lineScaleSpringParams: t,
+    bottomLine: f,
+    onLyricLineClick: E,
+    onLyricLineContextMenu: F,
+    ...j
+  }, q) => {
+    var y, L;
     const r = B(), w = B(null);
-    return n(() => (r.current = new H(), () => {
+    return n(() => (r.current = new P(), () => {
       var e;
       (e = r.current) == null || e.dispose();
     }), []), n(() => {
       if (!a) {
         let e = !1, u = -1;
-        const s = (R) => {
-          var L;
-          e || (u === -1 && (u = R), (L = r.current) == null || L.update(R - u), u = R, requestAnimationFrame(s));
+        const s = (v) => {
+          var A;
+          e || (u === -1 && (u = v), (A = r.current) == null || A.update(v - u), u = v, requestAnimationFrame(s));
         };
         return requestAnimationFrame(s), () => {
           e = !0;
@@ -93,38 +94,41 @@ const I = k(
       o && ((e = r.current) == null || e.setAlignPosition(o));
     }, [o]), n(() => {
       var e, u;
-      l ? (e = r.current) == null || e.setEnableSpring(l) : (u = r.current) == null || u.setEnableSpring(!0);
+      l !== void 0 ? (e = r.current) == null || e.setEnableSpring(l) : (u = r.current) == null || u.setEnableSpring(!0);
     }, [l]), n(() => {
+      var e, u;
+      p !== void 0 ? (e = r.current) == null || e.setEnableScale(p) : (u = r.current) == null || u.setEnableScale(!0);
+    }, [p]), n(() => {
       var e;
       (e = r.current) == null || e.setEnableBlur(m ?? !0);
     }, [m]), n(() => {
-      var e, u, s, R;
-      p ? ((e = r.current) == null || e.setLyricLines(p), (u = r.current) == null || u.update()) : ((s = r.current) == null || s.setLyricLines([]), (R = r.current) == null || R.update());
-    }, [p]), n(() => {
+      var e, u, s, v;
+      R ? ((e = r.current) == null || e.setLyricLines(R), (u = r.current) == null || u.update()) : ((s = r.current) == null || s.setLyricLines([]), (v = r.current) == null || v.update());
+    }, [R]), n(() => {
       var e, u;
-      v ? (e = r.current) == null || e.setCurrentTime(v) : (u = r.current) == null || u.setCurrentTime(0);
-    }, [v]), n(() => {
-      var e;
-      h && ((e = r.current) == null || e.setLinePosXSpringParams(h));
+      h ? (e = r.current) == null || e.setCurrentTime(h) : (u = r.current) == null || u.setCurrentTime(0);
     }, [h]), n(() => {
       var e;
-      c && ((e = r.current) == null || e.setLinePosYSpringParams(c));
+      c && ((e = r.current) == null || e.setLinePosXSpringParams(c));
     }, [c]), n(() => {
       var e;
-      i && ((e = r.current) == null || e.setLineScaleSpringParams(i));
+      i && ((e = r.current) == null || e.setLinePosYSpringParams(i));
     }, [i]), n(() => {
       var e;
-      if (f) {
-        const u = (s) => f(s);
+      t && ((e = r.current) == null || e.setLineScaleSpringParams(t));
+    }, [t]), n(() => {
+      var e;
+      if (E) {
+        const u = (s) => E(s);
         return (e = r.current) == null || e.addEventListener("line-click", u), () => {
           var s;
           return (s = r.current) == null ? void 0 : s.removeEventListener("line-click", u);
         };
       }
-    }, [f]), n(() => {
+    }, [E]), n(() => {
       var e;
-      if (E) {
-        const u = (s) => E(s);
+      if (F) {
+        const u = (s) => F(s);
         return (e = r.current) == null || e.addEventListener("line-contextmenu", u), () => {
           var s;
           return (s = r.current) == null ? void 0 : s.removeEventListener(
@@ -133,24 +137,24 @@ const I = k(
           );
         };
       }
-    }, [E]), x(
-      j,
+    }, [F]), g(
+      q,
       () => ({
         wrapperEl: w.current,
         lyricPlayer: r.current
       }),
       [w.current, r.current]
-    ), /* @__PURE__ */ q($, { children: [
-      /* @__PURE__ */ A("div", { ...g, ref: w }),
-      (F = r.current) != null && F.getBottomLineElement() && t ? P(
-        t,
-        (y = r.current) == null ? void 0 : y.getBottomLineElement()
+    ), /* @__PURE__ */ $(G, { children: [
+      /* @__PURE__ */ k("div", { ...j, ref: w }),
+      (y = r.current) != null && y.getBottomLineElement() && f ? T(
+        f,
+        (L = r.current) == null ? void 0 : L.getBottomLineElement()
       ) : null
     ] });
   }
 );
 export {
-  I as BackgroundRender,
-  J as LyricPlayer
+  J as BackgroundRender,
+  K as LyricPlayer
 };
 //# sourceMappingURL=amll-react.mjs.map

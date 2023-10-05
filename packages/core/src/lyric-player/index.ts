@@ -97,6 +97,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private enableBlur = true;
+	private enableScale = true;
 	private interludeDots: InterludeDots;
 	private interludeDotsSize: [number, number] = [0, 0];
 	private bottomLine: BottomLineEl;
@@ -146,6 +147,25 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	getEnableSpring() {
 		return !this.disableSpring;
+	}
+	/**
+	 * 是否启用歌词行缩放效果，默认启用
+	 *
+	 * 如果启用，非选中的歌词行会轻微缩小以凸显当前播放歌词行效果
+	 *
+	 * 此效果对性能影响微乎其微，推荐启用
+	 * @param enable 是否启用歌词行缩放效果
+	 */
+	setEnableScale(enable = true) {
+		this.enableScale = enable;
+		this.calcLayout();
+	}
+	/**
+	 * 获取当前是否启用了歌词行缩放效果
+	 * @returns 是否启用歌词行缩放效果
+	 */
+	getEnableScale() {
+		return this.enableScale;
 	}
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
@@ -233,7 +253,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		disableSpring: {
 			"& > *": {
-				transition: "filter 0.25s, transform 0.5s",
+				transition:
+					"filter 0.25s, transform 0.5s, background-color 0.25s, box-shadow 0.25s",
 			},
 		},
 		interludeDots: {
@@ -531,7 +552,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		} else {
 			this.interludeDots.setInterlude(undefined);
 		}
-		const SCALE_ASPECT = 0.95;
+		const SCALE_ASPECT = this.enableScale ? 0.95 : 1;
 		const scrollOffset = this.lyricLinesEl
 			.slice(0, targetAlignIndex)
 			.reduce(

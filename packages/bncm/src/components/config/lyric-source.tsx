@@ -18,7 +18,6 @@ import { Menu, MenuDevider, MenuItem } from "../appkit/menu";
 import { lyricProviderLogsAtom } from "../../lyric/provider";
 import { v1 as uuidv1 } from "uuid";
 import { setClipboardAtom } from "../../music-context/wrapper";
-import { warn } from "../../utils/logger";
 
 const sourceItemMenuAtom = atom<number | undefined>(undefined);
 

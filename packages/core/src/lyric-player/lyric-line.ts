@@ -536,13 +536,15 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		force = false,
 		delay = 0,
 	) {
+		const beforeInSight = this.isInSight;
+		const enableSpring = this.lyricPlayer.getEnableSpring();
 		this.left = left;
 		this.top = top;
 		this.scale = scale;
 		this.delay = (delay * 1000) | 0;
 		const main = this.element.children[0] as HTMLDivElement;
 		main.style.opacity = `${opacity}`;
-		if (force || !this.lyricPlayer.getEnableSpring()) {
+		if (force || !enableSpring) {
 			this.blur = Math.min(32, blur);
 			if (force)
 				this.element.classList.add(
@@ -551,8 +553,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.lineTransforms.posX.setPosition(left);
 			this.lineTransforms.posY.setPosition(top);
 			this.lineTransforms.scale.setPosition(scale);
-			if (!this.lyricPlayer.getEnableSpring()) this.show();
-			else this.rebuildStyle();
+			if (!enableSpring) {
+				const afterInSight = this.isInSight;
+				if (beforeInSight || afterInSight) {
+					this.show();
+				} else {
+					this.hide();
+				}
+			} else this.rebuildStyle();
 			if (force)
 				requestAnimationFrame(() => {
 					this.element.classList.remove(

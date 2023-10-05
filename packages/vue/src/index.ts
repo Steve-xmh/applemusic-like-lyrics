@@ -48,6 +48,14 @@ export interface LyricPlayerProps {
 	 */
 	enableBlur?: boolean;
 	/**
+	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
+	 *
+	 * 如果启用，则会通过弹簧算法实时处理歌词位置，但是需要性能足够强劲的电脑方可流畅运行
+	 *
+	 * 如果不启用，则会回退到基于 `transition` 的过渡效果，对低性能的机器比较友好，但是效果会比较单一
+	 */
+	enableScale?: boolean;
+	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
 	 */
 	lyricLines?: LyricLine[];

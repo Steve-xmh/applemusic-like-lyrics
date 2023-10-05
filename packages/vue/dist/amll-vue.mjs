@@ -1,4 +1,4 @@
-import { defineComponent as P, ref as u, onMounted as S, onUnmounted as y, watchEffect as r, openBlock as d, createElementBlock as L, Fragment as b, createElementVNode as B, mergeProps as E, createBlock as k, Teleport as w, createCommentVNode as h } from "vue";
+import { defineComponent as P, ref as u, onMounted as S, onUnmounted as y, watchEffect as r, openBlock as d, createElementBlock as b, Fragment as L, createElementVNode as B, mergeProps as E, createBlock as k, Teleport as w, createCommentVNode as h } from "vue";
 import { LyricPlayer as _, BackgroundRender as R } from "@applemusic-like-lyrics/core";
 const C = /* @__PURE__ */ P({
   inheritAttrs: !1,
@@ -9,6 +9,7 @@ const C = /* @__PURE__ */ P({
     alignPosition: {},
     enableSpring: { type: Boolean },
     enableBlur: { type: Boolean },
+    enableScale: { type: Boolean },
     lyricLines: {},
     currentTime: {},
     linePosXSpringParams: {},
@@ -66,7 +67,7 @@ const C = /* @__PURE__ */ P({
       wrapperEl: a
     }), (n, m) => {
       var t, s;
-      return d(), L(b, null, [
+      return d(), b(L, null, [
         B("div", E({
           ref_key: "wrapperRef",
           ref: a
@@ -115,7 +116,7 @@ const C = /* @__PURE__ */ P({
     }), p({
       bgRender: a,
       wrapperEl: l
-    }), (e, o) => (d(), L("div", {
+    }), (e, o) => (d(), b("div", {
       ref_key: "wrapperRef",
       ref: l
     }, null, 512));

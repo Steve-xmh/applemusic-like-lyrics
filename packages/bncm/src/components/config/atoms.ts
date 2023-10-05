@@ -129,6 +129,7 @@ export const neverGonnaGiveYouUpAtom = atomWithConfig({
 	key: "never-gonna-give-you-up",
 	default: false,
 	desc: "不再显示开发警告",
+	loadable: true,
 });
 
 export const showTutoialAtom = atomWithConfig({

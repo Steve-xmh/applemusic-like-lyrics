@@ -3,7 +3,7 @@ import { Application as z } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
 import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
 import { Texture as D } from "@pixi/core";
-import { Sprite as S } from "@pixi/sprite";
+import { Sprite as w } from "@pixi/sprite";
 import { BulgePinchFilter as v } from "@pixi/filter-bulge-pinch";
 import { create as A } from "jss";
 import I from "jss-preset-default";
@@ -252,7 +252,7 @@ class N {
       }
     if (!i)
       return;
-    const a = new O(), s = new S(i), r = new S(i), l = new S(i), o = new S(i);
+    const a = new O(), s = new w(i), r = new w(i), l = new w(i), o = new w(i);
     s.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), s.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, a.addChild(s, r, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = a, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
@@ -273,7 +273,7 @@ class re extends N {
   }
 }
 const $ = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
-class w {
+class S {
   currentPosition = 0;
   targetPosition = 0;
   currentTime = 0;
@@ -357,8 +357,8 @@ class _ {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new w(0),
-    posY: new w(0)
+    posX: new S(0),
+    posY: new S(0)
   };
   measureSize() {
     return [
@@ -525,9 +525,9 @@ class H extends EventTarget {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new w(0),
-    posY: new w(0),
-    scale: new w(1)
+    posX: new S(0),
+    posY: new S(0),
+    scale: new S(1)
   };
   listenersMap = /* @__PURE__ */ new Map();
   onMouseEvent = (e) => {
@@ -754,15 +754,25 @@ class H extends EventTarget {
     return this.element;
   }
   setTransform(e = this.left, t = this.top, n = this.scale, i = 1, a = 0, s = !1, r = 0) {
+    const l = this.isInSight, o = this.lyricPlayer.getEnableSpring();
     this.left = e, this.top = t, this.scale = n, this.delay = r * 1e3 | 0;
-    const l = this.element.children[0];
-    l.style.opacity = `${i}`, s || !this.lyricPlayer.getEnableSpring() ? (this.blur = Math.min(32, a), s && this.element.classList.add(
-      this.lyricPlayer.style.classes.tmpDisableTransition
-    ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(n), this.lyricPlayer.getEnableSpring() ? this.rebuildStyle() : this.show(), s && requestAnimationFrame(() => {
-      this.element.classList.remove(
+    const c = this.element.children[0];
+    if (c.style.opacity = `${i}`, s || !o) {
+      if (this.blur = Math.min(32, a), s && this.element.classList.add(
         this.lyricPlayer.style.classes.tmpDisableTransition
-      );
-    })) : (this.lineTransforms.posX.setTargetPosition(e, r), this.lineTransforms.posY.setTargetPosition(t, r), this.lineTransforms.scale.setTargetPosition(n), this.blur !== Math.min(32, a) && (this.blur = Math.min(32, a), this.element.style.filter = `blur(${Math.min(32, a)}px)`));
+      ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(n), o)
+        this.rebuildStyle();
+      else {
+        const d = this.isInSight;
+        l || d ? this.show() : this.hide();
+      }
+      s && requestAnimationFrame(() => {
+        this.element.classList.remove(
+          this.lyricPlayer.style.classes.tmpDisableTransition
+        );
+      });
+    } else
+      this.lineTransforms.posX.setTargetPosition(e, r), this.lineTransforms.posY.setTargetPosition(t, r), this.lineTransforms.scale.setTargetPosition(n), this.blur !== Math.min(32, a) && (this.blur = Math.min(32, a), this.element.style.filter = `blur(${Math.min(32, a)}px)`);
   }
   update(e = 0) {
     this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.lineTransforms.scale.update(e), this.isInSight ? this.show() : this.hide());
@@ -819,6 +829,7 @@ class ae extends EventTarget {
     stiffness: 100
   };
   enableBlur = !0;
+  enableScale = !0;
   interludeDots;
   interludeDotsSize = [0, 0];
   bottomLine;
@@ -858,6 +869,24 @@ class ae extends EventTarget {
    */
   getEnableSpring() {
     return !this.disableSpring;
+  }
+  /**
+   * 是否启用歌词行缩放效果，默认启用
+   *
+   * 如果启用，非选中的歌词行会轻微缩小以凸显当前播放歌词行效果
+   *
+   * 此效果对性能影响微乎其微，推荐启用
+   * @param enable 是否启用歌词行缩放效果
+   */
+  setEnableScale(e = !0) {
+    this.enableScale = e, this.calcLayout();
+  }
+  /**
+   * 获取当前是否启用了歌词行缩放效果
+   * @returns 是否启用歌词行缩放效果
+   */
+  getEnableScale() {
+    return this.enableScale;
   }
   style = V.createStyleSheet({
     lyricPlayer: {
@@ -945,7 +974,7 @@ class ae extends EventTarget {
     },
     disableSpring: {
       "& > *": {
-        transition: "filter 0.25s, transform 0.5s"
+        transition: "filter 0.25s, transform 0.5s, background-color 0.25s, box-shadow 0.25s"
       }
     },
     interludeDots: {
@@ -1128,7 +1157,7 @@ class ae extends EventTarget {
     const n = this.getCurrentInterlude();
     let i = -this.scrollOffset, a = this.scrollToIndex, s = 0;
     n ? (s = n[1] - n[0], s >= 5e3 && this.lyricLinesEl[n[2] + 1] && (a = n[2] + 1)) : this.interludeDots.setInterlude(void 0);
-    const r = 0.95, l = this.lyricLinesEl.slice(0, a).reduce(
+    const r = this.enableScale ? 0.95 : 1, l = this.lyricLinesEl.slice(0, a).reduce(
       (m, p) => m + (p.getLine().isBG ? 0 : this.lyricLinesSize.get(p)?.[1] ?? 0),
       0
     );

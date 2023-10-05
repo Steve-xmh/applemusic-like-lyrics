@@ -7,12 +7,9 @@ import {
 } from "../../components/config/atoms";
 import "./guide.sass";
 import { closeLyricPage, openLyricPage } from "../../injector";
-import { loadable } from "jotai/utils";
-
-const neverGonnaGiveYouUpLoadableAtom = loadable(neverGonnaGiveYouUpAtom);
 
 export const AMLLGuide: FC = () => {
-	const neverGonnaGiveYouUp = useAtomValue(neverGonnaGiveYouUpLoadableAtom);
+	const neverGonnaGiveYouUp = useAtomValue(neverGonnaGiveYouUpAtom);
 	const [showTutoial, setShowTutoial] = useAtom(showTutoialAtom);
 	const displayed = useRef(false);
 

@@ -1,7 +1,7 @@
 import { loadable, selectAtom } from "jotai/utils";
 import { normalizePath } from "../../utils/path";
 import { debounce } from "../../utils/debounce";
-import { warn } from "../../utils/logger";
+import { log, warn } from "../../utils/logger";
 import { type WritableAtom, atom } from "jotai";
 import { Loadable } from "jotai/vanilla/utils/loadable";
 
@@ -31,30 +31,36 @@ async function loadConfig(): Promise<Map<string, any>> {
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
 const saveConfig = debounce(async (config: Map<string, any>) => {
-	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-	const storeValue: any = {};
-	config.forEach((v, k) => {
-		storeValue[k] = v;
-	});
-	if ("betterncm" in window) {
-		const configPath = normalizePath(
-			`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
-		);
-		await betterncm.fs.writeFile(
-			configPath,
-			JSON.stringify(storeValue, null, 4),
-		);
-	} else {
-		localStorage.setItem("amll-config", JSON.stringify(storeValue));
+	try {
+		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const storeValue: any = {};
+		config.forEach((v, k) => {
+			storeValue[k] = v;
+		});
+		if ("betterncm" in window) {
+			const configPath = normalizePath(
+				`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
+			);
+			await betterncm.fs.writeFile(
+				configPath,
+				JSON.stringify(storeValue, null, 4),
+			);
+		} else {
+			localStorage.setItem("amll-config", JSON.stringify(storeValue));
+		}
+		log("配置文件保存成功");
+	} catch (err) {
+		warn("配置文件保存失败", err);
 	}
 }, 1000);
 
-const amllStorageLoadedAtom = atom(false);
+export const amllStorageLoadedAtom = atom(false);
 const rawAMLLStorageAtom = atom<AMLLStorage>(new Map());
-const amllStorageAtom = atom<Promise<AMLLStorage>, [AMLLStorage], void>(
-	async (get, opt) => {
+const amllStorageAtom = atom<AMLLStorage, [AMLLStorage], void>(
+	(get, opt) => {
 		if (!get(amllStorageLoadedAtom)) {
-			opt.setSelf(await loadConfig());
+			loadConfig().then((v) => opt.setSelf(v));
+			// opt.setSelf(await loadConfig());
 		}
 		return get(rawAMLLStorageAtom);
 	},
@@ -91,20 +97,39 @@ function atomWithConfigInner<Value>(
 	const select = selectAtom(
 		amllStorageAtom,
 		(v): Value => v.get(info.key) ?? info.default,
-		(a, b) => (a !== b && log("compare", info.key, a, b), a === b),
+		(a, b) => (void (a !== b && log("compare", info.key, a, b)), a === b),
 	);
-	const orig = atom<Promise<Value>, [Value], void>(
-		(get) => get(select),
-		(get, set, update) => {
-			get(amllStorageAtom).then((map) => {
-				map.set(info.key, update);
-				set(amllStorageAtom, map);
-			});
+	const orig = atom(
+		(get) => get(select) as Value,
+		(get, set, update: Value) => {
+			const map = get(amllStorageAtom);
+			map.set(info.key, update);
+			log("已设置", info.key, update);
+			set(amllStorageAtom, map);
 		},
 	);
-	const load = loadable(orig);
+	const load = atom((get) => {
+		const initLoaded = get(amllStorageLoadedAtom);
+		const data = get(orig);
+		if (initLoaded) {
+			return {
+				state: "hasData",
+				data: data,
+			} as Loadable<Value>;
+		} else {
+			return {
+				state: "loading",
+			} as Loadable<Value>;
+		}
+	});
 	if ("loadable" in info && info.loadable) {
-		return load;
+		const derived = atom(
+			(get) => get(load),
+			(_get, set, update: Value) => {
+				set(orig, update);
+			},
+		);
+		return derived;
 	} else {
 		const derived = atom(
 			(get) => {

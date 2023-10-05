@@ -60,47 +60,58 @@ watchEffect((onCleanup) => {
 });
 
 watchEffect(() => {
-    if (props.alignAnchor)
+    if (props.alignAnchor !== undefined)
         playerRef.value?.setAlignAnchor(props.alignAnchor);
 });
 
 watchEffect(() => {
-    if (props.alignPosition)
+    if (props.alignPosition !== undefined)
         playerRef.value?.setAlignPosition(props.alignPosition);
 });
 
 watchEffect(() => {
-    if (props.enableSpring)
+    if (props.enableSpring !== undefined)
         playerRef.value?.setEnableSpring(props.enableSpring);
+    else
+        playerRef.value?.setEnableSpring(true);
 });
 
 watchEffect(() => {
-    if (props.enableBlur)
+    if (props.enableBlur !== undefined)
         playerRef.value?.setEnableBlur(props.enableBlur);
+    else
+        playerRef.value?.setEnableBlur(true);
 });
 
 watchEffect(() => {
-    if (props.lyricLines)
+    if (props.enableScale !== undefined)
+        playerRef.value?.setEnableScale(props.enableScale);
+    else
+        playerRef.value?.setEnableScale(true);
+});
+
+watchEffect(() => {
+    if (props.lyricLines !== undefined)
         playerRef.value?.setLyricLines(props.lyricLines);
 });
 
 watchEffect(() => {
-    if (props.currentTime)
+    if (props.currentTime !== undefined)
         playerRef.value?.setCurrentTime(props.currentTime);
 });
 
 watchEffect(() => {
-    if (props.linePosXSpringParams)
+    if (props.linePosXSpringParams !== undefined)
         playerRef.value?.setLinePosXSpringParams(props.linePosXSpringParams);
 });
 
 watchEffect(() => {
-    if (props.linePosYSpringParams)
+    if (props.linePosYSpringParams !== undefined)
         playerRef.value?.setLinePosYSpringParams(props.linePosYSpringParams);
 });
 
 watchEffect(() => {
-    if (props.lineScaleSpringParams)
+    if (props.lineScaleSpringParams !== undefined)
         playerRef.value?.setLineScaleSpringParams(props.lineScaleSpringParams);
 });
 
