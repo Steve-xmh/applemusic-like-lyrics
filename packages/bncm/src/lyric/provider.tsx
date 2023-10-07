@@ -24,6 +24,7 @@ import { LyricFormat, LyricSource, SourceStringError } from "./source";
 import { processLyric } from "./processor";
 import { Loadable } from "jotai/vanilla/utils/loadable";
 import { raceLoad } from "../utils/race-load";
+import { globalStore } from "../injector";
 
 interface EAPILyric {
 	version: number;
@@ -44,7 +45,7 @@ interface EAPILyricResponse extends EAPIResponse {
  * @param songId 歌曲ID
  * @returns 歌词数据信息
  */
-async function getLyric(
+export async function getLyric(
 	songId: string,
 	signal?: AbortSignal,
 ): Promise<EAPILyricResponse> {

@@ -13,6 +13,7 @@ import { MusicContextV3 } from "./v3";
 import { normalizePath } from "../utils/path";
 import { warn } from "../utils/logger";
 import { loadable } from "jotai/utils";
+import { LyricLine } from "@applemusic-like-lyrics/core";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -119,6 +120,8 @@ export interface MusicOverrideData {
 	musicArtists: string;
 	musicCoverUrl: string;
 	musicCoverIsVideo: boolean;
+	lyricOffset: number;
+	overrideLyric: LyricLine[];
 }
 
 const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));
