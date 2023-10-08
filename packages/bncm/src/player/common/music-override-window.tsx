@@ -4,6 +4,7 @@ import { TextField } from "../../components/appkit/text-field";
 import { AppKitWindow, SidebarItem } from "../../components/appkit/window";
 import "./music-override-window.sass";
 import {
+	LyricOverrideType,
 	MusicOverrideData,
 	loadableMusicOverrideDataAtom,
 	musicArtistsAtom,
@@ -16,6 +17,7 @@ import { Switch } from "../../components/appkit/switch/switch";
 import { loadable, useAtomCallback } from "jotai/utils";
 import { getLyric } from "../../lyric/provider";
 import "./music-override-window.sass";
+import { Select } from "../../components/appkit/select";
 
 type Page = "music-info" | "lyric-info" | "override-lyric";
 
@@ -32,6 +34,7 @@ const overrideMusicArtistsAtom = atom("");
 const overrideMusicCoverUrlAtom = atom("");
 const overrideCoverIsVideoAtom = atom(false);
 const overrideLyricOffsetAtom = atom(0);
+const overrideLyricOverrideTypeAtom = atom(LyricOverrideType.None);
 
 const rawMusicInfoAtom = loadable(
 	atom((get) => {
@@ -41,8 +44,6 @@ const rawMusicInfoAtom = loadable(
 );
 
 const MusicInfoPage: FC = () => {
-	const musicOverrideWindowOpened = useAtomValue(musicOverrideWindowOpenedAtom);
-	const musicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const [overrideMusicName, setOverrideMusicName] = useAtom(
 		overrideMusicNameAtom,
 	);
@@ -55,23 +56,7 @@ const MusicInfoPage: FC = () => {
 	const [overrideCoverIsVideo, setOverrideCoverIsVideo] = useAtom(
 		overrideCoverIsVideoAtom,
 	);
-	const saving = useAtomValue(musicOverrideSavingAtom);
-	useLayoutEffect(() => {
-		if (musicOverrideWindowOpened && musicOverrideData.state === "hasData") {
-			setOverrideMusicName(musicOverrideData.data.musicName || "");
-			setOverrideMusicArtists(musicOverrideData.data.musicArtists || "");
-			setOverrideMusicCoverUrl(musicOverrideData.data.musicCoverUrl || "");
-			setOverrideCoverIsVideo(
-				musicOverrideData.data.musicCoverIsVideo || false,
-			);
-		} else {
-			setOverrideMusicName("");
-			setOverrideMusicArtists("");
-			setOverrideMusicCoverUrl("");
-			setOverrideCoverIsVideo(false);
-		}
-	}, [musicOverrideWindowOpened, musicOverrideData.state]);
-	const shouldDisable = saving || musicOverrideData.state === "loading";
+	const shouldDisable = useAtomValue(shouldDisableAtom);
 
 	return (
 		<div
@@ -267,6 +252,12 @@ const RawLyricInfoPage: FC = () => {
 };
 
 const LyricAdjectPage: FC = () => {
+	const [overrideLyricOffset, setOverrideLyricOffset] = useAtom(
+		overrideLyricOffsetAtom,
+	);
+	const [overrideLyricOverrideType, setOverrideLyricOverrideType] = useAtom(
+		overrideLyricOverrideTypeAtom,
+	);
 	return (
 		<div
 			style={{
@@ -276,9 +267,137 @@ const LyricAdjectPage: FC = () => {
 				paddingRight: "1em",
 			}}
 		>
-			施工中
+			<div
+				style={{
+					marginBlock: "1em",
+					display: "flex",
+					gap: "1em",
+					alignItems: "center",
+				}}
+			>
+				<div
+					style={{
+						flex: "1",
+					}}
+				>
+					<div
+						style={{
+							fontSize: "13px",
+						}}
+					>
+						歌词时间位移
+					</div>
+					<div
+						style={{
+							opacity: "0.5",
+						}}
+					>
+						单位毫秒，正值为提前，负值为推迟，留空为 0
+					</div>
+				</div>
+				<TextField
+					style={{
+						width: "8em",
+					}}
+					value={overrideLyricOffset}
+					onChange={(e) =>
+						setOverrideLyricOffset(Number(e.currentTarget.value))
+					}
+					type="number"
+				/>
+			</div>
+			<div
+				style={{
+					marginBlock: "1em",
+					display: "flex",
+					gap: "1em",
+					alignItems: "center",
+				}}
+			>
+				<div
+					style={{
+						flex: "1",
+					}}
+				>
+					<div
+						style={{
+							fontSize: "13px",
+						}}
+					>
+						歌词覆盖方式
+					</div>
+				</div>
+				<Select
+					data={[
+						{
+							value: LyricOverrideType.None,
+							label: "不替换",
+						},
+						{
+							value: LyricOverrideType.MusicId,
+							label: "使用其他歌曲 ID 的歌词",
+						},
+						{
+							value: LyricOverrideType.LocalLRC,
+							label: "使用本地 LRC 歌词",
+						},
+						{
+							value: LyricOverrideType.LocalYRC,
+							label: "使用本地 YRC 歌词",
+						},
+						{
+							value: LyricOverrideType.LocalQRC,
+							label: "使用本地 QRC 歌词",
+						},
+						{
+							value: LyricOverrideType.LocalTTML,
+							label: "使用本地 TTML 歌词",
+						},
+					]}
+					value={overrideLyricOverrideType}
+					onChange={(v) => setOverrideLyricOverrideType(v)}
+				/>
+			</div>
 		</div>
 	);
+};
+
+const MusicInit: FC = () => {
+	const musicOverrideWindowOpened = useAtomValue(musicOverrideWindowOpenedAtom);
+	const musicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
+
+	const initOverrideMusicData = useAtomCallback((get, set) => {
+		const musicOverrideData = get(loadableMusicOverrideDataAtom);
+		if (musicOverrideWindowOpened && musicOverrideData.state === "hasData") {
+			set(overrideMusicNameAtom, musicOverrideData.data.musicName || "");
+			set(overrideMusicArtistsAtom, musicOverrideData.data.musicArtists || "");
+			set(
+				overrideMusicCoverUrlAtom,
+				musicOverrideData.data.musicCoverUrl || "",
+			);
+			set(
+				overrideCoverIsVideoAtom,
+				musicOverrideData.data.musicCoverIsVideo || false,
+			);
+			set(overrideLyricOffsetAtom, musicOverrideData.data.lyricOffset || 0);
+			set(
+				overrideLyricOverrideTypeAtom,
+				musicOverrideData.data.lyricOverrideType || LyricOverrideType.None,
+			);
+		} else {
+			set(overrideMusicNameAtom, "");
+			set(overrideMusicArtistsAtom, "");
+			set(overrideMusicCoverUrlAtom, "");
+			set(overrideCoverIsVideoAtom, false);
+			set(overrideLyricOffsetAtom, 0);
+			set(overrideLyricOverrideTypeAtom, LyricOverrideType.None);
+		}
+	});
+	useLayoutEffect(initOverrideMusicData, [
+		musicOverrideWindowOpened,
+		musicOverrideData.state,
+	]);
+	return null;
 };
 
 export const MusicOverrideWindow: FC = () => {
@@ -312,73 +431,76 @@ export const MusicOverrideWindow: FC = () => {
 	});
 
 	return (
-		<AppKitWindow
-			width={600}
-			height={400}
-			open={musicOverrideWindowOpened}
-			sidebarItems={
-				<>
-					<SidebarItem
-						onClick={() => setMusicOverrideWindowPage("music-info")}
-						selected={musicOverrideWindowPage === "music-info"}
-					>
-						音乐基本信息
-					</SidebarItem>
-					<SidebarItem
-						onClick={() => setMusicOverrideWindowPage("lyric-info")}
-						selected={musicOverrideWindowPage === "lyric-info"}
-					>
-						原始歌词信息
-					</SidebarItem>
-					<SidebarItem
-						onClick={() => setMusicOverrideWindowPage("override-lyric")}
-						selected={musicOverrideWindowPage === "override-lyric"}
-					>
-						歌词替换或微调
-					</SidebarItem>
-				</>
-			}
-			sidebarBottomItems={
-				<>
-					<SidebarItem>
-						<Button
-							style={{
-								width: "100%",
-								boxSizing: "border-box",
-							}}
-							disabled={shouldDisable}
-							onClick={async () => {
-								setSaving(true);
-								setMusicOverrideData({});
-								setSaving(false);
-							}}
+		<>
+			<MusicInit />
+			<AppKitWindow
+				width={600}
+				height={400}
+				open={musicOverrideWindowOpened}
+				sidebarItems={
+					<>
+						<SidebarItem
+							onClick={() => setMusicOverrideWindowPage("music-info")}
+							selected={musicOverrideWindowPage === "music-info"}
 						>
-							全部还原默认
-						</Button>
-					</SidebarItem>
-					<SidebarItem>
-						<Button
-							accent
-							style={{
-								width: "100%",
-								boxSizing: "border-box",
-							}}
-							disabled={shouldDisable}
-							onClick={saveOverrideData}
+							音乐基本信息
+						</SidebarItem>
+						<SidebarItem
+							onClick={() => setMusicOverrideWindowPage("lyric-info")}
+							selected={musicOverrideWindowPage === "lyric-info"}
 						>
-							保存并更新
-						</Button>
-					</SidebarItem>
-				</>
-			}
-			onClose={() => setMusicOverrideWindowOpened(false)}
-			title={`编辑音乐数据：${musicArtists
-				.map((v) => v.name)
-				.join(", ")} - ${musicName}`}
-		>
-			{musicOverrideWindowPage === "music-info" && <MusicInfoPage />}
-			{musicOverrideWindowPage === "lyric-info" && <RawLyricInfoPage />}
-			{musicOverrideWindowPage === "override-lyric" && <LyricAdjectPage />}
-		</AppKitWindow>
+							原始歌词信息
+						</SidebarItem>
+						<SidebarItem
+							onClick={() => setMusicOverrideWindowPage("override-lyric")}
+							selected={musicOverrideWindowPage === "override-lyric"}
+						>
+							歌词替换或微调
+						</SidebarItem>
+					</>
+				}
+				sidebarBottomItems={
+					<>
+						<SidebarItem>
+							<Button
+								style={{
+									width: "100%",
+									boxSizing: "border-box",
+								}}
+								disabled={shouldDisable}
+								onClick={async () => {
+									setSaving(true);
+									setMusicOverrideData({});
+									setSaving(false);
+								}}
+							>
+								全部还原默认
+							</Button>
+						</SidebarItem>
+						<SidebarItem>
+							<Button
+								accent
+								style={{
+									width: "100%",
+									boxSizing: "border-box",
+								}}
+								disabled={shouldDisable}
+								onClick={saveOverrideData}
+							>
+								保存并更新
+							</Button>
+						</SidebarItem>
+					</>
+				}
+				onClose={() => setMusicOverrideWindowOpened(false)}
+				title={`编辑音乐数据：${musicArtists
+					.map((v) => v.name)
+					.join(", ")} - ${musicName}`}
+			>
+				{musicOverrideWindowPage === "music-info" && <MusicInfoPage />}
+				{musicOverrideWindowPage === "lyric-info" && <RawLyricInfoPage />}
+				{musicOverrideWindowPage === "override-lyric" && <LyricAdjectPage />}
+			</AppKitWindow>
+		</>
 	);
 };

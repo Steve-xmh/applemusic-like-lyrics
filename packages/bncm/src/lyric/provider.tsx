@@ -24,7 +24,6 @@ import { LyricFormat, LyricSource, SourceStringError } from "./source";
 import { processLyric } from "./processor";
 import { Loadable } from "jotai/vanilla/utils/loadable";
 import { raceLoad } from "../utils/race-load";
-import { globalStore } from "../injector";
 
 interface EAPILyric {
 	version: number;
@@ -383,7 +382,7 @@ export const LyricProvider: FC = () => {
 					}
 				}
 			},
-			(source, _index, result) => {
+			(_source, _index, result) => {
 				// log("已设置歌词为来自歌词源", source, "的", result);
 				setLyricLines(result);
 			},

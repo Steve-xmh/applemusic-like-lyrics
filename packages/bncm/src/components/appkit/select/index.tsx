@@ -38,6 +38,10 @@ export function Select<T extends Key>(
 					xmlns="http://www.w3.org/2000/svg"
 					width="8"
 					height="10"
+					style={{
+						width: "8px",
+						height: "10px",
+					}}
 					viewBox="0 0 8 10"
 					fill="none"
 				>

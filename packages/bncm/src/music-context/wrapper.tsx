@@ -13,7 +13,6 @@ import { MusicContextV3 } from "./v3";
 import { normalizePath } from "../utils/path";
 import { warn } from "../utils/logger";
 import { loadable } from "jotai/utils";
-import { LyricLine } from "@applemusic-like-lyrics/core";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -115,13 +114,26 @@ export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
 	await musicCtx?.setClipboard(data);
 });
 
+export enum LyricOverrideType {
+	None = "none",
+	MusicId = "id",
+	LocalLRC = "local-lrc",
+	LocalYRC = "local-yrc",
+	LocalQRC = "local-qrc",
+	LocalTTML = "local-ttml",
+}
+
 export interface MusicOverrideData {
 	musicName: string;
 	musicArtists: string;
 	musicCoverUrl: string;
 	musicCoverIsVideo: boolean;
 	lyricOffset: number;
-	overrideLyric: LyricLine[];
+	lyricOverrideType: LyricOverrideType;
+	lyricOverrideMusicId: string;
+	lyricOverrideOriginalLyricData: string;
+	lyricOverrideTranslatedLyricData: string;
+	lyricOverrideRomanLyricData: string;
 }
 
 const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));
