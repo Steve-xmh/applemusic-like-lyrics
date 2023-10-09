@@ -137,6 +137,18 @@ export interface MusicOverrideData {
 }
 
 const musicOverrideDataUpdateAtom = atom(Symbol("music-override-data-update"));
+export const newOverrideData = (): MusicOverrideData => ({
+	musicName: "",
+	musicArtists: "",
+	musicCoverUrl: "",
+	musicCoverIsVideo: false,
+	lyricOffset: 0,
+	lyricOverrideType: LyricOverrideType.None,
+	lyricOverrideMusicId: "",
+	lyricOverrideOriginalLyricData: "",
+	lyricOverrideTranslatedLyricData: "",
+	lyricOverrideRomanLyricData: "",
+});
 
 export const musicOverrideDataAtom = atom(
 	async (get) => {

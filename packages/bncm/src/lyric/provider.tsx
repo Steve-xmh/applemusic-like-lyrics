@@ -71,8 +71,8 @@ export const lyricProviderLogsAtom = atom(
 
 const transformDynamicLyricLine = (
 	line: LyricLine,
-	i: number,
-	lines: LyricLine[],
+	_i: number,
+	_lines: LyricLine[],
 ): CoreLyricLine => ({
 	words: line.words,
 	startTime: line.words[0]?.startTime ?? 0,

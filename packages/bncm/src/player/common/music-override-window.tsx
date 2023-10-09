@@ -11,6 +11,7 @@ import {
 	musicIdAtom,
 	musicNameAtom,
 	musicOverrideDataAtom,
+	newOverrideData,
 } from "../../music-context/wrapper";
 import { type FC, useLayoutEffect } from "react";
 import { Switch } from "../../components/appkit/switch/switch";
@@ -18,6 +19,7 @@ import { loadable, useAtomCallback } from "jotai/utils";
 import { getLyric } from "../../lyric/provider";
 import "./music-override-window.sass";
 import { Select } from "../../components/appkit/select";
+import { focusAtom } from "../../utils/atom-focus";
 
 type Page = "music-info" | "lyric-info" | "override-lyric";
 
@@ -29,12 +31,47 @@ const shouldDisableAtom = atom(
 		get(loadableMusicOverrideDataAtom).state === "loading" ||
 		get(musicOverrideSavingAtom),
 );
-const overrideMusicNameAtom = atom("");
-const overrideMusicArtistsAtom = atom("");
-const overrideMusicCoverUrlAtom = atom("");
-const overrideCoverIsVideoAtom = atom(false);
-const overrideLyricOffsetAtom = atom(0);
-const overrideLyricOverrideTypeAtom = atom(LyricOverrideType.None);
+const editingMusicOverrideDataAtom = atom(newOverrideData());
+const overrideMusicNameAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"musicName",
+);
+const overrideMusicArtistsAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"musicArtists",
+);
+const overrideMusicCoverUrlAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"musicCoverUrl",
+);
+const overrideCoverIsVideoAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"musicCoverIsVideo",
+);
+const overrideLyricOffsetAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOffset",
+);
+const overrideLyricOverrideTypeAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOverrideType",
+);
+const overrideLyricOverrideMusicIdAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOverrideMusicId",
+);
+const overrideLyricOverrideOriginalLyricDataAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOverrideOriginalLyricData",
+);
+const overrideLyricOverrideTranslatedLyricDataAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOverrideTranslatedLyricData",
+);
+const overrideLyricOverrideRomanLyricDataAtom = focusAtom(
+	editingMusicOverrideDataAtom,
+	"lyricOverrideRomanLyricData",
+);
 
 const rawMusicInfoAtom = loadable(
 	atom((get) => {
@@ -258,6 +295,20 @@ const LyricAdjectPage: FC = () => {
 	const [overrideLyricOverrideType, setOverrideLyricOverrideType] = useAtom(
 		overrideLyricOverrideTypeAtom,
 	);
+	const [overrideLyricOverrideMusicId, setOverrideLyricOverrideMusicId] =
+		useAtom(overrideLyricOverrideMusicIdAtom);
+	const [
+		overrideLyricOverrideOriginalLyricData,
+		setOverrideLyricOverrideOriginalLyricData,
+	] = useAtom(overrideLyricOverrideOriginalLyricDataAtom);
+	const [
+		overrideLyricOverrideTranslatedLyricData,
+		setOverrideLyricOverrideTranslatedLyricData,
+	] = useAtom(overrideLyricOverrideTranslatedLyricDataAtom);
+	const [
+		overrideLyricOverrideRomanLyricData,
+		setOverrideLyricOverrideRomanLyricData,
+	] = useAtom(overrideLyricOverrideRomanLyricDataAtom);
 	return (
 		<div
 			style={{
@@ -269,7 +320,7 @@ const LyricAdjectPage: FC = () => {
 		>
 			<div
 				style={{
-					marginBlock: "1em",
+					marginTop: "1em",
 					display: "flex",
 					gap: "1em",
 					alignItems: "center",
@@ -308,7 +359,6 @@ const LyricAdjectPage: FC = () => {
 			</div>
 			<div
 				style={{
-					marginBlock: "1em",
 					display: "flex",
 					gap: "1em",
 					alignItems: "center",
@@ -358,6 +408,83 @@ const LyricAdjectPage: FC = () => {
 					onChange={(v) => setOverrideLyricOverrideType(v)}
 				/>
 			</div>
+			{overrideLyricOverrideType === LyricOverrideType.MusicId && (
+				<div
+					style={{
+						display: "flex",
+						gap: "1em",
+						alignItems: "center",
+					}}
+				>
+					<div
+						style={{
+							flex: "1",
+						}}
+					>
+						<div
+							style={{
+								fontSize: "13px",
+							}}
+						>
+							歌曲ID
+						</div>
+					</div>
+					<TextField
+						style={{
+							width: "8em",
+						}}
+						value={overrideLyricOverrideMusicId}
+						onChange={(e) =>
+							setOverrideLyricOverrideMusicId(e.currentTarget.value)
+						}
+						type="text"
+					/>
+				</div>
+			)}
+			{[
+				LyricOverrideType.LocalLRC,
+				LyricOverrideType.LocalQRC,
+				LyricOverrideType.LocalYRC,
+			].includes(overrideLyricOverrideType) && (
+				<>
+					<div>原文歌词内容</div>
+					<textarea
+						className="raw-lyric-info-textarea"
+						value={overrideLyricOverrideOriginalLyricData}
+						onChange={(e) =>
+							setOverrideLyricOverrideOriginalLyricData(e.currentTarget.value)
+						}
+					/>
+					<div>译文歌词内容（必须 LRC 格式）</div>
+					<textarea
+						className="raw-lyric-info-textarea"
+						value={overrideLyricOverrideTranslatedLyricData}
+						onChange={(e) =>
+							setOverrideLyricOverrideTranslatedLyricData(e.currentTarget.value)
+						}
+					/>
+					<div>音译歌词内容（必须 LRC 格式）</div>
+					<textarea
+						className="raw-lyric-info-textarea"
+						value={overrideLyricOverrideRomanLyricData}
+						onChange={(e) =>
+							setOverrideLyricOverrideRomanLyricData(e.currentTarget.value)
+						}
+					/>
+				</>
+			)}
+			{overrideLyricOverrideType === LyricOverrideType.LocalTTML && (
+				<>
+					<div>TTML 歌词内容</div>
+					<textarea
+						className="raw-lyric-info-textarea"
+						value={overrideLyricOverrideOriginalLyricData}
+						onChange={(e) =>
+							setOverrideLyricOverrideOriginalLyricData(e.currentTarget.value)
+						}
+					/>
+				</>
+			)}
 		</div>
 	);
 };
@@ -369,28 +496,12 @@ const MusicInit: FC = () => {
 	const initOverrideMusicData = useAtomCallback((get, set) => {
 		const musicOverrideData = get(loadableMusicOverrideDataAtom);
 		if (musicOverrideWindowOpened && musicOverrideData.state === "hasData") {
-			set(overrideMusicNameAtom, musicOverrideData.data.musicName || "");
-			set(overrideMusicArtistsAtom, musicOverrideData.data.musicArtists || "");
 			set(
-				overrideMusicCoverUrlAtom,
-				musicOverrideData.data.musicCoverUrl || "",
-			);
-			set(
-				overrideCoverIsVideoAtom,
-				musicOverrideData.data.musicCoverIsVideo || false,
-			);
-			set(overrideLyricOffsetAtom, musicOverrideData.data.lyricOffset || 0);
-			set(
-				overrideLyricOverrideTypeAtom,
-				musicOverrideData.data.lyricOverrideType || LyricOverrideType.None,
+				editingMusicOverrideDataAtom,
+				Object.assign(newOverrideData(), musicOverrideData.data),
 			);
 		} else {
-			set(overrideMusicNameAtom, "");
-			set(overrideMusicArtistsAtom, "");
-			set(overrideMusicCoverUrlAtom, "");
-			set(overrideCoverIsVideoAtom, false);
-			set(overrideLyricOffsetAtom, 0);
-			set(overrideLyricOverrideTypeAtom, LyricOverrideType.None);
+			set(editingMusicOverrideDataAtom, newOverrideData());
 		}
 	});
 	useLayoutEffect(initOverrideMusicData, [
@@ -415,17 +526,9 @@ export const MusicOverrideWindow: FC = () => {
 
 	const saveOverrideData = useAtomCallback(async (get, set) => {
 		set(musicOverrideSavingAtom, true);
-		const overrideMusicName = get(overrideMusicNameAtom);
-		const overrideMusicArtists = get(overrideMusicArtistsAtom);
-		const overrideMusicCoverUrl = get(overrideMusicCoverUrlAtom);
-		const overrideCoverIsVideo = get(overrideCoverIsVideoAtom);
-
-		const data: Partial<MusicOverrideData> = {
-			musicName: overrideMusicName || undefined,
-			musicArtists: overrideMusicArtists || undefined,
-			musicCoverUrl: overrideMusicCoverUrl || undefined,
-			musicCoverIsVideo: overrideCoverIsVideo || undefined,
-		};
+		const data: Partial<MusicOverrideData> = Object.fromEntries(
+			Object.entries(get(editingMusicOverrideDataAtom)).filter((v) => v[1]),
+		);
 		await set(musicOverrideDataAtom, data);
 		set(musicOverrideSavingAtom, false);
 	});

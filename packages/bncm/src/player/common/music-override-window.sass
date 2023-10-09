@@ -14,3 +14,12 @@
     overflow: auto
     &::after
         content: " "
+    &:focus
+        box-shadow: 0 0 0 3.5px #3A6CD988
+        outline: none
+        animation: amll-raw-lyric-info-textarea-focus 0.3s ease-out 1 forwards
+        @keyframes amll-raw-lyric-info-textarea-focus
+            from
+                box-shadow: 0 0 0 16px #007AFF00
+            to
+                box-shadow: 0 0 0 3px #007AFF88
