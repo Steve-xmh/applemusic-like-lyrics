@@ -446,6 +446,10 @@ export class MusicContextV2 extends MusicContextBase {
 		await betterncm.fs.writeFileText(path, data);
 	}
 
+	override async deleteFile(path: string): Promise<void> {
+		await betterncm.fs.remove(path);
+	}
+
 	private switchPlayMode(playMode: PlayMode) {
 		const playModeBtn = document.querySelector<HTMLDivElement>(".type.f-cp");
 		let counter = 0;

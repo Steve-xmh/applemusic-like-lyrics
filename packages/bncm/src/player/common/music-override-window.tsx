@@ -309,6 +309,7 @@ const LyricAdjectPage: FC = () => {
 		overrideLyricOverrideRomanLyricData,
 		setOverrideLyricOverrideRomanLyricData,
 	] = useAtom(overrideLyricOverrideRomanLyricDataAtom);
+	const shouldDisable = useAtomValue(shouldDisableAtom);
 	return (
 		<div
 			style={{
@@ -404,6 +405,7 @@ const LyricAdjectPage: FC = () => {
 							label: "使用本地 TTML 歌词",
 						},
 					]}
+					disabled={shouldDisable}
 					value={overrideLyricOverrideType}
 					onChange={(v) => setOverrideLyricOverrideType(v)}
 				/>
@@ -433,6 +435,7 @@ const LyricAdjectPage: FC = () => {
 						style={{
 							width: "8em",
 						}}
+						disabled={shouldDisable}
 						value={overrideLyricOverrideMusicId}
 						onChange={(e) =>
 							setOverrideLyricOverrideMusicId(e.currentTarget.value)
@@ -451,6 +454,7 @@ const LyricAdjectPage: FC = () => {
 					<textarea
 						className="raw-lyric-info-textarea"
 						value={overrideLyricOverrideOriginalLyricData}
+						disabled={shouldDisable}
 						onChange={(e) =>
 							setOverrideLyricOverrideOriginalLyricData(e.currentTarget.value)
 						}
@@ -459,6 +463,7 @@ const LyricAdjectPage: FC = () => {
 					<textarea
 						className="raw-lyric-info-textarea"
 						value={overrideLyricOverrideTranslatedLyricData}
+						disabled={shouldDisable}
 						onChange={(e) =>
 							setOverrideLyricOverrideTranslatedLyricData(e.currentTarget.value)
 						}
@@ -467,6 +472,7 @@ const LyricAdjectPage: FC = () => {
 					<textarea
 						className="raw-lyric-info-textarea"
 						value={overrideLyricOverrideRomanLyricData}
+						disabled={shouldDisable}
 						onChange={(e) =>
 							setOverrideLyricOverrideRomanLyricData(e.currentTarget.value)
 						}
@@ -526,8 +532,11 @@ export const MusicOverrideWindow: FC = () => {
 
 	const saveOverrideData = useAtomCallback(async (get, set) => {
 		set(musicOverrideSavingAtom, true);
+		const newData = newOverrideData();
 		const data: Partial<MusicOverrideData> = Object.fromEntries(
-			Object.entries(get(editingMusicOverrideDataAtom)).filter((v) => v[1]),
+			Object.entries(get(editingMusicOverrideDataAtom)).filter(
+				(v) => v[1] && v[1] !== newData[v[0] as keyof MusicOverrideData],
+			),
 		);
 		await set(musicOverrideDataAtom, data);
 		set(musicOverrideSavingAtom, false);

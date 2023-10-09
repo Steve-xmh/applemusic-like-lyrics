@@ -438,6 +438,10 @@ export class MusicContextV3 extends MusicContextBase {
 		await betterncm.fs.writeFile(path, data);
 	}
 
+	override async deleteFile(path: string): Promise<void> {
+		await betterncm.fs.remove(path);
+	}
+
 	private switchPlayMode(playMode: PlayMode) {
 		// if (isNCMV3()) {
 		// 	if (playMode === PlayMode.AI) return; // 3.0.0 暂时没有心动模式 // TODO: 在隔壁增加 3.0 支持

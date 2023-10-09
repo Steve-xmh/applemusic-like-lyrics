@@ -187,11 +187,18 @@ export const musicOverrideDataAtom = atom(
 			if (!(await ctx.isFileExists(overrideDirPath))) {
 				await ctx.makeDirectory(overrideDirPath);
 			}
-			try {
-				await ctx.writeFileText(overrideJsonPath, JSON.stringify(data));
-				set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
-			} catch (err) {
-				warn("保存音乐覆盖信息出错", id, overrideJsonPath, err);
+			if (Object.keys(data).length === 0) {
+				await ctx.deleteFile(overrideJsonPath);
+			} else {
+				try {
+					await ctx.writeFileText(overrideJsonPath, JSON.stringify(data));
+					set(
+						musicOverrideDataUpdateAtom,
+						Symbol("music-override-data-update"),
+					);
+				} catch (err) {
+					warn("保存音乐覆盖信息出错", id, overrideJsonPath, err);
+				}
 			}
 		}
 	},
