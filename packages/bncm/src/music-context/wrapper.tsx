@@ -117,6 +117,7 @@ export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
 export enum LyricOverrideType {
 	None = "none",
 	MusicId = "id",
+	PureMusic = "pure-music",
 	LocalLRC = "local-lrc",
 	LocalYRC = "local-yrc",
 	LocalQRC = "local-qrc",
@@ -189,6 +190,7 @@ export const musicOverrideDataAtom = atom(
 			}
 			if (Object.keys(data).length === 0) {
 				await ctx.deleteFile(overrideJsonPath);
+				set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
 			} else {
 				try {
 					await ctx.writeFileText(overrideJsonPath, JSON.stringify(data));

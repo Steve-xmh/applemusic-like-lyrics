@@ -187,7 +187,11 @@ const CopyBetterNCMPlugin = ({
 };
 
 export default defineConfig(({ mode }) => {
-	const env = loadEnv(mode, process.cwd(), "AMLL");
+	const env = loadEnv(
+		process.env.AMLL_GITHUB_IS_ACTION ? "packdev" : mode,
+		process.cwd(),
+		"AMLL",
+	);
 	return {
 		mode: env.AMLL_DEV === "true" ? "development" : "production",
 		envPrefix: ["AMLL_"],

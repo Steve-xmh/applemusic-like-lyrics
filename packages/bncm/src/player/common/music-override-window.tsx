@@ -385,8 +385,8 @@ const LyricAdjectPage: FC = () => {
 							label: "不替换",
 						},
 						{
-							value: LyricOverrideType.MusicId,
-							label: "使用其他歌曲 ID 的歌词",
+							value: LyricOverrideType.PureMusic,
+							label: "纯音乐",
 						},
 						{
 							value: LyricOverrideType.LocalLRC,

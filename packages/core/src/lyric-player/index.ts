@@ -465,23 +465,29 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				nextLine.startTime = Math.min(nextLine.startTime, line.startTime);
 			}
 		});
-		const prevLinesEl = this.lyricLinesEl;
-		this.lyricLinesEl = this.processedLines.map((line, i) => {
-			if (this.lyricLinesEl[i]) {
-				return this.lyricLinesEl[i];
-			} else {
-				const lineEl = new LyricLineEl(this, line);
-				lineEl.addEventListener("click", this.onLineClickedHandler);
-				lineEl.addEventListener("contextmenu", this.onLineClickedHandler);
-				return lineEl;
-			}
+		this.lyricLinesEl.forEach((line) => {
+			line.removeEventListener("click", this.onLineClickedHandler);
+			line.removeEventListener("contextmenu", this.onLineClickedHandler);
+			line.dispose();
 		});
-		while (prevLinesEl.length > this.processedLines.length) {
-			const rest = prevLinesEl.pop();
-			rest?.removeEventListener("click", this.onLineClickedHandler);
-			rest?.removeEventListener("contextmenu", this.onLineClickedHandler);
-			rest?.dispose();
-		}
+		// const prevLinesEl = this.lyricLinesEl;
+		this.lyricLinesEl = this.processedLines.map((line, i) => {
+			// if (this.lyricLinesEl[i]) {
+			// 	this.lyricLinesEl[i].setLine(line);
+			// 	return this.lyricLinesEl[i];
+			// } else {
+			const lineEl = new LyricLineEl(this, line);
+			lineEl.addEventListener("click", this.onLineClickedHandler);
+			lineEl.addEventListener("contextmenu", this.onLineClickedHandler);
+			return lineEl;
+			// }
+		});
+		// while (prevLinesEl.length > this.processedLines.length) {
+		// 	const rest = prevLinesEl.pop();
+		// 	rest?.removeEventListener("click", this.onLineClickedHandler);
+		// 	rest?.removeEventListener("contextmenu", this.onLineClickedHandler);
+		// 	rest?.dispose();
+		// }
 		this.lyricLinesEl.forEach((el, i) => {
 			this.element.appendChild(el.getElement());
 			this.lyricLinesIndexes.set(el, i);

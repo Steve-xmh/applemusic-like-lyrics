@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "vite build",
+    "build:dev": "vite build",
     "fmt": "rome format --write ./src",
     "dev": "vite dev"
   },

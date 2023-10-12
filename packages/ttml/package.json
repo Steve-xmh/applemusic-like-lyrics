@@ -24,6 +24,7 @@
   "scripts": {
     "build:docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "build": "vite build",
+    "build:dev": "vite build",
     "fmt": "rome format --write ./src",
     "dev": "vite dev"
   },

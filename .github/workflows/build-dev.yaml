@@ -13,38 +13,13 @@ jobs:
         uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: latest
-      - name: 构建 WS Protocol 模块
-        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
-        working-directory: packages/ws-protocol
-      - name: 构建 Lyric 模块
-        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
-        working-directory: packages/lyric
-      - name: 构建 FFT 模块
-        run: wasm-pack build --target bundler --release --scope applemusic-like-lyrics
-        working-directory: packages/fft
-      - name: 安装依赖
-        run: yarn
-        env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
-      - name: 构建 Core 模块
-        run: yarn build
-        working-directory: packages/core
-      - name: 构建 React 模块
-        run: yarn build
-        working-directory: packages/react
-      - name: 构建 Vue 模块
-        run: yarn build
-        working-directory: packages/vue
-      - name: 构建 TTML 模块
-        run: yarn build
-        working-directory: packages/ttml
       - name: 构建 BNCM 插件
         run: |
           yarn
-          yarn build --mode packdev
+          yarn lerna run build:dev --scope "@applemusic-like-lyrics/*"
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
-        working-directory: packages/bncm
+          AMLL_GITHUB_IS_ACTION: true
       - uses: marvinpinto/action-automatic-releases@latest
         name: 发布到 Github Release
         with:

@@ -183,11 +183,13 @@ export const LyricPlayer = forwardRef<
 		}, [wrapperRef.current]);
 
 		useEffect(() => {
-			if (alignAnchor !== undefined) corePlayerRef.current?.setAlignAnchor(alignAnchor);
+			if (alignAnchor !== undefined)
+				corePlayerRef.current?.setAlignAnchor(alignAnchor);
 		}, [alignAnchor]);
 
 		useEffect(() => {
-			if (alignPosition !== undefined) corePlayerRef.current?.setAlignPosition(alignPosition);
+			if (alignPosition !== undefined)
+				corePlayerRef.current?.setAlignPosition(alignPosition);
 		}, [alignPosition]);
 
 		useEffect(() => {
@@ -217,7 +219,8 @@ export const LyricPlayer = forwardRef<
 		}, [lyricLines]);
 
 		useEffect(() => {
-			if (currentTime !== undefined) corePlayerRef.current?.setCurrentTime(currentTime);
+			if (currentTime !== undefined)
+				corePlayerRef.current?.setCurrentTime(currentTime);
 			else corePlayerRef.current?.setCurrentTime(0);
 		}, [currentTime]);
 

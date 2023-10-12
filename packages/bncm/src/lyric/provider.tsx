@@ -1,9 +1,12 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { FC, useEffect } from "react";
 import {
+	LyricOverrideType,
+	loadableMusicOverrideDataAtom,
 	musicArtistsAtom,
 	musicIdAtom,
 	musicNameAtom,
+	musicOverrideDataAtom,
 } from "../music-context/wrapper";
 import { LyricLine as CoreLyricLine } from "@applemusic-like-lyrics/core";
 import {
@@ -22,7 +25,7 @@ import {
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { LyricFormat, LyricSource, SourceStringError } from "./source";
 import { processLyric } from "./processor";
-import { Loadable } from "jotai/vanilla/utils/loadable";
+import { Loadable, loadable } from "jotai/vanilla/utils/loadable";
 import { raceLoad } from "../utils/race-load";
 
 interface EAPILyric {
@@ -305,9 +308,102 @@ async function getLyricFromNCM(
 
 class LyricNotExistError extends Error {}
 
-export const lyricLinesAtom = atom({
+const rawLyricLinesAtom = atom({
 	state: "loading",
 } as Loadable<CoreLyricLine[]>);
+
+export const lyricLinesAtom = atom(
+	(get) => {
+		const result = get(rawLyricLinesAtom);
+		const overrideData = get(loadableMusicOverrideDataAtom);
+		if (result.state === "hasData" && overrideData.state === "hasData") {
+			let overrideLines = result.data;
+			function checkTranslatedAndRomanLyric(
+				lyricOverrideTranslatedLyricData?: string,
+				lyricOverrideRomanLyricData?: string,
+			) {
+				if (lyricOverrideTranslatedLyricData) {
+					const translated = parseLrc(lyricOverrideTranslatedLyricData);
+					translated.forEach((line) =>
+						pairLyric(line, overrideLines, "translatedLyric"),
+					);
+				}
+				if (lyricOverrideRomanLyricData) {
+					const translated = parseLrc(lyricOverrideRomanLyricData);
+					translated.forEach((line) =>
+						pairLyric(line, overrideLines, "romanLyric"),
+					);
+				}
+			}
+			switch (overrideData.data.lyricOverrideType) {
+				case LyricOverrideType.PureMusic:
+					overrideLines = [];
+					break;
+				case LyricOverrideType.LocalLRC:
+					if (overrideData.data.lyricOverrideOriginalLyricData) {
+						overrideLines = parseLrc(
+							overrideData.data.lyricOverrideOriginalLyricData,
+						).map(transformLyricLine);
+						checkTranslatedAndRomanLyric(
+							overrideData.data.lyricOverrideTranslatedLyricData,
+							overrideData.data.lyricOverrideRomanLyricData,
+						);
+					}
+					break;
+				case LyricOverrideType.LocalYRC:
+					if (overrideData.data.lyricOverrideOriginalLyricData) {
+						overrideLines = parseYrc(
+							overrideData.data.lyricOverrideOriginalLyricData,
+						).map(transformLyricLine);
+						checkTranslatedAndRomanLyric(
+							overrideData.data.lyricOverrideTranslatedLyricData,
+							overrideData.data.lyricOverrideRomanLyricData,
+						);
+					}
+					break;
+				case LyricOverrideType.LocalQRC:
+					if (overrideData.data.lyricOverrideOriginalLyricData) {
+						overrideLines = parseQrc(
+							overrideData.data.lyricOverrideOriginalLyricData,
+						).map(transformLyricLine);
+						checkTranslatedAndRomanLyric(
+							overrideData.data.lyricOverrideTranslatedLyricData,
+							overrideData.data.lyricOverrideRomanLyricData,
+						);
+					}
+					break;
+				case LyricOverrideType.LocalTTML:
+					if (overrideData.data.lyricOverrideOriginalLyricData)
+						overrideLines = parseTTML(
+							overrideData.data.lyricOverrideOriginalLyricData,
+						);
+					break;
+				default:
+			}
+			if (overrideData.data.lyricOffset !== undefined) {
+				const lyricOffset = overrideData.data.lyricOffset;
+				overrideLines = overrideLines.map((line) => ({
+					...line,
+					startTime: line.startTime - lyricOffset,
+					endTime: line.endTime - lyricOffset,
+					words: line.words.map((word) => ({
+						...word,
+						startTime: word.startTime - lyricOffset,
+						endTime: word.endTime - lyricOffset,
+					})),
+				}));
+			}
+			return {
+				state: "hasData",
+				data: overrideLines,
+			};
+		}
+		return result;
+	},
+	(_get, set, update: Loadable<CoreLyricLine[]>) => {
+		set(rawLyricLinesAtom, update);
+	},
+);
 
 export const LyricProvider: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -317,7 +413,7 @@ export const LyricProvider: FC = () => {
 	const allowTranslatedLine = useAtomValue(showTranslatedLineAtom);
 	const allowRomanLine = useAtomValue(showRomanLineAtom);
 	const setLyricProviderLogs = useSetAtom(lyricProviderLogsAtom);
-	const setLyricLines = useSetAtom(lyricLinesAtom);
+	const setLyricLines = useSetAtom(rawLyricLinesAtom);
 
 	useEffect(() => {
 		setLyricProviderLogs([]);

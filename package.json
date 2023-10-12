@@ -3,8 +3,10 @@
   "private": true,
   "license": "GPL-3.0",
   "workspaces": [
-    "packages/*",
-    "packages/*/pkg"
+    "packages/*"
   ],
-  "packageManager": "yarn@3.6.1"
+  "packageManager": "yarn@3.6.1",
+  "devDependencies": {
+    "lerna": "^7.3.1"
+  }
 }
