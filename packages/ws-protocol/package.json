@@ -22,7 +22,7 @@
   "module": "pkg/ws_protocol.js",
   "types": "pkg/ws_protocol.d.ts",
   "sideEffects": [
-    "./pkg/lyric.js",
+    "./pkg/ws_protocol.js",
     "./pkg/snippets/*"
   ]
 }
