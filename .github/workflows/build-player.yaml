@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+      - name: 安装 Rust 工具链
+        uses: dtolnay/rust-toolchain@stable
       - name: 安装 wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
         with:
@@ -44,12 +46,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: 安装 Rust 工具链
-        uses: dtolnay/rust-toolchain@stable
-      - name: 安装 wasm-pack
-        uses: jetli/wasm-pack-action@v0.4.0
-        with:
-          version: latest
       - name: 安装 Tauri 所需系统依赖（仅 Linux）
         if: matrix.platform == 'ubuntu-20.04'
         run: |
