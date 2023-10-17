@@ -85,7 +85,7 @@ jobs:
       - name: 上传产物到 Action Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: AMLL TTML Tool ${{runner.os}}-${{runner.arch}}
+          name: AMLL Player ${{runner.os}}-${{runner.arch}}
           path: |
             packages/player/src-tauri/target/release/bundle/deb/*.deb
             packages/player/src-tauri/target/release/bundle/appimage/*.AppImage

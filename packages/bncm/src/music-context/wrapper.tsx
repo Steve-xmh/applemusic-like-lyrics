@@ -68,7 +68,7 @@ export const playModeAtom = atom(
 		if (mode) set(rawPlayModeAtom, mode);
 	},
 );
-const rawPlayModeAtom = atom(PlayMode.One);
+export const rawPlayModeAtom = atom(PlayMode.One);
 export const playStatusAtom = atom(
 	(get) => get(rawPlayStatusAtom),
 	(get, _set, update: PlayState) => {
@@ -80,7 +80,7 @@ export const playStatusAtom = atom(
 		}
 	},
 );
-const rawPlayStatusAtom = atom(PlayState.Pausing);
+export const rawPlayStatusAtom = atom(PlayState.Pausing);
 export const currentTimeAtom = atom(
 	(get) => get(rawCurrentTimeAtom),
 	(
@@ -97,7 +97,7 @@ export const currentTimeAtom = atom(
 		else set(rawCurrentTimeAtom, update.raw);
 	},
 );
-const rawCurrentTimeAtom = atom(0);
+export const rawCurrentTimeAtom = atom(0);
 export const rawCurrentVolumeAtom = atom(0.5);
 export const currentVolumeAtom = atom(
 	(get) => get(rawCurrentVolumeAtom),
@@ -108,7 +108,7 @@ export const currentVolumeAtom = atom(
 );
 export const lyricPageOpenedAtom = atom(false);
 export const musicContextAtom = atom((get) => get(rawMusicContextAtom));
-const rawMusicContextAtom = atom<MusicContextBase | undefined>(undefined);
+export const rawMusicContextAtom = atom<MusicContextBase | undefined>(undefined);
 export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
 	const musicCtx = get(rawMusicContextAtom);
 	await musicCtx?.setClipboard(data);
