@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue } from "jotai";
-import IconRewind from "../../assets/icon_rewind.svg";
-import IconForward from "../../assets/icon_forward.svg";
-import IconPause from "../../assets/icon_pause.svg";
-import IconPlay from "../../assets/icon_play.svg";
+import IconRewind from "../../assets/icon_rewind.svg?react";
+import IconForward from "../../assets/icon_forward.svg?react";
+import IconPause from "../../assets/icon_pause.svg?react";
+import IconPlay from "../../assets/icon_play.svg?react";
 import { PlayControlButton } from "./play-control-button";
 import { musicContextAtom, playStatusAtom } from "../../music-context/wrapper";
 import { PlayState } from "../../music-context";

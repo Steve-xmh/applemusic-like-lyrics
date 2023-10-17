@@ -74,7 +74,7 @@ export const PlayerConfig: FC = () => {
 					<TextField
 						type="text"
 						placeholder="歌词播放器连接地址"
-						style={{ flex: "1" }}
+						style={{ flex: "1", minWidth: "0" }}
 						value={url ?? ""}
 						onInput={async (event) => {
 							await setUrl(event.currentTarget.value);

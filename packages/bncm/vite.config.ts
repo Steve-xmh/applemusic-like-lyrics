@@ -222,11 +222,10 @@ export default defineConfig(({ mode }) => {
 			react(),
 			wasm(),
 			svgr({
-				exportAsDefault: true,
 				svgrOptions: {
 					ref: true,
 				},
-				include: ["./src/**/*.svg"],
+				include: ["./src/**/*.svg?react"],
 			}),
 			CopyBetterNCMPlugin({
 				name: "Apple-Musiclike-lyrics",

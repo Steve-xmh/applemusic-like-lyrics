@@ -11,6 +11,7 @@ import { FullSpinner, Spinner } from "../appkit/spinner/spinner";
 import { BackgroundConfig } from "./background";
 import { LyricSourceConfig } from "./lyric-source";
 import { DebugConfig } from "./debug";
+import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 
 export const configPageAtom = atom("lyric");
 
@@ -66,13 +67,16 @@ const ConfigSidebarItems: FC = () => {
 
 const ConfigSidebarBottomItems: FC = () => {
 	const [configPage, setConfigPage] = useAtom(configPageAtom);
+	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
 	return (
 		<>
 			<SidebarItem
 				selected={configPage === "about"}
 				onClick={() => setConfigPage("about")}
 			>
-				关于 Apple Music-like lyrics
+				{amllEnvironment === AMLLEnvironment.BetterNCM &&
+					"关于 Apple Music-like lyrics"}
+				{amllEnvironment === AMLLEnvironment.AMLLPlayer && "关于 AMLL Player"}
 			</SidebarItem>
 		</>
 	);

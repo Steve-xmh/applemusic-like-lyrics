@@ -1,4 +1,5 @@
 /// <reference types="./betterncm" />
+/// <reference types="vite-plugin-svgr/client" />
 
 declare module "*.css" {
 	const cssStyle: string;
@@ -23,11 +24,6 @@ declare module "*.frag" {
 declare module "*.vert" {
 	const vertShader: string;
 	export default vertShader;
-}
-
-declare module "*.svg" {
-	const svgData: React.FC<React.SVGProps<SVGSVGElement>>;
-	export default svgData;
 }
 
 interface EAPIResponse {

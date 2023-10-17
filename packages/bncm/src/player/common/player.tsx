@@ -20,6 +20,7 @@ import {
 	lyricScaleEffectAtom,
 	lyricSpringEffectAtom,
 } from "../../components/config/atoms";
+import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef: HTMLElement | null;
@@ -33,6 +34,7 @@ export const CoreLyricPlayer: FC<{
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
 	const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom);
 	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
+	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 
 	const [alignPosition, setAlighPosition] = useState(0.5);
@@ -102,9 +104,18 @@ export const CoreLyricPlayer: FC<{
 					}
 				/>
 				{lyricLines.state === "loading" && (
-					<div className="amll-lyric-player-wrapper load-status">
-						<div>歌词加载中</div>
-					</div>
+					<>
+						{amllEnvironment === AMLLEnvironment.AMLLPlayer && (
+							<div className="amll-lyric-player-wrapper load-status">
+								<div>等待连接中</div>
+							</div>
+						)}
+						{amllEnvironment === AMLLEnvironment.BetterNCM && (
+							<div className="amll-lyric-player-wrapper load-status">
+								<div>歌词加载中</div>
+							</div>
+						)}
+					</>
 				)}
 				{lyricLines.state === "hasError" && (
 					<div className="amll-lyric-player-wrapper load-status">

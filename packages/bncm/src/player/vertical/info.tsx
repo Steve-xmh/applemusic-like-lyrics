@@ -12,7 +12,7 @@ import {
 	musicArtistsAtom,
 	musicNameAtom,
 } from "../../music-context/wrapper";
-import IconMore from "../../assets/icon_more.svg";
+import IconMore from "../../assets/icon_more.svg?react";
 import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
 import { closeLyricPage } from "../../injector";
 import { topbarMenuOpenedAtom } from "../common/main-menu";

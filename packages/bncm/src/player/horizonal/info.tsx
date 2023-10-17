@@ -15,7 +15,7 @@ import {
 	musicAlbumNameAtom,
 	musicDurationAtom,
 } from "../../music-context/wrapper";
-import IconMore from "../../assets/icon_more.svg";
+import IconMore from "../../assets/icon_more.svg?react";
 import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
 import { closeLyricPage } from "../../injector";
 import { Slider } from "../../components/appkit/np-slider";

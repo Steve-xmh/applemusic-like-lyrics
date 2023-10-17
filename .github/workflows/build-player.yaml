@@ -1,0 +1,99 @@
+name: 构建 AMLL Player Tauri 桌面版本
+on:
+  - push
+  - workflow_dispatch
+
+jobs:
+  build-tauri:
+    name: 构建 Tauri 桌面版本
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-20.04, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+        name: 克隆仓库
+      - name: 安装 wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+      - name: 缓存依赖项目
+        uses: actions/cache@v3
+        with:
+          key: ${{ runner.os }}-cache
+          path: |
+            packages/player/node_modules
+            packages/player/src-tauri/target
+            packages/player/.yarn/cache
+            packages/player/.yarn/install-state.gz
+            node_modules
+            target
+            .yarn/cache
+            .yarn/install-state.gz
+            C:/Program Files/LLVM
+            ./llvm
+      # macOS 自带的 Xcode LLVM 不支持 WASM 目标
+      - name: "macOS: 安装 LLVM 和 Clang"
+        uses: KyleMayes/install-llvm-action@v1
+        if: matrix.platform == 'macos-latest'
+        with:
+          version: "14"
+      - name: 配置 NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: 安装 Rust 工具链
+        uses: dtolnay/rust-toolchain@stable
+      - name: 安装 wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+      - name: 安装 Tauri 所需系统依赖（仅 Linux）
+        if: matrix.platform == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: 构建 AMLL 包
+        run: |
+          yarn
+          yarn lerna run build:dev --scope "@applemusic-like-lyrics/*"
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+          AMLL_GITHUB_IS_ACTION: true
+      - name: 构建 Tauri 程序
+        uses: tauri-apps/tauri-action@v0
+        with:
+          projectPath: packages/player
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: marvinpinto/action-automatic-releases@latest
+        name: 发布到 Github Release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ github.ref_name }}-amll-player-nightly
+          prerelease: true
+          title: AMLL Player 最新 ${{ github.ref_name }} 分支开发调试构建
+          files: |
+            packages/player/src-tauri/target/release/bundle/deb/*.deb
+            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage
+            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz
+            packages/player/src-tauri/target/release/bundle/msis/*.exe
+            packages/player/src-tauri/target/release/bundle/msi/*.msi
+            packages/player/src-tauri/target/release/bundle/dmg/*.dmg
+            packages/player/src-tauri/target/release/bundle/macos/*.app
+            packages/player/src-tauri/target/release/bundle/macos/*.app.tar.gz
+      - name: 上传产物到 Action Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: AMLL TTML Tool ${{runner.os}}-${{runner.arch}}
+          path: |
+            packages/player/src-tauri/target/release/bundle/deb/*.deb
+            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage
+            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz
+            packages/player/src-tauri/target/release/bundle/msis/*.exe
+            packages/player/src-tauri/target/release/bundle/msi/*.msi
+            packages/player/src-tauri/target/release/bundle/dmg/*.dmg
+            packages/player/src-tauri/target/release/bundle/macos/*.app
+            packages/player/src-tauri/target/release/bundle/macos/*.app.tar.gz

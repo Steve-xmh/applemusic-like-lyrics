@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use std::time::Duration;
+use std::{collections::HashSet, net::SocketAddr, sync::Arc};
 
 use async_std::net::{TcpListener, TcpStream};
 use async_std::sync::Mutex;
@@ -11,11 +11,12 @@ use futures::stream::SplitSink;
 use tauri::{AppHandle, Manager};
 
 type Connections = Arc<Mutex<Vec<SplitSink<WebSocketStream<TcpStream>, Message>>>>;
-
+type ConnectionAddrs = Arc<std::sync::Mutex<HashSet<SocketAddr>>>;
 pub struct AMLLWebSocketServer {
     app: AppHandle,
     server_handle: Option<JoinHandle<()>>,
     connections: Connections,
+    connection_addrs: ConnectionAddrs,
 }
 
 impl AMLLWebSocketServer {
@@ -24,6 +25,7 @@ impl AMLLWebSocketServer {
             app,
             server_handle: None,
             connections: Arc::new(Mutex::new(Vec::with_capacity(8))),
+            connection_addrs: Arc::new(std::sync::Mutex::new(HashSet::with_capacity(8))),
         }
     }
     pub fn reopen(&mut self, addr: String) {
@@ -33,38 +35,58 @@ impl AMLLWebSocketServer {
             }
             let app = self.app.clone();
             let connections = self.connections.clone();
+            let conn_addrs = self.connection_addrs.clone();
             self.server_handle = Some(async_std::task::spawn(async move {
                 loop {
                     println!("正在开启 WebSocket 服务器到 {addr}");
                     let listener = TcpListener::bind(&addr).await;
-                    if let Ok(listener) = listener {
-                        println!("已开启 WebSocket 服务器到 {addr}");
-                        while let Ok((stream, _)) = listener.accept().await {
-                            async_std::task::spawn(Self::accept_conn(
-                                stream,
-                                app.clone(),
-                                connections.clone(),
-                            ));
+                    match listener {
+                        Ok(listener) => {
+                            println!("已开启 WebSocket 服务器到 {addr}");
+                            while let Ok((stream, _)) = listener.accept().await {
+                                async_std::task::spawn(Self::accept_conn(
+                                    stream,
+                                    app.clone(),
+                                    connections.clone(),
+                                    conn_addrs.clone(),
+                                ));
+                            }
+                            break;
                         }
-                        break;
-                    } else {
-                        async_std::task::sleep(Duration::from_secs(1)).await;
+                        Err(err) => {
+                            println!("WebSocket 服务器 {addr} 开启失败: {err:?}");
+                        }
                     }
+                    async_std::task::sleep(Duration::from_secs(1)).await;
                 }
             }));
         });
+    }
+
+    pub fn get_connections(&self) -> Vec<SocketAddr> {
+        let conns = self
+            .connection_addrs
+            .lock()
+            .unwrap()
+            .iter()
+            .copied()
+            .collect();
+        conns
     }
 
     async fn accept_conn(
         stream: TcpStream,
         app: AppHandle,
         conns: Connections,
+        conn_addrs: ConnectionAddrs,
     ) -> anyhow::Result<()> {
         let addr = stream.peer_addr()?;
         println!("已接受套接字连接: {addr}");
 
         let wss = async_tungstenite::accept_async(stream).await?;
         println!("已连接 WebSocket 客户端: {addr}");
+        app.emit_all("on-client-connected", addr)?;
+        conn_addrs.lock().unwrap().insert(addr.to_owned());
 
         let (write, read) = wss.split();
 
@@ -79,6 +101,8 @@ impl AMLLWebSocketServer {
         }
 
         println!("已断开 WebSocket 客户端: {addr}");
+        app.emit_all("on-client-disconnected", addr)?;
+        conn_addrs.lock().unwrap().remove(&addr);
         Ok(())
     }
 }

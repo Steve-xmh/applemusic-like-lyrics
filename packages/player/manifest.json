@@ -1,0 +1,14 @@
+{
+    "manifest_version": 1,
+    "name": "类苹果歌词",
+    "slug": "Apple-Musiclike-lyrics",
+    "author": "SteveXMH",
+    "author_links": [
+        "https://github.com/Steve-xmh",
+        "https://github.com/Steve-xmh/applemusic-like-lyrics"
+    ],
+    "description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
+    "version": "3.0.0",
+    "commit": "!SET_BY_BUILD_SCRIPT!",
+    "branch": "!SET_BY_BUILD_SCRIPT!"
+}

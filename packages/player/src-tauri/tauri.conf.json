@@ -33,9 +33,11 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "player",
+        "title": "",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "theme": "Dark",
+        "titleBarStyle": "Overlay"
       }
     ]
   }

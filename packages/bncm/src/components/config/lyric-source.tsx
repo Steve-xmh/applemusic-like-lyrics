@@ -9,8 +9,8 @@ import {
 	parseSourceString,
 	stringifySourceString,
 } from "../../lyric/source";
-import IconHandle from "../../assets/icon_handle.svg";
-import IconMoreCircle from "../../assets/icon_more_circle.svg";
+import IconHandle from "../../assets/icon_handle.svg?react";
+import IconMoreCircle from "../../assets/icon_more_circle.svg?react";
 import { TextField } from "../appkit/text-field";
 import { Button } from "../appkit/button";
 import { Select } from "../appkit/select";

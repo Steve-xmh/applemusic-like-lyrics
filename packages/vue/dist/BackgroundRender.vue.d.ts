@@ -16,7 +16,7 @@ declare const _default: import("vue").DefineComponent<{
         type: import("vue").PropType<number>;
     };
 }, {
-    bgRender: import("vue").Ref<BackgroundRender | undefined>;
+    bgRender?: import("vue").Ref<BackgroundRender | undefined> | undefined;
     wrapperEl: import("vue").Ref<HTMLDivElement | undefined>;
 }, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
     albumImageUrl: {

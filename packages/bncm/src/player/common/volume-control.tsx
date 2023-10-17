@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef } from "react";
 import { Slider } from "../../components/appkit/np-slider";
-import IconSpeaker from "../../assets/icon_speaker.svg";
-import IconSpeaker3 from "../../assets/icon_speaker_3.svg";
+import IconSpeaker from "../../assets/icon_speaker.svg?react";
+import IconSpeaker3 from "../../assets/icon_speaker_3.svg?react";
 import { useAtom } from "jotai";
 import { currentVolumeAtom } from "../../music-context/wrapper";
 import "./volume-control.sass";

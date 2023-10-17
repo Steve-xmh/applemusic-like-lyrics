@@ -2,7 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use crate::server::AMLLWebSocketServer;
-use std::sync::Mutex;
+use std::{
+    collections::HashSet,
+    net::SocketAddr,
+    sync::{Arc, Mutex},
+};
 use tauri::{Manager, State};
 
 mod server;
@@ -13,9 +17,14 @@ fn reopen_connection(addr: &str, ws: State<Mutex<AMLLWebSocketServer>>) {
     ws.lock().unwrap().reopen(addr.to_string());
 }
 
+#[tauri::command]
+fn get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> {
+    ws.lock().unwrap().get_connections()
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![reopen_connection])
+        .invoke_handler(tauri::generate_handler![reopen_connection, get_connections])
         .setup(|app| {
             app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle())));
             Ok(())

@@ -1,6 +1,6 @@
 import { Root, createRoot } from "react-dom/client";
 import { createPortal } from "react-dom";
-import { Provider, createStore } from "jotai";
+import { Provider, atom, createStore } from "jotai";
 import { LyricPlayer } from "../player";
 import { MusicInfoWrapper } from "../music-context/wrapper";
 import { LyricProvider } from "../lyric/provider";
@@ -17,6 +17,11 @@ configViewElement.style.height = "100%";
 let appRoot: Root;
 
 export const globalStore = createStore();
+export enum AMLLEnvironment {
+	BetterNCM = "betterncm",
+	AMLLPlayer = "amllplayer",
+}
+export const amllEnvironmentAtom = atom(AMLLEnvironment.BetterNCM);
 
 export function initLyricPage() {
 	appRoot = createRoot(mainViewElement);
