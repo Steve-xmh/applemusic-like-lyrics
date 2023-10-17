@@ -13,6 +13,8 @@ jobs:
         uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: latest
+      - name: 安装 wasm32 目标
+        run: rustup target add wasm32-unknown-unknown
       - name: 构建 BNCM 插件
         run: |
           yarn
