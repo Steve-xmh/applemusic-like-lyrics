@@ -108,7 +108,9 @@ export const currentVolumeAtom = atom(
 );
 export const lyricPageOpenedAtom = atom(false);
 export const musicContextAtom = atom((get) => get(rawMusicContextAtom));
-export const rawMusicContextAtom = atom<MusicContextBase | undefined>(undefined);
+export const rawMusicContextAtom = atom<MusicContextBase | undefined>(
+	undefined,
+);
 export const setClipboardAtom = atom(null, async (get, _set, data: string) => {
 	const musicCtx = get(rawMusicContextAtom);
 	await musicCtx?.setClipboard(data);

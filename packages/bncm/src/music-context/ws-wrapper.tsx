@@ -122,7 +122,7 @@ export const WebSocketWrapper: FC = () => {
 				warn("连接到播放器失败");
 				setTimeout(connect, 5000);
 			});
-			
+
 			webSocket.addEventListener("close", () => {
 				setWSStatus({
 					progress: false,

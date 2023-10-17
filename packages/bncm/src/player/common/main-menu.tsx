@@ -14,7 +14,11 @@ import {
 	musicNameAtom,
 	setClipboardAtom,
 } from "../../music-context/wrapper";
-import { AMLLEnvironment, amllEnvironmentAtom, closeLyricPage } from "../../injector";
+import {
+	AMLLEnvironment,
+	amllEnvironmentAtom,
+	closeLyricPage,
+} from "../../injector";
 import { amllConfigWindowedOpenedAtom } from "../../components/config";
 import { musicOverrideWindowOpenedAtom } from "./music-override-window";
 
@@ -262,31 +266,34 @@ export const MainMenu: FC = () => {
 				}}
 			/>
 			<MenuDevider />
-			{amllEnvironment === AMLLEnvironment.BetterNCM && <>
+			{amllEnvironment === AMLLEnvironment.BetterNCM && (
+				<>
+					<MenuItem
+						label="Apple Music-like Lyric 插件设置..."
+						onClick={() => {
+							setWindowedConfigOpened(true);
+							setMenuOpened(false);
+						}}
+					/>
+					<MenuDevider />
+					<MenuItem
+						label="退出歌词页面"
+						onClick={() => {
+							setMenuOpened(false);
+							closeLyricPage();
+						}}
+					/>
+				</>
+			)}
+			{amllEnvironment === AMLLEnvironment.AMLLPlayer && (
 				<MenuItem
-				label="Apple Music-like Lyric 插件设置..."
-				onClick={() => {
-					setWindowedConfigOpened(true);
-					setMenuOpened(false);
-				}}
-			/>
-			<MenuDevider />
-			<MenuItem
-				label="退出歌词页面"
-				onClick={() => {
-					setMenuOpened(false);
-					closeLyricPage();
-				}}
-			/>
-			
-			</>}
-			{amllEnvironment === AMLLEnvironment.AMLLPlayer && <MenuItem
-				label="AMLL Player 设置..."
-				onClick={() => {
-					setWindowedConfigOpened(true);
-					setMenuOpened(false);
-				}}
-			/>}
+					label="AMLL Player 设置..."
+					onClick={() => {
+						setWindowedConfigOpened(true);
+						setMenuOpened(false);
+					}}
+				/>
+			)}
 		</Menu>
 	);
 };

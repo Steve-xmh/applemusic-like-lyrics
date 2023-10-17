@@ -221,7 +221,7 @@ const AboutBNCMConfig: FC = () => {
 			</GroupBox>
 		</div>
 	);
-}
+};
 
 const AboutAMLLPlayerConfig: FC = () => {
 	const updateBranch = useAtomValue(updateBranchAtom);
@@ -267,11 +267,12 @@ const AboutAMLLPlayerConfig: FC = () => {
 			</div>
 		</div>
 	);
-}
+};
 
 export const AboutConfig: FC = () => {
 	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
-	
+
 	if (amllEnvironment === AMLLEnvironment.BetterNCM) return <AboutBNCMConfig />;
-	if (amllEnvironment === AMLLEnvironment.AMLLPlayer) return <AboutAMLLPlayerConfig />;
+	if (amllEnvironment === AMLLEnvironment.AMLLPlayer)
+		return <AboutAMLLPlayerConfig />;
 };
