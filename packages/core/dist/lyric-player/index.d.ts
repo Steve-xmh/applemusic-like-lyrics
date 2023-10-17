@@ -66,7 +66,6 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private isNonDynamic;
     readonly size: [number, number];
     readonly innerSize: [number, number];
-    readonly pos: [number, number];
     private readonly onLineClickedHandler;
     _getIsNonDynamic(): boolean;
     /**

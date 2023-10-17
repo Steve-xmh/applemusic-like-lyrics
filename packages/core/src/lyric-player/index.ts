@@ -64,8 +64,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		const rect = e[0].contentRect;
 		this.size[0] = rect.width;
 		this.size[1] = rect.height;
-		this.pos[0] = rect.left;
-		this.pos[1] = rect.top;
 		const styles = getComputedStyle(e[0].target);
 		const innerWidth =
 			this.element.clientWidth -
@@ -109,7 +107,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private isNonDynamic = false;
 	readonly size: [number, number] = [0, 0];
 	readonly innerSize: [number, number] = [0, 0];
-	readonly pos: [number, number] = [0, 0];
 	private readonly onLineClickedHandler = (e: RawLyricLineMouseEvent) => {
 		const evt = new LyricLineMouseEvent(
 			this.lyricLinesIndexes.get(e.line) ?? -1,
@@ -471,7 +468,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			line.dispose();
 		});
 		// const prevLinesEl = this.lyricLinesEl;
-		this.lyricLinesEl = this.processedLines.map((line, i) => {
+		this.lyricLinesEl = this.processedLines.map((line) => {
 			// if (this.lyricLinesEl[i]) {
 			// 	this.lyricLinesEl[i].setLine(line);
 			// 	return this.lyricLinesEl[i];

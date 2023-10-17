@@ -122,6 +122,16 @@ export const WebSocketWrapper: FC = () => {
 				warn("连接到播放器失败");
 				setTimeout(connect, 5000);
 			});
+			
+			webSocket.addEventListener("close", () => {
+				setWSStatus({
+					progress: false,
+					color: ConnectionColor.Error,
+					text: "连接已关闭，五秒后重试",
+				});
+				warn("连接到播放器失败");
+				setTimeout(connect, 5000);
+			});
 
 			webSocket.addEventListener("open", () => {
 				setWSStatus({

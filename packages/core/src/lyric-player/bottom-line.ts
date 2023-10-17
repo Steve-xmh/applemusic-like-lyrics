@@ -91,11 +91,9 @@ export class BottomLineEl implements HasElement, Disposable {
 		const t = this.lineTransforms.posY.getCurrentPosition();
 		const r = l + this.lineSize[0];
 		const b = t + this.lineSize[1];
-		const pl = this.lyricPlayer.pos[0];
-		const pt = this.lyricPlayer.pos[1];
-		const pr = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0];
-		const pb = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
-		return !(l > pr || t > pb || r < pl || b < pt);
+		const pr = this.lyricPlayer.size[0];
+		const pb = this.lyricPlayer.size[1];
+		return !(l > pr || t > pb || r < 0 || b < 0);
 	}
 	dispose(): void {
 		this.element.remove();

@@ -1,10 +1,10 @@
 import { Container as C } from "@pixi/display";
 import { Application as z } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
-import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
+import { ColorMatrixFilter as v } from "@pixi/filter-color-matrix";
 import { Texture as D } from "@pixi/core";
 import { Sprite as w } from "@pixi/sprite";
-import { BulgePinchFilter as v } from "@pixi/filter-bulge-pinch";
+import { BulgePinchFilter as P } from "@pixi/filter-bulge-pinch";
 import { create as A } from "jss";
 import I from "jss-preset-default";
 const k = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
@@ -22,24 +22,24 @@ function B(h) {
     "application/xml"
   );
   let i = "v1";
-  for (const r of t.querySelectorAll("ttm\\:agent"))
-    if (r.getAttribute("type") === "person") {
-      const n = r.getAttribute("xml:id");
+  for (const a of t.querySelectorAll("ttm\\:agent"))
+    if (a.getAttribute("type") === "person") {
+      const n = a.getAttribute("xml:id");
       n && (i = n);
     }
   const s = [];
-  for (const r of t.querySelectorAll("body p[begin][end]")) {
+  for (const a of t.querySelectorAll("body p[begin][end]")) {
     const n = {
       words: [],
-      startTime: T(r.getAttribute("begin") ?? "0:0"),
-      endTime: T(r.getAttribute("end") ?? "0:0"),
+      startTime: T(a.getAttribute("begin") ?? "0:0"),
+      endTime: T(a.getAttribute("end") ?? "0:0"),
       translatedLyric: "",
       romanLyric: "",
       isBG: !1,
-      isDuet: r.getAttribute("ttm:agent") !== i
+      isDuet: a.getAttribute("ttm:agent") !== i
     };
-    let a = null;
-    for (const l of r.childNodes)
+    let r = null;
+    for (const l of a.childNodes)
       if (l.nodeType === Node.TEXT_NODE) {
         const o = l.textContent ?? "";
         /^(\s+)$/.test(o) ? n.words.push({
@@ -95,7 +95,7 @@ function B(h) {
             d.endTime = f.endTime, f?.word.endsWith(")") && (f.word = f.word.substring(
               0,
               f.word.length - 1
-            )), a = d;
+            )), r = d;
           } else
             c === "x-translation" ? n.translatedLyric = o.innerHTML : c === "x-roman" && (n.romanLyric = o.innerHTML);
         else if (o.hasAttribute("begin") && o.hasAttribute("end")) {
@@ -107,7 +107,7 @@ function B(h) {
           n.words.push(d);
         }
       }
-    s.push(n), a && s.push(a);
+    s.push(n), r && s.push(r);
   }
   return s;
 }
@@ -148,11 +148,11 @@ class N {
         1,
         this.curContainer.alpha + e / 60
       );
-      const [t, i, s, r] = this.curContainer.children, n = Math.max(this.app.screen.width, this.app.screen.height);
+      const [t, i, s, a] = this.curContainer.children, n = Math.max(this.app.screen.width, this.app.screen.height);
       t.position.set(this.app.screen.width / 2, this.app.screen.height / 2), i.position.set(
         this.app.screen.width / 2.5,
         this.app.screen.height / 2.5
-      ), s.position.set(this.app.screen.width / 2, this.app.screen.height / 2), r.position.set(this.app.screen.width / 2, this.app.screen.height / 2), t.width = n * Math.sqrt(2), t.height = t.width, i.width = n * 0.8, i.height = i.width, s.width = n * 0.5, s.height = s.width, r.width = n * 0.25, r.height = r.width, this.curContainer.time += e * this.flowSpeed, t.rotation += e / 1e3 * this.flowSpeed, i.rotation -= e / 500 * this.flowSpeed, s.rotation += e / 1e3 * this.flowSpeed, r.rotation -= e / 750 * this.flowSpeed, s.x = this.app.screen.width / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), s.y = this.app.screen.height / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), r.x = this.app.screen.width / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), r.y = this.app.screen.height / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), this.curContainer.alpha >= 1 && this.lastContainer.size === 0 && this.staticMode && this.app.ticker.stop();
+      ), s.position.set(this.app.screen.width / 2, this.app.screen.height / 2), a.position.set(this.app.screen.width / 2, this.app.screen.height / 2), t.width = n * Math.sqrt(2), t.height = t.width, i.width = n * 0.8, i.height = i.width, s.width = n * 0.5, s.height = s.width, a.width = n * 0.25, a.height = a.width, this.curContainer.time += e * this.flowSpeed, t.rotation += e / 1e3 * this.flowSpeed, i.rotation -= e / 500 * this.flowSpeed, s.rotation += e / 1e3 * this.flowSpeed, a.rotation -= e / 750 * this.flowSpeed, s.x = this.app.screen.width / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), s.y = this.app.screen.height / 2 + this.app.screen.width / 4 * Math.cos(this.curContainer.time / 1e3 * 0.75), a.x = this.app.screen.width / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), a.y = this.app.screen.height / 2 + this.app.screen.width / 4 * 0.1 + Math.cos(this.curContainer.time * 6e-3 * 0.75), this.curContainer.alpha >= 1 && this.lastContainer.size === 0 && this.staticMode && this.app.ticker.stop();
     }
   };
   flowSpeed = 2;
@@ -179,21 +179,21 @@ class N {
     ), this.rebuildFilters();
   }
   rebuildFilters() {
-    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new P();
+    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new v();
     i.saturate(1.2, !1);
-    const s = new P();
+    const s = new v();
     s.brightness(0.6, !1);
-    const r = new P();
-    r.contrast(0.3, !0), this.app.stage.filters?.forEach((n) => {
+    const a = new v();
+    a.contrast(0.3, !0), this.app.stage.filters?.forEach((n) => {
       n.destroy();
-    }), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(i, s, r), this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(
-      new v({
+    }), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(i, s, a), this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(
+      new P({
         radius: (t + e) / 2,
         strength: 1,
         center: [0.25, 1]
       })
     ), this.app.stage.filters.push(
-      new v({
+      new P({
         radius: (t + e) / 2,
         strength: 1,
         center: [0.75, 0]
@@ -252,8 +252,8 @@ class N {
       }
     if (!s)
       return;
-    const r = new O(), n = new w(s), a = new w(s), l = new w(s), o = new w(s);
-    n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
+    const a = new O(), n = new w(s), r = new w(s), l = new w(s), o = new w(s);
+    n.anchor.set(0.5, 0.5), r.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, r.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, a.addChild(n, r, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = a, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick);
@@ -326,14 +326,14 @@ class S {
   }
 }
 function F(h, e, t, i = 0, s) {
-  const r = s?.soft ?? !1, n = s?.stiffness ?? 100, a = s?.damping ?? 10, l = s?.mass ?? 1, o = t - h;
-  if (r || 1 <= a / (2 * Math.sqrt(n * l))) {
+  const a = s?.soft ?? !1, n = s?.stiffness ?? 100, r = s?.damping ?? 10, l = s?.mass ?? 1, o = t - h;
+  if (a || 1 <= r / (2 * Math.sqrt(n * l))) {
     const c = -Math.sqrt(n / l), d = -c * o - e;
     return (u) => (u -= i, u < 0 ? h : t - (o + u * d) * Math.E ** (u * c));
   } else {
     const c = Math.sqrt(
-      4 * l * n - a ** 2
-    ), d = (a * o - 2 * l * e) / c, u = 0.5 * c / l, f = -(0.5 * a) / l;
+      4 * l * n - r ** 2
+    ), d = (r * o - 2 * l * e) / c, u = 0.5 * c / l, f = -(0.5 * r) / l;
     return (m) => (m -= i, m < 0 ? h : t - (Math.cos(m * u) * o + Math.sin(m * u) * d) * Math.E ** (m * f));
   }
 }
@@ -393,8 +393,8 @@ class _ {
     this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.isInSight ? this.show() : this.hide());
   }
   get isInSight() {
-    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], s = t + this.lineSize[1], r = this.lyricPlayer.pos[0], n = this.lyricPlayer.pos[1], a = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0], l = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
-    return !(e > a || t > l || i < r || s < n);
+    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], s = t + this.lineSize[1], a = 0, n = 0, r = a + this.lyricPlayer.size[0], l = n + this.lyricPlayer.size[1];
+    return !(e > r || t > l || i < a || s < n);
   }
   dispose() {
     this.element.remove();
@@ -435,11 +435,11 @@ class X {
     if (t += `transform:translate(${this.left}px, ${this.top}px)`, this.currentInterlude) {
       const i = this.currentInterlude[1] - this.currentInterlude[0], s = this.currentTime - this.currentInterlude[0];
       if (s <= i) {
-        const r = i / Math.ceil(i / this.targetBreatheDuration);
-        let n = 1, a = 1;
-        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - q(
+        const a = i / Math.ceil(i / this.targetBreatheDuration);
+        let n = 1, r = 1;
+        n *= Math.sin(1.5 * Math.PI - s / a * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? r = 0 : s < 1e3 && (r *= (s - 500) / 500), i - s < 750 && (n *= 1 - q(
           (750 - (i - s)) / 750 / 2
-        )), i - s < 375 && (a *= g(
+        )), i - s < 375 && (r *= g(
           0,
           (i - s) / 375,
           1
@@ -459,15 +459,15 @@ class X {
         );
         this.dot0.style.opacity = `${g(
           0,
-          Math.max(0, a * l),
+          Math.max(0, r * l),
           1
         )}`, this.dot1.style.opacity = `${g(
           0,
-          Math.max(0, a * o),
+          Math.max(0, r * o),
           1
         )}`, this.dot2.style.opacity = `${g(
           0,
-          Math.max(0, a * c),
+          Math.max(0, r * c),
           1
         )}`;
       } else
@@ -482,9 +482,9 @@ class X {
 }
 const x = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 function Y(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
-  const i = 2 + h, s = h / i, r = (1 - s) / 2;
+  const i = 2 + h, s = h / i, a = (1 - s) / 2;
   return [
-    `linear-gradient(to right,${e} ${r * 100}%,${t} ${(r + s) * 100}%)`,
+    `linear-gradient(to right,${e} ${a * 100}%,${t} ${(a + s) * 100}%)`,
     s,
     i
   ];
@@ -512,8 +512,8 @@ class H extends EventTarget {
       "class",
       this.lyricPlayer.style.classes.lyricLine
     ), this.lyricLine.isBG && this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine), this.lyricLine.isDuet && this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div"));
-    const i = this.element.children[0], s = this.element.children[1], r = this.element.children[2];
-    i.setAttribute("class", this.lyricPlayer.style.classes.lyricMainLine), s.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), r.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), this.rebuildElement(), this.rebuildStyle();
+    const i = this.element.children[0], s = this.element.children[1], a = this.element.children[2];
+    i.setAttribute("class", this.lyricPlayer.style.classes.lyricMainLine), s.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), a.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine), this.rebuildElement(), this.rebuildStyle();
   }
   element = document.createElement("div");
   left = 0;
@@ -633,13 +633,13 @@ class H extends EventTarget {
         }), d += u.length;
       });
     });
-    const s = [], r = [];
+    const s = [], a = [];
     function n(l) {
       for (; l.firstChild; )
-        l.firstChild.nodeType === Node.ELEMENT_NODE ? s.push(e.firstChild) : l.firstChild.nodeType === Node.TEXT_NODE && r.push(e.firstChild), l.removeChild(l.firstChild), n(l.firstChild);
+        l.firstChild.nodeType === Node.ELEMENT_NODE ? s.push(e.firstChild) : l.firstChild.nodeType === Node.TEXT_NODE && a.push(e.firstChild), l.removeChild(l.firstChild), n(l.firstChild);
     }
     n(e);
-    let a = null;
+    let r = null;
     this.splittedWords.forEach((l) => {
       if (l.word.trim().length > 0)
         if (l.shouldEmphasize) {
@@ -649,36 +649,36 @@ class H extends EventTarget {
             const d = s.pop() ?? document.createElement("span");
             d.className = "", d.innerText = c, o.appendChild(d), l.elements.push(d);
           }
-          if (l.elementAnimations = this.initEmphasizeAnimation(l), a && !x.test(l.word))
-            if (a.childElementCount > 0)
-              a.appendChild(o);
+          if (l.elementAnimations = this.initEmphasizeAnimation(l), r && !x.test(l.word))
+            if (r.childElementCount > 0)
+              r.appendChild(o);
             else {
               const c = s.pop() ?? document.createElement("span");
-              c.className = "", a.remove(), c.appendChild(a), c.appendChild(o), e.appendChild(c), a = c;
+              c.className = "", r.remove(), c.appendChild(r), c.appendChild(o), e.appendChild(c), r = c;
             }
           else
-            a = x.test(l.word) ? null : o, e.appendChild(o);
+            r = x.test(l.word) ? null : o, e.appendChild(o);
         } else {
           const o = s.pop() ?? document.createElement("span");
-          if (o.className = "", o.innerText = l.word, l.elements = [o], l.elementAnimations.push(this.initFloatAnimation(l, o)), a)
-            if (a.childElementCount > 0)
-              a.appendChild(o);
+          if (o.className = "", o.innerText = l.word, l.elements = [o], l.elementAnimations.push(this.initFloatAnimation(l, o)), r)
+            if (r.childElementCount > 0)
+              r.appendChild(o);
             else {
               const c = s.pop() ?? document.createElement("span");
-              c.className = "", a.remove(), c.appendChild(a), c.appendChild(o), e.appendChild(c), a = c;
+              c.className = "", r.remove(), c.appendChild(r), c.appendChild(o), e.appendChild(c), r = c;
             }
           else
-            a = o, e.appendChild(o);
+            r = o, e.appendChild(o);
         }
       else if (l.word.length > 0) {
-        const o = r.pop() ?? document.createTextNode(" ");
-        e.appendChild(o), a = null;
+        const o = a.pop() ?? document.createTextNode(" ");
+        e.appendChild(o), r = null;
       } else
-        a = null;
+        r = null;
     }), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
   }
   initFloatAnimation(e, t) {
-    const i = e.startTime - this.lyricLine.startTime, s = Math.max(1e3, e.endTime - e.startTime), r = t.animate(
+    const i = e.startTime - this.lyricLine.startTime, s = Math.max(1e3, e.endTime - e.startTime), a = t.animate(
       [
         {
           transform: "translateY(0px)"
@@ -695,15 +695,15 @@ class H extends EventTarget {
         fill: "both"
       }
     );
-    return r.pause(), r;
+    return a.pause(), a;
   }
   initEmphasizeAnimation(e) {
     const t = e.startTime - this.lyricLine.startTime, i = e.endTime - e.startTime;
-    return e.elements.map((s, r, n) => {
-      if (r === 0)
+    return e.elements.map((s, a, n) => {
+      if (a === 0)
         return this.initFloatAnimation(e, s);
       {
-        const a = Math.max(1e3, e.endTime - e.startTime), l = t + i / (n.length - 1) * (r - 1), o = s.animate(
+        const r = Math.max(1e3, e.endTime - e.startTime), l = t + i / (n.length - 1) * (a - 1), o = s.animate(
           [
             {
               offset: 0,
@@ -722,7 +722,7 @@ class H extends EventTarget {
             }
           ],
           {
-            duration: isFinite(a) ? a : 0,
+            duration: isFinite(r) ? r : 0,
             delay: isFinite(l) ? l : 0,
             id: "glow-word",
             iterations: 1,
@@ -739,13 +739,13 @@ class H extends EventTarget {
       const t = e.elements[0];
       if (t) {
         e.width = t.clientWidth, e.height = t.clientHeight;
-        const [i, s, r] = Y(
+        const [i, s, a] = Y(
           16 / e.width,
           "rgba(0,0,0,0.75)",
           "rgba(0,0,0,0.25)"
-        ), n = `${r * 100}% 100%`;
+        ), n = `${a * 100}% 100%`;
         this.lyricPlayer.supportMaskImage ? (t.style.maskImage = i, t.style.maskOrigin = "left", t.style.maskSize = n) : (t.style.webkitMaskImage = i, t.style.webkitMaskOrigin = "left", t.style.webkitMaskSize = n);
-        const a = e.width + 16, l = `clamp(${-a}px,calc(${-a}px + (var(--amll-player-time) - ${e.startTime})*${a / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
+        const r = e.width + 16, l = `clamp(${-r}px,calc(${-r}px + (var(--amll-player-time) - ${e.startTime})*${r / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
         t.style.maskPosition = l, t.style.webkitMaskPosition = l;
       }
     }), this._hide && (this.element.style.display = "none", this.element.style.visibility = "");
@@ -753,12 +753,12 @@ class H extends EventTarget {
   getElement() {
     return this.element;
   }
-  setTransform(e = this.left, t = this.top, i = this.scale, s = 1, r = 0, n = !1, a = 0) {
+  setTransform(e = this.left, t = this.top, i = this.scale, s = 1, a = 0, n = !1, r = 0) {
     const l = this.isInSight, o = this.lyricPlayer.getEnableSpring();
-    this.left = e, this.top = t, this.scale = i, this.delay = a * 1e3 | 0;
+    this.left = e, this.top = t, this.scale = i, this.delay = r * 1e3 | 0;
     const c = this.element.children[0];
     if (c.style.opacity = `${s}`, n || !o) {
-      if (this.blur = Math.min(32, r), n && this.element.classList.add(
+      if (this.blur = Math.min(32, a), n && this.element.classList.add(
         this.lyricPlayer.style.classes.tmpDisableTransition
       ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(i), o)
         this.rebuildStyle();
@@ -772,14 +772,14 @@ class H extends EventTarget {
         );
       });
     } else
-      this.lineTransforms.posX.setTargetPosition(e, a), this.lineTransforms.posY.setTargetPosition(t, a), this.lineTransforms.scale.setTargetPosition(i), this.blur !== Math.min(32, r) && (this.blur = Math.min(32, r), this.element.style.filter = `blur(${Math.min(32, r)}px)`);
+      this.lineTransforms.posX.setTargetPosition(e, r), this.lineTransforms.posY.setTargetPosition(t, r), this.lineTransforms.scale.setTargetPosition(i), this.blur !== Math.min(32, a) && (this.blur = Math.min(32, a), this.element.style.filter = `blur(${Math.min(32, a)}px)`);
   }
   update(e = 0) {
     this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.lineTransforms.scale.update(e), this.isInSight ? this.show() : this.hide());
   }
   get isInSight() {
-    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], s = t + this.lineSize[1], r = this.lyricPlayer.pos[0], n = this.lyricPlayer.pos[1], a = this.lyricPlayer.pos[0] + this.lyricPlayer.size[0], l = this.lyricPlayer.pos[1] + this.lyricPlayer.size[1];
-    return !(e > a || i < r || t > l || s < n);
+    const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], s = t + this.lineSize[1], a = 0, n = 0, r = a + this.lyricPlayer.size[0], l = n + this.lyricPlayer.size[1];
+    return !(e > r || i < a || t > l || s < n);
   }
   dispose() {
     this.element.remove();
@@ -809,9 +809,9 @@ class ae extends EventTarget {
   scrollOffset = 0;
   resizeObserver = new ResizeObserver((e) => {
     const t = e[0].contentRect;
-    this.size[0] = t.width, this.size[1] = t.height, this.pos[0] = t.left, this.pos[1] = t.top;
-    const i = getComputedStyle(e[0].target), s = this.element.clientWidth - parseFloat(i.paddingLeft) - parseFloat(i.paddingRight), r = this.element.clientHeight - parseFloat(i.paddingTop) - parseFloat(i.paddingBottom);
-    this.innerSize[0] = s, this.innerSize[1] = r, this.rebuildStyle(), this.calcLayout(!0, !0), this.lyricLinesEl.forEach((n) => n.updateMaskImage());
+    this.size[0] = t.width, this.size[1] = t.height;
+    const i = getComputedStyle(e[0].target), s = this.element.clientWidth - parseFloat(i.paddingLeft) - parseFloat(i.paddingRight), a = this.element.clientHeight - parseFloat(i.paddingTop) - parseFloat(i.paddingBottom);
+    this.innerSize[0] = s, this.innerSize[1] = a, this.rebuildStyle(), this.calcLayout(!0, !0), this.lyricLinesEl.forEach((n) => n.updateMaskImage());
   });
   posXSpringParams = {
     mass: 1,
@@ -841,7 +841,7 @@ class ae extends EventTarget {
   isNonDynamic = !1;
   size = [0, 0];
   innerSize = [0, 0];
-  pos = [0, 0];
+  // readonly pos: [number, number] = [0, 0];
   onLineClickedHandler = (e) => {
     const t = new j(
       this.lyricLinesIndexes.get(e.line) ?? -1,
@@ -1070,19 +1070,19 @@ class ae extends EventTarget {
     this.lyricLines = e;
     const t = 750;
     this.processedLines = e.filter(
-      (i) => i.words.reduce((s, r) => s + r.word.trim().length, 0) > 0
-    ).map((i, s, r) => {
+      (i) => i.words.reduce((s, a) => s + a.word.trim().length, 0) > 0
+    ).map((i, s, a) => {
       if (i.isBG)
         return {
           ...i
         };
       {
-        const n = r[s - 1], a = r[s - 2];
-        if (n?.isBG && a) {
-          if (a.endTime < i.startTime)
+        const n = a[s - 1], r = a[s - 2];
+        if (n?.isBG && r) {
+          if (r.endTime < i.startTime)
             return {
               ...i,
-              startTime: Math.max(a.endTime, i.startTime - t) || i.startTime
+              startTime: Math.max(r.endTime, i.startTime - t) || i.startTime
             };
         } else if (n?.endTime && n.endTime < i.startTime)
           return {
@@ -1099,19 +1099,19 @@ class ae extends EventTarget {
         this.isNonDynamic = !1;
         break;
       }
-    this.processedLines.forEach((i, s, r) => {
-      const n = r[s + 1], a = i.words[i.words.length - 1];
-      a && M(a) && (n ? n.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, n.startTime)) : i.endTime = i.endTime + 1500);
-    }), this.processedLines.forEach((i, s, r) => {
+    this.processedLines.forEach((i, s, a) => {
+      const n = a[s + 1], r = i.words[i.words.length - 1];
+      r && M(r) && (n ? n.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, n.startTime)) : i.endTime = i.endTime + 1500);
+    }), this.processedLines.forEach((i, s, a) => {
       if (i.isBG)
         return;
-      const n = r[s + 1];
+      const n = a[s + 1];
       n?.isBG && (n.startTime = Math.min(n.startTime, i.startTime));
     }), this.lyricLinesEl.forEach((i) => {
       i.removeEventListener("click", this.onLineClickedHandler), i.removeEventListener("contextmenu", this.onLineClickedHandler), i.dispose();
-    }), this.lyricLinesEl = this.processedLines.map((i, s) => {
-      const r = new H(this, i);
-      return r.addEventListener("click", this.onLineClickedHandler), r.addEventListener("contextmenu", this.onLineClickedHandler), r;
+    }), this.lyricLinesEl = this.processedLines.map((i) => {
+      const s = new H(this, i);
+      return s.addEventListener("click", this.onLineClickedHandler), s.addEventListener("contextmenu", this.onLineClickedHandler), s;
     }), this.lyricLinesEl.forEach((i, s) => {
       this.element.appendChild(i.getElement()), this.lyricLinesIndexes.set(i, s), i.updateMaskImage();
     }), this.interludeDots.setInterlude(void 0), this.hotLines.clear(), this.bufferedLines.clear(), this.setLinePosXSpringParams({}), this.setLinePosYSpringParams({}), this.setLineScaleSpringParams({}), this.setCurrentTime(0, !0), this.calcLayout(!0, !0);
@@ -1147,14 +1147,14 @@ class ae extends EventTarget {
       this.lyricLinesSize.set(m, p), m.lineSize = p;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());
     const i = this.getCurrentInterlude();
-    let s = -this.scrollOffset, r = this.scrollToIndex, n = 0;
-    i ? (n = i[1] - i[0], n >= 5e3 && this.lyricLinesEl[i[2] + 1] && (r = i[2] + 1)) : this.interludeDots.setInterlude(void 0);
-    const a = this.enableScale ? 0.95 : 1, l = this.lyricLinesEl.slice(0, r).reduce(
+    let s = -this.scrollOffset, a = this.scrollToIndex, n = 0;
+    i ? (n = i[1] - i[0], n >= 5e3 && this.lyricLinesEl[i[2] + 1] && (a = i[2] + 1)) : this.interludeDots.setInterlude(void 0);
+    const r = this.enableScale ? 0.95 : 1, l = this.lyricLinesEl.slice(0, a).reduce(
       (m, p) => m + (p.getLine().isBG ? 0 : this.lyricLinesSize.get(p)?.[1] ?? 0),
       0
     );
     s -= l, s += this.size[1] * this.alignPosition;
-    const o = this.lyricLinesEl[r];
+    const o = this.lyricLinesEl[a];
     if (o) {
       const m = this.lyricLinesSize.get(o)?.[1] ?? 0;
       switch (this.alignAnchor) {
@@ -1173,7 +1173,7 @@ class ae extends EventTarget {
       E.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && n >= 5e3 && (p === this.scrollToIndex && i?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]), m.setTransform(
         0,
         s,
-        b ? 1 : a,
+        b ? 1 : r,
         L ? 1 : 1 / 3,
         !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (p < this.scrollToIndex ? Math.abs(this.scrollToIndex - p) : Math.abs(p - Math.max(this.scrollToIndex, c))) : 0,
         e,
@@ -1242,31 +1242,31 @@ class ae extends EventTarget {
   setCurrentTime(e, t = !1) {
     if (this.currentTime = e, this.element.style.setProperty("--amll-player-time", `${e}`), this.isScrolled)
       return;
-    const i = /* @__PURE__ */ new Set(), s = /* @__PURE__ */ new Set(), r = /* @__PURE__ */ new Set();
+    const i = /* @__PURE__ */ new Set(), s = /* @__PURE__ */ new Set(), a = /* @__PURE__ */ new Set();
     this.hotLines.forEach((n) => {
-      const a = this.processedLines[n];
-      if (a) {
-        if (a.isBG)
+      const r = this.processedLines[n];
+      if (r) {
+        if (r.isBG)
           return;
         const l = this.processedLines[n + 1];
         if (l?.isBG) {
-          const o = Math.min(a.startTime, l?.startTime), c = Math.max(a.endTime, l?.endTime);
+          const o = Math.min(r.startTime, l?.startTime), c = Math.max(r.endTime, l?.endTime);
           (o > e || c <= e) && (this.hotLines.delete(n), i.add(n), this.hotLines.delete(n + 1), i.add(n + 1), t && (this.lyricLinesEl[n].disable(), this.lyricLinesEl[n + 1].disable()));
         } else
-          (a.startTime > e || a.endTime <= e) && (this.hotLines.delete(n), i.add(n), t && this.lyricLinesEl[n].disable());
+          (r.startTime > e || r.endTime <= e) && (this.hotLines.delete(n), i.add(n), t && this.lyricLinesEl[n].disable());
       } else
         this.hotLines.delete(n), i.add(n), t && this.lyricLinesEl[n].disable();
-    }), this.processedLines.forEach((n, a, l) => {
-      !n.isBG && n.startTime <= e && n.endTime > e && (this.hotLines.has(a) || (this.hotLines.add(a), r.add(a), t && this.lyricLinesEl[a].enable(), l[a + 1]?.isBG && (this.hotLines.add(a + 1), r.add(a + 1), t && this.lyricLinesEl[a + 1].enable())));
+    }), this.processedLines.forEach((n, r, l) => {
+      !n.isBG && n.startTime <= e && n.endTime > e && (this.hotLines.has(r) || (this.hotLines.add(r), a.add(r), t && this.lyricLinesEl[r].enable(), l[r + 1]?.isBG && (this.hotLines.add(r + 1), a.add(r + 1), t && this.lyricLinesEl[r + 1].enable())));
     }), this.bufferedLines.forEach((n) => {
       this.hotLines.has(n) || (s.add(n), t && this.lyricLinesEl[n].disable());
     }), t ? (this.bufferedLines.size > 0 ? this.scrollToIndex = Math.min(...this.bufferedLines) : this.scrollToIndex = this.processedLines.findIndex(
       (n) => n.startTime >= e
-    ), this.bufferedLines.clear(), this.hotLines.forEach((n) => this.bufferedLines.add(n)), this.calcLayout(!0)) : (s.size > 0 || r.size > 0) && (s.size === 0 && r.size > 0 ? (r.forEach((n) => {
+    ), this.bufferedLines.clear(), this.hotLines.forEach((n) => this.bufferedLines.add(n)), this.calcLayout(!0)) : (s.size > 0 || a.size > 0) && (s.size === 0 && a.size > 0 ? (a.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
-    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : r.size === 0 && s.size > 0 ? $(s, this.bufferedLines) && this.bufferedLines.forEach((n) => {
+    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : a.size === 0 && s.size > 0 ? $(s, this.bufferedLines) && this.bufferedLines.forEach((n) => {
       this.hotLines.has(n) || (this.bufferedLines.delete(n), this.lyricLinesEl[n].disable());
-    }) : (r.forEach((n) => {
+    }) : (a.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
     }), s.forEach((n) => {
       this.bufferedLines.delete(n), this.lyricLinesEl[n].disable();
