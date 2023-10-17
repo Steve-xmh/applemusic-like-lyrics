@@ -29,6 +29,7 @@ type WSClientBodies =
 			{
 				id: string;
 				name: string;
+				duration: number;
 			}
 	  >
 	| WSClientBody<
@@ -96,6 +97,7 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 	}
 	private musicId = "";
 	private musicName = "";
+	private musicDuration = 0;
 	private musicAlbumId = "";
 	private musicAlbumName = "";
 	private musicArtists: Artist[] = [];
@@ -103,8 +105,10 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 	private onClientBody(body: WSClientBodies) {
 		switch (body.type) {
 			case "setMusicId":
+				console.log(body);
 				this.musicId = body.value.id;
 				this.musicName = body.value.name;
+				this.musicDuration = body.value.duration;
 				this.dispatchTypedEvent(
 					"load",
 					new CustomEvent("load"),
@@ -151,7 +155,7 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 		return this.musicId;
 	}
 	override getMusicDuration(): number {
-		return 0;
+		return this.musicDuration;
 	}
 	override getMusicName(): string {
 		return this.musicName;

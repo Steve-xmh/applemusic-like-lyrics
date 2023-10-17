@@ -34,30 +34,42 @@ pub enum Body {
     #[brw(magic(1u16))]
     Pong,
     #[brw(magic(2u16))]
-    SetMusicId { id: NullString, name: NullString },
+    SetMusicId {
+        id: NullString,
+        name: NullString,
+        duration: u64,
+    },
     #[brw(magic(3u16))]
     SetMusicAlbum { id: NullString, name: NullString },
     #[serde(rename_all = "camelCase")]
     #[brw(magic(4u16))]
     SetMusicAlbumCoverImageURL { img_url: NullString },
     #[brw(magic(5u16))]
+    SetMusicAlbumCoverImageData {
+        #[bw(try_calc = u32::try_from(data.len()))]
+        size: u32,
+        #[br(count = size)]
+        #[serde(with = "serde_bytes")]
+        data: Vec<u8>,
+    },
+    #[brw(magic(6u16))]
     SetMusicArtists {
         #[bw(try_calc = u32::try_from(artists.len()))]
         size: u32,
         #[br(count = size)]
         artists: Vec<Artist>,
     },
-    #[brw(magic(6u16))]
-    OnLoadProgress { progress: f64 },
     #[brw(magic(7u16))]
-    OnPlayProgress { progress: f64 },
+    OnLoadProgress { progress: f64 },
     #[brw(magic(8u16))]
-    OnPaused,
+    OnPlayProgress { progress: f64 },
     #[brw(magic(9u16))]
-    OnResumed,
+    OnPaused,
     #[brw(magic(10u16))]
-    SetPlayProgress { progress: f64 },
+    OnResumed,
     #[brw(magic(11u16))]
+    SetPlayProgress { progress: f64 },
+    #[brw(magic(12u16))]
     OnAudioData {
         #[bw(try_calc = u32::try_from(data.len()))]
         size: u32,

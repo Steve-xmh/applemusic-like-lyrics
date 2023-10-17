@@ -52,7 +52,9 @@ export async function getLyric(
 	signal?: AbortSignal,
 ): Promise<EAPILyricResponse> {
 	const v = await fetch(
-		`${APP_CONF.domain}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
+		`${
+			window?.APP_CONF?.domain ?? "https://music.163.com"
+		}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
 		{
 			signal,
 		},

@@ -4,12 +4,14 @@ import {
 	currentTimeAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
+	musicDurationAtom,
 	musicIdAtom,
 	musicNameAtom,
 } from "./wrapper";
 import { log, warn } from "../utils/logger";
 import { toBody } from "@applemusic-like-lyrics/ws-protocol";
 import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
+import { toDataURL } from "../utils/to-data-uri";
 
 export enum ConnectionColor {
 	Disabled = "#aaaaaa",
@@ -28,6 +30,7 @@ export const WebSocketWrapper: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
 	const musicName = useAtomValue(musicNameAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
+	const musicDuration = useAtomValue(musicDurationAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const playProgress = useAtomValue(currentTimeAtom);
 	const setWSStatus = useSetAtom(wsConnectionStatusAtom);
@@ -42,10 +45,11 @@ export const WebSocketWrapper: FC = () => {
 				value: {
 					id: musicId,
 					name: musicName,
+					duration: musicDuration,
 				},
 			}),
 		);
-	}, [musicId, musicName]);
+	}, [musicId, musicName, musicDuration]);
 
 	useEffect(() => {
 		ws.current?.send(
@@ -73,14 +77,18 @@ export const WebSocketWrapper: FC = () => {
 	}, [playProgress]);
 
 	useEffect(() => {
-		ws.current?.send(
-			toBody({
-				type: "setMusicAlbumCoverImageURL",
-				value: {
-					imgUrl: musicCover,
-				},
-			}),
-		);
+		toDataURL(musicCover)
+			.then((musicCover) => {
+				ws.current?.send(
+					toBody({
+						type: "setMusicAlbumCoverImageURL",
+						value: {
+							imgUrl: musicCover,
+						},
+					}),
+				);
+			})
+			.catch(() => {});
 	}, [musicCover]);
 
 	useEffect(() => {

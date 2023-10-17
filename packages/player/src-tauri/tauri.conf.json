@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build:dev",
@@ -27,7 +28,8 @@
       ]
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src https://*; child-src 'none'; connect-src 'self' https://*",
+      "dangerousDisableAssetCspModification": true
     },
     "windows": [
       {

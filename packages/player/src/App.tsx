@@ -14,6 +14,7 @@ import {
 	PlayState,
 } from "@applemusic-like-lyrics/bncm/src/music-context";
 import {
+	lyricPageOpenedAtom,
 	musicAlbumIdAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
@@ -29,6 +30,7 @@ import {
 	rawPlayStatusAtom,
 } from "@applemusic-like-lyrics/bncm/src/music-context/wrapper";
 import { MusicContextAMLLPlayer } from "./player-context";
+import { LyricProvider } from "@applemusic-like-lyrics/bncm/src/lyric/provider";
 
 function ErrorRender({ error, resetErrorBoundary }) {
 	console.error(error);
@@ -46,6 +48,7 @@ function ErrorRender({ error, resetErrorBoundary }) {
 }
 
 globalStore.set(amllEnvironmentAtom, AMLLEnvironment.AMLLPlayer);
+globalStore.set(lyricPageOpenedAtom, true);
 
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
@@ -139,6 +142,9 @@ function App() {
 	return (
 		<ErrorBoundary fallbackRender={ErrorRender}>
 			<Provider store={globalStore}>
+				<Suspense>
+					<LyricProvider />
+				</Suspense>
 				<Suspense>
 					<MusicInfoWrapper />
 				</Suspense>
