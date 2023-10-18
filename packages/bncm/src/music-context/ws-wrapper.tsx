@@ -12,6 +12,7 @@ import { log, warn } from "../utils/logger";
 import { toBody } from "@applemusic-like-lyrics/ws-protocol";
 import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
 import { toDataURL } from "../utils/to-data-uri";
+import { debounce } from "../utils/debounce";
 
 export enum ConnectionColor {
 	Disabled = "#aaaaaa",
@@ -111,29 +112,34 @@ export const WebSocketWrapper: FC = () => {
 				text: "正在连接",
 			});
 
+			webSocket?.close();
 			webSocket = new WebSocket(url);
+			const nowWS = webSocket;
 
 			webSocket.addEventListener("error", () => {
+				if (nowWS !== webSocket) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
 					text: "连接失败，五秒后重试",
 				});
 				warn("连接到播放器失败");
-				setTimeout(connect, 5000);
+				enqueueConnect();
 			});
 
 			webSocket.addEventListener("close", () => {
+				if (nowWS !== webSocket) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
 					text: "连接已关闭，五秒后重试",
 				});
 				warn("连接到播放器失败");
-				setTimeout(connect, 5000);
+				enqueueConnect();
 			});
 
 			webSocket.addEventListener("open", () => {
+				if (nowWS !== webSocket) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Active,
@@ -144,6 +150,7 @@ export const WebSocketWrapper: FC = () => {
 				ws.current = webSocket;
 			});
 		};
+		const enqueueConnect = debounce(connect, 5000);
 
 		connect();
 

@@ -66,22 +66,6 @@ jobs:
           projectPath: packages/player
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: marvinpinto/action-automatic-releases@latest
-        name: 发布到 Github Release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: ${{ github.ref_name }}-amll-player-nightly
-          prerelease: true
-          title: AMLL Player 最新 ${{ github.ref_name }} 分支开发调试构建
-          files: |
-            packages/player/src-tauri/target/release/bundle/deb/*.deb
-            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage
-            packages/player/src-tauri/target/release/bundle/appimage/*.AppImage.tar.gz
-            packages/player/src-tauri/target/release/bundle/msis/*.exe
-            packages/player/src-tauri/target/release/bundle/msi/*.msi
-            packages/player/src-tauri/target/release/bundle/dmg/*.dmg
-            packages/player/src-tauri/target/release/bundle/macos/*.app
-            packages/player/src-tauri/target/release/bundle/macos/*.app.tar.gz
       - name: 上传产物到 Action Artifact
         uses: actions/upload-artifact@v3
         with:
