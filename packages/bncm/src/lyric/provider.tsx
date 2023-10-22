@@ -33,7 +33,7 @@ interface EAPILyric {
 	lyric: string;
 }
 
-interface EAPILyricResponse extends EAPIResponse {
+export interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
 	romalrc?: EAPILyric;
@@ -47,7 +47,7 @@ interface EAPILyricResponse extends EAPIResponse {
  * @param songId 歌曲ID
  * @returns 歌词数据信息
  */
-export async function getLyric(
+async function getLyric(
 	songId: string,
 	signal?: AbortSignal,
 ): Promise<EAPILyricResponse> {
@@ -64,6 +64,8 @@ export async function getLyric(
 	if (v.ok) return await v.json();
 	else throw v.statusText;
 }
+
+export const getLyricFromNCMAtom = atom({ getLyric });
 
 // export const lyricLinesAtom = atom<CoreLyricLine[] | undefined>(undefined);
 
@@ -263,8 +265,9 @@ async function getLyricFromNCM(
 	showTranslatedLine: boolean,
 	showRomanLine: boolean,
 	abortSignal: AbortSignal,
+	lyricGetter: typeof getLyric = getLyric,
 ) {
-	const currentRawLyricResp = await getLyric(musicId, abortSignal);
+	const currentRawLyricResp = await lyricGetter(musicId, abortSignal);
 	const canUseDynamicLyric = !(
 		!currentRawLyricResp?.yrc?.lyric ||
 		(showTranslatedLine &&
@@ -412,6 +415,7 @@ export const LyricProvider: FC = () => {
 	const songName = useAtomValue(musicNameAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const lyricSources = useAtomValue(lyricSourcesAtom);
+	const { getLyric } = useAtomValue(getLyricFromNCMAtom);
 	const allowTranslatedLine = useAtomValue(showTranslatedLineAtom);
 	const allowRomanLine = useAtomValue(showRomanLineAtom);
 	const setLyricProviderLogs = useSetAtom(lyricProviderLogsAtom);
@@ -471,6 +475,7 @@ export const LyricProvider: FC = () => {
 							allowTranslatedLine,
 							allowRomanLine,
 							signal,
+							getLyric,
 						);
 						if (lines) {
 							return lines;

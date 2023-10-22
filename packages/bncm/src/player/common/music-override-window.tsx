@@ -16,7 +16,7 @@ import {
 import { type FC, useLayoutEffect } from "react";
 import { Switch } from "../../components/appkit/switch/switch";
 import { loadable, useAtomCallback } from "jotai/utils";
-import { getLyric } from "../../lyric/provider";
+import { getLyricFromNCMAtom } from "../../lyric/provider";
 import "./music-override-window.sass";
 import { Select } from "../../components/appkit/select";
 import { focusAtom } from "../../utils/atom-focus";
@@ -76,6 +76,7 @@ const overrideLyricOverrideRomanLyricDataAtom = focusAtom(
 const rawMusicInfoAtom = loadable(
 	atom((get) => {
 		const musicId = get(musicIdAtom);
+		const { getLyric } = get(getLyricFromNCMAtom);
 		return getLyric(musicId);
 	}),
 );
