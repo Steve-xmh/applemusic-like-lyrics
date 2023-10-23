@@ -33,7 +33,7 @@
       ]
     },
     "security": {
-      "csp": "default-src 'self'; img-src https://*; child-src 'none'; connect-src 'self' https://*",
+      "csp": "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: mediastream: blob: filesystem: https://*",
       "dangerousDisableAssetCspModification": true
     },
     "windows": [

@@ -78,18 +78,14 @@ export const WebSocketWrapper: FC = () => {
 	}, [playProgress]);
 
 	useEffect(() => {
-		toDataURL(musicCover)
-			.then((musicCover) => {
-				ws.current?.send(
-					toBody({
-						type: "setMusicAlbumCoverImageURL",
-						value: {
-							imgUrl: musicCover,
-						},
-					}),
-				);
-			})
-			.catch(() => {});
+		ws.current?.send(
+			toBody({
+				type: "setMusicAlbumCoverImageURL",
+				value: {
+					imgUrl: musicCover,
+				},
+			}),
+		);
 	}, [musicCover]);
 
 	useEffect(() => {
@@ -117,7 +113,7 @@ export const WebSocketWrapper: FC = () => {
 			const nowWS = webSocket;
 
 			webSocket.addEventListener("error", () => {
-				if (nowWS !== webSocket) return;
+				if (nowWS !== webSocket || canceled) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
@@ -128,7 +124,7 @@ export const WebSocketWrapper: FC = () => {
 			});
 
 			webSocket.addEventListener("close", () => {
-				if (nowWS !== webSocket) return;
+				if (nowWS !== webSocket || canceled) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
@@ -139,7 +135,7 @@ export const WebSocketWrapper: FC = () => {
 			});
 
 			webSocket.addEventListener("open", () => {
-				if (nowWS !== webSocket) return;
+				if (nowWS !== webSocket || canceled) return;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Active,

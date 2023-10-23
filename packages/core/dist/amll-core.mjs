@@ -234,7 +234,7 @@ class N {
    */
   async setAlbumImage(e) {
     const t = new Image();
-    t.src = e;
+    t.src = e, t.crossOrigin = "anonymous";
     let i = 5, s;
     for (; !s?.baseTexture?.resource?.valid && i > 0; )
       try {

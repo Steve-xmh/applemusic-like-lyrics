@@ -212,6 +212,7 @@ export class PixiRenderer implements Disposable {
 	async setAlbumImage(albumUrl: string) {
 		const img = new Image();
 		img.src = albumUrl;
+		img.crossOrigin = "anonymous";
 		let remainRetryTimes = 5;
 		let tex;
 		while (!tex?.baseTexture?.resource?.valid && remainRetryTimes > 0) {
