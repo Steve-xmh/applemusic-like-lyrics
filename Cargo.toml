@@ -6,6 +6,7 @@ members = [
 ]
 exclude = [
     "./packages/player/src-tauri",
+    "./packages/skia-player",
 ]
 
 [profile.release]

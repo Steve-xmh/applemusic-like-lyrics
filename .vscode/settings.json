@@ -2,5 +2,6 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     "rust-analyzer.linkedProjects": [
         "./packages/player/src-tauri/Cargo.toml",
+        "./packages/skia-player/Cargo.toml",
     ]
 }

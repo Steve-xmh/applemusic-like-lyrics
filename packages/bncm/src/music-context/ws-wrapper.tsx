@@ -13,6 +13,7 @@ import { toBody } from "@applemusic-like-lyrics/ws-protocol";
 import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
 import { toDataURL } from "../utils/to-data-uri";
 import { debounce } from "../utils/debounce";
+import { lyricLinesAtom } from "../lyric/provider";
 
 export enum ConnectionColor {
 	Disabled = "#aaaaaa",
@@ -32,6 +33,7 @@ export const WebSocketWrapper: FC = () => {
 	const musicName = useAtomValue(musicNameAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
+	const lyricLines = useAtomValue(lyricLinesAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const playProgress = useAtomValue(currentTimeAtom);
 	const setWSStatus = useSetAtom(wsConnectionStatusAtom);
@@ -50,7 +52,7 @@ export const WebSocketWrapper: FC = () => {
 				},
 			}),
 		);
-	}, [musicId, musicName, musicDuration]);
+	}, [musicId, musicName, musicDuration, ws.current]);
 
 	useEffect(() => {
 		ws.current?.send(
@@ -64,7 +66,7 @@ export const WebSocketWrapper: FC = () => {
 				},
 			}),
 		);
-	}, [artists]);
+	}, [artists, ws.current]);
 
 	useEffect(() => {
 		ws.current?.send(
@@ -75,7 +77,28 @@ export const WebSocketWrapper: FC = () => {
 				},
 			}),
 		);
-	}, [playProgress]);
+	}, [playProgress, ws.current]);
+
+	useEffect(() => {
+		if (lyricLines.state === "hasData") {
+			ws.current?.send(
+				toBody({
+					type: "setLyric",
+					value: {
+						data: lyricLines.data.map((v) => ({
+							...v,
+							startTime: v.startTime | 0,
+							words: v.words.map((w) => ({
+								...w,
+								startTime: w.startTime | 0,
+								endTime: w.endTime | 0,
+							})),
+						})),
+					},
+				}),
+			);
+		}
+	}, [lyricLines, ws.current]);
 
 	useEffect(() => {
 		ws.current?.send(
@@ -86,7 +109,7 @@ export const WebSocketWrapper: FC = () => {
 				},
 			}),
 		);
-	}, [musicCover]);
+	}, [musicCover, ws.current]);
 
 	useEffect(() => {
 		if (!enabled) {
@@ -97,7 +120,7 @@ export const WebSocketWrapper: FC = () => {
 			});
 			return;
 		}
-		let webSocket: WebSocket;
+		let webSocket: WebSocket | undefined;
 		let canceled = false;
 
 		const connect = () => {
@@ -114,6 +137,8 @@ export const WebSocketWrapper: FC = () => {
 
 			webSocket.addEventListener("error", () => {
 				if (nowWS !== webSocket || canceled) return;
+				webSocket = undefined;
+				ws.current = undefined;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
@@ -125,6 +150,8 @@ export const WebSocketWrapper: FC = () => {
 
 			webSocket.addEventListener("close", () => {
 				if (nowWS !== webSocket || canceled) return;
+				webSocket = undefined;
+				ws.current = undefined;
 				setWSStatus({
 					progress: false,
 					color: ConnectionColor.Error,
@@ -151,7 +178,8 @@ export const WebSocketWrapper: FC = () => {
 		connect();
 
 		return () => {
-			webSocket.close();
+			webSocket?.close();
+			webSocket = undefined;
 			canceled = true;
 			setWSStatus({
 				color: ConnectionColor.Disabled,

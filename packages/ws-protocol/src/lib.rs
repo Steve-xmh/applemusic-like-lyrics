@@ -19,8 +19,44 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Artist {
-    id: NullString,
-    name: NullString,
+    pub id: NullString,
+    pub name: NullString,
+}
+
+#[binrw]
+#[brw(little)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct LyricWord {
+    pub start_time: u32,
+    pub end_time: u32,
+    pub word: NullString,
+}
+
+#[binrw]
+#[brw(little)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct LyricLine {
+    #[bw(try_calc = u32::try_from(words.len()))]
+    size: u32,
+    #[br(count = size)]
+    pub words: Vec<LyricWord>,
+    #[serde(default)]
+    pub translated_lyric: NullString,
+    #[serde(default)]
+    pub roman_lyric: NullString,
+    #[serde(skip)]
+    #[bw(calc = *is_bg as u8 | ((*is_duet as u8) << 1))]
+    flag: u8,
+    #[serde(default, rename = "isBG")]
+    #[br(calc = flag & 0b01 != 0)]
+    #[bw(ignore)]
+    pub is_bg: bool,
+    #[serde(default)]
+    #[br(calc = flag & 0b10 != 0)]
+    #[bw(ignore)]
+    pub is_duet: bool,
 }
 
 /// 信息主体
@@ -76,6 +112,13 @@ pub enum Body {
         #[br(count = size)]
         #[serde(with = "serde_bytes")]
         data: Vec<u8>,
+    },
+    #[brw(magic(13u16))]
+    SetLyric {
+        #[bw(try_calc = u32::try_from(data.len()))]
+        size: u32,
+        #[br(count = size)]
+        data: Vec<LyricLine>,
     },
 }
 
