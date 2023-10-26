@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use skia_safe::{Canvas, Color4f, Data, Font, Image, Rect, TextBlob, Typeface};
+use skia_safe::{Canvas, Color4f, Data, Font, Image, Rect, TextBlob, Typeface, Point, TextEncoding};
 use tracing::info;
 
 const PINGFANG_SC: &[u8] = include_bytes!("../assets/PingFangSC-Regular.ttf");
@@ -40,11 +40,11 @@ impl Renderer {
     }
 
     pub fn render(&mut self, canvas: &Canvas) {
-        canvas.reset_matrix();
         canvas.clear(skia_safe::Color::from_rgb(0x33, 0x33, 0x33));
         let font = Font::from_typeface(&self.sf_pro_type_face, 16.);
-        let tb = TextBlob::new(format!("FPS: {}", self.cur_frame), &font).unwrap();
-        canvas.scale((4.0, 4.0));
+        let text = format!("FPS: {}", self.cur_frame);
+        let text_poses = text.chars().enumerate().map(|x| Point::new(0., x.0 as f32 * 100.)).collect::<Vec<_>>();
+        let tb = TextBlob::from_pos_text(text.as_bytes(), &text_poses, &font, TextEncoding::UTF8).unwrap();
         canvas.draw_text_blob(
             &tb,
             (10., tb.bounds().height() + 10.),

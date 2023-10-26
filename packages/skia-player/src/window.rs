@@ -14,6 +14,7 @@ pub struct Window<T = ()> {
 pub enum WindowEvent<T = ()> {
     WindowResize(i32, i32),
     WindowRedraw,
+    WindowScale(f32, f32),
     MouseMove(f64, f64),
     MouseLeftDown,
     MouseLeftUp,
@@ -66,7 +67,7 @@ impl<T> Window<T> {
         self.glfw.set_swap_interval(glfw::SwapInterval::None);
         self.window.set_all_polling(true);
         {
-            let (w, h) = self.window.get_size();
+            let (w, h) = self.window.get_framebuffer_size();
             on_events(self, WindowEvent::WindowResize(w, h));
         }
         while !self.window.should_close() {
@@ -80,11 +81,12 @@ impl<T> Window<T> {
             }
             for (_, event) in self.events.try_iter().collect::<Vec<_>>() {
                 match event {
-                    glfw::WindowEvent::Size(w, h) => {
+                    glfw::WindowEvent::Size(_, _) => {
                         self.surface =
                             Self::create_surface(&self.window, Self::FB_INFO, &mut self.gr_context);
+                        let (w, h) = self.window.get_framebuffer_size();
                         info!("Resized window to {w}x{h}");
-                        on_events(self, WindowEvent::WindowResize(w as _, h as _));
+                        on_events(self, WindowEvent::WindowResize(w, h));
                     }
                     glfw::WindowEvent::CursorPos(x, y) => {
                         on_events(self, WindowEvent::MouseMove(x as _, y as _));
@@ -125,7 +127,7 @@ impl<T> Window<T> {
         fb_info: FramebufferInfo,
         gr_context: &mut skia_safe::gpu::DirectContext,
     ) -> skia_safe::Surface {
-        let size = win.get_size();
+        let size = win.get_framebuffer_size();
         let size = (size.0 as _, size.1 as _);
         let backend_render_target =
             skia_safe::gpu::backend_render_targets::make_gl(size, 0, 0, fb_info);

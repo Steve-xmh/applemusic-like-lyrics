@@ -66,8 +66,12 @@ export abstract class MusicContextBase extends TypedEventTarget<MusicStatusGette
 	abstract readFileText(path: string): Promise<string>;
 	abstract writeFileText(path: string, data: string): Promise<void>;
 	abstract deleteFile(path: string): Promise<void>;
-	async setClipboard(data: string): Promise<void> {
-		await navigator.clipboard.writeText(data);
+	setFullscreen(isFullscreen = true): Promise<void> {
+		if (isFullscreen) return document.body.requestFullscreen();
+		else return document.exitFullscreen();
+	}
+	setClipboard(data: string): Promise<void> {
+		return navigator.clipboard.writeText(data);
 	}
 	dispose(): void {}
 }
