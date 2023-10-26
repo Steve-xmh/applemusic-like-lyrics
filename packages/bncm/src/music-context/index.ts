@@ -66,6 +66,8 @@ export abstract class MusicContextBase extends TypedEventTarget<MusicStatusGette
 	abstract readFileText(path: string): Promise<string>;
 	abstract writeFileText(path: string, data: string): Promise<void>;
 	abstract deleteFile(path: string): Promise<void>;
+	acquireAudioData() {}
+	releaseAudioData() {}
 	setFullscreen(isFullscreen = true): Promise<void> {
 		if (isFullscreen) return document.body.requestFullscreen();
 		else return document.exitFullscreen();
@@ -129,5 +131,11 @@ export interface MusicStatusGetterEvents {
 	 */
 	"play-mode": CustomEvent<{
 		playMode: PlayMode;
+	}>;
+	/**
+	 * 当产生音频数据时触发，在网易云 3.0 中这是一个 48000hz int16 2通道的 PCM 数据
+	 */
+	"audio-data": CustomEvent<{
+		data: ArrayBuffer;
 	}>;
 }

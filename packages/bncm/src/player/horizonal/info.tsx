@@ -1,6 +1,8 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import type { FC } from "react";
 import {
+	MusicControlType,
+	musicControlTypeAtom,
 	showAlbumNameAtom,
 	showAudioQualityTagAtom,
 	showMenuButtonAtom,
@@ -23,6 +25,11 @@ import { topbarMenuOpenedAtom } from "../common/main-menu";
 import { AudioQualityTag } from "../../components/song-info/audio-quality-tag";
 import { PlayControls } from "../../components/song-info/play-controls";
 import { VolumeControl } from "../common/volume-control";
+import { AudioFFTControl } from "./audio-fft-control";
+import {
+	ConnectionColor,
+	wsConnectionStatusAtom,
+} from "../../music-context/ws-wrapper";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -43,6 +50,8 @@ export const MusicInfo: FC = () => {
 	const artists = useAtomValue(displayMusicArtistsAtom);
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
+	const musicControlType = useAtomValue(musicControlTypeAtom);
+	const wsConnectionStatus = useAtomValue(wsConnectionStatusAtom);
 
 	const showMusicName = useAtomValue(showMusicNameAtom);
 	const showMusicArtists = useAtomValue(showMusicArtistsAtom);
@@ -130,8 +139,18 @@ export const MusicInfo: FC = () => {
 					<div>{remainText}</div>
 				</div>
 			</div>
-			<PlayControls />
-			<VolumeControl />
+			{musicControlType === MusicControlType.Default && (
+				<>
+					<PlayControls />
+					<VolumeControl />
+				</>
+			)}
+			{musicControlType === MusicControlType.BarVisualizer &&
+				wsConnectionStatus.color !== ConnectionColor.Active && (
+					<>
+						<AudioFFTControl />
+					</>
+				)}
 		</div>
 	);
 };

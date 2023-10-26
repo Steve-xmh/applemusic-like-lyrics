@@ -24,6 +24,8 @@ function gauss(x: number, sigma = 1, mu = 0) {
 	return Math.pow(Math.E, -(Math.pow(x - mu, 2) / (2 * sigma * sigma)));
 }
 
+type AudioData = number[] | Uint8Array;
+
 export interface SoundProcessorOption {
 	filterParams?: {
 		sigma?: number;
@@ -64,7 +66,7 @@ export class SoundProcessor {
 	}[];
 	gKernel: number[];
 	historyLimit: number;
-	history: number[][];
+	history: AudioData[];
 	gKernelSum = 0;
 	filterRadius = 0;
 	constructor(options: SoundProcessorOption) {
@@ -132,7 +134,7 @@ export class SoundProcessor {
 
 		// 根据起止频谱、频带数量确定倍频数: N
 		// fu = 2^(1/N)*fl  => n = 1/N = log2(fu/fl) / bandsQty
-		let n = Math.log2(endFrequency / startFrequency) / outBandsQty;
+		let n = Math.log2(endFrequency / (startFrequency || 1)) / outBandsQty;
 		n = Math.pow(2, n); // n = 2^(1/N)
 
 		const nextBand = {
@@ -178,7 +180,7 @@ export class SoundProcessor {
 		console.log(gKernel);
 	}
 
-	private filter(frequencies: number[]) {
+	private filter(frequencies: AudioData) {
 		const { gKernel, gKernelSum, filterRadius } = this;
 
 		if (!filterRadius) return;
@@ -195,7 +197,7 @@ export class SoundProcessor {
 		}
 	}
 
-	private aWeighting(frequencies: number[]) {
+	private aWeighting(frequencies: AudioData) {
 		const { aWeights } = this;
 
 		for (let i = 0; i < frequencies.length; i++) {
@@ -205,7 +207,7 @@ export class SoundProcessor {
 		}
 	}
 
-	private divide(frequencies: number[]) {
+	private divide(frequencies: AudioData): number[] {
 		const { outBandsQty, bandwidth, bands } = this;
 		const temp = new Array(outBandsQty);
 
@@ -227,7 +229,7 @@ export class SoundProcessor {
 		return temp;
 	}
 
-	private timeWeighting(frequencies: number[]) {
+	private timeWeighting(frequencies: AudioData) {
 		const { history, historyLimit } = this;
 
 		if (history.length < 5) {
@@ -245,7 +247,7 @@ export class SoundProcessor {
 		}
 	}
 
-	process(frequencies: number[]) {
+	process(frequencies: AudioData): number[] {
 		// 1. filter
 		if (this.filterParams) {
 			this.filter(frequencies);

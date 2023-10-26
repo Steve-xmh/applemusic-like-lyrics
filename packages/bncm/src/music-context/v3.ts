@@ -77,6 +77,20 @@ export class MusicContextV3 extends MusicContextBase {
 			);
 		}
 
+		interface NCMV3AudioData {
+			data: ArrayBuffer;
+			pts: number;
+		}
+		appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
+			this.dispatchTypedEvent(
+				"audio-data",
+				new CustomEvent("audio-data", {
+					detail: {
+						data: data.data,
+					},
+				}),
+			);
+		});
 		appendRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
 		appendRegisterCall("End", "audioplayer", this.bindedOnMusicUnload);
 		// 在 Windows 版本中，这个函数会逐帧强制调用，也就是说会强制占用阻塞渲染线程
@@ -480,6 +494,23 @@ export class MusicContextV3 extends MusicContextBase {
 			playModeBtn.click();
 		}
 		// }
+	}
+
+	private audioDataLock = 0;
+
+	override acquireAudioData(): void {
+		if (++this.audioDataLock) {
+			channel.call("audioplayer.enableAudioData", () => {}, [1]);
+		}
+	}
+
+	override releaseAudioData(): void {
+		if (this.audioDataLock <= 0) {
+			throw new Error("Audio data lock is already 0");
+		}
+		if (!--this.audioDataLock) {
+			channel.call("audioplayer.enableAudioData", () => {}, [0]);
+		}
 	}
 
 	getMusicAlbumId(): string {

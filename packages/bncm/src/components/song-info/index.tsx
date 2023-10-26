@@ -19,7 +19,7 @@ import {
 } from "../../core/states";
 import { LyricPlayerFMControls } from "../lyric-player-fm-controls";
 
-import { AudioFFTControl } from "./audio-fft-control";
+import { AudioFFTControl } from "../../player/horizonal/audio-fft-control";
 import { PlayControls } from "./play-controls";
 import { Slider } from "../appkit/np-slider";
 import { AudioQualityTag } from "./audio-quality-tag";

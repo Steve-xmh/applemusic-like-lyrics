@@ -20,6 +20,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/bncm@workspace:packages/bncm"
   dependencies:
     "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/fft": "workspace:^"
     "@applemusic-like-lyrics/lyric": "workspace:^"
     "@applemusic-like-lyrics/react": "workspace:^"
     "@applemusic-like-lyrics/ttml": "workspace:^"
@@ -101,6 +102,12 @@ __metadata:
     "@pixi/sprite": "*"
     jss: "*"
     jss-preset-default: "*"
+  languageName: unknown
+  linkType: soft
+
+"@applemusic-like-lyrics/fft@workspace:^, @applemusic-like-lyrics/fft@workspace:packages/fft":
+  version: 0.0.0-use.local
+  resolution: "@applemusic-like-lyrics/fft@workspace:packages/fft"
   languageName: unknown
   linkType: soft
 

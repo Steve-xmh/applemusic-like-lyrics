@@ -9,6 +9,7 @@ import {
 	musicAlbumIdAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
+	musicContextAtom,
 	musicCoverAtom,
 	musicIdAtom,
 	musicNameAtom,
@@ -23,6 +24,7 @@ import { amllConfigWindowedOpenedAtom } from "../../components/config";
 import { musicOverrideWindowOpenedAtom } from "./music-override-window";
 
 export const topbarMenuOpenedAtom = atom(false);
+const isFullscreenAtom = atom(false);
 
 export const MainMenu: FC = () => {
 	const [menuOpened, setMenuOpened] = useAtom(topbarMenuOpenedAtom);
@@ -38,11 +40,13 @@ export const MainMenu: FC = () => {
 	const setMusicOverrideWindowOpened = useSetAtom(
 		musicOverrideWindowOpenedAtom,
 	);
+	const musicCtx = useAtomValue(musicContextAtom);
 
 	const [configTranslatedLyric, setConfigTranslatedLyric] = useAtom(
 		showTranslatedLineAtom,
 	);
 	const [configRomanLyric, setConfigRomanLyric] = useAtom(showRomanLineAtom);
+	const [isFullscreen, setFullscreen] = useAtom(isFullscreenAtom);
 
 	const isFavSong = useMemo(() => {
 		return document
@@ -262,6 +266,18 @@ export const MainMenu: FC = () => {
 				checked={configRomanLyric}
 				onClick={() => {
 					setConfigRomanLyric(!configRomanLyric);
+					setMenuOpened(false);
+				}}
+			/>
+			<MenuDevider />
+			<MenuItem
+				label="切换全屏模式"
+				checked={isFullscreen}
+				onClick={() => {
+					setFullscreen((v) => {
+						musicCtx?.setFullscreen(!v);
+						return !v;
+					});
 					setMenuOpened(false);
 				}}
 			/>
