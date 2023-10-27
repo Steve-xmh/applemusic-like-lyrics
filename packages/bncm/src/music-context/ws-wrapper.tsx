@@ -3,6 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import {
 	currentTimeAtom,
 	musicArtistsAtom,
+	musicContextAtom,
 	musicCoverAtom,
 	musicDurationAtom,
 	musicIdAtom,
@@ -14,6 +15,7 @@ import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
 import { toDataURL } from "../utils/to-data-uri";
 import { debounce } from "../utils/debounce";
 import { lyricLinesAtom } from "../lyric/provider";
+import { MusicStatusGetterEvents } from ".";
 
 export enum ConnectionColor {
 	Disabled = "#aaaaaa",
@@ -35,6 +37,7 @@ export const WebSocketWrapper: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 	const artists = useAtomValue(musicArtistsAtom);
+	const musicContext = useAtomValue(musicContextAtom);
 	const playProgress = useAtomValue(currentTimeAtom);
 	const setWSStatus = useSetAtom(wsConnectionStatusAtom);
 	const enabled = useAtomValue(enableWSPlayer);
@@ -110,6 +113,27 @@ export const WebSocketWrapper: FC = () => {
 			}),
 		);
 	}, [musicCover, ws.current]);
+
+	useEffect(() => {
+		if (musicContext && ws.current?.readyState === WebSocket.OPEN) {
+			musicContext.acquireAudioData();
+			const onAudioData = (evt: MusicStatusGetterEvents["audio-data"]) => {
+				ws.current?.send(
+					toBody({
+						type: "onAudioData",
+						value: {
+							data: new Uint8Array(evt.detail.data),
+						},
+					}),
+				);
+			};
+			musicContext.addEventListener("audio-data", onAudioData);
+			return () => {
+				musicContext.removeEventListener("audio-data", onAudioData);
+				musicContext.releaseAudioData();
+			};
+		}
+	}, [musicContext, ws.current?.readyState]);
 
 	useEffect(() => {
 		if (!enabled) {
