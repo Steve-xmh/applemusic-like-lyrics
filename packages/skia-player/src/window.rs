@@ -20,6 +20,8 @@ pub enum WindowEvent<T = ()> {
     MouseLeftUp,
     MouseRightDown,
     MouseRightUp,
+    
+    VSyncEnabled(bool),
 
     UserEvent(T),
 }
@@ -64,7 +66,8 @@ impl<T> Window<T> {
 
     pub fn run(&mut self, mut on_events: impl FnMut(&mut Self, WindowEvent<T>)) {
         self.window.make_current();
-        self.glfw.set_swap_interval(glfw::SwapInterval::None);
+        let mut vsync = true;
+        on_events(self, WindowEvent::VSyncEnabled(true));
         self.window.set_all_polling(true);
         {
             let (w, h) = self.window.get_framebuffer_size();
@@ -82,11 +85,15 @@ impl<T> Window<T> {
             for (_, event) in self.events.try_iter().collect::<Vec<_>>() {
                 match event {
                     glfw::WindowEvent::Size(_, _) => {
-                        self.surface =
-                            Self::create_surface(&self.window, Self::FB_INFO, &mut self.gr_context);
-                        let (w, h) = self.window.get_framebuffer_size();
-                        info!("Resized window to {w}x{h}");
-                        on_events(self, WindowEvent::WindowResize(w, h));
+                        if self.window.is_visible() {
+                            self.surface = Self::create_surface(
+                                &self.window,
+                                Self::FB_INFO,
+                                &mut self.gr_context,
+                            );
+                            let (w, h) = self.window.get_framebuffer_size();
+                            on_events(self, WindowEvent::WindowResize(w, h));
+                        }
                     }
                     glfw::WindowEvent::CursorPos(x, y) => {
                         on_events(self, WindowEvent::MouseMove(x as _, y as _));
@@ -112,6 +119,22 @@ impl<T> Window<T> {
                         },
                         _ => {}
                     },
+                    glfw::WindowEvent::Key(key, code, action, _modifier) => {
+                        if action == Action::Press {
+                            match key {
+                                glfw::Key::V => {
+                                    vsync = !vsync;
+                                    on_events(self, WindowEvent::VSyncEnabled(vsync));
+                                    if vsync {
+                                        self.glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
+                                    } else {
+                                        self.glfw.set_swap_interval(glfw::SwapInterval::None);
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
                     glfw::WindowEvent::Refresh => {}
                     glfw::WindowEvent::Close => {
                         self.window.set_should_close(true);

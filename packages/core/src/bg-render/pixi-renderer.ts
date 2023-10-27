@@ -259,5 +259,6 @@ export class PixiRenderer implements Disposable {
 	dispose() {
 		this.observer.disconnect();
 		this.app.ticker.remove(this.onTick);
+		this.app.destroy(true);
 	}
 }

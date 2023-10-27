@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "build:dev": "vite build",
+    "build": "tsc && vite build --mode dev",
+    "build:dev": "vite build --mode dev",
     "preview": "vite preview",
     "tauri": "tauri"
   },
@@ -16,7 +16,6 @@
     "@applemusic-like-lyrics/react": "workspace:^",
     "@applemusic-like-lyrics/ws-protocol": "workspace:^",
     "@tauri-apps/api": "^1.4.0",
-    "jotai": "^2.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.11",

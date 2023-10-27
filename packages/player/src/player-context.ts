@@ -15,6 +15,7 @@ import {
 	BaseDirectory,
 } from "@tauri-apps/api/fs";
 import { appDataDir } from "@tauri-apps/api/path";
+import { getCurrent } from "@tauri-apps/api/window";
 
 interface WSClientBody<Type = string, Value = never> {
 	type: Type;
@@ -228,5 +229,12 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 	}
 	override dispose(): void {
 		this.cancel();
+	}
+	override async setFullscreen(isFullscreen?: boolean): Promise<void> {
+		if (isFullscreen) {
+			getCurrent().setFullscreen(isFullscreen)
+		} else {
+			getCurrent().setFullscreen(false)
+		}
 	}
 }

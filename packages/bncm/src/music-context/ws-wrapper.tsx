@@ -144,7 +144,7 @@ export const WebSocketWrapper: FC = () => {
 			});
 			return;
 		}
-		let webSocket: WebSocket | undefined;
+		let webSocket: WebSocket | undefined = undefined;
 		let canceled = false;
 
 		const connect = () => {

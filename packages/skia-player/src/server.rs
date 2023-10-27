@@ -100,12 +100,15 @@ impl AMLLWebSocketServer {
         let mut read = read.try_filter(|x| future::ready(x.is_binary()));
 
         while let Some(Ok(data)) = read.next().await {
-            if let Ok(body) = ws_protocol::parse_body(&data.into_data()) {
-                if !matches!(body, Body::OnPlayProgress { .. }) {
+            match ws_protocol::parse_body(&data.into_data()) {
+                Ok(body) => {
                     debug!("已接收 WebSocket 客户端 {addr} 的数据: {body:?}");
+                    // sender.emit_all("on-client-body", body)?;
+                    sender.send(body).await?;
                 }
-                // sender.emit_all("on-client-body", body)?;
-                sender.send(body).await?;
+                Err(err) => {
+                    warn!("解析来自 WebSocket 客户端 {addr} 的数据发生错误: {err:?}")
+                }
             }
         }
 

@@ -19,10 +19,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    
-    "paths": {
-      "@applemusic-like-lyrics/bncm": ["../bncm/src"]
-    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

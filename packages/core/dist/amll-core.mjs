@@ -256,7 +256,7 @@ class N {
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
-    this.observer.disconnect(), this.app.ticker.remove(this.onTick);
+    this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
 class re extends N {

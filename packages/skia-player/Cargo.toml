@@ -17,3 +17,5 @@ anyhow = "1.0.72"
 futures = "0.3.28"
 ws-protocol = { path = "../ws-protocol" }
 attohttpc = "0.26.1"
+rand = "0.8.5"
+byteorder = "1.5.0"

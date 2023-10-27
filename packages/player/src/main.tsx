@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.sass";
 import * as wsp from "@applemusic-like-lyrics/ws-protocol";
@@ -20,15 +20,11 @@ listen("on-client-connected", (event) => {
   console.log("已连接新播放状态源", event);
 })
 
-listen("on-client-body", (event) => {
-  // console.log("已接收到播放数据", event);
-})
-
 listen("on-client-disconnected", (event) => {
   console.log("已断开播放状态源", event);
 })
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,

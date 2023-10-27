@@ -20,7 +20,6 @@ __metadata:
   resolution: "@applemusic-like-lyrics/bncm@workspace:packages/bncm"
   dependencies:
     "@applemusic-like-lyrics/core": "workspace:^"
-    "@applemusic-like-lyrics/fft": "workspace:^"
     "@applemusic-like-lyrics/lyric": "workspace:^"
     "@applemusic-like-lyrics/react": "workspace:^"
     "@applemusic-like-lyrics/ttml": "workspace:^"
@@ -102,12 +101,6 @@ __metadata:
     "@pixi/sprite": "*"
     jss: "*"
     jss-preset-default: "*"
-  languageName: unknown
-  linkType: soft
-
-"@applemusic-like-lyrics/fft@workspace:^, @applemusic-like-lyrics/fft@workspace:packages/fft":
-  version: 0.0.0-use.local
-  resolution: "@applemusic-like-lyrics/fft@workspace:packages/fft"
   languageName: unknown
   linkType: soft
 
@@ -7861,7 +7854,6 @@ __metadata:
     "@types/react": ^18.2.15
     "@types/react-dom": ^18.2.7
     "@vitejs/plugin-react": ^4.0.3
-    jotai: ^2.4.3
     react: ^18.2.0
     react-dom: ^18.2.0
     react-error-boundary: ^4.0.11

@@ -7,7 +7,7 @@ import {
 } from "@applemusic-like-lyrics/bncm/src/injector/index.tsx";
 import { LyricPlayer } from "@applemusic-like-lyrics/bncm/src/player/index.tsx";
 import "@applemusic-like-lyrics/bncm/src/index.sass";
-import { Provider, useAtom, useSetAtom } from "jotai";
+import { Provider, useAtom, useSetAtom, useStore } from "jotai";
 import { Client, ResponseType, getClient } from "@tauri-apps/api/http";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -53,19 +53,6 @@ function ErrorRender({ error, resetErrorBoundary }) {
 }
 
 let client: Client;
-globalStore.set(amllEnvironmentAtom, AMLLEnvironment.AMLLPlayer);
-globalStore.set(lyricPageOpenedAtom, true);
-globalStore.set(getLyricFromNCMAtom, {
-	async getLyric(songId: string, _signal?: AbortSignal) {
-		client ??= await getClient();
-		const res = await client.get(
-			`https://music.163.com/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
-			{ responseType: ResponseType.JSON },
-		);
-		if (res.ok) return res.data as EAPILyricResponse;
-		else throw `${res.status} ${res.data}`;
-	},
-});
 
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
@@ -156,18 +143,25 @@ export const MusicInfoWrapper: FC = () => {
 };
 
 function App() {
+	globalStore.set(amllEnvironmentAtom, AMLLEnvironment.AMLLPlayer);
+	globalStore.set(lyricPageOpenedAtom, true);
+	globalStore.set(getLyricFromNCMAtom, {
+		async getLyric(songId: string, _signal?: AbortSignal) {
+			client ??= await getClient();
+			const res = await client.get(
+				`https://music.163.com/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
+				{ responseType: ResponseType.JSON },
+			);
+			if (res.ok) return res.data as EAPILyricResponse;
+			else throw `${res.status} ${res.data}`;
+		},
+	});
 	return (
 		<ErrorBoundary fallbackRender={ErrorRender}>
 			<Provider store={globalStore}>
-				<Suspense>
-					<LyricProvider />
-				</Suspense>
-				<Suspense>
-					<MusicInfoWrapper />
-				</Suspense>
-				<Suspense>
-					<LyricPlayer />
-				</Suspense>
+				<LyricProvider />
+				<MusicInfoWrapper />
+				<LyricPlayer />
 			</Provider>
 		</ErrorBoundary>
 	);

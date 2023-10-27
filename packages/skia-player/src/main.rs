@@ -38,7 +38,9 @@ fn main() {
                     std::thread::spawn(move || match attohttpc::get(img_url).send() {
                         Ok(res) => match res.bytes() {
                             Ok(data) => {
-                                let _ = win_sx.send(GlobalMessage::SetAlbumImageData(data));
+                                if let Err(err) = win_sx.send(GlobalMessage::SetAlbumImageData(data)) {
+                                    warn!("Failed to send message to window: {}", err)
+                                }
                             }
                             Err(err) => {
                                 warn!("Failed to fetch album image: {}", err)
@@ -50,7 +52,9 @@ fn main() {
                     });
                 }
                 other => {
-                    let _ = win_sx.send(GlobalMessage::Body(other));
+                    if let Err(err) = win_sx.send(GlobalMessage::Body(other)) {
+                        warn!("Failed to send message to window: {}", err)
+                    }
                 }
             }
         }
@@ -64,6 +68,9 @@ fn main() {
         }
         WindowEvent::WindowResize(w, h) => {
             renderer.set_size(w as _, h as _);
+        }
+        WindowEvent::VSyncEnabled(enabled) => {
+            renderer.set_vsync(enabled);
         }
         WindowEvent::UserEvent(msg) => match msg {
             GlobalMessage::Body(body) => match body {
