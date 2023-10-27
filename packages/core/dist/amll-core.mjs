@@ -890,7 +890,7 @@ class ae extends EventTarget {
   style = V.createStyleSheet({
     lyricPlayer: {
       userSelect: "none",
-      fontSize: "var(--amll-lyric-player-font-size,max(5vh, 12px))",
+      fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 10vw), 12px))",
       padding: "1em",
       margin: "-1em",
       width: "100%",

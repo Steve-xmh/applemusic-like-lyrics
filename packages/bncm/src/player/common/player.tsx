@@ -24,6 +24,7 @@ import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef: HTMLElement | null;
+	isVertical?: boolean;
 }> = (props) => {
 	const playerRef = useRef<LyricPlayerRef>(null);
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
@@ -56,7 +57,7 @@ export const CoreLyricPlayer: FC<{
 		} else {
 			setAlighPosition(0.5);
 		}
-	}, [props.albumCoverRef]);
+	}, [props.albumCoverRef, lyricPageOpened]);
 
 	if (wsStatus.color === ConnectionColor.Active) {
 		return (
@@ -73,8 +74,12 @@ export const CoreLyricPlayer: FC<{
 				<LyricPlayerComponent
 					className="amll-lyric-player-wrapper"
 					disabled={!lyricPageOpened}
-					alignAnchor={props.albumCoverRef ? "center" : "top"}
-					alignPosition={props.albumCoverRef ? alignPosition : 0.2}
+					alignAnchor={
+						!props.isVertical && props.albumCoverRef ? "center" : "top"
+					}
+					alignPosition={
+						!props.isVertical && props.albumCoverRef ? alignPosition : 0.1
+					}
 					currentTime={currentTime}
 					enableBlur={lyricBlurEffect}
 					enableSpring={lyricSpringEffect}

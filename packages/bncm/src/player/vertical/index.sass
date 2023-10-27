@@ -39,8 +39,8 @@
         align-items: center
         justify-content: center
         > *
-            width: 50%
-            height: 50%
+            width: 75%
+            height: 75%
     .amll-lyric-player-wrapper
         grid-column: 2 / 4
         grid-row: lyric-player
@@ -58,6 +58,38 @@
         -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)
         &.load-status
             opacity: 0.5
+    .amll-music-name
+        white-space: nowrap
+        line-height: normal
+        cursor: text
+        user-select: text
+        min-width: 0
+        font-weight: 600
+        letter-spacing: 0.3px
+    .amll-music-artists
+        white-space: nowrap
+        text-align: center
+        opacity: 0.75
+        font-weight: 400
+        letter-spacing: 0.3px
+
+        a
+            line-height: normal
+            text-decoration: none
+            user-select: text
+
+            &:hover
+                opacity: 0.75
+
+            &:active
+                opacity: 0.5
+
+            &::after
+                content: var(--applemusic-like-lyrics-music-artists-separator, " - ")
+                opacity: 0.5
+
+            &:last-child::after
+                content: ""
     .amll-contributors
         font-size: 50%
         opacity: 0.5
@@ -73,9 +105,12 @@
         justify-self: center
         mix-blend-mode: plus-lighter
     .amll-music-info
-        margin-left: 2vh
+        padding-left: 2vh
+        box-sizing: border-box
         font-size: min(2vh,4vw)
         grid-column: info-side
         grid-row: music-info
         display: flex
         align-items: center
+        overflow: hidden
+        width: 100%
