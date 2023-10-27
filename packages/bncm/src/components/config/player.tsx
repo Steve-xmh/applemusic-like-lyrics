@@ -108,7 +108,16 @@ export const PlayerConfig: FC = () => {
 						gap: "8px",
 					}}
 				>
-					<Button accent>前往下载 AMLL Player</Button>
+					<Button
+						onClick={() => {
+							betterncm.ncm.openUrl(
+								"https://github.com/Steve-xmh/applemusic-like-lyrics/actions/workflows/build-player.yaml",
+							);
+						}}
+						accent
+					>
+						前往下载 AMLL Player
+					</Button>
 				</div>
 			</GroupBox>
 		</>
