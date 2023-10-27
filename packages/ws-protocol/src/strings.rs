@@ -35,6 +35,12 @@ pub struct NullString(
     pub Vec<u8>,
 );
 
+impl AsRef<str> for NullString {
+    fn as_ref(&self) -> &str {
+        core::str::from_utf8(&self.0).unwrap()
+    }
+}
+
 impl Serialize for NullString {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

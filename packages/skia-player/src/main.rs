@@ -9,6 +9,11 @@ use ws_protocol::Body;
 
 use crate::{renderer::Renderer, server::AMLLWebSocketServer, window::WindowEvent};
 
+enum GlobalMessage {
+    Body(Body),
+    SetAlbumImageData(Vec<u8>),
+}
+
 fn main() {
     tracing_subscriber::fmt::fmt()
         .with_max_level(tracing::Level::DEBUG)
@@ -25,7 +30,29 @@ fn main() {
     });
     std::thread::spawn(move || {
         while let Ok(body) = rx.recv_blocking() {
-            win_sx.send(body);
+            match body {
+                Body::SetMusicAlbumCoverImageURL { img_url } => {
+                    let img_url = img_url.to_string();
+                    let win_sx = win_sx.clone();
+                    // TODO: 确保同步
+                    std::thread::spawn(move || match attohttpc::get(img_url).send() {
+                        Ok(res) => match res.bytes() {
+                            Ok(data) => {
+                                let _ = win_sx.send(GlobalMessage::SetAlbumImageData(data));
+                            }
+                            Err(err) => {
+                                warn!("Failed to fetch album image: {}", err)
+                            }
+                        },
+                        Err(err) => {
+                            warn!("Failed to fetch album image: {}", err)
+                        }
+                    });
+                }
+                other => {
+                    let _ = win_sx.send(GlobalMessage::Body(other));
+                }
+            }
         }
     });
     let mut renderer = Renderer::new();
@@ -38,12 +65,18 @@ fn main() {
         WindowEvent::WindowResize(w, h) => {
             renderer.set_size(w as _, h as _);
         }
-        WindowEvent::UserEvent(body) => match body {
-            Body::SetLyric { data } => {
-                renderer.set_lyric_lines(data);
-            }
-            Body::OnPlayProgress { progress } => {
-                renderer.set_progress(progress);
+        WindowEvent::UserEvent(msg) => match msg {
+            GlobalMessage::Body(body) => match body {
+                Body::SetLyric { data } => {
+                    renderer.set_lyric_lines(data);
+                }
+                Body::OnPlayProgress { progress } => {
+                    renderer.set_progress(progress);
+                }
+                _ => {}
+            },
+            GlobalMessage::SetAlbumImageData(data) => {
+                renderer.set_album_image(data);
             }
             _ => {}
         },
