@@ -15,6 +15,7 @@ jobs:
             ssh-host: gitcode.net
       - name: 强制推送至 GitCode
         run: |
+          git config lfs.allowincompletepush true
           git fetch --all
           git pull --all --unshallow
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
