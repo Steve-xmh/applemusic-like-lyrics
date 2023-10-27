@@ -23,21 +23,6 @@ jobs:
           version: latest
       - name: 安装 wasm32 目标
         run: rustup target add wasm32-unknown-unknown
-      - name: 缓存依赖项目
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-cache
-          path: |
-            packages/player/node_modules
-            packages/player/src-tauri/target
-            packages/player/.yarn/cache
-            packages/player/.yarn/install-state.gz
-            node_modules
-            target
-            .yarn/cache
-            .yarn/install-state.gz
-            C:/Program Files/LLVM
-            ./llvm
       # macOS 自带的 Xcode LLVM 不支持 WASM 目标
       - name: "macOS: 安装 LLVM 和 Clang"
         uses: KyleMayes/install-llvm-action@v1
