@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+        with:
+          lfs: true
       - uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
             ssh-private-key: ${{ secrets.AMLL_PUSH_KEY }}
