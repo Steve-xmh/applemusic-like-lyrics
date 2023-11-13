@@ -18,6 +18,7 @@ jobs:
       - name: 强制推送至 GitCode
         run: |
           git config lfs.allowincompletepush true
+          git config lfs.https://gitcode.net/sn/applemusic-like-lyrics.git/info/lfs.locksverify true
           git fetch --all
           git pull --all --unshallow
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git
