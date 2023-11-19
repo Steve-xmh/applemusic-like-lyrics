@@ -48,7 +48,9 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private scrolledHandler;
     private isScrolled;
     private invokedByScrollEvent;
+    private padding;
     private scrollOffset;
+    private hidePassedLines;
     private resizeObserver;
     private posXSpringParams;
     private posYSpringParams;
@@ -113,6 +115,11 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      * 这个只允许内部调用
      */
     rebuildStyle(): void;
+    /**
+     * 设置是否隐藏已经播放过的歌词行，默认不隐藏
+     * @param hide 是否隐藏已经播放过的歌词行，默认不隐藏
+     */
+    setHidePassedLines(hide: boolean): void;
     /**
      * 设置是否启用歌词行的模糊效果
      * @param enable 是否启用

@@ -65,6 +65,11 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
+    if (props.hidePassedLines !== undefined)
+        playerRef.value?.setHidePassedLines(props.hidePassedLines);
+});
+
+watchEffect(() => {
     if (props.alignPosition !== undefined)
         playerRef.value?.setAlignPosition(props.alignPosition);
 });

@@ -56,6 +56,10 @@ export interface LyricPlayerProps {
 	 */
 	enableScale?: boolean;
 	/**
+	 * 设置是否隐藏已经播放过的歌词行，默认不隐藏
+	 */
+	hidePassedLines?: boolean;
+	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
 	 */
 	lyricLines?: LyricLine[];

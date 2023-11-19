@@ -1,22 +1,22 @@
-import { Container as C } from "@pixi/display";
-import { Application as z } from "@pixi/app";
+import { Container as z } from "@pixi/display";
+import { Application as D } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
-import { ColorMatrixFilter as v } from "@pixi/filter-color-matrix";
-import { Texture as D } from "@pixi/core";
+import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
+import { Texture as I } from "@pixi/core";
 import { Sprite as w } from "@pixi/sprite";
-import { BulgePinchFilter as P } from "@pixi/filter-bulge-pinch";
+import { BulgePinchFilter as E } from "@pixi/filter-bulge-pinch";
 import { create as A } from "jss";
-import I from "jss-preset-default";
-const k = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
+import k from "jss-preset-default";
+const B = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
 function T(h) {
-  const e = k.exec(h);
+  const e = B.exec(h);
   if (e) {
     const t = Number(e.groups?.hour || "0"), i = Number(e.groups?.min || "0"), s = Number(e.groups?.sec.replace(/:/, ".") || "0");
     return Math.floor((t * 3600 + i * 60 + s) * 1e3);
   } else
     throw new TypeError("时间戳字符串解析失败");
 }
-function B(h) {
+function O(h) {
   const t = new DOMParser().parseFromString(
     h,
     "application/xml"
@@ -77,9 +77,9 @@ function B(h) {
                   endTime: 0
                 });
               } else if (m.nodeType === Node.ELEMENT_NODE) {
-                const p = m, L = p.getAttribute("ttm:role");
-                if (p.nodeName === "span" && L)
-                  L === "x-translation" ? d.translatedLyric = p.innerHTML.trim() : L === "x-roman" && (d.romanLyric = p.innerHTML.trim());
+                const p = m, g = p.getAttribute("ttm:role");
+                if (p.nodeName === "span" && g)
+                  g === "x-translation" ? d.translatedLyric = p.innerHTML.trim() : g === "x-roman" && (d.romanLyric = p.innerHTML.trim());
                 else if (p.hasAttribute("begin") && p.hasAttribute("end")) {
                   const b = {
                     word: m.textContent,
@@ -111,14 +111,14 @@ function B(h) {
   }
   return s;
 }
-const ne = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const re = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  parseTTML: B
+  parseTTML: O
 }, Symbol.toStringTag, { value: "Module" }));
-class O extends C {
+class N extends z {
   time = 0;
 }
-class N {
+class $ {
   constructor(e) {
     this.canvas = e;
     const t = e.getBoundingClientRect();
@@ -128,7 +128,7 @@ class N {
         this.canvas.width * this.currerntRenderScale,
         this.canvas.height * this.currerntRenderScale
       ), this.app.ticker.start(), this.rebuildFilters();
-    }), this.observer.observe(e), this.app = new z({
+    }), this.observer.observe(e), this.app = new D({
       view: e,
       resizeTo: this.canvas,
       powerPreference: "low-power",
@@ -179,26 +179,38 @@ class N {
     ), this.rebuildFilters();
   }
   rebuildFilters() {
-    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new v();
+    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new P();
     i.saturate(1.2, !1);
-    const s = new v();
+    const s = new P();
     s.brightness(0.6, !1);
-    const r = new v();
+    const r = new P();
     r.contrast(0.3, !0), this.app.stage.filters?.forEach((n) => {
       n.destroy();
-    }), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(i, s, r), this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(
-      new P({
+    }), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(i, s, r), this.app.stage.filters.push(new y(5, 1)), Math.random() > 0.5 ? (this.app.stage.filters.push(
+      new E({
         radius: (t + e) / 2,
         strength: 1,
         center: [0.25, 1]
       })
     ), this.app.stage.filters.push(
-      new P({
+      new E({
         radius: (t + e) / 2,
         strength: 1,
         center: [0.75, 0]
       })
-    );
+    )) : (this.app.stage.filters.push(
+      new E({
+        radius: (t + e) / 2,
+        strength: 1,
+        center: [0.75, 1]
+      })
+    ), this.app.stage.filters.push(
+      new E({
+        radius: (t + e) / 2,
+        strength: 1,
+        center: [0.25, 0]
+      })
+    ));
   }
   /**
    * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
@@ -238,7 +250,7 @@ class N {
     let i = 5, s;
     for (; !s?.baseTexture?.resource?.valid && i > 0; )
       try {
-        await t.decode(), s = D.from(t, {
+        await t.decode(), s = I.from(t, {
           resourceOptions: {
             autoLoad: !1
           }
@@ -252,14 +264,14 @@ class N {
       }
     if (!s)
       return;
-    const r = new O(), n = new w(s), a = new w(s), l = new w(s), o = new w(s);
+    const r = new N(), n = new w(s), a = new w(s), l = new w(s), o = new w(s);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
-class re extends N {
+class ae extends $ {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -272,7 +284,7 @@ class re extends N {
     super.dispose(), this.element.remove();
   }
 }
-const $ = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
+const W = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
 class S {
   currentPosition = 0;
   targetPosition = 0;
@@ -293,7 +305,7 @@ class S {
       this.targetPosition,
       0,
       this.params
-    ), this.getV = W(this.currentSolver);
+    ), this.getV = _(this.currentSolver);
   }
   arrived() {
     return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
@@ -340,10 +352,10 @@ function F(h, e, t, i = 0, s) {
 function R(h) {
   return (t) => (h(t + 1e-3) - h(t - 1e-3)) / (2 * 1e-3);
 }
-function W(h) {
+function _(h) {
   return R(h);
 }
-class _ {
+class q {
   constructor(e) {
     this.lyricPlayer = e, this.element.setAttribute(
       "class",
@@ -400,12 +412,12 @@ class _ {
     this.element.remove();
   }
 }
-function q(h) {
+function X(h) {
   const t = 2.5949095;
   return h < 0.5 ? Math.pow(2 * h, 2) * ((t + 1) * 2 * h - t) / 2 : (Math.pow(2 * h - 2, 2) * ((t + 1) * (h * 2 - 2) + t) + 2) / 2;
 }
-const g = (h, e, t) => Math.max(h, Math.min(e, t));
-class X {
+const L = (h, e, t) => Math.max(h, Math.min(e, t));
+class Y {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -437,35 +449,35 @@ class X {
       if (s <= i) {
         const r = i / Math.ceil(i / this.targetBreatheDuration);
         let n = 1, a = 1;
-        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - q(
+        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - X(
           (750 - (i - s)) / 750 / 2
-        )), i - s < 375 && (a *= g(
+        )), i - s < 375 && (a *= L(
           0,
           (i - s) / 375,
           1
         )), n = Math.max(0, n), t += ` scale(${n})`;
-        const l = g(
+        const l = L(
           0.25,
           s * 3 / i * 0.75,
           1
-        ), o = g(
+        ), o = L(
           0.25,
           (s - i / 3) * 3 / i * 0.75,
           1
-        ), c = g(
+        ), c = L(
           0.25,
           (s - i / 3 * 2) * 3 / i * 0.75,
           1
         );
-        this.dot0.style.opacity = `${g(
+        this.dot0.style.opacity = `${L(
           0,
           Math.max(0, a * l),
           1
-        )}`, this.dot1.style.opacity = `${g(
+        )}`, this.dot1.style.opacity = `${L(
           0,
           Math.max(0, a * o),
           1
-        )}`, this.dot2.style.opacity = `${g(
+        )}`, this.dot2.style.opacity = `${L(
           0,
           Math.max(0, a * c),
           1
@@ -481,7 +493,7 @@ class X {
   }
 }
 const x = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
-function Y(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
+function G(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
   const i = 2 + h, s = h / i, r = (1 - s) / 2;
   return [
     `linear-gradient(to right,${e} ${r * 100}%,${t} ${(r + s) * 100}%)`,
@@ -492,12 +504,12 @@ function Y(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
 function M(h) {
   return h.endTime - h.startTime >= 1e3 && h.word.length <= 7;
 }
-class G extends MouseEvent {
+class H extends MouseEvent {
   constructor(e, t) {
     super(t.type, t), this.line = e;
   }
 }
-class H extends EventTarget {
+class V extends EventTarget {
   // rome-ignore lint/correctness/noUnreachableSuper: <explanation>
   constructor(e, t = {
     words: [],
@@ -531,7 +543,7 @@ class H extends EventTarget {
   };
   listenersMap = /* @__PURE__ */ new Map();
   onMouseEvent = (e) => {
-    if (!this.dispatchEvent(new G(this, e)))
+    if (!this.dispatchEvent(new H(this, e)))
       return e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation(), !1;
   };
   addEventListener(e, t, i) {
@@ -739,14 +751,14 @@ class H extends EventTarget {
       const t = e.elements[0];
       if (t) {
         e.width = t.clientWidth, e.height = t.clientHeight;
-        const [i, s, r] = Y(
-          16 / e.width,
-          "rgba(0,0,0,0.75)",
+        const i = e.height / 2, [s, r, n] = G(
+          i / e.width,
+          "rgba(0,0,0,1)",
           "rgba(0,0,0,0.25)"
-        ), n = `${r * 100}% 100%`;
-        this.lyricPlayer.supportMaskImage ? (t.style.maskImage = i, t.style.maskOrigin = "left", t.style.maskSize = n) : (t.style.webkitMaskImage = i, t.style.webkitMaskOrigin = "left", t.style.webkitMaskSize = n);
-        const a = e.width + 16, l = `clamp(${-a}px,calc(${-a}px + (var(--amll-player-time) - ${e.startTime})*${a / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
-        t.style.maskPosition = l, t.style.webkitMaskPosition = l;
+        ), a = `${n * 100}% 100%`;
+        this.lyricPlayer.supportMaskImage ? (t.style.maskImage = s, t.style.maskOrigin = "left", t.style.maskSize = a) : (t.style.webkitMaskImage = s, t.style.webkitMaskOrigin = "left", t.style.webkitMaskSize = a);
+        const l = e.width + i, o = `clamp(${-l}px,calc(${-l}px + (var(--amll-player-time) - ${e.startTime})*${l / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
+        t.style.maskPosition = o, t.style.webkitMaskPosition = o;
       }
     }), this._hide && (this.element.style.display = "none", this.element.style.visibility = "");
   }
@@ -756,15 +768,15 @@ class H extends EventTarget {
   setTransform(e = this.left, t = this.top, i = this.scale, s = 1, r = 0, n = !1, a = 0) {
     const l = this.isInSight, o = this.lyricPlayer.getEnableSpring();
     this.left = e, this.top = t, this.scale = i, this.delay = a * 1e3 | 0;
-    const c = this.element.children[0];
-    if (c.style.opacity = `${s}`, n || !o) {
+    const c = this.element.children[0], d = this.element.children[1], u = this.element.children[2];
+    if (c.style.opacity = `${s}`, d.style.opacity = `${s / 2}`, u.style.opacity = `${s / 2}`, n || !o) {
       if (this.blur = Math.min(32, r), n && this.element.classList.add(
         this.lyricPlayer.style.classes.tmpDisableTransition
       ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(i), o)
         this.rebuildStyle();
       else {
-        const d = this.isInSight;
-        l || d ? this.show() : this.hide();
+        const f = this.isInSight;
+        l || f ? this.show() : this.hide();
       }
       n && requestAnimationFrame(() => {
         this.element.classList.remove(
@@ -785,13 +797,13 @@ class H extends EventTarget {
     this.element.remove();
   }
 }
-const V = A(I());
-class j extends MouseEvent {
+const j = A(k());
+class J extends MouseEvent {
   constructor(e, t, i) {
     super(`line-${i.type}`, i), this.lineIndex = e, this.line = t;
   }
 }
-class ae extends EventTarget {
+class le extends EventTarget {
   element = document.createElement("div");
   currentTime = 0;
   lyricLines = [];
@@ -806,7 +818,9 @@ class ae extends EventTarget {
   scrolledHandler = 0;
   isScrolled = !1;
   invokedByScrollEvent = !1;
+  padding = 32;
   scrollOffset = 0;
+  hidePassedLines = !1;
   resizeObserver = new ResizeObserver((e) => {
     const t = e[0].contentRect;
     this.size[0] = t.width, this.size[1] = t.height;
@@ -842,7 +856,7 @@ class ae extends EventTarget {
   size = [0, 0];
   innerSize = [0, 0];
   onLineClickedHandler = (e) => {
-    const t = new j(
+    const t = new J(
       this.lyricLinesIndexes.get(e.line) ?? -1,
       e.line,
       e
@@ -887,7 +901,7 @@ class ae extends EventTarget {
   getEnableScale() {
     return this.enableScale;
   }
-  style = V.createStyleSheet({
+  style = j.createStyleSheet({
     lyricPlayer: {
       userSelect: "none",
       fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 10vw), 12px))",
@@ -956,7 +970,6 @@ class ae extends EventTarget {
       },
       "& > span": {
         whiteSpace: "pre-wrap",
-        wordBreak: "keep-all",
         maxLines: "1",
         // willChange: "transform,display,mask-image",
         "&.emphasize": {
@@ -968,7 +981,8 @@ class ae extends EventTarget {
       }
     },
     lyricSubLine: {
-      fontSize: "max(50%, 10px)",
+      fontSize: "max(0.5em, 10px)",
+      transition: "opacity 0.3s 0.25s",
       opacity: 0.5
     },
     disableSpring: {
@@ -1011,7 +1025,7 @@ class ae extends EventTarget {
     this.calcLayout(!0, !0);
   };
   constructor() {
-    super(), this.interludeDots = new X(this), this.bottomLine = new _(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
+    super(), this.interludeDots = new Y(this), this.bottomLine = new q(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
       this.allowScroll && (this.isScrolled = !0, clearTimeout(this.scrolledHandler), this.scrolledHandler = setTimeout(() => {
         this.isScrolled = !1, this.scrollOffset = 0;
       }, 5e3), this.invokedByScrollEvent = !0, e.deltaMode === e.DOM_DELTA_PIXEL ? (this.scrollOffset += e.deltaY, this.calcLayout(!0)) : (this.scrollOffset += e.deltaY * 50, this.calcLayout(!1)), this.invokedByScrollEvent = !1);
@@ -1052,7 +1066,14 @@ class ae extends EventTarget {
    */
   rebuildStyle() {
     let e = "";
-    e += "--amll-lyric-player-width:", e += this.innerSize[0], e += "px;", e += "--amll-lyric-player-height:", e += this.innerSize[1], e += "px;", e += "--amll-player-time:", e += this.currentTime, e += ";", this.element.setAttribute("style", e);
+    e += "--amll-lyric-player-width:", e += this.innerSize[0] - this.padding * 2, e += "px;", e += "--amll-lyric-player-height:", e += this.innerSize[1] - this.padding * 2, e += "px;", e += "--amll-player-time:", e += this.currentTime, e += ";", this.element.setAttribute("style", e);
+  }
+  /**
+   * 设置是否隐藏已经播放过的歌词行，默认不隐藏
+   * @param hide 是否隐藏已经播放过的歌词行，默认不隐藏
+   */
+  setHidePassedLines(e) {
+    this.hidePassedLines = e, this.calcLayout();
   }
   /**
    * 设置是否启用歌词行的模糊效果
@@ -1074,6 +1095,11 @@ class ae extends EventTarget {
       if (i.isBG)
         return {
           ...i
+        };
+      if (s === 0)
+        return {
+          ...i,
+          startTime: Math.max(i.startTime - t, 0)
         };
       {
         const n = r[s - 1], a = r[s - 2];
@@ -1109,7 +1135,7 @@ class ae extends EventTarget {
     }), this.lyricLinesEl.forEach((i) => {
       i.removeEventListener("click", this.onLineClickedHandler), i.removeEventListener("contextmenu", this.onLineClickedHandler), i.dispose();
     }), this.lyricLinesEl = this.processedLines.map((i) => {
-      const s = new H(this, i);
+      const s = new V(this, i);
       return s.addEventListener("click", this.onLineClickedHandler), s.addEventListener("contextmenu", this.onLineClickedHandler), s;
     }), this.lyricLinesEl.forEach((i, s) => {
       this.element.appendChild(i.getElement()), this.lyricLinesIndexes.set(i, s), i.updateMaskImage();
@@ -1168,17 +1194,19 @@ class ae extends EventTarget {
     const c = Math.max(...this.bufferedLines);
     let d = 0, u = 0.05, f = !1;
     this.lyricLinesEl.forEach((m, p) => {
-      const L = this.bufferedLines.has(p), b = L || p >= this.scrollToIndex && p < c, E = m.getLine();
-      E.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && n >= 5e3 && (p === this.scrollToIndex && i?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]), m.setTransform(
-        0,
+      const g = this.bufferedLines.has(p), b = g || p >= this.scrollToIndex && p < c, v = m.getLine();
+      v.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && n >= 5e3 && (p === this.scrollToIndex && i?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]);
+      const C = this.hidePassedLines && p < (i ? i[2] + 1 : this.scrollToIndex) ? 0 : g ? 1 : 1 / 3;
+      m.setTransform(
+        this.padding,
         s,
         b ? 1 : a,
-        L ? 1 : 1 / 3,
+        C,
         !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (p < this.scrollToIndex ? Math.abs(this.scrollToIndex - p) : Math.abs(p - Math.max(this.scrollToIndex, c))) : 0,
         e,
         d
-      ), E.isBG && b ? s += this.lyricLinesSize.get(m)?.[1] ?? 0 : E.isBG || (s += this.lyricLinesSize.get(m)?.[1] ?? 0), s >= 0 && (d += u, u /= 1.2);
-    }), this.bottomLine.setTransform(0, s, e, d);
+      ), v.isBG && b ? s += this.lyricLinesSize.get(m)?.[1] ?? 0 : v.isBG || (s += this.lyricLinesSize.get(m)?.[1] ?? 0), s >= 0 && (d += u, u /= 1.2);
+    }), this.bottomLine.setTransform(this.padding, s, e, d);
   }
   /**
    * 获取当前歌词的播放位置
@@ -1263,7 +1291,7 @@ class ae extends EventTarget {
       (n) => n.startTime >= e
     ), this.bufferedLines.clear(), this.hotLines.forEach((n) => this.bufferedLines.add(n)), this.calcLayout(!0)) : (s.size > 0 || r.size > 0) && (s.size === 0 && r.size > 0 ? (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
-    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : r.size === 0 && s.size > 0 ? $(s, this.bufferedLines) && this.bufferedLines.forEach((n) => {
+    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : r.size === 0 && s.size > 0 ? W(s, this.bufferedLines) && this.bufferedLines.forEach((n) => {
       this.hotLines.has(n) || (this.bufferedLines.delete(n), this.lyricLinesEl[n].disable());
     }) : (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
@@ -1325,8 +1353,8 @@ class ae extends EventTarget {
   }
 }
 export {
-  re as BackgroundRender,
-  ae as LyricPlayer,
-  ne as ttml
+  ae as BackgroundRender,
+  le as LyricPlayer,
+  re as ttml
 };
 //# sourceMappingURL=amll-core.mjs.map

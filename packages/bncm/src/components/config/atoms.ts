@@ -125,6 +125,12 @@ export const fontColorAtom = atomWithConfig({
 	desc: "字体颜色",
 });
 
+export const primaryColorAtom = atomWithConfig({
+	key: "primary-color-color",
+	default: "#FFFFFF",
+	desc: "控件主要颜色",
+});
+
 export const neverGonnaGiveYouUpAtom = atomWithConfig({
 	key: "never-gonna-give-you-up",
 	default: false,

@@ -10,6 +10,7 @@ import {
 	lyricHidePassedAtom,
 	fontColorAtom,
 	lyricSpringEffectAtom,
+	primaryColorAtom,
 } from "./atoms";
 
 export const LyricConfig: FC = () => {
@@ -54,6 +55,7 @@ export const LyricConfig: FC = () => {
 			</GroupBox>
 			<GroupBox>
 				<ColorConfigComponent atom={fontColorAtom} label="字体颜色" />
+				<ColorConfigComponent atom={primaryColorAtom} label="控件主要颜色" />
 			</GroupBox>
 		</>
 	);

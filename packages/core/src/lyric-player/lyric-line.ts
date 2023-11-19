@@ -493,9 +493,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			if (wordEl) {
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
+				const fadeWidth = word.height / 2;
 				const [maskImage, _widthInTotal, totalAspect] = generateFadeGradient(
-					16 / word.width,
-					"rgba(0,0,0,0.75)",
+					fadeWidth / word.width,
+					"rgba(0,0,0,1)",
 					"rgba(0,0,0,0.25)",
 				);
 				const totalAspectStr = `${totalAspect * 100}% 100%`;
@@ -508,7 +509,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskOrigin = "left";
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
-				const w = word.width + 16;
+				const w = word.width + fadeWidth;
 				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
 					word.startTime
 				})*${
@@ -543,7 +544,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.scale = scale;
 		this.delay = (delay * 1000) | 0;
 		const main = this.element.children[0] as HTMLDivElement;
+		const trans = this.element.children[1] as HTMLDivElement;
+		const roman = this.element.children[2] as HTMLDivElement;
 		main.style.opacity = `${opacity}`;
+		trans.style.opacity = `${opacity / 2}`;
+		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {
 			this.blur = Math.min(32, blur);
 			if (force)

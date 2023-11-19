@@ -18,6 +18,9 @@ declare const _default: import("vue").DefineComponent<{
     enableScale: {
         type: import("vue").PropType<boolean>;
     };
+    hidePassedLines: {
+        type: import("vue").PropType<boolean>;
+    };
     lyricLines: {
         type: import("vue").PropType<import("@applemusic-like-lyrics/core").LyricLine[]>;
     };
@@ -61,6 +64,9 @@ declare const _default: import("vue").DefineComponent<{
         type: import("vue").PropType<boolean>;
     };
     enableScale: {
+        type: import("vue").PropType<boolean>;
+    };
+    hidePassedLines: {
         type: import("vue").PropType<boolean>;
     };
     lyricLines: {

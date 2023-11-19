@@ -9,17 +9,11 @@ import "./guide.sass";
 import { closeLyricPage, openLyricPage } from "../../injector";
 
 export const AMLLGuide: FC = () => {
-	const neverGonnaGiveYouUp = useAtomValue(neverGonnaGiveYouUpAtom);
 	const [showTutoial, setShowTutoial] = useAtom(showTutoialAtom);
 	const displayed = useRef(false);
 
 	useEffect(() => {
-		if (
-			showTutoial.state !== "hasData" ||
-			neverGonnaGiveYouUp.state !== "hasData" ||
-			displayed.current
-		)
-			return;
+		if (showTutoial.state !== "hasData" || displayed.current) return;
 		const driverObj = driver({
 			allowClose: false,
 			allowKeyboardControl: false,
@@ -111,7 +105,7 @@ export const AMLLGuide: FC = () => {
 			driverObj.drive();
 		}
 		displayed.current = true;
-	}, [neverGonnaGiveYouUp, showTutoial]);
+	}, [showTutoial]);
 
 	return null;
 };

@@ -308,7 +308,30 @@ async function getLyricFromNCM(
 		}
 	}
 
-	return converted;
+	// 是否为纯音乐
+	console.log(converted);
+	if (
+		converted.length === 1 &&
+		converted[0].startTime === 5940000 &&
+		converted[0].endTime === Infinity &&
+		converted[0].words[0].startTime === 5940000 &&
+		converted[0].words[0].endTime === Infinity &&
+		converted[0].words[0].word === "纯音乐，请欣赏" &&
+		converted[0].translatedLyric === "" &&
+		converted[0].romanLyric === "" &&
+		converted[0].isBG === false &&
+		converted[0].isDuet === false
+	) {
+		return {
+			type: "pure-music",
+			lines: [],
+		};
+	}
+
+	return {
+		type: "music",
+		lines: converted,
+	};
 }
 
 class LyricNotExistError extends Error {}
@@ -477,8 +500,10 @@ export const LyricProvider: FC = () => {
 							signal,
 							getLyric,
 						);
-						if (lines) {
-							return lines;
+						if (lines.type === "music") {
+							return lines.lines;
+						} else if (lines.type === "pure-music") {
+							return [];
 						} else {
 							throw new LyricNotExistError();
 						}

@@ -17,6 +17,7 @@ import { lyricLinesAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {
 	lyricBlurEffectAtom,
+	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
 	lyricSpringEffectAtom,
 } from "../../components/config/atoms";
@@ -35,6 +36,7 @@ export const CoreLyricPlayer: FC<{
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
 	const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom);
 	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
+	const lyricHidePassed = useAtomValue(lyricHidePassedAtom);
 	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 
@@ -84,6 +86,7 @@ export const CoreLyricPlayer: FC<{
 					enableBlur={lyricBlurEffect}
 					enableSpring={lyricSpringEffect}
 					enableScale={lyricScaleEffect}
+					hidePassedLines={lyricHidePassed}
 					lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
 					ref={playerRef}
 					onLyricLineClick={(line) => {

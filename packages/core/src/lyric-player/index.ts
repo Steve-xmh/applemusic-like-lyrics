@@ -59,7 +59,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private scrolledHandler = 0;
 	private isScrolled = false;
 	private invokedByScrollEvent = false;
+	private padding = 32;
 	private scrollOffset = 0;
+	private hidePassedLines = false;
 	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
 		const rect = e[0].contentRect;
 		this.size[0] = rect.width;
@@ -233,7 +235,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 			"& > span": {
 				whiteSpace: "pre-wrap",
-				wordBreak: "keep-all",
 				maxLines: "1",
 				// willChange: "transform,display,mask-image",
 				"&.emphasize": {
@@ -245,7 +246,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 		},
 		lyricSubLine: {
-			fontSize: "max(50%, 10px)",
+			fontSize: "max(0.5em, 10px)",
+			transition: "opacity 0.3s 0.25s",
 			opacity: 0.5,
 		},
 		disableSpring: {
@@ -372,15 +374,23 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	rebuildStyle() {
 		let style = "";
 		style += "--amll-lyric-player-width:";
-		style += this.innerSize[0];
+		style += this.innerSize[0] - this.padding * 2;
 		style += "px;";
 		style += "--amll-lyric-player-height:";
-		style += this.innerSize[1];
+		style += this.innerSize[1] - this.padding * 2;
 		style += "px;";
 		style += "--amll-player-time:";
 		style += this.currentTime;
 		style += ";";
 		this.element.setAttribute("style", style);
+	}
+	/**
+	 * 设置是否隐藏已经播放过的歌词行，默认不隐藏
+	 * @param hide 是否隐藏已经播放过的歌词行，默认不隐藏
+	 */
+	setHidePassedLines(hide: boolean) {
+		this.hidePassedLines = hide;
+		this.calcLayout();
 	}
 	/**
 	 * 设置是否启用歌词行的模糊效果
@@ -409,30 +419,37 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						...line,
 					};
 				else {
-					const lastLine = lines[i - 1];
-					const pastLine = lines[i - 2];
-					if (lastLine?.isBG && pastLine) {
-						if (pastLine.endTime < line.startTime) {
-							return {
-								...line,
-								startTime:
-									Math.max(pastLine.endTime, line.startTime - timeOffset) ||
-									line.startTime,
-							};
+					if (i === 0) {
+						return {
+							...line,
+							startTime: Math.max(line.startTime - timeOffset, 0),
+						};
+					} else {
+						const lastLine = lines[i - 1];
+						const pastLine = lines[i - 2];
+						if (lastLine?.isBG && pastLine) {
+							if (pastLine.endTime < line.startTime) {
+								return {
+									...line,
+									startTime:
+										Math.max(pastLine.endTime, line.startTime - timeOffset) ||
+										line.startTime,
+								};
+							}
+						} else if (lastLine?.endTime) {
+							if (lastLine.endTime < line.startTime) {
+								return {
+									...line,
+									startTime:
+										Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
+										line.startTime,
+								};
+							}
 						}
-					} else if (lastLine?.endTime) {
-						if (lastLine.endTime < line.startTime) {
-							return {
-								...line,
-								startTime:
-									Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
-									line.startTime,
-							};
-						}
+						return {
+							...line,
+						};
 					}
-					return {
-						...line,
-					};
 				}
 			});
 		this.isNonDynamic = true;
@@ -605,11 +622,20 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				curPos += this.interludeDotsSize[1];
 			}
+			const targetOpacity = this.hidePassedLines
+				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
+					? 0
+					: hasBuffered
+					? 1
+					: 1 / 3
+				: hasBuffered
+				? 1
+				: 1 / 3;
 			el.setTransform(
-				0,
+				this.padding,
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
-				hasBuffered ? 1 : 1 / 3,
+				targetOpacity,
 				!this.invokedByScrollEvent && this.enableBlur
 					? isActive
 						? 0
@@ -631,7 +657,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				baseDelay /= 1.2;
 			}
 		});
-		this.bottomLine.setTransform(0, curPos, force, delay);
+		this.bottomLine.setTransform(this.padding, curPos, force, delay);
 	}
 	/**
 	 * 获取当前歌词的播放位置

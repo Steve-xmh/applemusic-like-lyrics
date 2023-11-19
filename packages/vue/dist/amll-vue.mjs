@@ -1,4 +1,4 @@
-import { defineComponent as S, ref as c, onMounted as P, onUnmounted as b, watchEffect as r, openBlock as d, createElementBlock as y, Fragment as E, createElementVNode as L, mergeProps as B, createBlock as k, Teleport as w, createCommentVNode as h } from "vue";
+import { defineComponent as S, ref as c, onMounted as P, onUnmounted as y, watchEffect as a, openBlock as v, createElementBlock as b, Fragment as L, createElementVNode as B, mergeProps as E, createBlock as h, Teleport as k, createCommentVNode as w } from "vue";
 import { LyricPlayer as _, BackgroundRender as R } from "@applemusic-like-lyrics/core";
 const C = /* @__PURE__ */ S({
   inheritAttrs: !1,
@@ -10,6 +10,7 @@ const C = /* @__PURE__ */ S({
     enableSpring: { type: Boolean },
     enableBlur: { type: Boolean },
     enableScale: { type: Boolean },
+    hidePassedLines: { type: Boolean },
     lyricLines: {},
     currentTime: {},
     linePosXSpringParams: {},
@@ -18,67 +19,70 @@ const C = /* @__PURE__ */ S({
     bottomLine: {}
   },
   emits: ["line-click", "line-contextmenu"],
-  setup(p, { expose: m, emit: i }) {
-    const l = p, a = c(), e = c(), s = (n) => i("line-click", n), f = (n) => i("line-contextmenu", n);
+  setup(p, { expose: d, emit: r }) {
+    const l = p, i = c(), e = c(), o = (n) => r("line-click", n), f = (n) => r("line-contextmenu", n);
     return P(() => {
-      a.value && (e.value = new _(), a.value.appendChild(e.value.getElement()), e.value.addEventListener("line-click", s), e.value.addEventListener("line-contextmenu", f));
-    }), b(() => {
-      e.value && (e.value.removeEventListener("line-click", s), e.value.removeEventListener("line-contextmenu", f), e.value.dispose());
-    }), r((n) => {
+      i.value && (e.value = new _(), i.value.appendChild(e.value.getElement()), e.value.addEventListener("line-click", o), e.value.addEventListener("line-contextmenu", f));
+    }), y(() => {
+      e.value && (e.value.removeEventListener("line-click", o), e.value.removeEventListener("line-contextmenu", f), e.value.dispose());
+    }), a((n) => {
       if (!l.disabled) {
-        let t = !1, o = -1;
-        const u = (v) => {
+        let t = !1, s = -1;
+        const u = (m) => {
           var g;
-          t || (o === -1 && (o = v), (g = e.value) == null || g.update(v - o), o = v, requestAnimationFrame(u));
+          t || (s === -1 && (s = m), (g = e.value) == null || g.update(m - s), s = m, requestAnimationFrame(u));
         };
         requestAnimationFrame(u), n(() => {
           t = !0;
         });
       }
-    }), r(() => {
+    }), a(() => {
       var n;
       l.alignAnchor !== void 0 && ((n = e.value) == null || n.setAlignAnchor(l.alignAnchor));
-    }), r(() => {
+    }), a(() => {
+      var n;
+      l.hidePassedLines !== void 0 && ((n = e.value) == null || n.setHidePassedLines(l.hidePassedLines));
+    }), a(() => {
       var n;
       l.alignPosition !== void 0 && ((n = e.value) == null || n.setAlignPosition(l.alignPosition));
-    }), r(() => {
+    }), a(() => {
       var n, t;
       l.enableSpring !== void 0 ? (n = e.value) == null || n.setEnableSpring(l.enableSpring) : (t = e.value) == null || t.setEnableSpring(!0);
-    }), r(() => {
+    }), a(() => {
       var n, t;
       l.enableBlur !== void 0 ? (n = e.value) == null || n.setEnableBlur(l.enableBlur) : (t = e.value) == null || t.setEnableBlur(!0);
-    }), r(() => {
+    }), a(() => {
       var n, t;
       l.enableScale !== void 0 ? (n = e.value) == null || n.setEnableScale(l.enableScale) : (t = e.value) == null || t.setEnableScale(!0);
-    }), r(() => {
+    }), a(() => {
       var n;
       l.lyricLines !== void 0 && ((n = e.value) == null || n.setLyricLines(l.lyricLines));
-    }), r(() => {
+    }), a(() => {
       var n;
       l.currentTime !== void 0 && ((n = e.value) == null || n.setCurrentTime(l.currentTime));
-    }), r(() => {
+    }), a(() => {
       var n;
       l.linePosXSpringParams !== void 0 && ((n = e.value) == null || n.setLinePosXSpringParams(l.linePosXSpringParams));
-    }), r(() => {
+    }), a(() => {
       var n;
       l.linePosYSpringParams !== void 0 && ((n = e.value) == null || n.setLinePosYSpringParams(l.linePosYSpringParams));
-    }), r(() => {
+    }), a(() => {
       var n;
       l.lineScaleSpringParams !== void 0 && ((n = e.value) == null || n.setLineScaleSpringParams(l.lineScaleSpringParams));
-    }), m({
+    }), d({
       lyricPlayer: e,
-      wrapperEl: a
+      wrapperEl: i
     }), (n, t) => {
-      var o, u;
-      return d(), y(E, null, [
-        L("div", B({
+      var s, u;
+      return v(), b(L, null, [
+        B("div", E({
           ref_key: "wrapperRef",
-          ref: a
+          ref: i
         }, n.$attrs), null, 16),
-        (o = e.value) != null && o.getBottomLineElement() && l.bottomLine ? (d(), k(w, {
+        (s = e.value) != null && s.getBottomLineElement() && l.bottomLine ? (v(), h(k, {
           key: 0,
           to: (u = e.value) == null ? void 0 : u.getBottomLineElement()
-        }, null, 8, ["to"])) : h("", !0)
+        }, null, 8, ["to"])) : w("", !0)
       ], 64);
     };
   }
@@ -91,35 +95,35 @@ const C = /* @__PURE__ */ S({
     flowSpeed: {},
     renderScale: {}
   },
-  setup(p, { expose: m }) {
-    const i = p, l = c(), a = c();
+  setup(p, { expose: d }) {
+    const r = p, l = c(), i = c();
     return P(() => {
       if (l.value) {
-        a.value = new R();
-        const e = a.value.getElement();
+        i.value = new R();
+        const e = i.value.getElement();
         e.style.width = "100%", e.style.height = "100%", l.value.appendChild(e);
       }
-    }), b(() => {
-      a.value && a.value.dispose();
-    }), r(() => {
+    }), y(() => {
+      i.value && i.value.dispose();
+    }), a(() => {
       var e;
-      i.albumImageUrl && ((e = a.value) == null || e.setAlbumImage(i.albumImageUrl));
-    }), r(() => {
+      r.albumImageUrl && ((e = i.value) == null || e.setAlbumImage(r.albumImageUrl));
+    }), a(() => {
       var e;
-      i.fps && ((e = a.value) == null || e.setFPS(i.fps));
-    }), r(() => {
-      var e, s;
-      i.playing ? (e = a.value) == null || e.pause() : (s = a.value) == null || s.resume();
-    }), r(() => {
+      r.fps && ((e = i.value) == null || e.setFPS(r.fps));
+    }), a(() => {
+      var e, o;
+      r.playing ? (e = i.value) == null || e.pause() : (o = i.value) == null || o.resume();
+    }), a(() => {
       var e;
-      i.flowSpeed && ((e = a.value) == null || e.setFlowSpeed(i.flowSpeed));
-    }), r(() => {
+      r.flowSpeed && ((e = i.value) == null || e.setFlowSpeed(r.flowSpeed));
+    }), a(() => {
       var e;
-      i.renderScale && ((e = a.value) == null || e.setRenderScale(i.renderScale));
-    }), m({
-      bgRender: a,
+      r.renderScale && ((e = i.value) == null || e.setRenderScale(r.renderScale));
+    }), d({
+      bgRender: i,
       wrapperEl: l
-    }), (e, s) => (d(), y("div", {
+    }), (e, o) => (v(), b("div", {
       ref_key: "wrapperRef",
       ref: l
     }, null, 512));

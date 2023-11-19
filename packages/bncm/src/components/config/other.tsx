@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { GroupBox } from "../appkit/group-box";
-import { SwitchConfigComponent } from "./common";
+import { SwitchConfigComponent, SwitchLoadableConfigComponent } from "./common";
 import {
 	neverGonnaGiveYouUpAtom,
 	showStatsAtom,
@@ -17,7 +17,7 @@ export const OtherConfig: FC = () => {
 				/>
 			</GroupBox>
 			<GroupBox>
-				<SwitchConfigComponent
+				<SwitchLoadableConfigComponent
 					atom={showTutoialAtom}
 					label="下一次启动时显示使用教程"
 					description="如果忘记怎么操作了的话就打开这个吧"

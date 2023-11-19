@@ -3,6 +3,7 @@ import { topbarMenuOpenedAtom } from "../common/main-menu";
 import { useSetAtom, useAtomValue } from "jotai";
 import {
 	fontColorAtom,
+	primaryColorAtom,
 	showAlbumImageAtom,
 	showControlThumbAtom,
 } from "../../components/config/atoms";
@@ -15,6 +16,7 @@ import { displayMusicCoverAtom } from "../../music-context/wrapper";
 export const LyricPlayerVertical: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const fontColor = useAtomValue(fontColorAtom);
+	const primaryColor = useAtomValue(primaryColorAtom);
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
@@ -24,7 +26,11 @@ export const LyricPlayerVertical: FC = () => {
 			className="lyric-player-vertical"
 			style={
 				{
+					"--amll-lyric-font-color": fontColor,
 					"--amll-lyric-view-color": fontColor,
+					"--amll-lyric-primary-color": primaryColor,
+					"--amll-lyric-primary-color-t15": `${primaryColor}26`,
+					"--amll-lyric-primary-color-t30": `${primaryColor}4D`,
 					color: fontColor,
 				} as any
 			}

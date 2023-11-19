@@ -12,6 +12,7 @@ import {
 	fontColorAtom,
 	showAlbumImageAtom,
 	showControlThumbAtom,
+	primaryColorAtom,
 } from "../../components/config/atoms";
 import { useEffect, useRef } from "react";
 import { topbarMenuOpenedAtom } from "../common/main-menu";
@@ -19,17 +20,21 @@ import Stats from "stats.js";
 import { PlayState } from "../../music-context";
 import { MusicInfo } from "./info";
 import { CoreLyricPlayer } from "../common/player";
+import classNames from "classnames";
+import { lyricLinesAtom } from "../../lyric/provider";
 
 export const LyricPlayerHorizonal: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const showStats = useAtomValue(showStatsAtom);
 	const fontColor = useAtomValue(fontColorAtom);
+	const primaryColor = useAtomValue(primaryColorAtom);
 	const playStatus = useAtomValue(playStatusAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
 	const musicOverrideData = useAtomValue(musicOverrideDataAtom);
+	const lyricLines = useAtomValue(lyricLinesAtom);
 
 	useEffect(() => {
 		if (showStats) {
@@ -59,10 +64,17 @@ export const LyricPlayerHorizonal: FC = () => {
 	return (
 		<>
 			<div
-				className="lyric-player-horizonal"
+				className={classNames("lyric-player-horizonal", {
+					"no-lyric":
+						lyricLines.state === "hasData" && lyricLines.data.length === 0,
+				})}
 				style={
 					{
+						"--amll-lyric-font-color": fontColor,
 						"--amll-lyric-view-color": fontColor,
+						"--amll-lyric-primary-color": primaryColor,
+						"--amll-lyric-primary-color-t15": `${primaryColor}26`,
+						"--amll-lyric-primary-color-t30": `${primaryColor}4D`,
 						color: fontColor,
 					} as any
 				}
@@ -72,6 +84,12 @@ export const LyricPlayerHorizonal: FC = () => {
 					evt.stopPropagation();
 				}}
 			>
+				<div
+					style={{
+						gridColumn: "center-space",
+						gridRow: "1 / 7",
+					}}
+				/>
 				{showControlThumb && (
 					<button
 						className="amll-control-thumb"
@@ -124,7 +142,7 @@ export const LyricPlayerHorizonal: FC = () => {
 					data-tauri-drag-region
 					style={{
 						height: "30px",
-						gridColumn: "1 / 3",
+						gridColumn: "1 / 4",
 						gridRow: "1",
 						zIndex: "1",
 					}}
