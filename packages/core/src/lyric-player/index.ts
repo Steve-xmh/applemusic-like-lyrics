@@ -199,6 +199,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "border-box",
 			borderRadius: "8px",
+			"& span": {
+				padding: "0.05em",
+				margin: "-0.05em",
+			},
 			"&:hover": {
 				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
 				boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)",

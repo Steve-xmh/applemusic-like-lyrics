@@ -1,22 +1,22 @@
-import { Container as z } from "@pixi/display";
-import { Application as D } from "@pixi/app";
+import { Container as C } from "@pixi/display";
+import { Application as z } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
-import { ColorMatrixFilter as P } from "@pixi/filter-color-matrix";
-import { Texture as I } from "@pixi/core";
-import { Sprite as w } from "@pixi/sprite";
+import { ColorMatrixFilter as v } from "@pixi/filter-color-matrix";
+import { Texture as A } from "@pixi/core";
+import { Sprite as S } from "@pixi/sprite";
 import { BulgePinchFilter as E } from "@pixi/filter-bulge-pinch";
-import { create as A } from "jss";
-import k from "jss-preset-default";
-const B = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
+import { create as I } from "jss";
+import D from "jss-preset-default";
+const k = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
 function T(h) {
-  const e = B.exec(h);
+  const e = k.exec(h);
   if (e) {
     const t = Number(e.groups?.hour || "0"), i = Number(e.groups?.min || "0"), s = Number(e.groups?.sec.replace(/:/, ".") || "0");
     return Math.floor((t * 3600 + i * 60 + s) * 1e3);
   } else
     throw new TypeError("时间戳字符串解析失败");
 }
-function O(h) {
+function B(h) {
   const t = new DOMParser().parseFromString(
     h,
     "application/xml"
@@ -55,7 +55,7 @@ function O(h) {
         const o = l, c = o.getAttribute("ttm:role");
         if (o.nodeName === "span" && c)
           if (c === "x-bg") {
-            const d = {
+            const m = {
               words: [],
               startTime: n.startTime,
               endTime: n.endTime,
@@ -64,58 +64,58 @@ function O(h) {
               isBG: !0,
               isDuet: n.isDuet
             };
-            for (const m of o.childNodes)
-              if (m.nodeType === Node.TEXT_NODE) {
-                const p = m.textContent ?? "";
-                /^(\s+)$/.test(p) ? d.words.push({
+            for (const p of o.childNodes)
+              if (p.nodeType === Node.TEXT_NODE) {
+                const d = p.textContent ?? "";
+                /^(\s+)$/.test(d) ? m.words.push({
                   word: " ",
                   startTime: 0,
                   endTime: 0
-                }) : d.words.push({
-                  word: p,
+                }) : m.words.push({
+                  word: d,
                   startTime: 0,
                   endTime: 0
                 });
-              } else if (m.nodeType === Node.ELEMENT_NODE) {
-                const p = m, g = p.getAttribute("ttm:role");
-                if (p.nodeName === "span" && g)
-                  g === "x-translation" ? d.translatedLyric = p.innerHTML.trim() : g === "x-roman" && (d.romanLyric = p.innerHTML.trim());
-                else if (p.hasAttribute("begin") && p.hasAttribute("end")) {
+              } else if (p.nodeType === Node.ELEMENT_NODE) {
+                const d = p, g = d.getAttribute("ttm:role");
+                if (d.nodeName === "span" && g)
+                  g === "x-translation" ? m.translatedLyric = d.innerHTML.trim() : g === "x-roman" && (m.romanLyric = d.innerHTML.trim());
+                else if (d.hasAttribute("begin") && d.hasAttribute("end")) {
                   const b = {
-                    word: m.textContent,
-                    startTime: T(p.getAttribute("begin")),
-                    endTime: T(p.getAttribute("end"))
+                    word: p.textContent,
+                    startTime: T(d.getAttribute("begin")),
+                    endTime: T(d.getAttribute("end"))
                   };
-                  d.words.push(b);
+                  m.words.push(b);
                 }
               }
-            const u = d.words[0];
-            d.startTime = u.startTime, u?.word.startsWith("(") && (u.word = u.word.substring(1));
-            const f = d.words[d.words.length - 1];
-            d.endTime = f.endTime, f?.word.endsWith(")") && (f.word = f.word.substring(
+            const u = m.words[0];
+            m.startTime = u.startTime, u?.word.startsWith("(") && (u.word = u.word.substring(1));
+            const f = m.words[m.words.length - 1];
+            m.endTime = f.endTime, f?.word.endsWith(")") && (f.word = f.word.substring(
               0,
               f.word.length - 1
-            )), a = d;
+            )), a = m;
           } else
             c === "x-translation" ? n.translatedLyric = o.innerHTML : c === "x-roman" && (n.romanLyric = o.innerHTML);
         else if (o.hasAttribute("begin") && o.hasAttribute("end")) {
-          const d = {
+          const m = {
             word: l.textContent ?? "",
             startTime: T(o.getAttribute("begin")),
             endTime: T(o.getAttribute("end"))
           };
-          n.words.push(d);
+          n.words.push(m);
         }
       }
     s.push(n), a && s.push(a);
   }
   return s;
 }
-const re = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const ae = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  parseTTML: O
+  parseTTML: B
 }, Symbol.toStringTag, { value: "Module" }));
-class N extends z {
+class O extends C {
   time = 0;
 }
 class $ {
@@ -128,7 +128,7 @@ class $ {
         this.canvas.width * this.currerntRenderScale,
         this.canvas.height * this.currerntRenderScale
       ), this.app.ticker.start(), this.rebuildFilters();
-    }), this.observer.observe(e), this.app = new D({
+    }), this.observer.observe(e), this.app = new z({
       view: e,
       resizeTo: this.canvas,
       powerPreference: "low-power",
@@ -179,11 +179,11 @@ class $ {
     ), this.rebuildFilters();
   }
   rebuildFilters() {
-    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new P();
+    const e = Math.min(this.canvas.width, this.canvas.height), t = Math.max(this.canvas.width, this.canvas.height), i = new v();
     i.saturate(1.2, !1);
-    const s = new P();
+    const s = new v();
     s.brightness(0.6, !1);
-    const r = new P();
+    const r = new v();
     r.contrast(0.3, !0), this.app.stage.filters?.forEach((n) => {
       n.destroy();
     }), this.app.stage.filters = [], this.app.stage.filters.push(new y(5, 1)), this.app.stage.filters.push(new y(10, 1)), this.app.stage.filters.push(new y(20, 2)), this.app.stage.filters.push(new y(40, 2)), this.app.stage.filters.push(new y(80, 2)), e > 768 && this.app.stage.filters.push(new y(160, 4)), e > 768 * 2 && this.app.stage.filters.push(new y(320, 4)), this.app.stage.filters.push(i, s, r), this.app.stage.filters.push(new y(5, 1)), Math.random() > 0.5 ? (this.app.stage.filters.push(
@@ -250,7 +250,7 @@ class $ {
     let i = 5, s;
     for (; !s?.baseTexture?.resource?.valid && i > 0; )
       try {
-        await t.decode(), s = I.from(t, {
+        await t.decode(), s = A.from(t, {
           resourceOptions: {
             autoLoad: !1
           }
@@ -264,14 +264,14 @@ class $ {
       }
     if (!s)
       return;
-    const r = new N(), n = new w(s), a = new w(s), l = new w(s), o = new w(s);
+    const r = new O(), n = new S(s), a = new S(s), l = new S(s), o = new S(s);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
-class ae extends $ {
+class oe extends $ {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -285,7 +285,7 @@ class ae extends $ {
   }
 }
 const W = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
-class S {
+class w {
   currentPosition = 0;
   targetPosition = 0;
   currentTime = 0;
@@ -299,13 +299,13 @@ class S {
   }
   resetSolver() {
     const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = F(
+    this.currentTime = 0, this.currentSolver = N(
       this.currentPosition,
       e,
       this.targetPosition,
       0,
       this.params
-    ), this.getV = _(this.currentSolver);
+    ), this.getV = R(this.currentSolver);
   }
   arrived() {
     return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
@@ -337,23 +337,23 @@ class S {
     return this.currentPosition;
   }
 }
-function F(h, e, t, i = 0, s) {
+function N(h, e, t, i = 0, s) {
   const r = s?.soft ?? !1, n = s?.stiffness ?? 100, a = s?.damping ?? 10, l = s?.mass ?? 1, o = t - h;
   if (r || 1 <= a / (2 * Math.sqrt(n * l))) {
-    const c = -Math.sqrt(n / l), d = -c * o - e;
-    return (u) => (u -= i, u < 0 ? h : t - (o + u * d) * Math.E ** (u * c));
+    const c = -Math.sqrt(n / l), m = -c * o - e;
+    return (u) => (u -= i, u < 0 ? h : t - (o + u * m) * Math.E ** (u * c));
   } else {
     const c = Math.sqrt(
       4 * l * n - a ** 2
-    ), d = (a * o - 2 * l * e) / c, u = 0.5 * c / l, f = -(0.5 * a) / l;
-    return (m) => (m -= i, m < 0 ? h : t - (Math.cos(m * u) * o + Math.sin(m * u) * d) * Math.E ** (m * f));
+    ), m = (a * o - 2 * l * e) / c, u = 0.5 * c / l, f = -(0.5 * a) / l;
+    return (p) => (p -= i, p < 0 ? h : t - (Math.cos(p * u) * o + Math.sin(p * u) * m) * Math.E ** (p * f));
   }
 }
-function R(h) {
+function F(h) {
   return (t) => (h(t + 1e-3) - h(t - 1e-3)) / (2 * 1e-3);
 }
-function _(h) {
-  return R(h);
+function R(h) {
+  return F(h);
 }
 class q {
   constructor(e) {
@@ -369,8 +369,8 @@ class q {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new S(0),
-    posY: new S(0)
+    posX: new w(0),
+    posY: new w(0)
   };
   measureSize() {
     return [
@@ -492,7 +492,7 @@ class Y {
     this.element.remove();
   }
 }
-const x = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
+const _ = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 function G(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
   const i = 2 + h, s = h / i, r = (1 - s) / 2;
   return [
@@ -501,15 +501,24 @@ function G(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
     i
   ];
 }
-function M(h) {
+function H(h, e) {
+  let t = [], i = [];
+  const s = [];
+  for (const r of h) {
+    const n = e(r);
+    t.push(n), i.push(r), n.length > 0 && n.trim().length === 0 ? (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), s.push(r), t = [], i = []) : (!/^\s*[^\s]*\s*$/.test(t.join("")) || _.test(n)) && (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), t = [n], i = [r]);
+  }
+  return i.length === 1 ? s.push(i[0]) : s.push(i), s;
+}
+function x(h) {
   return h.endTime - h.startTime >= 1e3 && h.word.length <= 7;
 }
-class H extends MouseEvent {
+class V extends MouseEvent {
   constructor(e, t) {
     super(t.type, t), this.line = e;
   }
 }
-class V extends EventTarget {
+class j extends EventTarget {
   // rome-ignore lint/correctness/noUnreachableSuper: <explanation>
   constructor(e, t = {
     words: [],
@@ -537,13 +546,13 @@ class V extends EventTarget {
   // 由 LyricPlayer 来设置
   lineSize = [0, 0];
   lineTransforms = {
-    posX: new S(0),
-    posY: new S(0),
-    scale: new S(1)
+    posX: new w(0),
+    posY: new w(0),
+    scale: new w(1)
   };
   listenersMap = /* @__PURE__ */ new Map();
   onMouseEvent = (e) => {
-    if (!this.dispatchEvent(new H(this, e)))
+    if (!this.dispatchEvent(new V(this, e)))
       return e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation(), !1;
   };
   addEventListener(e, t, i) {
@@ -615,79 +624,79 @@ class V extends EventTarget {
   rebuildElement() {
     const e = this.element.children[0], t = this.element.children[1], i = this.element.children[2];
     if (this.lyricPlayer._getIsNonDynamic()) {
-      for (; e.firstChild; )
-        e.removeChild(e.firstChild), n(e.firstChild);
-      e.innerText = this.lyricLine.words.map((l) => l.word).join(""), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
+      e.innerText = this.lyricLine.words.map((r) => r.word).join(""), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
       return;
     }
-    this.splittedWords = [], this.lyricLine.words.forEach((l) => {
-      const o = l.word.split(/\s+/), c = o.reduce((u, f) => u + f.length, 0);
-      let d = 0;
-      o.forEach((u, f) => {
-        f > 0 && this.splittedWords.push({
-          word: " ",
-          startTime: 0,
-          endTime: 0,
-          width: 0,
-          height: 0,
-          elements: [],
-          elementAnimations: [],
-          shouldEmphasize: !1
-        }), this.splittedWords.push({
-          word: u,
-          startTime: l.startTime + (l.endTime - l.startTime) / c * d,
-          endTime: l.startTime + (l.endTime - l.startTime) / c * (d + u.length),
-          width: 0,
-          height: 0,
-          elements: [],
-          elementAnimations: [],
-          shouldEmphasize: M(l)
-        }), d += u.length;
-      });
-    });
-    const s = [], r = [];
-    function n(l) {
-      for (; l.firstChild; )
-        l.firstChild.nodeType === Node.ELEMENT_NODE ? s.push(e.firstChild) : l.firstChild.nodeType === Node.TEXT_NODE && r.push(e.firstChild), l.removeChild(l.firstChild), n(l.firstChild);
-    }
-    n(e);
-    let a = null;
-    this.splittedWords.forEach((l) => {
-      if (l.word.trim().length > 0)
-        if (l.shouldEmphasize) {
-          const o = s.pop() ?? document.createElement("span");
-          o.className = "emphasize", l.elements = [o];
-          for (const c of l.word) {
-            const d = s.pop() ?? document.createElement("span");
-            d.className = "", d.innerText = c, o.appendChild(d), l.elements.push(d);
-          }
-          if (l.elementAnimations = this.initEmphasizeAnimation(l), a && !x.test(l.word))
-            if (a.childElementCount > 0)
-              a.appendChild(o);
-            else {
-              const c = s.pop() ?? document.createElement("span");
-              c.className = "", a.remove(), c.appendChild(a), c.appendChild(o), e.appendChild(c), a = c;
+    const s = H(this.lyricLine.words, (r) => r.word);
+    e.innerHTML = "", this.splittedWords = [];
+    for (const r of s)
+      if (r instanceof Array) {
+        const n = r.map((o) => x(o)).reduce((o, c) => o || c, !1), a = r.reduce(
+          (o, c) => (o.endTime = Math.max(o.endTime, c.endTime), o.startTime = Math.min(o.startTime, c.startTime), o.word += c.word, o),
+          { word: "", startTime: 1 / 0, endTime: -1 / 0 }
+        ), l = document.createElement("span");
+        for (const o of r) {
+          const c = document.createElement("span"), m = this.initFloatAnimation(
+            a,
+            c
+          );
+          if (n) {
+            const u = [];
+            for (const p of o.word.trim().split("")) {
+              const d = document.createElement("span");
+              d.innerText = p, u.push(d), c.appendChild(d);
             }
-          else
-            a = x.test(l.word) ? null : o, e.appendChild(o);
-        } else {
-          const o = s.pop() ?? document.createElement("span");
-          if (o.className = "", o.innerText = l.word, l.elements = [o], l.elementAnimations.push(this.initFloatAnimation(l, o)), a)
-            if (a.childElementCount > 0)
-              a.appendChild(o);
-            else {
-              const c = s.pop() ?? document.createElement("span");
-              c.className = "", a.remove(), c.appendChild(a), c.appendChild(o), e.appendChild(c), a = c;
-            }
-          else
-            a = o, e.appendChild(o);
+            const f = {
+              ...o,
+              mainElement: c,
+              subElements: u,
+              elementAnimations: [m],
+              width: 0,
+              height: 0,
+              shouldEmphasize: n
+            };
+            f.elementAnimations.push(
+              ...this.initEmphasizeAnimation(f)
+            ), this.splittedWords.push(f);
+          } else
+            c.innerText = o.word, this.splittedWords.push({
+              ...o,
+              mainElement: c,
+              subElements: [],
+              elementAnimations: [m],
+              width: 0,
+              height: 0,
+              shouldEmphasize: n
+            });
+          l.appendChild(c);
         }
-      else if (l.word.length > 0) {
-        const o = r.pop() ?? document.createTextNode(" ");
-        e.appendChild(o), a = null;
-      } else
-        a = null;
-    }), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
+        a.word.trimStart() !== a.word && e.appendChild(document.createTextNode(" ")), e.appendChild(l), a.word.trimEnd() !== a.word && e.appendChild(document.createTextNode(" "));
+      } else if (r.word.trim().length === 0)
+        e.appendChild(document.createTextNode(" "));
+      else {
+        const n = x(r), a = document.createElement("span"), l = {
+          ...r,
+          mainElement: a,
+          subElements: [],
+          elementAnimations: [this.initFloatAnimation(r, a)],
+          width: 0,
+          height: 0,
+          shouldEmphasize: n
+        };
+        if (n) {
+          const o = [];
+          for (const c of r.word.trim().split("")) {
+            const m = document.createElement("span");
+            m.innerText = c, o.push(m), a.appendChild(m);
+          }
+          l.subElements = o, l.elementAnimations.push(
+            ...this.initEmphasizeAnimation(l)
+          );
+        } else
+          a.innerText = r.word.trim();
+        r.word.trimStart() !== r.word && e.appendChild(document.createTextNode(" ")), e.appendChild(a), r.word.trimEnd() !== r.word && e.appendChild(document.createTextNode(" ")), this.splittedWords.push(l);
+      }
+    t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
   }
   initFloatAnimation(e, t) {
     const i = e.startTime - this.lyricLine.startTime, s = Math.max(1e3, e.endTime - e.startTime), r = t.animate(
@@ -711,44 +720,40 @@ class V extends EventTarget {
   }
   initEmphasizeAnimation(e) {
     const t = e.startTime - this.lyricLine.startTime, i = e.endTime - e.startTime;
-    return e.elements.map((s, r, n) => {
-      if (r === 0)
-        return this.initFloatAnimation(e, s);
-      {
-        const a = Math.max(1e3, e.endTime - e.startTime), l = t + i / (n.length - 1) * (r - 1), o = s.animate(
-          [
-            {
-              offset: 0,
-              transform: "translate3d(0, 0, 0px)",
-              filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
-            },
-            {
-              offset: 0.5,
-              transform: "translate3d(0, -1%, 20px)",
-              filter: "drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))"
-            },
-            {
-              offset: 1,
-              transform: "translate3d(0, 0, 0)",
-              filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
-            }
-          ],
+    return e.subElements.map((s, r, n) => {
+      const a = Math.max(1e3, e.endTime - e.startTime), l = t + i / n.length * r, o = s.animate(
+        [
           {
-            duration: isFinite(a) ? a : 0,
-            delay: isFinite(l) ? l : 0,
-            id: "glow-word",
-            iterations: 1,
-            composite: "replace",
-            fill: "both"
+            offset: 0,
+            transform: "translate3d(0, 0, 0px)",
+            filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
+          },
+          {
+            offset: 0.5,
+            transform: "translate3d(0, -2%, 20px)",
+            filter: "drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))"
+          },
+          {
+            offset: 1,
+            transform: "translate3d(0, 0, 0)",
+            filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))"
           }
-        );
-        return o.pause(), o;
-      }
+        ],
+        {
+          duration: isFinite(a) ? a : 0,
+          delay: isFinite(l) ? l : 0,
+          id: "glow-word",
+          iterations: 1,
+          composite: "replace",
+          fill: "both"
+        }
+      );
+      return o.pause(), o;
     });
   }
   updateMaskImage() {
     this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden"), this.splittedWords.forEach((e) => {
-      const t = e.elements[0];
+      const t = e.mainElement;
       if (t) {
         e.width = t.clientWidth, e.height = t.clientHeight;
         const i = e.height / 2, [s, r, n] = G(
@@ -768,8 +773,8 @@ class V extends EventTarget {
   setTransform(e = this.left, t = this.top, i = this.scale, s = 1, r = 0, n = !1, a = 0) {
     const l = this.isInSight, o = this.lyricPlayer.getEnableSpring();
     this.left = e, this.top = t, this.scale = i, this.delay = a * 1e3 | 0;
-    const c = this.element.children[0], d = this.element.children[1], u = this.element.children[2];
-    if (c.style.opacity = `${s}`, d.style.opacity = `${s / 2}`, u.style.opacity = `${s / 2}`, n || !o) {
+    const c = this.element.children[0], m = this.element.children[1], u = this.element.children[2];
+    if (c.style.opacity = `${s}`, m.style.opacity = `${s / 2}`, u.style.opacity = `${s / 2}`, n || !o) {
       if (this.blur = Math.min(32, r), n && this.element.classList.add(
         this.lyricPlayer.style.classes.tmpDisableTransition
       ), this.lineTransforms.posX.setPosition(e), this.lineTransforms.posY.setPosition(t), this.lineTransforms.scale.setPosition(i), o)
@@ -797,8 +802,8 @@ class V extends EventTarget {
     this.element.remove();
   }
 }
-const j = A(k());
-class J extends MouseEvent {
+const J = I(D());
+class K extends MouseEvent {
   constructor(e, t, i) {
     super(`line-${i.type}`, i), this.lineIndex = e, this.line = t;
   }
@@ -856,7 +861,7 @@ class le extends EventTarget {
   size = [0, 0];
   innerSize = [0, 0];
   onLineClickedHandler = (e) => {
-    const t = new J(
+    const t = new K(
       this.lyricLinesIndexes.get(e.line) ?? -1,
       e.line,
       e
@@ -901,7 +906,7 @@ class le extends EventTarget {
   getEnableScale() {
     return this.enableScale;
   }
-  style = j.createStyleSheet({
+  style = J.createStyleSheet({
     lyricPlayer: {
       userSelect: "none",
       fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 10vw), 12px))",
@@ -934,6 +939,10 @@ class le extends EventTarget {
       transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
       boxSizing: "border-box",
       borderRadius: "8px",
+      "& span": {
+        padding: "0.05em",
+        margin: "-0.05em"
+      },
       "&:hover": {
         backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
         boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)"
@@ -1126,7 +1135,7 @@ class le extends EventTarget {
       }
     this.processedLines.forEach((i, s, r) => {
       const n = r[s + 1], a = i.words[i.words.length - 1];
-      a && M(a) && (n ? n.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, n.startTime)) : i.endTime = i.endTime + 1500);
+      a && x(a) && (n ? n.startTime > i.endTime && (i.endTime = Math.min(i.endTime + 1500, n.startTime)) : i.endTime = i.endTime + 1500);
     }), this.processedLines.forEach((i, s, r) => {
       if (i.isBG)
         return;
@@ -1135,7 +1144,7 @@ class le extends EventTarget {
     }), this.lyricLinesEl.forEach((i) => {
       i.removeEventListener("click", this.onLineClickedHandler), i.removeEventListener("contextmenu", this.onLineClickedHandler), i.dispose();
     }), this.lyricLinesEl = this.processedLines.map((i) => {
-      const s = new V(this, i);
+      const s = new j(this, i);
       return s.addEventListener("click", this.onLineClickedHandler), s.addEventListener("contextmenu", this.onLineClickedHandler), s;
     }), this.lyricLinesEl.forEach((i, s) => {
       this.element.appendChild(i.getElement()), this.lyricLinesIndexes.set(i, s), i.updateMaskImage();
@@ -1167,46 +1176,46 @@ class le extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(e = !1, t = !1) {
-    t && (this.lyricLinesEl.forEach((m) => {
-      const p = m.measureSize();
-      this.lyricLinesSize.set(m, p), m.lineSize = p;
+    t && (this.lyricLinesEl.forEach((p) => {
+      const d = p.measureSize();
+      this.lyricLinesSize.set(p, d), p.lineSize = d;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());
     const i = this.getCurrentInterlude();
     let s = -this.scrollOffset, r = this.scrollToIndex, n = 0;
     i ? (n = i[1] - i[0], n >= 5e3 && this.lyricLinesEl[i[2] + 1] && (r = i[2] + 1)) : this.interludeDots.setInterlude(void 0);
     const a = this.enableScale ? 0.95 : 1, l = this.lyricLinesEl.slice(0, r).reduce(
-      (m, p) => m + (p.getLine().isBG ? 0 : this.lyricLinesSize.get(p)?.[1] ?? 0),
+      (p, d) => p + (d.getLine().isBG ? 0 : this.lyricLinesSize.get(d)?.[1] ?? 0),
       0
     );
     s -= l, s += this.size[1] * this.alignPosition;
     const o = this.lyricLinesEl[r];
     if (o) {
-      const m = this.lyricLinesSize.get(o)?.[1] ?? 0;
+      const p = this.lyricLinesSize.get(o)?.[1] ?? 0;
       switch (this.alignAnchor) {
         case "bottom":
-          s -= m;
+          s -= p;
           break;
         case "center":
-          s -= m / 2;
+          s -= p / 2;
           break;
       }
     }
     const c = Math.max(...this.bufferedLines);
-    let d = 0, u = 0.05, f = !1;
-    this.lyricLinesEl.forEach((m, p) => {
-      const g = this.bufferedLines.has(p), b = g || p >= this.scrollToIndex && p < c, v = m.getLine();
-      v.isDuet && this.size[0] - (this.lyricLinesSize.get(m)?.[0] ?? 0), !f && n >= 5e3 && (p === this.scrollToIndex && i?.[2] === -2 || p === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]);
-      const C = this.hidePassedLines && p < (i ? i[2] + 1 : this.scrollToIndex) ? 0 : g ? 1 : 1 / 3;
-      m.setTransform(
+    let m = 0, u = 0.05, f = !1;
+    this.lyricLinesEl.forEach((p, d) => {
+      const g = this.bufferedLines.has(d), b = g || d >= this.scrollToIndex && d < c, P = p.getLine();
+      P.isDuet && this.size[0] - (this.lyricLinesSize.get(p)?.[0] ?? 0), !f && n >= 5e3 && (d === this.scrollToIndex && i?.[2] === -2 || d === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]);
+      const M = this.hidePassedLines && d < (i ? i[2] + 1 : this.scrollToIndex) ? 0 : g ? 1 : 1 / 3;
+      p.setTransform(
         this.padding,
         s,
         b ? 1 : a,
-        C,
-        !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (p < this.scrollToIndex ? Math.abs(this.scrollToIndex - p) : Math.abs(p - Math.max(this.scrollToIndex, c))) : 0,
+        M,
+        !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (d < this.scrollToIndex ? Math.abs(this.scrollToIndex - d) : Math.abs(d - Math.max(this.scrollToIndex, c))) : 0,
         e,
-        d
-      ), v.isBG && b ? s += this.lyricLinesSize.get(m)?.[1] ?? 0 : v.isBG || (s += this.lyricLinesSize.get(m)?.[1] ?? 0), s >= 0 && (d += u, u /= 1.2);
-    }), this.bottomLine.setTransform(this.padding, s, e, d);
+        m
+      ), P.isBG && b ? s += this.lyricLinesSize.get(p)?.[1] ?? 0 : P.isBG || (s += this.lyricLinesSize.get(p)?.[1] ?? 0), s >= 0 && (m += u, u /= 1.2);
+    }), this.bottomLine.setTransform(this.padding, s, e, m);
   }
   /**
    * 获取当前歌词的播放位置
@@ -1353,8 +1362,8 @@ class le extends EventTarget {
   }
 }
 export {
-  ae as BackgroundRender,
+  oe as BackgroundRender,
   le as LyricPlayer,
-  re as ttml
+  ae as ttml
 };
 //# sourceMappingURL=amll-core.mjs.map
