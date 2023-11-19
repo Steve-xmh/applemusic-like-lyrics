@@ -10,9 +10,8 @@ import {
 	musicNameAtom,
 } from "./wrapper";
 import { log, warn } from "../utils/logger";
-import { toBody } from "@applemusic-like-lyrics/ws-protocol";
+import { toBody, parseBody } from "@applemusic-like-lyrics/ws-protocol";
 import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
-import { toDataURL } from "../utils/to-data-uri";
 import { debounce } from "../utils/debounce";
 import { lyricLinesAtom } from "../lyric/provider";
 import { MusicStatusGetterEvents } from ".";
@@ -158,6 +157,31 @@ export const WebSocketWrapper: FC = () => {
 			webSocket?.close();
 			webSocket = new WebSocket(url);
 			const nowWS = webSocket;
+
+			webSocket.addEventListener("message", (evt) => {
+				if (nowWS !== webSocket || canceled) return;
+				const data = parseBody(evt.data);
+				switch (data.type) {
+					case "setPlayProgress":
+						musicContext?.seekToPosition(data.value.progress);
+						break;
+					case "ping":
+						webSocket?.send(toBody({ type: "pong" }));
+						break;
+					case "pause":
+						musicContext?.pause();
+						break;
+					case "resume":
+						musicContext?.resume();
+						break;
+					case "forwardSong":
+						musicContext?.forwardSong();
+						break;
+					case "backwardSong":
+						musicContext?.rewindSong();
+						break;
+				}
+			});
 
 			webSocket.addEventListener("error", () => {
 				if (nowWS !== webSocket || canceled) return;

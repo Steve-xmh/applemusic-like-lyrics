@@ -74,6 +74,22 @@ impl AMLLWebSocketServer {
         conns
     }
 
+    pub async fn boardcast_message(&mut self, data: ws_protocol::Body) {
+        let mut conns = self.connections.lock().await;
+        let mut i = 0;
+        while i < conns.len() {
+            if let Err(err) = conns[i]
+                .send(Message::Binary(ws_protocol::to_body(&data).unwrap()))
+                .await
+            {
+                println!("WebSocket 客户端 {:?} 发送失败: {err:?}", conns[i]);
+                conns.remove(i);
+            } else {
+                i += 1;
+            }
+        }
+    }
+
     async fn accept_conn(
         stream: TcpStream,
         app: AppHandle,

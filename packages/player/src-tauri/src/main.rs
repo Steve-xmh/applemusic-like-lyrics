@@ -22,9 +22,19 @@ fn get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> {
     ws.lock().unwrap().get_connections()
 }
 
+#[tauri::command]
+fn boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
+    let ws = ws.clone();
+    tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![reopen_connection, get_connections])
+        .invoke_handler(tauri::generate_handler![
+            reopen_connection,
+            get_connections,
+            boardcast_message
+        ])
         .setup(|app| {
             app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle())));
             Ok(())

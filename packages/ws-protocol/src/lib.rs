@@ -120,6 +120,14 @@ pub enum Body {
         #[br(count = size)]
         data: Vec<LyricLine>,
     },
+    #[brw(magic(14u16))]
+    Pause,
+    #[brw(magic(15u16))]
+    Resume,
+    #[brw(magic(16u16))]
+    ForwardSong,
+    #[brw(magic(17u16))]
+    BackwardSong,
 }
 
 pub fn parse_body(body: &[u8]) -> anyhow::Result<Body> {
