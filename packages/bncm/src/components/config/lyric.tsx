@@ -22,7 +22,7 @@ export const LyricConfig: FC = () => {
 					label="显示翻译歌词"
 				/>
 				<GroupBoxDevider />
-				<SwitchConfigComponent atom={showRomanLineAtom} label="显示翻译歌词" />
+				<SwitchConfigComponent atom={showRomanLineAtom} label="显示音译歌词" />
 				<GroupBoxDevider />
 				<SwitchConfigComponent
 					atom={swapTranslatedRomanLineAtom}

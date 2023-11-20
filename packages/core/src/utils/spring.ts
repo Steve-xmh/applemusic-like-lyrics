@@ -15,6 +15,7 @@ export class Spring {
 	private params: Partial<SpringParams> = {};
 	private currentSolver: (t: seconds) => number;
 	private getV: (t: seconds) => number;
+	private getV2: (t: seconds) => number;
 	private queueParams:
 		| (Partial<SpringParams> & {
 				time: number;
@@ -31,6 +32,7 @@ export class Spring {
 		this.currentPosition = this.targetPosition;
 		this.currentSolver = () => this.targetPosition;
 		this.getV = () => 0;
+		this.getV2 = () => 0;
 	}
 	private resetSolver() {
 		const curV = this.getV(this.currentTime);
@@ -43,11 +45,13 @@ export class Spring {
 			this.params,
 		);
 		this.getV = getVelocity(this.currentSolver);
+		this.getV2 = getVelocity(this.getV);
 	}
 	arrived() {
 		return (
 			Math.abs(this.targetPosition - this.currentPosition) < 0.01 &&
 			this.getV(this.currentTime) < 0.01 &&
+			this.getV2(this.currentTime) < 0.01 &&
 			this.queueParams === undefined &&
 			this.queuePosition === undefined
 		);
@@ -57,6 +61,7 @@ export class Spring {
 		this.currentPosition = targetPosition;
 		this.currentSolver = () => this.targetPosition;
 		this.getV = () => 0;
+		this.getV2 = () => 0;
 	}
 	update(delta = 0) {
 		this.currentTime += delta;
@@ -82,10 +87,12 @@ export class Spring {
 	updateParams(params: Partial<SpringParams>, delay = 0) {
 		if (delay > 0) {
 			this.queueParams = {
+				...(this.queuePosition ?? {}),
 				...params,
 				time: delay,
 			};
 		} else {
+			this.queuePosition = undefined;
 			this.params = {
 				...this.params,
 				...params,
@@ -96,6 +103,7 @@ export class Spring {
 	setTargetPosition(targetPosition: number, delay = 0) {
 		if (delay > 0) {
 			this.queuePosition = {
+				...(this.queuePosition ?? {}),
 				position: targetPosition,
 				time: delay,
 			};

@@ -581,6 +581,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.hide();
 		}
 	}
+
+	_getDebugTargetPos(): string {
+		return `[位移: ${this.left}, ${this.top}; 缩放: ${this.scale}; 延时: ${this.delay}]`;
+	}
+
 	get isInSight() {
 		const l = this.lineTransforms.posX.getCurrentPosition();
 		const t = this.lineTransforms.posY.getCurrentPosition();

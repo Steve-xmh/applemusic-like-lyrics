@@ -12,6 +12,7 @@ export declare class Spring {
     private params;
     private currentSolver;
     private getV;
+    private getV2;
     private queueParams;
     private queuePosition;
     constructor(currentPosition?: number);

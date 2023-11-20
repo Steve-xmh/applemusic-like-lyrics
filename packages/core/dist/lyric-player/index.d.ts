@@ -48,13 +48,14 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private scrolledHandler;
     private isScrolled;
     private invokedByScrollEvent;
-    private padding;
     private scrollOffset;
     private hidePassedLines;
     private resizeObserver;
     private posXSpringParams;
     private posYSpringParams;
     private scaleSpringParams;
+    private emUnit;
+    private padding;
     private enableBlur;
     private enableScale;
     private interludeDots;

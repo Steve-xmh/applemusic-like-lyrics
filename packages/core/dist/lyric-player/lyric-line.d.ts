@@ -50,6 +50,7 @@ export declare class LyricLineEl extends EventTarget implements HasElement, Disp
     getElement(): HTMLElement;
     setTransform(left?: number, top?: number, scale?: number, opacity?: number, blur?: number, force?: boolean, delay?: number): void;
     update(delta?: number): void;
+    _getDebugTargetPos(): string;
     get isInSight(): boolean;
     dispose(): void;
 }

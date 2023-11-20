@@ -59,7 +59,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private scrolledHandler = 0;
 	private isScrolled = false;
 	private invokedByScrollEvent = false;
-	private padding = 32;
 	private scrollOffset = 0;
 	private hidePassedLines = false;
 	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
@@ -96,6 +95,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		damping: 20,
 		stiffness: 100,
 	};
+	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
+	private padding = this.emUnit;
 	private enableBlur = true;
 	private enableScale = true;
 	private interludeDots: InterludeDots;
@@ -198,7 +199,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			contain: "content",
 			willChange: "filter,transform,opacity",
 			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
-			boxSizing: "border-box",
+			boxSizing: "content-box",
 			borderRadius: "8px",
 			"&:hover": {
 				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
@@ -548,6 +549,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
+			this.emUnit = parseFloat(getComputedStyle(this.element).fontSize);
 			this.lyricLinesEl.forEach((el) => {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);
@@ -601,6 +603,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		let delay = 0;
 		let baseDelay = 0.05;
 		let setDots = false;
+		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
@@ -617,7 +620,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(32, curPos);
+				this.interludeDots.setTransform(this.padding, curPos);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
@@ -648,6 +651,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				force,
 				delay,
 			);
+			// console.log(i, el._getDebugTargetPos());
 			if (line.isBG && isActive) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			} else if (!line.isBG) {
@@ -658,6 +662,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				baseDelay /= 1.2;
 			}
 		});
+		// console.groupEnd();
 		this.bottomLine.setTransform(this.padding, curPos, force, delay);
 	}
 	/**
@@ -797,22 +802,33 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			this.hotLines.forEach((v) => this.bufferedLines.add(v));
 			this.calcLayout(true);
 		} else if (removedIds.size > 0 || addedIds.size > 0) {
+			// function debugLog() {
+			// 	console.groupCollapsed("setCurrentTime", time);
+			// 	console.log("removedIds", removedIds);
+			// 	console.log("addedIds", addedIds);
+			// 	console.groupEnd();
+			// }
 			if (removedIds.size === 0 && addedIds.size > 0) {
+				// debugLog();
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable();
 				});
 				this.scrollToIndex = Math.min(...this.bufferedLines);
+				this.calcLayout();
 			} else if (addedIds.size === 0 && removedIds.size > 0) {
 				if (eqSet(removedIds, this.bufferedLines)) {
+					// debugLog();
 					this.bufferedLines.forEach((v) => {
 						if (!this.hotLines.has(v)) {
 							this.bufferedLines.delete(v);
 							this.lyricLinesEl[v].disable();
 						}
 					});
+					this.calcLayout();
 				}
 			} else {
+				// debugLog();
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable();
@@ -823,8 +839,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				});
 				if (this.bufferedLines.size > 0)
 					this.scrollToIndex = Math.min(...this.bufferedLines);
+				this.calcLayout();
 			}
-			this.calcLayout();
 		}
 	}
 	/**

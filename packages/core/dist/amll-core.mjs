@@ -1,22 +1,22 @@
-import { Container as C } from "@pixi/display";
-import { Application as z } from "@pixi/app";
+import { Container as z } from "@pixi/display";
+import { Application as A } from "@pixi/app";
 import { BlurFilter as y } from "@pixi/filter-blur";
 import { ColorMatrixFilter as v } from "@pixi/filter-color-matrix";
-import { Texture as A } from "@pixi/core";
+import { Texture as I } from "@pixi/core";
 import { Sprite as S } from "@pixi/sprite";
 import { BulgePinchFilter as E } from "@pixi/filter-bulge-pinch";
-import { create as I } from "jss";
-import D from "jss-preset-default";
-const k = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
+import { create as D } from "jss";
+import k from "jss-preset-default";
+const B = /^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
 function T(h) {
-  const e = k.exec(h);
+  const e = B.exec(h);
   if (e) {
     const t = Number(e.groups?.hour || "0"), i = Number(e.groups?.min || "0"), s = Number(e.groups?.sec.replace(/:/, ".") || "0");
     return Math.floor((t * 3600 + i * 60 + s) * 1e3);
   } else
     throw new TypeError("时间戳字符串解析失败");
 }
-function B(h) {
+function $(h) {
   const t = new DOMParser().parseFromString(
     h,
     "application/xml"
@@ -113,12 +113,12 @@ function B(h) {
 }
 const ae = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  parseTTML: B
+  parseTTML: $
 }, Symbol.toStringTag, { value: "Module" }));
-class O extends C {
+class O extends z {
   time = 0;
 }
-class $ {
+class W {
   constructor(e) {
     this.canvas = e;
     const t = e.getBoundingClientRect();
@@ -128,7 +128,7 @@ class $ {
         this.canvas.width * this.currerntRenderScale,
         this.canvas.height * this.currerntRenderScale
       ), this.app.ticker.start(), this.rebuildFilters();
-    }), this.observer.observe(e), this.app = new z({
+    }), this.observer.observe(e), this.app = new A({
       view: e,
       resizeTo: this.canvas,
       powerPreference: "low-power",
@@ -250,7 +250,7 @@ class $ {
     let i = 5, s;
     for (; !s?.baseTexture?.resource?.valid && i > 0; )
       try {
-        await t.decode(), s = A.from(t, {
+        await t.decode(), s = I.from(t, {
           resourceOptions: {
             autoLoad: !1
           }
@@ -271,7 +271,7 @@ class $ {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
-class oe extends $ {
+class oe extends W {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -284,7 +284,7 @@ class oe extends $ {
     super.dispose(), this.element.remove();
   }
 }
-const W = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
+const N = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
 class w {
   currentPosition = 0;
   targetPosition = 0;
@@ -292,26 +292,27 @@ class w {
   params = {};
   currentSolver;
   getV;
+  getV2;
   queueParams;
   queuePosition;
   constructor(e = 0) {
-    this.targetPosition = e, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+    this.targetPosition = e, this.currentPosition = this.targetPosition, this.currentSolver = () => this.targetPosition, this.getV = () => 0, this.getV2 = () => 0;
   }
   resetSolver() {
     const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = N(
+    this.currentTime = 0, this.currentSolver = q(
       this.currentPosition,
       e,
       this.targetPosition,
       0,
       this.params
-    ), this.getV = R(this.currentSolver);
+    ), this.getV = M(this.currentSolver), this.getV2 = M(this.getV);
   }
   arrived() {
-    return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
+    return Math.abs(this.targetPosition - this.currentPosition) < 0.01 && this.getV(this.currentTime) < 0.01 && this.getV2(this.currentTime) < 0.01 && this.queueParams === void 0 && this.queuePosition === void 0;
   }
   setPosition(e) {
-    this.targetPosition = e, this.currentPosition = e, this.currentSolver = () => this.targetPosition, this.getV = () => 0;
+    this.targetPosition = e, this.currentPosition = e, this.currentSolver = () => this.targetPosition, this.getV = () => 0, this.getV2 = () => 0;
   }
   update(e = 0) {
     this.currentTime += e, this.currentPosition = this.currentSolver(this.currentTime), this.queueParams && (this.queueParams.time -= e, this.queueParams.time <= 0 && this.updateParams({
@@ -320,15 +321,17 @@ class w {
   }
   updateParams(e, t = 0) {
     t > 0 ? this.queueParams = {
+      ...this.queuePosition ?? {},
       ...e,
       time: t
-    } : (this.params = {
+    } : (this.queuePosition = void 0, this.params = {
       ...this.params,
       ...e
     }, this.resetSolver());
   }
   setTargetPosition(e, t = 0) {
     t > 0 ? this.queuePosition = {
+      ...this.queuePosition ?? {},
       position: e,
       time: t
     } : (this.queuePosition = void 0, this.targetPosition = e, this.resetSolver());
@@ -337,7 +340,7 @@ class w {
     return this.currentPosition;
   }
 }
-function N(h, e, t, i = 0, s) {
+function q(h, e, t, i = 0, s) {
   const r = s?.soft ?? !1, n = s?.stiffness ?? 100, a = s?.damping ?? 10, l = s?.mass ?? 1, o = t - h;
   if (r || 1 <= a / (2 * Math.sqrt(n * l))) {
     const c = -Math.sqrt(n / l), m = -c * o - e;
@@ -352,10 +355,10 @@ function N(h, e, t, i = 0, s) {
 function F(h) {
   return (t) => (h(t + 1e-3) - h(t - 1e-3)) / (2 * 1e-3);
 }
-function R(h) {
+function M(h) {
   return F(h);
 }
-class q {
+class R {
   constructor(e) {
     this.lyricPlayer = e, this.element.setAttribute(
       "class",
@@ -412,12 +415,12 @@ class q {
     this.element.remove();
   }
 }
-function X(h) {
+function _(h) {
   const t = 2.5949095;
   return h < 0.5 ? Math.pow(2 * h, 2) * ((t + 1) * 2 * h - t) / 2 : (Math.pow(2 * h - 2, 2) * ((t + 1) * (h * 2 - 2) + t) + 2) / 2;
 }
 const L = (h, e, t) => Math.max(h, Math.min(e, t));
-class Y {
+class X {
   constructor(e) {
     this.lyricPlayer = e, this.element.className = this.lyricPlayer.style.classes.interludeDots, this.element.appendChild(this.dot0), this.element.appendChild(this.dot1), this.element.appendChild(this.dot2);
   }
@@ -449,7 +452,7 @@ class Y {
       if (s <= i) {
         const r = i / Math.ceil(i / this.targetBreatheDuration);
         let n = 1, a = 1;
-        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - X(
+        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - _(
           (750 - (i - s)) / 750 / 2
         )), i - s < 375 && (a *= L(
           0,
@@ -492,7 +495,7 @@ class Y {
     this.element.remove();
   }
 }
-const _ = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
+const Y = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 function G(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
   const i = 2 + h, s = h / i, r = (1 - s) / 2;
   return [
@@ -501,19 +504,19 @@ function G(h, e = "rgba(0,0,0,1)", t = "rgba(0,0,0,0.5)") {
     i
   ];
 }
-function H(h, e) {
+function V(h, e) {
   let t = [], i = [];
   const s = [];
   for (const r of h) {
     const n = e(r);
-    t.push(n), i.push(r), n.length > 0 && n.trim().length === 0 ? (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), s.push(r), t = [], i = []) : (!/^\s*[^\s]*\s*$/.test(t.join("")) || _.test(n)) && (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), t = [n], i = [r]);
+    t.push(n), i.push(r), n.length > 0 && n.trim().length === 0 ? (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), s.push(r), t = [], i = []) : (!/^\s*[^\s]*\s*$/.test(t.join("")) || Y.test(n)) && (t.pop(), i.pop(), i.length === 1 ? s.push(i[0]) : i.length > 1 && s.push(i), t = [n], i = [r]);
   }
   return i.length === 1 ? s.push(i[0]) : s.push(i), s;
 }
 function x(h) {
   return h.endTime - h.startTime >= 1e3 && h.word.length <= 7;
 }
-class V extends MouseEvent {
+class H extends MouseEvent {
   constructor(e, t) {
     super(t.type, t), this.line = e;
   }
@@ -552,7 +555,7 @@ class j extends EventTarget {
   };
   listenersMap = /* @__PURE__ */ new Map();
   onMouseEvent = (e) => {
-    if (!this.dispatchEvent(new V(this, e)))
+    if (!this.dispatchEvent(new H(this, e)))
       return e.preventDefault(), e.stopPropagation(), e.stopImmediatePropagation(), !1;
   };
   addEventListener(e, t, i) {
@@ -627,7 +630,7 @@ class j extends EventTarget {
       e.innerText = this.lyricLine.words.map((r) => r.word).join(""), t.innerText = this.lyricLine.translatedLyric, i.innerText = this.lyricLine.romanLyric;
       return;
     }
-    const s = H(this.lyricLine.words, (r) => r.word);
+    const s = V(this.lyricLine.words, (r) => r.word);
     e.innerHTML = "", this.splittedWords = [];
     for (const r of s)
       if (r instanceof Array) {
@@ -797,6 +800,9 @@ class j extends EventTarget {
   update(e = 0) {
     this.lyricPlayer.getEnableSpring() && (this.lineTransforms.posX.update(e), this.lineTransforms.posY.update(e), this.lineTransforms.scale.update(e), this.isInSight ? this.show() : this.hide());
   }
+  _getDebugTargetPos() {
+    return `[位移: ${this.left}, ${this.top}; 缩放: ${this.scale}; 延时: ${this.delay}]`;
+  }
   get isInSight() {
     const e = this.lineTransforms.posX.getCurrentPosition(), t = this.lineTransforms.posY.getCurrentPosition(), i = e + this.lineSize[0], s = t + this.lineSize[1], r = this.lyricPlayer.size[0], n = this.lyricPlayer.size[1];
     return !(e > r || i < 0 || t > n || s < 0);
@@ -805,8 +811,8 @@ class j extends EventTarget {
     this.element.remove();
   }
 }
-const J = I(D());
-class K extends MouseEvent {
+const U = D(k());
+class J extends MouseEvent {
   constructor(e, t, i) {
     super(`line-${i.type}`, i), this.lineIndex = e, this.line = t;
   }
@@ -826,7 +832,6 @@ class le extends EventTarget {
   scrolledHandler = 0;
   isScrolled = !1;
   invokedByScrollEvent = !1;
-  padding = 32;
   scrollOffset = 0;
   hidePassedLines = !1;
   resizeObserver = new ResizeObserver((e) => {
@@ -850,6 +855,8 @@ class le extends EventTarget {
     damping: 20,
     stiffness: 100
   };
+  emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
+  padding = this.emUnit;
   enableBlur = !0;
   enableScale = !0;
   interludeDots;
@@ -864,7 +871,7 @@ class le extends EventTarget {
   size = [0, 0];
   innerSize = [0, 0];
   onLineClickedHandler = (e) => {
-    const t = new K(
+    const t = new J(
       this.lyricLinesIndexes.get(e.line) ?? -1,
       e.line,
       e
@@ -909,7 +916,7 @@ class le extends EventTarget {
   getEnableScale() {
     return this.enableScale;
   }
-  style = J.createStyleSheet({
+  style = U.createStyleSheet({
     lyricPlayer: {
       userSelect: "none",
       fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 10vw), 12px))",
@@ -941,7 +948,7 @@ class le extends EventTarget {
       contain: "content",
       willChange: "filter,transform,opacity",
       transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
-      boxSizing: "border-box",
+      boxSizing: "content-box",
       borderRadius: "8px",
       "&:hover": {
         backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
@@ -1034,7 +1041,7 @@ class le extends EventTarget {
     this.calcLayout(!0, !0);
   };
   constructor() {
-    super(), this.interludeDots = new Y(this), this.bottomLine = new q(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
+    super(), this.interludeDots = new X(this), this.bottomLine = new R(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
       this.allowScroll && (this.isScrolled = !0, clearTimeout(this.scrolledHandler), this.scrolledHandler = setTimeout(() => {
         this.isScrolled = !1, this.scrollOffset = 0;
       }, 5e3), this.invokedByScrollEvent = !0, e.deltaMode === e.DOM_DELTA_PIXEL ? (this.scrollOffset += e.deltaY, this.calcLayout(!0)) : (this.scrollOffset += e.deltaY * 50, this.calcLayout(!1)), this.invokedByScrollEvent = !1);
@@ -1176,7 +1183,7 @@ class le extends EventTarget {
    * @param reflow 是否进行重新布局（重新计算每行歌词大小）
    */
   calcLayout(e = !1, t = !1) {
-    t && (this.lyricLinesEl.forEach((p) => {
+    t && (this.emUnit = parseFloat(getComputedStyle(this.element).fontSize), this.lyricLinesEl.forEach((p) => {
       const d = p.measureSize();
       this.lyricLinesSize.set(p, d), p.lineSize = d;
     }), this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth, this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight, this.bottomLine.lineSize = this.bottomLine.measureSize());
@@ -1204,13 +1211,13 @@ class le extends EventTarget {
     let m = 0, u = 0.05, f = !1;
     this.lyricLinesEl.forEach((p, d) => {
       const g = this.bufferedLines.has(d), b = g || d >= this.scrollToIndex && d < c, P = p.getLine();
-      P.isDuet && this.size[0] - (this.lyricLinesSize.get(p)?.[0] ?? 0), !f && n >= 5e3 && (d === this.scrollToIndex && i?.[2] === -2 || d === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(32, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]);
-      const M = this.hidePassedLines && d < (i ? i[2] + 1 : this.scrollToIndex) ? 0 : g ? 1 : 1 / 3;
+      P.isDuet && this.size[0] - (this.lyricLinesSize.get(p)?.[0] ?? 0), !f && n >= 5e3 && (d === this.scrollToIndex && i?.[2] === -2 || d === this.scrollToIndex + 1) && (f = !0, this.interludeDots.setTransform(this.padding, s), i && this.interludeDots.setInterlude([i[0], i[1]]), s += this.interludeDotsSize[1]);
+      const C = this.hidePassedLines && d < (i ? i[2] + 1 : this.scrollToIndex) ? 0 : g ? 1 : 1 / 3;
       p.setTransform(
         this.padding,
         s,
         b ? 1 : a,
-        M,
+        C,
         !this.invokedByScrollEvent && this.enableBlur ? b ? 0 : 1 + (d < this.scrollToIndex ? Math.abs(this.scrollToIndex - d) : Math.abs(d - Math.max(this.scrollToIndex, c))) : 0,
         e,
         m
@@ -1300,13 +1307,13 @@ class le extends EventTarget {
       (n) => n.startTime >= e
     ), this.bufferedLines.clear(), this.hotLines.forEach((n) => this.bufferedLines.add(n)), this.calcLayout(!0)) : (s.size > 0 || r.size > 0) && (s.size === 0 && r.size > 0 ? (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
-    }), this.scrollToIndex = Math.min(...this.bufferedLines)) : r.size === 0 && s.size > 0 ? W(s, this.bufferedLines) && this.bufferedLines.forEach((n) => {
+    }), this.scrollToIndex = Math.min(...this.bufferedLines), this.calcLayout()) : r.size === 0 && s.size > 0 ? N(s, this.bufferedLines) && (this.bufferedLines.forEach((n) => {
       this.hotLines.has(n) || (this.bufferedLines.delete(n), this.lyricLinesEl[n].disable());
-    }) : (r.forEach((n) => {
+    }), this.calcLayout()) : (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
     }), s.forEach((n) => {
       this.bufferedLines.delete(n), this.lyricLinesEl[n].disable();
-    }), this.bufferedLines.size > 0 && (this.scrollToIndex = Math.min(...this.bufferedLines))), this.calcLayout());
+    }), this.bufferedLines.size > 0 && (this.scrollToIndex = Math.min(...this.bufferedLines)), this.calcLayout()));
   }
   /**
    * 更新动画，这个函数应该被逐帧调用或者在以下情况下调用一次：
