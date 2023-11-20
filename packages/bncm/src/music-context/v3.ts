@@ -54,6 +54,7 @@ export class MusicContextV3 extends MusicContextBase {
 	private audioQuality = AudioQualityType.Normal;
 	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private store: any;
+	private forcePlayPositionLerp = false;
 	constructor() {
 		super();
 		this.bindedOnMusicLoad = this.onMusicLoad.bind(this);
@@ -276,7 +277,11 @@ export class MusicContextV3 extends MusicContextBase {
 				}),
 			);
 		});
-		if (!isTween && APP_CONF.isOSX && this.playState === PlayState.Playing) {
+		if (
+			!isTween &&
+			(APP_CONF.isOSX || this.forcePlayPositionLerp) &&
+			this.playState === PlayState.Playing
+		) {
 			this.tweenAtom = Symbol("tween-atom");
 			const curAtom = this.tweenAtom;
 			const baseTime = this.musicPlayProgress;
@@ -379,6 +384,10 @@ export class MusicContextV3 extends MusicContextBase {
 
 	setPlayMode(playMode: PlayMode): void {
 		this.switchPlayMode(playMode);
+	}
+
+	setPlayPositionLerp(enable: boolean) {
+		this.forcePlayPositionLerp = enable;
 	}
 
 	private getCurrentPlayMode(): PlayMode | undefined {

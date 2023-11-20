@@ -75,6 +75,7 @@ export abstract class MusicContextBase extends TypedEventTarget<MusicStatusGette
 	setClipboard(data: string): Promise<void> {
 		return navigator.clipboard.writeText(data);
 	}
+	abstract setPlayPositionLerp(enable: boolean): void;
 	dispose(): void {}
 }
 

@@ -2,7 +2,7 @@ import { driver } from "driver.js";
 import { useAtom, useAtomValue } from "jotai";
 import { FC, useEffect, useRef } from "react";
 import {
-	neverGonnaGiveYouUpAtom,
+	autoOpenLyricPageAtom,
 	showTutoialAtom,
 } from "../../components/config/atoms";
 import "./guide.sass";
@@ -10,7 +10,14 @@ import { closeLyricPage, openLyricPage } from "../../injector";
 
 export const AMLLGuide: FC = () => {
 	const [showTutoial, setShowTutoial] = useAtom(showTutoialAtom);
+	const autoOpenLyricPage = useAtomValue(autoOpenLyricPageAtom);
 	const displayed = useRef(false);
+
+	useEffect(() => {
+		if (autoOpenLyricPage.state === "hasData" && autoOpenLyricPage.data) {
+			openLyricPage();
+		}
+	}, [autoOpenLyricPage]);
 
 	useEffect(() => {
 		if (showTutoial.state !== "hasData" || displayed.current) return;

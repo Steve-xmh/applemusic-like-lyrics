@@ -193,16 +193,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			maxWidth: "var(--amll-lyric-player-width,100%)",
 			minWidth: "var(--amll-lyric-player-width,100%)",
 			width: "var(--amll-lyric-player-width,100%)",
-			padding: "2vh 0.05em",
+			padding: "2vh 1.05em",
+			margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
 			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "border-box",
 			borderRadius: "8px",
-			"& span": {
-				padding: "0.05em",
-				margin: "-0.05em",
-			},
 			"&:hover": {
 				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
 				boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)",
@@ -213,7 +210,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
-				padding: "1vh 0",
+				padding: "1vh 1em",
 			},
 		},
 		lyricDuetLine: {

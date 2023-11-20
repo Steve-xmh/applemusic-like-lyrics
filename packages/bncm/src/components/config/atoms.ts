@@ -145,6 +145,25 @@ export const showTutoialAtom = atomWithConfig({
 	loadable: true,
 });
 
+export const keepBuiltinPlayerWhenConnectedAtom = atomWithConfig({
+	key: "keep-builtin-player-when-connected",
+	default: false,
+	desc: "歌词播放器连接时保持启用内嵌歌词页面",
+});
+
+export const usePlayPositionLerpAtom = atomWithConfig({
+	key: "use-play-position-lerp",
+	default: false,
+	desc: "是否使用插值平滑播放进度，本选项在 macOS 会强制启用",
+});
+
+export const autoOpenLyricPageAtom = atomWithConfig({
+	key: "auto-open-lyric-page",
+	default: false,
+	desc: "是否在插件加载完成后自动打开歌词页面",
+	loadable: true,
+});
+
 export const showStatsAtom = atomWithConfig({
 	key: "show-stats",
 	default: false,

@@ -641,6 +641,7 @@ class j extends EventTarget {
             c
           );
           if (n) {
+            c.classList.add("emphasize");
             const u = [];
             for (const p of o.word.trim().split("")) {
               const d = document.createElement("span");
@@ -684,6 +685,7 @@ class j extends EventTarget {
           shouldEmphasize: n
         };
         if (n) {
+          a.classList.add("emphasize");
           const o = [];
           for (const c of r.word.trim().split("")) {
             const m = document.createElement("span");
@@ -730,7 +732,7 @@ class j extends EventTarget {
           },
           {
             offset: 0.5,
-            transform: "translate3d(0, -2%, 20px)",
+            transform: "translate3d(0, -0.02em, 20px)",
             filter: "drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))"
           },
           {
@@ -745,6 +747,7 @@ class j extends EventTarget {
           id: "glow-word",
           iterations: 1,
           composite: "replace",
+          easing: "ease-in-out",
           fill: "both"
         }
       );
@@ -933,16 +936,13 @@ class le extends EventTarget {
       maxWidth: "var(--amll-lyric-player-width,100%)",
       minWidth: "var(--amll-lyric-player-width,100%)",
       width: "var(--amll-lyric-player-width,100%)",
-      padding: "2vh 0.05em",
+      padding: "2vh 1.05em",
+      margin: "0 -1em",
       contain: "content",
       willChange: "filter,transform,opacity",
       transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
       boxSizing: "border-box",
       borderRadius: "8px",
-      "& span": {
-        padding: "0.05em",
-        margin: "-0.05em"
-      },
       "&:hover": {
         backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
         boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)"
@@ -953,7 +953,7 @@ class le extends EventTarget {
     },
     "@media (max-width: 1024px)": {
       lyricLine: {
-        padding: "1vh 0"
+        padding: "1vh 1em"
       }
     },
     lyricDuetLine: {

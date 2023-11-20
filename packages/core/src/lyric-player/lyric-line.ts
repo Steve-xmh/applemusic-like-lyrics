@@ -324,6 +324,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						mainWordEl,
 					);
 					if (emp) {
+						mainWordEl.classList.add("emphasize");
 						const charEls: HTMLSpanElement[] = [];
 						for (const char of word.word.trim().split("")) {
 							const charEl = document.createElement("span");
@@ -380,6 +381,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					shouldEmphasize: emp,
 				};
 				if (emp) {
+					mainWordEl.classList.add("emphasize");
 					const charEls: HTMLSpanElement[] = [];
 					for (const char of chunk.word.trim().split("")) {
 						const charEl = document.createElement("span");
@@ -445,7 +447,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.5,
-						transform: "translate3d(0, -2%, 20px)",
+						transform: "translate3d(0, -0.02em, 20px)",
 						filter:
 							"drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))",
 					},
@@ -461,6 +463,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					id: "glow-word",
 					iterations: 1,
 					composite: "replace",
+					easing: "ease-in-out",
 					fill: "both",
 				},
 			);

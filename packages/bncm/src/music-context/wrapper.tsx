@@ -1,5 +1,5 @@
 import { type FC, useEffect, useRef } from "react";
-import { atom, useAtom, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
 	Artist,
 	AudioQualityType,
@@ -13,6 +13,7 @@ import { MusicContextV3 } from "./v3";
 import { normalizePath } from "../utils/path";
 import { warn } from "../utils/logger";
 import { loadable } from "jotai/utils";
+import { usePlayPositionLerpAtom } from "../components/config/atoms";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -212,6 +213,7 @@ export const loadableMusicOverrideDataAtom = loadable(musicOverrideDataAtom);
 export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
 	const [lyricPageOpened, setLyricPageOpened] = useAtom(lyricPageOpenedAtom);
+	const usePlayPositionLerp = useAtomValue(usePlayPositionLerpAtom);
 	const setMusicId = useSetAtom(musicIdAtom);
 	const setMusicName = useSetAtom(musicNameAtom);
 	const setMusicArtists = useSetAtom(musicArtistsAtom);
@@ -300,7 +302,13 @@ export const MusicInfoWrapper: FC = () => {
 		if (musicCtx.current) {
 			setCurrentPlayMode(musicCtx.current.getPlayMode());
 		}
-	}, [lyricPageOpened]);
+	}, [lyricPageOpened, musicCtx.current]);
+
+	useEffect(() => {
+		if (musicCtx.current) {
+			musicCtx.current.setPlayPositionLerp(usePlayPositionLerp);
+		}
+	}, [usePlayPositionLerp, musicCtx.current]);
 
 	return null;
 };

@@ -51,7 +51,4 @@ export async function injectLyricPage() {
 	)) as HTMLAnchorElement;
 	lyricPageButton.addEventListener("click", onLyricPageButtonClicked);
 	log("已找到歌词页面按钮", lyricPageButton);
-	if (import.meta.env.AMLL_DEV) {
-		openLyricPage();
-	}
 }

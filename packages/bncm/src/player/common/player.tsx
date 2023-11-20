@@ -16,6 +16,7 @@ import {
 import { lyricLinesAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {
+	keepBuiltinPlayerWhenConnectedAtom,
 	lyricBlurEffectAtom,
 	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
@@ -30,6 +31,9 @@ export const CoreLyricPlayer: FC<{
 	const playerRef = useRef<LyricPlayerRef>(null);
 	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
 	const artists = useAtomValue(musicArtistsAtom);
+	const keepBuiltinPlayerWhenConnected = useAtomValue(
+		keepBuiltinPlayerWhenConnectedAtom,
+	);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
@@ -61,7 +65,10 @@ export const CoreLyricPlayer: FC<{
 		}
 	}, [props.albumCoverRef, lyricPageOpened]);
 
-	if (wsStatus.color === ConnectionColor.Active) {
+	if (
+		wsStatus.color === ConnectionColor.Active &&
+		!keepBuiltinPlayerWhenConnected
+	) {
 		return (
 			<div className="amll-lyric-player-wrapper">
 				<div>歌词播放器已连接 当前歌词页面已自动禁用以降低占用</div>

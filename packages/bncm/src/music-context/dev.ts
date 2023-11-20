@@ -253,4 +253,18 @@ export class MusicStatusGetterDev extends MusicContextBase {
 		this.audioEl.pause();
 		this.audioEl.remove();
 	}
+
+	getDataDir(): string {
+		return "";
+	}
+	async isFileExists(path: string): Promise<boolean> {
+		return false;
+	}
+	async makeDirectory(path: string): Promise<void> {}
+	async readFileText(path: string): Promise<string> {
+		return "";
+	}
+	async writeFileText(path: string, data: string): Promise<void> {}
+	async deleteFile(path: string): Promise<void> {}
+	setPlayPositionLerp(enable: boolean): void {}
 }

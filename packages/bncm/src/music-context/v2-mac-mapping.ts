@@ -9,5 +9,5 @@ export const V2_MAC_TRACKMAPPING: {
 	[packageVersion: string]: string | undefined;
 } = {
 	"755f2e4": "baF",
-	"e19f4e3": "baF",
+	e19f4e3: "baF",
 };
