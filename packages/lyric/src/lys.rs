@@ -15,22 +15,24 @@ fn process_time<'a>(
     start_time: &'a str,
     duration: &'a str,
 ) -> IResult<&'a str, (usize, usize)> {
-    let start_time = usize::from_str(start_time);
-    if start_time.is_err() {
-        return Err(nom::Err::Error(nom::error::Error {
-            input: src,
-            code: nom::error::ErrorKind::Digit,
-        }));
-    }
-    let start_time = start_time.unwrap();
-    let duration = usize::from_str(duration);
-    if duration.is_err() {
-        return Err(nom::Err::Error(nom::error::Error {
-            input: src,
-            code: nom::error::ErrorKind::Digit,
-        }));
-    }
-    let duration = duration.unwrap();
+    let start_time = match usize::from_str(start_time) {
+        Ok(start_time) => start_time,
+        Err(_) => {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: src,
+                code: nom::error::ErrorKind::Digit,
+            }))
+        }
+    };
+    let duration = match usize::from_str(duration) {
+        Ok(duration) => duration,
+        Err(_) => {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: src,
+                code: nom::error::ErrorKind::Digit,
+            }))
+        }
+    };
 
     Ok((src, (start_time, duration)))
 }

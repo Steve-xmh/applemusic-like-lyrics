@@ -4,7 +4,7 @@
 
 # Apple Music-like Lyrics
 
-一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持 DOM 原生、React 和 Vue 绑定，并提供针对网易云音乐的插件支持。
+一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持[ DOM 原生](./packages/core/README.md)、[React ](./packages/react/README.md)和[ Vue ](./packages/react/README.md)绑定，并提供针对[ NCM 插件加载器的插件支持](./packages/bncm/README.md)。
 
 前身是基于 NCM 插件加载器 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 实现的的类 Apple Music 歌词显示插件。
 
@@ -20,7 +20,7 @@
 
 ## 性能配置参考
 
-经过性能基准测试，五年内的主流 CPU 处理器均可以正常带动歌词页面。
+经过性能基准测试，五年内的主流 CPU 处理器均可以以 30FPS 正常带动歌词页面，但如果需要 60FPS 流畅运行，请确保 CPU 频率至少为 4.2Ghz 或以上。
 
 GPU 性能在以下状况下能够以预期尺寸下满 60 帧运行：
 - `1080p (1920x1080)`: NVIDIA GTX 10 系列及以上
@@ -36,9 +36,8 @@ GPU 性能在以下状况下能够以预期尺寸下满 60 帧运行：
 
 ```bash
 yarn
-yarn build:dev # 开发构建，包含 Source Map 方便查错
-yarn build # 发行构建，会压缩代码，不包含 Source Map
-yarn dist # 在发行构建的基础上打包 .plugin 插件文件
+yarn lerna run build:dev --scope "@applemusic-like-lyrics/*" # 开发构建
+yarn lerna run build --scope "@applemusic-like-lyrics/*" # 发行构建
 ```
 
 ## 鸣谢

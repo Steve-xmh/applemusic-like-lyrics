@@ -2,6 +2,10 @@
 
 > 警告：此为个人项目，且尚未完成开发，可能仍有大量问题，所以请勿直接用于生产环境！
 
+![AMLL-Core](https://img.shields.io/badge/Core-%233178c6?label=Apple%20Music-like%20Lyrics&labelColor=%23FB5C74)
+[![npm](https://img.shields.io/npm/dt/%40applemusic-like-lyrics/core)](https://www.npmjs.com/package/@applemusic-like-lyrics/core)
+[![npm](https://img.shields.io/npm/v/%40applemusic-like-lyrics%2Fcore)](https://www.npmjs.com/package/@applemusic-like-lyrics/core)
+
 AMLL 的纯 JS 核心组件框架，包括歌词显示组件和背景组件等其它可以复用的组件。
 
 此处的东西都是 UI 框架无关的，所以可以间接在各种动态页面框架下引用。

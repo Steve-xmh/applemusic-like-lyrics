@@ -6,7 +6,6 @@ import {
 	musicArtistsAtom,
 	musicIdAtom,
 	musicNameAtom,
-	musicOverrideDataAtom,
 } from "../music-context/wrapper";
 import { LyricLine as CoreLyricLine } from "@applemusic-like-lyrics/core";
 import {
@@ -16,7 +15,7 @@ import {
 	parseLys,
 	type LyricLine,
 } from "@applemusic-like-lyrics/lyric";
-import { log } from "../utils/logger";
+import { log, warn } from "../utils/logger";
 import {
 	lyricSourcesAtom,
 	showRomanLineAtom,
@@ -25,7 +24,7 @@ import {
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { LyricFormat, LyricSource, SourceStringError } from "./source";
 import { processLyric } from "./processor";
-import { Loadable, loadable } from "jotai/vanilla/utils/loadable";
+import { Loadable } from "jotai/vanilla/utils/loadable";
 import { raceLoad } from "../utils/race-load";
 
 interface EAPILyric {
@@ -533,6 +532,7 @@ export const LyricProvider: FC = () => {
 							},
 						]);
 					} else {
+						warn("查询该歌词源时发生错误：", source.id, result.error);
 						setLyricProviderLogs((v) => [
 							...v,
 							{
