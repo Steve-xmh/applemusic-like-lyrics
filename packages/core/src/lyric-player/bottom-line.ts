@@ -35,7 +35,11 @@ export class BottomLineEl implements HasElement, Disposable {
 		this.rebuildStyle();
 	}
 	rebuildStyle() {
-		let style = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px);`;
+		let style = `transform:translate(${this.lineTransforms.posX
+			.getCurrentPosition()
+			.toFixed(2)}px,${this.lineTransforms.posY
+			.getCurrentPosition()
+			.toFixed(2)}px);`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}

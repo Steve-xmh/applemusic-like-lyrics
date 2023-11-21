@@ -18,6 +18,7 @@ export class BackgroundRender
 		this.element = canvas;
 		canvas.style.pointerEvents = "none";
 		canvas.style.zIndex = "-1";
+		canvas.style.contain = "strict";
 	}
 	getElement() {
 		return this.element;

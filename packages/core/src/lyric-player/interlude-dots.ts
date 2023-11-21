@@ -47,7 +47,9 @@ export class InterludeDots implements HasElement, Disposable {
 		this.currentTime += delta;
 		let curStyle = "";
 
-		curStyle += `transform:translate(${this.left}px, ${this.top}px)`;
+		curStyle += `transform:translate(${this.left.toFixed(
+			2,
+		)}px, ${this.top.toFixed(2)}px)`;
 
 		// 计算缩放大小
 

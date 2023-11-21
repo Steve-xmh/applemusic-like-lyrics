@@ -134,6 +134,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		},
 	) {
 		super();
+		this._prevParentEl = lyricPlayer.getElement();
 		this.element.setAttribute(
 			"class",
 			this.lyricPlayer.style.classes.lyricLine,
@@ -210,6 +211,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	measureSize(): [number, number] {
 		if (this._hide) {
+			if (this._prevParentEl) {
+				this._prevParentEl.appendChild(this.element);
+			}
 			this.element.style.display = "";
 			this.element.style.visibility = "hidden";
 		}
@@ -218,6 +222,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.element.clientHeight,
 		];
 		if (this._hide) {
+			if (this._prevParentEl) {
+				this.element.remove();
+			}
 			this.element.style.display = "none";
 			this.element.style.visibility = "";
 		}
@@ -258,13 +265,22 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return this.lyricLine;
 	}
 	private _hide = true;
+	private _prevParentEl: HTMLElement | null = null;
 	private lastStyle = "";
 	show() {
 		this._hide = false;
+		if (this._prevParentEl) {
+			this._prevParentEl.appendChild(this.element);
+			this._prevParentEl = null;
+		}
 		this.rebuildStyle();
 	}
 	hide() {
 		this._hide = true;
+		if (this.element.parentElement) {
+			this._prevParentEl = this.element.parentElement;
+			this.element.remove();
+		}
 		this.rebuildStyle();
 	}
 	rebuildStyle() {
@@ -278,7 +294,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			return;
 		}
-		let style = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
+		let style = `transform:translate(${this.lineTransforms.posX
+			.getCurrentPosition()
+			.toFixed(2)}px,${this.lineTransforms.posY
+			.getCurrentPosition()
+			.toFixed(2)}px) scale(${this.lineTransforms.scale
+			.getCurrentPosition()
+			.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}

@@ -39,6 +39,7 @@ export declare class LyricLineEl extends EventTarget implements HasElement, Disp
     setLine(line: LyricLine): void;
     getLine(): LyricLine;
     private _hide;
+    private _prevParentEl;
     private lastStyle;
     show(): void;
     hide(): void;

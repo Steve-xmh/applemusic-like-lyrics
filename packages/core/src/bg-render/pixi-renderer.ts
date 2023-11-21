@@ -109,6 +109,7 @@ export class PixiRenderer implements Disposable {
 			backgroundAlpha: 0,
 		});
 		this.rebuildFilters();
+		this.app.ticker.maxFPS = 30;
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}

@@ -18,6 +18,7 @@ import {
 	playStatusAtom,
 } from "../../music-context/wrapper";
 import { lyricLinesAtom } from "../../lyric/provider";
+import { stringifyTTML } from "@applemusic-like-lyrics/ttml";
 
 const DebugValue: FC<{
 	label: string;
@@ -33,6 +34,18 @@ const DebugValue: FC<{
 						? String(atomValue)
 						: JSON.stringify(atomValue, null, 2)}
 				</Suspense>
+			</div>
+		</>
+	);
+};
+
+const TTMLDebugValue: FC = () => {
+	const lyricLines = useAtomValue(lyricLinesAtom);
+	return (
+		<>
+			<div>TTML 歌词数据</div>
+			<div>
+				{lyricLines.state === "hasData" ? stringifyTTML(lyricLines.data) : null}
 			</div>
 		</>
 	);
@@ -67,6 +80,7 @@ export const DebugConfig: FC = () => {
 				{values.map(([label, atom]) => (
 					<DebugValue key={label} label={label} atom={atom} />
 				))}
+				<TTMLDebugValue />
 			</div>
 		</>
 	);

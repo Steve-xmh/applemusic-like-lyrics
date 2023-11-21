@@ -176,6 +176,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			width: "100%",
 			height: "100%",
 			overflow: "hidden",
+			boxSizing: "content-box",
 			maxWidth: "100%",
 			maxHeight: "100%",
 			zIndex: 1,
@@ -191,9 +192,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricLine: {
 			position: "absolute",
 			transformOrigin: "left",
-			maxWidth: "var(--amll-lyric-player-width,100%)",
-			minWidth: "var(--amll-lyric-player-width,100%)",
 			width: "var(--amll-lyric-player-width,100%)",
+			height: "fit-content",
 			padding: "2vh 1.05em",
 			margin: "0 -1em",
 			contain: "content",
@@ -381,9 +381,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		style += "--amll-lyric-player-height:";
 		style += this.innerSize[1] - this.padding * 2;
 		style += "px;";
-		style += "--amll-player-time:";
-		style += this.currentTime;
-		style += ";";
+		// style += "--amll-player-time:";
+		// style += this.currentTime;
+		// style += ";";
 		this.element.setAttribute("style", style);
 	}
 	/**
@@ -734,7 +734,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.currentTime = time;
-		this.element.style.setProperty("--amll-player-time", `${time}`);
+		if (!this._getIsNonDynamic())
+			this.element.style.setProperty("--amll-player-time", `${time}`);
 		if (this.isScrolled) return;
 		const removedHotIds = new Set<number>();
 		const removedIds = new Set<number>();

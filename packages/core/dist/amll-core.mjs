@@ -115,10 +115,10 @@ const ae = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   parseTTML: $
 }, Symbol.toStringTag, { value: "Module" }));
-class O extends z {
+class F extends z {
   time = 0;
 }
-class W {
+class _ {
   constructor(e) {
     this.canvas = e;
     const t = e.getBoundingClientRect();
@@ -133,7 +133,7 @@ class W {
       resizeTo: this.canvas,
       powerPreference: "low-power",
       backgroundAlpha: 0
-    }), this.rebuildFilters(), this.app.ticker.add(this.onTick), this.app.ticker.start();
+    }), this.rebuildFilters(), this.app.ticker.maxFPS = 30, this.app.ticker.add(this.onTick), this.app.ticker.start();
   }
   observer;
   app;
@@ -264,18 +264,18 @@ class W {
       }
     if (!s)
       return;
-    const r = new O(), n = new S(s), a = new S(s), l = new S(s), o = new S(s);
+    const r = new F(), n = new S(s), a = new S(s), l = new S(s), o = new S(s);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
-class oe extends W {
+class oe extends _ {
   element;
   constructor() {
     const e = document.createElement("canvas");
-    super(e), this.element = e, e.style.pointerEvents = "none", e.style.zIndex = "-1";
+    super(e), this.element = e, e.style.pointerEvents = "none", e.style.zIndex = "-1", e.style.contain = "strict";
   }
   getElement() {
     return this.element;
@@ -284,7 +284,7 @@ class oe extends W {
     super.dispose(), this.element.remove();
   }
 }
-const N = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
+const O = (h, e) => h.size === e.size && [...h].every((t) => e.has(t));
 class w {
   currentPosition = 0;
   targetPosition = 0;
@@ -300,7 +300,7 @@ class w {
   }
   resetSolver() {
     const e = this.getV(this.currentTime);
-    this.currentTime = 0, this.currentSolver = q(
+    this.currentTime = 0, this.currentSolver = N(
       this.currentPosition,
       e,
       this.targetPosition,
@@ -340,7 +340,7 @@ class w {
     return this.currentPosition;
   }
 }
-function q(h, e, t, i = 0, s) {
+function N(h, e, t, i = 0, s) {
   const r = s?.soft ?? !1, n = s?.stiffness ?? 100, a = s?.damping ?? 10, l = s?.mass ?? 1, o = t - h;
   if (r || 1 <= a / (2 * Math.sqrt(n * l))) {
     const c = -Math.sqrt(n / l), m = -c * o - e;
@@ -352,13 +352,13 @@ function q(h, e, t, i = 0, s) {
     return (p) => (p -= i, p < 0 ? h : t - (Math.cos(p * u) * o + Math.sin(p * u) * m) * Math.E ** (p * f));
   }
 }
-function F(h) {
+function W(h) {
   return (t) => (h(t + 1e-3) - h(t - 1e-3)) / (2 * 1e-3);
 }
 function M(h) {
-  return F(h);
+  return W(h);
 }
-class R {
+class q {
   constructor(e) {
     this.lyricPlayer = e, this.element.setAttribute(
       "class",
@@ -389,7 +389,7 @@ class R {
     this.rebuildStyle();
   }
   rebuildStyle() {
-    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px);`;
+    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition().toFixed(2)}px,${this.lineTransforms.posY.getCurrentPosition().toFixed(2)}px);`;
     !this.lyricPlayer.getEnableSpring() && this.isInSight && (e += `transition-delay:${this.delay}ms;`), e !== this.lastStyle && (this.lastStyle = e, this.element.setAttribute("style", e));
   }
   getElement() {
@@ -415,7 +415,7 @@ class R {
     this.element.remove();
   }
 }
-function _(h) {
+function R(h) {
   const t = 2.5949095;
   return h < 0.5 ? Math.pow(2 * h, 2) * ((t + 1) * 2 * h - t) / 2 : (Math.pow(2 * h - 2, 2) * ((t + 1) * (h * 2 - 2) + t) + 2) / 2;
 }
@@ -447,12 +447,14 @@ class X {
   update(e = 0) {
     this.currentTime += e;
     let t = "";
-    if (t += `transform:translate(${this.left}px, ${this.top}px)`, this.currentInterlude) {
+    if (t += `transform:translate(${this.left.toFixed(
+      2
+    )}px, ${this.top.toFixed(2)}px)`, this.currentInterlude) {
       const i = this.currentInterlude[1] - this.currentInterlude[0], s = this.currentTime - this.currentInterlude[0];
       if (s <= i) {
         const r = i / Math.ceil(i / this.targetBreatheDuration);
         let n = 1, a = 1;
-        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - _(
+        n *= Math.sin(1.5 * Math.PI - s / r * 2) / 10 + 1, s < 1e3 && (n *= 1 - Math.pow((1e3 - s) / 1e3, 2)), s < 500 ? a = 0 : s < 1e3 && (a *= (s - 500) / 500), i - s < 750 && (n *= 1 - R(
           (750 - (i - s)) / 750 / 2
         )), i - s < 375 && (a *= L(
           0,
@@ -532,7 +534,7 @@ class j extends EventTarget {
     isBG: !1,
     isDuet: !1
   }) {
-    super(), this.lyricPlayer = e, this.lyricLine = t, this.element.setAttribute(
+    super(), this.lyricPlayer = e, this.lyricLine = t, this._prevParentEl = e.getElement(), this.element.setAttribute(
       "class",
       this.lyricPlayer.style.classes.lyricLine
     ), this.lyricLine.isBG && this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine), this.lyricLine.isDuet && this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div")), this.element.appendChild(document.createElement("div"));
@@ -581,12 +583,12 @@ class j extends EventTarget {
     }), e.classList.add("active");
   }
   measureSize() {
-    this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden");
+    this._hide && (this._prevParentEl && this._prevParentEl.appendChild(this.element), this.element.style.display = "", this.element.style.visibility = "hidden");
     const e = [
       this.element.clientWidth,
       this.element.clientHeight
     ];
-    return this._hide && (this.element.style.display = "none", this.element.style.visibility = ""), e;
+    return this._hide && (this._prevParentEl && this.element.remove(), this.element.style.display = "none", this.element.style.visibility = ""), e;
   }
   disable() {
     this.isEnabled = !1, this.element.classList.remove("active");
@@ -606,12 +608,13 @@ class j extends EventTarget {
     return this.lyricLine;
   }
   _hide = !0;
+  _prevParentEl = null;
   lastStyle = "";
   show() {
-    this._hide = !1, this.rebuildStyle();
+    this._hide = !1, this._prevParentEl && (this._prevParentEl.appendChild(this.element), this._prevParentEl = null), this.rebuildStyle();
   }
   hide() {
-    this._hide = !0, this.rebuildStyle();
+    this._hide = !0, this.element.parentElement && (this._prevParentEl = this.element.parentElement, this.element.remove()), this.rebuildStyle();
   }
   rebuildStyle() {
     if (this._hide) {
@@ -621,7 +624,7 @@ class j extends EventTarget {
       ));
       return;
     }
-    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition()}px,${this.lineTransforms.posY.getCurrentPosition()}px) scale(${this.lineTransforms.scale.getCurrentPosition()});`;
+    let e = `transform:translate(${this.lineTransforms.posX.getCurrentPosition().toFixed(2)}px,${this.lineTransforms.posY.getCurrentPosition().toFixed(2)}px) scale(${this.lineTransforms.scale.getCurrentPosition().toFixed(4)});`;
     !this.lyricPlayer.getEnableSpring() && this.isInSight && (e += `transition-delay:${this.delay}ms;`), e += `filter:blur(${Math.min(32, this.blur)}px);`, e !== this.lastStyle && (this.lastStyle = e, this.element.setAttribute("style", e));
   }
   rebuildElement() {
@@ -925,6 +928,7 @@ class le extends EventTarget {
       width: "100%",
       height: "100%",
       overflow: "hidden",
+      boxSizing: "content-box",
       maxWidth: "100%",
       maxHeight: "100%",
       zIndex: 1,
@@ -940,9 +944,8 @@ class le extends EventTarget {
     lyricLine: {
       position: "absolute",
       transformOrigin: "left",
-      maxWidth: "var(--amll-lyric-player-width,100%)",
-      minWidth: "var(--amll-lyric-player-width,100%)",
       width: "var(--amll-lyric-player-width,100%)",
+      height: "fit-content",
       padding: "2vh 1.05em",
       margin: "0 -1em",
       contain: "content",
@@ -1041,7 +1044,7 @@ class le extends EventTarget {
     this.calcLayout(!0, !0);
   };
   constructor() {
-    super(), this.interludeDots = new X(this), this.bottomLine = new R(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
+    super(), this.interludeDots = new X(this), this.bottomLine = new q(this), this.element.setAttribute("class", this.style.classes.lyricPlayer), this.disableSpring && this.element.classList.add(this.style.classes.disableSpring), this.rebuildStyle(), this.resizeObserver.observe(this.element), this.element.appendChild(this.interludeDots.getElement()), this.element.appendChild(this.bottomLine.getElement()), this.style.attach(), this.interludeDots.setTransform(0, 200), window.addEventListener("pageshow", this.onPageShow), this.element.addEventListener("wheel", (e) => {
       this.allowScroll && (this.isScrolled = !0, clearTimeout(this.scrolledHandler), this.scrolledHandler = setTimeout(() => {
         this.isScrolled = !1, this.scrollOffset = 0;
       }, 5e3), this.invokedByScrollEvent = !0, e.deltaMode === e.DOM_DELTA_PIXEL ? (this.scrollOffset += e.deltaY, this.calcLayout(!0)) : (this.scrollOffset += e.deltaY * 50, this.calcLayout(!1)), this.invokedByScrollEvent = !1);
@@ -1082,7 +1085,7 @@ class le extends EventTarget {
    */
   rebuildStyle() {
     let e = "";
-    e += "--amll-lyric-player-width:", e += this.innerSize[0] - this.padding * 2, e += "px;", e += "--amll-lyric-player-height:", e += this.innerSize[1] - this.padding * 2, e += "px;", e += "--amll-player-time:", e += this.currentTime, e += ";", this.element.setAttribute("style", e);
+    e += "--amll-lyric-player-width:", e += this.innerSize[0] - this.padding * 2, e += "px;", e += "--amll-lyric-player-height:", e += this.innerSize[1] - this.padding * 2, e += "px;", this.element.setAttribute("style", e);
   }
   /**
    * 设置是否隐藏已经播放过的歌词行，默认不隐藏
@@ -1283,7 +1286,7 @@ class le extends EventTarget {
    * @param time 当前播放进度，单位为毫秒
    */
   setCurrentTime(e, t = !1) {
-    if (this.currentTime = e, this.element.style.setProperty("--amll-player-time", `${e}`), this.isScrolled)
+    if (this.currentTime = e, this._getIsNonDynamic() || this.element.style.setProperty("--amll-player-time", `${e}`), this.isScrolled)
       return;
     const i = /* @__PURE__ */ new Set(), s = /* @__PURE__ */ new Set(), r = /* @__PURE__ */ new Set();
     this.hotLines.forEach((n) => {
@@ -1307,7 +1310,7 @@ class le extends EventTarget {
       (n) => n.startTime >= e
     ), this.bufferedLines.clear(), this.hotLines.forEach((n) => this.bufferedLines.add(n)), this.calcLayout(!0)) : (s.size > 0 || r.size > 0) && (s.size === 0 && r.size > 0 ? (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
-    }), this.scrollToIndex = Math.min(...this.bufferedLines), this.calcLayout()) : r.size === 0 && s.size > 0 ? N(s, this.bufferedLines) && (this.bufferedLines.forEach((n) => {
+    }), this.scrollToIndex = Math.min(...this.bufferedLines), this.calcLayout()) : r.size === 0 && s.size > 0 ? O(s, this.bufferedLines) && (this.bufferedLines.forEach((n) => {
       this.hotLines.has(n) || (this.bufferedLines.delete(n), this.lyricLinesEl[n].disable());
     }), this.calcLayout()) : (r.forEach((n) => {
       this.bufferedLines.add(n), this.lyricLinesEl[n].enable();
