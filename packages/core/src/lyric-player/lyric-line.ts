@@ -495,6 +495,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	updateMaskImage() {
 		if (this._hide) {
+			if (this._prevParentEl) {
+				this._prevParentEl.appendChild(this.element);
+			}
 			this.element.style.display = "";
 			this.element.style.visibility = "hidden";
 		}
@@ -531,6 +534,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 		});
 		if (this._hide) {
+			if (this._prevParentEl) {
+				this.element.remove();
+			}
 			this.element.style.display = "none";
 			this.element.style.visibility = "";
 		}

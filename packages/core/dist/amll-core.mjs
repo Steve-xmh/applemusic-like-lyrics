@@ -16,7 +16,7 @@ function T(h) {
   } else
     throw new TypeError("时间戳字符串解析失败");
 }
-function $(h) {
+function _(h) {
   const t = new DOMParser().parseFromString(
     h,
     "application/xml"
@@ -113,12 +113,12 @@ function $(h) {
 }
 const ae = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  parseTTML: $
+  parseTTML: _
 }, Symbol.toStringTag, { value: "Module" }));
-class F extends z {
+class $ extends z {
   time = 0;
 }
-class _ {
+class F {
   constructor(e) {
     this.canvas = e;
     const t = e.getBoundingClientRect();
@@ -264,14 +264,14 @@ class _ {
       }
     if (!s)
       return;
-    const r = new F(), n = new S(s), a = new S(s), l = new S(s), o = new S(s);
+    const r = new $(), n = new S(s), a = new S(s), l = new S(s), o = new S(s);
     n.anchor.set(0.5, 0.5), a.anchor.set(0.5, 0.5), l.anchor.set(0.5, 0.5), o.anchor.set(0.5, 0.5), n.rotation = Math.random() * Math.PI * 2, a.rotation = Math.random() * Math.PI * 2, l.rotation = Math.random() * Math.PI * 2, o.rotation = Math.random() * Math.PI * 2, r.addChild(n, a, l, o), this.curContainer && this.lastContainer.add(this.curContainer), this.curContainer = r, this.app.stage.addChild(this.curContainer), this.curContainer.alpha = 0, this.app.ticker.start();
   }
   dispose() {
     this.observer.disconnect(), this.app.ticker.remove(this.onTick), this.app.destroy(!0);
   }
 }
-class oe extends _ {
+class oe extends F {
   element;
   constructor() {
     const e = document.createElement("canvas");
@@ -761,7 +761,7 @@ class j extends EventTarget {
     });
   }
   updateMaskImage() {
-    this._hide && (this.element.style.display = "", this.element.style.visibility = "hidden"), this.splittedWords.forEach((e) => {
+    this._hide && (this._prevParentEl && this._prevParentEl.appendChild(this.element), this.element.style.display = "", this.element.style.visibility = "hidden"), this.splittedWords.forEach((e) => {
       const t = e.mainElement;
       if (t) {
         e.width = t.clientWidth, e.height = t.clientHeight;
@@ -774,7 +774,7 @@ class j extends EventTarget {
         const l = e.width + i, o = `clamp(${-l}px,calc(${-l}px + (var(--amll-player-time) - ${e.startTime})*${l / Math.abs(e.endTime - e.startTime)}px),0px) 0px, left top`;
         t.style.maskPosition = o, t.style.webkitMaskPosition = o;
       }
-    }), this._hide && (this.element.style.display = "none", this.element.style.visibility = "");
+    }), this._hide && (this._prevParentEl && this.element.remove(), this.element.style.display = "none", this.element.style.visibility = "");
   }
   getElement() {
     return this.element;
