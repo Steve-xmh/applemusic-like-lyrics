@@ -120,9 +120,13 @@ const CopyBetterNCMPlugin = ({
 								const srcCode = await readFile(srcFile, { encoding: "utf8" });
 								const result = await terserMinify(srcCode, {
 									module: true,
+									format: {
+										comments: false,
+									},
 									compress: {
 										global_defs: {
 											"process.env.NODE_ENV": "production",
+											"process.env.NODE_DEBUG": "",
 										},
 										passes: 3,
 									},
@@ -162,6 +166,27 @@ const CopyBetterNCMPlugin = ({
 							resolve(fullDistDir, file),
 							resolve(fullDistDir, newName),
 						);
+						if (minify) {
+							console.log(`Compressing ${resolve(fullDistDir, file)}`);
+							const srcCode = await readFile(resolve(fullDistDir, newName), {
+								encoding: "utf8",
+							});
+							const result = await terserMinify(srcCode, {
+								module: true,
+								format: {
+									comments: false,
+								},
+								compress: {
+									global_defs: {
+										"process.env.NODE_ENV": "production",
+										"process.env.NODE_DEBUG": "",
+									},
+									passes: 3,
+								},
+							});
+							if (!result.code) continue;
+							await writeFile(resolve(fullDistDir, newName), result.code);
+						}
 					}
 					zip.file(newName, createReadStream(resolve(fullDistDir, newName)));
 				}
@@ -241,9 +266,11 @@ export default defineConfig(({ mode }) => {
 			env.AMLL_DEV === "true"
 				? {
 						"process.env.NODE_ENV": '"development"',
+						"process.env.NODE_DEBUG": '""',
 				  }
 				: {
 						"process.env.NODE_ENV": '"production"',
+						"process.env.NODE_DEBUG": '""',
 				  },
 	};
 });

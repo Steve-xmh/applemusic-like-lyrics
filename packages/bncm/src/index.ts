@@ -99,6 +99,7 @@ async function initDevelopmentReload() {
 
 // 配置页面
 plugin.onConfig(() => {
+	console.log("AMLL Config", configViewElement);
 	return configViewElement;
 });
 
@@ -114,7 +115,7 @@ plugin.onLoad(async () => {
 			"color:#F8878A;font-weight:bold;",
 		);
 
-		if (import.meta.env.AMLL_DEV) {
+		if (import.meta.env.AMLL_DEV === "true") {
 			warn("正在以开发模式运行插件！");
 			initDevelopmentReload();
 		}

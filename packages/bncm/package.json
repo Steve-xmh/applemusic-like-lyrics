@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "build:pack": "vite build --mode pack",
     "build:dev": "vite build --mode dev",
     "fmt": "rome format --write ./src",
     "dev": "node ./scripts/dev.js"

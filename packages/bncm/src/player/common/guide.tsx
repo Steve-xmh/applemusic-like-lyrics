@@ -77,8 +77,18 @@ export const AMLLGuide: FC = () => {
 						),
 						onNextClick: () => {
 							closeLyricPage();
-							driverObj.moveNext();
+							setTimeout(driverObj.moveNext, 750);
 						},
+					},
+				},
+				{
+					element: "#x-g-mn .m-pinfo .j-flag .cover",
+					popover: {
+						title: "需要回到原来的歌词页面？",
+						description: [
+							"只需要按住 Shift 键再点击此处即可回到默认歌词页面！",
+							"如果你还安装了其他歌词插件，则会按照其他歌词插件的方式打开其他歌词页面噢！",
+						].join("\n"),
 					},
 				},
 				{
