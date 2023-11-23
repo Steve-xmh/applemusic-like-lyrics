@@ -1,0 +1,121 @@
+.am-music-controls
+    display: flex
+    align-items: center
+    justify-content: space-between
+    transition: margin-top 0.25s
+    margin-top: 2vh
+    @media screen and (max-height: 900px)
+        margin-top: unset
+
+    > .am-music-track-btn
+        opacity: 0.5
+        aspect-ratio: 1/1
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 50%
+        position: relative
+
+    > .am-music-track-prev,
+    > .am-music-play,
+    > .am-music-track-next
+        aspect-ratio: 1/1
+        height: 6vh !important
+        width: 6vh !important
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 50%
+        position: relative
+        background-color: #FFF0
+        transition: background-color 0.5s
+        &:hover
+            background-color: #FFF2
+        &:active
+            background-color: #FFF4
+            *
+                animation-name: none !important
+        > *
+            height: 60%
+            transition: transform 0.5s
+            transform-origin: center
+            animation: pressed-animation 0.7s
+            animation-composition: accumulate
+            @keyframes pressed-animation
+                0%
+                    transform: scale(1)
+                20%
+                    transform: scale(0.85)
+                50%
+                    transform: scale(1.1)
+                100%
+                    transform: scale(1)
+
+    > .am-music-track-next
+        margin-right: 16px
+        height: 100%
+        > *
+            transform: scale(1.5)
+        .forward-left-arrow
+            animation: forward-left-end 0.6s cubic-bezier(0.4, 1.51, 0.4, 1)
+            animation-fill-mode: forwards
+        .forward-right-arrow
+            animation: forward-right-end 0.2s ease-out
+            transform-origin: 81% 50%
+            animation-fill-mode: forwards
+        .forward-left-standby
+            animation: forward-left-new 0.6s cubic-bezier(0.4, 1.51, 0.4, 1)
+            transform-origin: 22% 50%
+            animation-fill-mode: forwards
+
+        @keyframes forward-left-end
+            100%
+                transform: translateX(40px)
+
+        @keyframes forward-right-end
+            100%
+                transform: scale(0)
+                opacity: 0
+
+        @keyframes forward-left-new
+            0%
+                transform: scale(0) translateX(-15px)
+                opacity: 0
+
+            100%
+                transform: scale(1) translateX(0px)
+                opacity: 1
+
+    > .am-music-track-prev
+        margin-left: 16px
+        height: 100%
+        > *
+            transform: scale(1.5)
+        .rewind-right-arrow
+            animation: rewind-right-end 0.6s cubic-bezier(0.4, 1.51, 0.4, 1)
+            animation-fill-mode: forwards
+        .rewind-left-arrow
+            animation: rewind-left-end 0.2s ease-out
+            transform-origin: 19% 50%
+            animation-fill-mode: forwards
+        .rewind-right-standby
+            animation: rewind-right-new 0.6s cubic-bezier(0.4, 1.51, 0.4, 1)
+            transform-origin: 78% 50%
+            animation-fill-mode: forwards
+            @keyframes rewind-right-end
+                100%
+                    transform: translateX(-40px)
+
+            @keyframes rewind-left-end
+                100%
+                    transform: scale(0)
+                    opacity: 0
+
+            @keyframes rewind-right-new
+                0%
+                    transform: scale(0) translateX(15px)
+                    opacity: 0
+
+                100%
+                    transform: scale(1) translateX(0px)
+                    opacity: 1

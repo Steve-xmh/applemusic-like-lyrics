@@ -1,0 +1,38 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build:dev",
+          "build",
+          "fmt"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "fmt": {
+      "dependsOn": [
+        "^fmt"
+      ],
+      "outputs": [
+        "{projectRoot}/src"
+      ]
+    },
+    "build": {
+      "dependsOn": ["^build", "fmt"],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/pkg"
+      ]
+    },
+    "build:dev": {
+      "dependsOn": ["^build:dev"],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/pkg"
+      ]
+    }
+  }
+}

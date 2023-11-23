@@ -1,0 +1,58 @@
+@import "../common.sass"  
+
+.appkit-menu
+    @include pingfang-font
+    font-weight: normal
+    z-index: 999
+    background: rgba(40, 40, 40, 0.6)
+    border: 0.5px solid rgba(0, 0, 0, 0.7)
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25)
+    border-radius: 6px
+    max-height: 80vh
+    width: fit-content
+    pointer-events: none
+    overflow-y: scroll
+    max-width: 100vw
+    max-height: 100vh
+
+    &::-webkit-scrollbar
+        display: none
+    @include blur-behind(16px, 6px)
+
+    > *
+        border: 1px solid rgba(255, 255, 255, 0.3)
+        padding: 5px 0
+        border-radius: 6px
+        cursor: default
+
+    &.is-submenu
+        position: fixed
+    //     &.side-right
+    //         margin-left: -6px
+    //         left: 100%
+    //     &.side-left
+    //         margin-right: -6px
+    //         right: 100%
+    //     &.direction-down
+    //         top: 0
+    //         margin-top: -9px
+    //     &.direction-up
+    //         bottom: 0
+    //         margin-bottom: -9px
+    //     &.direction-center
+    //         height: 80%
+    &.hide
+        visibility: hidden
+
+    &.with-checkbox > *
+        > .appkit-menu-item
+            padding-left: 22px
+
+            &.checked
+                background-image: url("data:image/svg+xml,%3Csvg width='13' height='14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg filter='url(%23prefix__filter0_d_416_340)'%3E%3Cpath d='M3 8l2.25 2.5L9.5 4' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='prefix__filter0_d_416_340' x='1.75' y='3.25' width='9' height='9' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0' result='hardAlpha'/%3E%3CfeOffset dy='.5'/%3E%3CfeGaussianBlur stdDeviation='.25'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0'/%3E%3CfeBlend in2='BackgroundImageFix' result='effect1_dropShadow_416_340'/%3E%3CfeBlend in='SourceGraphic' in2='effect1_dropShadow_416_340' result='shape'/%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E")
+                background-repeat: no-repeat
+                background-position-y: center
+                background-position-x: 5px + 3px
+
+        > .appkit-menu-item-devider
+            margin-left: 11px

@@ -1,1 +1,0 @@
-"use strict";(()=>{var s=typeof WorkerGlobalScope<"u"&&self instanceof WorkerGlobalScope;var c=()=>{};var r=c;var n=channel.call;channel.call=function(o,...e){if(o==="storage.downloadscanner")r(o,...e,new Error().stack);else return n.apply(n,[o,...e])};})();

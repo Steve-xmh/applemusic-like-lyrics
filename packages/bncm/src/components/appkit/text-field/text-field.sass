@@ -1,0 +1,33 @@
+@import "../common.sass"
+
+.appkit-text-field
+    @include pingfang-font
+    border: solid 1px #FFFFFF0D
+    border-radius: 6px
+    background: #FFFFFF0D
+    font-size: 13px
+    font-weight: 400
+    line-height: 16px
+    white-space: nowrap
+    color: white
+    padding: 3.5px 7px
+
+    &::placeholder
+        color: #FFFFFF4C
+
+    &:focus
+        box-shadow: 0 0 0 3.5px #3A6CD988
+        outline: none
+        animation: appkit-text-field-focus 0.3s ease-out 1 forwards
+        @keyframes appkit-text-field-focus
+            from
+                box-shadow: 0 0 0 16px #007AFF00
+            to
+                box-shadow: 0 0 0 3px #007AFF88
+
+    &.error
+        box-shadow: 0 0 0 3px rgb(255, 69, 58, 0.3)
+.appkit-text-field-label
+    margin-block: 0.5em
+.appkit-text-field-error
+    color: rgb(255, 69, 58)

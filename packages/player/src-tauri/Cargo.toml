@@ -1,0 +1,28 @@
+[package]
+name = "player"
+version = "0.0.0"
+description = "A Tauri App"
+authors = ["you"]
+license = ""
+repository = ""
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1.4", features = [] }
+
+[dependencies]
+tauri = { version = "1.4", features = [ "api-all", "devtools"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-tungstenite = { version = "0.23.0", features = ["async-std-runtime"] }
+async-std = "1.12.0"
+anyhow = "1.0.72"
+futures = "0.3.28"
+ws-protocol = { path = "../../ws-protocol" }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

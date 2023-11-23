@@ -1,0 +1,30 @@
+@import "../common.sass"
+
+.appkit-button
+    @include pingfang-font
+    background: #6E6D70
+    color: white
+    border: 0.5px solid rgba(0, 0, 0, 0.12)
+    box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.1), inset 0px 0.5px 0.5px rgba(255, 255, 255, 0.5)
+    border-radius: 6px
+    font-size: 13px
+    line-height: 16px
+    font-weight: 500
+    font-style: normal
+    text-align: center
+    min-width: 70px
+    padding: 4px 14px
+    cursor: pointer
+
+    &:active
+        background: #6E6D70
+        color: #DFDEDF
+
+        &.accent
+            background: linear-gradient(180deg, #1568E5 0%, #155CCC 100%)
+            box-shadow: 0px 0.5px 1px rgba(0, 0, 0, 0.5), inset 0px 0.5px 0px rgba(255, 255, 255, 0.25)
+
+    &.accent
+        background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%)
+        box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25)
+        color: white

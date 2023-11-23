@@ -1,5 +1,4 @@
 node_modules/
-*.lock
 *.log
 *.map
 *.plugin
@@ -11,3 +10,6 @@ lyrics/
 /startup_script.js
 /worker_script.js
 .DS_Store
+target/
+.yarn/cache/
+.yarn/install-state.gz

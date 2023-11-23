@@ -1,0 +1,34 @@
+
+.appkit-spinner
+    display: block
+    position: relative
+    width: 12px
+    height: 12px
+    border-radius: 10px
+
+    &.with-bg
+        background: #0004
+
+    div
+        width: 5%
+        height: 15%
+        left: 49%
+        top: 43%
+        background: #444
+        @media (prefers-color-scheme: dark)
+            background: #FFF
+            position: absolute
+            animation: appkit-spinner-div-fade 1s linear infinite
+            box-shadow: 0 0 3px rbga(0, 0, 0, 0.2)
+            border-radius: 50px
+
+        @keyframes appkit-spinner-div-fade
+            from
+                opacity: 1
+            to
+                opacity: 0
+
+        @for $i from 0 through 11
+            &:nth-child(#{$i + 1})
+                transform: rotate(30deg * $i) translateY(-130%)
+                animation-delay: calc(-1s + $i * (1s / 12))

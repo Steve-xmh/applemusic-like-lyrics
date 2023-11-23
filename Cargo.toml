@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "./packages/lyric",
+    "./packages/ws-protocol",
+]
+exclude = [
+    "./packages/player/src-tauri",
+    "./packages/skia-player",
+]
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = 3
+codegen-units = 1
+lto = true
+panic = "abort"
+

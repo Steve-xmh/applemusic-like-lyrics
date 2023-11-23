@@ -1,0 +1,21 @@
+
+@import "driver.js/dist/driver.css"
+@import "../../components/appkit/common.sass"
+@import "../../components/appkit/window/window.sass"
+.driver-popover
+    @include appkit-window-frame
+    -webkit-backdrop-filter: blur(40.7742px)
+    backdrop-filter: blur(40.7742px)
+    color: white
+.driver-popover-description
+    white-space: pre-wrap
+.driver-popover-arrow
+    display: none
+.driver-popover,
+.driver-popover-title,
+.driver-popover-description,
+.driver-popover-progress-text,
+.driver-popover-prev-btn,
+.driver-popover-next-btn,
+.driver-popover-close-btn
+    @include pingfang-font

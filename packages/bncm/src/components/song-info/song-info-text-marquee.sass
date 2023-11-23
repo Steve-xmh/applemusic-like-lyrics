@@ -1,0 +1,10 @@
+.amll-song-info-text-marquee
+    min-width: 0
+    overflow: hidden
+    -webkit-mask-image: linear-gradient(to right, #000 95%, #0000)
+
+    &.animating
+        -webkit-mask-image: linear-gradient(to left, #0000, #000 5%, #000 95%, #0000)
+
+    > *
+        width: fit-content

@@ -1,0 +1,20 @@
+{
+    "include": [
+        "./vite.config.ts"
+    ],
+    "files": [
+        "./vite.config.ts"
+    ],
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": [
+            "ESNext"
+        ],
+        "module": "NodeNext",
+        "types": [],
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strictNullChecks": true,
+        "allowJs": false
+    }
+}

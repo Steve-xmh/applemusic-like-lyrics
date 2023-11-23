@@ -1,12 +1,14 @@
 <div align=center>
 
-![](./src/assets/amll-icon.svg)
+![](packages/bncm/src/assets/amll-icon.svg)
 
 # Apple Music-like Lyrics
 
-一个基于 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 的类 Apple Music 歌词显示插件。
+一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持[ DOM 原生](./packages/core/README.md)、[React ](./packages/react/README.md)和[ Vue ](./packages/react/README.md)绑定，并提供针对[ NCM 插件加载器的插件支持](./packages/bncm/README.md)。
 
-这是你能在网易云上见到的最像 iPad Apple Music 的播放页面了。
+前身是基于 NCM 插件加载器 [BetterNCM](https://github.com/MicroCBer/BetterNCM)/[MRBNCM](https://github.com/Steve-xmh/mrbncm)/[MMBNCM](https://github.com/Steve-xmh/mmbncm) 实现的的类 Apple Music 歌词显示插件。
+
+这是你能在前端系里能见到的最像 iPad Apple Music 的播放页面了。
 
 **—— AMLL 生态作品 ——**
 
@@ -14,33 +16,28 @@
 /
 [AMLL TTML Tool 逐词歌词编辑器](https://github.com/Steve-xmh/amll-ttml-tool)
 
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b9dc5226-e08c-475c-a90d-1d1dbb3e0d70)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b26631f6-5925-4de9-ba9c-fc4d41bc14da)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/6a36d069-559e-4bce-8904-31a8f8648a0f)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8049da87-c6ef-4140-b324-e0f78a9c5ba4)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/e9cebc5b-9778-4914-9460-ebdcfa7f1e68)
-
 </div>
 
-## 安装说明
+## 性能配置参考
 
-你可以前往本仓库的 Release 下载对应的插件包，也可以通过 BetterNCM 的插件商店安装本插件。
+经过性能基准测试，五年内的主流 CPU 处理器均可以以 30FPS 正常带动歌词页面，但如果需要 60FPS 流畅运行，请确保 CPU 频率至少为 4.2Ghz 或以上。
 
-请不要将本插件与其它同功能用途的插件混用，**作者不会为其做兼容工作**！以下是不兼容或有功能影响的插件清单：
+GPU 性能在以下状况下能够以预期尺寸下满 60 帧运行：
+- `1080p (1920x1080)`: NVIDIA GTX 10 系列及以上
+- `2160p (3840x2160)`: NVIDIA RTX 2070 及以上
 
-- [RefinedNowPlaying - 一个美化网易云音乐播放界面的 BetterNCM 插件](https://github.com/solstice23/refined-now-playing-netease)
+## 代码贡献
 
-主题插件作者推荐使用 MoTheme 或 [Material You](https://github.com/solstice23/material-you-theme-netease)，其它主题插件作者没有使用过，可能需要你做一定的设置调整才能契合主题。
+由于作者精力有限，已经无力处理大家使用过程中产生的问题，所以关闭了 Issues 板块，但是欢迎任何对代码有积极贡献的 Pull Request！
 
 ## 开发/构建/打包流程
 
-安装好 `nodejs`, `yarn`, `rustc`, `wasm-pack`，克隆本仓库到任意文件夹后在终端输入以下指令即可构建：
+安装好 `yarn`, `rustc`, `wasm-pack`，克隆本仓库到任意文件夹后在终端输入以下指令即可构建：
 
 ```bash
 yarn
-yarn build:dev # 开发构建，包含 Source Map 方便查错
-yarn build # 发行构建，会压缩代码，不包含 Source Map
-yarn dist # 在发行构建的基础上打包 .plugin 插件文件
+yarn lerna run build:dev --scope "@applemusic-like-lyrics/*" # 开发构建
+yarn lerna run build --scope "@applemusic-like-lyrics/*" # 发行构建
 ```
 
 ## 鸣谢
@@ -50,3 +47,13 @@ yarn dist # 在发行构建的基础上打包 .plugin 插件文件
 - [Steve-xmh/mmbncm](https://github.com/Steve-xmh/mmbncm)
 - [solstice23/refined-now-playing-netease](https://github.com/solstice23/refined-now-playing-netease)
 - [Barba828/color-quantize](https://github.com/Barba828/color-quantize)
+- [woshizja/sound-processor](https://github.com/woshizja/sound-processor)
+
+### 特别鸣谢
+
+<div align="center">
+<image src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg"></image>
+<div>
+感谢 <a href=https://jb.gg/OpenSourceSupport>JetBrains</a> 系列开发工具为 AMLL 项目提供的大力支持
+</div>
+</div>

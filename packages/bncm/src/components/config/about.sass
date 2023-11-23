@@ -1,0 +1,36 @@
+
+.amll-about
+    display: flex
+    flex-direction: column
+    gap: 8px
+    .amll-icon
+        display: flex
+        justify-content: center
+        > *
+            width: 64px !important
+            height: 64px !important
+    .amll-name
+        font-weight: bold
+        margin-top: 1em
+        font-size: 1.5em
+        margin-bottom: 0.5em
+        text-align: center
+    .version, .update-tip, .current-branch
+        opacity: 0.5
+        text-align: center
+        margin-bottom: 0.2em
+    .author
+        opacity: 0.5
+        text-align: center
+        margin-bottom: 1em
+    .update-btn
+        display: flex
+        justify-content: center
+    .ext-links
+        display: flex
+        justify-content: center
+        margin: 1em 0
+        > *
+            margin-right: 8px
+            &:last-child
+                margin-right: 0

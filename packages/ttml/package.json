@@ -1,0 +1,40 @@
+{
+  "name": "@applemusic-like-lyrics/ttml",
+  "packageManager": "yarn@3.6.1",
+  "version": "0.0.1",
+  "description": "AMLL 的 TTML 歌词文件序列化和反序列化模块",
+  "repository": {
+    "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
+    "directory": "packages/ttml",
+    "type": "git"
+  },
+  "license": "GPL-3.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/amll-ttml.umd.cjs",
+  "module": "./dist/amll-ttml.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/amll-ttml.js",
+    "require": "./dist/amll-ttml.umd.cjs"
+  },
+  "scripts": {
+    "build:docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
+    "build": "vite build",
+    "build:dev": "vite build",
+    "fmt": "rome format --write ./src",
+    "dev": "vite dev"
+  },
+  "devDependencies": {
+    "rome": "^12.1.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11",
+    "vite-plugin-dts": "^3.6.0"
+  },
+  "peerDependencies": {
+    "@applemusic-like-lyrics/core": "workspace:^"
+  }
+}

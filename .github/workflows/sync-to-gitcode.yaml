@@ -1,4 +1,3 @@
----
 name: "同步仓库至 GitCode"
 
 on: push
@@ -10,12 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+        with:
+          lfs: true
       - uses: kielabokkie/ssh-key-and-known-hosts-action@v1
         with:
             ssh-private-key: ${{ secrets.AMLL_PUSH_KEY }}
             ssh-host: gitcode.net
       - name: 强制推送至 GitCode
         run: |
+          git config lfs.allowincompletepush true
+          git config lfs.https://gitcode.net/sn/applemusic-like-lyrics.git/info/lfs.locksverify true
           git fetch --all
           git pull --all --unshallow
           git remote add gitcode git@gitcode.net:sn/applemusic-like-lyrics.git

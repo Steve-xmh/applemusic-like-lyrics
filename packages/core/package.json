@@ -1,0 +1,60 @@
+{
+  "name": "@applemusic-like-lyrics/core",
+  "packageManager": "yarn@3.6.1",
+  "version": "0.0.13",
+  "description": "AMLL 的纯 JS 核心组件框架，包括歌词显示组件和背景组件等其它可以复用的组件",
+  "repository": {
+    "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
+    "directory": "packages/core",
+    "type": "git"
+  },
+  "license": "GPL-3.0",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
+    "build": "vite build",
+    "build:dev": "vite build",
+    "fmt": "rome format --write ./src",
+    "dev": "vite dev"
+  },
+  "main": "./dist/amll-core.cjs",
+  "module": "./dist/amll-core.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/amll-core.mjs",
+      "require": "./dist/amll-core.cjs"
+    }
+  },
+  "devDependencies": {
+    "@applemusic-like-lyrics/lyric": "^0.0.2",
+    "@types/stats.js": "^0.17.0",
+    "lil-gui": "^0.18.2",
+    "rome": "^12.1.3",
+    "stats.js": "^0.17.0",
+    "typedoc": "^0.25.2",
+    "typedoc-plugin-markdown": "^3.16.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11",
+    "vite-plugin-dts": "^3.6.0",
+    "vite-plugin-top-level-await": "^1.3.1",
+    "vite-plugin-wasm": "^3.2.2"
+  },
+  "peerDependencies": {
+    "@pixi/app": "*",
+    "@pixi/core": "*",
+    "@pixi/display": "*",
+    "@pixi/filter-blur": "*",
+    "@pixi/filter-bulge-pinch": "*",
+    "@pixi/filter-color-matrix": "*",
+    "@pixi/sprite": "*",
+    "jss": "*",
+    "jss-preset-default": "*"
+  },
+  "dependencies": {
+    "node-vibrant": "^3.2.1-alpha.1"
+  }
+}

@@ -1,10 +1,6 @@
----
-name: "调试开发构建"
+name: "调试开发构建 BNCM 插件"
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   pre-release:
@@ -17,17 +13,20 @@ jobs:
         uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: latest
-      - name: 构建插件包
+      - name: 安装 wasm32 目标
+        run: rustup target add wasm32-unknown-unknown
+      - name: 构建 BNCM 插件
         run: |
-          yarn global add sass
           yarn
-          yarn dist --dev
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
+          yarn lerna run build:dev --scope "@applemusic-like-lyrics/*"
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+          AMLL_GITHUB_IS_ACTION: true
+      - uses: marvinpinto/action-automatic-releases@latest
         name: 发布到 Github Release
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "dev-nightly"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ github.ref_name }}-nightly
           prerelease: true
-          title: "最新开发调试构建"
-          files: Apple Music-like lyrics.plugin
+          title: 最新 ${{ github.ref_name }} 分支开发调试构建
+          files: packages/bncm/dist/*.plugin

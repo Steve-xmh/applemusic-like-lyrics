@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/packages/bncm" />
+    <content url="file://$MODULE_DIR$/packages/core">
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/docs" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/core/node_modules" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/fft">
+      <excludeFolder url="file://$MODULE_DIR$/packages/fft/pkg" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/fft/target" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/lyric">
+      <excludeFolder url="file://$MODULE_DIR$/packages/lyric/pkg" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/lyric/target" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/player">
+      <excludeFolder url="file://$MODULE_DIR$/packages/player/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/player/src-tauri/target" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/react">
+      <excludeFolder url="file://$MODULE_DIR$/packages/react/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/react/docs" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/vue">
+      <excludeFolder url="file://$MODULE_DIR$/packages/vue/dist" />
+    </content>
+    <content url="file://$MODULE_DIR$/packages/ws-protocol">
+      <excludeFolder url="file://$MODULE_DIR$/packages/ws-protocol/pkg" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/ws-protocol/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
