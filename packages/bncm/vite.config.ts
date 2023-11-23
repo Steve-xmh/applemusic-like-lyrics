@@ -157,6 +157,7 @@ const CopyBetterNCMPlugin = ({
 					recursive: true,
 				});
 			} catch {}
+			await cp(resolve(__dirname, "preview.svg"), resolve(fullDistDir, "preview.svg"));
 			if (packPlugin) {
 				const zip = new JSZip();
 				for (const file of await readdir(fullDistDir)) {

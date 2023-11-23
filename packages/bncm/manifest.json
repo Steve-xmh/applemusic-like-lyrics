@@ -9,7 +9,7 @@
     ],
     "description": "类 Apple Music 歌词页面插件|近乎完美的 Apple Music 歌词体验",
     "preview": "preview.svg",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "commit": "!SET_BY_BUILD_SCRIPT!",
     "branch": "!SET_BY_BUILD_SCRIPT!",
     "type": "extension",
