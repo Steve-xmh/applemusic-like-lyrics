@@ -4,15 +4,38 @@
 
 AMLL 组件的 BetterNCM 插件实现，提供给 NCM 软件的歌词播放页面支持。
 
+![AMLL 歌词组件展示图，歌曲： Leave The Door Open ，TTML 歌词贡献者：Y-CIAO](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8a6a671f-7d67-4b86-a152-b1d0aa53c24b)
+
 <div align=center>
-
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b9dc5226-e08c-475c-a90d-1d1dbb3e0d70)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b26631f6-5925-4de9-ba9c-fc4d41bc14da)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/6a36d069-559e-4bce-8904-31a8f8648a0f)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8049da87-c6ef-4140-b324-e0f78a9c5ba4)
-![](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/e9cebc5b-9778-4914-9460-ebdcfa7f1e68)
-
+歌曲： Leave The Door Open
+<br/>
+TTML 歌词贡献者：Y-CIAO
 </div>
+
+![AMLL 歌词组件展示图，歌曲： 限りなく灰色へ ，歌词源自 NCM YRC 逐词歌词](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/3fab0eaf-c1f2-4239-b3ef-9deaa4c550d5)
+
+<div align=center>
+歌曲： 限りなく灰色へ
+<br/>
+歌词源自 NCM YRC 逐词歌词
+</div>
+
+![AMLL 歌词组件展示图，歌曲： Sugar ，TTML 歌词贡献者：Y-CIAO](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/1c4fc650-474b-4bf4-9ded-6a73b3d7fe9d)
+
+<div align=center>
+歌曲： Sugar
+<br/>
+TTML 歌词贡献者：Y-CIAO
+</div>
+
+![AMLL 歌词组件展示图，歌曲： Idol ，TTML 歌词贡献者：SteveXMH](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/f6a14ee5-36fd-4529-99fc-1c123864819f)
+
+<div align=center>
+歌曲： Idol
+<br/>
+TTML 歌词贡献者：SteveXMH
+</div>
+
 
 ## 安装说明
 
