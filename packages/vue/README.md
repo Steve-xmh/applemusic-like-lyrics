@@ -12,6 +12,19 @@ AMLL 组件库的 Vue 绑定，你可以通过此库来更加方便地使用 AML
 
 ## 安装
 
+安装使用的依赖（如果以下列出的依赖包没有安装的话需要自行安装）：
+```bash
+npm install @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite jss jss-preset-default # 使用 npm
+yarn add @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite jss jss-preset-default # 使用 yarn
+```
+
+安装 Vue 绑定需要使用的依赖（如果以下列出的依赖包没有安装的话需要自行安装）：
+```bash
+npm install vue # 使用 npm
+yarn add vue # 使用 yarn
+```
+
+安装本体框架：
 ```bash
 npm install @applemusic-like-lyrics/vue # 使用 npm
 yarn add @applemusic-like-lyrics/vue # 使用 yarn
