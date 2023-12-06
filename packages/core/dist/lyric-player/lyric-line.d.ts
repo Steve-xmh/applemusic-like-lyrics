@@ -30,8 +30,8 @@ export declare class LyricLineEl extends EventTarget implements HasElement, Disp
     constructor(lyricPlayer: LyricPlayer, lyricLine?: LyricLine);
     private listenersMap;
     private readonly onMouseEvent;
-    addEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | AddEventListenerOptions | undefined): void;
-    removeEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | EventListenerOptions | undefined): void;
+    addMouseEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | AddEventListenerOptions | undefined): void;
+    removeMouseEventListener(type: MouseEventTypes, callback: MouseEventListener | null, options?: boolean | EventListenerOptions | undefined): void;
     private isEnabled;
     enable(): void;
     measureSize(): [number, number];

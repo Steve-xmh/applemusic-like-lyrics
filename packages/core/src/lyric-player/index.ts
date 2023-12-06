@@ -108,6 +108,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private alignAnchor: "top" | "bottom" | "center" = "center";
 	private alignPosition = 0.5;
 	private isNonDynamic = false;
+	private scrollBoundary = [0, 0];
 	readonly size: [number, number] = [0, 0];
 	readonly innerSize: [number, number] = [0, 0];
 	private readonly onLineClickedHandler = (e: RawLyricLineMouseEvent) => {
@@ -307,25 +308,115 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.style.attach();
 		this.interludeDots.setTransform(0, 200);
 		window.addEventListener("pageshow", this.onPageShow);
+		let startScrollY = 0;
+		let direction: "up" | "down" | "none" = "none";
+		let startTouchPosY = 0;
+		let startScrollTime = 0;
+		let scrollSpeed = 0;
+		let scrollId = Symbol("amll-scroll");
+		let lastMoveY = 0;
+		let lastDragTime = 0;
+		this.element.addEventListener("touchstart", (evt) => {
+			if (this.beginScrollHandler()) {
+				evt.preventDefault();
+				startScrollY = this.scrollOffset;
+				startTouchPosY = evt.touches[0].screenY;
+				lastMoveY = startTouchPosY;
+				startScrollTime = Date.now();
+				scrollSpeed = 0;
+			}
+		});
+		this.element.addEventListener("touchmove", (evt) => {
+			if (this.beginScrollHandler()) {
+				evt.preventDefault();
+				const touchScreenY = evt.touches[0].screenY;
+				const delta = touchScreenY - startTouchPosY;
+				const lastDelta = touchScreenY - lastMoveY;
+				const targetDirection =
+					lastDelta > 0 ? "down" : lastDelta < 0 ? "up" : "none";
+				if (direction !== targetDirection) {
+					direction = targetDirection;
+					startScrollY = this.scrollOffset;
+					startTouchPosY = touchScreenY;
+					startScrollTime = Date.now();
+				} else {
+					this.scrollOffset = startScrollY - delta;
+				}
+				lastMoveY = touchScreenY;
+				lastDragTime = Date.now();
+				this.limitScrollOffset();
+				this.calcLayout(true);
+			}
+		});
+		this.element.addEventListener("touchend", (evt) => {
+			if (this.beginScrollHandler()) {
+				evt.preventDefault();
+				startTouchPosY = 0;
+				const curTime = Date.now();
+				if (curTime - lastDragTime > 100) return this.endScrollHandler();
+				const scrollDuration = curTime - startScrollTime;
+				scrollSpeed =
+					((this.scrollOffset - startScrollY) / scrollDuration) * 1000;
+				let lt = 0;
+				const curScrollId = Symbol("amll-scroll");
+				scrollId = curScrollId;
+				const onScrollFrame = (dt: number) => {
+					lt ||= dt;
+					if (scrollId === curScrollId && this.beginScrollHandler()) {
+						this.scrollOffset += (scrollSpeed * (dt - lt)) / 1000;
+						scrollSpeed *= 0.99;
+						this.limitScrollOffset();
+						this.calcLayout(true);
+						if (
+							Math.abs(scrollSpeed) > 1 &&
+							!this.scrollBoundary.includes(this.scrollOffset)
+						) {
+							requestAnimationFrame(onScrollFrame);
+						}
+						this.endScrollHandler();
+						lt = dt;
+					}
+				};
+				requestAnimationFrame(onScrollFrame);
+				this.endScrollHandler();
+			}
+		});
 		this.element.addEventListener("wheel", (evt) => {
-			if (this.allowScroll) {
-				this.isScrolled = true;
-				clearTimeout(this.scrolledHandler);
-				this.scrolledHandler = setTimeout(() => {
-					this.isScrolled = false;
-					this.scrollOffset = 0;
-				}, 5000);
-				this.invokedByScrollEvent = true;
+			if (this.beginScrollHandler()) {
 				if (evt.deltaMode === evt.DOM_DELTA_PIXEL) {
 					this.scrollOffset += evt.deltaY;
+					this.limitScrollOffset();
 					this.calcLayout(true);
 				} else {
 					this.scrollOffset += evt.deltaY * 50;
+					this.limitScrollOffset();
 					this.calcLayout(false);
 				}
-				this.invokedByScrollEvent = false;
+				this.endScrollHandler();
 			}
 		});
+	}
+	private beginScrollHandler() {
+		const allowed = this.allowScroll;
+		if (allowed) {
+			this.isScrolled = true;
+			this.invokedByScrollEvent = true;
+			clearTimeout(this.scrolledHandler);
+			this.scrolledHandler = setTimeout(() => {
+				this.isScrolled = false;
+				this.scrollOffset = 0;
+			}, 5000);
+		}
+		return allowed;
+	}
+	private endScrollHandler() {
+		this.invokedByScrollEvent = false;
+	}
+	private limitScrollOffset() {
+		this.scrollOffset = Math.max(
+			Math.min(this.scrollBoundary[1], this.scrollOffset),
+			this.scrollBoundary[0],
+		);
 	}
 	/**
 	 * 获取当前播放时间里是否处于间奏区间
@@ -482,8 +573,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 		});
 		this.lyricLinesEl.forEach((line) => {
-			line.removeEventListener("click", this.onLineClickedHandler);
-			line.removeEventListener("contextmenu", this.onLineClickedHandler);
+			line.removeMouseEventListener("click", this.onLineClickedHandler);
+			line.removeMouseEventListener("contextmenu", this.onLineClickedHandler);
 			line.dispose();
 		});
 		// const prevLinesEl = this.lyricLinesEl;
@@ -493,8 +584,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// 	return this.lyricLinesEl[i];
 			// } else {
 			const lineEl = new LyricLineEl(this, line);
-			lineEl.addEventListener("click", this.onLineClickedHandler);
-			lineEl.addEventListener("contextmenu", this.onLineClickedHandler);
+			lineEl.addMouseEventListener("click", this.onLineClickedHandler);
+			lineEl.addMouseEventListener("contextmenu", this.onLineClickedHandler);
 			return lineEl;
 			// }
 		});
@@ -583,6 +674,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					acc + (el.getLine().isBG ? 0 : this.lyricLinesSize.get(el)?.[1] ?? 0),
 				0,
 			);
+		this.scrollBoundary[0] = -scrollOffset;
 		curPos -= scrollOffset;
 		curPos += this.size[1] * this.alignPosition;
 		const curLine = this.lyricLinesEl[targetAlignIndex];
@@ -662,6 +754,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				baseDelay /= 1.2;
 			}
 		});
+		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
 		// console.groupEnd();
 		this.bottomLine.setTransform(this.padding, curPos, force, delay);
 	}

@@ -37,6 +37,7 @@
 - [setFPS](BackgroundRender.md#setfps)
 - [setFlowSpeed](BackgroundRender.md#setflowspeed)
 - [setRenderScale](BackgroundRender.md#setrenderscale)
+- [setStaticMode](BackgroundRender.md#setstaticmode)
 
 ## Constructors
 
@@ -50,7 +51,7 @@ PixiRenderer.constructor
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:15](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/index.ts#L15)
+[packages/core/src/bg-render/index.ts:15](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L15)
 
 ## Properties
 
@@ -60,7 +61,7 @@ PixiRenderer.constructor
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:14](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/index.ts#L14)
+[packages/core/src/bg-render/index.ts:14](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L14)
 
 ## Methods
 
@@ -86,7 +87,7 @@ PixiRenderer.dispose
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:25](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/index.ts#L25)
+[packages/core/src/bg-render/index.ts:26](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L26)
 
 ___
 
@@ -106,7 +107,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:22](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/index.ts#L22)
+[packages/core/src/bg-render/index.ts:23](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L23)
 
 ___
 
@@ -126,7 +127,7 @@ PixiRenderer.pause
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:160](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L160)
+[packages/core/src/bg-render/pixi-renderer.ts:216](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L216)
 
 ___
 
@@ -146,7 +147,7 @@ PixiRenderer.resume
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:167](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L167)
+[packages/core/src/bg-render/pixi-renderer.ts:223](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L223)
 
 ___
 
@@ -172,7 +173,7 @@ PixiRenderer.setAlbumImage
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:174](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L174)
+[packages/core/src/bg-render/pixi-renderer.ts:230](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L230)
 
 ___
 
@@ -200,7 +201,7 @@ PixiRenderer.setFPS
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:154](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L154)
+[packages/core/src/bg-render/pixi-renderer.ts:210](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L210)
 
 ___
 
@@ -226,7 +227,7 @@ PixiRenderer.setFlowSpeed
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:107](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L107)
+[packages/core/src/bg-render/pixi-renderer.ts:120](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L120)
 
 ___
 
@@ -254,4 +255,30 @@ PixiRenderer.setRenderScale
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:116](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/bg-render/pixi-renderer.ts#L116)
+[packages/core/src/bg-render/pixi-renderer.ts:129](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L129)
+
+___
+
+### setStaticMode
+
+▸ **setStaticMode**(`enable?`): `void`
+
+是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `enable` | `boolean` | `false` | 是否启用静态模式 |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+PixiRenderer.setStaticMode
+
+#### Defined in
+
+[packages/core/src/bg-render/pixi-renderer.ts:200](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L200)

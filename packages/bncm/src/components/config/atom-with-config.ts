@@ -41,6 +41,10 @@ const saveConfig = debounce(async (config: Map<string, any>) => {
 			const configPath = normalizePath(
 				`${plugin.mainPlugin.pluginPath}/../../amll-data/amll-settings.json`,
 			);
+			const configFolderPath = normalizePath(`${configPath}/..`);
+			if (!(await betterncm.fs.exists(configFolderPath))) {
+				await betterncm.fs.mkdir(configFolderPath);
+			}
 			await betterncm.fs.writeFile(
 				configPath,
 				JSON.stringify(storeValue, null, 4),

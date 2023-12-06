@@ -67,6 +67,7 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     private alignAnchor;
     private alignPosition;
     private isNonDynamic;
+    private scrollBoundary;
     readonly size: [number, number];
     readonly innerSize: [number, number];
     private readonly onLineClickedHandler;
@@ -101,6 +102,9 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
     readonly style: import("jss").StyleSheet<"lyricPlayer" | "lyricLine" | "@media (max-width: 1024px)" | "lyricDuetLine" | "lyricBgLine" | "lyricMainLine" | "lyricSubLine" | "disableSpring" | "interludeDots" | "@supports (mix-blend-mode: plus-lighter)" | "tmpDisableTransition">;
     private onPageShow;
     constructor();
+    private beginScrollHandler;
+    private endScrollHandler;
+    private limitScrollOffset;
     /**
      * 获取当前播放时间里是否处于间奏区间
      * 如果是则会返回单位为毫秒的始末时间

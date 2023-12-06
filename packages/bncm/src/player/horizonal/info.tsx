@@ -85,15 +85,16 @@ export const MusicInfo: FC = () => {
 					)}
 					{showAlbumName && (
 						<SongInfoTextMarquee>
-							<a
-								className="amll-music-album"
-								href={`#/m/album/?id=${musicAlbumId}`}
-								onMouseUp={() => {
-									closeLyricPage();
-								}}
-							>
-								{musicAlbumName}
-							</a>
+							<div className="amll-music-album">
+								<a
+									href={`#/m/album/?id=${musicAlbumId}`}
+									onMouseUp={() => {
+										closeLyricPage();
+									}}
+								>
+									{musicAlbumName}
+								</a>
+							</div>
 						</SongInfoTextMarquee>
 					)}
 					{showMusicArtists && (

@@ -1,6 +1,10 @@
 .lyric-player-horizonal
     display: grid
+    width: 100%
+    height: 100%
+    grid-template-rows: [drag-area] minmax(30px, 1fr) [thumb] auto [cover] auto [music-info] 3fr 1fr
     grid-template-columns: [center-space] 0fr [info-side] 0.75fr [player-side] 1fr
+    gap: 8px
     transition: 0.5s ease-in-out
     &.no-lyric
         grid-template-columns: [center-space] 1fr [info-side] 0fr [player-side] 1fr
@@ -13,10 +17,6 @@
                     display: inherit
                 to
                     display: none
-    gap: 8px
-    grid-template-rows: [drag-area] minmax(30px, 1fr) [thumb] auto [cover] auto [music-info] 3fr 1fr
-    width: 100%
-    height: 100%
     .amll-control-thumb
         grid-column: info-side
         grid-row: thumb
@@ -109,7 +109,7 @@
             $base-scale: 1.05
             transform: scale($base-scale, calc($base-scale * 1.1))
 
-    .amll-music-artists
+    .amll-music-album, .amll-music-artists
         white-space: nowrap
         text-align: center
         opacity: 0.75

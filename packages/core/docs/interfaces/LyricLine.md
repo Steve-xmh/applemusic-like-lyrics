@@ -22,11 +22,11 @@
 
 • **endTime**: `number`
 
-句子的结束时间
+句子的结束时间，单位为毫秒
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L49)
+[packages/core/src/interfaces.ts:51](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L51)
 
 ___
 
@@ -34,11 +34,11 @@ ___
 
 • **isBG**: `boolean`
 
-该行是否为背景歌词行
+该行是否为背景歌词行，当该行歌词的上一句非背景歌词被激活时，这行歌词将会显示出来，注意每个非背景歌词下方只能拥有一个背景歌词
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:51](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L51)
+[packages/core/src/interfaces.ts:53](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L53)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:53](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L53)
+[packages/core/src/interfaces.ts:55](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L55)
 
 ___
 
@@ -58,9 +58,11 @@ ___
 
 • **romanLyric**: `string`
 
+该行的音译歌词，将会显示在翻译歌词行的下方
+
 #### Defined in
 
-[packages/core/src/interfaces.ts:45](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L45)
+[packages/core/src/interfaces.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L47)
 
 ___
 
@@ -68,11 +70,11 @@ ___
 
 • **startTime**: `number`
 
-句子的起始时间
+句子的起始时间，单位为毫秒
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L47)
+[packages/core/src/interfaces.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L49)
 
 ___
 
@@ -80,9 +82,11 @@ ___
 
 • **translatedLyric**: `string`
 
+该行的翻译歌词，将会显示在主歌词行的下方
+
 #### Defined in
 
-[packages/core/src/interfaces.ts:44](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L44)
+[packages/core/src/interfaces.ts:45](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L45)
 
 ___
 
@@ -91,8 +95,8 @@ ___
 • **words**: [`LyricWord`](LyricWord.md)[]
 
 该行的所有单词
-如果是 LyRiC 等只能表达一行歌词的格式，这里就只会有一个单词
+如果是 LyRiC 等只能表达一行歌词的格式，这里就只会有一个单词且通常其始末时间和本结构的 `startTime` 和 `endTime` 相同
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:43](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L43)
+[packages/core/src/interfaces.ts:43](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L43)

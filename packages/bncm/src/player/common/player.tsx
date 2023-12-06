@@ -4,6 +4,7 @@ import {
 	currentTimeAtom,
 	lyricPageOpenedAtom,
 	musicArtistsAtom,
+	musicContextAtom,
 } from "../../music-context/wrapper";
 import {
 	LyricPlayer as LyricPlayerComponent,
@@ -13,7 +14,7 @@ import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
 } from "../../music-context/ws-wrapper";
-import { lyricLinesAtom } from "../../lyric/provider";
+import { lyricLinesAtom, usingLyricSourceAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {
 	keepBuiltinPlayerWhenConnectedAtom,
@@ -21,8 +22,10 @@ import {
 	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
 	lyricSpringEffectAtom,
+	showAMLLTTMLDBTipAtom,
 } from "../../components/config/atoms";
 import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
+import "./player.sass";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef: HTMLElement | null;
@@ -37,11 +40,13 @@ export const CoreLyricPlayer: FC<{
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
+	const usingLyricSource = useAtomValue(usingLyricSourceAtom);
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
 	const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom);
 	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
 	const lyricHidePassed = useAtomValue(lyricHidePassedAtom);
 	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
+	const showAMLLTTMLDBTip = useAtomValue(showAMLLTTMLDBTipAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
 
 	const [alignPosition, setAlighPosition] = useState(0.5);
@@ -113,7 +118,25 @@ export const CoreLyricPlayer: FC<{
 					bottomLine={
 						lyricLines.state === "hasData" ? (
 							<div className="amll-contributors">
-								贡献者：{artists.map((v) => v.name).join(", ")}
+								<div>贡献者：{artists.map((v) => v.name).join(", ")}</div>
+								{usingLyricSource.state === "hasData" &&
+								usingLyricSource.data.type === "builtin:amll-ttml-db" &&
+								showAMLLTTMLDBTip ? (
+									<div className="ttml-db-tip">
+										{/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
+										<a
+											href="javascript:void(0);"
+											onClick={() => {
+												betterncm.ncm.openUrl(
+													"https://github.com/Steve-xmh/amll-ttml-db",
+												);
+											}}
+											title="点击可以一起贡献更加出色的 TTML 歌词哦！"
+										>
+											本歌词由 AMLL TTML 歌词数据库强力驱动
+										</a>
+									</div>
+								) : null}
 							</div>
 						) : null
 					}

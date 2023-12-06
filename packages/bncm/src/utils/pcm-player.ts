@@ -65,7 +65,7 @@ export class PCMPlayer {
 		this.audioCtx = new AudioContext();
 		this.analyzerNode = this.audioCtx.createAnalyser();
 		this.analyzerNode.smoothingTimeConstant = 0.5;
-		this.analyzerNode.minDecibels = -60;
+		this.analyzerNode.minDecibels = -70;
 		this.analyzerNode.maxDecibels = -20;
 
 		this.processNode = this.analyzerNode;
@@ -149,22 +149,15 @@ export class PCMPlayer {
 
 	feed(data: AnyArrayBuffer) {
 		this.isSupported(data);
+		if (this.audioCtx.state === "suspended" || this.audioCtx.state === "closed")
+			return;
 
 		// 获取格式化后的buffer
 		const fmtData = this.getFormattedValue(data);
-		// 开始拷贝buffer数据
-		// 新建一个Float32Array的空间
-		const tmp = new Float32Array(this.samples.length + fmtData.length);
-		// console.log(data, this.samples, this.samples.length)
-		// 复制当前的实例的buffer值（历史buff)
-		// 从头（0）开始复制
-		tmp.set(this.samples, 0);
-		// 复制传入的新数据
-		// 从历史buff位置开始
-		tmp.set(fmtData, this.samples.length);
+		// 因为只用于音频可视化，所以我们将来不及处理或表现当前音频状况的数据丢弃
 		// 将新的完整buff数据赋值给samples
 		// interval定时器也会从samples里面播放数据
-		this.samples = tmp;
+		this.samples = fmtData;
 		// console.log('this.samples', this.samples)
 	}
 
@@ -201,6 +194,8 @@ export class PCMPlayer {
 
 	flush() {
 		if (!this.samples.length) return;
+		if (this.audioCtx.state === "closed" || this.audioCtx.state === "suspended")
+			return;
 		const bufferSource = this.audioCtx.createBufferSource();
 		if (typeof this.option.onended === "function") {
 			const onended = this.option.onended;

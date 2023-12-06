@@ -339,6 +339,10 @@ const rawLyricLinesAtom = atom({
 	state: "loading",
 } as Loadable<CoreLyricLine[]>);
 
+export const usingLyricSourceAtom = atom({
+	state: "loading",
+} as Loadable<LyricSource>);
+
 export const lyricLinesAtom = atom(
 	(get) => {
 		const result = get(rawLyricLinesAtom);
@@ -442,10 +446,14 @@ export const LyricProvider: FC = () => {
 	const allowRomanLine = useAtomValue(showRomanLineAtom);
 	const setLyricProviderLogs = useSetAtom(lyricProviderLogsAtom);
 	const setLyricLines = useSetAtom(rawLyricLinesAtom);
+	const setLyricSource = useSetAtom(usingLyricSourceAtom);
 
 	useEffect(() => {
 		setLyricProviderLogs([]);
 		setLyricLines({
+			state: "loading",
+		});
+		setLyricSource({
 			state: "loading",
 		});
 
@@ -509,8 +517,12 @@ export const LyricProvider: FC = () => {
 					}
 				}
 			},
-			(_source, _index, result) => {
+			(source, _index, result) => {
 				// log("已设置歌词为来自歌词源", source, "的", result);
+				setLyricSource({
+					state: "hasData",
+					data: source,
+				});
 				setLyricLines(result);
 			},
 			(source, _index, result) => {

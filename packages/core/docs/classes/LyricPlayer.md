@@ -26,24 +26,38 @@
 ### Properties
 
 - [alignAnchor](LyricPlayer.md#alignanchor)
+- [alignPosition](LyricPlayer.md#alignposition)
+- [allowScroll](LyricPlayer.md#allowscroll)
+- [bottomLine](LyricPlayer.md#bottomline)
 - [bufferedLines](LyricPlayer.md#bufferedlines)
 - [currentTime](LyricPlayer.md#currenttime)
 - [disableSpring](LyricPlayer.md#disablespring)
 - [element](LyricPlayer.md#element)
+- [emUnit](LyricPlayer.md#emunit)
 - [enableBlur](LyricPlayer.md#enableblur)
+- [enableScale](LyricPlayer.md#enablescale)
+- [hidePassedLines](LyricPlayer.md#hidepassedlines)
 - [hotLines](LyricPlayer.md#hotlines)
+- [innerSize](LyricPlayer.md#innersize)
 - [interludeDots](LyricPlayer.md#interludedots)
 - [interludeDotsSize](LyricPlayer.md#interludedotssize)
+- [invokedByScrollEvent](LyricPlayer.md#invokedbyscrollevent)
+- [isNonDynamic](LyricPlayer.md#isnondynamic)
+- [isScrolled](LyricPlayer.md#isscrolled)
 - [lyricLines](LyricPlayer.md#lyriclines)
 - [lyricLinesEl](LyricPlayer.md#lyriclinesel)
+- [lyricLinesIndexes](LyricPlayer.md#lyriclinesindexes)
 - [lyricLinesSize](LyricPlayer.md#lyriclinessize)
-- [pos](LyricPlayer.md#pos)
+- [padding](LyricPlayer.md#padding)
 - [posXSpringParams](LyricPlayer.md#posxspringparams)
 - [posYSpringParams](LyricPlayer.md#posyspringparams)
 - [processedLines](LyricPlayer.md#processedlines)
 - [resizeObserver](LyricPlayer.md#resizeobserver)
 - [scaleSpringParams](LyricPlayer.md#scalespringparams)
+- [scrollBoundary](LyricPlayer.md#scrollboundary)
+- [scrollOffset](LyricPlayer.md#scrolloffset)
 - [scrollToIndex](LyricPlayer.md#scrolltoindex)
+- [scrolledHandler](LyricPlayer.md#scrolledhandler)
 - [size](LyricPlayer.md#size)
 - [style](LyricPlayer.md#style)
 - [supportMaskImage](LyricPlayer.md#supportmaskimage)
@@ -51,22 +65,33 @@
 
 ### Methods
 
+- [\_getIsNonDynamic](LyricPlayer.md#_getisnondynamic)
 - [addEventListener](LyricPlayer.md#addeventlistener)
+- [beginScrollHandler](LyricPlayer.md#beginscrollhandler)
 - [calcLayout](LyricPlayer.md#calclayout)
 - [dispatchEvent](LyricPlayer.md#dispatchevent)
 - [dispose](LyricPlayer.md#dispose)
+- [endScrollHandler](LyricPlayer.md#endscrollhandler)
+- [getBottomLineElement](LyricPlayer.md#getbottomlineelement)
 - [getCurrentInterlude](LyricPlayer.md#getcurrentinterlude)
 - [getCurrentTime](LyricPlayer.md#getcurrenttime)
 - [getElement](LyricPlayer.md#getelement)
+- [getEnableScale](LyricPlayer.md#getenablescale)
 - [getEnableSpring](LyricPlayer.md#getenablespring)
 - [getLyricLines](LyricPlayer.md#getlyriclines)
+- [limitScrollOffset](LyricPlayer.md#limitscrolloffset)
+- [onLineClickedHandler](LyricPlayer.md#onlineclickedhandler)
 - [onPageShow](LyricPlayer.md#onpageshow)
 - [rebuildStyle](LyricPlayer.md#rebuildstyle)
 - [removeEventListener](LyricPlayer.md#removeeventlistener)
+- [resetScroll](LyricPlayer.md#resetscroll)
 - [setAlignAnchor](LyricPlayer.md#setalignanchor)
+- [setAlignPosition](LyricPlayer.md#setalignposition)
 - [setCurrentTime](LyricPlayer.md#setcurrenttime)
 - [setEnableBlur](LyricPlayer.md#setenableblur)
+- [setEnableScale](LyricPlayer.md#setenablescale)
 - [setEnableSpring](LyricPlayer.md#setenablespring)
+- [setHidePassedLines](LyricPlayer.md#sethidepassedlines)
 - [setLinePosXSpringParams](LyricPlayer.md#setlineposxspringparams)
 - [setLinePosYSpringParams](LyricPlayer.md#setlineposyspringparams)
 - [setLineScaleSpringParams](LyricPlayer.md#setlinescalespringparams)
@@ -85,17 +110,47 @@ EventTarget.constructor
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:198](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L198)
+[packages/core/src/lyric-player/index.ts:296](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L296)
 
 ## Properties
 
 ### alignAnchor
 
-• `Private` **alignAnchor**: `number` \| ``"bottom"`` \| ``"top"`` = `0.5`
+• `Private` **alignAnchor**: ``"bottom"`` \| ``"center"`` \| ``"top"`` = `"center"`
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:63](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L63)
+[packages/core/src/lyric-player/index.ts:108](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L108)
+
+___
+
+### alignPosition
+
+• `Private` **alignPosition**: `number` = `0.5`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:109](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L109)
+
+___
+
+### allowScroll
+
+• `Private` **allowScroll**: `boolean` = `true`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:58](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L58)
+
+___
+
+### bottomLine
+
+• `Private` **bottomLine**: `BottomLineEl`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:104](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L104)
 
 ___
 
@@ -105,7 +160,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:30](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L30)
+[packages/core/src/lyric-player/index.ts:56](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L56)
 
 ___
 
@@ -115,7 +170,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:24](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L24)
+[packages/core/src/lyric-player/index.ts:48](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L48)
 
 ___
 
@@ -125,7 +180,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:62](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L62)
+[packages/core/src/lyric-player/index.ts:107](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L107)
 
 ___
 
@@ -135,7 +190,17 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:23](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L23)
+[packages/core/src/lyric-player/index.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L47)
+
+___
+
+### emUnit
+
+• `Private` **emUnit**: `number`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:98](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L98)
 
 ___
 
@@ -145,7 +210,27 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:57](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L57)
+[packages/core/src/lyric-player/index.ts:100](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L100)
+
+___
+
+### enableScale
+
+• `Private` **enableScale**: `boolean` = `true`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:101](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L101)
+
+___
+
+### hidePassedLines
+
+• `Private` **hidePassedLines**: `boolean` = `false`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:63](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L63)
 
 ___
 
@@ -155,7 +240,17 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:29](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L29)
+[packages/core/src/lyric-player/index.ts:55](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L55)
+
+___
+
+### innerSize
+
+• `Readonly` **innerSize**: [`number`, `number`]
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:113](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L113)
 
 ___
 
@@ -165,7 +260,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:58](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L58)
+[packages/core/src/lyric-player/index.ts:102](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L102)
 
 ___
 
@@ -175,7 +270,37 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:59](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L59)
+[packages/core/src/lyric-player/index.ts:103](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L103)
+
+___
+
+### invokedByScrollEvent
+
+• `Private` **invokedByScrollEvent**: `boolean` = `false`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:61](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L61)
+
+___
+
+### isNonDynamic
+
+• `Private` **isNonDynamic**: `boolean` = `false`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:110](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L110)
+
+___
+
+### isScrolled
+
+• `Private` **isScrolled**: `boolean` = `false`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:60](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L60)
 
 ___
 
@@ -185,7 +310,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:25](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L25)
+[packages/core/src/lyric-player/index.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L49)
 
 ___
 
@@ -195,27 +320,37 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:27](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L27)
+[packages/core/src/lyric-player/index.ts:51](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L51)
+
+___
+
+### lyricLinesIndexes
+
+• `Private` **lyricLinesIndexes**: `WeakMap`<`LyricLineEl`, `number`\>
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:54](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L54)
 
 ___
 
 ### lyricLinesSize
 
-• `Private` **lyricLinesSize**: `Map`<`LyricLineEl`, [`number`, `number`]\>
+• `Private` **lyricLinesSize**: `WeakMap`<`LyricLineEl`, [`number`, `number`]\>
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:28](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L28)
+[packages/core/src/lyric-player/index.ts:52](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L52)
 
 ___
 
-### pos
+### padding
 
-• `Readonly` **pos**: [`number`, `number`]
+• `Private` **padding**: `number`
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:65](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L65)
+[packages/core/src/lyric-player/index.ts:99](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L99)
 
 ___
 
@@ -225,7 +360,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:42](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L42)
+[packages/core/src/lyric-player/index.ts:83](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L83)
 
 ___
 
@@ -235,7 +370,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L47)
+[packages/core/src/lyric-player/index.ts:88](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L88)
 
 ___
 
@@ -245,7 +380,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:26](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L26)
+[packages/core/src/lyric-player/index.ts:50](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L50)
 
 ___
 
@@ -255,7 +390,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:32](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L32)
+[packages/core/src/lyric-player/index.ts:64](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L64)
 
 ___
 
@@ -265,7 +400,27 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:52](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L52)
+[packages/core/src/lyric-player/index.ts:93](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L93)
+
+___
+
+### scrollBoundary
+
+• `Private` **scrollBoundary**: `number`[]
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:111](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L111)
+
+___
+
+### scrollOffset
+
+• `Private` **scrollOffset**: `number` = `0`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:62](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L62)
 
 ___
 
@@ -275,7 +430,17 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:31](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L31)
+[packages/core/src/lyric-player/index.ts:57](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L57)
+
+___
+
+### scrolledHandler
+
+• `Private` **scrolledHandler**: `number` = `0`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:59](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L59)
 
 ___
 
@@ -285,7 +450,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:64](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L64)
+[packages/core/src/lyric-player/index.ts:112](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L112)
 
 ___
 
@@ -295,7 +460,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:89](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L89)
+[packages/core/src/lyric-player/index.ts:171](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L171)
 
 ___
 
@@ -305,7 +470,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:61](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L61)
+[packages/core/src/lyric-player/index.ts:106](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L106)
 
 ___
 
@@ -315,9 +480,23 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:60](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L60)
+[packages/core/src/lyric-player/index.ts:105](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L105)
 
 ## Methods
+
+### \_getIsNonDynamic
+
+▸ **_getIsNonDynamic**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:126](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L126)
+
+___
 
 ### addEventListener
 
@@ -357,16 +536,32 @@ EventTarget.addEventListener
 
 #### Defined in
 
-node_modules/typescript/lib/lib.dom.d.ts:8168
+node_modules/typescript/lib/lib.dom.d.ts:8209
+
+___
+
+### beginScrollHandler
+
+▸ `Private` **beginScrollHandler**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:399](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L399)
 
 ___
 
 ### calcLayout
 
-▸ **calcLayout**(`reflow?`): `void`
+▸ **calcLayout**(`force?`, `reflow?`): `void`
 
 重新布局定位歌词行的位置，调用完成后再逐帧调用 `update`
 函数即可让歌词通过动画移动到目标位置。
+
+函数有一个 `force` 参数，用于指定是否强制修改布局，也就是不经过动画直接调整元素位置和大小。
 
 此函数还有一个 `reflow` 参数，用于指定是否需要重新计算布局
 
@@ -380,6 +575,7 @@ ___
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
+| `force` | `boolean` | `false` | 是否不经过动画直接修改布局定位 |
 | `reflow` | `boolean` | `false` | 是否进行重新布局（重新计算每行歌词大小） |
 
 #### Returns
@@ -388,7 +584,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:362](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L362)
+[packages/core/src/lyric-player/index.ts:641](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L641)
 
 ___
 
@@ -416,7 +612,7 @@ EventTarget.dispatchEvent
 
 #### Defined in
 
-node_modules/typescript/lib/lib.dom.d.ts:8174
+node_modules/typescript/lib/lib.dom.d.ts:8215
 
 ___
 
@@ -438,13 +634,49 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:654](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L654)
+[packages/core/src/lyric-player/index.ts:996](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L996)
+
+___
+
+### endScrollHandler
+
+▸ `Private` **endScrollHandler**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:412](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L412)
+
+___
+
+### getBottomLineElement
+
+▸ **getBottomLineElement**(): `HTMLElement`
+
+获取一个特殊的底栏元素，默认是空白的，可以往内部添加任意元素
+
+这个元素始终在歌词的底部，可以用于显示歌曲创作者等信息
+
+但是请勿删除该元素，只能在内部存放元素
+
+#### Returns
+
+`HTMLElement`
+
+一个元素，可以往内部添加任意元素
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:791](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L791)
 
 ___
 
 ### getCurrentInterlude
 
-▸ **getCurrentInterlude**(): `undefined` \| [`number`, `number`]
+▸ **getCurrentInterlude**(): `undefined` \| [`number`, `number`, `number`, `boolean`]
 
 获取当前播放时间里是否处于间奏区间
 如果是则会返回单位为毫秒的始末时间
@@ -454,13 +686,13 @@ ___
 
 #### Returns
 
-`undefined` \| [`number`, `number`]
+`undefined` \| [`number`, `number`, `number`, `boolean`]
 
-[开始时间,结束时间] 或 undefined 如果不处于间奏区间
+[开始时间,结束时间,大概处于的歌词行ID,下一句是否为对唱歌词] 或 undefined 如果不处于间奏区间
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:220](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L220)
+[packages/core/src/lyric-player/index.ts:429](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L429)
 
 ___
 
@@ -480,7 +712,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:460](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L460)
+[packages/core/src/lyric-player/index.ts:767](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L767)
 
 ___
 
@@ -500,7 +732,25 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:472](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L472)
+[packages/core/src/lyric-player/index.ts:779](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L779)
+
+___
+
+### getEnableScale
+
+▸ **getEnableScale**(): `boolean`
+
+获取当前是否启用了歌词行缩放效果
+
+#### Returns
+
+`boolean`
+
+是否启用歌词行缩放效果
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:168](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L168)
 
 ___
 
@@ -518,7 +768,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:86](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L86)
+[packages/core/src/lyric-player/index.ts:149](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L149)
 
 ___
 
@@ -538,7 +788,41 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:469](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L469)
+[packages/core/src/lyric-player/index.ts:776](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L776)
+
+___
+
+### limitScrollOffset
+
+▸ `Private` **limitScrollOffset**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:415](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L415)
+
+___
+
+### onLineClickedHandler
+
+▸ `Private` `Readonly` **onLineClickedHandler**(`e`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `e` | `RawLyricLineMouseEvent` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:114](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L114)
 
 ___
 
@@ -552,7 +836,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:195](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L195)
+[packages/core/src/lyric-player/index.ts:293](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L293)
 
 ___
 
@@ -570,7 +854,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:251](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L251)
+[packages/core/src/lyric-player/index.ts:467](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L467)
 
 ___
 
@@ -600,25 +884,17 @@ EventTarget.removeEventListener
 
 #### Defined in
 
-node_modules/typescript/lib/lib.dom.d.ts:8180
+node_modules/typescript/lib/lib.dom.d.ts:8221
 
 ___
 
-### setAlignAnchor
+### resetScroll
 
-▸ **setAlignAnchor**(`alignAnchor`): `void`
+▸ **resetScroll**(): `void`
 
-设置歌词行的对齐方式，默认为 `top`
+重置用户滚动状态
 
-- 设置成 `top` 的话歌词将会向组件顶部对齐
-- 设置成 `bottom` 的话歌词将会向组件底部对齐
-- 设置成 [0.0-1.0] 之间任意数字的话则会根据当前组件高度从顶部向下位移为对齐位置垂直居中对齐
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `alignAnchor` | `number` \| ``"bottom"`` \| ``"top"`` | 歌词行对齐方式，详情见函数说明 |
+请在用户完成滚动点击跳转歌词时调用本事件再调用 `calcLayout` 以正确滚动到目标位置
 
 #### Returns
 
@@ -626,7 +902,55 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:483](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L483)
+[packages/core/src/lyric-player/index.ts:617](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L617)
+
+___
+
+### setAlignAnchor
+
+▸ **setAlignAnchor**(`alignAnchor`): `void`
+
+设置目标歌词行的对齐方式，默认为 `center`
+
+- 设置成 `top` 的话将会向目标歌词行的顶部对齐
+- 设置成 `bottom` 的话将会向目标歌词行的底部对齐
+- 设置成 `center` 的话将会向目标歌词行的垂直中心对齐
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `alignAnchor` | ``"bottom"`` \| ``"center"`` \| ``"top"`` | 歌词行对齐方式，详情见函数说明 |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:802](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L802)
+
+___
+
+### setAlignPosition
+
+▸ **setAlignPosition**(`alignPosition`): `void`
+
+设置默认的歌词行对齐位置，相对于整个歌词播放组件的大小位置，默认为 `0.5`
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `alignPosition` | `number` | 一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置 |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:809](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L809)
 
 ___
 
@@ -652,7 +976,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:493](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L493)
+[packages/core/src/lyric-player/index.ts:819](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L819)
 
 ___
 
@@ -674,7 +998,33 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:270](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L270)
+[packages/core/src/lyric-player/index.ts:492](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L492)
+
+___
+
+### setEnableScale
+
+▸ **setEnableScale**(`enable?`): `void`
+
+是否启用歌词行缩放效果，默认启用
+
+如果启用，非选中的歌词行会轻微缩小以凸显当前播放歌词行效果
+
+此效果对性能影响微乎其微，推荐启用
+
+#### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `enable` | `boolean` | `true` | 是否启用歌词行缩放效果 |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:160](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L160)
 
 ___
 
@@ -700,7 +1050,29 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:73](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L73)
+[packages/core/src/lyric-player/index.ts:136](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L136)
+
+___
+
+### setHidePassedLines
+
+▸ **setHidePassedLines**(`hide`): `void`
+
+设置是否隐藏已经播放过的歌词行，默认不隐藏
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `hide` | `boolean` | 是否隐藏已经播放过的歌词行，默认不隐藏 |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[packages/core/src/lyric-player/index.ts:484](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L484)
 
 ___
 
@@ -722,7 +1094,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:617](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L617)
+[packages/core/src/lyric-player/index.ts:957](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L957)
 
 ___
 
@@ -744,7 +1116,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:631](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L631)
+[packages/core/src/lyric-player/index.ts:972](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L972)
 
 ___
 
@@ -766,7 +1138,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:645](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L645)
+[packages/core/src/lyric-player/index.ts:987](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L987)
 
 ___
 
@@ -788,7 +1160,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:279](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L279)
+[packages/core/src/lyric-player/index.ts:501](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L501)
 
 ___
 
@@ -812,4 +1184,4 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:607](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/lyric-player/index.ts#L607)
+[packages/core/src/lyric-player/index.ts:946](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L946)

@@ -12,14 +12,27 @@
         }
 
         body {
+            max-width: 100vw;
+            width: 100vw;
+            max-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             background: #222;
             margin: 0;
+        }
+        
+        #player {
+            max-height: 100vh;
+            height: 100vh;
+            max-width: 100vw;
+            width: 100vw;
+            overflow: hidden;
         }
     </style>
 </head>
 
-<body style="height: 100vh; overflow: hidden;">
-    <div style="position: fixed; top: 50vh; width: 100vw; height: 1px; background: red; z-index: 10"></div>
+<body>
+    <div id="player"></div>
 </body>
 
 </html>

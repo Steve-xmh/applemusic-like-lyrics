@@ -68,6 +68,12 @@ export const showControlThumbAtom = atomWithConfig({
 	desc: "显示控制横条",
 });
 
+export const showAMLLTTMLDBTipAtom = atomWithConfig({
+	key: "show-amll-ttml-db-tip",
+	default: true,
+	desc: "是否在歌词底部显示歌词来自 AMLL TTML DB（如果正在使用）",
+});
+
 export const leftControlButtonTypeAtom = atomWithConfig({
 	key: "left-control-button-type",
 	default: PlayControlButtonType.PlaybackRandom,

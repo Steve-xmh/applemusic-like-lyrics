@@ -7,11 +7,11 @@
 ### Namespaces
 
 - [spring](modules/spring.md)
-- [ttml](modules/ttml.md)
 
 ### Classes
 
 - [BackgroundRender](classes/BackgroundRender.md)
+- [LyricLineMouseEvent](classes/LyricLineMouseEvent.md)
 - [LyricPlayer](classes/LyricPlayer.md)
 
 ### Interfaces

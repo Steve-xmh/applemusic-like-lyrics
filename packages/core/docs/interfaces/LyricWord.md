@@ -18,11 +18,11 @@
 
 • **endTime**: `number`
 
-单词的结束时间
+单词的结束时间，单位为毫秒
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:32](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L32)
+[packages/core/src/interfaces.ts:32](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L32)
 
 ___
 
@@ -30,11 +30,11 @@ ___
 
 • **startTime**: `number`
 
-单词的起始时间
+单词的起始时间，单位为毫秒
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:30](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L30)
+[packages/core/src/interfaces.ts:30](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L30)
 
 ___
 
@@ -42,8 +42,8 @@ ___
 
 • **word**: `string`
 
-单词
+单词内容
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:34](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L34)
+[packages/core/src/interfaces.ts:34](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L34)

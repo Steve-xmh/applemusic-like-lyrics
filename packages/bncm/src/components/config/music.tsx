@@ -13,6 +13,7 @@ import {
 	MusicControlType,
 	leftControlButtonTypeAtom,
 	rightControlButtonTypeAtom,
+	showAMLLTTMLDBTipAtom,
 } from "./atoms";
 import { Select } from "../appkit/select";
 import { useAtom } from "jotai";
@@ -100,6 +101,11 @@ export const LyricStyleConfig: FC = () => {
 					label="显示控制横条"
 					description="隐藏后，你依然可以通过菜单来关闭歌词页面"
 				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={showAMLLTTMLDBTipAtom}
+					label="是否在歌词底部显示歌词来自 AMLL TTML 歌词数据库（如果正在使用）"
+				/>
 			</GroupBox>
 			<GroupBox>
 				<div
@@ -172,10 +178,15 @@ export const LyricStyleConfig: FC = () => {
 				</>
 			)}
 			{musicControlType === MusicControlType.BarVisualizer && (
-				<Alert type="warning" title="音频可视化兼容性警告">
-					音频可视化目前暂时仅支持网易云 3.0.0
-					以上版本，其它不兼容平台将会隐藏或无动画，日后会提供兼容。
-				</Alert>
+				<>
+					<Alert type="info" title="可视化提示">
+						由于浏览器权限限制，你需要至少产生一次用户交互行为（例如点击）后播放歌曲才能使可视化生效。
+					</Alert>
+					<Alert type="warning" title="音频可视化兼容性警告">
+						音频可视化目前暂时仅支持网易云 3.0.0
+						以上版本，其它不兼容平台将会隐藏或无动画，日后会提供兼容。
+					</Alert>
+				</>
 			)}
 		</>
 	);

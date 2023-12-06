@@ -3,8 +3,8 @@ import { appendRegisterCall } from "../../utils/channel";
 import { log, warn } from "../../utils/logger";
 import { SoundProcessor } from "../../utils/fft";
 import { useAtomValue } from "jotai";
-import { musicContextAtom } from "../../music-context/wrapper";
-import { MusicStatusGetterEvents } from "../../music-context";
+import { musicContextAtom, playStatusAtom } from "../../music-context/wrapper";
+import { MusicStatusGetterEvents, PlayState } from "../../music-context";
 
 import { AMLLFFT } from "@applemusic-like-lyrics/fft";
 import PCMPlayer from "../../utils/pcm-player";
@@ -19,6 +19,7 @@ interface NCMV3AudioData {
 export const AudioFFTControl: FC = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const musicCtx = useAtomValue(musicContextAtom);
+	const playstate = useAtomValue(playStatusAtom);
 
 	// const fftWeightingMethod = useConfigValue("fftWeightingMethod", "");
 	const soundProcessor = useRef() as MutableRefObject<SoundProcessor>;
@@ -68,6 +69,12 @@ export const AudioFFTControl: FC = () => {
 	}, [canvasRef.current]);
 
 	useLayoutEffect(() => {
+		if (playstate === PlayState.Playing) {
+			amllFFT.current.continue();
+		}
+	}, [playstate]);
+
+	useLayoutEffect(() => {
 		const canvas = canvasRef.current;
 
 		if (canvas) {
@@ -102,8 +109,8 @@ export const AudioFFTControl: FC = () => {
 					sampleRate: 48000,
 					fftSize: fftData.length,
 					outBandsQty: 61,
-					startFrequency: 150,
-					endFrequency: 24000,
+					startFrequency: 75,
+					endFrequency: 14000,
 					aWeight: true,
 				});
 				let maxValue = 1;
@@ -126,7 +133,7 @@ export const AudioFFTControl: FC = () => {
 					{
 						ctx.beginPath();
 						const targetMaxValue = Math.max.apply(Math, processed);
-						maxValue = targetMaxValue * 0.1 + maxValue * 0.9;
+						maxValue = Math.max(targetMaxValue * 0.1 + maxValue * 0.9, 100);
 
 						const len = processed.length;
 

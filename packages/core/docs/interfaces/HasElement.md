@@ -31,4 +31,4 @@
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:8](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L8)
+[packages/core/src/interfaces.ts:8](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L8)

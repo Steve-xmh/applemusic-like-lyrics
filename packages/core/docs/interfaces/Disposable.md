@@ -35,4 +35,4 @@
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:24](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/3f124db/packages/core/src/interfaces.ts#L24)
+[packages/core/src/interfaces.ts:24](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L24)

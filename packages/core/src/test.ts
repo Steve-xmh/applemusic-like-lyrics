@@ -207,7 +207,13 @@ requestAnimationFrame(frame);
 const bg = new BackgroundRender();
 bg.setFPS(30);
 
-(window as any).lyricPlayer = lyricPlayer;
+declare global {
+	interface Window {
+		globalLyricPlayer: LyricPlayer;
+	}
+}
+
+window.globalLyricPlayer = lyricPlayer;
 
 async function loadLyric() {
 	const lyricFile = debugValues.lyric;
@@ -244,9 +250,12 @@ async function loadLyric() {
 	bg.setAlbumImage(debugValues.album);
 	audio.style.display = "none";
 	lyricPlayer.getBottomLineElement().innerHTML = "Test Bottom Line";
-	document.body.appendChild(audio);
-	document.body.appendChild(bg.getElement());
-	document.body.appendChild(lyricPlayer.getElement());
+	const player = document.getElementById("player");
+	if (player) {
+		player.appendChild(audio);
+		player.appendChild(bg.getElement());
+		player.appendChild(lyricPlayer.getElement());
+	}
 	await loadLyric();
 	debugValues.play();
 })();

@@ -15,7 +15,7 @@ interface RealWord extends LyricWord {
 
 function generateFadeGradient(
 	width: number,
-	bright = "rgba(0,0,0,1)",
+	bright = "rgba(0,0,0,0.85)",
 	dark = "rgba(0,0,0,0.5)",
 ): [string, number, number] {
 	const totalAspect = 2 + width;
@@ -159,19 +159,23 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	private listenersMap = new Map<string, Set<MouseEventListener>>();
 	private readonly onMouseEvent = (e: MouseEvent) => {
-		if (!this.dispatchEvent(new RawLyricLineMouseEvent(this, e))) {
+		const wrapped = new RawLyricLineMouseEvent(this, e);
+		for (const listener of this.listenersMap.get(e.type) ?? []) {
+			listener.call(this, wrapped);
+		}
+		if (!this.dispatchEvent(wrapped) || wrapped.defaultPrevented) {
 			e.preventDefault();
 			e.stopPropagation();
 			e.stopImmediatePropagation();
 			return false;
 		}
 	};
-	override addEventListener(
+
+	addMouseEventListener(
 		type: MouseEventTypes,
 		callback: MouseEventListener | null,
 		options?: boolean | AddEventListenerOptions | undefined,
 	): void {
-		super.addEventListener(type, callback, options);
 		if (callback) {
 			const listeners = this.listenersMap.get(type) ?? new Set();
 			if (listeners.size === 0)
@@ -180,12 +184,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.listenersMap.set(type, listeners);
 		}
 	}
-	override removeEventListener(
+
+	removeMouseEventListener(
 		type: MouseEventTypes,
 		callback: MouseEventListener | null,
 		options?: boolean | EventListenerOptions | undefined,
 	): void {
-		super.removeEventListener(type, callback, options);
 		if (callback) {
 			const listeners = this.listenersMap.get(type);
 			if (listeners) {
@@ -195,6 +199,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 		}
 	}
+
 	private isEnabled = false;
 	enable() {
 		this.isEnabled = true;
@@ -509,16 +514,18 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				const fadeWidth = word.height / 2;
 				const [maskImage, _widthInTotal, totalAspect] = generateFadeGradient(
 					fadeWidth / word.width,
-					"rgba(0,0,0,1)",
+					"rgba(0,0,0,0.85)",
 					"rgba(0,0,0,0.25)",
 				);
 				const totalAspectStr = `${totalAspect * 100}% 100%`;
 				if (this.lyricPlayer.supportMaskImage) {
 					wordEl.style.maskImage = maskImage;
+					wordEl.style.maskRepeat = "no-repeat";
 					wordEl.style.maskOrigin = "left";
 					wordEl.style.maskSize = totalAspectStr;
 				} else {
 					wordEl.style.webkitMaskImage = maskImage;
+					wordEl.style.webkitMaskRepeat = "no-repeat";
 					wordEl.style.webkitMaskOrigin = "left";
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
