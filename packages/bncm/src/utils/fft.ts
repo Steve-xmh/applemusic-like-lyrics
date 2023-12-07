@@ -197,7 +197,7 @@ export class SoundProcessor {
 		}
 	}
 
-	private aWeighting(frequencies: AudioData) {
+	aWeighting(frequencies: AudioData) {
 		const { aWeights } = this;
 
 		for (let i = 0; i < frequencies.length; i++) {
@@ -207,7 +207,7 @@ export class SoundProcessor {
 		}
 	}
 
-	private divide(frequencies: AudioData): number[] {
+	divide(frequencies: AudioData): number[] {
 		const { outBandsQty, bandwidth, bands } = this;
 		const temp = new Array(outBandsQty);
 

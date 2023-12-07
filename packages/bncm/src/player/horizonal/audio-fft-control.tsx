@@ -1,24 +1,16 @@
 import { useRef, FC, useLayoutEffect, MutableRefObject } from "react";
-import { appendRegisterCall } from "../../utils/channel";
-import { log, warn } from "../../utils/logger";
 import { SoundProcessor } from "../../utils/fft";
 import { useAtomValue } from "jotai";
 import { musicContextAtom, playStatusAtom } from "../../music-context/wrapper";
 import { MusicStatusGetterEvents, PlayState } from "../../music-context";
 
-import { AMLLFFT } from "@applemusic-like-lyrics/fft";
 import PCMPlayer from "../../utils/pcm-player";
-
-// AudioData 48000hz int16 2 channels
-
-interface NCMV3AudioData {
-	data: ArrayBuffer;
-	pts: number;
-}
+import { processBarFFTAtom } from "../../components/config/atoms";
 
 export const AudioFFTControl: FC = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const musicCtx = useAtomValue(musicContextAtom);
+	const processBarFFT = useAtomValue(processBarFFTAtom);
 	const playstate = useAtomValue(playStatusAtom);
 
 	// const fftWeightingMethod = useConfigValue("fftWeightingMethod", "");
@@ -92,6 +84,7 @@ export const AudioFFTControl: FC = () => {
 
 				const onAudioData = (evt: MusicStatusGetterEvents["audio-data"]) => {
 					amllFFT.current.feed(evt.detail.data);
+					amllFFT.current.continue();
 				};
 
 				musicCtx?.addEventListener("audio-data", onAudioData);
@@ -109,25 +102,24 @@ export const AudioFFTControl: FC = () => {
 					sampleRate: 48000,
 					fftSize: fftData.length,
 					outBandsQty: 61,
-					startFrequency: 75,
+					startFrequency: 100,
 					endFrequency: 14000,
 					aWeight: true,
 				});
 				let maxValue = 1;
 
-				function onFrame(time: number) {
+				function onFrame() {
 					if (!(canvas && ctx) || stopped) return;
 					const width = canvas.width;
 					const height = canvas.height;
-					// const curData = audioStream.splice(
-					// 	0,
-					// 	(48000 * (time - lastTime)) / 1000,
-					// );
-					// audioStream.splice(6000, Infinity);
 					amllFFT.current.getByteFrequencyData(fftData);
-					// const processed = fftData.slice(0, fftData.length * 7500 / 24000)
-					const processed = soundProcessor.current.process(fftData);
-					// const data = soundProcessor.current.process(processed);
+
+					let processed: number[];
+					if (processBarFFT)
+						processed = soundProcessor.current.process(fftData);
+					else {
+						processed = soundProcessor.current.divide(fftData);
+					}
 
 					ctx.clearRect(0, 0, width, height);
 					{
@@ -139,9 +131,6 @@ export const AudioFFTControl: FC = () => {
 
 						const barWidth = width / len;
 
-						// ctx.fillStyle = "white";
-						// ctx.fillText(`maxValue: ${maxValue}`, 0, 16);
-
 						ctx.strokeStyle = "white";
 						ctx.lineWidth = 4 * window.devicePixelRatio;
 						ctx.lineCap = "round";
@@ -150,10 +139,6 @@ export const AudioFFTControl: FC = () => {
 						for (let i = 0; i < processed.length; i++) {
 							const x = barWidth * (i + 0.5);
 							ctx.moveTo(x, height - barWidth);
-							// ctx.lineTo(
-							// 	x,
-							// 	height - (harfBarWidth + (height - barWidth) * data[i]),
-							// );
 							ctx.lineTo(
 								x,
 								height -
@@ -166,24 +151,10 @@ export const AudioFFTControl: FC = () => {
 						ctx.stroke();
 					}
 
-					// {
-					// 	ctx.beginPath();
-					// 	ctx.strokeStyle = "white";
-					// 	ctx.lineWidth = 1 * window.devicePixelRatio;
-					// 	const dbgBarWidth = width / curData.length;
-					// 	for (let i = 0; i < curData.length; i++) {
-					// 		const x = dbgBarWidth * (i + 0.5);
-					// 		// ctx.moveTo(x, height / 2);
-					// 		ctx.lineTo(x, ((curData[i] / 512 - 0.5) * height + height / 2));
-					// 	}
-
-					// 	ctx.stroke();
-					// }
-
 					requestAnimationFrame(onFrame);
 				}
 
-				onFrame(0);
+				onFrame();
 
 				return () => {
 					obs.disconnect();
@@ -192,7 +163,7 @@ export const AudioFFTControl: FC = () => {
 				};
 			}
 		}
-	}, [canvasRef.current, musicCtx]);
+	}, [canvasRef.current, musicCtx, processBarFFT]);
 
 	return (
 		<canvas

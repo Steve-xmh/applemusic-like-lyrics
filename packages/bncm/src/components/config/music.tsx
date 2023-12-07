@@ -14,6 +14,7 @@ import {
 	leftControlButtonTypeAtom,
 	rightControlButtonTypeAtom,
 	showAMLLTTMLDBTipAtom,
+	processBarFFTAtom,
 } from "./atoms";
 import { Select } from "../appkit/select";
 import { useAtom } from "jotai";
@@ -186,6 +187,13 @@ export const LyricStyleConfig: FC = () => {
 						音频可视化目前暂时仅支持网易云 3.0.0
 						以上版本，其它不兼容平台将会隐藏或无动画，日后会提供兼容。
 					</Alert>
+					<GroupBox>
+						<SwitchConfigComponent
+							atom={processBarFFTAtom}
+							label="是否进行可视化动画频谱数据后处理"
+							description="后处理会让频谱看上去更居中且相对舒适，但有些人更喜欢原始的频谱数据所展现的效果"
+						/>
+					</GroupBox>
 				</>
 			)}
 		</>

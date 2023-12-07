@@ -3,7 +3,7 @@ import { closeLyricPage } from "../../injector";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
 	displayMusicCoverAtom,
-	musicOverrideDataAtom,
+	loadableMusicOverrideDataAtom,
 	playStatusAtom,
 } from "../../music-context/wrapper";
 import "./index.sass";
@@ -33,7 +33,7 @@ export const LyricPlayerHorizonal: FC = () => {
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
-	const musicOverrideData = useAtomValue(musicOverrideDataAtom);
+	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 
 	useEffect(() => {
@@ -100,7 +100,8 @@ export const LyricPlayerHorizonal: FC = () => {
 					/>
 				)}
 				{showAlbumImage &&
-					(musicOverrideData.musicCoverIsVideo ? (
+					(loadableMusicOverrideData.state === "hasData" &&
+					loadableMusicOverrideData.data.musicCoverIsVideo ? (
 						<div
 							style={{
 								transform:
@@ -121,7 +122,7 @@ export const LyricPlayerHorizonal: FC = () => {
 									objectPosition: "center",
 									objectFit: "cover",
 								}}
-								src={musicOverrideData.musicCoverUrl}
+								src={loadableMusicOverrideData.data.musicCoverUrl}
 							/>
 						</div>
 					) : (

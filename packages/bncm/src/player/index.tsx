@@ -7,17 +7,20 @@ import { MainMenu } from "./common/main-menu";
 import { AMLLConfigWindowed } from "../components/config";
 import { MusicOverrideWindow } from "./common/music-override-window";
 import { RightClickLyricMenu } from "./common/lyric-line-menu";
+import { SuspenseLogger } from "../injector";
 
 export const LyricPlayer: FC = () => {
 	return (
 		<>
-			<Background />
-			<Suspense>
+			<SuspenseLogger text="Background">
+				<Background />
+			</SuspenseLogger>
+			<SuspenseLogger text="MainMenu">
 				<MainMenu />
-			</Suspense>
-			<Suspense>
+			</SuspenseLogger>
+			<SuspenseLogger text="RightClickLyricMenu">
 				<RightClickLyricMenu />
-			</Suspense>
+			</SuspenseLogger>
 			<Media
 				queries={{
 					vertical: "(orientation: portrait)",
@@ -26,17 +29,25 @@ export const LyricPlayer: FC = () => {
 			>
 				{(matches) => (
 					<>
-						{matches.horizonal && <LyricPlayerHorizonal />}
-						{matches.vertical && <LyricPlayerVertical />}
+						{matches.horizonal && (
+							<SuspenseLogger text="LyricPlayerHorizonal">
+								<LyricPlayerHorizonal />
+							</SuspenseLogger>
+						)}
+						{matches.vertical && (
+							<SuspenseLogger text="LyricPlayerVertical">
+								<LyricPlayerVertical />
+							</SuspenseLogger>
+						)}
 					</>
 				)}
 			</Media>
-			<Suspense>
+			<SuspenseLogger text="AMLLConfigWindowed">
 				<AMLLConfigWindowed />
-			</Suspense>
-			<Suspense>
+			</SuspenseLogger>
+			<SuspenseLogger text="MusicOverrideWindow">
 				<MusicOverrideWindow />
-			</Suspense>
+			</SuspenseLogger>
 		</>
 	);
 };

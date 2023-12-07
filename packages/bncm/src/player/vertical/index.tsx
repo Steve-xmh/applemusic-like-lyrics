@@ -11,7 +11,10 @@ import "./index.sass";
 import { closeLyricPage } from "../../injector";
 import { MusicInfo } from "./info";
 import { CoreLyricPlayer } from "../common/player";
-import { displayMusicCoverAtom } from "../../music-context/wrapper";
+import {
+	displayMusicCoverAtom,
+	loadableMusicOverrideDataAtom,
+} from "../../music-context/wrapper";
 
 export const LyricPlayerVertical: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -20,6 +23,7 @@ export const LyricPlayerVertical: FC = () => {
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
+	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
 	return (
 		<div
@@ -49,16 +53,38 @@ export const LyricPlayerVertical: FC = () => {
 					}}
 				/>
 			)}
-			{showAlbumImage && (
-				<div
-					style={{
-						backgroundImage: `url(${musicCoverUrl})`,
-						imageRendering: "auto",
-					}}
-					className="amll-cover-image"
-					ref={albumCoverRef}
-				/>
-			)}
+			{showAlbumImage &&
+				(loadableMusicOverrideData.state === "hasData" &&
+				loadableMusicOverrideData.data.musicCoverIsVideo ? (
+					<div
+						className="amll-cover-image amll-cover-image-video"
+						ref={albumCoverRef}
+					>
+						<video
+							playsInline
+							autoPlay
+							loop
+							muted
+							crossOrigin="anonymous"
+							style={{
+								width: "100%",
+								height: "100%",
+								objectPosition: "center",
+								objectFit: "cover",
+							}}
+							src={loadableMusicOverrideData.data.musicCoverUrl}
+						/>
+					</div>
+				) : (
+					<div
+						className="amll-cover-image"
+						style={{
+							backgroundImage: `url(${musicCoverUrl})`,
+							imageRendering: "auto",
+						}}
+						ref={albumCoverRef}
+					/>
+				))}
 			<div
 				style={{
 					height: "30px",

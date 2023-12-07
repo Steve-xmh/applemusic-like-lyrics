@@ -7,7 +7,8 @@ import { LyricProvider } from "../lyric/provider";
 import { WebSocketWrapper } from "../music-context/ws-wrapper";
 import { AMLLConfig } from "../components/config";
 import { AMLLGuide } from "../player/common/guide";
-import { Suspense } from "react";
+import { FC, PropsWithChildren, Suspense, useEffect } from "react";
+import { warn } from "../utils/logger";
 
 export const mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "amll-view";
@@ -23,17 +24,55 @@ export enum AMLLEnvironment {
 }
 export const amllEnvironmentAtom = atom(AMLLEnvironment.BetterNCM);
 
+const SuspenseLoggerInner: FC<PropsWithChildren<{ text: String }>> = (
+	props,
+) => {
+	useEffect(() => {
+		warn("SuspenseLogger 检测到状态等待状态", props.text);
+		return () => {
+			warn("SuspenseLogger 检测到状态已获取", props.text);
+		};
+	}, []);
+	return <>{props.children}</>;
+};
+
+export const SuspenseLogger: FC<PropsWithChildren<{ text: String }>> = (
+	props,
+) => {
+	return (
+		<Suspense fallback={<SuspenseLoggerInner text={props.text} />}>
+			{props.children}
+		</Suspense>
+	);
+};
+
 export function initLyricPage() {
 	appRoot = createRoot(mainViewElement);
 	appRoot.render(
 		<Provider store={globalStore}>
 			<Suspense>
 				<AMLLGuide />
-				<MusicInfoWrapper />
-				<WebSocketWrapper />
-				<LyricProvider />
-				{createPortal(<LyricPlayer />, mainViewElement)}
-				{createPortal(<AMLLConfig />, configViewElement)}
+				<SuspenseLogger text="MusicInfoWrapper">
+					<MusicInfoWrapper />
+				</SuspenseLogger>
+				<SuspenseLogger text="WebSocketWrapper">
+					<WebSocketWrapper />
+				</SuspenseLogger>
+				<SuspenseLogger text="LyricProvider">
+					<LyricProvider />
+				</SuspenseLogger>
+				{createPortal(
+					<SuspenseLogger text="LyricPlayer">
+						<LyricPlayer />
+					</SuspenseLogger>,
+					mainViewElement,
+				)}
+				{createPortal(
+					<SuspenseLogger text="AMLLConfig">
+						<AMLLConfig />
+					</SuspenseLogger>,
+					configViewElement,
+				)}
 			</Suspense>
 		</Provider>,
 	);

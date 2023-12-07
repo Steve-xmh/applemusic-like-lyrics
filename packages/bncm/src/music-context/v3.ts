@@ -249,12 +249,25 @@ export class MusicContextV3 extends MusicContextBase {
 		this.dispatchTypedEvent("unload", new Event("unload"));
 	}
 	private progressDispatchHandle = 0;
+	private lastProgress = 0;
 	private onPlayProgress(
 		audioId: string,
 		progress: number,
 		loadProgress: number,
 		isTween = false,
 	) {
+		if (Math.abs(progress - this.lastProgress) > 1 || progress <= 0.01) {
+			warn(
+				"音乐播放进度异常",
+				audioId,
+				progress,
+				loadProgress,
+				this.lastProgress,
+			);
+			this.lastProgress = progress;
+			return;
+		}
+		this.lastProgress = progress;
 		// log("音乐加载进度", audioId, progress, loadProgress);
 		if (this.playState === PlayState.Playing) {
 			this.musicPlayProgress = Math.max(
@@ -267,12 +280,13 @@ export class MusicContextV3 extends MusicContextBase {
 		if (this.progressDispatchHandle) {
 			cancelAnimationFrame(this.progressDispatchHandle);
 		}
+		const curMusicPlayProgress = this.musicPlayProgress;
 		this.progressDispatchHandle = requestAnimationFrame(() => {
 			this.dispatchTypedEvent(
 				"progress",
 				new CustomEvent("progress", {
 					detail: {
-						progress: this.musicPlayProgress,
+						progress: curMusicPlayProgress,
 					},
 				}),
 			);

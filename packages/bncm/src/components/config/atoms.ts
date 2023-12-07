@@ -255,3 +255,9 @@ export const musicControlTypeAtom = atomWithConfig({
 	default: MusicControlType.Default,
 	desc: "音乐控制组件的类型",
 });
+
+export const processBarFFTAtom = atomWithConfig({
+	key: "process-bar-fft",
+	default: true,
+	desc: "是否进行可视化动画频谱数据的后处理以更适合观赏",
+});
