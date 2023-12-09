@@ -29,7 +29,7 @@ import { AudioFFTControl } from "./audio-fft-control";
 import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
-} from "../../music-context/ws-wrapper";
+} from "../../music-context/ws-states";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;

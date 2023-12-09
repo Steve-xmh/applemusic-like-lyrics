@@ -1,4 +1,4 @@
-import { Suspense, type FC } from "react";
+import { type FC } from "react";
 import Media from "react-media";
 import { LyricPlayerHorizonal } from "./horizonal";
 import { Background } from "./common/background";

@@ -10,8 +10,6 @@ import {
 	PlayMode,
 	PlayState,
 } from ".";
-import { appendRegisterCall, removeRegisterCall } from "../utils/channel";
-import { callCachedSearchFunction } from "../utils/func";
 import { log } from "../utils/logger";
 import { getNCMImageUrl } from "../utils/ncm-url";
 
@@ -30,7 +28,7 @@ interface AudioLoadInfo {
  * @returns 歌词数据信息
  */
 function getMusic(songId: string, br = 128000) {
-	return fetch(`${APP_CONF.domain}/api/song/enhance/download/url`, {
+	return fetch(`${APP_CONF?.domain}/api/song/enhance/download/url`, {
 		method: "POST",
 		body: `id=${songId}&br=${br}`,
 		headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -38,7 +36,7 @@ function getMusic(songId: string, br = 128000) {
 }
 
 function getMusicInfo(songId: string) {
-	return fetch(`${APP_CONF.domain}/api/v3/song/detail`, {
+	return fetch(`${APP_CONF?.domain}/api/v3/song/detail`, {
 		method: "POST",
 		body: `c=${encodeURIComponent(
 			JSON.stringify([
@@ -116,8 +114,6 @@ export class MusicStatusGetterDev extends MusicContextBase {
 		const prefix = "";
 
 		const urls: string[] = [];
-
-		// TODO: 增加自定义图片源
 
 		const originalTrackPic = songData?.al?.picUrl;
 		if (originalTrackPic) {

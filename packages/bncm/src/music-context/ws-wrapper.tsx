@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from "react";
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
 	currentTimeAtom,
 	musicArtistsAtom,
@@ -15,19 +15,7 @@ import { enableWSPlayer, wsPlayerURL } from "../components/config/atoms";
 import { debounce } from "../utils/debounce";
 import { lyricLinesAtom } from "../lyric/provider";
 import { MusicStatusGetterEvents } from ".";
-
-export enum ConnectionColor {
-	Disabled = "#aaaaaa",
-	Connecting = "#fdcf1b",
-	Active = "#36be36",
-	Error = "#d01010",
-}
-
-export const wsConnectionStatusAtom = atom({
-	color: ConnectionColor.Disabled,
-	progress: false,
-	text: "未开启",
-});
+import { ConnectionColor, wsConnectionStatusAtom } from "./ws-states";
 
 export const WebSocketWrapper: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);

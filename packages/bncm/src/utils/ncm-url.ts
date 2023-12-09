@@ -9,7 +9,7 @@ export function getNCMImageUrl(id: number | string) {
 	selectIndex++;
 	selectIndex %= NCM_IMAGE_CDNS.length;
 	try {
-		if (APP_CONF.isOSX) {
+		if (APP_CONF?.isOSX) {
 			return `${NCM_IMAGE_CDNS[selectIndex]}${callCachedSearchFunction(
 				"R$nameDo",
 				["encryptId", id.toString()],

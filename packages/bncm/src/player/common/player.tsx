@@ -4,7 +4,6 @@ import {
 	currentTimeAtom,
 	lyricPageOpenedAtom,
 	musicArtistsAtom,
-	musicContextAtom,
 } from "../../music-context/wrapper";
 import {
 	LyricPlayer as LyricPlayerComponent,
@@ -13,7 +12,7 @@ import {
 import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
-} from "../../music-context/ws-wrapper";
+} from "../../music-context/ws-states";
 import { lyricLinesAtom, usingLyricSourceAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {

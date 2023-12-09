@@ -293,7 +293,7 @@ export class MusicContextV3 extends MusicContextBase {
 		});
 		if (
 			!isTween &&
-			(APP_CONF.isOSX || this.forcePlayPositionLerp) &&
+			(APP_CONF?.isOSX || this.forcePlayPositionLerp) &&
 			this.playState === PlayState.Playing
 		) {
 			this.tweenAtom = Symbol("tween-atom");

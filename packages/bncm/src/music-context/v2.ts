@@ -262,7 +262,7 @@ export class MusicContextV2 extends MusicContextBase {
 		});
 		if (
 			!isTween &&
-			(APP_CONF.isOSX || this.forcePlayPositionLerp) &&
+			(APP_CONF?.isOSX || this.forcePlayPositionLerp) &&
 			this.playState === PlayState.Playing
 		) {
 			this.tweenAtom = Symbol("tween-atom");
@@ -293,7 +293,7 @@ export class MusicContextV2 extends MusicContextBase {
 		}
 	}
 	private getPlayingSong() {
-		if (APP_CONF.isOSX) {
+		if (APP_CONF?.isOSX) {
 			return callCachedSearchFunction(
 				function (v) {
 					const source = v.toString();

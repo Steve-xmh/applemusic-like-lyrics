@@ -9,7 +9,7 @@ import {
 import {
 	ConnectionColor,
 	wsConnectionStatusAtom,
-} from "../../music-context/ws-wrapper";
+} from "../../music-context/ws-states";
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
 import {
 	displayMusicCoverAtom,
