@@ -87,7 +87,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	};
 	private posYSpringParams: Partial<SpringParams> = {
 		mass: 1,
-		damping: 15,
+		damping: 16.5,
 		stiffness: 100,
 	};
 	private scaleSpringParams: Partial<SpringParams> = {
@@ -202,11 +202,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "content-box",
 			borderRadius: "8px",
-			"&:hover": {
+			"&:has(>*):hover": {
 				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
 				boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)",
 			},
-			"&:active": {
+			"&:has(>*):active": {
 				boxShadow: "0 0 0 4px var(--amll-lyric-view-hover-bg-color,#fff1)",
 			},
 		},
@@ -225,7 +225,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transition: "opacity 0.25s",
 			"&.active": {
 				transition: "opacity 0.25s 0.25s",
-				opacity: 0.75,
+				opacity: 0.4,
 			},
 		},
 		lyricMainLine: {
@@ -245,13 +245,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					perspective: "50vw",
 					padding: "1em",
 					margin: "-1em",
+					"& > span": {
+						padding: "1em",
+						margin: "-1em",
+					},
 				},
 			},
 		},
 		lyricSubLine: {
 			fontSize: "max(0.5em, 10px)",
 			transition: "opacity 0.3s 0.25s",
-			opacity: 0.5,
+			opacity: 0.3,
 		},
 		disableSpring: {
 			"& > *": {
@@ -712,11 +716,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(this.padding, curPos);
+				this.interludeDots.setTransform(this.padding, curPos + 12);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
-				curPos += this.interludeDotsSize[1];
+				curPos += this.interludeDotsSize[1] + 40;
 			}
 			const targetOpacity = this.hidePassedLines
 				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)

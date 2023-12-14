@@ -19,13 +19,14 @@
     "fmt": "rome format --write ./src",
     "dev": "vite dev"
   },
+  "type": "module",
   "main": "./dist/amll-core.cjs",
-  "module": "./dist/amll-core.mjs",
+  "module": "./dist/amll-core.js",
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/amll-core.mjs",
+      "import": "./dist/amll-core.js",
       "require": "./dist/amll-core.cjs"
     }
   },
@@ -40,6 +41,7 @@
     "typescript": "^5.2.2",
     "vite": "^4.4.11",
     "vite-plugin-dts": "^3.6.0",
+    "vite-plugin-glsl": "^1.2.1",
     "vite-plugin-top-level-await": "^1.3.1",
     "vite-plugin-wasm": "^3.2.2"
   },

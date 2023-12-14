@@ -90,7 +90,7 @@ export const LyricPlayerHorizonal: FC = () => {
 						gridRow: "1 / 7",
 					}}
 				/>
-				{showControlThumb && (
+				{showControlThumb ? (
 					<button
 						className="amll-control-thumb"
 						type="button"
@@ -98,7 +98,7 @@ export const LyricPlayerHorizonal: FC = () => {
 							closeLyricPage();
 						}}
 					/>
-				)}
+				): <div />}
 				{showAlbumImage &&
 					(loadableMusicOverrideData.state === "hasData" &&
 					loadableMusicOverrideData.data.musicCoverIsVideo ? (

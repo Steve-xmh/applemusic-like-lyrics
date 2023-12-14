@@ -1,2 +1,170 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const q=require("react/jsx-runtime"),x=require("@applemusic-like-lyrics/core"),r=require("react"),k=require("react-dom"),H=r.forwardRef(({albumImageUrl:l,fps:d,playing:E,flowSpeed:o,renderScale:a,staticMode:v,...m},p)=>{const n=r.useRef(),i=r.useRef(null);return r.useEffect(()=>(n.current=new x.BackgroundRender,()=>{var u;(u=n.current)==null||u.dispose()}),[]),r.useEffect(()=>{var u;l&&((u=n.current)==null||u.setAlbumImage(l))},[l]),r.useEffect(()=>{var u;d&&((u=n.current)==null||u.setFPS(d))},[d]),r.useEffect(()=>{var u,s,w;E===void 0?(u=n.current)==null||u.resume():E?(s=n.current)==null||s.resume():(w=n.current)==null||w.pause()},[E]),r.useEffect(()=>{var u;o&&((u=n.current)==null||u.setFlowSpeed(o))},[o]),r.useEffect(()=>{var u;(u=n.current)==null||u.setStaticMode(v)},[v]),r.useEffect(()=>{var u;a&&((u=n.current)==null||u.setRenderScale(a))},[a]),r.useEffect(()=>{var u;if(n.current){const s=n.current.getElement();s.style.width="100%",s.style.height="100%",(u=i.current)==null||u.appendChild(s)}}),r.useImperativeHandle(p,()=>({wrapperEl:i.current,bgRender:n.current}),[i.current,n.current]),q.jsx("div",{...m,ref:i})}),T=r.forwardRef(({disabled:l,alignAnchor:d,alignPosition:E,enableSpring:o,enableBlur:a,enableScale:v,hidePassedLines:m,lyricLines:p,currentTime:n,linePosXSpringParams:i,linePosYSpringParams:u,lineScaleSpringParams:s,bottomLine:w,onLyricLineClick:B,onLyricLineContextMenu:F,...A},L)=>{var h,j;const t=r.useRef(),y=r.useRef(null);return r.useEffect(()=>(t.current=new x.LyricPlayer,()=>{var e;(e=t.current)==null||e.dispose()}),[]),r.useEffect(()=>{if(!l){let e=!1,c=-1;const f=R=>{var g;e||(c===-1&&(c=R),(g=t.current)==null||g.update(R-c),c=R,requestAnimationFrame(f))};return requestAnimationFrame(f),()=>{e=!0}}},[l]),r.useEffect(()=>{var e;t.current&&((e=y.current)==null||e.appendChild(t.current.getElement()))},[y.current]),r.useEffect(()=>{var e;d!==void 0&&((e=t.current)==null||e.setAlignAnchor(d))},[d]),r.useEffect(()=>{var e;m!==void 0&&((e=t.current)==null||e.setHidePassedLines(m))},[m]),r.useEffect(()=>{var e;E!==void 0&&((e=t.current)==null||e.setAlignPosition(E))},[E]),r.useEffect(()=>{var e,c;o!==void 0?(e=t.current)==null||e.setEnableSpring(o):(c=t.current)==null||c.setEnableSpring(!0)},[o]),r.useEffect(()=>{var e,c;v!==void 0?(e=t.current)==null||e.setEnableScale(v):(c=t.current)==null||c.setEnableScale(!0)},[v]),r.useEffect(()=>{var e;(e=t.current)==null||e.setEnableBlur(a??!0)},[a]),r.useEffect(()=>{var e,c,f,R;p!==void 0?((e=t.current)==null||e.setLyricLines(p),(c=t.current)==null||c.update()):((f=t.current)==null||f.setLyricLines([]),(R=t.current)==null||R.update())},[p]),r.useEffect(()=>{var e,c;n!==void 0?(e=t.current)==null||e.setCurrentTime(n):(c=t.current)==null||c.setCurrentTime(0)},[n]),r.useEffect(()=>{var e;i!==void 0&&((e=t.current)==null||e.setLinePosXSpringParams(i))},[i]),r.useEffect(()=>{var e;u!==void 0&&((e=t.current)==null||e.setLinePosYSpringParams(u))},[u]),r.useEffect(()=>{var e;s!==void 0&&((e=t.current)==null||e.setLineScaleSpringParams(s))},[s]),r.useEffect(()=>{var e;if(B){const c=f=>B(f);return(e=t.current)==null||e.addEventListener("line-click",c),()=>{var f;return(f=t.current)==null?void 0:f.removeEventListener("line-click",c)}}},[B]),r.useEffect(()=>{var e;if(F){const c=f=>F(f);return(e=t.current)==null||e.addEventListener("line-contextmenu",c),()=>{var f;return(f=t.current)==null?void 0:f.removeEventListener("line-contextmenu",c)}}},[F]),r.useImperativeHandle(L,()=>({wrapperEl:y.current,lyricPlayer:t.current}),[y.current,t.current]),q.jsxs(q.Fragment,{children:[q.jsx("div",{...A,ref:y}),(h=t.current)!=null&&h.getBottomLineElement()&&w?k.createPortal(w,(j=t.current)==null?void 0:j.getBottomLineElement()):null]})});exports.BackgroundRender=H;exports.LyricPlayer=T;
+import { jsx as q, jsxs as $, Fragment as G } from "react/jsx-runtime";
+import { BackgroundRender as T, PixiRenderer as z, LyricPlayer as C } from "@applemusic-like-lyrics/core";
+import { forwardRef as H, useRef as k, useEffect as u, useImperativeHandle as P } from "react";
+import { createPortal as D } from "react-dom";
+const Q = H(
+  ({
+    albumImageUrl: v,
+    fps: f,
+    playing: o,
+    flowSpeed: d,
+    renderScale: m,
+    staticMode: R,
+    renderer: p,
+    ...B
+  }, h) => {
+    const t = k(), a = k(null);
+    return u(() => {
+      var n, i, l, F, x, L, r, E;
+      return t.current = T.new(
+        p ?? z
+      ), v && ((n = t.current) == null || n.setAlbumImage(v)), f && ((i = t.current) == null || i.setFPS(f)), o === void 0 ? (l = t.current) == null || l.resume() : o ? (F = t.current) == null || F.resume() : (x = t.current) == null || x.pause(), d && ((L = t.current) == null || L.setFlowSpeed(d)), (r = t.current) == null || r.setStaticMode(R ?? !1), m && ((E = t.current) == null || E.setRenderScale(m ?? 0.5)), () => {
+        var A;
+        (A = t.current) == null || A.dispose();
+      };
+    }, [p]), u(() => {
+      var n;
+      v && ((n = t.current) == null || n.setAlbumImage(v));
+    }, [v]), u(() => {
+      var n;
+      f && ((n = t.current) == null || n.setFPS(f));
+    }, [f]), u(() => {
+      var n, i, l;
+      o === void 0 ? (n = t.current) == null || n.resume() : o ? (i = t.current) == null || i.resume() : (l = t.current) == null || l.pause();
+    }, [o]), u(() => {
+      var n;
+      d && ((n = t.current) == null || n.setFlowSpeed(d));
+    }, [d]), u(() => {
+      var n;
+      (n = t.current) == null || n.setStaticMode(R ?? !1);
+    }, [R]), u(() => {
+      var n;
+      m && ((n = t.current) == null || n.setRenderScale(m ?? 0.5));
+    }, [m]), u(() => {
+      var n;
+      if (t.current) {
+        const i = t.current.getElement();
+        i.style.width = "100%", i.style.height = "100%", (n = a.current) == null || n.appendChild(i);
+      }
+    }, [t.current]), P(
+      h,
+      () => ({
+        wrapperEl: a.current,
+        bgRender: t.current
+      }),
+      [a.current, t.current]
+    ), /* @__PURE__ */ q("div", { ...B, ref: a });
+  }
+), V = H(
+  ({
+    disabled: v,
+    alignAnchor: f,
+    alignPosition: o,
+    enableSpring: d,
+    enableBlur: m,
+    enableScale: R,
+    hidePassedLines: p,
+    lyricLines: B,
+    currentTime: h,
+    linePosXSpringParams: t,
+    linePosYSpringParams: a,
+    lineScaleSpringParams: n,
+    bottomLine: i,
+    onLyricLineClick: l,
+    onLyricLineContextMenu: F,
+    ...x
+  }, L) => {
+    var A, y;
+    const r = k(), E = k(null);
+    return u(() => (r.current = new C(), () => {
+      var e;
+      (e = r.current) == null || e.dispose();
+    }), []), u(() => {
+      if (!v) {
+        let e = !1, c = -1;
+        const s = (w) => {
+          var j;
+          e || (c === -1 && (c = w), (j = r.current) == null || j.update(w - c), c = w, requestAnimationFrame(s));
+        };
+        return requestAnimationFrame(s), () => {
+          e = !0;
+        };
+      }
+    }, [v]), u(() => {
+      var e;
+      r.current && ((e = E.current) == null || e.appendChild(r.current.getElement()));
+    }, [E.current]), u(() => {
+      var e;
+      f !== void 0 && ((e = r.current) == null || e.setAlignAnchor(f));
+    }, [f]), u(() => {
+      var e;
+      p !== void 0 && ((e = r.current) == null || e.setHidePassedLines(p));
+    }, [p]), u(() => {
+      var e;
+      o !== void 0 && ((e = r.current) == null || e.setAlignPosition(o));
+    }, [o]), u(() => {
+      var e, c;
+      d !== void 0 ? (e = r.current) == null || e.setEnableSpring(d) : (c = r.current) == null || c.setEnableSpring(!0);
+    }, [d]), u(() => {
+      var e, c;
+      R !== void 0 ? (e = r.current) == null || e.setEnableScale(R) : (c = r.current) == null || c.setEnableScale(!0);
+    }, [R]), u(() => {
+      var e;
+      (e = r.current) == null || e.setEnableBlur(m ?? !0);
+    }, [m]), u(() => {
+      var e, c, s, w;
+      B !== void 0 ? ((e = r.current) == null || e.setLyricLines(B), (c = r.current) == null || c.update()) : ((s = r.current) == null || s.setLyricLines([]), (w = r.current) == null || w.update());
+    }, [B]), u(() => {
+      var e, c;
+      h !== void 0 ? (e = r.current) == null || e.setCurrentTime(h) : (c = r.current) == null || c.setCurrentTime(0);
+    }, [h]), u(() => {
+      var e;
+      t !== void 0 && ((e = r.current) == null || e.setLinePosXSpringParams(t));
+    }, [t]), u(() => {
+      var e;
+      a !== void 0 && ((e = r.current) == null || e.setLinePosYSpringParams(a));
+    }, [a]), u(() => {
+      var e;
+      n !== void 0 && ((e = r.current) == null || e.setLineScaleSpringParams(n));
+    }, [n]), u(() => {
+      var e;
+      if (l) {
+        const c = (s) => l(s);
+        return (e = r.current) == null || e.addEventListener("line-click", c), () => {
+          var s;
+          return (s = r.current) == null ? void 0 : s.removeEventListener("line-click", c);
+        };
+      }
+    }, [l]), u(() => {
+      var e;
+      if (F) {
+        const c = (s) => F(s);
+        return (e = r.current) == null || e.addEventListener("line-contextmenu", c), () => {
+          var s;
+          return (s = r.current) == null ? void 0 : s.removeEventListener(
+            "line-contextmenu",
+            c
+          );
+        };
+      }
+    }, [F]), P(
+      L,
+      () => ({
+        wrapperEl: E.current,
+        lyricPlayer: r.current
+      }),
+      [E.current, r.current]
+    ), /* @__PURE__ */ $(G, { children: [
+      /* @__PURE__ */ q("div", { ...x, ref: E }),
+      (A = r.current) != null && A.getBottomLineElement() && i ? D(
+        i,
+        (y = r.current) == null ? void 0 : y.getBottomLineElement()
+      ) : null
+    ] });
+  }
+);
+export {
+  Q as BackgroundRender,
+  V as LyricPlayer
+};
 //# sourceMappingURL=amll-react.js.map

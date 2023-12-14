@@ -11,10 +11,10 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@applemusic-like-lyrics/bncm": "workspace:^",
-    "@applemusic-like-lyrics/lyric": "workspace:^",
-    "@applemusic-like-lyrics/react": "workspace:^",
-    "@applemusic-like-lyrics/ws-protocol": "workspace:^",
+    "@applemusic-like-lyrics/bncm": "*",
+    "@applemusic-like-lyrics/lyric": "*",
+    "@applemusic-like-lyrics/react": "*",
+    "@applemusic-like-lyrics/ws-protocol": "*",
     "@tauri-apps/api": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

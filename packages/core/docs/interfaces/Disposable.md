@@ -10,7 +10,7 @@
 
 ## Implemented by
 
-- [`BackgroundRender`](../classes/BackgroundRender.md)
+- [`AbstractBaseRenderer`](../classes/AbstractBaseRenderer.md)
 - [`LyricPlayer`](../classes/LyricPlayer.md)
 
 ## Table of contents
@@ -35,4 +35,4 @@
 
 #### Defined in
 
-[packages/core/src/interfaces.ts:24](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/interfaces.ts#L24)
+[packages/core/src/interfaces.ts:24](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/interfaces.ts#L24)

@@ -56,6 +56,14 @@ type WSClientBodies =
 			}
 	  >
 	| WSClientBody<
+			"setVolume",
+			{
+				volume: {
+					volume: number;
+				}[];
+			}
+		>
+	| WSClientBody<
 			"onLoadProgress",
 			{
 				progress: number;
@@ -103,6 +111,7 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 	private musicAlbumName = "";
 	private musicArtists: Artist[] = [];
 	private musicCoverImage = "";
+	private volume = 0.5;
 	private onClientBody(body: WSClientBodies) {
 		switch (body.type) {
 			case "setMusicId":
@@ -145,6 +154,17 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 							progress: body.value.progress,
 						},
 					}),
+				);
+				break;
+			case "setVolume":
+				this.dispatchTypedEvent(
+					"volume",
+					new CustomEvent("volume", {
+						detail: {
+							volume: this.volume
+						}
+					}
+					),
 				);
 				break;
 			default:
@@ -198,6 +218,7 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 	}
 	override setVolume(value: number): void {
 		// throw new Error("Method not implemented.");
+		this.volume = value;
 	}
 	override getVolume(): number {
 		// throw new Error("Method not implemented.");

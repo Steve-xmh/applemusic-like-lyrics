@@ -35,6 +35,6 @@
     "vite-plugin-dts": "^3.6.0"
   },
   "peerDependencies": {
-    "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/core": "^0.0.15"
   }
 }

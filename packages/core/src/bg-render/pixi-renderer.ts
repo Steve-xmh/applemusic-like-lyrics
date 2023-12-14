@@ -5,14 +5,13 @@ import { ColorMatrixFilter } from "@pixi/filter-color-matrix";
 import { Texture } from "@pixi/core";
 import { Sprite } from "@pixi/sprite";
 import { BulgePinchFilter } from "@pixi/filter-bulge-pinch";
-import { Disposable } from "../interfaces";
+import { BaseRenderer } from "./base";
 
 class TimedContainer extends Container {
 	public time = 0;
 }
 
-export class PixiRenderer implements Disposable {
-	private observer: ResizeObserver;
+export class PixiRenderer extends BaseRenderer {
 	private app: Application;
 	private curContainer?: TimedContainer;
 	private staticMode = false;
@@ -84,57 +83,28 @@ export class PixiRenderer implements Disposable {
 			}
 		}
 	};
-	private flowSpeed = 2;
-	private currerntRenderScale = 0.75;
-	constructor(private canvas: HTMLCanvasElement) {
-		const bounds = canvas.getBoundingClientRect();
-		this.canvas.width = bounds.width * this.currerntRenderScale;
-		this.canvas.height = bounds.height * this.currerntRenderScale;
-		this.observer = new ResizeObserver(() => {
-			const bounds = canvas.getBoundingClientRect();
-			this.canvas.width = Math.max(1, bounds.width);
-			this.canvas.height = Math.max(1, bounds.height);
-			this.app.renderer.resize(
-				this.canvas.width * this.currerntRenderScale,
-				this.canvas.height * this.currerntRenderScale,
-			);
-			this.app.ticker.start();
-			this.rebuildFilters();
-		});
-		this.observer.observe(canvas);
+	constructor(protected canvas: HTMLCanvasElement) {
+		super(canvas);
 		this.app = new Application({
 			view: canvas,
 			resizeTo: this.canvas,
 			powerPreference: "low-power",
-			backgroundAlpha: 0,
+			backgroundAlpha: 1,
 		});
 		this.rebuildFilters();
 		this.app.ticker.maxFPS = 30;
 		this.app.ticker.add(this.onTick);
 		this.app.ticker.start();
 	}
-	/**
-	 * 修改背景的流动速度，数字越大越快，默认为 2
-	 * @param speed 背景的流动速度，默认为 2
-	 */
-	setFlowSpeed(speed: number) {
-		this.flowSpeed = speed;
+
+	protected override onResize(width: number, height: number): void {
+		super.onResize(width, height);
+		this.app.resize();
+		this.rebuildFilters();
 	}
-	/**
-	 * 修改背景的渲染比例，默认是 0.5
-	 *
-	 * 一般情况下这个程度既没有明显瑕疵也不会特别吃性能
-	 * @param scale 背景的渲染比例
-	 */
-	setRenderScale(scale: number) {
-		this.currerntRenderScale = scale;
-		const bounds = this.canvas.getBoundingClientRect();
-		this.canvas.width = Math.max(1, bounds.width);
-		this.canvas.height = Math.max(1, bounds.height);
-		this.app.renderer.resize(
-			this.canvas.width * this.currerntRenderScale,
-			this.canvas.height * this.currerntRenderScale,
-		);
+
+	override setRenderScale(scale: number) {
+		super.setRenderScale(scale);
 		this.rebuildFilters();
 	}
 	private rebuildFilters() {
@@ -193,41 +163,27 @@ export class PixiRenderer implements Disposable {
 			);
 		}
 	}
-	/**
-	 * 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
-	 * @param enable 是否启用静态模式
-	 */
-	setStaticMode(enable = false) {
+
+	override setStaticMode(enable = false) {
 		this.staticMode = enable;
 		this.app.ticker.start();
 	}
-	/**
-	 * 修改背景动画帧率，默认是 30 FPS
-	 *
-	 * 如果设置成 0 则会停止动画
-	 * @param fps 目标帧率，默认 30 FPS
-	 */
-	setFPS(fps: number) {
+
+	override setFPS(fps: number) {
 		this.app.ticker.maxFPS = fps;
 	}
-	/**
-	 * 暂停背景动画，画面即便是更新了图片也不会发生变化
-	 */
-	pause() {
+
+	override pause() {
 		this.app.ticker.stop();
 		this.app.render();
 	}
-	/**
-	 * 恢复播放背景动画
-	 */
-	resume() {
+
+	override resume() {
 		this.app.ticker.start();
 	}
-	/**
-	 * 设置背景专辑图片，图片材质加载并设置完成后会返回
-	 * @param albumUrl 图片的目标链接
-	 */
-	async setAlbumImage(albumUrl: string) {
+
+	override async setAlbumImage(albumUrl: string) {
+		if (albumUrl.trim().length === 0) return;
 		const img = new Image();
 		img.src = albumUrl;
 		img.crossOrigin = "anonymous";
@@ -269,14 +225,18 @@ export class PixiRenderer implements Disposable {
 		container.addChild(s1, s2, s3, s4);
 		if (this.curContainer) this.lastContainer.add(this.curContainer);
 		this.curContainer = container;
-		this.app.stage.addChild(this.curContainer);
+		this.app.stage.addChild(container);
 		this.curContainer.alpha = 0;
 		this.app.ticker.start();
 	}
 
-	dispose() {
-		this.observer.disconnect();
+	override dispose() {
+		super.dispose();
 		this.app.ticker.remove(this.onTick);
 		this.app.destroy(true);
+	}
+
+	override getElement(): HTMLElement {
+		return this.canvas;
 	}
 }

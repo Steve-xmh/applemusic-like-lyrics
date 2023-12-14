@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import wasm from "vite-plugin-wasm";
+import glsl from "vite-plugin-glsl";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
@@ -29,6 +30,9 @@ export default defineConfig({
 	plugins: [
 		wasm(),
 		topLevelAwait(),
+		glsl({
+			compress: true,
+		}),
 		dts({
 			exclude: ["src/test.ts"],
 		}),

@@ -8,6 +8,7 @@
     "directory": "packages/react",
     "type": "git"
   },
+  "type": "module",
   "license": "GPL-3.0",
   "files": [
     "dist"
@@ -20,11 +21,11 @@
     "dev": "vite dev"
   },
   "main": "./dist/amll-react.cjs",
-  "module": "./dist/amll-react.mjs",
+  "module": "./dist/amll-react.js",
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/amll-react.mjs",
+      "import": "./dist/amll-react.js",
       "require": "./dist/amll-react.cjs"
     }
   },
@@ -49,7 +50,7 @@
     "vite-plugin-dts": "^3.6.0"
   },
   "dependencies": {
-    "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/core": "^0.0.15"
   },
   "peerDependencies": {
     "react": "*",

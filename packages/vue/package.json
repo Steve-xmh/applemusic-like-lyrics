@@ -8,6 +8,7 @@
     "directory": "packages/vue",
     "type": "git"
   },
+  "type": "module",
   "license": "GPL-3.0",
   "files": [
     "dist"
@@ -19,16 +20,16 @@
     "dev": "vite dev"
   },
   "main": "./dist/amll-vue.cjs",
-  "module": "./dist/amll-vue.mjs",
+  "module": "./dist/amll-vue.js",
   "typings": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/amll-vue.mjs",
+      "import": "./dist/amll-vue.js",
       "require": "./dist/amll-vue.cjs"
     }
   },
   "dependencies": {
-    "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/core": "^0.0.15"
   },
   "peerDependencies": {
     "vue": "*"

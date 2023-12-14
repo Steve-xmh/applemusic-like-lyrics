@@ -1,21 +1,22 @@
 [@applemusic-like-lyrics/core](../README.md) / [Exports](../modules.md) / BackgroundRender
 
-# Class: BackgroundRender
+# Class: BackgroundRender<Renderer\>
 
-拥有一个 HTML 元素的接口
+实现了这个接口的东西需要在使用完毕后
 
-可以通过 `getElement` 获取这个类所对应的 HTML 元素实例
+手动调用 `dispose` 函数来销毁清除占用资源
 
-## Hierarchy
+以免产生泄露
 
-- `PixiRenderer`
+## Type parameters
 
-  ↳ **`BackgroundRender`**
+| Name | Type |
+| :------ | :------ |
+| `Renderer` | extends [`BaseRenderer`](BaseRenderer.md) |
 
 ## Implements
 
-- [`HasElement`](../interfaces/HasElement.md)
-- [`Disposable`](../interfaces/Disposable.md)
+- [`AbstractBaseRenderer`](AbstractBaseRenderer.md)
 
 ## Table of contents
 
@@ -26,6 +27,7 @@
 ### Properties
 
 - [element](BackgroundRender.md#element)
+- [renderer](BackgroundRender.md#renderer)
 
 ### Methods
 
@@ -38,20 +40,30 @@
 - [setFlowSpeed](BackgroundRender.md#setflowspeed)
 - [setRenderScale](BackgroundRender.md#setrenderscale)
 - [setStaticMode](BackgroundRender.md#setstaticmode)
+- [new](BackgroundRender.md#new)
 
 ## Constructors
 
 ### constructor
 
-• **new BackgroundRender**()
+• **new BackgroundRender**<`Renderer`\>(`renderer`, `canvas`)
 
-#### Overrides
+#### Type parameters
 
-PixiRenderer.constructor
+| Name | Type |
+| :------ | :------ |
+| `Renderer` | extends [`BaseRenderer`](BaseRenderer.md) |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `renderer` | `Renderer` |
+| `canvas` | `HTMLCanvasElement` |
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:15](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L15)
+[packages/core/src/bg-render/index.ts:17](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L17)
 
 ## Properties
 
@@ -61,7 +73,17 @@ PixiRenderer.constructor
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:14](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L14)
+[packages/core/src/bg-render/index.ts:15](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L15)
+
+___
+
+### renderer
+
+• `Private` **renderer**: `Renderer`
+
+#### Defined in
+
+[packages/core/src/bg-render/index.ts:16](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L16)
 
 ## Methods
 
@@ -79,15 +101,11 @@ PixiRenderer.constructor
 
 #### Implementation of
 
-[Disposable](../interfaces/Disposable.md).[dispose](../interfaces/Disposable.md#dispose)
-
-#### Overrides
-
-PixiRenderer.dispose
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[dispose](AbstractBaseRenderer.md#dispose)
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:26](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L26)
+[packages/core/src/bg-render/index.ts:58](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L58)
 
 ___
 
@@ -103,11 +121,11 @@ ___
 
 #### Implementation of
 
-[HasElement](../interfaces/HasElement.md).[getElement](../interfaces/HasElement.md#getelement)
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[getElement](AbstractBaseRenderer.md#getelement)
 
 #### Defined in
 
-[packages/core/src/bg-render/index.ts:23](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/index.ts#L23)
+[packages/core/src/bg-render/index.ts:55](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L55)
 
 ___
 
@@ -121,13 +139,13 @@ ___
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.pause
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[pause](AbstractBaseRenderer.md#pause)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:216](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L216)
+[packages/core/src/bg-render/index.ts:46](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L46)
 
 ___
 
@@ -141,13 +159,13 @@ ___
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.resume
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[resume](AbstractBaseRenderer.md#resume)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:223](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L223)
+[packages/core/src/bg-render/index.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L49)
 
 ___
 
@@ -167,13 +185,13 @@ ___
 
 `Promise`<`void`\>
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.setAlbumImage
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[setAlbumImage](AbstractBaseRenderer.md#setalbumimage)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:230](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L230)
+[packages/core/src/bg-render/index.ts:52](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L52)
 
 ___
 
@@ -195,13 +213,13 @@ ___
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.setFPS
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[setFPS](AbstractBaseRenderer.md#setfps)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:210](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L210)
+[packages/core/src/bg-render/index.ts:43](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L43)
 
 ___
 
@@ -221,13 +239,13 @@ ___
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.setFlowSpeed
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[setFlowSpeed](AbstractBaseRenderer.md#setflowspeed)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:120](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L120)
+[packages/core/src/bg-render/index.ts:37](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L37)
 
 ___
 
@@ -249,36 +267,62 @@ ___
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.setRenderScale
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[setRenderScale](AbstractBaseRenderer.md#setrenderscale)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:129](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L129)
+[packages/core/src/bg-render/index.ts:33](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L33)
 
 ___
 
 ### setStaticMode
 
-▸ **setStaticMode**(`enable?`): `void`
+▸ **setStaticMode**(`enable`): `void`
 
 是否启用静态模式，即图片在更换后就会保持静止状态并禁用更新，以节省性能
 
 #### Parameters
 
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `enable` | `boolean` | `false` | 是否启用静态模式 |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `enable` | `boolean` | 是否启用静态模式 |
 
 #### Returns
 
 `void`
 
-#### Inherited from
+#### Implementation of
 
-PixiRenderer.setStaticMode
+[AbstractBaseRenderer](AbstractBaseRenderer.md).[setStaticMode](AbstractBaseRenderer.md#setstaticmode)
 
 #### Defined in
 
-[packages/core/src/bg-render/pixi-renderer.ts:200](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/bg-render/pixi-renderer.ts#L200)
+[packages/core/src/bg-render/index.ts:40](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L40)
+
+___
+
+### new
+
+▸ `Static` **new**<`Renderer`\>(`type`): [`BackgroundRender`](BackgroundRender.md)<`Renderer`\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `Renderer` | extends [`BaseRenderer`](BaseRenderer.md) |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `type` | (`canvas`: `HTMLCanvasElement`) => `Renderer` |
+
+#### Returns
+
+[`BackgroundRender`](BackgroundRender.md)<`Renderer`\>
+
+#### Defined in
+
+[packages/core/src/bg-render/index.ts:26](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/bg-render/index.ts#L26)

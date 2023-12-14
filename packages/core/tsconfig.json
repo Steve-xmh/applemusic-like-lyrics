@@ -8,7 +8,7 @@
             "DOM.Iterable"
         ],
         "module": "ESNext",
-        "types": [],
+        "types": ["vite-plugin-glsl/ext"],
         "strict": true,
         "moduleResolution": "node",
         "resolveJsonModule": true,

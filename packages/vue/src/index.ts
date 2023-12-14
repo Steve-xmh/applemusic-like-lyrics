@@ -4,6 +4,8 @@ import type {
 	LyricPlayer as CoreLyricPlayer,
 	BackgroundRender as CoreBackgroundRender,
 	LyricLineMouseEvent,
+	BaseRenderer,
+	AbstractBaseRenderer,
 } from "@applemusic-like-lyrics/core";
 import type { Ref, VNode } from "vue";
 import LyricPlayer from "./LyricPlayer.vue";
@@ -145,6 +147,11 @@ export interface BackgroundRenderProps {
 	 * 设置当前渲染缩放比例，如果为 `undefined` 则默认为 `0.5`
 	 */
 	renderScale?: number;
+	/**
+	 * 设置渲染器，如果为 `undefined` 则默认为 `PixiRenderer`
+	 * 默认渲染器有可能会随着版本更新而更换
+	 */
+	renderer?: { new (canvas: HTMLCanvasElement): BaseRenderer };
 }
 
 /**
@@ -154,7 +161,7 @@ export interface BackgroundRenderRef {
 	/**
 	 * 背景渲染实例引用
 	 */
-	bgRender?: Ref<CoreBackgroundRender | undefined>;
+	bgRender?: Ref<AbstractBaseRenderer | undefined>;
 	/**
 	 * 将背景渲染实例的元素包裹起来的 DIV 元素实例
 	 */

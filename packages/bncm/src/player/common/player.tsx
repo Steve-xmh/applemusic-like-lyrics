@@ -117,7 +117,7 @@ export const CoreLyricPlayer: FC<{
 					bottomLine={
 						lyricLines.state === "hasData" ? (
 							<div className="amll-contributors">
-								<div>贡献者：{artists.map((v) => v.name).join(", ")}</div>
+								<div>创作者：{artists.map((v) => v.name).join("、")}</div>
 								{usingLyricSource.state === "hasData" &&
 								usingLyricSource.data.type === "builtin:amll-ttml-db" &&
 								showAMLLTTMLDBTip ? (

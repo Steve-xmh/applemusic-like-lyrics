@@ -10,9 +10,13 @@
 
 ### Classes
 
+- [AbstractBaseRenderer](classes/AbstractBaseRenderer.md)
 - [BackgroundRender](classes/BackgroundRender.md)
+- [BaseRenderer](classes/BaseRenderer.md)
+- [EplorRenderer](classes/EplorRenderer.md)
 - [LyricLineMouseEvent](classes/LyricLineMouseEvent.md)
 - [LyricPlayer](classes/LyricPlayer.md)
+- [PixiRenderer](classes/PixiRenderer.md)
 
 ### Interfaces
 

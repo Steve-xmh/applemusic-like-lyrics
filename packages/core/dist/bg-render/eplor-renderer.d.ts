@@ -1,0 +1,33 @@
+import { BaseRenderer } from "./base";
+export declare class EplorRenderer extends BaseRenderer {
+    protected canvas: HTMLCanvasElement;
+    private maxFPS;
+    private lastTickTime;
+    private randomOffset;
+    private paused;
+    private staticMode;
+    private gl;
+    private reduceImageSizeCanvas;
+    private tickHandle;
+    private sprites;
+    private onTick;
+    private mainProgram;
+    private blendProgram;
+    private copyProgram;
+    private static readonly rawVertexBuffer;
+    private static readonly rawIndexBuffer;
+    private vertexBuffer;
+    private indexBuffer;
+    protected onResize(width: number, height: number): void;
+    private requestTick;
+    private onRedraw;
+    constructor(canvas: HTMLCanvasElement);
+    private setupGL;
+    setStaticMode(enable: boolean): void;
+    setFPS(fps: number): void;
+    pause(): void;
+    resume(): void;
+    private loadImage;
+    setAlbumImage(albumUrl: string): Promise<void>;
+    getElement(): HTMLElement;
+}

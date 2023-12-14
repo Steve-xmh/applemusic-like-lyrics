@@ -1,10 +1,16 @@
 import type { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
-import { ColorConfigComponent, SwitchConfigComponent } from "./common";
+import {
+	ColorConfigComponent,
+	NumberTextFieldConfigComponent,
+	SwitchConfigComponent,
+} from "./common";
 import {
 	BackgroundType,
 	backgroundCustomSolidColorAtom,
-	backgroundFakeLiquidStaticModeAtom,
+	backgroundMaxFPSAtom,
+	backgroundRenderScaleAtom,
+	backgroundStaticModeAtom,
 	backgroundTypeAtom,
 	enableBackgroundAtom,
 } from "./atoms";
@@ -42,6 +48,10 @@ export const BackgroundConfig: FC = () => {
 										label: "伪流体背景",
 									},
 									{
+										value: BackgroundType.LiquidEplor,
+										label: "真流体背景 (Eplor)",
+									},
+									{
 										value: BackgroundType.CustomSolidColor,
 										label: "纯实心静态颜色背景",
 									},
@@ -53,12 +63,24 @@ export const BackgroundConfig: FC = () => {
 			</GroupBox>
 			{enableBackground && (
 				<>
-					{backgroundType === BackgroundType.FakeLiquid && (
+					{backgroundType !== BackgroundType.CustomSolidColor && (
 						<GroupBox>
 							<SwitchConfigComponent
-								atom={backgroundFakeLiquidStaticModeAtom}
+								atom={backgroundStaticModeAtom}
 								label="静态模式"
 								description="即背景变换完成后保持静止并暂停渲染，以改善性能"
+							/>
+							<GroupBoxDevider />
+							<NumberTextFieldConfigComponent
+								atom={backgroundMaxFPSAtom}
+								label="最大帧率"
+								description="默认为 30，如果超出你的显示器设备的最大帧率则没有作用"
+							/>
+							<GroupBoxDevider />
+							<NumberTextFieldConfigComponent
+								atom={backgroundRenderScaleAtom}
+								label="渲染精度"
+								description="默认为 0.5 (50%)，越高背景更细致，但是性能消耗更大且很多时候并不明显"
 							/>
 						</GroupBox>
 					)}

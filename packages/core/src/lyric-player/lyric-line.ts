@@ -15,10 +15,11 @@ interface RealWord extends LyricWord {
 
 function generateFadeGradient(
 	width: number,
+	padding: number = 0,
 	bright = "rgba(0,0,0,0.85)",
 	dark = "rgba(0,0,0,0.5)",
 ): [string, number, number] {
-	const totalAspect = 2 + width;
+	const totalAspect = 2 + width + padding;
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
@@ -120,7 +121,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(1),
 	};
-	// rome-ignore lint/correctness/noUnreachableSuper: <explanation>
+
 	constructor(
 		private lyricPlayer: LyricPlayer,
 		private lyricLine: LyricLine = {
@@ -301,9 +302,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
-			.toFixed(2)}px,${this.lineTransforms.posY
+			.toFixed(1)}px,${this.lineTransforms.posY
 			.getCurrentPosition()
-			.toFixed(2)}px) scale(${this.lineTransforms.scale
+			.toFixed(1)}px) scale(${this.lineTransforms.scale
 			.getCurrentPosition()
 			.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
@@ -445,7 +446,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					transform: "translateY(0px)",
 				},
 				{
-					transform: "translateY(-3%)",
+					transform: "translateY(-0.05em)",
 				},
 			],
 			{
@@ -464,24 +465,35 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.max(1000, word.endTime - word.startTime);
-			const de = delay + (duration / arr.length) * i;
-			const a = el.animate(
+			const de = delay + (duration / 2 / arr.length) * i;
+			const glowAnimation = el.animate(
 				[
 					{
 						offset: 0,
-						transform: "translate3d(0, 0, 0px)",
-						filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))",
+						transform: "translateZ(0vw)",
+						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+					},
+					{
+						offset: 0.1,
+						transform: "translateZ(2vw)",
+						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+					},
+					{
+						offset: 0.2,
+						textShadow: "var(--amll-lyric-view-color,white) 0 0 0.05em",
 					},
 					{
 						offset: 0.5,
-						transform: "translate3d(0, -0.02em, 20px)",
-						filter:
-							"drop-shadow(0 0 0.05em var(--amll-lyric-view-color,white))",
+						transform: "translateZ(1vw)",
+					},
+					{
+						offset: 0.9,
+						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
 					},
 					{
 						offset: 1,
-						transform: "translate3d(0, 0, 0)",
-						filter: "drop-shadow(0 0 0 var(--amll-lyric-view-color,white))",
+						transform: "translateZ(0vw)",
+						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
 					},
 				],
 				{
@@ -494,8 +506,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					fill: "both",
 				},
 			);
-			a.pause();
-			return a;
+			glowAnimation.pause();
+			return glowAnimation;
 		});
 	}
 	updateMaskImage() {
@@ -506,14 +518,16 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.element.style.display = "";
 			this.element.style.visibility = "hidden";
 		}
-		this.splittedWords.forEach((word) => {
+		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
+				const wordPaddingInline = parseFloat(getComputedStyle(wordEl).paddingInline);
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
 				const fadeWidth = word.height / 2;
 				const [maskImage, _widthInTotal, totalAspect] = generateFadeGradient(
 					fadeWidth / word.width,
+					0,
 					"rgba(0,0,0,0.85)",
 					"rgba(0,0,0,0.25)",
 				);
@@ -560,6 +574,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		force = false,
 		delay = 0,
 	) {
+		const roundedBlur = Math.round(blur);
 		const beforeInSight = this.isInSight;
 		const enableSpring = this.lyricPlayer.getEnableSpring();
 		this.left = left;
@@ -573,7 +588,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		trans.style.opacity = `${opacity / 2}`;
 		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {
-			this.blur = Math.min(32, blur);
+			this.blur = Math.min(32, roundedBlur);
 			if (force)
 				this.element.classList.add(
 					this.lyricPlayer.style.classes.tmpDisableTransition,
@@ -599,9 +614,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.lineTransforms.posX.setTargetPosition(left, delay);
 			this.lineTransforms.posY.setTargetPosition(top, delay);
 			this.lineTransforms.scale.setTargetPosition(scale);
-			if (this.blur !== Math.min(32, blur)) {
-				this.blur = Math.min(32, blur);
-				this.element.style.filter = `blur(${Math.min(32, blur)}px)`;
+			if (this.blur !== Math.min(32, roundedBlur)) {
+				this.blur = Math.min(32, roundedBlur);
+				this.element.style.filter = `blur(${Math.min(32, roundedBlur)}px)`;
 			}
 		}
 	}

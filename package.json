@@ -5,7 +5,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@4.0.2",
   "devDependencies": {
     "lerna": "^7.3.1"
   }

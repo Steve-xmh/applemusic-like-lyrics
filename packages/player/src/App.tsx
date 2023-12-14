@@ -85,6 +85,7 @@ export const MusicInfoWrapper: FC = () => {
 					setMusicAlbumId(this.getMusicAlbumId());
 					setMusicAlbumName(this.getMusicAlbumName());
 					setMusicArtists(this.getMusicArtists().map((v) => ({ ...v })));
+					setVolume(this.getVolume());
 				},
 			);
 			musicCtx.current.addEventListener(

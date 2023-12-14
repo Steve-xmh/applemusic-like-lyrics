@@ -1,4 +1,9 @@
-import { BackgroundRender as CoreBackgroundRender } from "@applemusic-like-lyrics/core";
+import {
+	BackgroundRender as CoreBackgroundRender,
+	AbstractBaseRenderer,
+	BaseRenderer,
+	PixiRenderer,
+} from "@applemusic-like-lyrics/core";
 import {
 	useRef,
 	useEffect,
@@ -36,6 +41,11 @@ export interface BackgroundRenderProps {
 	 * 默认为 `false`
 	 */
 	staticMode?: boolean;
+	/**
+	 * 设置渲染器，如果为 `undefined` 则默认为 `PixiRenderer`
+	 * 默认渲染器有可能会随着版本更新而更换
+	 */
+	renderer?: { new (canvas: HTMLCanvasElement): BaseRenderer };
 }
 
 /**
@@ -45,7 +55,7 @@ export interface BackgroundRenderRef {
 	/**
 	 * 背景渲染实例引用
 	 */
-	bgRender?: CoreBackgroundRender;
+	bgRender?: AbstractBaseRenderer;
 	/**
 	 * 将背景渲染实例的元素包裹起来的 DIV 元素实例
 	 */
@@ -67,19 +77,35 @@ export const BackgroundRender = forwardRef<
 			flowSpeed,
 			renderScale,
 			staticMode,
+			renderer,
 			...props
 		},
 		ref,
 	) => {
-		const coreBGRenderRef = useRef<CoreBackgroundRender>();
+		const coreBGRenderRef = useRef<AbstractBaseRenderer>();
 		const wrapperRef = useRef<HTMLDivElement>(null);
 
 		useEffect(() => {
-			coreBGRenderRef.current = new CoreBackgroundRender();
+			coreBGRenderRef.current = CoreBackgroundRender.new(
+				renderer ?? PixiRenderer,
+			);
+			if (albumImageUrl) coreBGRenderRef.current?.setAlbumImage(albumImageUrl);
+			if (fps) coreBGRenderRef.current?.setFPS(fps);
+			if (playing === undefined) {
+				coreBGRenderRef.current?.resume();
+			} else if (playing) {
+				coreBGRenderRef.current?.resume();
+			} else {
+				coreBGRenderRef.current?.pause();
+			}
+			if (flowSpeed) coreBGRenderRef.current?.setFlowSpeed(flowSpeed);
+			coreBGRenderRef.current?.setStaticMode(staticMode ?? false);
+			if (renderScale)
+				coreBGRenderRef.current?.setRenderScale(renderScale ?? 0.5);
 			return () => {
 				coreBGRenderRef.current?.dispose();
 			};
-		}, []);
+		}, [renderer]);
 
 		useEffect(() => {
 			if (albumImageUrl) coreBGRenderRef.current?.setAlbumImage(albumImageUrl);
@@ -104,11 +130,12 @@ export const BackgroundRender = forwardRef<
 		}, [flowSpeed]);
 
 		useEffect(() => {
-			coreBGRenderRef.current?.setStaticMode(staticMode);
+			coreBGRenderRef.current?.setStaticMode(staticMode ?? false);
 		}, [staticMode]);
 
 		useEffect(() => {
-			if (renderScale) coreBGRenderRef.current?.setRenderScale(renderScale);
+			if (renderScale)
+				coreBGRenderRef.current?.setRenderScale(renderScale ?? 0.5);
 		}, [renderScale]);
 
 		useEffect(() => {
@@ -118,7 +145,7 @@ export const BackgroundRender = forwardRef<
 				el.style.height = "100%";
 				wrapperRef.current?.appendChild(el);
 			}
-		});
+		}, [coreBGRenderRef.current]);
 
 		useImperativeHandle(
 			ref,

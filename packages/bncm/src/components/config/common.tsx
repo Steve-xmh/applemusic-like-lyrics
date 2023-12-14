@@ -3,6 +3,7 @@ import { atomWithConfig } from "./atom-with-config";
 import { WritableAtom, useAtom } from "jotai";
 import { Switch } from "../appkit/switch/switch";
 import { Loadable } from "jotai/vanilla/utils/loadable";
+import { TextField } from "../appkit/text-field";
 
 export const ColorConfigComponent: FC<{
 	atom: ReturnType<typeof atomWithConfig<string>>;
@@ -32,6 +33,38 @@ export const ColorConfigComponent: FC<{
 				}}
 				value={configValue}
 				onInput={(e) => setConfigValue(e.currentTarget.value)}
+			/>
+		</div>
+	);
+};
+
+export const NumberTextFieldConfigComponent: FC<{
+	atom: WritableAtom<number, [number], any>;
+	label: string;
+	description?: string;
+	disabled?: boolean;
+}> = (props) => {
+	const [configValue, setConfigValue] = useAtom(props.atom);
+	return (
+		<div
+			style={{
+				display: "flex",
+				gap: "8px",
+				justifyContent: "space-between",
+				alignItems: "center",
+			}}
+		>
+			<div className="amll-config-text">
+				<div className="amll-config-label">{props.label}</div>
+				<div className="amll-config-description">{props.description}</div>
+			</div>
+			<TextField
+				style={{
+					width: "8em",
+				}}
+				value={configValue}
+				onChange={(e) => setConfigValue(Number(e.currentTarget.value))}
+				type="number"
 			/>
 		</div>
 	);

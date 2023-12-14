@@ -6,7 +6,7 @@
  */
 
 import GUI from "lil-gui";
-import { BackgroundRender } from "./bg-render";
+import { BackgroundRender, PixiRenderer, EplorRenderer } from "./bg-render";
 import Stats from "stats.js";
 import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
 import { parseTTML } from "./lyric/ttml";
@@ -22,6 +22,7 @@ const debugValues = {
 	album: new URL(location.href).searchParams.get("album") || "",
 	enableSpring: true,
 	bgFPS: 30,
+	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
 	bgScale: 0.5,
 	bgFlowSpeed: 2,
 	bgPlaying: true,
@@ -61,6 +62,25 @@ const debugValues = {
 	},
 };
 
+function recreateBGRenderer(mode: string) {
+	window.globalBackground?.dispose();
+	if (mode === "pixi") {
+		window.globalBackground = BackgroundRender.new(PixiRenderer);
+	} else if (mode === "eplor") {
+		window.globalBackground = BackgroundRender.new(EplorRenderer);
+	} else {
+		throw new Error("Unknown renderer mode");
+	}
+	const bg = window.globalBackground;
+	bg.setFPS(30);
+	bg.getElement().style.position = "absolute";
+	bg.getElement().style.top = "0";
+	bg.getElement().style.left = "0";
+	bg.getElement().style.width = "100%";
+	bg.getElement().style.height = "100%";
+	bg.setAlbumImage(debugValues.album);
+}
+
 audio.src = debugValues.music;
 audio.load();
 
@@ -84,7 +104,7 @@ gui
 	.add(debugValues, "album")
 	.name("专辑图片")
 	.onFinishChange((v: string) => {
-		bg.setAlbumImage(v);
+		window.globalBackground.setAlbumImage(v);
 	});
 
 const bgGui = gui.addFolder("背景");
@@ -93,34 +113,40 @@ bgGui
 	.name("播放")
 	.onFinishChange((v: boolean) => {
 		if (v) {
-			bg.resume();
+			window.globalBackground.resume();
 		} else {
-			bg.pause();
+			window.globalBackground.pause();
 		}
+	});
+bgGui
+	.add(debugValues, "bgMode", ["pixi", "eplor"])
+	.name("背景渲染器")
+	.onFinishChange((v: string) => {
+		recreateBGRenderer(v);
 	});
 bgGui
 	.add(debugValues, "bgScale", 0.01, 1, 0.01)
 	.name("分辨率比率")
 	.onChange((v: number) => {
-		bg.setRenderScale(v);
+		window.globalBackground.setRenderScale(v);
 	});
 bgGui
 	.add(debugValues, "bgFPS", 1, 60, 1)
 	.name("帧率")
 	.onFinishChange((v: number) => {
-		bg.setFPS(v);
+		window.globalBackground.setFPS(v);
 	});
 bgGui
 	.add(debugValues, "bgFlowSpeed", 0, 10, 0.1)
 	.name("流动速度")
 	.onFinishChange((v: number) => {
-		bg.setFlowSpeed(v);
+		window.globalBackground.setFlowSpeed(v);
 	});
 bgGui
 	.add(debugValues, "bgStaticMode")
 	.name("静态模式")
 	.onFinishChange((v: boolean) => {
-		bg.setStaticMode(v);
+		window.globalBackground.setStaticMode(v);
 	});
 
 {
@@ -204,12 +230,12 @@ const frame = (time: number) => {
 };
 requestAnimationFrame(frame);
 
-const bg = new BackgroundRender();
-bg.setFPS(30);
-
 declare global {
 	interface Window {
 		globalLyricPlayer: LyricPlayer;
+		globalBackground:
+			| BackgroundRender<PixiRenderer>
+			| BackgroundRender<EplorRenderer>;
 	}
 }
 
@@ -242,18 +268,13 @@ async function loadLyric() {
 }
 
 (async () => {
-	bg.getElement().style.position = "absolute";
-	bg.getElement().style.top = "0";
-	bg.getElement().style.left = "0";
-	bg.getElement().style.width = "100%";
-	bg.getElement().style.height = "100%";
-	bg.setAlbumImage(debugValues.album);
+	recreateBGRenderer(debugValues.bgMode);
 	audio.style.display = "none";
 	lyricPlayer.getBottomLineElement().innerHTML = "Test Bottom Line";
 	const player = document.getElementById("player");
 	if (player) {
 		player.appendChild(audio);
-		player.appendChild(bg.getElement());
+		player.appendChild(window.globalBackground.getElement());
 		player.appendChild(lyricPlayer.getElement());
 	}
 	await loadLyric();

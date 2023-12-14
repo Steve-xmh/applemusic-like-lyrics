@@ -8,6 +8,8 @@ import {
 	musicDurationAtom,
 	musicIdAtom,
 	musicNameAtom,
+	currentVolumeAtom,
+	playStatusAtom,
 } from "./wrapper";
 import { log, warn } from "../utils/logger";
 import { toBody, parseBody } from "@applemusic-like-lyrics/ws-protocol";
@@ -26,6 +28,8 @@ export const WebSocketWrapper: FC = () => {
 	const artists = useAtomValue(musicArtistsAtom);
 	const musicContext = useAtomValue(musicContextAtom);
 	const playProgress = useAtomValue(currentTimeAtom);
+	const volume = useAtomValue(currentVolumeAtom);
+	const currentPlayMode = useAtomValue(playStatusAtom);
 	const setWSStatus = useSetAtom(wsConnectionStatusAtom);
 	const enabled = useAtomValue(enableWSPlayer);
 	const url = useAtomValue(wsPlayerURL);
@@ -68,6 +72,17 @@ export const WebSocketWrapper: FC = () => {
 			}),
 		);
 	}, [playProgress, ws.current]);
+
+	useEffect(() => {
+		ws.current?.send(
+			toBody({
+				type: "setVolume",
+				value: {
+					volume: volume,
+				},
+			}),
+		);
+	}, [volume, ws.current]);
 
 	useEffect(() => {
 		if (lyricLines.state === "hasData") {
@@ -168,6 +183,8 @@ export const WebSocketWrapper: FC = () => {
 					case "backwardSong":
 						musicContext?.rewindSong();
 						break;
+					case "setVolume":
+						musicContext?.setVolume(data.value.volume);
 				}
 			});
 

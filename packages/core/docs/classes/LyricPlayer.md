@@ -110,7 +110,7 @@ EventTarget.constructor
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:296](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L296)
+[packages/core/src/lyric-player/index.ts:300](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L300)
 
 ## Properties
 
@@ -120,7 +120,7 @@ EventTarget.constructor
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:108](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L108)
+[packages/core/src/lyric-player/index.ts:108](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L108)
 
 ___
 
@@ -130,7 +130,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:109](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L109)
+[packages/core/src/lyric-player/index.ts:109](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L109)
 
 ___
 
@@ -140,7 +140,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:58](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L58)
+[packages/core/src/lyric-player/index.ts:58](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L58)
 
 ___
 
@@ -150,7 +150,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:104](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L104)
+[packages/core/src/lyric-player/index.ts:104](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L104)
 
 ___
 
@@ -160,7 +160,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:56](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L56)
+[packages/core/src/lyric-player/index.ts:56](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L56)
 
 ___
 
@@ -170,7 +170,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:48](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L48)
+[packages/core/src/lyric-player/index.ts:48](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L48)
 
 ___
 
@@ -180,7 +180,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:107](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L107)
+[packages/core/src/lyric-player/index.ts:107](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L107)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L47)
+[packages/core/src/lyric-player/index.ts:47](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L47)
 
 ___
 
@@ -200,7 +200,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:98](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L98)
+[packages/core/src/lyric-player/index.ts:98](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L98)
 
 ___
 
@@ -210,7 +210,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:100](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L100)
+[packages/core/src/lyric-player/index.ts:100](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L100)
 
 ___
 
@@ -220,7 +220,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:101](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L101)
+[packages/core/src/lyric-player/index.ts:101](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L101)
 
 ___
 
@@ -230,7 +230,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:63](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L63)
+[packages/core/src/lyric-player/index.ts:63](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L63)
 
 ___
 
@@ -240,7 +240,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:55](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L55)
+[packages/core/src/lyric-player/index.ts:55](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L55)
 
 ___
 
@@ -250,7 +250,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:113](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L113)
+[packages/core/src/lyric-player/index.ts:113](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L113)
 
 ___
 
@@ -260,7 +260,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:102](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L102)
+[packages/core/src/lyric-player/index.ts:102](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L102)
 
 ___
 
@@ -270,7 +270,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:103](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L103)
+[packages/core/src/lyric-player/index.ts:103](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L103)
 
 ___
 
@@ -280,7 +280,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:61](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L61)
+[packages/core/src/lyric-player/index.ts:61](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L61)
 
 ___
 
@@ -290,7 +290,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:110](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L110)
+[packages/core/src/lyric-player/index.ts:110](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L110)
 
 ___
 
@@ -300,7 +300,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:60](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L60)
+[packages/core/src/lyric-player/index.ts:60](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L60)
 
 ___
 
@@ -310,7 +310,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L49)
+[packages/core/src/lyric-player/index.ts:49](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L49)
 
 ___
 
@@ -320,7 +320,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:51](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L51)
+[packages/core/src/lyric-player/index.ts:51](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L51)
 
 ___
 
@@ -330,7 +330,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:54](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L54)
+[packages/core/src/lyric-player/index.ts:54](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L54)
 
 ___
 
@@ -340,7 +340,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:52](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L52)
+[packages/core/src/lyric-player/index.ts:52](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L52)
 
 ___
 
@@ -350,7 +350,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:99](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L99)
+[packages/core/src/lyric-player/index.ts:99](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L99)
 
 ___
 
@@ -360,7 +360,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:83](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L83)
+[packages/core/src/lyric-player/index.ts:83](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L83)
 
 ___
 
@@ -370,7 +370,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:88](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L88)
+[packages/core/src/lyric-player/index.ts:88](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L88)
 
 ___
 
@@ -380,7 +380,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:50](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L50)
+[packages/core/src/lyric-player/index.ts:50](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L50)
 
 ___
 
@@ -390,7 +390,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:64](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L64)
+[packages/core/src/lyric-player/index.ts:64](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L64)
 
 ___
 
@@ -400,7 +400,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:93](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L93)
+[packages/core/src/lyric-player/index.ts:93](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L93)
 
 ___
 
@@ -410,7 +410,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:111](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L111)
+[packages/core/src/lyric-player/index.ts:111](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L111)
 
 ___
 
@@ -420,7 +420,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:62](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L62)
+[packages/core/src/lyric-player/index.ts:62](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L62)
 
 ___
 
@@ -430,7 +430,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:57](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L57)
+[packages/core/src/lyric-player/index.ts:57](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L57)
 
 ___
 
@@ -440,7 +440,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:59](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L59)
+[packages/core/src/lyric-player/index.ts:59](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L59)
 
 ___
 
@@ -450,7 +450,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:112](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L112)
+[packages/core/src/lyric-player/index.ts:112](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L112)
 
 ___
 
@@ -460,7 +460,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:171](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L171)
+[packages/core/src/lyric-player/index.ts:171](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L171)
 
 ___
 
@@ -470,7 +470,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:106](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L106)
+[packages/core/src/lyric-player/index.ts:106](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L106)
 
 ___
 
@@ -480,7 +480,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:105](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L105)
+[packages/core/src/lyric-player/index.ts:105](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L105)
 
 ## Methods
 
@@ -494,7 +494,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:126](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L126)
+[packages/core/src/lyric-player/index.ts:126](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L126)
 
 ___
 
@@ -550,7 +550,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:399](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L399)
+[packages/core/src/lyric-player/index.ts:403](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L403)
 
 ___
 
@@ -584,7 +584,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:641](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L641)
+[packages/core/src/lyric-player/index.ts:645](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L645)
 
 ___
 
@@ -634,7 +634,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:996](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L996)
+[packages/core/src/lyric-player/index.ts:1000](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L1000)
 
 ___
 
@@ -648,7 +648,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:412](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L412)
+[packages/core/src/lyric-player/index.ts:416](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L416)
 
 ___
 
@@ -670,7 +670,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:791](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L791)
+[packages/core/src/lyric-player/index.ts:795](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L795)
 
 ___
 
@@ -692,7 +692,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:429](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L429)
+[packages/core/src/lyric-player/index.ts:433](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L433)
 
 ___
 
@@ -712,7 +712,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:767](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L767)
+[packages/core/src/lyric-player/index.ts:771](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L771)
 
 ___
 
@@ -732,7 +732,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:779](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L779)
+[packages/core/src/lyric-player/index.ts:783](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L783)
 
 ___
 
@@ -750,7 +750,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:168](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L168)
+[packages/core/src/lyric-player/index.ts:168](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L168)
 
 ___
 
@@ -768,7 +768,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:149](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L149)
+[packages/core/src/lyric-player/index.ts:149](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L149)
 
 ___
 
@@ -788,7 +788,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:776](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L776)
+[packages/core/src/lyric-player/index.ts:780](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L780)
 
 ___
 
@@ -802,7 +802,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:415](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L415)
+[packages/core/src/lyric-player/index.ts:419](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L419)
 
 ___
 
@@ -822,7 +822,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:114](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L114)
+[packages/core/src/lyric-player/index.ts:114](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L114)
 
 ___
 
@@ -836,7 +836,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:293](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L293)
+[packages/core/src/lyric-player/index.ts:297](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L297)
 
 ___
 
@@ -854,7 +854,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:467](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L467)
+[packages/core/src/lyric-player/index.ts:471](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L471)
 
 ___
 
@@ -902,7 +902,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:617](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L617)
+[packages/core/src/lyric-player/index.ts:621](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L621)
 
 ___
 
@@ -928,7 +928,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:802](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L802)
+[packages/core/src/lyric-player/index.ts:806](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L806)
 
 ___
 
@@ -950,7 +950,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:809](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L809)
+[packages/core/src/lyric-player/index.ts:813](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L813)
 
 ___
 
@@ -976,7 +976,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:819](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L819)
+[packages/core/src/lyric-player/index.ts:823](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L823)
 
 ___
 
@@ -998,7 +998,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:492](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L492)
+[packages/core/src/lyric-player/index.ts:496](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L496)
 
 ___
 
@@ -1024,7 +1024,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:160](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L160)
+[packages/core/src/lyric-player/index.ts:160](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L160)
 
 ___
 
@@ -1050,7 +1050,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:136](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L136)
+[packages/core/src/lyric-player/index.ts:136](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L136)
 
 ___
 
@@ -1072,7 +1072,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:484](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L484)
+[packages/core/src/lyric-player/index.ts:488](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L488)
 
 ___
 
@@ -1094,7 +1094,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:957](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L957)
+[packages/core/src/lyric-player/index.ts:961](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L961)
 
 ___
 
@@ -1116,7 +1116,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:972](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L972)
+[packages/core/src/lyric-player/index.ts:976](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L976)
 
 ___
 
@@ -1138,7 +1138,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:987](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L987)
+[packages/core/src/lyric-player/index.ts:991](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L991)
 
 ___
 
@@ -1160,7 +1160,7 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:501](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L501)
+[packages/core/src/lyric-player/index.ts:505](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L505)
 
 ___
 
@@ -1184,4 +1184,4 @@ ___
 
 #### Defined in
 
-[packages/core/src/lyric-player/index.ts:946](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/0cbfd70/packages/core/src/lyric-player/index.ts#L946)
+[packages/core/src/lyric-player/index.ts:950](https://github.com/Steve-xmh/applemusic-like-lyrics/blob/98c389d/packages/core/src/lyric-player/index.ts#L950)

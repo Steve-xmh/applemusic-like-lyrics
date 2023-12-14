@@ -154,6 +154,53 @@ export const newOverrideData = (): MusicOverrideData => ({
 	lyricOverrideRomanLyricData: "",
 });
 
+export const patchMusicOverrideDataAtom = atom(
+	null,
+	async (get, set, id: string, overrideData: Partial<MusicOverrideData>) => {
+		get(musicOverrideDataUpdateAtom);
+		const ctx = get(rawMusicContextAtom);
+		let curData: Partial<MusicOverrideData> = {};
+
+		if (ctx) {
+			const overrideDirPath = normalizePath(
+				`${ctx.getDataDir()}/music-override-data`,
+			);
+			const overrideJsonPath = normalizePath(
+				`${overrideDirPath}/${id}.json`,
+			);
+			try {
+				if (await ctx.isFileExists(overrideJsonPath)) {
+					const overrideJson = JSON.parse(
+						await ctx.readFileText(overrideJsonPath),
+					);
+					curData = overrideJson;
+					if (typeof curData !== "object") curData = {};
+				}
+			} catch (err) {
+				warn("加载音乐覆盖信息出错", id, overrideJsonPath, err);
+			}
+			const modifiedData = Object.assign(curData, overrideData);
+			if (!(await ctx.isFileExists(overrideDirPath))) {
+				await ctx.makeDirectory(overrideDirPath);
+			}
+			if (Object.keys(modifiedData).length === 0) {
+				await ctx.deleteFile(overrideJsonPath);
+				set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
+			} else {
+				try {
+					await ctx.writeFileText(overrideJsonPath, JSON.stringify(modifiedData));
+					set(
+						musicOverrideDataUpdateAtom,
+						Symbol("music-override-data-update"),
+					);
+				} catch (err) {
+					warn("保存音乐覆盖信息出错", id, overrideJsonPath, err);
+				}
+			}
+		}
+	},
+);
+
 export const musicOverrideDataAtom = atom(
 	async (get) => {
 		get(musicOverrideDataUpdateAtom);

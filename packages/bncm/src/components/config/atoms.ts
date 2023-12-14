@@ -195,6 +195,7 @@ export const enableBackgroundAtom = atomWithConfig({
 
 export enum BackgroundType {
 	FakeLiquid = "fake-liquid",
+	LiquidEplor = "liquid-eplor",
 	CustomSolidColor = "custom-solid-color",
 }
 
@@ -204,10 +205,22 @@ export const backgroundTypeAtom = atomWithConfig({
 	desc: "背景类型",
 });
 
-export const backgroundFakeLiquidStaticModeAtom = atomWithConfig({
-	key: "background-fake-liquid-static-mode",
+export const backgroundStaticModeAtom = atomWithConfig({
+	key: "background-static-mode",
 	default: false,
-	desc: "伪流体动画 - 静态背景模式",
+	desc: "动态背景通用设置 - 静态背景模式",
+});
+
+export const backgroundMaxFPSAtom = atomWithConfig({
+	key: "background-max-fps",
+	default: 30,
+	desc: "动态背景通用设置 - 最大 FPS",
+});
+
+export const backgroundRenderScaleAtom = atomWithConfig({
+	key: "background-render-scale",
+	default: 0.5,
+	desc: "动态背景通用设置 - 渲染精度",
 });
 
 export const backgroundCustomSolidColorAtom = atomWithConfig({

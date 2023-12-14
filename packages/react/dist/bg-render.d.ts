@@ -1,4 +1,4 @@
-import { BackgroundRender as CoreBackgroundRender } from "@applemusic-like-lyrics/core";
+import { AbstractBaseRenderer, BaseRenderer } from "@applemusic-like-lyrics/core";
 import { type HTMLProps } from "react";
 /**
  * 背景渲染组件的属性
@@ -29,6 +29,13 @@ export interface BackgroundRenderProps {
      * 默认为 `false`
      */
     staticMode?: boolean;
+    /**
+     * 设置渲染器，如果为 `undefined` 则默认为 `PixiRenderer`
+     * 默认渲染器有可能会随着版本更新而更换
+     */
+    renderer?: {
+        new (canvas: HTMLCanvasElement): BaseRenderer;
+    };
 }
 /**
  * 背景渲染组件的引用
@@ -37,7 +44,7 @@ export interface BackgroundRenderRef {
     /**
      * 背景渲染实例引用
      */
-    bgRender?: CoreBackgroundRender;
+    bgRender?: AbstractBaseRenderer;
     /**
      * 将背景渲染实例的元素包裹起来的 DIV 元素实例
      */

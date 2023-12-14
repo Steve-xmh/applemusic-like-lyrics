@@ -3,17 +3,17 @@
 </template>
 
 <script setup lang="ts">
-import { BackgroundRender } from "@applemusic-like-lyrics/core";
+import { AbstractBaseRenderer, BackgroundRender, PixiRenderer } from "@applemusic-like-lyrics/core";
 import { onMounted, onUnmounted, ref, watchEffect } from "vue";
 import type { BackgroundRenderProps, BackgroundRenderRef } from ".";
 
 const props = defineProps<BackgroundRenderProps>();
 const wrapperRef = ref<HTMLDivElement>();
-const bgRenderRef = ref<BackgroundRender>();
+const bgRenderRef = ref<AbstractBaseRenderer>();
 
 onMounted(() => {
     if (wrapperRef.value) {
-        bgRenderRef.value = new BackgroundRender();
+        bgRenderRef.value = BackgroundRender.new(props.renderer ?? PixiRenderer);
         const el = bgRenderRef.value.getElement();
         el.style.width = "100%";
         el.style.height = "100%";
