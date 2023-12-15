@@ -192,6 +192,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		lyricLine: {
 			position: "absolute",
+			backfaceVisibility: "hidden",
 			transformOrigin: "left",
 			width: "var(--amll-lyric-player-width,100%)",
 			height: "fit-content",
