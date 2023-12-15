@@ -32,7 +32,7 @@ jobs:
       - name: 配置 NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: 安装 Tauri 所需系统依赖（仅 Linux）
         if: matrix.platform == 'ubuntu-20.04'
         run: |
