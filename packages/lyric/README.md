@@ -13,12 +13,14 @@
 
 支持以下歌词格式的解析：
 - LyRiC 格式 `.lrc`
+- ESLyric 逐词歌词格式 `.lrc`
 - 网易云音乐逐词歌词格式 `.yrc`
 - QQ 音乐逐词歌词格式 `.qrc`
 - Lyricify Syllable 逐词歌词格式 `.lys`
 
 支持以下歌词格式的导出：
 - LyRiC 格式 `.lrc`
+- ESLyric 逐词歌词格式 `.lrc`
 - 网易云音乐逐词歌词格式 `.yrc`
 - QQ 音乐逐词歌词格式 `.qrc`
 - Lyricify Syllable 逐词歌词格式 `.lys`
