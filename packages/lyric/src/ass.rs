@@ -18,7 +18,6 @@ fn write_timestamp(result: &mut String, time: usize) {
     write!(result, "{}:{:02}:{:02}.{:02}", hour, min, sec % 60, ms / 10).unwrap()
 }
 
-#[inline]
 pub fn stringify_ass(lines: &[LyricLine]) -> String {
     let mut result = String::with_capacity(
         lines

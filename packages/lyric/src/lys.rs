@@ -61,7 +61,6 @@ pub fn parse_property(src: &str) -> IResult<&str, (bool, bool)> {
     ))
 }
 
-#[inline]
 pub fn parse_word_time(src: &str) -> IResult<&str, (usize, usize)> {
     let (src, _) = tag("(")(src)?;
     let (src, start_time) = take_until1(",")(src)?;
@@ -102,7 +101,6 @@ pub fn parse_words(src: &str) -> IResult<&str, Vec<LyricWord<'_>>> {
     Ok((src, words))
 }
 
-#[inline]
 pub fn parse_line(src: &str) -> IResult<&str, LyricLine<'_>> {
     let (src, (is_bg, is_duet)) = parse_property(src)?;
     match is_not("\r\n")(src) {
@@ -138,7 +136,6 @@ pub fn parse_line(src: &str) -> IResult<&str, LyricLine<'_>> {
     }
 }
 
-#[inline]
 pub fn parse_lys(src: &str) -> Vec<LyricLine> {
     let lines = src.lines();
     let mut result = Vec::with_capacity(lines.size_hint().1.unwrap_or(1024).min(1024));
@@ -154,7 +151,6 @@ pub fn parse_lys(src: &str) -> Vec<LyricLine> {
     result
 }
 
-#[inline]
 pub fn stringify_lys(lines: &[LyricLine]) -> String {
     let capacity: usize = lines
         .iter()

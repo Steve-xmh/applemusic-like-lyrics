@@ -4,7 +4,7 @@
     "SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"
   ],
   "description": "一个歌词解析/生成模块，着重于歌词内容解析，支持多种格式",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "wasm-pack build --release",
-    "build:dev": "wasm-pack build --dev"
+    "build:dev": "wasm-pack build --dev",
+    "fmt": "cargo fmt"
   },
   "files": [
     "pkg/*.wasm",

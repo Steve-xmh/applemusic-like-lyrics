@@ -27,7 +27,7 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
     let (src, _) = take(1usize)(src)?;
     let (src, sec) = take_till1(|c: char| c == ':' || c == '.')(src)?;
 
-    let sec = match u32::from_str(sec) {
+    let sec = match usize::from_str(sec) {
         Ok(v) => v,
         Err(_) => {
             return IResult::Err(nom::Err::Error(nom::error::Error::new(
@@ -39,7 +39,7 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
 
     let (src, _) = take(1usize)(src)?;
     let (src, mss) = take_while_m_n(1, 3, |c: char| c.is_ascii_digit())(src)?;
-    let mut ms = u32::from_str(mss).unwrap_or_default();
+    let mut ms = usize::from_str(mss).unwrap_or_default();
 
     match mss.len() {
         0 => {}
@@ -183,7 +183,7 @@ pub fn parse_lrc(src: &str) -> Vec<LyricLine> {
     result
 }
 
-fn write_timestamp(result: &mut String, time: usize) {
+pub fn write_timestamp(result: &mut String, time: usize) {
     let ms = time % 1000;
     let sec = (time - ms) / 1000;
     let min = (sec - sec % 60) / 60;
@@ -223,10 +223,7 @@ fn stringify_lrc_test() {
 
 #[wasm_bindgen(js_name = "parseLrc", skip_typescript)]
 pub fn parse_lrc_js(src: &str) -> JsValue {
-    match serde_wasm_bindgen::to_value(&parse_lrc(src)) {
-        Ok(v) => v,
-        Err(err) => JsValue::from_str(&format!("Can't serialize lyric lines: {err:?}")),
-    }
+    serde_wasm_bindgen::to_value(&parse_lrc(src)).unwrap()
 }
 
 #[wasm_bindgen(js_name = "stringifyLrc", skip_typescript)]

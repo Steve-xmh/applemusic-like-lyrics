@@ -56,6 +56,20 @@ export function parseLys(src: string): LyricLine[];
 export function stringifyLys(lines: LyricLine[]): string;
 
 /**
+ * 解析 ESLyric 格式的歌词字符串
+ * @param src 歌词字符串
+ * @returns 成功解析出来的歌词
+ */
+export function parseEslrc(src: string): LyricLine[];
+
+/**
+ * 将歌词数组转换为 ESLyric 格式的字符串
+ * @param lines 歌词数组
+ * @returns ESLyric 格式的字符串
+ */
+export function stringifyEslrc(lines: LyricLine[]): string;
+
+/**
  * 将歌词数组转换为 ASS 字幕格式的字符串
  * 
  * 注意导出会损失 10 毫秒以内的精度

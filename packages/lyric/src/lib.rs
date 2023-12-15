@@ -1,5 +1,7 @@
 mod ass;
+#[cfg(feature = "qrc")]
 mod eqrc;
+mod eslrc;
 mod lrc;
 mod lys;
 mod qrc;
