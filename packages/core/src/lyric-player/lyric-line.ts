@@ -85,7 +85,7 @@ function chunkLyricWords<T>(
 // 果子在对辉光效果的解释是一种强调（emphasized）效果
 // 条件是一个单词时长大于等于 1s 且长度小于等于 7
 export function shouldEmphasize(word: LyricWord): boolean {
-	return word.endTime - word.startTime >= 1000 && word.word.length <= 7;
+	return word.endTime - word.startTime >= 2000 && word.word.length <= 7;
 }
 
 export class RawLyricLineMouseEvent extends MouseEvent {
@@ -475,16 +475,16 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: "translateZ(2vw)",
+						transform: "translateZ(4vw)",
 						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
 					},
 					{
 						offset: 0.2,
-						textShadow: "var(--amll-lyric-view-color,white) 0 0 0.05em",
+						textShadow: "rgba(255, 255, 255, 0.6) 0 0 0.15em",
 					},
 					{
 						offset: 0.5,
-						transform: "translateZ(1vw)",
+						transform: "translateZ(2vw)",
 					},
 					{
 						offset: 0.9,

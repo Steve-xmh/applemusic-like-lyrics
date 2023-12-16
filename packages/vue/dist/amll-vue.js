@@ -1,2 +1,137 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const a=require("vue"),v=require("@applemusic-like-lyrics/core"),g=a.defineComponent({inheritAttrs:!1,__name:"LyricPlayer",props:{disabled:{type:Boolean},alignAnchor:{},alignPosition:{},enableSpring:{type:Boolean},enableBlur:{type:Boolean},enableScale:{type:Boolean},hidePassedLines:{type:Boolean},lyricLines:{},currentTime:{},linePosXSpringParams:{},linePosYSpringParams:{},lineScaleSpringParams:{},bottomLine:{}},emits:["line-click","line-contextmenu"],setup(u,{expose:f,emit:i}){const l=u,t=a.ref(),e=a.ref(),c=n=>i("line-click",n),d=n=>i("line-contextmenu",n);return a.onMounted(()=>{t.value&&(e.value=new v.LyricPlayer,t.value.appendChild(e.value.getElement()),e.value.addEventListener("line-click",c),e.value.addEventListener("line-contextmenu",d))}),a.onUnmounted(()=>{e.value&&(e.value.removeEventListener("line-click",c),e.value.removeEventListener("line-contextmenu",d),e.value.dispose())}),a.watchEffect(n=>{if(!l.disabled){let r=!1,o=-1;const s=p=>{var m;r||(o===-1&&(o=p),(m=e.value)==null||m.update(p-o),o=p,requestAnimationFrame(s))};requestAnimationFrame(s),n(()=>{r=!0})}}),a.watchEffect(()=>{var n;l.alignAnchor!==void 0&&((n=e.value)==null||n.setAlignAnchor(l.alignAnchor))}),a.watchEffect(()=>{var n;l.hidePassedLines!==void 0&&((n=e.value)==null||n.setHidePassedLines(l.hidePassedLines))}),a.watchEffect(()=>{var n;l.alignPosition!==void 0&&((n=e.value)==null||n.setAlignPosition(l.alignPosition))}),a.watchEffect(()=>{var n,r;l.enableSpring!==void 0?(n=e.value)==null||n.setEnableSpring(l.enableSpring):(r=e.value)==null||r.setEnableSpring(!0)}),a.watchEffect(()=>{var n,r;l.enableBlur!==void 0?(n=e.value)==null||n.setEnableBlur(l.enableBlur):(r=e.value)==null||r.setEnableBlur(!0)}),a.watchEffect(()=>{var n,r;l.enableScale!==void 0?(n=e.value)==null||n.setEnableScale(l.enableScale):(r=e.value)==null||r.setEnableScale(!0)}),a.watchEffect(()=>{var n;l.lyricLines!==void 0&&((n=e.value)==null||n.setLyricLines(l.lyricLines))}),a.watchEffect(()=>{var n;l.currentTime!==void 0&&((n=e.value)==null||n.setCurrentTime(l.currentTime))}),a.watchEffect(()=>{var n;l.linePosXSpringParams!==void 0&&((n=e.value)==null||n.setLinePosXSpringParams(l.linePosXSpringParams))}),a.watchEffect(()=>{var n;l.linePosYSpringParams!==void 0&&((n=e.value)==null||n.setLinePosYSpringParams(l.linePosYSpringParams))}),a.watchEffect(()=>{var n;l.lineScaleSpringParams!==void 0&&((n=e.value)==null||n.setLineScaleSpringParams(l.lineScaleSpringParams))}),f({lyricPlayer:e,wrapperEl:t}),(n,r)=>{var o,s;return a.openBlock(),a.createElementBlock(a.Fragment,null,[a.createElementVNode("div",a.mergeProps({ref_key:"wrapperRef",ref:t},n.$attrs),null,16),(o=e.value)!=null&&o.getBottomLineElement()&&l.bottomLine?(a.openBlock(),a.createBlock(a.Teleport,{key:0,to:(s=e.value)==null?void 0:s.getBottomLineElement()},null,8,["to"])):a.createCommentVNode("",!0)],64)}}}),S=a.defineComponent({__name:"BackgroundRender",props:{albumImageUrl:{},fps:{},playing:{type:Boolean},flowSpeed:{},renderScale:{}},setup(u,{expose:f}){const i=u,l=a.ref(),t=a.ref();return a.onMounted(()=>{if(l.value){t.value=new v.BackgroundRender;const e=t.value.getElement();e.style.width="100%",e.style.height="100%",l.value.appendChild(e)}}),a.onUnmounted(()=>{t.value&&t.value.dispose()}),a.watchEffect(()=>{var e;i.albumImageUrl&&((e=t.value)==null||e.setAlbumImage(i.albumImageUrl))}),a.watchEffect(()=>{var e;i.fps&&((e=t.value)==null||e.setFPS(i.fps))}),a.watchEffect(()=>{var e,c;i.playing?(e=t.value)==null||e.pause():(c=t.value)==null||c.resume()}),a.watchEffect(()=>{var e;i.flowSpeed&&((e=t.value)==null||e.setFlowSpeed(i.flowSpeed))}),a.watchEffect(()=>{var e;i.renderScale&&((e=t.value)==null||e.setRenderScale(i.renderScale))}),f({bgRender:t,wrapperEl:l}),(e,c)=>(a.openBlock(),a.createElementBlock("div",{ref_key:"wrapperRef",ref:l},null,512))}});exports.BackgroundRender=S;exports.LyricPlayer=g;
+import { defineComponent as S, ref as c, onMounted as y, onUnmounted as b, watchEffect as i, openBlock as v, createElementBlock as L, Fragment as B, createElementVNode as E, mergeProps as h, createBlock as k, Teleport as w, createCommentVNode as R } from "vue";
+import { LyricPlayer as _, BackgroundRender as x, PixiRenderer as A } from "@applemusic-like-lyrics/core";
+const T = /* @__PURE__ */ S({
+  inheritAttrs: !1,
+  __name: "LyricPlayer",
+  props: {
+    disabled: { type: Boolean },
+    alignAnchor: {},
+    alignPosition: {},
+    enableSpring: { type: Boolean },
+    enableBlur: { type: Boolean },
+    enableScale: { type: Boolean },
+    hidePassedLines: { type: Boolean },
+    lyricLines: {},
+    currentTime: {},
+    linePosXSpringParams: {},
+    linePosYSpringParams: {},
+    lineScaleSpringParams: {},
+    bottomLine: {}
+  },
+  emits: ["line-click", "line-contextmenu"],
+  setup(p, { expose: d, emit: t }) {
+    const l = p, r = t, a = c(), n = c(), f = (e) => r("line-click", e), g = (e) => r("line-contextmenu", e);
+    return y(() => {
+      a.value && (n.value = new _(), a.value.appendChild(n.value.getElement()), n.value.addEventListener("line-click", f), n.value.addEventListener("line-contextmenu", g));
+    }), b(() => {
+      n.value && (n.value.removeEventListener("line-click", f), n.value.removeEventListener("line-contextmenu", g), n.value.dispose());
+    }), i((e) => {
+      if (!l.disabled) {
+        let s = !1, o = -1;
+        const u = (m) => {
+          var P;
+          s || (o === -1 && (o = m), (P = n.value) == null || P.update(m - o), o = m, requestAnimationFrame(u));
+        };
+        requestAnimationFrame(u), e(() => {
+          s = !0;
+        });
+      }
+    }), i(() => {
+      var e;
+      l.alignAnchor !== void 0 && ((e = n.value) == null || e.setAlignAnchor(l.alignAnchor));
+    }), i(() => {
+      var e;
+      l.hidePassedLines !== void 0 && ((e = n.value) == null || e.setHidePassedLines(l.hidePassedLines));
+    }), i(() => {
+      var e;
+      l.alignPosition !== void 0 && ((e = n.value) == null || e.setAlignPosition(l.alignPosition));
+    }), i(() => {
+      var e, s;
+      l.enableSpring !== void 0 ? (e = n.value) == null || e.setEnableSpring(l.enableSpring) : (s = n.value) == null || s.setEnableSpring(!0);
+    }), i(() => {
+      var e, s;
+      l.enableBlur !== void 0 ? (e = n.value) == null || e.setEnableBlur(l.enableBlur) : (s = n.value) == null || s.setEnableBlur(!0);
+    }), i(() => {
+      var e, s;
+      l.enableScale !== void 0 ? (e = n.value) == null || e.setEnableScale(l.enableScale) : (s = n.value) == null || s.setEnableScale(!0);
+    }), i(() => {
+      var e;
+      l.lyricLines !== void 0 && ((e = n.value) == null || e.setLyricLines(l.lyricLines));
+    }), i(() => {
+      var e;
+      l.currentTime !== void 0 && ((e = n.value) == null || e.setCurrentTime(l.currentTime));
+    }), i(() => {
+      var e;
+      l.linePosXSpringParams !== void 0 && ((e = n.value) == null || e.setLinePosXSpringParams(l.linePosXSpringParams));
+    }), i(() => {
+      var e;
+      l.linePosYSpringParams !== void 0 && ((e = n.value) == null || e.setLinePosYSpringParams(l.linePosYSpringParams));
+    }), i(() => {
+      var e;
+      l.lineScaleSpringParams !== void 0 && ((e = n.value) == null || e.setLineScaleSpringParams(l.lineScaleSpringParams));
+    }), d({
+      lyricPlayer: n,
+      wrapperEl: a
+    }), (e, s) => {
+      var o, u;
+      return v(), L(B, null, [
+        E("div", h({
+          ref_key: "wrapperRef",
+          ref: a
+        }, e.$attrs), null, 16),
+        (o = n.value) != null && o.getBottomLineElement() && l.bottomLine ? (v(), k(w, {
+          key: 0,
+          to: (u = n.value) == null ? void 0 : u.getBottomLineElement()
+        }, null, 8, ["to"])) : R("", !0)
+      ], 64);
+    };
+  }
+}), I = /* @__PURE__ */ S({
+  __name: "BackgroundRender",
+  props: {
+    albumImageUrl: {},
+    fps: {},
+    playing: { type: Boolean },
+    flowSpeed: {},
+    renderScale: {},
+    renderer: { type: Function }
+  },
+  setup(p, { expose: d }) {
+    const t = p, l = c(), r = c();
+    return y(() => {
+      if (l.value) {
+        r.value = x.new(t.renderer ?? A);
+        const a = r.value.getElement();
+        a.style.width = "100%", a.style.height = "100%", l.value.appendChild(a);
+      }
+    }), b(() => {
+      r.value && r.value.dispose();
+    }), i(() => {
+      var a;
+      t.albumImageUrl && ((a = r.value) == null || a.setAlbumImage(t.albumImageUrl));
+    }), i(() => {
+      var a;
+      t.fps && ((a = r.value) == null || a.setFPS(t.fps));
+    }), i(() => {
+      var a, n;
+      t.playing ? (a = r.value) == null || a.pause() : (n = r.value) == null || n.resume();
+    }), i(() => {
+      var a;
+      t.flowSpeed && ((a = r.value) == null || a.setFlowSpeed(t.flowSpeed));
+    }), i(() => {
+      var a;
+      t.renderScale && ((a = r.value) == null || a.setRenderScale(t.renderScale));
+    }), d({
+      bgRender: r,
+      wrapperEl: l
+    }), (a, n) => (v(), L("div", {
+      ref_key: "wrapperRef",
+      ref: l
+    }, null, 512));
+  }
+});
+export {
+  I as BackgroundRender,
+  T as LyricPlayer
+};
 //# sourceMappingURL=amll-vue.js.map
