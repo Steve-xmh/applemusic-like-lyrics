@@ -237,13 +237,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			"& span": {
 				display: "inline-block",
 			},
-			"& > span": {
+			"& > span, span.emphasize-wrapper": {
 				whiteSpace: "pre-wrap",
 				maxLines: "1",
-				// willChange: "transform,display,mask-image",
-				"&.emphasize": {
+				willChange: "transform,display,mask-image",
+				"&.emphasize, span.emphasize": {
 					transformStyle: "preserve-3d",
-					perspective: "50vw",
+					perspective: "min(50vw, 50vh)",
 					padding: "1em",
 					margin: "-1em",
 					"& > span": {

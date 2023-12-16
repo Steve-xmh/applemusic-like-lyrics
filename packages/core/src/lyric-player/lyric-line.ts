@@ -345,6 +345,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					{ word: "", startTime: Infinity, endTime: -Infinity },
 				);
 				const wrapperWordEl = document.createElement("span");
+				wrapperWordEl.classList.add("emphasize-wrapper");
 				for (const word of chunk) {
 					const mainWordEl = document.createElement("span");
 					const mainWordFloatAnimation = this.initFloatAnimation(
@@ -475,7 +476,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: "translateZ(4vw)",
+						transform: "translateZ(2vw)",
 						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
 					},
 					{
@@ -484,7 +485,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.5,
-						transform: "translateZ(2vw)",
+						transform: "translateZ(1vw)",
 					},
 					{
 						offset: 0.9,
@@ -521,7 +522,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				const wordPaddingInline = parseFloat(getComputedStyle(wordEl).paddingInline);
+				const wordPaddingInline = parseFloat(
+					getComputedStyle(wordEl).paddingInline,
+				);
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
 				const fadeWidth = word.height / 2;
