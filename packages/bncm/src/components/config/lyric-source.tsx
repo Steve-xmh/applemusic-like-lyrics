@@ -67,7 +67,7 @@ function getDisplayNameForSource(source: LyricSource | undefined) {
 		} catch {}
 		return `无名歌词源 (${source.id})`;
 	} else if (source.type === "builtin:amll-ttml-db") {
-		return "AMLL TTML 逐词歌词数据库 (Github)";
+		return "AMLL TTML 逐词歌词数据库（多源聚合）";
 	} else if (source.type === "builtin:ncm") {
 		return "网易云歌词源";
 	} else {
