@@ -182,6 +182,10 @@ export class PixiRenderer extends BaseRenderer {
 		this.app.ticker.start();
 	}
 
+	override setLowFreqVolume(_volume: number): void {
+		// NOOP
+	}
+
 	override async setAlbumImage(albumUrl: string) {
 		if (albumUrl.trim().length === 0) return;
 		const img = new Image();

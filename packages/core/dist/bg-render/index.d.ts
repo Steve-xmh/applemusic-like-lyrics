@@ -20,6 +20,7 @@ export declare class BackgroundRender<Renderer extends BaseRenderer> implements 
     setFPS(fps: number): void;
     pause(): void;
     resume(): void;
+    setLowFreqVolume(volume: number): void;
     setAlbumImage(albumUrl: string): Promise<void>;
     getElement(): HTMLCanvasElement;
     dispose(): void;

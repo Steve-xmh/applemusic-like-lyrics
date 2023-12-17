@@ -10,7 +10,7 @@
         "module": "ESNext",
         "types": ["vite-plugin-glsl/ext"],
         "strict": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "strictNullChecks": true,
         "allowSyntheticDefaultImports": true,

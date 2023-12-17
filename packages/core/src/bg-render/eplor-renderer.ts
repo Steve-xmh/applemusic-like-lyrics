@@ -323,6 +323,7 @@ class AlbumTexture implements Disposable {
 export class EplorRenderer extends BaseRenderer {
 	private maxFPS = 30;
 	private lastTickTime = 0;
+	private _lowFreqVolume = 1;
 	private randomOffset = Math.random() * 1000;
 	private paused = false;
 	private staticMode = false;
@@ -398,6 +399,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
+		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
 		for (const sprite of this.sprites) {
 			sprite.draw("IlllIIlIlllIll");
 		}
@@ -423,6 +425,10 @@ export class EplorRenderer extends BaseRenderer {
 		if (!gl) throw new Error("WebGL2 not supported");
 		this.gl = gl;
 		return gl;
+	}
+
+	override setLowFreqVolume(volume: number): void {
+		this._lowFreqVolume = Math.max(0, Math.min(1, volume));
 	}
 
 	override setStaticMode(enable: boolean): void {

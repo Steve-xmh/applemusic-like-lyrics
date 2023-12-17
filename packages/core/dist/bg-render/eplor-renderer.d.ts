@@ -3,6 +3,7 @@ export declare class EplorRenderer extends BaseRenderer {
     protected canvas: HTMLCanvasElement;
     private maxFPS;
     private lastTickTime;
+    private _lowFreqVolume;
     private randomOffset;
     private paused;
     private staticMode;
@@ -23,6 +24,7 @@ export declare class EplorRenderer extends BaseRenderer {
     private onRedraw;
     constructor(canvas: HTMLCanvasElement);
     private setupGL;
+    setLowFreqVolume(volume: number): void;
     setStaticMode(enable: boolean): void;
     setFPS(fps: number): void;
     pause(): void;

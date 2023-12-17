@@ -14,6 +14,7 @@ export declare class PixiRenderer extends BaseRenderer {
     setFPS(fps: number): void;
     pause(): void;
     resume(): void;
+    setLowFreqVolume(_volume: number): void;
     setAlbumImage(albumUrl: string): Promise<void>;
     dispose(): void;
     getElement(): HTMLElement;

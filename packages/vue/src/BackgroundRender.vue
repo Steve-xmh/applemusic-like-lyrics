@@ -54,6 +54,11 @@ watchEffect(() => {
         bgRenderRef.value?.setRenderScale(props.renderScale);
 });
 
+watchEffect(() => {
+    if (props.lowFreqVolume)
+        bgRenderRef.value?.setLowFreqVolume(props.lowFreqVolume);
+});
+
 defineExpose<BackgroundRenderRef>({
     bgRender: bgRenderRef,
     wrapperEl: wrapperRef,

@@ -1,6 +1,6 @@
-import { defineComponent as S, ref as c, onMounted as y, onUnmounted as b, watchEffect as i, openBlock as v, createElementBlock as L, Fragment as B, createElementVNode as E, mergeProps as h, createBlock as k, Teleport as w, createCommentVNode as R } from "vue";
-import { LyricPlayer as _, BackgroundRender as x, PixiRenderer as A } from "@applemusic-like-lyrics/core";
-const T = /* @__PURE__ */ S({
+import { defineComponent as S, ref as c, onMounted as y, onUnmounted as b, watchEffect as i, openBlock as v, createElementBlock as L, Fragment as B, createElementVNode as E, mergeProps as w, createBlock as h, Teleport as k, createCommentVNode as R } from "vue";
+import { LyricPlayer as _, BackgroundRender as F, PixiRenderer as x } from "@applemusic-like-lyrics/core";
+const q = /* @__PURE__ */ S({
   inheritAttrs: !1,
   __name: "LyricPlayer",
   props: {
@@ -19,7 +19,7 @@ const T = /* @__PURE__ */ S({
     bottomLine: {}
   },
   emits: ["line-click", "line-contextmenu"],
-  setup(p, { expose: d, emit: t }) {
+  setup(p, { expose: m, emit: t }) {
     const l = p, r = t, a = c(), n = c(), f = (e) => r("line-click", e), g = (e) => r("line-contextmenu", e);
     return y(() => {
       a.value && (n.value = new _(), a.value.appendChild(n.value.getElement()), n.value.addEventListener("line-click", f), n.value.addEventListener("line-contextmenu", g));
@@ -27,13 +27,13 @@ const T = /* @__PURE__ */ S({
       n.value && (n.value.removeEventListener("line-click", f), n.value.removeEventListener("line-contextmenu", g), n.value.dispose());
     }), i((e) => {
       if (!l.disabled) {
-        let s = !1, o = -1;
-        const u = (m) => {
+        let o = !1, s = -1;
+        const u = (d) => {
           var P;
-          s || (o === -1 && (o = m), (P = n.value) == null || P.update(m - o), o = m, requestAnimationFrame(u));
+          o || (s === -1 && (s = d), (P = n.value) == null || P.update(d - s), s = d, requestAnimationFrame(u));
         };
         requestAnimationFrame(u), e(() => {
-          s = !0;
+          o = !0;
         });
       }
     }), i(() => {
@@ -46,14 +46,14 @@ const T = /* @__PURE__ */ S({
       var e;
       l.alignPosition !== void 0 && ((e = n.value) == null || e.setAlignPosition(l.alignPosition));
     }), i(() => {
-      var e, s;
-      l.enableSpring !== void 0 ? (e = n.value) == null || e.setEnableSpring(l.enableSpring) : (s = n.value) == null || s.setEnableSpring(!0);
+      var e, o;
+      l.enableSpring !== void 0 ? (e = n.value) == null || e.setEnableSpring(l.enableSpring) : (o = n.value) == null || o.setEnableSpring(!0);
     }), i(() => {
-      var e, s;
-      l.enableBlur !== void 0 ? (e = n.value) == null || e.setEnableBlur(l.enableBlur) : (s = n.value) == null || s.setEnableBlur(!0);
+      var e, o;
+      l.enableBlur !== void 0 ? (e = n.value) == null || e.setEnableBlur(l.enableBlur) : (o = n.value) == null || o.setEnableBlur(!0);
     }), i(() => {
-      var e, s;
-      l.enableScale !== void 0 ? (e = n.value) == null || e.setEnableScale(l.enableScale) : (s = n.value) == null || s.setEnableScale(!0);
+      var e, o;
+      l.enableScale !== void 0 ? (e = n.value) == null || e.setEnableScale(l.enableScale) : (o = n.value) == null || o.setEnableScale(!0);
     }), i(() => {
       var e;
       l.lyricLines !== void 0 && ((e = n.value) == null || e.setLyricLines(l.lyricLines));
@@ -69,38 +69,39 @@ const T = /* @__PURE__ */ S({
     }), i(() => {
       var e;
       l.lineScaleSpringParams !== void 0 && ((e = n.value) == null || e.setLineScaleSpringParams(l.lineScaleSpringParams));
-    }), d({
+    }), m({
       lyricPlayer: n,
       wrapperEl: a
-    }), (e, s) => {
-      var o, u;
+    }), (e, o) => {
+      var s, u;
       return v(), L(B, null, [
-        E("div", h({
+        E("div", w({
           ref_key: "wrapperRef",
           ref: a
         }, e.$attrs), null, 16),
-        (o = n.value) != null && o.getBottomLineElement() && l.bottomLine ? (v(), k(w, {
+        (s = n.value) != null && s.getBottomLineElement() && l.bottomLine ? (v(), h(k, {
           key: 0,
           to: (u = n.value) == null ? void 0 : u.getBottomLineElement()
         }, null, 8, ["to"])) : R("", !0)
       ], 64);
     };
   }
-}), I = /* @__PURE__ */ S({
+}), T = /* @__PURE__ */ S({
   __name: "BackgroundRender",
   props: {
     albumImageUrl: {},
     fps: {},
     playing: { type: Boolean },
     flowSpeed: {},
+    lowFreqVolume: {},
     renderScale: {},
     renderer: { type: Function }
   },
-  setup(p, { expose: d }) {
+  setup(p, { expose: m }) {
     const t = p, l = c(), r = c();
     return y(() => {
       if (l.value) {
-        r.value = x.new(t.renderer ?? A);
+        r.value = F.new(t.renderer ?? x);
         const a = r.value.getElement();
         a.style.width = "100%", a.style.height = "100%", l.value.appendChild(a);
       }
@@ -121,7 +122,10 @@ const T = /* @__PURE__ */ S({
     }), i(() => {
       var a;
       t.renderScale && ((a = r.value) == null || a.setRenderScale(t.renderScale));
-    }), d({
+    }), i(() => {
+      var a;
+      t.lowFreqVolume && ((a = r.value) == null || a.setLowFreqVolume(t.lowFreqVolume));
+    }), m({
       bgRender: r,
       wrapperEl: l
     }), (a, n) => (v(), L("div", {
@@ -131,7 +135,7 @@ const T = /* @__PURE__ */ S({
   }
 });
 export {
-  I as BackgroundRender,
-  T as LyricPlayer
+  T as BackgroundRender,
+  q as LyricPlayer
 };
 //# sourceMappingURL=amll-vue.js.map

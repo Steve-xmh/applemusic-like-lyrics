@@ -49,6 +49,9 @@ export class BackgroundRender<Renderer extends BaseRenderer>
 	resume(): void {
 		this.renderer.resume();
 	}
+	setLowFreqVolume(volume: number): void {
+		this.renderer.setLowFreqVolume(volume);
+	}
 	setAlbumImage(albumUrl: string): Promise<void> {
 		return this.renderer.setAlbumImage(albumUrl);
 	}

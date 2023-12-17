@@ -33,6 +33,14 @@ export interface BackgroundRenderProps {
 	 */
 	flowSpeed?: number;
 	/**
+	 * 设置低频的音量大小，范围在 80hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
+	 *
+	 * 部分渲染器会根据音量大小调整背景效果（例如根据鼓点跳动）
+	 *
+	 * 如果无法获取到类似的数据，请传入 undefined 或 1.0 作为默认值，或不做任何处理（默认值即 1.0）
+	 */
+	lowFreqVolume?: number;
+	/**
 	 * 设置当前渲染缩放比例，如果为 `undefined` 则默认为 `0.5`
 	 */
 	renderScale?: number;
@@ -77,6 +85,7 @@ export const BackgroundRender = forwardRef<
 			flowSpeed,
 			renderScale,
 			staticMode,
+			lowFreqVolume,
 			renderer,
 			...props
 		},
@@ -137,6 +146,11 @@ export const BackgroundRender = forwardRef<
 			if (renderScale)
 				coreBGRenderRef.current?.setRenderScale(renderScale ?? 0.5);
 		}, [renderScale]);
+
+		useEffect(() => {
+			if (lowFreqVolume)
+				coreBGRenderRef.current?.setLowFreqVolume(lowFreqVolume ?? 1.0);
+		}, [lowFreqVolume]);
 
 		useEffect(() => {
 			if (coreBGRenderRef.current) {

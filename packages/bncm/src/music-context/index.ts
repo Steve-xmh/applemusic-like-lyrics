@@ -139,4 +139,10 @@ export interface MusicStatusGetterEvents {
 	"audio-data": CustomEvent<{
 		data: ArrayBuffer;
 	}>;
+	/**
+	 * 当产生频谱数据时触发
+	 */
+	"fft-data": CustomEvent<{
+		data: number[];
+	}>;
 }

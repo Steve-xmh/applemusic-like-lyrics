@@ -29,19 +29,17 @@ export const AudioFFTControl: FC = () => {
 			aWeight: true,
 		});
 	}
-	const amllFFT = useRef() as MutableRefObject<PCMPlayer>;
-	if (amllFFT.current === undefined) {
+	const amllFFT = useRef<PCMPlayer>();
+
+	useLayoutEffect(() => {
 		amllFFT.current = new PCMPlayer({
 			inputCodec: "Int16",
 			channels: 2,
 			sampleRate: 48000,
 			flushTime: 50,
 		});
-	}
-
-	useLayoutEffect(() => {
 		return () => {
-			amllFFT.current.destroy();
+			amllFFT.current?.destroy();
 			(amllFFT.current as unknown) = undefined;
 		};
 	}, []);
@@ -62,14 +60,14 @@ export const AudioFFTControl: FC = () => {
 
 	useLayoutEffect(() => {
 		if (playstate === PlayState.Playing) {
-			amllFFT.current.continue();
+			amllFFT.current?.continue();
 		}
 	}, [playstate]);
 
 	useLayoutEffect(() => {
 		const canvas = canvasRef.current;
 
-		if (canvas) {
+		if (canvas && amllFFT.current) {
 			const ctx = canvas.getContext("2d");
 			if (ctx) {
 				const obs = new ResizeObserver((sizes) => {
@@ -81,13 +79,22 @@ export const AudioFFTControl: FC = () => {
 				});
 
 				// const audioStream: number[] = [];
+				let isFFTMode = false;
+				let ctxFFTData: number[] = [];
 
 				const onAudioData = (evt: MusicStatusGetterEvents["audio-data"]) => {
-					amllFFT.current.feed(evt.detail.data);
-					amllFFT.current.continue();
+					isFFTMode = false;
+					amllFFT.current?.feed(evt.detail.data);
+					amllFFT.current?.continue();
+				};
+
+				const onFFTData = (evt: MusicStatusGetterEvents["fft-data"]) => {
+					isFFTMode = true;
+					ctxFFTData = evt.detail.data.map((v) => v * 50);
 				};
 
 				musicCtx?.addEventListener("audio-data", onAudioData);
+				musicCtx?.addEventListener("fft-data", onFFTData);
 
 				obs.observe(canvas);
 
@@ -108,17 +115,24 @@ export const AudioFFTControl: FC = () => {
 				});
 				let maxValue = 1;
 
+				console.log("onFrame");
+
 				function onFrame() {
 					if (!(canvas && ctx) || stopped) return;
 					const width = canvas.width;
 					const height = canvas.height;
-					amllFFT.current.getByteFrequencyData(fftData);
 
 					let processed: number[];
-					if (processBarFFT)
-						processed = soundProcessor.current.process(fftData);
-					else {
-						processed = soundProcessor.current.divide(fftData);
+
+					if (isFFTMode) {
+						processed = ctxFFTData;
+					} else {
+						amllFFT.current?.getByteFrequencyData(fftData);
+						if (processBarFFT)
+							processed = soundProcessor.current.process(fftData);
+						else {
+							processed = soundProcessor.current.divide(fftData);
+						}
 					}
 
 					ctx.clearRect(0, 0, width, height);
@@ -159,11 +173,12 @@ export const AudioFFTControl: FC = () => {
 				return () => {
 					obs.disconnect();
 					musicCtx?.removeEventListener("audio-data", onAudioData);
+					musicCtx?.removeEventListener("fft-data", onFFTData);
 					stopped = true;
 				};
 			}
 		}
-	}, [canvasRef.current, musicCtx, processBarFFT]);
+	}, [canvasRef.current, musicCtx, amllFFT.current, processBarFFT]);
 
 	return (
 		<canvas

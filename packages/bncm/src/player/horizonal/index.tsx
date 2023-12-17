@@ -98,7 +98,9 @@ export const LyricPlayerHorizonal: FC = () => {
 							closeLyricPage();
 						}}
 					/>
-				): <div />}
+				) : (
+					<div />
+				)}
 				{showAlbumImage &&
 					(loadableMusicOverrideData.state === "hasData" &&
 					loadableMusicOverrideData.data.musicCoverIsVideo ? (

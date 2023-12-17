@@ -165,9 +165,7 @@ export const patchMusicOverrideDataAtom = atom(
 			const overrideDirPath = normalizePath(
 				`${ctx.getDataDir()}/music-override-data`,
 			);
-			const overrideJsonPath = normalizePath(
-				`${overrideDirPath}/${id}.json`,
-			);
+			const overrideJsonPath = normalizePath(`${overrideDirPath}/${id}.json`);
 			try {
 				if (await ctx.isFileExists(overrideJsonPath)) {
 					const overrideJson = JSON.parse(
@@ -188,7 +186,10 @@ export const patchMusicOverrideDataAtom = atom(
 				set(musicOverrideDataUpdateAtom, Symbol("music-override-data-update"));
 			} else {
 				try {
-					await ctx.writeFileText(overrideJsonPath, JSON.stringify(modifiedData));
+					await ctx.writeFileText(
+						overrideJsonPath,
+						JSON.stringify(modifiedData),
+					);
 					set(
 						musicOverrideDataUpdateAtom,
 						Symbol("music-override-data-update"),

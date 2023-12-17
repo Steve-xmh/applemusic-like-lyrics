@@ -38,6 +38,15 @@ export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 	 * @param albumUrl 图片的目标链接
 	 */
 	abstract setAlbumImage(albumUrl: string): Promise<void>;
+	/**
+	 * 设置低频的音量大小，范围在 80hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
+	 *
+	 * 部分渲染器会根据音量大小调整背景效果（例如根据鼓点跳动）
+	 *
+	 * 如果无法获取到类似的数据，请传入 1.0 作为默认值，或不做任何处理（默认值即 1.0）
+	 * @param volume 低频的音量大小，范围在 50hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
+	 */
+	abstract setLowFreqVolume(volume: number): void;
 	abstract dispose(): void;
 	abstract getElement(): HTMLElement;
 }
@@ -50,8 +59,14 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 		super();
 		this.observer = new ResizeObserver(() => {
 			const bounds = canvas.getBoundingClientRect();
-			const width = Math.max(1, bounds.width * window.devicePixelRatio * this.currerntRenderScale);
-			const height = Math.max(1, bounds.height * window.devicePixelRatio * this.currerntRenderScale);
+			const width = Math.max(
+				1,
+				bounds.width * window.devicePixelRatio * this.currerntRenderScale,
+			);
+			const height = Math.max(
+				1,
+				bounds.height * window.devicePixelRatio * this.currerntRenderScale,
+			);
 			this.onResize(width, height);
 		});
 		this.observer.observe(canvas);
