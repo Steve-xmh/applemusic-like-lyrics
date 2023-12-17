@@ -69,7 +69,7 @@
 #main-player, .m-pinfo
     transition: bottom 0.5s cubic-bezier(0.8, 0, 0.1, 1), opacity 0.25s ease-in-out
 
-#root header
+#root header, #page_pc_main_nav
     transition: opacity 0.25s 0.5s ease-in-out
     opacity: 1
     
@@ -93,6 +93,11 @@ body.amll-lyric-page-open
         > * > * > *
             transition: opacity 0.25s ease-in-out
             opacity: 0
+
+    #page_pc_main_nav
+        pointer-events: none
+        transition: opacity 0.25s ease-in-out
+        opacity: 0
 
     #amll-view
         top: 0vh
