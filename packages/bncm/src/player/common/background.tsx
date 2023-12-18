@@ -20,6 +20,7 @@ import {
 } from "../../music-context/wrapper";
 import "./background.sass";
 import { EplorRenderer } from "@applemusic-like-lyrics/core";
+import { fftDataAtom } from "./fft-context";
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -33,6 +34,8 @@ export const Background: FC = () => {
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const backgroundFakeLiquidStaticMode = useAtomValue(backgroundStaticModeAtom);
 	const backgroundType = useAtomValue(backgroundTypeAtom);
+	const fftData = useAtomValue(fftDataAtom);
+	
 	if (wsStatus.color !== ConnectionColor.Active && enableBackground) {
 		if (
 			backgroundType === BackgroundType.FakeLiquid ||
@@ -45,6 +48,7 @@ export const Background: FC = () => {
 					disabled={!lyricPageOpened}
 					albumImageUrl={musicCoverUrl}
 					fps={backgroundMaxFPS}
+					lowFreqVolume={fftData[0]}
 					renderScale={backgroundRenderScale}
 					renderer={
 						backgroundType === BackgroundType.LiquidEplor
