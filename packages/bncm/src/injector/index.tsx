@@ -9,6 +9,7 @@ import { AMLLConfig } from "../components/config";
 import { AMLLGuide } from "../player/common/guide";
 import { FC, PropsWithChildren, Suspense, useEffect } from "react";
 import { warn } from "../utils/logger";
+import { AudioFFTContext } from "../player/common/fft-context";
 
 export const mainViewElement: HTMLDivElement = document.createElement("div");
 mainViewElement.id = "amll-view";
@@ -57,6 +58,9 @@ export function initLyricPage() {
 				</SuspenseLogger>
 				<SuspenseLogger text="WebSocketWrapper">
 					<WebSocketWrapper />
+				</SuspenseLogger>
+				<SuspenseLogger text="AudioFFTContext">
+					<AudioFFTContext />
 				</SuspenseLogger>
 				<SuspenseLogger text="LyricProvider">
 					<LyricProvider />
