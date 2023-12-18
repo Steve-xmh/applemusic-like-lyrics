@@ -38,20 +38,18 @@ export const Background: FC = () => {
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
 	
 	useEffect(() => {
-		let maxValue = 1;
 		let curValue = 1;
 		
 		let stopped = false;
 		let lt = 0;
 		const onFrame = (dt: number) => {
 			if (stopped) return;
-			// const delta = dt - lt;
+			const delta = (dt - lt);
 			
 			const value = globalStore.get(fftDataAtom)[0] ?? 1;
-			setLowFreqVolume(curValue / maxValue);
+			setLowFreqVolume(Math.sqrt(Math.sqrt(Math.sqrt(curValue))) / 500 + 0.7);
 			
-			maxValue = (maxValue * 99 + Math.max(maxValue, curValue * 2, 1)) / 100;
-			curValue = (curValue * 9 + value) / 10;
+			curValue = (curValue * 10 + value * delta) / (10 + delta);
 			
 			requestAnimationFrame(onFrame);
 			lt = dt;
@@ -85,7 +83,7 @@ export const Background: FC = () => {
 							: undefined
 					}
 				/>
-				<span>{lowFreqVolume}</span>
+				{/* <span>{lowFreqVolume}</span> */}
 				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {
