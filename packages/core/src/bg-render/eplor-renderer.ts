@@ -428,7 +428,7 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	override setLowFreqVolume(volume: number): void {
-		this._lowFreqVolume = Math.max(0, Math.min(1, volume));
+		this._lowFreqVolume = volume;
 	}
 
 	override setStaticMode(enable: boolean): void {

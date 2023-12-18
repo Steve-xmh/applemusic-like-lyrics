@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import type { FC } from "react";
+import { useState, type FC, useEffect } from "react";
 import {
 	backgroundStaticModeAtom,
 	backgroundTypeAtom,
@@ -21,6 +21,7 @@ import {
 import "./background.sass";
 import { EplorRenderer } from "@applemusic-like-lyrics/core";
 import { fftDataAtom } from "./fft-context";
+import { globalStore } from "../../injector";
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -34,7 +35,34 @@ export const Background: FC = () => {
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const backgroundFakeLiquidStaticMode = useAtomValue(backgroundStaticModeAtom);
 	const backgroundType = useAtomValue(backgroundTypeAtom);
-	const fftData = useAtomValue(fftDataAtom);
+	const [lowFreqVolume, setLowFreqVolume] = useState(1);
+	
+	useEffect(() => {
+		let maxValue = 1;
+		let curValue = 1;
+		
+		let stopped = false;
+		let lt = 0;
+		const onFrame = (dt: number) => {
+			if (stopped) return;
+			// const delta = dt - lt;
+			
+			const value = globalStore.get(fftDataAtom)[0] ?? 1;
+			setLowFreqVolume(curValue / maxValue);
+			
+			maxValue = (maxValue * 99 + Math.max(maxValue, curValue * 2, 1)) / 100;
+			curValue = (curValue * 9 + value) / 10;
+			
+			requestAnimationFrame(onFrame);
+			lt = dt;
+		};
+		
+		onFrame(0);
+		
+		return () => {
+			stopped = true;
+		}
+	}, [wsStatus.color, enableBackground, backgroundType])
 	
 	if (wsStatus.color !== ConnectionColor.Active && enableBackground) {
 		if (
@@ -42,13 +70,14 @@ export const Background: FC = () => {
 			backgroundType === BackgroundType.LiquidEplor
 		) {
 			return (
+				<>
 				<BackgroundRender
 					className="amll-background-render-wrapper"
 					staticMode={backgroundFakeLiquidStaticMode}
 					disabled={!lyricPageOpened}
 					albumImageUrl={musicCoverUrl}
 					fps={backgroundMaxFPS}
-					lowFreqVolume={fftData[0]}
+					lowFreqVolume={lowFreqVolume}
 					renderScale={backgroundRenderScale}
 					renderer={
 						backgroundType === BackgroundType.LiquidEplor
@@ -56,6 +85,8 @@ export const Background: FC = () => {
 							: undefined
 					}
 				/>
+				<span>{lowFreqVolume}</span>
+				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {
 			return (
