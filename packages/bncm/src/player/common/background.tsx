@@ -58,7 +58,7 @@ export const Background: FC = () => {
 						0.0001 -
 						0.09,
 					0.0,
-				) * 0.5;
+				) * 0.04;
 			setLowFreqVolume(curValue);
 
 			const increasing = curValue < value;
