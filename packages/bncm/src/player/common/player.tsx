@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useState, type FC, useEffect, useRef } from "react";
+import { useState, type FC, useEffect, useRef, RefObject } from "react";
 import {
 	currentTimeAtom,
 	lyricPageOpenedAtom,
@@ -27,7 +27,7 @@ import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 import "./player.sass";
 
 export const CoreLyricPlayer: FC<{
-	albumCoverRef: HTMLElement | null;
+	albumCoverRef?: RefObject<HTMLElement | null>;
 	isVertical?: boolean;
 }> = (props) => {
 	const playerRef = useRef<LyricPlayerRef>(null);
@@ -51,8 +51,9 @@ export const CoreLyricPlayer: FC<{
 	const [alignPosition, setAlighPosition] = useState(0.5);
 
 	useEffect(() => {
-		if (props.albumCoverRef) {
-			const el = props.albumCoverRef;
+		const el = props.albumCoverRef?.current;
+		console.log("已更新居中位置", el);
+		if (el) {
 			const onResize = () => {
 				setAlighPosition(
 					(el.offsetTop + el.clientHeight / 2) / window.innerHeight,
@@ -67,7 +68,7 @@ export const CoreLyricPlayer: FC<{
 		} else {
 			setAlighPosition(0.5);
 		}
-	}, [props.albumCoverRef, lyricPageOpened]);
+	}, [props.albumCoverRef?.current, lyricPageOpened]);
 
 	if (
 		wsStatus.color === ConnectionColor.Active &&

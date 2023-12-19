@@ -117,11 +117,15 @@ body.amll-lyric-page-open
     font-weight: 400
     opacity: 0.5
     align-items: center
+    justify-content: center
     font-size: 0.55em
     letter-spacing: 0.5px
+    @media screen and (max-height: 768px)
+        margin-top: 8px
 
     > *
         flex: 0
+        height: fit-content
 
         &:first-child
             flex: 1
@@ -129,7 +133,5 @@ body.amll-lyric-page-open
         &:last-child
             flex: 1
             text-align: right
-
-    > .am-music-quality
-        height: 10px
-        transform: translateY(-9px)
+    .am-music-quality
+        transform: translateY(1px)

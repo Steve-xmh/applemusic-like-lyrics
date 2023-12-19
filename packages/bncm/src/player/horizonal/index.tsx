@@ -140,7 +140,7 @@ export const LyricPlayerHorizonal: FC = () => {
 						/>
 					))}
 				<MusicInfo />
-				<CoreLyricPlayer albumCoverRef={albumCoverRef.current} />
+				<CoreLyricPlayer albumCoverRef={albumCoverRef} />
 				<div
 					data-tauri-drag-region
 					style={{

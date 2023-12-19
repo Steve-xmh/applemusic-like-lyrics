@@ -13,7 +13,6 @@ export const VolumeControl: FC = () => {
 	const maxSpeakerRef = useRef<SVGSVGElement>(null);
 
 	useEffect(() => {
-		console.log(volume);
 		if (lastVolumeRef.current !== volume) {
 			lastVolumeRef.current = volume;
 			if (volume === 0 && minSpeakerRef.current) {

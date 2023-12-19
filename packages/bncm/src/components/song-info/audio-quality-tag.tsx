@@ -11,19 +11,13 @@ export const AudioQualityTag: FC = () => {
 	return (
 		<div className="am-music-quality">
 			{currentAudioQualityType === AudioQualityType.Lossless && (
-				<div>
 					<TagLossless />
-				</div>
 			)}
 			{currentAudioQualityType === AudioQualityType.HiRes && (
-				<div>
 					<TagHiresLossless />
-				</div>
 			)}
 			{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
-				<div>
 					<IconDolbyAtmos />
-				</div>
 			)}
 		</div>
 	);
