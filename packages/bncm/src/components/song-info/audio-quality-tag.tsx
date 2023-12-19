@@ -10,14 +10,12 @@ export const AudioQualityTag: FC = () => {
 	const currentAudioQualityType = useAtomValue(musicQualityAtom);
 	return (
 		<div className="am-music-quality">
-			{currentAudioQualityType === AudioQualityType.Lossless && (
-					<TagLossless />
-			)}
+			{currentAudioQualityType === AudioQualityType.Lossless && <TagLossless />}
 			{currentAudioQualityType === AudioQualityType.HiRes && (
-					<TagHiresLossless />
+				<TagHiresLossless />
 			)}
 			{currentAudioQualityType === AudioQualityType.DolbyAtmos && (
-					<IconDolbyAtmos />
+				<IconDolbyAtmos />
 			)}
 		</div>
 	);

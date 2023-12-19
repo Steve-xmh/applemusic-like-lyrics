@@ -12,7 +12,7 @@ export const AudioFFTContext: FC = () => {
 	const musicCtx = useAtomValue(musicContextAtom);
 	const processBarFFT = useAtomValue(processBarFFTAtom);
 	const playstate = useAtomValue(playStatusAtom);
-    const setFFTData = useSetAtom(fftDataAtom);
+	const setFFTData = useSetAtom(fftDataAtom);
 	const soundProcessor = useRef<SoundProcessor>();
 	const amllFFT = useRef<PCMPlayer>();
 
@@ -38,7 +38,7 @@ export const AudioFFTContext: FC = () => {
 		return () => {
 			amllFFT.current?.destroy();
 			amllFFT.current = undefined;
-            soundProcessor.current = undefined;
+			soundProcessor.current = undefined;
 		};
 	}, []);
 
@@ -49,67 +49,67 @@ export const AudioFFTContext: FC = () => {
 	}, [playstate]);
 
 	useLayoutEffect(() => {
-        const fft = amllFFT.current
-        if (!fft) return;
-        let isFFTMode = false;
-        let ctxFFTData: number[] = [];
+		const fft = amllFFT.current;
+		if (!fft) return;
+		let isFFTMode = false;
+		let ctxFFTData: number[] = [];
 
-        const onAudioData = (evt: MusicStatusGetterEvents["audio-data"]) => {
-            isFFTMode = false;
-            fft.feed(evt.detail.data);
-            fft.continue();
-        };
+		const onAudioData = (evt: MusicStatusGetterEvents["audio-data"]) => {
+			isFFTMode = false;
+			fft.feed(evt.detail.data);
+			fft.continue();
+		};
 
-        const onFFTData = (evt: MusicStatusGetterEvents["fft-data"]) => {
-            isFFTMode = true;
-            ctxFFTData = evt.detail.data;
-        };
+		const onFFTData = (evt: MusicStatusGetterEvents["fft-data"]) => {
+			isFFTMode = true;
+			ctxFFTData = evt.detail.data;
+		};
 
-        musicCtx?.addEventListener("audio-data", onAudioData);
-        musicCtx?.addEventListener("fft-data", onFFTData);
+		musicCtx?.addEventListener("audio-data", onAudioData);
+		musicCtx?.addEventListener("fft-data", onFFTData);
 
-        let stopped = false;
+		let stopped = false;
 
-        const fftData = fft.createFrequencyData();
-        soundProcessor.current = new SoundProcessor({
-            filterParams: {
-                sigma: 1,
-                radius: 1,
-            },
-            sampleRate: 48000,
-            fftSize: fftData.length,
-            outBandsQty: 61,
-            startFrequency: 100,
-            endFrequency: 14000,
-            aWeight: true,
-        });
+		const fftData = fft.createFrequencyData();
+		soundProcessor.current = new SoundProcessor({
+			filterParams: {
+				sigma: 1,
+				radius: 1,
+			},
+			sampleRate: 48000,
+			fftSize: fftData.length,
+			outBandsQty: 61,
+			startFrequency: 100,
+			endFrequency: 14000,
+			aWeight: true,
+		});
 
-        function onFrame() {
-            if (stopped) return;
-            let processed: number[];
+		function onFrame() {
+			if (stopped) return;
+			let processed: number[];
 
-            if (isFFTMode) {
-                processed = ctxFFTData;
-            } else {
-                amllFFT.current?.getByteFrequencyData(fftData);
-                if (processBarFFT)
-                    processed = soundProcessor.current?.process(fftData) ?? [...fftData];
-                else {
-                    processed = soundProcessor.current?.divide(fftData) ?? [...fftData];
-                }
-            }
-            setFFTData(processed);
+			if (isFFTMode) {
+				processed = ctxFFTData;
+			} else {
+				amllFFT.current?.getByteFrequencyData(fftData);
+				if (processBarFFT)
+					processed = soundProcessor.current?.process(fftData) ?? [...fftData];
+				else {
+					processed = soundProcessor.current?.divide(fftData) ?? [...fftData];
+				}
+			}
+			setFFTData(processed);
 
-            requestAnimationFrame(onFrame);
-        }
+			requestAnimationFrame(onFrame);
+		}
 
-        onFrame();
+		onFrame();
 
-        return () => {
-            musicCtx?.removeEventListener("audio-data", onAudioData);
-            musicCtx?.removeEventListener("fft-data", onFFTData);
-            stopped = true;
-        };
+		return () => {
+			musicCtx?.removeEventListener("audio-data", onAudioData);
+			musicCtx?.removeEventListener("fft-data", onFFTData);
+			stopped = true;
+		};
 	}, [musicCtx, amllFFT.current, processBarFFT]);
 
 	return null;

@@ -36,32 +36,56 @@ export const Background: FC = () => {
 	const backgroundFakeLiquidStaticMode = useAtomValue(backgroundStaticModeAtom);
 	const backgroundType = useAtomValue(backgroundTypeAtom);
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
-	
+
 	useEffect(() => {
 		let curValue = 1;
-		
+
 		let stopped = false;
 		let lt = 0;
 		const onFrame = (dt: number) => {
 			if (stopped) return;
-			const delta = (dt - lt);
-			
-			const value = globalStore.get(fftDataAtom)[0] ?? 1;
-			setLowFreqVolume(Math.sqrt(Math.sqrt(Math.sqrt(curValue))) / 500 + 0.7);
-			
-			curValue = (curValue * 10 + value * delta) / (10 + delta);
-			
+			const delta = dt - lt;
+
+			//算法1
+			//			const value = (Math.max(Math.pow(Math.pow(globalStore.get(fftDataAtom)[0] ?? 1, 0.05) - 0.8, 1.1) - 1.2, 0.0)) * 0.3;
+			const value =
+				Math.max(
+					Math.sqrt(
+						globalStore.get(fftDataAtom)[0] +
+							globalStore.get(fftDataAtom)[1] +
+							globalStore.get(fftDataAtom)[2] * 0.5 ?? 1,
+					) *
+						0.0001 -
+						0.09,
+					0.0,
+				) * 0.5;
+			setLowFreqVolume(curValue);
+
+			const increasing = curValue < value;
+
+			if (increasing) {
+				curValue = Math.min(
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
+				);
+			} else {
+				curValue = Math.max(
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
+				);
+			}
+
 			requestAnimationFrame(onFrame);
 			lt = dt;
 		};
-		
+
 		onFrame(0);
-		
+
 		return () => {
 			stopped = true;
-		}
-	}, [wsStatus.color, enableBackground, backgroundType])
-	
+		};
+	}, [wsStatus.color, enableBackground, backgroundType]);
+
 	if (wsStatus.color !== ConnectionColor.Active && enableBackground) {
 		if (
 			backgroundType === BackgroundType.FakeLiquid ||
@@ -69,21 +93,21 @@ export const Background: FC = () => {
 		) {
 			return (
 				<>
-				<BackgroundRender
-					className="amll-background-render-wrapper"
-					staticMode={backgroundFakeLiquidStaticMode}
-					disabled={!lyricPageOpened}
-					albumImageUrl={musicCoverUrl}
-					fps={backgroundMaxFPS}
-					lowFreqVolume={lowFreqVolume}
-					renderScale={backgroundRenderScale}
-					renderer={
-						backgroundType === BackgroundType.LiquidEplor
-							? EplorRenderer
-							: undefined
-					}
-				/>
-				{/* <span>{lowFreqVolume}</span> */}
+					<BackgroundRender
+						className="amll-background-render-wrapper"
+						staticMode={backgroundFakeLiquidStaticMode}
+						disabled={!lyricPageOpened}
+						albumImageUrl={musicCoverUrl}
+						fps={backgroundMaxFPS}
+						lowFreqVolume={lowFreqVolume}
+						renderScale={backgroundRenderScale}
+						renderer={
+							backgroundType === BackgroundType.LiquidEplor
+								? EplorRenderer
+								: undefined
+						}
+					/>
+{/*					<span>{lowFreqVolume}</span>*/}
 				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {

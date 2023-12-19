@@ -321,5 +321,6 @@ export const AboutConfig: FC = () => {
 	if (amllEnvironment === AMLLEnvironment.BetterNCM) return <AboutBNCMConfig />;
 	if (amllEnvironment === AMLLEnvironment.AMLLPlayer)
 		return <AboutAMLLPlayerConfig />;
-	if (amllEnvironment === AMLLEnvironment.Component) return <AboutAMLLComponentConfig />;
+	if (amllEnvironment === AMLLEnvironment.Component)
+		return <AboutAMLLComponentConfig />;
 };

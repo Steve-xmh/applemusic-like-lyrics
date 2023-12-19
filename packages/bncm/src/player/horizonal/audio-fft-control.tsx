@@ -41,7 +41,7 @@ export const AudioFFTControl: FC = () => {
 					} else {
 						for (let i = 0; i < buf.length; i++) {
 							let t = processed[i];
-							t = t * Math.min((i + 5) / buf.length * 4, 1)
+							t = t * Math.min(((i + 5) / buf.length) * 4, 1);
 							buf[i] += t * 2;
 							buf[i] /= 3;
 						}
