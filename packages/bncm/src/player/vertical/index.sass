@@ -31,7 +31,7 @@
         position: relative
         border: none
         background: var(--amll-lyric-primary-color-t15, white) !important
-        width: 50px
+        width: 30px
         margin-left: 16px
         border-radius: 50%
         align-self: center
@@ -39,8 +39,12 @@
         align-items: center
         justify-content: center
         > *
-            width: 75%
-            height: 75%
+            transform: scale(2.5)
+        @media screen and (max-width: 512px)
+            width: 25px
+            height: 25px
+            > *
+                transform: scale(6)
     .amll-lyric-player-wrapper
         grid-column: 1 / 5
         grid-row: lyric-player
@@ -108,6 +112,8 @@
         background-color: var(--amll-lyric-primary-color-t30, white)
         justify-self: center
         mix-blend-mode: plus-lighter
+        @media screen and (max-width: 768px)
+            margin: 4px
     .amll-music-info
         padding-left: 2vh
         box-sizing: border-box
@@ -118,3 +124,5 @@
         align-items: center
         overflow: hidden
         width: 100%
+        @media screen and (max-width: 512px)
+            font-size: 1.1em
