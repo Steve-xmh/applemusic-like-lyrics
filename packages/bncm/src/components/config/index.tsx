@@ -77,6 +77,7 @@ const ConfigSidebarBottomItems: FC = () => {
 				{amllEnvironment === AMLLEnvironment.BetterNCM &&
 					"关于 Apple Music-like lyrics"}
 				{amllEnvironment === AMLLEnvironment.AMLLPlayer && "关于 AMLL Player"}
+				{amllEnvironment === AMLLEnvironment.Component && "关于 AMLL 组件库"}
 			</SidebarItem>
 		</>
 	);

@@ -310,6 +310,15 @@ export const MainMenu: FC = () => {
 					}}
 				/>
 			)}
+			{amllEnvironment === AMLLEnvironment.Component && (
+				<MenuItem
+					label="AMLL 播放页面设置..."
+					onClick={() => {
+						setWindowedConfigOpened(true);
+						setMenuOpened(false);
+					}}
+				/>
+			)}
 		</Menu>
 	);
 };

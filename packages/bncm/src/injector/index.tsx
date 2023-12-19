@@ -22,6 +22,7 @@ export const globalStore = createStore();
 export enum AMLLEnvironment {
 	BetterNCM = "betterncm",
 	AMLLPlayer = "amllplayer",
+	Component = "component",
 }
 export const amllEnvironmentAtom = atom(AMLLEnvironment.BetterNCM);
 
