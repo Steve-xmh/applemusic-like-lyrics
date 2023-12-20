@@ -4,6 +4,7 @@ import { SwitchConfigComponent, SwitchLoadableConfigComponent } from "./common";
 import {
 	autoOpenLyricPageAtom,
 	keepBuiltinPlayerWhenConnectedAtom,
+	pauseWhenMusicLoadedAtom,
 	showStatsAtom,
 	showTutoialAtom,
 	usePlayPositionLerpAtom,
@@ -28,6 +29,12 @@ export const OtherConfig: FC = () => {
 				<SwitchLoadableConfigComponent
 					atom={autoOpenLyricPageAtom}
 					label="启动时自动开启歌词页面"
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={pauseWhenMusicLoadedAtom}
+					label="音乐载入后暂停播放"
+					description="当播放上下文接收到音乐加载的事件后立刻暂停播放，方便等待歌词、专辑图等资源加载完毕，也方便录制展示视频"
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent

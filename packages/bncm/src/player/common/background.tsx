@@ -45,20 +45,14 @@ export const Background: FC = () => {
 		const onFrame = (dt: number) => {
 			if (stopped) return;
 			const delta = dt - lt;
+			const fftData = globalStore.get(fftDataAtom);
 
-			//算法1
-			//			const value = (Math.max(Math.pow(Math.pow(globalStore.get(fftDataAtom)[0] ?? 1, 0.05) - 0.8, 1.1) - 1.2, 0.0)) * 0.3;
 			const value =
 				Math.max(
-					Math.sqrt(
-						globalStore.get(fftDataAtom)[0] +
-							globalStore.get(fftDataAtom)[1] +
-							globalStore.get(fftDataAtom)[2] * 0.5 ?? 1,
-					) *
-						0.0001 -
+					Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5 ?? 1) * 0.001 -
 						0.09,
 					0.0,
-				) * 0.04;
+				) * 0.4;
 			setLowFreqVolume(curValue);
 
 			const increasing = curValue < value;
@@ -107,7 +101,7 @@ export const Background: FC = () => {
 								: undefined
 						}
 					/>
-{/*					<span>{lowFreqVolume}</span>*/}
+					{/* <div style={{position:"fixed"}}>{lowFreqVolume}</div> */}
 				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {

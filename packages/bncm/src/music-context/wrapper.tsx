@@ -1,5 +1,5 @@
 import { type FC, useEffect, useRef } from "react";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import {
 	Artist,
 	AudioQualityType,
@@ -13,7 +13,10 @@ import { MusicContextV3 } from "./v3";
 import { normalizePath } from "../utils/path";
 import { warn } from "../utils/logger";
 import { loadable } from "jotai/utils";
-import { usePlayPositionLerpAtom } from "../components/config/atoms";
+import {
+	pauseWhenMusicLoadedAtom,
+	usePlayPositionLerpAtom,
+} from "../components/config/atoms";
 
 export const musicIdAtom = atom("0");
 export const musicNameAtom = atom("未知歌名");
@@ -262,6 +265,7 @@ export const MusicInfoWrapper: FC = () => {
 	const musicCtx = useRef<MusicContextBase>();
 	const [lyricPageOpened, setLyricPageOpened] = useAtom(lyricPageOpenedAtom);
 	const usePlayPositionLerp = useAtomValue(usePlayPositionLerpAtom);
+	const store = useStore();
 	const setMusicId = useSetAtom(musicIdAtom);
 	const setMusicName = useSetAtom(musicNameAtom);
 	const setMusicArtists = useSetAtom(musicArtistsAtom);
@@ -290,6 +294,9 @@ export const MusicInfoWrapper: FC = () => {
 			musicCtx.current.addEventListener(
 				"load",
 				function (this: MusicContextBase) {
+					if (store.get(pauseWhenMusicLoadedAtom)) {
+						musicCtx.current?.pause();
+					}
 					setMusicId(this.getMusicId());
 					setMusicName(this.getMusicName());
 					setMusicDuration(this.getMusicDuration());

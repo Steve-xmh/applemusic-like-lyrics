@@ -170,6 +170,12 @@ export const autoOpenLyricPageAtom = atomWithConfig({
 	loadable: true,
 });
 
+export const pauseWhenMusicLoadedAtom = atomWithConfig({
+	key: "pause-when-music-loaded",
+	default: false,
+	desc: "是否在播放上下文接收到音乐加载的事件后立刻暂停播放",
+});
+
 export const showStatsAtom = atomWithConfig({
 	key: "show-stats",
 	default: false,
