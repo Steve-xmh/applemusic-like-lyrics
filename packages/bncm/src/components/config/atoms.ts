@@ -182,6 +182,12 @@ export const showStatsAtom = atomWithConfig({
 	desc: "显示实时帧数统计数据",
 });
 
+export const showBackgroundFFTLowFreqAtom = atomWithConfig({
+	key: "show-background-fft-low-freq",
+	default: false,
+	desc: "显示实时背景音频状态数据",
+});
+
 export const enableWSPlayer = atomWithConfig({
 	key: "enable-ws-player",
 	default: false,

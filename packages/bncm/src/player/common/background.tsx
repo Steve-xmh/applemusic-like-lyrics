@@ -8,6 +8,7 @@ import {
 	BackgroundType,
 	backgroundMaxFPSAtom,
 	backgroundRenderScaleAtom,
+	showBackgroundFFTLowFreqAtom,
 } from "../../components/config/atoms";
 import {
 	ConnectionColor,
@@ -28,6 +29,7 @@ export const Background: FC = () => {
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const backgroundMaxFPS = useAtomValue(backgroundMaxFPSAtom);
+	const showBackgroundFFTLowFreq = useAtomValue(showBackgroundFFTLowFreqAtom);
 	const backgroundRenderScale = useAtomValue(backgroundRenderScaleAtom);
 	const backgroundCustomSolidColor = useAtomValue(
 		backgroundCustomSolidColorAtom,
@@ -36,6 +38,7 @@ export const Background: FC = () => {
 	const backgroundFakeLiquidStaticMode = useAtomValue(backgroundStaticModeAtom);
 	const backgroundType = useAtomValue(backgroundTypeAtom);
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
+	const [dbgValue, setDbgValue] = useState<number[]>([]);
 
 	useEffect(() => {
 		let curValue = 1;
@@ -46,6 +49,8 @@ export const Background: FC = () => {
 			if (stopped) return;
 			const delta = dt - lt;
 			const fftData = globalStore.get(fftDataAtom);
+
+			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
 			const value =
 				Math.max(
@@ -69,6 +74,8 @@ export const Background: FC = () => {
 				);
 			}
 
+			if (isNaN(curValue)) curValue = 1;
+
 			requestAnimationFrame(onFrame);
 			lt = dt;
 		};
@@ -78,7 +85,12 @@ export const Background: FC = () => {
 		return () => {
 			stopped = true;
 		};
-	}, [wsStatus.color, enableBackground, backgroundType]);
+	}, [
+		wsStatus.color,
+		enableBackground,
+		backgroundType,
+		showBackgroundFFTLowFreq,
+	]);
 
 	if (wsStatus.color !== ConnectionColor.Active && enableBackground) {
 		if (
@@ -101,7 +113,23 @@ export const Background: FC = () => {
 								: undefined
 						}
 					/>
-					{/* <div style={{position:"fixed"}}>{lowFreqVolume}</div> */}
+					{showBackgroundFFTLowFreq && (
+						<div
+							style={{
+								position: "fixed",
+								textAlign: "right",
+								width: "10em",
+								fontFamily: "monospace",
+							}}
+						>
+							<div style={{ fontFamily: "monospace" }}>
+								{lowFreqVolume.toFixed(4)}
+							</div>
+							{dbgValue.map((v) => (
+								<div style={{ fontFamily: "monospace" }}>{v.toFixed(4)}</div>
+							))}
+						</div>
+					)}
 				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {

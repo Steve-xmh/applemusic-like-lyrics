@@ -5,6 +5,7 @@ import {
 	autoOpenLyricPageAtom,
 	keepBuiltinPlayerWhenConnectedAtom,
 	pauseWhenMusicLoadedAtom,
+	showBackgroundFFTLowFreqAtom,
 	showStatsAtom,
 	showTutoialAtom,
 	usePlayPositionLerpAtom,
@@ -17,6 +18,11 @@ export const OtherConfig: FC = () => {
 				<SwitchConfigComponent
 					atom={showStatsAtom}
 					label="显示实时帧数统计数据"
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={showBackgroundFFTLowFreqAtom}
+					label="显示实时背景音频状态数据"
 				/>
 			</GroupBox>
 			<GroupBox>
