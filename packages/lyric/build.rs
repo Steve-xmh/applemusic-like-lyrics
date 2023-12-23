@@ -1,4 +1,3 @@
-
 #[cfg(feature = "qrc")]
 fn build_qdec() {
     let arch = std::env::var("CARGO_CFG_TARGET_POINTER_WIDTH").unwrap();

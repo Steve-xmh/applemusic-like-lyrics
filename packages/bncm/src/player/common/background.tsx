@@ -53,11 +53,16 @@ export const Background: FC = () => {
 			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
 			const value =
-				Math.max(
-					Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5 ?? 1) * 0.001 -
-						0.09,
-					0.0,
-				) * 0.4;
+				Math.pow(
+					Math.max(
+						Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5 ?? 1) * 0.001 -
+							0.15,
+						0.0,
+					) *
+						4.0 +
+						1.0,
+					1.2,
+				) - 1.0;
 			setLowFreqVolume(curValue);
 
 			const increasing = curValue < value;

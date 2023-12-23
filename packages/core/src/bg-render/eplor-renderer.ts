@@ -331,6 +331,7 @@ export class EplorRenderer extends BaseRenderer {
 	private reduceImageSizeCanvas = new OffscreenCanvas(512, 512);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
+    private ampTransition = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -344,6 +345,8 @@ export class EplorRenderer extends BaseRenderer {
 		this.onRedraw(tickTime);
 
 		this.lastTickTime = tickTime;
+
+        this.ampTransition
 	}
 
 	private mainProgram: GLProgram = new GLProgram(
@@ -399,6 +402,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.clearColor(0, 0, 0, 1);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
+        this.mainProgram.setUniform1f("IIIlllllllIIIllIl", 1.0);
 		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
 		for (const sprite of this.sprites) {
 			sprite.draw("IlllIIlIlllIll");
@@ -492,7 +496,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.8);
-		brightnessImage(imageData, 0.9);
+		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 1);
 		const sprite = new AlbumTexture(
 			this.gl,
