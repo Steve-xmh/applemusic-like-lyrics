@@ -25,7 +25,8 @@
   "exports": {
     ".": {
       "import": "./dist/amll-vue.js",
-      "require": "./dist/amll-vue.cjs"
+      "require": "./dist/amll-vue.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "dependencies": {

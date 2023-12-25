@@ -10,7 +10,19 @@ function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const width = imageData.width;
 	const height = imageData.height;
 
-	let rsum, gsum, bsum, asum, x, y, i, p, p1, p2, yp, yi, yw;
+	let rsum: number;
+	let gsum: number;
+	let bsum: number;
+	let asum: number;
+	let x: number;
+	let y: number;
+	let i: number;
+	let p: number;
+	let p1: number;
+	let p2: number;
+	let yp: number;
+	let yi: number;
+	let yw: number;
 	const wm = width - 1;
 	const hm = height - 1;
 	const rad1x = radius + 1;
@@ -19,13 +31,13 @@ function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const divy = radius + rad1y;
 	const div2 = 1 / (divx * divy);
 
-	const r = [];
-	const g = [];
-	const b = [];
-	const a = [];
+	const r: number[] = [];
+	const g: number[] = [];
+	const b: number[] = [];
+	const a: number[] = [];
 
-	const vmin = [];
-	const vmax = [];
+	const vmin: number[] = [];
+	const vmax: number[] = [];
 
 	while (quality-- > 0) {
 		yw = yi = 0;
@@ -50,7 +62,7 @@ function blurImage(imageData: ImageData, radius: number, quality: number) {
 				b[yi] = bsum;
 				a[yi] = asum;
 
-				if (y == 0) {
+				if (y === 0) {
 					vmin[x] = Math.min(x + rad1x, wm) << 2;
 					vmax[x] = Math.max(x - radius, 0) << 2;
 				}
@@ -90,7 +102,7 @@ function blurImage(imageData: ImageData, radius: number, quality: number) {
 				pixels[yi + 2] = (bsum * div2 + 0.5) | 0;
 				pixels[yi + 3] = (asum * div2 + 0.5) | 0;
 
-				if (x == 0) {
+				if (x === 0) {
 					vmin[y] = Math.min(y + rad1y, hm) * width;
 					vmax[y] = Math.max(y - radius, 0) * width;
 				}

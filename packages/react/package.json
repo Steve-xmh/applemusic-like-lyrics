@@ -26,7 +26,8 @@
   "exports": {
     ".": {
       "import": "./dist/amll-react.js",
-      "require": "./dist/amll-react.cjs"
+      "require": "./dist/amll-react.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "devDependencies": {
