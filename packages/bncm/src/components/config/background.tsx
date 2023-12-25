@@ -8,6 +8,7 @@ import {
 import {
 	BackgroundType,
 	backgroundCustomSolidColorAtom,
+	backgroundFlowSpeedAtom,
 	backgroundMaxFPSAtom,
 	backgroundRenderScaleAtom,
 	backgroundStaticModeAtom,
@@ -81,6 +82,12 @@ export const BackgroundConfig: FC = () => {
 								atom={backgroundRenderScaleAtom}
 								label="渲染精度"
 								description="默认为 0.5 (50%)，越高背景更细致，但是性能消耗更大且很多时候并不明显"
+							/>
+							<GroupBoxDevider />
+							<NumberTextFieldConfigComponent
+								atom={backgroundFlowSpeedAtom}
+								label="播放速度"
+								description="也可以被叫做背景的流动速度，默认为 2，数字越大越快"
 							/>
 						</GroupBox>
 					)}

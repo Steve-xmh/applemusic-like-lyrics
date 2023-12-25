@@ -4,7 +4,6 @@ export declare class EplorRenderer extends BaseRenderer {
     private maxFPS;
     private lastTickTime;
     private _lowFreqVolume;
-    private randomOffset;
     private paused;
     private staticMode;
     private gl;
@@ -12,6 +11,7 @@ export declare class EplorRenderer extends BaseRenderer {
     private tickHandle;
     private sprites;
     private ampTransition;
+    private playTime;
     private onTick;
     private mainProgram;
     private blendProgram;

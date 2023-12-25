@@ -235,6 +235,12 @@ export const backgroundRenderScaleAtom = atomWithConfig({
 	desc: "动态背景通用设置 - 渲染精度",
 });
 
+export const backgroundFlowSpeedAtom = atomWithConfig({
+	key: "background-flow-speed",
+	default: 2,
+	desc: "动态背景通用设置 - 动画速度",
+});
+
 export const backgroundCustomSolidColorAtom = atomWithConfig({
 	key: "background-custom-solid-color",
 	default: "#222222",

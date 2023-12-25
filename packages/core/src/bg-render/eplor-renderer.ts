@@ -324,7 +324,6 @@ export class EplorRenderer extends BaseRenderer {
 	private maxFPS = 30;
 	private lastTickTime = 0;
 	private _lowFreqVolume = 1;
-	private randomOffset = Math.random() * 1000;
 	private paused = false;
 	private staticMode = false;
 	private gl: WebGLRenderingContext = this.setupGL();
@@ -332,6 +331,7 @@ export class EplorRenderer extends BaseRenderer {
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
     private ampTransition = 0;
+	private playTime = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -341,8 +341,10 @@ export class EplorRenderer extends BaseRenderer {
 		if (delta < 1000 / this.maxFPS) {
 			return;
 		}
+		
+		this.playTime += delta * this.flowSpeed;
 
-		this.onRedraw(tickTime);
+		this.onRedraw(this.playTime);
 
 		this.lastTickTime = tickTime;
 
@@ -507,7 +509,7 @@ export class EplorRenderer extends BaseRenderer {
 		);
 		console.log(imageData, sprite);
 		this.sprites.push(sprite);
-		this.randomOffset = Math.random() * 1000;
+		this.playTime = Math.random() * 1000;
 		this.requestTick();
 	}
 

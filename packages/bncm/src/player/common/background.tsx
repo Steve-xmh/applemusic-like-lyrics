@@ -9,6 +9,7 @@ import {
 	backgroundMaxFPSAtom,
 	backgroundRenderScaleAtom,
 	showBackgroundFFTLowFreqAtom,
+	backgroundFlowSpeedAtom,
 } from "../../components/config/atoms";
 import {
 	ConnectionColor,
@@ -31,6 +32,7 @@ export const Background: FC = () => {
 	const backgroundMaxFPS = useAtomValue(backgroundMaxFPSAtom);
 	const showBackgroundFFTLowFreq = useAtomValue(showBackgroundFFTLowFreqAtom);
 	const backgroundRenderScale = useAtomValue(backgroundRenderScaleAtom);
+	const flowSpeed = useAtomValue(backgroundFlowSpeedAtom);
 	const backgroundCustomSolidColor = useAtomValue(
 		backgroundCustomSolidColorAtom,
 	);
@@ -112,6 +114,7 @@ export const Background: FC = () => {
 						fps={backgroundMaxFPS}
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
+						flowSpeed={flowSpeed}
 						renderer={
 							backgroundType === BackgroundType.LiquidEplor
 								? EplorRenderer
