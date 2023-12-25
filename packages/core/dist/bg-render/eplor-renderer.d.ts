@@ -11,6 +11,7 @@ export declare class EplorRenderer extends BaseRenderer {
     private reduceImageSizeCanvas;
     private tickHandle;
     private sprites;
+    private ampTransition;
     private onTick;
     private mainProgram;
     private blendProgram;
