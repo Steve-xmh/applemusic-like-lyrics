@@ -20,10 +20,13 @@ export declare class EplorRenderer extends BaseRenderer {
     private static readonly rawIndexBuffer;
     private vertexBuffer;
     private indexBuffer;
+    private fb;
+    constructor(canvas: HTMLCanvasElement);
     protected onResize(width: number, height: number): void;
     private requestTick;
+    private drawScreen;
+    private bindDefaultFrameBuffer;
     private onRedraw;
-    constructor(canvas: HTMLCanvasElement);
     private setupGL;
     setLowFreqVolume(volume: number): void;
     setStaticMode(enable: boolean): void;
@@ -33,4 +36,5 @@ export declare class EplorRenderer extends BaseRenderer {
     private loadImage;
     setAlbumImage(albumUrl: string): Promise<void>;
     getElement(): HTMLElement;
+    dispose(): void;
 }

@@ -172,6 +172,7 @@ class GLProgram implements Disposable {
 	program: WebGLProgram;
 	private vertexShader: WebGLShader;
 	private fragmentShader: WebGLShader;
+	private coordPos: number;
 	constructor(
 		gl: WebGLRenderingContext,
 		vertexShaderSource: string,
@@ -184,6 +185,11 @@ class GLProgram implements Disposable {
 			fragmentShaderSource,
 		);
 		this.program = this.createProgram();
+
+		const coordPos = gl.getAttribLocation(this.program, "v_coord");
+		if (coordPos === -1)
+			throw new Error("Failed to get attribute location v_coord");
+		this.coordPos = coordPos;
 	}
 	private createShader(type: number, source: string) {
 		const gl = this.gl;
@@ -218,6 +224,8 @@ class GLProgram implements Disposable {
 	use() {
 		const gl = this.gl;
 		gl.useProgram(this.program);
+		gl.vertexAttribPointer(this.coordPos, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(this.coordPos);
 	}
 	setUniform1f(name: string, value: number) {
 		const gl = this.gl;
@@ -242,6 +250,62 @@ class GLProgram implements Disposable {
 		gl.deleteShader(this.vertexShader);
 		gl.deleteShader(this.fragmentShader);
 		gl.deleteProgram(this.program);
+	}
+}
+
+class Framebuffer implements Disposable {
+	private fb: WebGLFramebuffer;
+	private tex: WebGLTexture;
+	constructor(
+		private gl: WebGLRenderingContext,
+		width: number,
+		height: number,
+	) {
+		const fb = gl.createFramebuffer();
+		if (!fb) throw new Error("Can't create framebuffer");
+		const tex = gl.createTexture();
+		if (!tex) throw new Error("Failed to create texture");
+		this.fb = fb;
+		this.tex = tex;
+		this.resize(width, height);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
+	}
+	resize(width: number, height: number) {
+		const gl = this.gl;
+		this.bind();
+		gl.viewport(0, 0, width, height);
+		gl.bindTexture(gl.TEXTURE_2D, this.tex);
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			width,
+			height,
+			0,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			null,
+		);
+	}
+	bind() {
+		const gl = this.gl;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
+		gl.framebufferTexture2D(
+			gl.FRAMEBUFFER,
+			gl.COLOR_ATTACHMENT0,
+			gl.TEXTURE_2D,
+			this.tex,
+			0,
+		);
+	}
+	active(texture: number = this.gl.TEXTURE0) {
+		this.gl.activeTexture(texture);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
+	}
+	dispose(): void {
+		this.gl.deleteFramebuffer(this.fb);
 	}
 }
 
@@ -309,21 +373,17 @@ class AlbumTexture implements Disposable {
 			albumImageData,
 		);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
-		const coordPos = gl.getAttribLocation(mainProgram.program, "v_coord");
-		gl.vertexAttribPointer(coordPos, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(coordPos);
 	}
 
 	draw(sampler: string) {
 		const gl = this.gl;
-		this.vertexBuffer.bind();
-		this.indexBuffer.bind();
 		this.mainProgram.use();
-		gl.activeTexture(gl.TEXTURE1);
+		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, this.albumTexture);
-		this.mainProgram.setUniform1i(sampler, 1);
+		this.mainProgram.setUniform1i(sampler, 0);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	}
 
@@ -339,10 +399,10 @@ export class EplorRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private gl: WebGLRenderingContext = this.setupGL();
-	private reduceImageSizeCanvas = new OffscreenCanvas(512, 512);
+	private reduceImageSizeCanvas = new OffscreenCanvas(64, 64);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
-    private ampTransition = 0;
+	private ampTransition = 0;
 	private playTime = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
@@ -353,14 +413,14 @@ export class EplorRenderer extends BaseRenderer {
 		if (delta < 1000 / this.maxFPS) {
 			return;
 		}
-		
+
 		this.playTime += delta * this.flowSpeed;
 
-		this.onRedraw(this.playTime);
+		this.onRedraw(this.playTime, delta);
 
 		this.lastTickTime = tickTime;
 
-        this.ampTransition
+		this.ampTransition;
 	}
 
 	private mainProgram: GLProgram = new GLProgram(
@@ -399,10 +459,37 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.STATIC_DRAW,
 	);
 
+	private fb: [Framebuffer, Framebuffer];
+
+	constructor(protected canvas: HTMLCanvasElement) {
+		super(canvas);
+		const gl = this.gl;
+		gl.enable(this.gl.BLEND);
+		gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+		this.requestTick();
+		const bounds = canvas.getBoundingClientRect();
+		const width =
+			bounds.width * window.devicePixelRatio * this.currerntRenderScale;
+		const height =
+			bounds.height * window.devicePixelRatio * this.currerntRenderScale;
+		this.fb = [
+			new Framebuffer(this.gl, width, height),
+			new Framebuffer(this.gl, width, height),
+		];
+		this.fb.forEach((fb) => {
+			fb.bind();
+			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+		});
+		this.onResize(width, height);
+	}
+
 	protected override onResize(width: number, height: number): void {
 		super.onResize(width, height);
-		console.log("onResize", width, height);
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 		this.gl.viewport(0, 0, width, height);
+		for (const fb of this.fb) {
+			fb.resize(width, height);
+		}
 		this.mainProgram.use();
 		this.mainProgram.setUniform2f("IIlIlIIlIlIllI", width, height);
 	}
@@ -412,26 +499,61 @@ export class EplorRenderer extends BaseRenderer {
 			this.tickHandle = requestAnimationFrame((t) => this.onTick(t));
 	}
 
-	private onRedraw(tickTime: number) {
-		this.gl.clearColor(0, 0, 0, 1);
-		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
-        this.mainProgram.setUniform1f("IIIlllllllIIIllIl", 1.0);
-		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
-		for (const sprite of this.sprites) {
-			sprite.draw("IlllIIlIlllIll");
-		}
+	private drawScreen() {
+		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
 	}
 
-	constructor(protected canvas: HTMLCanvasElement) {
-		super(canvas);
-		this.gl.enable(this.gl.BLEND);
-		this.requestTick();
-		const bounds = canvas.getBoundingClientRect();
-		this.onResize(
-			bounds.width * window.devicePixelRatio * this.currerntRenderScale,
-			bounds.height * window.devicePixelRatio * this.currerntRenderScale,
-		);
+	private bindDefaultFrameBuffer() {
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+	}
+
+	private onRedraw(tickTime: number, delta: number) {
+		const gl = this.gl;
+		this.vertexBuffer.bind();
+		this.indexBuffer.bind();
+
+		this.mainProgram.use();
+		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
+		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", 1.0);
+		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
+		let [fba, fbb] = this.fb;
+		fbb.bind();
+		gl.clearColor(0, 0, 0, 0);
+		gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+		for (const sprite of this.sprites) {
+			fba.bind();
+			gl.clearColor(0, 0, 0, 0);
+			gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+			this.mainProgram.use();
+			sprite.draw("IlllIIlIlllIll");
+
+			fbb.bind();
+
+			this.blendProgram.use();
+			fba.active();
+			this.blendProgram.setUniform1i("src", 0);
+			this.blendProgram.setUniform1f("lerp", sprite.alpha);
+			this.drawScreen();
+
+			sprite.alpha = Math.min(1, sprite.alpha + delta / 1000);
+		}
+
+		this.bindDefaultFrameBuffer();
+		this.copyProgram.use();
+		fbb.active();
+		this.copyProgram.setUniform1i("src", 0);
+		this.drawScreen();
+
+		if (this.sprites.length > 1) {
+			const coveredIndex = this.sprites.findLastIndex((v) => v.alpha >= 1);
+			if (coveredIndex !== -1) {
+				for (const deleted of this.sprites.splice(0, coveredIndex)) {
+					deleted.dispose();
+				}
+			}
+		}
 	}
 
 	private setupGL() {
@@ -442,6 +564,10 @@ export class EplorRenderer extends BaseRenderer {
 		});
 		if (!gl) throw new Error("WebGL2 not supported");
 		this.gl = gl;
+		gl.enable(gl.BLEND);
+		gl.disable(gl.DEPTH_TEST);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
 		return gl;
 	}
 
@@ -477,7 +603,6 @@ export class EplorRenderer extends BaseRenderer {
 		});
 	}
 	override async setAlbumImage(albumUrl: string): Promise<void> {
-		console.log("setAlbumImage", albumUrl);
 		if (albumUrl.trim().length === 0) return;
 		let remainRetryTimes = 5;
 		let img: HTMLImageElement | null = null;
@@ -500,7 +625,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 50;
+		const blurRadius = 8;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw = img.naturalWidth;
@@ -519,7 +644,6 @@ export class EplorRenderer extends BaseRenderer {
 			this.indexBuffer,
 			imageData,
 		);
-		console.log(imageData, sprite);
 		this.sprites.push(sprite);
 		this.playTime = Math.random() * 1000;
 		this.requestTick();
@@ -527,5 +651,18 @@ export class EplorRenderer extends BaseRenderer {
 
 	override getElement(): HTMLElement {
 		return this.canvas;
+	}
+	override dispose(): void {
+		super.dispose();
+		this.vertexBuffer.dispose();
+		this.indexBuffer.dispose();
+		this.sprites.forEach((v) => v.dispose());
+		this.copyProgram.dispose();
+		this.blendProgram.dispose();
+		this.mainProgram.dispose();
+		if (this.tickHandle) {
+			cancelAnimationFrame(this.tickHandle);
+			this.tickHandle = 0;
+		}
 	}
 }

@@ -1,4 +1,5 @@
 #version 300 es
+precision highp float;
 
 in vec2 v_coord;
 out vec2 f_v_coord;
