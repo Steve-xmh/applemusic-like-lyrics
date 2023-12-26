@@ -504,6 +504,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param lines 歌词数组
 	 */
 	setLyricLines(lines: LyricLine[]) {
+		lines.forEach((line) => {
+			line.words.forEach((word) => {
+				word.word = word.word.replace(/\s+/g, " ");
+			});
+		});
 		this.lyricLines = lines;
 		const timeOffset = 750;
 		this.processedLines = lines
