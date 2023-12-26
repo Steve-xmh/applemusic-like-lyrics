@@ -1,8 +1,11 @@
 import { BaseRenderer } from "./base";
 export declare class EplorRenderer extends BaseRenderer {
     protected canvas: HTMLCanvasElement;
+    private hasLyric;
+    private hasLyricValue;
     private maxFPS;
     private lastTickTime;
+    private lastFrameTime;
     private _lowFreqVolume;
     private paused;
     private staticMode;
@@ -35,6 +38,7 @@ export declare class EplorRenderer extends BaseRenderer {
     resume(): void;
     private loadImage;
     setAlbumImage(albumUrl: string): Promise<void>;
+    setHasLyric(hasLyric: boolean): void;
     getElement(): HTMLElement;
     dispose(): void;
 }

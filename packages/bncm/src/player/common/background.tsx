@@ -24,6 +24,7 @@ import "./background.sass";
 import { EplorRenderer } from "@applemusic-like-lyrics/core";
 import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
+import { lyricLinesAtom } from "../../lyric/provider";
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -38,6 +39,7 @@ export const Background: FC = () => {
 	);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const backgroundFakeLiquidStaticMode = useAtomValue(backgroundStaticModeAtom);
+	const lyricLines = useAtomValue(lyricLinesAtom);
 	const backgroundType = useAtomValue(backgroundTypeAtom);
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
 	const [dbgValue, setDbgValue] = useState<number[]>([]);
@@ -114,6 +116,7 @@ export const Background: FC = () => {
 						fps={backgroundMaxFPS}
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
+						hasLyric={lyricLines.state === "hasData" && lyricLines.data.length > 0}
 						flowSpeed={flowSpeed}
 						renderer={
 							backgroundType === BackgroundType.LiquidEplor

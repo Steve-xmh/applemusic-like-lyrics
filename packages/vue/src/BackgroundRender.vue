@@ -59,6 +59,11 @@ watchEffect(() => {
         bgRenderRef.value?.setLowFreqVolume(props.lowFreqVolume);
 });
 
+watchEffect(() => {
+    if (props.hasLyric !== undefined)
+        bgRenderRef.value?.setHasLyric(props.hasLyric ?? true);
+});
+
 defineExpose<BackgroundRenderRef>({
     bgRender: bgRenderRef,
     wrapperEl: wrapperRef,

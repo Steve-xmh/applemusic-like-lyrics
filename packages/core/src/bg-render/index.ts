@@ -52,6 +52,9 @@ export class BackgroundRender<Renderer extends BaseRenderer>
 	setLowFreqVolume(volume: number): void {
 		this.renderer.setLowFreqVolume(volume);
 	}
+	setHasLyric(hasLyric: boolean): void {
+		this.renderer.setHasLyric(hasLyric);
+	}
 	setAlbumImage(albumUrl: string): Promise<void> {
 		return this.renderer.setAlbumImage(albumUrl);
 	}

@@ -186,6 +186,10 @@ export class PixiRenderer extends BaseRenderer {
 		// NOOP
 	}
 
+	override setHasLyric(_hasLyric: boolean): void {
+		// NOOP
+	}
+
 	override async setAlbumImage(albumUrl: string) {
 		if (albumUrl.trim().length === 0) return;
 		const img = new Image();

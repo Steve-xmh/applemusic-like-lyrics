@@ -15,6 +15,7 @@ export declare class PixiRenderer extends BaseRenderer {
     pause(): void;
     resume(): void;
     setLowFreqVolume(_volume: number): void;
+    setHasLyric(_hasLyric: boolean): void;
     setAlbumImage(albumUrl: string): Promise<void>;
     dispose(): void;
     getElement(): HTMLElement;

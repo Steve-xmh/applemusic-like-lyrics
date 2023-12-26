@@ -33,6 +33,14 @@ export interface BackgroundRenderProps {
 	 */
 	flowSpeed?: number;
 	/**
+	 * 设置背景是否根据“是否有歌词”这个特征调整自身效果，例如有歌词时会变得更加活跃
+	 *
+	 * 部分渲染器会根据这个特征调整自身效果
+	 *
+	 * 如果不确定是否需要赋值或无法知晓是否包含歌词，请传入 true 或不做任何处理（默认值为 true）
+	 */
+	hasLyric?: boolean;
+	/**
 	 * 设置低频的音量大小，范围在 80hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
 	 *
 	 * 部分渲染器会根据音量大小调整背景效果（例如根据鼓点跳动）
@@ -86,6 +94,7 @@ export const BackgroundRender = forwardRef<
 			renderScale,
 			staticMode,
 			lowFreqVolume,
+			hasLyric,
 			renderer,
 			...props
 		},
@@ -151,6 +160,11 @@ export const BackgroundRender = forwardRef<
 			if (lowFreqVolume)
 				coreBGRenderRef.current?.setLowFreqVolume(lowFreqVolume ?? 1.0);
 		}, [lowFreqVolume]);
+
+		useEffect(() => {
+			if (hasLyric !== undefined)
+				coreBGRenderRef.current?.setHasLyric(hasLyric ?? true);
+		}, [hasLyric]);
 
 		useEffect(() => {
 			if (coreBGRenderRef.current) {

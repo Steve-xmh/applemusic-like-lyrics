@@ -21,6 +21,7 @@ export declare class BackgroundRender<Renderer extends BaseRenderer> implements 
     pause(): void;
     resume(): void;
     setLowFreqVolume(volume: number): void;
+    setHasLyric(hasLyric: boolean): void;
     setAlbumImage(albumUrl: string): Promise<void>;
     getElement(): HTMLCanvasElement;
     dispose(): void;

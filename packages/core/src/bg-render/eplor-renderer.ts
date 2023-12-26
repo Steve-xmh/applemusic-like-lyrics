@@ -393,8 +393,11 @@ class AlbumTexture implements Disposable {
 }
 
 export class EplorRenderer extends BaseRenderer {
+	private hasLyric = true;
+	private hasLyricValue = 1;
 	private maxFPS = 30;
 	private lastTickTime = 0;
+	private lastFrameTime = 0;
 	private _lowFreqVolume = 1;
 	private paused = false;
 	private staticMode = false;
@@ -409,14 +412,18 @@ export class EplorRenderer extends BaseRenderer {
 		if (this.paused) return;
 
 		const delta = tickTime - this.lastTickTime;
-		if (!this.staticMode) this.requestTick();
+		const frameDelta = tickTime - this.lastFrameTime;
+		this.lastFrameTime = tickTime;
 		if (delta < 1000 / this.maxFPS) {
+			this.requestTick();
 			return;
 		}
 
-		this.playTime += delta * this.flowSpeed;
+		this.playTime += frameDelta * this.flowSpeed;
 
-		this.onRedraw(this.playTime, delta);
+		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
+			this.requestTick();
+		}
 
 		this.lastTickTime = tickTime;
 
@@ -508,13 +515,15 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
+		this.hasLyricValue =
+			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
 		const gl = this.gl;
 		this.vertexBuffer.bind();
 		this.indexBuffer.bind();
 
 		this.mainProgram.use();
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
-		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", 1.0);
+		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
 		let [fba, fbb] = this.fb;
 		fbb.bind();
@@ -554,6 +563,7 @@ export class EplorRenderer extends BaseRenderer {
 				}
 			}
 		}
+		return this.sprites.length === 1 && this.sprites[0].alpha >= 1;
 	}
 
 	private setupGL() {
@@ -577,6 +587,7 @@ export class EplorRenderer extends BaseRenderer {
 
 	override setStaticMode(enable: boolean): void {
 		this.staticMode = enable;
+		this.lastFrameTime = performance.now();
 		this.requestTick();
 	}
 	override setFPS(fps: number): void {
@@ -646,6 +657,12 @@ export class EplorRenderer extends BaseRenderer {
 		);
 		this.sprites.push(sprite);
 		this.playTime = Math.random() * 1000;
+		this.lastFrameTime = performance.now();
+		this.requestTick();
+	}
+
+	override setHasLyric(hasLyric: boolean): void {
+		this.hasLyric = hasLyric;
 		this.requestTick();
 	}
 
