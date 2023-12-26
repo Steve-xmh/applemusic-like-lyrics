@@ -546,7 +546,7 @@ export class EplorRenderer extends BaseRenderer {
 			this.blendProgram.setUniform1f("lerp", sprite.alpha);
 			this.drawScreen();
 
-			sprite.alpha = Math.min(1, sprite.alpha + delta / 1000);
+			sprite.alpha = Math.min(1, sprite.alpha + delta / 200);
 		}
 
 		this.bindDefaultFrameBuffer();
@@ -636,7 +636,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 8;
+		const blurRadius = 4;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw = img.naturalWidth;
@@ -647,7 +647,7 @@ export class EplorRenderer extends BaseRenderer {
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
-		blurImage(imageData, blurRadius, 1);
+		blurImage(imageData, blurRadius, 4);
 		const sprite = new AlbumTexture(
 			this.gl,
 			this.mainProgram,

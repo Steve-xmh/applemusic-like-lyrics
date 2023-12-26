@@ -116,7 +116,9 @@ export const Background: FC = () => {
 						fps={backgroundMaxFPS}
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
-						hasLyric={lyricLines.state === "hasData" && lyricLines.data.length > 0}
+						hasLyric={
+							lyricLines.state === "hasData" && lyricLines.data.length > 0
+						}
 						flowSpeed={flowSpeed}
 						renderer={
 							backgroundType === BackgroundType.LiquidEplor
