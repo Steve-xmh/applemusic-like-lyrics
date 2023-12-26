@@ -3,6 +3,7 @@ import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
 import { SwitchConfigComponent, SwitchLoadableConfigComponent } from "./common";
 import {
 	autoOpenLyricPageAtom,
+	disableMixBlendModeAtom,
 	keepBuiltinPlayerWhenConnectedAtom,
 	pauseWhenMusicLoadedAtom,
 	showBackgroundFFTLowFreqAtom,
@@ -53,6 +54,12 @@ export const OtherConfig: FC = () => {
 					atom={usePlayPositionLerpAtom}
 					label="使用插值平滑播放进度"
 					description="会略微提高播放进度的精度，理论上可以让AMLL更精确地判定歌词行进度和展示方式，对于某些歌曲歌词可能会有帮助。此选项在 macOS 上会无视设置强制启用。"
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={disableMixBlendModeAtom}
+					label="禁用高亮混色效果"
+					description="对低 DPI 屏幕友好，但是会导致高亮效果变得不太明显，在不支持混色效果的浏览器上没有作用"
 				/>
 			</GroupBox>
 		</>

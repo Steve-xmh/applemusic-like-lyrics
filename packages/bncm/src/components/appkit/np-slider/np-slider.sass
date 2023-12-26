@@ -1,7 +1,7 @@
 
 .appkit-now-playing-slider
     cursor: pointer
-    mix-blend-mode: plus-lighter
+    mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
     transform-origin: center
     display: flex
     justify-content: stretch
@@ -20,7 +20,7 @@
         border-radius: 100px
         background-color: var(--amll-lyric-primary-color-t15, #FFFFFF26)
         overflow: hidden
-        
+
         > .thumb
             transition: opacity 0.2s cubic-bezier(0.2, 0.2, 0, 1)
             height: 100%

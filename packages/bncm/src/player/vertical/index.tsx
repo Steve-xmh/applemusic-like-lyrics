@@ -2,6 +2,7 @@ import { useRef, type FC } from "react";
 import { topbarMenuOpenedAtom } from "../common/main-menu";
 import { useSetAtom, useAtomValue } from "jotai";
 import {
+	disableMixBlendModeAtom,
 	fontColorAtom,
 	primaryColorAtom,
 	showAlbumImageAtom,
@@ -22,6 +23,7 @@ export const LyricPlayerVertical: FC = () => {
 	const primaryColor = useAtomValue(primaryColorAtom);
 	const showAlbumImage = useAtomValue(showAlbumImageAtom);
 	const showControlThumb = useAtomValue(showControlThumbAtom);
+	const disableMixBlendMode = useAtomValue(disableMixBlendModeAtom);
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
@@ -35,6 +37,9 @@ export const LyricPlayerVertical: FC = () => {
 					"--amll-lyric-primary-color": primaryColor,
 					"--amll-lyric-primary-color-t15": `${primaryColor}26`,
 					"--amll-lyric-primary-color-t30": `${primaryColor}4D`,
+					"--amll-lyric-mix-blend-mode": disableMixBlendMode
+						? "normal"
+						: "plus-lighter",
 					color: fontColor,
 				} as any
 			}

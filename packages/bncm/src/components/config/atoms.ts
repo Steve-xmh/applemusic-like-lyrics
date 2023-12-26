@@ -182,6 +182,12 @@ export const showStatsAtom = atomWithConfig({
 	desc: "显示实时帧数统计数据",
 });
 
+export const disableMixBlendModeAtom = atomWithConfig({
+	key: "disable-mix-blend-mode",
+	default: false,
+	desc: "禁用高亮混色模式",
+});
+
 export const showBackgroundFFTLowFreqAtom = atomWithConfig({
 	key: "show-background-fft-low-freq",
 	default: false,

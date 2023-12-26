@@ -52,7 +52,7 @@
         height: 100%
         font-weight: 700
         box-sizing: border-box
-        mix-blend-mode: plus-lighter
+        mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         display: flex
         flex-direction: column
         justify-content: center
@@ -60,6 +60,8 @@
         gap: 16px
         mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)
         -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)
+        > *
+            mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         &.load-status
             opacity: 0.5
     .amll-music-name
@@ -92,8 +94,8 @@
                 content: var(--applemusic-like-lyrics-music-artists-separator, ", ")
                 opacity: 0.5
 
-            &:nth-last-child(2)::after 
-                content:  " & "
+            &:nth-last-child(2)::after
+                content: " & "
                 opacity: 0.5
 
             &:last-child::after
@@ -111,7 +113,7 @@
         border: none
         background-color: var(--amll-lyric-primary-color-t30, white)
         justify-self: center
-        mix-blend-mode: plus-lighter
+        mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         @media screen and (max-width: 768px)
             margin: 4px
     .amll-music-info
