@@ -15,6 +15,7 @@ import { log, warn } from "../utils/logger";
 import { getNCMImageUrl } from "../utils/ncm-url";
 import { genRandomString } from "../utils/gen-random-string";
 import { normalizePath } from "../utils/path";
+import { FFTPlayer } from "@applemusic-like-lyrics/fft";
 
 interface AudioLoadInfo {
 	activeCode: number;
@@ -42,6 +43,7 @@ export class MusicContextV3 extends MusicContextBase {
 	private musicAlbumName = "";
 	private musicAlbumImage = "";
 	private artists: Artist[] = [];
+	private fftPlayer = new FFTPlayer();
 	private tweenAtom = Symbol("tween-atom");
 	private searchForAlbumCoverAtom = Symbol("search-for-album-cover-atom");
 	private readonly bindedOnMusicLoad: Function;
@@ -83,11 +85,13 @@ export class MusicContextV3 extends MusicContextBase {
 			pts: number;
 		}
 		appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
+			this.fftPlayer.pushDataI16(48000, 2, new Int16Array(data.data));
+			this.fftPlayer.read(this.fftBuf);
 			this.dispatchTypedEvent(
-				"audio-data",
-				new CustomEvent("audio-data", {
+				"fft-data",
+				new CustomEvent("fft-data", {
 					detail: {
-						data: data.data,
+						data: [...this.fftBuf],
 					},
 				}),
 			);
@@ -520,6 +524,7 @@ export class MusicContextV3 extends MusicContextBase {
 	}
 
 	private audioDataLock = 0;
+	private fftBuf = new Float32Array(64);
 
 	override acquireAudioData(): void {
 		if (++this.audioDataLock) {

@@ -525,7 +525,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
-		let [fba, fbb] = this.fb;
+		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
 		gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -556,9 +556,9 @@ export class EplorRenderer extends BaseRenderer {
 		this.drawScreen();
 
 		if (this.sprites.length > 1) {
-			const coveredIndex = this.sprites.findLastIndex((v) => v.alpha >= 1);
-			if (coveredIndex !== -1) {
-				for (const deleted of this.sprites.splice(0, coveredIndex)) {
+			const coveredIndex = this.sprites[this.sprites.length - 1];
+			if (coveredIndex.alpha >= 1) {
+				for (const deleted of this.sprites.splice(0, this.sprites.length - 1)) {
 					deleted.dispose();
 				}
 			}

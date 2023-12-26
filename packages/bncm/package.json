@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@applemusic-like-lyrics/core": "*",
+    "@applemusic-like-lyrics/fft": "*",
     "@applemusic-like-lyrics/lyric": "*",
     "@applemusic-like-lyrics/react": "*",
     "@applemusic-like-lyrics/ttml": "*",

@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "./packages/lyric",
+    "./packages/fft",
     "./packages/ws-protocol",
 ]
 exclude = [
