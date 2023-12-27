@@ -207,6 +207,14 @@ export declare class LyricPlayer extends EventTarget implements HasElement, Disp
      */
     setCurrentTime(time: number, isSeek?: boolean): void;
     /**
+     * 暂停部分效果演出，目前会暂停播放间奏点的动画
+     */
+    pause(): void;
+    /**
+     * 恢复部分效果演出，目前会恢复播放间奏点的动画
+     */
+    resume(): void;
+    /**
      * 更新动画，这个函数应该被逐帧调用或者在以下情况下调用一次：
      *
      * 1. 刚刚调用完设置歌词函数的时候

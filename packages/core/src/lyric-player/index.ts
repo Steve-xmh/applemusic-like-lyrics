@@ -440,7 +440,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				if (this.processedLines[0].startTime > currentTime) {
 					return [
 						currentTime,
-						this.processedLines[0].startTime,
+						Math.max(currentTime, this.processedLines[0].startTime - 250),
 						-2,
 						this.processedLines[0].isDuet,
 					];
@@ -946,6 +946,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.calcLayout();
 			}
 		}
+	}
+	/**
+	 * 暂停部分效果演出，目前会暂停播放间奏点的动画
+	 */
+	pause() {
+		this.interludeDots.pause();
+	}
+	/**
+	 * 恢复部分效果演出，目前会恢复播放间奏点的动画
+	 */
+	resume() {
+		this.interludeDots.resume();
 	}
 	/**
 	 * 更新动画，这个函数应该被逐帧调用或者在以下情况下调用一次：

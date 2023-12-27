@@ -21,9 +21,11 @@ export class InterludeDots implements HasElement, Disposable {
 	private left = 0;
 	private top = 0;
 	private scale = 1;
+	private playing = true;
 	private lastStyle = "";
 	private currentInterlude?: [number, number];
 	private currentTime = 0;
+	private interludeTime = 0;
 	private targetBreatheDuration = 1500;
 	constructor(private readonly lyricPlayer: LyricPlayer) {
 		this.element.className = this.lyricPlayer.style.classes.interludeDots;
@@ -43,7 +45,14 @@ export class InterludeDots implements HasElement, Disposable {
 		this.currentInterlude = interlude;
 		this.currentTime = interlude?.[0] ?? 0;
 	}
+	pause() {
+		this.playing = false;
+	}
+	resume() {
+		this.playing = true;
+	}
 	update(delta = 0) {
+		if (!this.playing) return;
 		this.currentTime += delta;
 		let curStyle = "";
 

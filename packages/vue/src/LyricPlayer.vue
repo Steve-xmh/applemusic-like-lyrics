@@ -60,6 +60,16 @@ watchEffect((onCleanup) => {
 });
 
 watchEffect(() => {
+    if (props.playing !== undefined) {
+        if (props.playing) {
+            playerRef.value?.resume();
+        } else {
+            playerRef.value?.pause();
+        }
+    } else playerRef.value?.resume();
+});
+
+watchEffect(() => {
     if (props.alignAnchor !== undefined)
         playerRef.value?.setAlignAnchor(props.alignAnchor);
 });
