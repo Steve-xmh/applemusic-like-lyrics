@@ -212,14 +212,14 @@ export const enableBackgroundAtom = atomWithConfig({
 });
 
 export enum BackgroundType {
-	FakeLiquid = "fake-liquid",
 	LiquidEplor = "liquid-eplor",
+	FakeLiquid = "fake-liquid",
 	CustomSolidColor = "custom-solid-color",
 }
 
 export const backgroundTypeAtom = atomWithConfig({
 	key: "background-type",
-	default: BackgroundType.FakeLiquid,
+	default: BackgroundType.LiquidEplor,
 	desc: "背景类型",
 });
 

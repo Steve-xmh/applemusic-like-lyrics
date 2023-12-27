@@ -148,7 +148,7 @@ impl FFTPlayer {
                 for _ in 0..cut_len {
                     self.pcm_queue.pop_front();
                 }
-                self.pcm_queue.truncate(44100);
+                self.pcm_queue.truncate(2048 * 4);
                 true
             }
             Err(e) => {
