@@ -4,6 +4,8 @@ import vertShader from "./shaders/base.vert.glsl";
 import fragShader from "./shaders/base.frag.glsl";
 import blendShader from "./shaders/blend.frag.glsl";
 import eplorShader from "./shaders/eplor.frag.glsl";
+import { ConsoleLogger } from "typedoc/dist/lib/utils";
+import { RandomIdentifierGenerator } from "vite-plugin-top-level-await/dist/utils/random-identifier";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
@@ -419,7 +421,7 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		this.playTime += frameDelta * this.flowSpeed;
+		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
@@ -656,7 +658,8 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		this.playTime = Math.random() * 1000;
+		if (this.hasLyric) this.playTime = Math.random() * 100000;
+		else this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		this.requestTick();
 	}
