@@ -533,7 +533,7 @@ export class MusicContextV3 extends MusicContextBase {
 	};
 
 	override acquireAudioData(): void {
-		if (!(this.audioDataLock++)) {
+		if (!this.audioDataLock++) {
 			channel.call("audioplayer.enableAudioData", () => {}, [1]);
 			this.onFFTTick();
 		}
