@@ -46,6 +46,7 @@
         justify-content: center
         align-items: center
         gap: 16px
+        mask-image: linear-gradient(to bottom, transparent 5%, white 20%, white 80%, transparent 95%)
         > *
             mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         &.load-status
@@ -64,8 +65,8 @@
         transition: margin-top 0.25s
         margin-top: 3.5vh
         @media screen and (max-height: 768px)
-            margin-top: unset
-            font-size: 133%
+            margin-top: 2.0vh
+            font-size: 111%
     .amll-cover-image
         aspect-ratio: 1/1
         grid-column: info-side
@@ -101,6 +102,8 @@
         align-items: center
         justify-content: center
         padding: 0
+        @media screen and (max-height: 768px)
+            scale: 0.8
 
     .amll-contributors
         font-size: 50%

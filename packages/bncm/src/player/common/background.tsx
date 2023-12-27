@@ -118,6 +118,10 @@ export const Background: FC = () => {
 						renderScale={backgroundRenderScale}
 						hasLyric={
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
+								? true
+								: lyricLines.state === "loading"
+								? undefined
+								: false
 						}
 						flowSpeed={flowSpeed}
 						renderer={
