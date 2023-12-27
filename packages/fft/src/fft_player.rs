@@ -8,6 +8,18 @@ use wasm_bindgen::prelude::*;
 
 use super::resampler::FastFixedOutResampler;
 
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+    #[wasm_bindgen(js_namespace = console)]
+    fn warn(s: &str);
+}
+
+macro_rules! eprintln {
+    ($($t:tt)*) => (warn(&format_args!($($t)*).to_string()))
+}
+
 /// 一个接收音频 PCM 数据并转换成频谱的伪播放结构
 /// 该结构会将传入的音频数据转换为单通道音频数据，然后进行频谱分析
 #[wasm_bindgen]
@@ -91,18 +103,21 @@ impl FFTPlayer {
     }
 
     pub fn read(&mut self, buf: &mut [f32]) -> bool {
-        let elapsed = self.last_fft_time.elapsed();
-        let elapsed_sec = elapsed.as_secs_f32();
-        let mut updated = false;
+        if self.pcm_queue.len() < 2048 {
+            self.last_fft_time = Instant::now();
+            return false;
+        }
 
         let (start_freq, end_freq) = self.freq_range.get();
 
-        self.last_fft_time = Instant::now();
-
         let mut fft_buf = [0.0; 2048];
-        for v in fft_buf.iter_mut().rev() {
-            *v = self.pcm_queue.pop_back().unwrap_or(0.0);
-        }
+        self.pcm_queue
+            .iter()
+            .take(2048)
+            .enumerate()
+            .for_each(|(i, v)| {
+                fft_buf[i] = *v;
+            });
 
         let fft_buf = windows::hamming_window(&fft_buf);
 
@@ -123,22 +138,24 @@ impl FFTPlayer {
                     *v += spec.freq_val_exact(freq).val();
                     *v /= 2.0;
                 });
-                updated = true;
+                vec_interp(&self.result_buf, buf);
+
+                let elapsed = self.last_fft_time.elapsed();
+                let elapsed_sec = elapsed.as_secs_f64();
+                self.last_fft_time = Instant::now();
+
+                let cut_len = (elapsed_sec * 44100.0) as usize;
+                for _ in 0..cut_len {
+                    self.pcm_queue.pop_front();
+                }
+                self.pcm_queue.truncate(44100);
+                true
             }
             Err(e) => {
                 eprintln!("FFT error: {:?}", e);
+                false
             }
         }
-        let skip_frames = (44100.0 * (elapsed_sec).max(0.0)) as usize;
-
-        self.pcm_queue
-            .truncate(self.pcm_queue.len().wrapping_sub(skip_frames));
-
-        // buf.copy_from_slice(&self.result_buf);
-        vec_interp(&self.result_buf, buf);
-        // a_weighting_slice(buf, start_freq, end_freq);
-
-        updated
     }
 
     /// 将解码后的音频数据压入播放器
@@ -181,7 +198,9 @@ impl FFTPlayer {
         rsp.resample(channels, decoded);
 
         while let Some(buf) = rsp.flush() {
-            self.pcm_queue.extend(buf.iter().copied());
+            for v in buf.iter() {
+                self.pcm_queue.push_back(*v);
+            }
         }
     }
 }
@@ -216,6 +235,13 @@ impl FFTPlayer {
     /// 务必在添加数据后及时通过 `read` 方法读取频谱数据
     #[wasm_bindgen(js_name = "pushDataI16")]
     pub fn push_data_i16_js(&mut self, rate: usize, channels: usize, decoded: &[i16]) {
+        self.push_data(rate, channels, decoded);
+    }
+
+    /// 将解码后的音频数据压入播放器
+    /// 务必在添加数据后及时通过 `read` 方法读取频谱数据
+    #[wasm_bindgen(js_name = "pushDataU16")]
+    pub fn push_data_u16_js(&mut self, rate: usize, channels: usize, decoded: &[u16]) {
         self.push_data(rate, channels, decoded);
     }
 

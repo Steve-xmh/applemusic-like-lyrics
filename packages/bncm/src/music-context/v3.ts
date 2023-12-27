@@ -86,15 +86,6 @@ export class MusicContextV3 extends MusicContextBase {
 		}
 		appendRegisterCall("AudioData", "audioplayer", (data: NCMV3AudioData) => {
 			this.fftPlayer.pushDataI16(48000, 2, new Int16Array(data.data));
-			this.fftPlayer.read(this.fftBuf);
-			this.dispatchTypedEvent(
-				"fft-data",
-				new CustomEvent("fft-data", {
-					detail: {
-						data: [...this.fftBuf],
-					},
-				}),
-			);
 		});
 		appendRegisterCall("Load", "audioplayer", this.bindedOnMusicLoad);
 		appendRegisterCall("End", "audioplayer", this.bindedOnMusicUnload);
@@ -526,9 +517,25 @@ export class MusicContextV3 extends MusicContextBase {
 	private audioDataLock = 0;
 	private fftBuf = new Float32Array(64);
 
+	private onFFTTick = () => {
+		if (this.fftPlayer.read(this.fftBuf)) {
+			this.dispatchTypedEvent(
+				"fft-data",
+				new CustomEvent("fft-data", {
+					detail: {
+						data: [...this.fftBuf],
+					},
+				}),
+			);
+		}
+
+		if (this.audioDataLock) requestAnimationFrame(() => this.onFFTTick());
+	};
+
 	override acquireAudioData(): void {
-		if (++this.audioDataLock) {
+		if (!(this.audioDataLock++)) {
 			channel.call("audioplayer.enableAudioData", () => {}, [1]);
+			this.onFFTTick();
 		}
 	}
 
