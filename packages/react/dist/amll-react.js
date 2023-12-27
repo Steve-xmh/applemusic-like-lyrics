@@ -1,28 +1,28 @@
-import { jsx as $, jsxs as T, Fragment as y } from "react/jsx-runtime";
-import { BackgroundRender as z, PixiRenderer as C, LyricPlayer as D } from "@applemusic-like-lyrics/core";
-import { forwardRef as q, useRef as j, useEffect as u, useImperativeHandle as G } from "react";
+import { jsx as q, jsxs as T, Fragment as y } from "react/jsx-runtime";
+import { BackgroundRender as z, EplorRenderer as C, LyricPlayer as D } from "@applemusic-like-lyrics/core";
+import { forwardRef as G, useRef as j, useEffect as u, useImperativeHandle as P } from "react";
 import { createPortal as J } from "react-dom";
-const W = q(
+const W = G(
   ({
     albumImageUrl: l,
     fps: f,
-    playing: d,
-    flowSpeed: o,
+    playing: o,
+    flowSpeed: d,
     renderScale: v,
     staticMode: F,
     lowFreqVolume: R,
     hasLyric: p,
     renderer: B,
     ...A
-  }, x) => {
+  }, L) => {
     const n = j(), E = j(null);
     return u(() => {
-      var t, i, m, k, H, r, a, L;
+      var t, i, m, x, H, r, a, h;
       return n.current = z.new(
         B ?? C
-      ), l && ((t = n.current) == null || t.setAlbumImage(l)), f && ((i = n.current) == null || i.setFPS(f)), d === void 0 ? (m = n.current) == null || m.resume() : d ? (k = n.current) == null || k.resume() : (H = n.current) == null || H.pause(), o && ((r = n.current) == null || r.setFlowSpeed(o)), (a = n.current) == null || a.setStaticMode(F ?? !1), v && ((L = n.current) == null || L.setRenderScale(v ?? 0.5)), () => {
-        var h;
-        (h = n.current) == null || h.dispose();
+      ), l && ((t = n.current) == null || t.setAlbumImage(l)), f && ((i = n.current) == null || i.setFPS(f)), o === void 0 ? (m = n.current) == null || m.resume() : o ? (x = n.current) == null || x.resume() : (H = n.current) == null || H.pause(), d && ((r = n.current) == null || r.setFlowSpeed(d)), (a = n.current) == null || a.setStaticMode(F ?? !1), v && ((h = n.current) == null || h.setRenderScale(v ?? 0.5)), () => {
+        var k;
+        (k = n.current) == null || k.dispose();
       };
     }, [B]), u(() => {
       var t;
@@ -32,11 +32,11 @@ const W = q(
       f && ((t = n.current) == null || t.setFPS(f));
     }, [f]), u(() => {
       var t, i, m;
-      d === void 0 ? (t = n.current) == null || t.resume() : d ? (i = n.current) == null || i.resume() : (m = n.current) == null || m.pause();
-    }, [d]), u(() => {
-      var t;
-      o && ((t = n.current) == null || t.setFlowSpeed(o));
+      o === void 0 ? (t = n.current) == null || t.resume() : o ? (i = n.current) == null || i.resume() : (m = n.current) == null || m.pause();
     }, [o]), u(() => {
+      var t;
+      d && ((t = n.current) == null || t.setFlowSpeed(d));
+    }, [d]), u(() => {
       var t;
       (t = n.current) == null || t.setStaticMode(F ?? !1);
     }, [F]), u(() => {
@@ -54,36 +54,36 @@ const W = q(
         const i = n.current.getElement();
         i.style.width = "100%", i.style.height = "100%", (t = E.current) == null || t.appendChild(i);
       }
-    }, [n.current]), G(
-      x,
+    }, [n.current]), P(
+      L,
       () => ({
         wrapperEl: E.current,
         bgRender: n.current
       }),
       [E.current, n.current]
-    ), /* @__PURE__ */ $("div", { ...A, ref: E });
+    ), /* @__PURE__ */ q("div", { ...A, ref: E });
   }
-), Z = q(
+), Z = G(
   ({
     disabled: l,
     playing: f,
-    alignAnchor: d,
-    alignPosition: o,
+    alignAnchor: o,
+    alignPosition: d,
     enableSpring: v,
     enableBlur: F,
     enableScale: R,
     hidePassedLines: p,
     lyricLines: B,
     currentTime: A,
-    linePosXSpringParams: x,
+    linePosXSpringParams: L,
     linePosYSpringParams: n,
     lineScaleSpringParams: E,
     bottomLine: t,
     onLyricLineClick: i,
     onLyricLineContextMenu: m,
-    ...k
+    ...x
   }, H) => {
-    var L, h;
+    var h, k;
     const r = j(), a = j(null);
     return u(() => (r.current = new D(), () => {
       var e;
@@ -92,8 +92,8 @@ const W = q(
       if (!l) {
         let e = !1, c = -1;
         const s = (w) => {
-          var P;
-          e || (c === -1 && (c = w), (P = r.current) == null || P.update(w - c), c = w, requestAnimationFrame(s));
+          var $;
+          e || (c === -1 && (c = w), ($ = r.current) == null || $.update(w - c), c = w, requestAnimationFrame(s));
         };
         return requestAnimationFrame(s), () => {
           e = !0;
@@ -107,14 +107,14 @@ const W = q(
       r.current && ((e = a.current) == null || e.appendChild(r.current.getElement()));
     }, [a.current]), u(() => {
       var e;
-      d !== void 0 && ((e = r.current) == null || e.setAlignAnchor(d));
-    }, [d]), u(() => {
+      o !== void 0 && ((e = r.current) == null || e.setAlignAnchor(o));
+    }, [o]), u(() => {
       var e;
       p !== void 0 && ((e = r.current) == null || e.setHidePassedLines(p));
     }, [p]), u(() => {
       var e;
-      o !== void 0 && ((e = r.current) == null || e.setAlignPosition(o));
-    }, [o]), u(() => {
+      d !== void 0 && ((e = r.current) == null || e.setAlignPosition(d));
+    }, [d]), u(() => {
       var e, c;
       v !== void 0 ? (e = r.current) == null || e.setEnableSpring(v) : (c = r.current) == null || c.setEnableSpring(!0);
     }, [v]), u(() => {
@@ -131,8 +131,8 @@ const W = q(
       A !== void 0 ? (e = r.current) == null || e.setCurrentTime(A) : (c = r.current) == null || c.setCurrentTime(0);
     }, [A]), u(() => {
       var e;
-      x !== void 0 && ((e = r.current) == null || e.setLinePosXSpringParams(x));
-    }, [x]), u(() => {
+      L !== void 0 && ((e = r.current) == null || e.setLinePosXSpringParams(L));
+    }, [L]), u(() => {
       var e;
       n !== void 0 && ((e = r.current) == null || e.setLinePosYSpringParams(n));
     }, [n]), u(() => {
@@ -159,7 +159,7 @@ const W = q(
           );
         };
       }
-    }, [m]), G(
+    }, [m]), P(
       H,
       () => ({
         wrapperEl: a.current,
@@ -167,10 +167,10 @@ const W = q(
       }),
       [a.current, r.current]
     ), /* @__PURE__ */ T(y, { children: [
-      /* @__PURE__ */ $("div", { ...k, ref: a }),
-      (L = r.current) != null && L.getBottomLineElement() && t ? J(
+      /* @__PURE__ */ q("div", { ...x, ref: a }),
+      (h = r.current) != null && h.getBottomLineElement() && t ? J(
         t,
-        (h = r.current) == null ? void 0 : h.getBottomLineElement()
+        (k = r.current) == null ? void 0 : k.getBottomLineElement()
       ) : null
     ] });
   }

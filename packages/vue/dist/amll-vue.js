@@ -1,10 +1,11 @@
-import { defineComponent as S, ref as c, onMounted as y, onUnmounted as L, watchEffect as i, openBlock as v, createElementBlock as b, Fragment as B, createElementVNode as h, mergeProps as E, createBlock as w, Teleport as k, createCommentVNode as R } from "vue";
-import { LyricPlayer as _, BackgroundRender as F, PixiRenderer as x } from "@applemusic-like-lyrics/core";
+import { defineComponent as S, ref as c, onMounted as P, onUnmounted as L, watchEffect as i, openBlock as v, createElementBlock as b, Fragment as B, createElementVNode as E, mergeProps as h, createBlock as w, Teleport as k, createCommentVNode as R } from "vue";
+import { LyricPlayer as _, BackgroundRender as F, EplorRenderer as A } from "@applemusic-like-lyrics/core";
 const q = /* @__PURE__ */ S({
   inheritAttrs: !1,
   __name: "LyricPlayer",
   props: {
     disabled: { type: Boolean },
+    playing: { type: Boolean },
     alignAnchor: {},
     alignPosition: {},
     enableSpring: { type: Boolean },
@@ -20,66 +21,69 @@ const q = /* @__PURE__ */ S({
   },
   emits: ["line-click", "line-contextmenu"],
   setup(p, { expose: m, emit: r }) {
-    const a = p, t = r, n = c(), l = c(), f = (e) => t("line-click", e), g = (e) => t("line-contextmenu", e);
-    return y(() => {
-      n.value && (l.value = new _(), n.value.appendChild(l.value.getElement()), l.value.addEventListener("line-click", f), l.value.addEventListener("line-contextmenu", g));
+    const n = p, t = r, a = c(), l = c(), f = (e) => t("line-click", e), g = (e) => t("line-contextmenu", e);
+    return P(() => {
+      a.value && (l.value = new _(), a.value.appendChild(l.value.getElement()), l.value.addEventListener("line-click", f), l.value.addEventListener("line-contextmenu", g));
     }), L(() => {
       l.value && (l.value.removeEventListener("line-click", f), l.value.removeEventListener("line-contextmenu", g), l.value.dispose());
     }), i((e) => {
-      if (!a.disabled) {
+      if (!n.disabled) {
         let o = !1, s = -1;
         const u = (d) => {
-          var P;
-          o || (s === -1 && (s = d), (P = l.value) == null || P.update(d - s), s = d, requestAnimationFrame(u));
+          var y;
+          o || (s === -1 && (s = d), (y = l.value) == null || y.update(d - s), s = d, requestAnimationFrame(u));
         };
         requestAnimationFrame(u), e(() => {
           o = !0;
         });
       }
     }), i(() => {
-      var e;
-      a.alignAnchor !== void 0 && ((e = l.value) == null || e.setAlignAnchor(a.alignAnchor));
+      var e, o, s;
+      n.playing !== void 0 ? n.playing ? (e = l.value) == null || e.resume() : (o = l.value) == null || o.pause() : (s = l.value) == null || s.resume();
     }), i(() => {
       var e;
-      a.hidePassedLines !== void 0 && ((e = l.value) == null || e.setHidePassedLines(a.hidePassedLines));
+      n.alignAnchor !== void 0 && ((e = l.value) == null || e.setAlignAnchor(n.alignAnchor));
     }), i(() => {
       var e;
-      a.alignPosition !== void 0 && ((e = l.value) == null || e.setAlignPosition(a.alignPosition));
+      n.hidePassedLines !== void 0 && ((e = l.value) == null || e.setHidePassedLines(n.hidePassedLines));
+    }), i(() => {
+      var e;
+      n.alignPosition !== void 0 && ((e = l.value) == null || e.setAlignPosition(n.alignPosition));
     }), i(() => {
       var e, o;
-      a.enableSpring !== void 0 ? (e = l.value) == null || e.setEnableSpring(a.enableSpring) : (o = l.value) == null || o.setEnableSpring(!0);
+      n.enableSpring !== void 0 ? (e = l.value) == null || e.setEnableSpring(n.enableSpring) : (o = l.value) == null || o.setEnableSpring(!0);
     }), i(() => {
       var e, o;
-      a.enableBlur !== void 0 ? (e = l.value) == null || e.setEnableBlur(a.enableBlur) : (o = l.value) == null || o.setEnableBlur(!0);
+      n.enableBlur !== void 0 ? (e = l.value) == null || e.setEnableBlur(n.enableBlur) : (o = l.value) == null || o.setEnableBlur(!0);
     }), i(() => {
       var e, o;
-      a.enableScale !== void 0 ? (e = l.value) == null || e.setEnableScale(a.enableScale) : (o = l.value) == null || o.setEnableScale(!0);
+      n.enableScale !== void 0 ? (e = l.value) == null || e.setEnableScale(n.enableScale) : (o = l.value) == null || o.setEnableScale(!0);
     }), i(() => {
       var e;
-      a.lyricLines !== void 0 && ((e = l.value) == null || e.setLyricLines(a.lyricLines));
+      n.lyricLines !== void 0 && ((e = l.value) == null || e.setLyricLines(n.lyricLines));
     }), i(() => {
       var e;
-      a.currentTime !== void 0 && ((e = l.value) == null || e.setCurrentTime(a.currentTime));
+      n.currentTime !== void 0 && ((e = l.value) == null || e.setCurrentTime(n.currentTime));
     }), i(() => {
       var e;
-      a.linePosXSpringParams !== void 0 && ((e = l.value) == null || e.setLinePosXSpringParams(a.linePosXSpringParams));
+      n.linePosXSpringParams !== void 0 && ((e = l.value) == null || e.setLinePosXSpringParams(n.linePosXSpringParams));
     }), i(() => {
       var e;
-      a.linePosYSpringParams !== void 0 && ((e = l.value) == null || e.setLinePosYSpringParams(a.linePosYSpringParams));
+      n.linePosYSpringParams !== void 0 && ((e = l.value) == null || e.setLinePosYSpringParams(n.linePosYSpringParams));
     }), i(() => {
       var e;
-      a.lineScaleSpringParams !== void 0 && ((e = l.value) == null || e.setLineScaleSpringParams(a.lineScaleSpringParams));
+      n.lineScaleSpringParams !== void 0 && ((e = l.value) == null || e.setLineScaleSpringParams(n.lineScaleSpringParams));
     }), m({
       lyricPlayer: l,
-      wrapperEl: n
+      wrapperEl: a
     }), (e, o) => {
       var s, u;
       return v(), b(B, null, [
-        h("div", E({
+        E("div", h({
           ref_key: "wrapperRef",
-          ref: n
+          ref: a
         }, e.$attrs), null, 16),
-        (s = l.value) != null && s.getBottomLineElement() && a.bottomLine ? (v(), w(k, {
+        (s = l.value) != null && s.getBottomLineElement() && n.bottomLine ? (v(), w(k, {
           key: 0,
           to: (u = l.value) == null ? void 0 : u.getBottomLineElement()
         }, null, 8, ["to"])) : R("", !0)
@@ -99,42 +103,42 @@ const q = /* @__PURE__ */ S({
     renderer: { type: Function }
   },
   setup(p, { expose: m }) {
-    const r = p, a = c(), t = c();
-    return y(() => {
-      if (a.value) {
-        t.value = F.new(r.renderer ?? x);
-        const n = t.value.getElement();
-        n.style.width = "100%", n.style.height = "100%", a.value.appendChild(n);
+    const r = p, n = c(), t = c();
+    return P(() => {
+      if (n.value) {
+        t.value = F.new(r.renderer ?? A);
+        const a = t.value.getElement();
+        a.style.width = "100%", a.style.height = "100%", n.value.appendChild(a);
       }
     }), L(() => {
       t.value && t.value.dispose();
     }), i(() => {
-      var n;
-      r.albumImageUrl && ((n = t.value) == null || n.setAlbumImage(r.albumImageUrl));
+      var a;
+      r.albumImageUrl && ((a = t.value) == null || a.setAlbumImage(r.albumImageUrl));
     }), i(() => {
-      var n;
-      r.fps && ((n = t.value) == null || n.setFPS(r.fps));
+      var a;
+      r.fps && ((a = t.value) == null || a.setFPS(r.fps));
     }), i(() => {
-      var n, l;
-      r.playing ? (n = t.value) == null || n.pause() : (l = t.value) == null || l.resume();
+      var a, l;
+      r.playing ? (a = t.value) == null || a.pause() : (l = t.value) == null || l.resume();
     }), i(() => {
-      var n;
-      r.flowSpeed && ((n = t.value) == null || n.setFlowSpeed(r.flowSpeed));
+      var a;
+      r.flowSpeed && ((a = t.value) == null || a.setFlowSpeed(r.flowSpeed));
     }), i(() => {
-      var n;
-      r.renderScale && ((n = t.value) == null || n.setRenderScale(r.renderScale));
+      var a;
+      r.renderScale && ((a = t.value) == null || a.setRenderScale(r.renderScale));
     }), i(() => {
-      var n;
-      r.lowFreqVolume && ((n = t.value) == null || n.setLowFreqVolume(r.lowFreqVolume));
+      var a;
+      r.lowFreqVolume && ((a = t.value) == null || a.setLowFreqVolume(r.lowFreqVolume));
     }), i(() => {
-      var n;
-      r.hasLyric !== void 0 && ((n = t.value) == null || n.setHasLyric(r.hasLyric ?? !0));
+      var a;
+      r.hasLyric !== void 0 && ((a = t.value) == null || a.setHasLyric(r.hasLyric ?? !0));
     }), m({
       bgRender: t,
-      wrapperEl: a
-    }), (n, l) => (v(), b("div", {
+      wrapperEl: n
+    }), (a, l) => (v(), b("div", {
       ref_key: "wrapperRef",
-      ref: a
+      ref: n
     }, null, 512));
   }
 });
