@@ -2,7 +2,7 @@ import {
 	BackgroundRender as CoreBackgroundRender,
 	AbstractBaseRenderer,
 	BaseRenderer,
-	PixiRenderer,
+	EplorRenderer,
 } from "@applemusic-like-lyrics/core";
 import {
 	useRef,
@@ -105,7 +105,7 @@ export const BackgroundRender = forwardRef<
 
 		useEffect(() => {
 			coreBGRenderRef.current = CoreBackgroundRender.new(
-				renderer ?? PixiRenderer,
+				renderer ?? EplorRenderer,
 			);
 			if (albumImageUrl) coreBGRenderRef.current?.setAlbumImage(albumImageUrl);
 			if (fps) coreBGRenderRef.current?.setFPS(fps);

@@ -1,178 +1,182 @@
-import { jsx as y, jsxs as q, Fragment as G } from "react/jsx-runtime";
-import { BackgroundRender as T, PixiRenderer as z, LyricPlayer as C } from "@applemusic-like-lyrics/core";
-import { forwardRef as P, useRef as H, useEffect as u, useImperativeHandle as $ } from "react";
-import { createPortal as D } from "react-dom";
-const Q = P(
+import { jsx as q, jsxs as T, Fragment as y } from "react/jsx-runtime";
+import { BackgroundRender as z, EplorRenderer as C, LyricPlayer as D } from "@applemusic-like-lyrics/core";
+import { forwardRef as G, useRef as j, useEffect as u, useImperativeHandle as P } from "react";
+import { createPortal as J } from "react-dom";
+const W = G(
   ({
-    albumImageUrl: v,
+    albumImageUrl: l,
     fps: f,
-    playing: d,
-    flowSpeed: o,
-    renderScale: m,
-    staticMode: E,
-    lowFreqVolume: a,
-    hasLyric: R,
+    playing: o,
+    flowSpeed: d,
+    renderScale: v,
+    staticMode: F,
+    lowFreqVolume: R,
+    hasLyric: p,
     renderer: B,
     ...A
-  }, x) => {
-    const n = H(), p = H(null);
+  }, L) => {
+    const n = j(), E = j(null);
     return u(() => {
-      var r, i, F, k, t, l, L, h;
-      return n.current = T.new(
-        B ?? z
-      ), v && ((r = n.current) == null || r.setAlbumImage(v)), f && ((i = n.current) == null || i.setFPS(f)), d === void 0 ? (F = n.current) == null || F.resume() : d ? (k = n.current) == null || k.resume() : (t = n.current) == null || t.pause(), o && ((l = n.current) == null || l.setFlowSpeed(o)), (L = n.current) == null || L.setStaticMode(E ?? !1), m && ((h = n.current) == null || h.setRenderScale(m ?? 0.5)), () => {
-        var e;
-        (e = n.current) == null || e.dispose();
+      var t, i, m, x, H, r, a, h;
+      return n.current = z.new(
+        B ?? C
+      ), l && ((t = n.current) == null || t.setAlbumImage(l)), f && ((i = n.current) == null || i.setFPS(f)), o === void 0 ? (m = n.current) == null || m.resume() : o ? (x = n.current) == null || x.resume() : (H = n.current) == null || H.pause(), d && ((r = n.current) == null || r.setFlowSpeed(d)), (a = n.current) == null || a.setStaticMode(F ?? !1), v && ((h = n.current) == null || h.setRenderScale(v ?? 0.5)), () => {
+        var k;
+        (k = n.current) == null || k.dispose();
       };
     }, [B]), u(() => {
-      var r;
-      v && ((r = n.current) == null || r.setAlbumImage(v));
-    }, [v]), u(() => {
-      var r;
-      f && ((r = n.current) == null || r.setFPS(f));
+      var t;
+      l && ((t = n.current) == null || t.setAlbumImage(l));
+    }, [l]), u(() => {
+      var t;
+      f && ((t = n.current) == null || t.setFPS(f));
     }, [f]), u(() => {
-      var r, i, F;
-      d === void 0 ? (r = n.current) == null || r.resume() : d ? (i = n.current) == null || i.resume() : (F = n.current) == null || F.pause();
-    }, [d]), u(() => {
-      var r;
-      o && ((r = n.current) == null || r.setFlowSpeed(o));
+      var t, i, m;
+      o === void 0 ? (t = n.current) == null || t.resume() : o ? (i = n.current) == null || i.resume() : (m = n.current) == null || m.pause();
     }, [o]), u(() => {
-      var r;
-      (r = n.current) == null || r.setStaticMode(E ?? !1);
-    }, [E]), u(() => {
-      var r;
-      m && ((r = n.current) == null || r.setRenderScale(m ?? 0.5));
-    }, [m]), u(() => {
-      var r;
-      a && ((r = n.current) == null || r.setLowFreqVolume(a ?? 1));
-    }, [a]), u(() => {
-      var r;
-      R !== void 0 && ((r = n.current) == null || r.setHasLyric(R ?? !0));
+      var t;
+      d && ((t = n.current) == null || t.setFlowSpeed(d));
+    }, [d]), u(() => {
+      var t;
+      (t = n.current) == null || t.setStaticMode(F ?? !1);
+    }, [F]), u(() => {
+      var t;
+      v && ((t = n.current) == null || t.setRenderScale(v ?? 0.5));
+    }, [v]), u(() => {
+      var t;
+      R && ((t = n.current) == null || t.setLowFreqVolume(R ?? 1));
     }, [R]), u(() => {
-      var r;
+      var t;
+      p !== void 0 && ((t = n.current) == null || t.setHasLyric(p ?? !0));
+    }, [p]), u(() => {
+      var t;
       if (n.current) {
         const i = n.current.getElement();
-        i.style.width = "100%", i.style.height = "100%", (r = p.current) == null || r.appendChild(i);
+        i.style.width = "100%", i.style.height = "100%", (t = E.current) == null || t.appendChild(i);
       }
-    }, [n.current]), $(
-      x,
+    }, [n.current]), P(
+      L,
       () => ({
-        wrapperEl: p.current,
+        wrapperEl: E.current,
         bgRender: n.current
       }),
-      [p.current, n.current]
-    ), /* @__PURE__ */ y("div", { ...A, ref: p });
+      [E.current, n.current]
+    ), /* @__PURE__ */ q("div", { ...A, ref: E });
   }
-), W = P(
+), Z = G(
   ({
-    disabled: v,
-    alignAnchor: f,
+    disabled: l,
+    playing: f,
+    alignAnchor: o,
     alignPosition: d,
-    enableSpring: o,
-    enableBlur: m,
-    enableScale: E,
-    hidePassedLines: a,
-    lyricLines: R,
-    currentTime: B,
-    linePosXSpringParams: A,
-    linePosYSpringParams: x,
-    lineScaleSpringParams: n,
-    bottomLine: p,
-    onLyricLineClick: r,
-    onLyricLineContextMenu: i,
-    ...F
-  }, k) => {
-    var L, h;
-    const t = H(), l = H(null);
-    return u(() => (t.current = new C(), () => {
+    enableSpring: v,
+    enableBlur: F,
+    enableScale: R,
+    hidePassedLines: p,
+    lyricLines: B,
+    currentTime: A,
+    linePosXSpringParams: L,
+    linePosYSpringParams: n,
+    lineScaleSpringParams: E,
+    bottomLine: t,
+    onLyricLineClick: i,
+    onLyricLineContextMenu: m,
+    ...x
+  }, H) => {
+    var h, k;
+    const r = j(), a = j(null);
+    return u(() => (r.current = new D(), () => {
       var e;
-      (e = t.current) == null || e.dispose();
+      (e = r.current) == null || e.dispose();
     }), []), u(() => {
-      if (!v) {
+      if (!l) {
         let e = !1, c = -1;
         const s = (w) => {
-          var j;
-          e || (c === -1 && (c = w), (j = t.current) == null || j.update(w - c), c = w, requestAnimationFrame(s));
+          var $;
+          e || (c === -1 && (c = w), ($ = r.current) == null || $.update(w - c), c = w, requestAnimationFrame(s));
         };
         return requestAnimationFrame(s), () => {
           e = !0;
         };
       }
-    }, [v]), u(() => {
-      var e;
-      t.current && ((e = l.current) == null || e.appendChild(t.current.getElement()));
-    }, [l.current]), u(() => {
-      var e;
-      f !== void 0 && ((e = t.current) == null || e.setAlignAnchor(f));
+    }, [l]), u(() => {
+      var e, c, s;
+      f !== void 0 ? f ? (e = r.current) == null || e.resume() : (c = r.current) == null || c.pause() : (s = r.current) == null || s.resume();
     }, [f]), u(() => {
       var e;
-      a !== void 0 && ((e = t.current) == null || e.setHidePassedLines(a));
-    }, [a]), u(() => {
+      r.current && ((e = a.current) == null || e.appendChild(r.current.getElement()));
+    }, [a.current]), u(() => {
       var e;
-      d !== void 0 && ((e = t.current) == null || e.setAlignPosition(d));
+      o !== void 0 && ((e = r.current) == null || e.setAlignAnchor(o));
+    }, [o]), u(() => {
+      var e;
+      p !== void 0 && ((e = r.current) == null || e.setHidePassedLines(p));
+    }, [p]), u(() => {
+      var e;
+      d !== void 0 && ((e = r.current) == null || e.setAlignPosition(d));
     }, [d]), u(() => {
       var e, c;
-      o !== void 0 ? (e = t.current) == null || e.setEnableSpring(o) : (c = t.current) == null || c.setEnableSpring(!0);
-    }, [o]), u(() => {
+      v !== void 0 ? (e = r.current) == null || e.setEnableSpring(v) : (c = r.current) == null || c.setEnableSpring(!0);
+    }, [v]), u(() => {
       var e, c;
-      E !== void 0 ? (e = t.current) == null || e.setEnableScale(E) : (c = t.current) == null || c.setEnableScale(!0);
-    }, [E]), u(() => {
-      var e;
-      (e = t.current) == null || e.setEnableBlur(m ?? !0);
-    }, [m]), u(() => {
-      var e, c, s, w;
-      R !== void 0 ? ((e = t.current) == null || e.setLyricLines(R), (c = t.current) == null || c.update()) : ((s = t.current) == null || s.setLyricLines([]), (w = t.current) == null || w.update());
+      R !== void 0 ? (e = r.current) == null || e.setEnableScale(R) : (c = r.current) == null || c.setEnableScale(!0);
     }, [R]), u(() => {
-      var e, c;
-      B !== void 0 ? (e = t.current) == null || e.setCurrentTime(B) : (c = t.current) == null || c.setCurrentTime(0);
-    }, [B]), u(() => {
       var e;
-      A !== void 0 && ((e = t.current) == null || e.setLinePosXSpringParams(A));
+      (e = r.current) == null || e.setEnableBlur(F ?? !0);
+    }, [F]), u(() => {
+      var e, c, s, w;
+      B !== void 0 ? ((e = r.current) == null || e.setLyricLines(B), (c = r.current) == null || c.update()) : ((s = r.current) == null || s.setLyricLines([]), (w = r.current) == null || w.update());
+    }, [B]), u(() => {
+      var e, c;
+      A !== void 0 ? (e = r.current) == null || e.setCurrentTime(A) : (c = r.current) == null || c.setCurrentTime(0);
     }, [A]), u(() => {
       var e;
-      x !== void 0 && ((e = t.current) == null || e.setLinePosYSpringParams(x));
-    }, [x]), u(() => {
+      L !== void 0 && ((e = r.current) == null || e.setLinePosXSpringParams(L));
+    }, [L]), u(() => {
       var e;
-      n !== void 0 && ((e = t.current) == null || e.setLineScaleSpringParams(n));
+      n !== void 0 && ((e = r.current) == null || e.setLinePosYSpringParams(n));
     }, [n]), u(() => {
       var e;
-      if (r) {
-        const c = (s) => r(s);
-        return (e = t.current) == null || e.addEventListener("line-click", c), () => {
-          var s;
-          return (s = t.current) == null ? void 0 : s.removeEventListener("line-click", c);
-        };
-      }
-    }, [r]), u(() => {
+      E !== void 0 && ((e = r.current) == null || e.setLineScaleSpringParams(E));
+    }, [E]), u(() => {
       var e;
       if (i) {
         const c = (s) => i(s);
-        return (e = t.current) == null || e.addEventListener("line-contextmenu", c), () => {
+        return (e = r.current) == null || e.addEventListener("line-click", c), () => {
           var s;
-          return (s = t.current) == null ? void 0 : s.removeEventListener(
+          return (s = r.current) == null ? void 0 : s.removeEventListener("line-click", c);
+        };
+      }
+    }, [i]), u(() => {
+      var e;
+      if (m) {
+        const c = (s) => m(s);
+        return (e = r.current) == null || e.addEventListener("line-contextmenu", c), () => {
+          var s;
+          return (s = r.current) == null ? void 0 : s.removeEventListener(
             "line-contextmenu",
             c
           );
         };
       }
-    }, [i]), $(
-      k,
+    }, [m]), P(
+      H,
       () => ({
-        wrapperEl: l.current,
-        lyricPlayer: t.current
+        wrapperEl: a.current,
+        lyricPlayer: r.current
       }),
-      [l.current, t.current]
-    ), /* @__PURE__ */ q(G, { children: [
-      /* @__PURE__ */ y("div", { ...F, ref: l }),
-      (L = t.current) != null && L.getBottomLineElement() && p ? D(
-        p,
-        (h = t.current) == null ? void 0 : h.getBottomLineElement()
+      [a.current, r.current]
+    ), /* @__PURE__ */ T(y, { children: [
+      /* @__PURE__ */ q("div", { ...x, ref: a }),
+      (h = r.current) != null && h.getBottomLineElement() && t ? J(
+        t,
+        (k = r.current) == null ? void 0 : k.getBottomLineElement()
       ) : null
     ] });
   }
 );
 export {
-  Q as BackgroundRender,
-  W as LyricPlayer
+  W as BackgroundRender,
+  Z as LyricPlayer
 };
 //# sourceMappingURL=amll-react.js.map

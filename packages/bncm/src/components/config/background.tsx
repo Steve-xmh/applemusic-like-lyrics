@@ -45,12 +45,12 @@ export const BackgroundConfig: FC = () => {
 								value={backgroundType}
 								data={[
 									{
-										value: BackgroundType.FakeLiquid,
-										label: "伪流体背景",
+										value: BackgroundType.LiquidEplor,
+										label: "流体背景 (Eplor)",
 									},
 									{
-										value: BackgroundType.LiquidEplor,
-										label: "真流体背景 (Eplor)",
+										value: BackgroundType.FakeLiquid,
+										label: "伪流体背景",
 									},
 									{
 										value: BackgroundType.CustomSolidColor,

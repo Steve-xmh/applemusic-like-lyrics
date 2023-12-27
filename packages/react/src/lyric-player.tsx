@@ -25,6 +25,10 @@ export interface LyricPlayerProps {
 	 */
 	disabled?: boolean;
 	/**
+	 * 是否演出部分效果，目前会控制播放间奏点的动画的播放暂停与否，默认为 `true`
+	 */
+	playing?: boolean;
+	/**
 	 * 设置歌词行的对齐方式，如果为 `undefined` 则默认为 `center`
 	 *
 	 * - 设置成 `top` 的话将会向目标歌词行的顶部对齐
@@ -134,6 +138,7 @@ export const LyricPlayer = forwardRef<
 	(
 		{
 			disabled,
+			playing,
 			alignAnchor,
 			alignPosition,
 			enableSpring,
@@ -181,6 +186,16 @@ export const LyricPlayer = forwardRef<
 				};
 			}
 		}, [disabled]);
+
+		useEffect(() => {
+			if (playing !== undefined) {
+				if (playing) {
+					corePlayerRef.current?.resume();
+				} else {
+					corePlayerRef.current?.pause();
+				}
+			} else corePlayerRef.current?.resume();
+		}, [playing]);
 
 		useEffect(() => {
 			if (corePlayerRef.current)

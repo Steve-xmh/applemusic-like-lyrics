@@ -4,6 +4,7 @@ import {
 	currentTimeAtom,
 	lyricPageOpenedAtom,
 	musicArtistsAtom,
+	playStatusAtom,
 } from "../../music-context/wrapper";
 import {
 	LyricPlayer as LyricPlayerComponent,
@@ -25,6 +26,7 @@ import {
 } from "../../components/config/atoms";
 import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 import "./player.sass";
+import { PlayState } from "../../music-context";
 
 export const CoreLyricPlayer: FC<{
 	albumCoverRef?: RefObject<HTMLElement | null>;
@@ -38,6 +40,7 @@ export const CoreLyricPlayer: FC<{
 	);
 	const wsStatus = useAtomValue(wsConnectionStatusAtom);
 	const lyricPageOpened = useAtomValue(lyricPageOpenedAtom);
+	const playStatus = useAtomValue(playStatusAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 	const usingLyricSource = useAtomValue(usingLyricSourceAtom);
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
@@ -94,6 +97,7 @@ export const CoreLyricPlayer: FC<{
 					alignPosition={
 						!props.isVertical && props.albumCoverRef ? alignPosition : 0.1
 					}
+					playing={playStatus === PlayState.Playing}
 					currentTime={currentTime}
 					enableBlur={lyricBlurEffect}
 					enableSpring={lyricSpringEffect}
