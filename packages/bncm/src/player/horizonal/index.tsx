@@ -1,28 +1,24 @@
-import type { FC } from "react";
-import { closeLyricPage } from "../../injector";
-import { useAtomValue, useSetAtom } from "jotai";
-import {
-	displayMusicCoverAtom,
-	loadableMusicOverrideDataAtom,
-	playStatusAtom,
-} from "../../music-context/wrapper";
+import type {FC} from "react";
+import {useEffect, useRef} from "react";
+import {closeLyricPage} from "../../injector";
+import {useAtomValue, useSetAtom} from "jotai";
+import {displayMusicCoverAtom, loadableMusicOverrideDataAtom, playStatusAtom,} from "../../music-context/wrapper";
 import "./index.sass";
 import {
-	showStatsAtom,
-	fontColorAtom,
-	showAlbumImageAtom,
-	showControlThumbAtom,
-	primaryColorAtom,
-	disableMixBlendModeAtom,
+    disableMixBlendModeAtom,
+    fontColorAtom,
+    primaryColorAtom,
+    showAlbumImageAtom,
+    showControlThumbAtom,
+    showStatsAtom,
 } from "../../components/config/atoms";
-import { useEffect, useRef } from "react";
-import { topbarMenuOpenedAtom } from "../common/main-menu";
+import {topbarMenuOpenedAtom} from "../common/main-menu";
 import Stats from "stats.js";
-import { PlayState } from "../../music-context";
-import { MusicInfo } from "./info";
-import { CoreLyricPlayer } from "../common/player";
+import {PlayState} from "../../music-context";
+import {MusicInfo} from "./info";
+import {CoreLyricPlayer} from "../common/player";
 import classNames from "classnames";
-import { lyricLinesAtom } from "../../lyric/provider";
+import {lyricLinesAtom} from "../../lyric/provider";
 
 export const LyricPlayerHorizonal: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -110,7 +106,9 @@ export const LyricPlayerHorizonal: FC = () => {
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						style={{
+                            "box-shadow": playStatus === PlayState.Playing ? "rgba(0,0,0,0.4) 0px 16px 32px" : "rgba(0,0,0,0.2) 0px 8px 16px",
 							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
+                            transition: playStatus === PlayState.Playing ? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)" : "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)"
 						}}
 						className="amll-cover-image amll-cover-image-video"
 						ref={albumCoverRef}
@@ -133,9 +131,11 @@ export const LyricPlayerHorizonal: FC = () => {
 				) : (
 					<div
 						style={{
+                            "box-shadow": playStatus === PlayState.Playing ? "rgba(0,0,0,0.4) 0px 16px 32px" : "rgba(0,0,0,0.2) 0px 8px 16px",
 							backgroundImage: `url(${musicCoverUrl})`,
 							imageRendering: "auto",
 							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
+                            transition: playStatus === PlayState.Playing ? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)" : "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)"
 						}}
 						className="amll-cover-image"
 						ref={albumCoverRef}
