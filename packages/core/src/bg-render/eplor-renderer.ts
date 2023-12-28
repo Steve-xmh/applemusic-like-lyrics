@@ -526,7 +526,10 @@ export class EplorRenderer extends BaseRenderer {
 		this.mainProgram.use();
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
-		this.mainProgram.setUniform1f("IIIlllIlIIllll", this._lowFreqVolume);
+		this.mainProgram.setUniform1f(
+			"IIIlllIlIIllll",
+			this.hasLyric ? this._lowFreqVolume : 0.0,
+		);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);

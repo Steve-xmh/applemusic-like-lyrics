@@ -32,6 +32,7 @@ export const LyricPlayerVertical: FC = () => {
 			className="lyric-player-vertical"
 			style={
 				{
+					"--amll-lyric-player-font-size": "min(3.5vh, 45px)",
 					"--amll-lyric-font-color": fontColor,
 					"--amll-lyric-view-color": fontColor,
 					"--amll-lyric-primary-color": primaryColor,
