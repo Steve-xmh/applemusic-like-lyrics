@@ -7,16 +7,17 @@
     justify-content: stretch
     align-items: center
     min-height: 20px
-    &:active
+    &:hover
         > .inner
             height: 18.9px
-            > .thumb
-                opacity: 0.9
+    &:active
+        > .thumb
+            opacity: 0.9
     > .inner
         flex: 1
         width: 100%
         height: 8.4px
-        transition: height 0.5s cubic-bezier(0.38, 1.625, 0.62, 0.995)
+        transition: height 0.3s cubic-bezier(0.38, 1.625, 0.62, 0.995)
         border-radius: 100px
         background-color: var(--amll-lyric-primary-color-t15, #FFFFFF26)
         overflow: hidden
