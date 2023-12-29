@@ -35,10 +35,13 @@ export const Slider: React.FC<
         const outer = outerRef.current;
         const inner = innerRef.current;
         if (outer && inner) {
-            const scaleSpring = new Spring(100);
+            const heightSpring = new Spring(84);
             const bounceSpring = new Spring(0);
-            scaleSpring.updateParams({
+			let dragging = false;
+            heightSpring.updateParams({
                 stiffness: 150,
+				mass: 1,
+				damping: 10
             });
             bounceSpring.updateParams({
                 stiffness: 150,
@@ -50,11 +53,13 @@ export const Slider: React.FC<
                 const delta = (dt - lastTime) / 1000;
 
                 bounceSpring.update(delta);
+				heightSpring.update(delta);
                 outer.style.transform = `translateX(${bounceSpring.getCurrentPosition() / 100}px)`;
+				inner.style.height = `${heightSpring.getCurrentPosition() / 10}px`;
 
                 lastTime = dt;
 
-                if (!(scaleSpring.arrived() && bounceSpring.arrived())) {
+                if (!(heightSpring.arrived() && bounceSpring.arrived())) {
                     if (handler) cancelAnimationFrame(handler);
                     handler = requestAnimationFrame(onFrame);
                 }
@@ -80,15 +85,31 @@ export const Slider: React.FC<
                 if (handler) cancelAnimationFrame(handler);
                 handler = requestAnimationFrame(onFrame);
             };
-            const onMouseOver = (evt: MouseEvent) => {
-                window.removeEventListener("mouseover", onMouseOver);
-            };
+			const onMouseEnter = (evt: MouseEvent) => {
+				heightSpring.setTargetPosition(189);
+				evt.stopImmediatePropagation();
+				evt.stopPropagation();
+				evt.preventDefault();
+                if (handler) cancelAnimationFrame(handler);
+                handler = requestAnimationFrame(onFrame);
+			}
+			const onMouseLeave = (evt: MouseEvent) => {
+				if (!dragging) {
+					heightSpring.setTargetPosition(84);
+					evt.stopImmediatePropagation();
+					evt.stopPropagation();
+					evt.preventDefault();
+					if (handler) cancelAnimationFrame(handler);
+					handler = requestAnimationFrame(onFrame);
+				}
+			}
 			const onMouseDown = (evt: MouseEvent) => {
 				evt.stopImmediatePropagation();
 				evt.stopPropagation();
 				evt.preventDefault();
-				scaleSpring.setTargetPosition(105);
+				heightSpring.setTargetPosition(189);
 				lastTime = null;
+				dragging = true;
 				window.addEventListener("mousemove", onMouseMove);
 				window.addEventListener("mouseup", onMouseUp);
 				onBeforeChange?.();
@@ -98,8 +119,9 @@ export const Slider: React.FC<
 				evt.stopImmediatePropagation();
 				evt.stopPropagation();
 				evt.preventDefault();
-				scaleSpring.setTargetPosition(100);
+				heightSpring.setTargetPosition(84);
 				lastTime = null;
+				dragging = false;
 				window.removeEventListener("mousemove", onMouseMove);
 				window.removeEventListener("mouseup", onMouseUp);
 				setValue(evt);
@@ -109,8 +131,12 @@ export const Slider: React.FC<
 				setValue(evt);
 			};
 			inner.addEventListener("mousedown", onMouseDown);
+			outer.addEventListener("mouseenter", onMouseEnter);
+			outer.addEventListener("mouseleave", onMouseLeave);
 			return () => {
 				inner.removeEventListener("mousedown", onMouseDown);
+				outer.removeEventListener("mouseenter", onMouseEnter);
+				outer.removeEventListener("mouseleave", onMouseLeave);
 				window.removeEventListener("mouseup", onMouseUp);
 				window.removeEventListener("mousemove", onMouseMove);
 			};

@@ -851,8 +851,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				if (line.isBG) return;
 				const nextLine = this.processedLines[lastHotId + 1];
 				if (nextLine?.isBG) {
+					const nextMainLine = this.processedLines[lastHotId + 2];
 					const startTime = Math.min(line.startTime, nextLine?.startTime);
-					const endTime = Math.max(line.endTime, nextLine?.endTime);
+					const endTime = Math.min(Math.max(line.endTime, nextMainLine?.startTime ?? Number.MAX_VALUE), Math.max(line.endTime, nextLine?.endTime));
 					if (startTime > time || endTime <= time) {
 						this.hotLines.delete(lastHotId);
 						removedHotIds.add(lastHotId);
