@@ -12,14 +12,14 @@
         transition: background-image 0.5s linear, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)
         background-position: center
         background-size: cover
-        border-radius: 8%
+        border-radius: 10%
         $lyric-enabled: true
         @if ($lyric-enabled == true)
             grid-column: cover-side
             grid-row: music-info
-            width: min(10vh,20vw)
-            height: min(10vh,20vw)
-            box-shadow: rgba(0,0,0,0.2) 0px 8px 16px
+            width: min(6.5vh,20vw)
+            height: min(6.5vh,20vw)
+            box-shadow: rgba(0,0,0,0.4) 0px 4px 16px
         @else
             grid-column: 2 / 4
             grid-row: music-info / span cover-middle
@@ -39,7 +39,7 @@
         align-items: center
         justify-content: center
         > *
-            transform: scale(2.5)
+            transform: scale(6)
         @media screen and (max-width: 512px)
             width: 25px
             height: 25px
@@ -70,14 +70,15 @@
         cursor: text
         user-select: text
         min-width: 0
-        font-weight: 600
+        font-weight: 500
         letter-spacing: 0.3px
     .amll-music-album, .amll-music-artists
         white-space: nowrap
         text-align: center
         opacity: 0.5
-        font-weight: 400
+        font-weight: 300
         letter-spacing: 0.3px
+        font-size: min(2vw,4vw)
 
         a
             line-height: normal
@@ -117,14 +118,16 @@
         @media screen and (max-width: 768px)
             margin: 4px
     .amll-music-info
-        padding-left: 2vh
+        padding-left: 1vh
         box-sizing: border-box
-        font-size: min(2vh,4vw)
+        font-size: min(2.5vw,4vw)
         grid-column: info-side
         grid-row: music-info
         display: flex
         align-items: center
         overflow: hidden
         width: 100%
+        line-height: 4vw
+        mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         @media screen and (max-width: 512px)
             font-size: 1.1em
