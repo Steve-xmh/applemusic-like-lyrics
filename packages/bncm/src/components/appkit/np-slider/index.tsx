@@ -31,68 +31,70 @@ export const Slider: React.FC<
 	const [curValue, setCurValue] = useState(value);
 	const outerRef = useRef<HTMLDivElement>(null);
 	const innerRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        const outer = outerRef.current;
-        const inner = innerRef.current;
-        if (outer && inner) {
-            const heightSpring = new Spring(84);
-            const bounceSpring = new Spring(0);
+	useEffect(() => {
+		const outer = outerRef.current;
+		const inner = innerRef.current;
+		if (outer && inner) {
+			const heightSpring = new Spring(84);
+			const bounceSpring = new Spring(0);
 			let dragging = false;
-            heightSpring.updateParams({
-                stiffness: 150,
+			heightSpring.updateParams({
+				stiffness: 150,
 				mass: 1,
-				damping: 10
-            });
-            bounceSpring.updateParams({
-                stiffness: 150,
-            });
-            let lastTime: number | null = null;
-            let handler = 0;
-            const onFrame = (dt: number) => {
-                lastTime ??= dt;
-                const delta = (dt - lastTime) / 1000;
+				damping: 10,
+			});
+			bounceSpring.updateParams({
+				stiffness: 150,
+			});
+			let lastTime: number | null = null;
+			let handler = 0;
+			const onFrame = (dt: number) => {
+				lastTime ??= dt;
+				const delta = (dt - lastTime) / 1000;
 
-                bounceSpring.update(delta);
+				bounceSpring.update(delta);
 				heightSpring.update(delta);
-                outer.style.transform = `translateX(${bounceSpring.getCurrentPosition() / 100}px)`;
+				outer.style.transform = `translateX(${
+					bounceSpring.getCurrentPosition() / 100
+				}px)`;
 				inner.style.height = `${heightSpring.getCurrentPosition() / 10}px`;
 
-                lastTime = dt;
+				lastTime = dt;
 
-                if (!(heightSpring.arrived() && bounceSpring.arrived())) {
-                    if (handler) cancelAnimationFrame(handler);
-                    handler = requestAnimationFrame(onFrame);
-                }
-            };
-            const setValue = (evt: MouseEvent) => {
-                const rect = inner.getBoundingClientRect();
-                const relPos = (evt.clientX - rect.left) / rect.width;
-                if (relPos > 1) {
-                    const o = (relPos - 1) * 900;
-                    bounceSpring.setPosition(o);
-                    bounceSpring.setTargetPosition(o);
-                } else if (relPos < 0) {
-                    const o = relPos * 900;
-                    bounceSpring.setPosition(o);
-                    bounceSpring.setTargetPosition(o);
-                } else {
-                    bounceSpring.setPosition(0);
-                    bounceSpring.setTargetPosition(0);
-                }
-                const v = Math.min(max, Math.max(min, min + (max - min) * relPos));
-                onChange?.(v);
-                setCurValue(v);
-                if (handler) cancelAnimationFrame(handler);
-                handler = requestAnimationFrame(onFrame);
-            };
+				if (!(heightSpring.arrived() && bounceSpring.arrived())) {
+					if (handler) cancelAnimationFrame(handler);
+					handler = requestAnimationFrame(onFrame);
+				}
+			};
+			const setValue = (evt: MouseEvent) => {
+				const rect = inner.getBoundingClientRect();
+				const relPos = (evt.clientX - rect.left) / rect.width;
+				if (relPos > 1) {
+					const o = (relPos - 1) * 900;
+					bounceSpring.setPosition(o);
+					bounceSpring.setTargetPosition(o);
+				} else if (relPos < 0) {
+					const o = relPos * 900;
+					bounceSpring.setPosition(o);
+					bounceSpring.setTargetPosition(o);
+				} else {
+					bounceSpring.setPosition(0);
+					bounceSpring.setTargetPosition(0);
+				}
+				const v = Math.min(max, Math.max(min, min + (max - min) * relPos));
+				onChange?.(v);
+				setCurValue(v);
+				if (handler) cancelAnimationFrame(handler);
+				handler = requestAnimationFrame(onFrame);
+			};
 			const onMouseEnter = (evt: MouseEvent) => {
 				heightSpring.setTargetPosition(189);
 				evt.stopImmediatePropagation();
 				evt.stopPropagation();
 				evt.preventDefault();
-                if (handler) cancelAnimationFrame(handler);
-                handler = requestAnimationFrame(onFrame);
-			}
+				if (handler) cancelAnimationFrame(handler);
+				handler = requestAnimationFrame(onFrame);
+			};
 			const onMouseLeave = (evt: MouseEvent) => {
 				if (!dragging) {
 					heightSpring.setTargetPosition(84);
@@ -102,7 +104,7 @@ export const Slider: React.FC<
 					if (handler) cancelAnimationFrame(handler);
 					handler = requestAnimationFrame(onFrame);
 				}
-			}
+			};
 			const onMouseDown = (evt: MouseEvent) => {
 				evt.stopImmediatePropagation();
 				evt.stopPropagation();
