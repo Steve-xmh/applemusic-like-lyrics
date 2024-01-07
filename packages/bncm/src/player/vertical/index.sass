@@ -1,6 +1,6 @@
 .lyric-player-vertical
     display: grid
-    grid-template-columns: 0.1fr [cover-side] 0fr [info-side] 1fr 0.1fr
+    grid-template-columns: 1em [cover-side] 0fr [info-side] 1fr 1em
     grid-template-rows: [drag-area] 30px [thumb] 0fr [music-info] 0fr [cover-middle] 0fr [lyric-player] 1fr [control] 0fr
     gap: 8px
     width: 100%
@@ -17,8 +17,8 @@
         @if ($lyric-enabled == true)
             grid-column: cover-side
             grid-row: music-info
-            width: min(6.5vh,20vw)
-            height: min(6.5vh,20vw)
+            width: max(min(6.5vh,20vw), 50px)
+            height: max(min(6.5vh,20vw), 50px)
             box-shadow: rgba(0,0,0,0.4) 0px 4px 16px
         @else
             grid-column: 2 / 4
@@ -78,7 +78,7 @@
         opacity: 0.5
         font-weight: 300
         letter-spacing: 0.3px
-        font-size: min(2vw,4vw)
+        font-size: max(min(2vw,4vw), 12px)
 
         a
             line-height: normal
@@ -107,20 +107,12 @@
     .amll-control-thumb
         grid-column: 2 / 4
         grid-row: thumb
-        width: 50px
-        height: 8px
-        margin: 2vh
-        border-radius: 4px
-        border: none
-        background-color: var(--amll-lyric-primary-color-t30, white)
-        justify-self: center
-        mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         @media screen and (max-width: 768px)
             margin: 4px
     .amll-music-info
         padding-left: 1vh
         box-sizing: border-box
-        font-size: min(2.5vw,4vw)
+        font-size: max(min(2.5vw,4vw), 12px)
         grid-column: info-side
         grid-row: music-info
         display: flex
@@ -130,4 +122,4 @@
         line-height: 4vw
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         @media screen and (max-width: 512px)
-            font-size: 1.1em
+            font-size: max(12px, 1.1em)

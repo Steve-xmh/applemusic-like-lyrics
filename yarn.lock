@@ -43,6 +43,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.0.3"
     classnames: "npm:^2.3.2"
     driver.js: "npm:^1.3.0"
+    framer-motion: "npm:^10.17.9"
     jotai: "npm:^2.4.3"
     jss: "npm:^10.10.0"
     jss-preset-default: "npm:^10.10.0"
@@ -470,10 +471,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emotion/is-prop-valid@npm:^0.8.2":
+  version: 0.8.8
+  resolution: "@emotion/is-prop-valid@npm:0.8.8"
+  dependencies:
+    "@emotion/memoize": "npm:0.7.4"
+  checksum: e85bdeb9d9d23de422f271e0f5311a0142b15055bb7e610440dbf250f0cdfd049df88af72a49e2c6081954481f1cbeca9172e2116ff536b38229397dfbed8082
+  languageName: node
+  linkType: hard
+
 "@emotion/memoize@npm:0.7.1":
   version: 0.7.1
   resolution: "@emotion/memoize@npm:0.7.1"
   checksum: fec25e74c3a4af920bfdb0f552c16f648c8f4343d51cb073af85fcec1a382ce041a4e082f458a999dc3599e9d768c0dd28e5accd6066169e01364b270b7036cf
+  languageName: node
+  linkType: hard
+
+"@emotion/memoize@npm:0.7.4":
+  version: 0.7.4
+  resolution: "@emotion/memoize@npm:0.7.4"
+  checksum: 4e3920d4ec95995657a37beb43d3f4b7d89fed6caa2b173a4c04d10482d089d5c3ea50bbc96618d918b020f26ed6e9c4026bbd45433566576c1f7b056c3271dc
   languageName: node
   linkType: hard
 
@@ -4119,6 +4136,27 @@ __metadata:
     combined-stream: "npm:^1.0.8"
     mime-types: "npm:^2.1.12"
   checksum: 7264aa760a8cf09482816d8300f1b6e2423de1b02bba612a136857413fdc96d7178298ced106817655facc6b89036c6e12ae31c9eb5bdc16aabf502ae8a5d805
+  languageName: node
+  linkType: hard
+
+"framer-motion@npm:^10.17.9":
+  version: 10.17.9
+  resolution: "framer-motion@npm:10.17.9"
+  dependencies:
+    "@emotion/is-prop-valid": "npm:^0.8.2"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  dependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 7ce3449885c49ea08cda429d82da45e688e321c49ac0443e56b595161e0a8b6d468efba7a13bf55194e7c0f030356383d9b38ca0e9ea48bcc113172b548c1876
   languageName: node
   linkType: hard
 

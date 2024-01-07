@@ -23,6 +23,7 @@ import { MusicInfo } from "./info";
 import { CoreLyricPlayer } from "../common/player";
 import classNames from "classnames";
 import { lyricLinesAtom } from "../../lyric/provider";
+import { ControlThumb } from "../common/control-thumb";
 
 export const LyricPlayerHorizonal: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -95,13 +96,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				}}
 			/>
 			{showControlThumb ? (
-				<button
-					className="amll-control-thumb"
-					type="button"
-					onClick={() => {
-						closeLyricPage();
-					}}
-				/>
+				<ControlThumb />
 			) : (
 				<div />
 			)}

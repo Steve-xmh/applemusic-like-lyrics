@@ -16,6 +16,7 @@ import {
 	displayMusicCoverAtom,
 	loadableMusicOverrideDataAtom,
 } from "../../music-context/wrapper";
+import { ControlThumb } from "../common/control-thumb";
 
 export const LyricPlayerVertical: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -51,13 +52,7 @@ export const LyricPlayerVertical: FC = () => {
 			}}
 		>
 			{showControlThumb && (
-				<button
-					className="amll-control-thumb"
-					type="button"
-					onClick={() => {
-						closeLyricPage();
-					}}
-				/>
+				<ControlThumb />
 			)}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
