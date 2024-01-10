@@ -59,7 +59,7 @@ export const Background: FC = () => {
 			const value =
 				Math.pow(
 					Math.max(
-						Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5 ?? 1) * 0.001 -
+						Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5) * 0.001 -
 							0.15,
 						0.0,
 					) *
