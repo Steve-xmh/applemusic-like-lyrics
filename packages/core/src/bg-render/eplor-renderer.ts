@@ -651,6 +651,8 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.8);
+		saturateImage(imageData, 1.5);
+		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 4);
 		const sprite = new AlbumTexture(
@@ -661,7 +663,7 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		if (this.hasLyric) this.playTime = Math.random() * 100000;
+		if (this.hasLyric) this.playTime = 80000;
 		else this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		this.requestTick();
