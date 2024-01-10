@@ -348,7 +348,7 @@ export const usingLyricSourceAtom = atom({
 } as Loadable<LyricSource>);
 
 export const lyricLinesAtom = atom(
-	(get) => {
+	(get): Loadable<CoreLyricLine[]> => {
 		const result = get(rawLyricLinesAtom);
 		const overrideData = get(loadableMusicOverrideDataAtom);
 		if (result.state === "hasData" && overrideData.state === "hasData") {
