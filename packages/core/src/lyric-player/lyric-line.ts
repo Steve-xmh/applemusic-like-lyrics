@@ -365,7 +365,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							...word,
 							mainElement: mainWordEl,
 							subElements: charEls,
-							elementAnimations: [mainWordFloatAnimation],
+							elementAnimations: [],
 							width: 0,
 							height: 0,
 							shouldEmphasize: emp,
@@ -466,35 +466,34 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.max(1000, word.endTime - word.startTime);
-			const de = delay + (duration / 2 / arr.length) * i;
+			const de = delay + (duration / 4 / arr.length) * i;
 			const glowAnimation = el.animate(
 				[
 					{
 						offset: 0,
-						transform: "translateZ(0vw)",
-						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+						textShadow: "rgba(255, 255, 255, 0) 0 0 0.15em",
 					},
 					{
 						offset: 0.1,
-						transform: "translateZ(2vw)",
-						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+						transform: "translateZ(1vw) translateY(-0.05em)",
+						textShadow: "rgba(255, 255, 255, 0.2) 0 0 0.15em",
 					},
 					{
 						offset: 0.2,
-						textShadow: "rgba(255, 255, 255, 0.6) 0 0 0.15em",
+						textShadow: "rgba(255, 255, 255, 0.3) 0 0 0.15em",
 					},
 					{
 						offset: 0.5,
-						transform: "translateZ(1vw)",
+						textShadow: "rgba(255, 255, 255, 0.3) 0 0 0.15em",
 					},
 					{
-						offset: 0.9,
-						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+						offset: 0.7,
+						textShadow: "rgba(255, 255, 255, 0.2) 0 0 0.15em",
 					},
 					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: "var(--amll-lyric-view-color,white) 0 0 0",
+						textShadow: "rgba(255, 255, 255, 0.0) 0 0 0.15em",
 					},
 				],
 				{
@@ -503,7 +502,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					id: "glow-word",
 					iterations: 1,
 					composite: "replace",
-					easing: "ease-in-out",
+					easing: "ease-in",
 					fill: "both",
 				},
 			);
