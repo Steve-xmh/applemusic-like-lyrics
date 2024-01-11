@@ -4,6 +4,7 @@ import vertShader from "./shaders/base.vert.glsl";
 import fragShader from "./shaders/base.frag.glsl";
 import blendShader from "./shaders/blend.frag.glsl";
 import eplorShader from "./shaders/eplor.frag.glsl";
+import filterShader from "./shaders/filter.frag.glsl";
 import { ConsoleLogger } from "typedoc/dist/lib/utils";
 import { RandomIdentifierGenerator } from "vite-plugin-top-level-await/dist/utils/random-identifier";
 
@@ -409,6 +410,7 @@ export class EplorRenderer extends BaseRenderer {
 	private sprites: AlbumTexture[] = [];
 	private ampTransition = 0;
 	private playTime = 0;
+    private frameTime = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -421,7 +423,8 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed;
+		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed * 0.2;
+        this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
@@ -447,6 +450,11 @@ export class EplorRenderer extends BaseRenderer {
 		vertShader,
 		fragShader,
 	);
+	private filterProgram: GLProgram = new GLProgram(
+		this.gl,
+		vertShader,
+        filterShader,
+	);
 
 	private static readonly rawVertexBuffer = new Float32Array([
 		-1, -1, 1, -1, -1, 1, 1, 1,
@@ -468,7 +476,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.STATIC_DRAW,
 	);
 
-	private fb: [Framebuffer, Framebuffer];
+	private fb: [Framebuffer, Framebuffer, Framebuffer, Framebuffer];
 
 	constructor(protected canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -482,6 +490,8 @@ export class EplorRenderer extends BaseRenderer {
 		const height =
 			bounds.height * window.devicePixelRatio * this.currerntRenderScale;
 		this.fb = [
+			new Framebuffer(this.gl, width, height),
+			new Framebuffer(this.gl, width, height),
 			new Framebuffer(this.gl, width, height),
 			new Framebuffer(this.gl, width, height),
 		];
@@ -501,6 +511,7 @@ export class EplorRenderer extends BaseRenderer {
 		}
 		this.mainProgram.use();
 		this.mainProgram.setUniform2f("IIlIlIIlIlIllI", width, height);
+        this.filterProgram.setUniform2f("texSize", width, height);
 	}
 
 	private requestTick() {
@@ -530,7 +541,7 @@ export class EplorRenderer extends BaseRenderer {
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
-		const [fba, fbb] = this.fb;
+		const [fba, fbb, fbc, fbd] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
 		gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -554,11 +565,26 @@ export class EplorRenderer extends BaseRenderer {
 			sprite.alpha = Math.min(1, sprite.alpha + delta / 200);
 		}
 
-		this.bindDefaultFrameBuffer();
+        fbc.bind();
 		this.copyProgram.use();
+        this.copyProgram.setUniform1f("frameTime", this.frameTime / 1000);
 		fbb.active();
 		this.copyProgram.setUniform1i("src", 0);
 		this.drawScreen();
+
+        this.bindDefaultFrameBuffer();
+
+        this.filterProgram.use();
+        this.filterProgram.setUniform1f("frameTime", this.frameTime / 1000);
+        fbc.active();
+        this.filterProgram.setUniform1i("src", 0);
+        this.drawScreen();
+        fbd.active();
+        this.filterProgram.setUniform1i("lastsrc", 0);
+
+        this.filterProgram.use();
+        fbd.bind();
+        this.drawScreen();
 
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
@@ -663,7 +689,7 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		if (this.hasLyric) this.playTime = 80000;
+		if (this.hasLyric) this.playTime = 90000;
 		else this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		this.requestTick();

@@ -79,7 +79,7 @@ export const Background: FC = () => {
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.003 * delta,
+					curValue + (value - curValue) * 0.0008 * delta,
 				);
 			}
 

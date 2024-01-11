@@ -95,11 +95,7 @@ export const LyricPlayerHorizonal: FC = () => {
 					gridRow: "1 / 7",
 				}}
 			/>
-			{showControlThumb ? (
-				<ControlThumb />
-			) : (
-				<div />
-			)}
+			{showControlThumb ? <ControlThumb /> : <div />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (

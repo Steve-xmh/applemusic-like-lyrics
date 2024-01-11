@@ -51,9 +51,7 @@ export const LyricPlayerVertical: FC = () => {
 				evt.stopPropagation();
 			}}
 		>
-			{showControlThumb && (
-				<ControlThumb />
-			)}
+			{showControlThumb && <ControlThumb />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (

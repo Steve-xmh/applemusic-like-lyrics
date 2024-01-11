@@ -551,7 +551,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				})*${
 					w / Math.abs(word.endTime - word.startTime)
 				}px),0px) 0px, left top`;
-				// const maskPos = `clamp(0px,${w}px,${w}px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
