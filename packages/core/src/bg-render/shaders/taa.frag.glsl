@@ -7,31 +7,30 @@ uniform vec2 texSize;
 in vec2 f_v_coord;
 out vec4 fragColor;
 
-vec4 smartDeNoise(sampler2D tex, vec2 uv, float radius, float threshold)
-{
+vec4 smartDeNoise(sampler2D tex, vec2 uv, float radius, float threshold) {
     float radQ = radius * radius;
 
-    vec4 centrPx = texture(tex,uv);
-    
-    float zBuff = 0.0;
-    vec4 aBuff = vec4(0.0);
+    vec4 centrPx = texture(tex, uv);
+
+    float zBuff = 0.0f;
+    vec4 aBuff = vec4(0.0f);
     vec2 size = vec2(textureSize(tex, 0));
-    
-    for(float x=-radius; x <= radius; x++) {
-        float pt = sqrt(radQ-x*x);
-        for(float y=-pt; y <= pt; y++) {
-            vec2 d = vec2(x,y);
 
-            vec4 walkPx =  texture(tex,uv+d/size);
+    for(float x = -radius; x <= radius; x++) {
+        float pt = sqrt(radQ - x * x);
+        for(float y = -pt; y <= pt; y++) {
+            vec2 d = vec2(x, y);
 
-            vec4 dC = walkPx-centrPx;
-            float deltaFactor = exp( -dot(dC, dC) * threshold);
-                                 
+            vec4 walkPx = texture(tex, uv + d / size);
+
+            vec4 dC = walkPx - centrPx;
+            float deltaFactor = exp(-dot(dC, dC) * threshold);
+
             zBuff += deltaFactor;
-            aBuff += deltaFactor*walkPx;
+            aBuff += deltaFactor * walkPx;
         }
     }
-    return aBuff/zBuff;
+    return aBuff / zBuff;
 }
 
 void main() {
@@ -72,8 +71,6 @@ void main() {
     fragColor = vec4(pixelColor, 1.0f);
 }
 */
-
-
 
 /*
 #define INV_SQRT_OF_2PI 0.39894228040143267793994605993439  // 1.0/SQRT_OF_2PI

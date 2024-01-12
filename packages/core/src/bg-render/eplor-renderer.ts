@@ -4,9 +4,8 @@ import vertShader from "./shaders/base.vert.glsl";
 import fragShader from "./shaders/base.frag.glsl";
 import blendShader from "./shaders/blend.frag.glsl";
 import eplorShader from "./shaders/eplor.frag.glsl";
-import filterShader from "./shaders/filter.frag.glsl";
-import { ConsoleLogger } from "typedoc/dist/lib/utils";
-import { RandomIdentifierGenerator } from "vite-plugin-top-level-await/dist/utils/random-identifier";
+import taaShader from "./shaders/taa.frag.glsl";
+import noiseShader from "./shaders/noise.frag.glsl";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
@@ -259,11 +258,16 @@ class GLProgram implements Disposable {
 class Framebuffer implements Disposable {
 	private fb: WebGLFramebuffer;
 	private tex: WebGLTexture;
+	private _size: [number, number];
+	get size() {
+		return this._size;
+	}
 	constructor(
 		private gl: WebGLRenderingContext,
 		width: number,
 		height: number,
 	) {
+		this._size = [width, height];
 		const fb = gl.createFramebuffer();
 		if (!fb) throw new Error("Can't create framebuffer");
 		const tex = gl.createTexture();
@@ -278,7 +282,6 @@ class Framebuffer implements Disposable {
 	resize(width: number, height: number) {
 		const gl = this.gl;
 		this.bind();
-		gl.viewport(0, 0, width, height);
 		gl.bindTexture(gl.TEXTURE_2D, this.tex);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
@@ -291,6 +294,10 @@ class Framebuffer implements Disposable {
 			gl.UNSIGNED_BYTE,
 			null,
 		);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
 	}
 	bind() {
 		const gl = this.gl;
@@ -410,7 +417,7 @@ export class EplorRenderer extends BaseRenderer {
 	private sprites: AlbumTexture[] = [];
 	private ampTransition = 0;
 	private playTime = 0;
-    private frameTime = 0;
+	private frameTime = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -424,7 +431,7 @@ export class EplorRenderer extends BaseRenderer {
 		}
 
 		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed * 0.2;
-        this.frameTime += frameDelta;
+		this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
@@ -450,10 +457,11 @@ export class EplorRenderer extends BaseRenderer {
 		vertShader,
 		fragShader,
 	);
-	private filterProgram: GLProgram = new GLProgram(
+	private taaProgram: GLProgram = new GLProgram(this.gl, vertShader, taaShader);
+	private noiseProgram: GLProgram = new GLProgram(
 		this.gl,
 		vertShader,
-        filterShader,
+		noiseShader,
 	);
 
 	private static readonly rawVertexBuffer = new Float32Array([
@@ -476,7 +484,8 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.STATIC_DRAW,
 	);
 
-	private fb: [Framebuffer, Framebuffer, Framebuffer, Framebuffer];
+	private fb: [Framebuffer, Framebuffer];
+	private historyFrameBuffer: Framebuffer[] = [];
 
 	constructor(protected canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -492,26 +501,47 @@ export class EplorRenderer extends BaseRenderer {
 		this.fb = [
 			new Framebuffer(this.gl, width, height),
 			new Framebuffer(this.gl, width, height),
-			new Framebuffer(this.gl, width, height),
-			new Framebuffer(this.gl, width, height),
 		];
+		this.historyFrameBuffer = new Array(5)
+			.fill(0)
+			.map(() => new Framebuffer(this.gl, width, height));
 		this.fb.forEach((fb) => {
 			fb.bind();
 			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 		});
 		this.onResize(width, height);
 	}
+	private _currentSize = [0, 0];
+	private _targetSize = [0, 0];
+	private pixelSize = [0, 0];
+	private renderSize = [0, 0];
 
 	protected override onResize(width: number, height: number): void {
-		super.onResize(width, height);
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-		this.gl.viewport(0, 0, width, height);
+		// super.onResize(width, height);
+		this._targetSize = [width, height];
+	}
+
+	private checkResize() {
+		if (
+			this._currentSize[0] === this._targetSize[0] &&
+			this._currentSize[1] === this._targetSize[1]
+		)
+			return;
+		this._currentSize = [...this._targetSize];
+		const [width, height] = this._targetSize;
+		const realWidth = Math.max(width / this.currerntRenderScale, width);
+		const realHeight = Math.max(height / this.currerntRenderScale, height);
+		this.renderSize = [width, height];
+		this.canvas.width = realWidth;
+		this.canvas.height = realHeight;
+		this.pixelSize = [realWidth, realHeight];
+		this.gl.viewport(0, 0, realWidth, realHeight);
 		for (const fb of this.fb) {
 			fb.resize(width, height);
 		}
-		this.mainProgram.use();
-		this.mainProgram.setUniform2f("IIlIlIIlIlIllI", width, height);
-        this.filterProgram.setUniform2f("texSize", width, height);
+		for (const fb of this.historyFrameBuffer) {
+			fb.resize(realWidth, realHeight);
+		}
 	}
 
 	private requestTick() {
@@ -528,6 +558,7 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
+		this.checkResize();
 		this.hasLyricValue =
 			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
 		const gl = this.gl;
@@ -535,13 +566,18 @@ export class EplorRenderer extends BaseRenderer {
 		this.indexBuffer.bind();
 
 		this.mainProgram.use();
+		this.mainProgram.setUniform2f(
+			"IIlIlIIlIlIllI",
+			this.renderSize[0],
+			this.renderSize[1],
+		);
 		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
-		const [fba, fbb, fbc, fbd] = this.fb;
+		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
 		gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -560,31 +596,49 @@ export class EplorRenderer extends BaseRenderer {
 			fba.active();
 			this.blendProgram.setUniform1i("src", 0);
 			this.blendProgram.setUniform1f("lerp", sprite.alpha);
+			this.blendProgram.setUniform1f("scale", this.currerntRenderScale);
 			this.drawScreen();
 
 			sprite.alpha = Math.min(1, sprite.alpha + delta / 200);
 		}
 
-        fbc.bind();
-		this.copyProgram.use();
-        this.copyProgram.setUniform1f("frameTime", this.frameTime / 1000);
+		// 增加噪点以缓解色带现象
+		this.noiseProgram.use();
+		this.noiseProgram.setUniform1f("scale", this.currerntRenderScale);
+		this.noiseProgram.setUniform1f("frameTime", this.frameTime / 10000000);
+		this.noiseProgram.setUniform2f(
+			"renderSize",
+			this.renderSize[0],
+			this.renderSize[1],
+		);
+		fba.bind();
 		fbb.active();
-		this.copyProgram.setUniform1i("src", 0);
+		this.blendProgram.setUniform1i("src", 0);
 		this.drawScreen();
 
-        this.bindDefaultFrameBuffer();
-
-        this.filterProgram.use();
-        this.filterProgram.setUniform1f("frameTime", this.frameTime / 1000);
-        fbc.active();
-        this.filterProgram.setUniform1i("src", 0);
-        this.drawScreen();
-        fbd.active();
-        this.filterProgram.setUniform1i("lastsrc", 0);
-
-        this.filterProgram.use();
-        fbd.bind();
-        this.drawScreen();
+		const nextFB = this.historyFrameBuffer.pop();
+		if (nextFB) {
+			// 应用 TAA 抗锯齿以缓解噪点带来的颗粒感
+			nextFB.bind();
+			this.copyFrameBuffer(fba, nextFB);
+			this.taaProgram.use();
+			this.taaProgram.setUniform1f("scale", this.currerntRenderScale);
+			this.taaProgram.setUniform1f("frameTime", this.frameTime);
+			this.taaProgram.setUniform2f(
+				"renderSize",
+				this.renderSize[0],
+				this.renderSize[1],
+			);
+			this.historyFrameBuffer.forEach((historyFB, index) => {
+				historyFB.active(gl.TEXTURE0 + index + 1);
+				this.taaProgram.setUniform1i(`historyFrame${index}`, index + 1);
+			});
+			this.drawScreen();
+			this.copyFrameBuffer(nextFB, null);
+			this.historyFrameBuffer.unshift(nextFB);
+		} else {
+			this.copyFrameBuffer(fba, null);
+		}
 
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
@@ -595,6 +649,20 @@ export class EplorRenderer extends BaseRenderer {
 			}
 		}
 		return this.sprites.length === 1 && this.sprites[0].alpha >= 1;
+	}
+
+	private copyFrameBuffer(src: Framebuffer, dst: Framebuffer | null = null) {
+		if (src === dst) return;
+		src.active(this.gl.TEXTURE0);
+		this.copyProgram.use();
+		if (dst) {
+			dst.bind();
+		} else {
+			this.bindDefaultFrameBuffer();
+		}
+		this.copyProgram.setUniform1i("src", 0);
+		// this.copyProgram.setUniform1f("scale", scale);
+		this.drawScreen();
 	}
 
 	private setupGL() {
@@ -711,6 +779,8 @@ export class EplorRenderer extends BaseRenderer {
 		this.copyProgram.dispose();
 		this.blendProgram.dispose();
 		this.mainProgram.dispose();
+		this.fb.forEach((v) => v.dispose());
+		this.historyFrameBuffer.forEach((v) => v.dispose());
 		if (this.tickHandle) {
 			cancelAnimationFrame(this.tickHandle);
 			this.tickHandle = 0;
