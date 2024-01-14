@@ -101,7 +101,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						style={{
-							"box-shadow":
+							boxShadow:
 								playStatus === PlayState.Playing
 									? "rgba(0,0,0,0.4) 0px 16px 32px"
 									: "rgba(0,0,0,0.2) 0px 8px 16px",
@@ -132,7 +132,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				) : (
 					<div
 						style={{
-							"box-shadow":
+							boxShadow:
 								playStatus === PlayState.Playing
 									? "rgba(0,0,0,0.4) 0px 16px 32px"
 									: "rgba(0,0,0,0.2) 0px 8px 16px",
