@@ -2606,6 +2606,7 @@ __metadata:
   resolution: "applemusic-like-lyrics@workspace:."
   dependencies:
     lerna: "npm:^7.3.1"
+    vite-plugin-glsl: "npm:^1.2.1"
   languageName: unknown
   linkType: soft
 

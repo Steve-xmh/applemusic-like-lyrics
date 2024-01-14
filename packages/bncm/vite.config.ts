@@ -18,6 +18,7 @@ import { minify as terserMinify } from "terser";
 import { execSync } from "child_process";
 import JSZip from "jszip";
 import lightningcss from "vite-plugin-lightningcss";
+import glsl from "vite-plugin-glsl";
 import { createReadStream } from "fs";
 
 function getDefaultBetterNCMPath() {
@@ -247,6 +248,9 @@ export default defineConfig(({ mode }) => {
 		plugins: [
 			react(),
 			wasm(),
+			glsl({
+				compress: true,
+			}),
 			svgr({
 				svgrOptions: {
 					ref: true,
