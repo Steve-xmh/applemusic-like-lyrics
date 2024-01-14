@@ -1,10 +1,10 @@
 import { Disposable } from "../interfaces";
 import { BaseRenderer } from "./base";
-import vertShader from "./shaders/base.vert.glsl";
-import fragShader from "./shaders/base.frag.glsl";
-import blendShader from "./shaders/blend.frag.glsl";
-import eplorShader from "./shaders/eplor.frag.glsl";
-import noiseShader from "./shaders/noise.frag.glsl";
+import vertShader from "./shaders/base.vert.glsl?raw";
+import fragShader from "./shaders/base.frag.glsl?raw";
+import blendShader from "./shaders/blend.frag.glsl?raw";
+import eplorShader from "./shaders/eplor.frag.glsl?raw";
+import noiseShader from "./shaders/noise.frag.glsl?raw";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
