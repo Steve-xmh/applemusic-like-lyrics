@@ -16,6 +16,7 @@
       "noEmit": true
     },
     "include": ["src"],
+    "exclude": ["src/test.ts"],
     "extends": "@vue/tsconfig/tsconfig.dom.json"
   }
   

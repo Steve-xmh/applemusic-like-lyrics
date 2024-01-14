@@ -1,5 +1,6 @@
 {
     "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+    "exclude": ["./src/test-app.tsx"],
     "compilerOptions": {
         "target": "ESNext",
         "lib": [

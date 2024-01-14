@@ -263,6 +263,13 @@ export default defineConfig(({ mode }) => {
 				browserslist: "safari >= 10.13, chrome >= 91",
 			}),
 		],
+		resolve: {
+			alias: {
+				"@applemusic-like-lyrics/core": resolve(__dirname, "../core/src"),
+				"@applemusic-like-lyrics/react": resolve(__dirname, "../react/src"),
+				"@applemusic-like-lyrics/ttml": resolve(__dirname, "../ttml/src"),
+			}
+		},
 		define:
 			env.AMLL_DEV === "true"
 				? {

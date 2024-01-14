@@ -68,14 +68,13 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 	constructor(protected canvas: HTMLCanvasElement) {
 		super();
 		this.observer = new ResizeObserver(() => {
-			const bounds = canvas.getBoundingClientRect();
 			const width = Math.max(
 				1,
-				bounds.width * window.devicePixelRatio * this.currerntRenderScale,
+				canvas.clientWidth * window.devicePixelRatio * this.currerntRenderScale,
 			);
 			const height = Math.max(
 				1,
-				bounds.height * window.devicePixelRatio * this.currerntRenderScale,
+				canvas.clientHeight * window.devicePixelRatio * this.currerntRenderScale,
 			);
 			this.onResize(width, height);
 		});
@@ -83,10 +82,9 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 	}
 	setRenderScale(scale: number) {
 		this.currerntRenderScale = scale;
-		const bounds = this.canvas.getBoundingClientRect();
 		this.onResize(
-			bounds.width * window.devicePixelRatio * this.currerntRenderScale,
-			bounds.height * window.devicePixelRatio * this.currerntRenderScale,
+			this.canvas.clientWidth * window.devicePixelRatio * this.currerntRenderScale,
+			this.canvas.clientHeight * window.devicePixelRatio * this.currerntRenderScale,
 		);
 	}
 	/**

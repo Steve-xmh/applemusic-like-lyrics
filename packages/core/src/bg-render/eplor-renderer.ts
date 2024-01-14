@@ -4,7 +4,6 @@ import vertShader from "./shaders/base.vert.glsl";
 import fragShader from "./shaders/base.frag.glsl";
 import blendShader from "./shaders/blend.frag.glsl";
 import eplorShader from "./shaders/eplor.frag.glsl";
-import taaShader from "./shaders/taa.frag.glsl";
 import noiseShader from "./shaders/noise.frag.glsl";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
@@ -170,13 +169,13 @@ function contrastImage(imageData: ImageData, contrast: number) {
 }
 
 class GLProgram implements Disposable {
-	private gl: WebGLRenderingContext;
+	private gl: WebGL2RenderingContext;
 	program: WebGLProgram;
 	private vertexShader: WebGLShader;
 	private fragmentShader: WebGLShader;
 	private coordPos: number;
 	constructor(
-		gl: WebGLRenderingContext,
+		gl: WebGL2RenderingContext,
 		vertexShaderSource: string,
 		fragmentShaderSource: string,
 	) {
@@ -229,22 +228,28 @@ class GLProgram implements Disposable {
 		gl.vertexAttribPointer(this.coordPos, 2, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(this.coordPos);
 	}
+	private notFoundUniforms: Set<string> = new Set();
+	private warnUniformNotFound(name: string) {
+		if (this.notFoundUniforms.has(name)) return;
+		this.notFoundUniforms.add(name);
+		console.warn(`Failed to get uniform location: ${name}`);
+	}
 	setUniform1f(name: string, value: number) {
 		const gl = this.gl;
 		const location = gl.getUniformLocation(this.program, name);
-		if (!location) console.warn(`Failed to get uniform location: ${name}`);
+		if (!location) this.warnUniformNotFound(name);
 		else gl.uniform1f(location, value);
 	}
 	setUniform2f(name: string, value1: number, value2: number) {
 		const gl = this.gl;
 		const location = gl.getUniformLocation(this.program, name);
-		if (!location) console.warn(`Failed to get uniform location: ${name}`);
+		if (!location) this.warnUniformNotFound(name);
 		else gl.uniform2f(location, value1, value2);
 	}
 	setUniform1i(name: string, value: number) {
 		const gl = this.gl;
 		const location = gl.getUniformLocation(this.program, name);
-		if (!location) console.warn(`Failed to get uniform location: ${name}`);
+		if (!location) this.warnUniformNotFound(name);
 		else gl.uniform1i(location, value);
 	}
 	dispose() {
@@ -263,7 +268,7 @@ class Framebuffer implements Disposable {
 		return this._size;
 	}
 	constructor(
-		private gl: WebGLRenderingContext,
+		private gl: WebGL2RenderingContext,
 		width: number,
 		height: number,
 	) {
@@ -274,6 +279,15 @@ class Framebuffer implements Disposable {
 		if (!tex) throw new Error("Failed to create texture");
 		this.fb = fb;
 		this.tex = tex;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.framebufferTexture2D(
+			gl.FRAMEBUFFER,
+			gl.COLOR_ATTACHMENT0,
+			gl.TEXTURE_2D,
+			tex,
+			0,
+		);
 		this.resize(width, height);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
@@ -283,17 +297,31 @@ class Framebuffer implements Disposable {
 		const gl = this.gl;
 		this.bind();
 		gl.bindTexture(gl.TEXTURE_2D, this.tex);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			width,
-			height,
-			0,
-			gl.RGBA,
-			gl.UNSIGNED_BYTE,
-			null,
-		);
+		if (gl.getExtension("EXT_color_buffer_float")) {
+			gl.texImage2D(
+				gl.TEXTURE_2D,
+				0,
+				gl.RGBA32F,
+				width,
+				height,
+				0,
+				gl.RGBA,
+				gl.FLOAT,
+				null,
+			);
+		} else {
+			gl.texImage2D(
+				gl.TEXTURE_2D,
+				0,
+				gl.RGBA,
+				width,
+				height,
+				0,
+				gl.RGBA,
+				gl.UNSIGNED_BYTE,
+				null,
+			);
+		}
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
@@ -302,13 +330,6 @@ class Framebuffer implements Disposable {
 	bind() {
 		const gl = this.gl;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.fb);
-		gl.framebufferTexture2D(
-			gl.FRAMEBUFFER,
-			gl.COLOR_ATTACHMENT0,
-			gl.TEXTURE_2D,
-			this.tex,
-			0,
-		);
 	}
 	active(texture: number = this.gl.TEXTURE0) {
 		this.gl.activeTexture(texture);
@@ -316,18 +337,19 @@ class Framebuffer implements Disposable {
 	}
 	dispose(): void {
 		this.gl.deleteFramebuffer(this.fb);
+		this.gl.deleteTexture(this.tex);
 	}
 }
 
 class GLBuffer implements Disposable {
-	private gl: WebGLRenderingContext;
+	private gl: WebGL2RenderingContext;
 	private buffer: WebGLBuffer;
 	private type: number;
 	private data: ArrayBufferView;
 	private usage: number;
 	private length: number;
 	constructor(
-		gl: WebGLRenderingContext,
+		gl: WebGL2RenderingContext,
 		type: number,
 		data: ArrayBufferView,
 		usage: number,
@@ -364,7 +386,7 @@ class AlbumTexture implements Disposable {
 	alpha = 0;
 
 	constructor(
-		private gl: WebGLRenderingContext,
+		private gl: WebGL2RenderingContext,
 		private mainProgram: GLProgram,
 		private vertexBuffer: GLBuffer,
 		private indexBuffer: GLBuffer,
@@ -411,7 +433,7 @@ export class EplorRenderer extends BaseRenderer {
 	private _lowFreqVolume = 1;
 	private paused = false;
 	private staticMode = false;
-	private gl: WebGLRenderingContext = this.setupGL();
+	private gl: WebGL2RenderingContext = this.setupGL();
 	private reduceImageSizeCanvas = new OffscreenCanvas(64, 64);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
@@ -457,7 +479,6 @@ export class EplorRenderer extends BaseRenderer {
 		vertShader,
 		fragShader,
 	);
-	private taaProgram: GLProgram = new GLProgram(this.gl, vertShader, taaShader);
 	private noiseProgram: GLProgram = new GLProgram(
 		this.gl,
 		vertShader,
@@ -485,7 +506,6 @@ export class EplorRenderer extends BaseRenderer {
 	);
 
 	private fb: [Framebuffer, Framebuffer];
-	private historyFrameBuffer: Framebuffer[] = [];
 
 	constructor(protected canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -502,9 +522,6 @@ export class EplorRenderer extends BaseRenderer {
 			new Framebuffer(this.gl, width, height),
 			new Framebuffer(this.gl, width, height),
 		];
-		this.historyFrameBuffer = new Array(5)
-			.fill(0)
-			.map(() => new Framebuffer(this.gl, width, height));
 		this.fb.forEach((fb) => {
 			fb.bind();
 			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -513,12 +530,11 @@ export class EplorRenderer extends BaseRenderer {
 	}
 	private _currentSize = [0, 0];
 	private _targetSize = [0, 0];
-	private pixelSize = [0, 0];
 	private renderSize = [0, 0];
 
 	protected override onResize(width: number, height: number): void {
 		// super.onResize(width, height);
-		this._targetSize = [width, height];
+		this._targetSize = [Math.round(width), Math.round(height)];
 	}
 
 	private checkResize() {
@@ -529,18 +545,18 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		this._currentSize = [...this._targetSize];
 		const [width, height] = this._targetSize;
-		const realWidth = Math.max(width / this.currerntRenderScale, width);
-		const realHeight = Math.max(height / this.currerntRenderScale, height);
+		const realWidth = Math.round(
+			Math.max(width / this.currerntRenderScale, width),
+		);
+		const realHeight = Math.round(
+			Math.max(height / this.currerntRenderScale, height),
+		);
 		this.renderSize = [width, height];
 		this.canvas.width = realWidth;
 		this.canvas.height = realHeight;
-		this.pixelSize = [realWidth, realHeight];
 		this.gl.viewport(0, 0, realWidth, realHeight);
 		for (const fb of this.fb) {
 			fb.resize(width, height);
-		}
-		for (const fb of this.historyFrameBuffer) {
-			fb.resize(realWidth, realHeight);
 		}
 	}
 
@@ -604,41 +620,11 @@ export class EplorRenderer extends BaseRenderer {
 
 		// 增加噪点以缓解色带现象
 		this.noiseProgram.use();
-		this.noiseProgram.setUniform1f("scale", this.currerntRenderScale);
-		this.noiseProgram.setUniform1f("frameTime", this.frameTime / 10000000);
-		this.noiseProgram.setUniform2f(
-			"renderSize",
-			this.renderSize[0],
-			this.renderSize[1],
-		);
+		this.noiseProgram.setUniform1i("src", 0);
 		fba.bind();
 		fbb.active();
-		this.blendProgram.setUniform1i("src", 0);
+		this.bindDefaultFrameBuffer();
 		this.drawScreen();
-
-		const nextFB = this.historyFrameBuffer.pop();
-		if (nextFB) {
-			// 应用 TAA 抗锯齿以缓解噪点带来的颗粒感
-			nextFB.bind();
-			this.copyFrameBuffer(fba, nextFB);
-			this.taaProgram.use();
-			this.taaProgram.setUniform1f("scale", this.currerntRenderScale);
-			this.taaProgram.setUniform1f("frameTime", this.frameTime);
-			this.taaProgram.setUniform2f(
-				"renderSize",
-				this.renderSize[0],
-				this.renderSize[1],
-			);
-			this.historyFrameBuffer.forEach((historyFB, index) => {
-				historyFB.active(gl.TEXTURE0 + index + 1);
-				this.taaProgram.setUniform1i(`historyFrame${index}`, index + 1);
-			});
-			this.drawScreen();
-			this.copyFrameBuffer(nextFB, null);
-			this.historyFrameBuffer.unshift(nextFB);
-		} else {
-			this.copyFrameBuffer(fba, null);
-		}
 
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
@@ -676,6 +662,12 @@ export class EplorRenderer extends BaseRenderer {
 		gl.enable(gl.BLEND);
 		gl.disable(gl.DEPTH_TEST);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		if (!gl.getExtension("EXT_color_buffer_float"))
+			console.warn("EXT_color_buffer_float not supported");
+		if (!gl.getExtension("EXT_float_blend"))
+			console.warn("EXT_float_blend not supported");
+		if (!gl.getExtension("OES_texture_float_linear"))
+			console.warn("OES_texture_float_linear not supported");
 
 		return gl;
 	}
@@ -780,7 +772,6 @@ export class EplorRenderer extends BaseRenderer {
 		this.blendProgram.dispose();
 		this.mainProgram.dispose();
 		this.fb.forEach((v) => v.dispose());
-		this.historyFrameBuffer.forEach((v) => v.dispose());
 		if (this.tickHandle) {
 			cancelAnimationFrame(this.tickHandle);
 			this.tickHandle = 0;
