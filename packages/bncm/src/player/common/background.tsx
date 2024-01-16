@@ -57,16 +57,16 @@ export const Background: FC = () => {
 			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
 			const value =
-				Math.pow(
+				(Math.pow(
 					Math.max(
 						Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5) * 0.001 -
-							0.15,
+						0.2,
 						0.0,
 					) *
-						4.0 +
-						1.0,
-					1.2,
-				) - 1.0;
+					4.0 +
+					1.0,
+					0.8,
+				) - 1.0) * 2.0;
 			setLowFreqVolume(curValue);
 
 			const increasing = curValue < value;
@@ -79,7 +79,7 @@ export const Background: FC = () => {
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.0008 * delta,
+					curValue + (value - curValue) * 0.003 * delta,
 				);
 			}
 
@@ -120,8 +120,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-								? undefined
-								: false
+									? undefined
+									: false
 						}
 						flowSpeed={flowSpeed}
 						renderer={

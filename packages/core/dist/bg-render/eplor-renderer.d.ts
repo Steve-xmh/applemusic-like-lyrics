@@ -20,8 +20,8 @@ export declare class EplorRenderer extends BaseRenderer {
     private mainProgram;
     private blendProgram;
     private copyProgram;
-    private taaProgram;
     private noiseProgram;
+    private taaProgram;
     private static readonly rawVertexBuffer;
     private static readonly rawIndexBuffer;
     private vertexBuffer;
@@ -31,8 +31,8 @@ export declare class EplorRenderer extends BaseRenderer {
     constructor(canvas: HTMLCanvasElement);
     private _currentSize;
     private _targetSize;
-    private pixelSize;
     private renderSize;
+    private pixelSize;
     protected onResize(width: number, height: number): void;
     private checkResize;
     private requestTick;

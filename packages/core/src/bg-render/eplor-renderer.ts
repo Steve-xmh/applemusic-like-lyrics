@@ -5,6 +5,7 @@ import fragShader from "./shaders/base.frag.glsl";
 import blendShader from "./shaders/blend.frag.glsl";
 import eplorShader from "./shaders/eplor.frag.glsl";
 import noiseShader from "./shaders/noise.frag.glsl";
+import taaShader from "./shaders/taa.frag.glsl";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
@@ -434,7 +435,7 @@ export class EplorRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private gl: WebGL2RenderingContext = this.setupGL();
-	private reduceImageSizeCanvas = new OffscreenCanvas(64, 64);
+	private reduceImageSizeCanvas = new OffscreenCanvas(128, 128);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
 	private ampTransition = 0;
@@ -484,6 +485,7 @@ export class EplorRenderer extends BaseRenderer {
 		vertShader,
 		noiseShader,
 	);
+	private taaProgram: GLProgram = new GLProgram(this.gl, vertShader, taaShader);
 
 	private static readonly rawVertexBuffer = new Float32Array([
 		-1, -1, 1, -1, -1, 1, 1, 1,
@@ -506,6 +508,7 @@ export class EplorRenderer extends BaseRenderer {
 	);
 
 	private fb: [Framebuffer, Framebuffer];
+	private historyFrameBuffer: Framebuffer[] = [];
 
 	constructor(protected canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -526,11 +529,15 @@ export class EplorRenderer extends BaseRenderer {
 			fb.bind();
 			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 		});
+		this.historyFrameBuffer = new Array(2)
+			.fill(0)
+			.map(() => new Framebuffer(this.gl, width, height));
 		this.onResize(width, height);
 	}
 	private _currentSize = [0, 0];
 	private _targetSize = [0, 0];
 	private renderSize = [0, 0];
+	private pixelSize = [0, 0];
 
 	protected override onResize(width: number, height: number): void {
 		// super.onResize(width, height);
@@ -554,9 +561,13 @@ export class EplorRenderer extends BaseRenderer {
 		this.renderSize = [width, height];
 		this.canvas.width = realWidth;
 		this.canvas.height = realHeight;
+		this.pixelSize = [realWidth, realHeight];
 		this.gl.viewport(0, 0, realWidth, realHeight);
 		for (const fb of this.fb) {
 			fb.resize(width, height);
+		}
+		for (const fb of this.historyFrameBuffer) {
+			fb.resize(realWidth, realHeight);
 		}
 	}
 
@@ -574,6 +585,7 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
+		const taa = false;
 		this.checkResize();
 		this.hasLyricValue =
 			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
@@ -620,11 +632,48 @@ export class EplorRenderer extends BaseRenderer {
 
 		// 增加噪点以缓解色带现象
 		this.noiseProgram.use();
-		this.noiseProgram.setUniform1i("src", 0);
+		if (!taa) {
+			this.blendProgram.setUniform1i("src", 0);
+		}
+		this.noiseProgram.setUniform2f("renderSize",
+			this.renderSize[0],
+			this.renderSize[1],
+		);
+		this.noiseProgram.setUniform1f("frameTime", this.frameTime);
 		fba.bind();
 		fbb.active();
-		this.bindDefaultFrameBuffer();
+		if (taa) {
+			this.blendProgram.setUniform1i("src", 0);
+		} else {
+			this.bindDefaultFrameBuffer();
+		}
 		this.drawScreen();
+
+		if (taa) {
+			const nextFB = this.historyFrameBuffer.pop();
+			if (nextFB) {
+				// 应用 TAA 抗锯齿以缓解噪点带来的颗粒感
+				nextFB.bind();
+				this.copyFrameBuffer(fba, nextFB);
+				this.taaProgram.use();
+				this.taaProgram.setUniform1f("scale", this.currerntRenderScale);
+				this.taaProgram.setUniform1f("frameTime", this.frameTime);
+				this.taaProgram.setUniform2f(
+					"renderSize",
+					this.renderSize[0],
+					this.renderSize[1],
+				);
+				this.historyFrameBuffer.forEach((historyFB, index) => {
+					historyFB.active(gl.TEXTURE0 + index + 1);
+					this.taaProgram.setUniform1i(`historyFrame${index}`, index + 1);
+				});
+				this.drawScreen();
+				this.copyFrameBuffer(nextFB, null);
+				this.historyFrameBuffer.unshift(nextFB);
+			} else {
+				this.copyFrameBuffer(fba, null);
+			}
+		}
 
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
@@ -727,7 +776,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 4;
+		const blurRadius = 8;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw = img.naturalWidth;
@@ -737,7 +786,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.8);
-		saturateImage(imageData, 1.5);
+		saturateImage(imageData, 2.0);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 4);
@@ -749,7 +798,7 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		if (this.hasLyric) this.playTime = 90000;
+		if (this.hasLyric) this.playTime = Math.random() * 100000;
 		else this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		this.requestTick();
@@ -772,6 +821,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.blendProgram.dispose();
 		this.mainProgram.dispose();
 		this.fb.forEach((v) => v.dispose());
+		this.historyFrameBuffer.forEach((v) => v.dispose());
 		if (this.tickHandle) {
 			cancelAnimationFrame(this.tickHandle);
 			this.tickHandle = 0;

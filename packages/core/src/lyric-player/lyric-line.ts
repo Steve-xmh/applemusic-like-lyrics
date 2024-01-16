@@ -23,8 +23,7 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
-			(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
 		}%)`,
 		widthInTotal,
 		totalAspect,
@@ -85,7 +84,7 @@ function chunkLyricWords<T>(
 // 果子在对辉光效果的解释是一种强调（emphasized）效果
 // 条件是一个单词时长大于等于 1s 且长度小于等于 7
 export function shouldEmphasize(word: LyricWord): boolean {
-	return word.endTime - word.startTime >= 1000 && word.word.length <= 7;
+	return word.endTime - word.startTime >= 1000 && word.word.length <= 7 && word.word.length > 1;
 }
 
 export class RawLyricLineMouseEvent extends MouseEvent {
@@ -96,9 +95,9 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in
-		keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-		? evt
-		: never;
+	keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
+	? evt
+	: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -303,10 +302,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-			.getCurrentPosition()
-			.toFixed(1)}px) scale(${this.lineTransforms.scale
-			.getCurrentPosition()
-			.toFixed(4)});`;
+				.getCurrentPosition()
+				.toFixed(1)}px) scale(${this.lineTransforms.scale
+					.getCurrentPosition()
+					.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -447,7 +446,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					transform: "translateY(0px)",
 				},
 				{
-					transform: "translateY(-0.05em)",
+					transform: "translateY(-0.03em)",
 				},
 			],
 			{
@@ -456,6 +455,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				id: "float-word",
 				composite: "add",
 				fill: "both",
+				easing: "ease-in",
 			},
 		);
 		a.pause();
@@ -466,7 +466,21 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.max(1000, word.endTime - word.startTime);
-			const de = delay + (duration / 4 / arr.length) * i;
+			const de = delay + (duration / 2 / arr.length) * i;
+			let amount = 0, blur = 0;
+			if (du >= 1500 && du < 3000) {
+				amount = 1;
+				blur = 0.2;
+			} else if (du >= 3000 && du < 4000) {
+				amount = 1.5;
+				blur = 0.3;
+			} else if (du >= 4000 && du < 4500) {
+				amount = 2;
+				blur = 0.4;
+			} else if (du >= 4500) {
+				amount = 3;
+				blur = 0.4;
+			}
 			const glowAnimation = el.animate(
 				[
 					{
@@ -475,25 +489,25 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: "translateZ(1vw) translateY(-0.05em)",
-						textShadow: "rgba(255, 255, 255, 0.2) 0 0 0.15em",
+						transform: `translateZ(${amount}vw) translateY(-0.03em)`,
+						textShadow: `rgba(255, 255, 255, ${blur * .5}) 0 0 0.15em`,
 					},
 					{
 						offset: 0.2,
-						textShadow: "rgba(255, 255, 255, 0.3) 0 0 0.15em",
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 0.2em`,
 					},
 					{
 						offset: 0.5,
-						textShadow: "rgba(255, 255, 255, 0.3) 0 0 0.15em",
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 0.2em`,
 					},
 					{
 						offset: 0.7,
-						textShadow: "rgba(255, 255, 255, 0.2) 0 0 0.15em",
+						textShadow: `rgba(255, 255, 255, ${blur * .75}) 0 0 0.2em`,
 					},
 					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: "rgba(255, 255, 255, 0.0) 0 0 0.15em",
+						textShadow: "rgba(255, 255, 255, 0.0) 0 0 0.2em",
 					},
 				],
 				{
@@ -520,6 +534,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
+			console.log(word.startTime + " " + this.getLine().startTime)
 			if (wordEl) {
 				const wordPaddingInline = parseFloat(
 					getComputedStyle(wordEl).paddingInline,
@@ -546,11 +561,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
-					word.startTime
-				})*${
-					w / Math.max(1, Math.abs(word.endTime - word.startTime))
-				}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
+					})*${w / Math.max(1, Math.abs(word.endTime - word.startTime))
+					}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}

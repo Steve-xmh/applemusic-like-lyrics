@@ -732,11 +732,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
 					? 0
 					: hasBuffered
-					? 1
-					: 1 / 3
+						? 1
+						: 1 / 3
 				: hasBuffered
-				? 1
-				: 1 / 3;
+					? 1
+					: 1 / 3;
 			el.setTransform(
 				this.padding,
 				curPos,
@@ -746,9 +746,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					? isActive
 						? 0
 						: 1 +
-						  (i < this.scrollToIndex
-								? Math.abs(this.scrollToIndex - i)
-								: Math.abs(i - Math.max(this.scrollToIndex, latestIndex)))
+						(i < this.scrollToIndex
+							? Math.abs(this.scrollToIndex - i)
+							: Math.abs(i - Math.max(this.scrollToIndex, latestIndex)))
 					: 0,
 				force,
 				delay,
