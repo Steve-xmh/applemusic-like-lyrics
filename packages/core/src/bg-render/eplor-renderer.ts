@@ -5,7 +5,7 @@ import fragShader from "./shaders/base.frag.glsl?raw";
 import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
-import taaShader from "./shaders/taa.frag.glsl";
+import taaShader from "./shaders/taa.frag.glsl?raw";
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
@@ -635,7 +635,8 @@ export class EplorRenderer extends BaseRenderer {
 		if (!taa) {
 			this.blendProgram.setUniform1i("src", 0);
 		}
-		this.noiseProgram.setUniform2f("renderSize",
+		this.noiseProgram.setUniform2f(
+			"renderSize",
 			this.renderSize[0],
 			this.renderSize[1],
 		);

@@ -84,7 +84,11 @@ function chunkLyricWords<T>(
 // 果子在对辉光效果的解释是一种强调（emphasized）效果
 // 条件是一个单词时长大于等于 1s 且长度小于等于 7
 export function shouldEmphasize(word: LyricWord): boolean {
-	return word.endTime - word.startTime >= 1000 && word.word.length <= 7 && word.word.length > 1;
+	return (
+		word.endTime - word.startTime >= 1000 &&
+		word.word.length <= 7 &&
+		word.word.length > 1
+	);
 }
 
 export class RawLyricLineMouseEvent extends MouseEvent {
@@ -467,14 +471,15 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.max(1000, word.endTime - word.startTime);
 			const de = delay + (duration / 2 / arr.length) * i;
-			let amount = 0, blur = 0;
-			if (du >= 1500 && du < 3000) {
+			let amount = 0,
+				blur = 0;
+			if (du >= 1500 && du < 2000) {
 				amount = 1;
 				blur = 0.2;
-			} else if (du >= 3000 && du < 4000) {
+			} else if (du >= 2000 && du < 3000) {
 				amount = 1.5;
 				blur = 0.3;
-			} else if (du >= 4000 && du < 4500) {
+			} else if (du >= 3000 && du < 4500) {
 				amount = 2;
 				blur = 0.4;
 			} else if (du >= 4500) {
@@ -490,7 +495,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					{
 						offset: 0.1,
 						transform: `translateZ(${amount}vw) translateY(-0.03em)`,
-						textShadow: `rgba(255, 255, 255, ${blur * .5}) 0 0 0.15em`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 0.15em`,
 					},
 					{
 						offset: 0.2,
@@ -502,7 +507,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.7,
-						textShadow: `rgba(255, 255, 255, ${blur * .75}) 0 0 0.2em`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 0.2em`,
 					},
 					{
 						offset: 1,
@@ -534,7 +539,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
-			console.log(word.startTime + " " + this.getLine().startTime)
+			console.log(word.startTime + " " + this.getLine().startTime);
 			if (wordEl) {
 				const wordPaddingInline = parseFloat(
 					getComputedStyle(wordEl).paddingInline,
