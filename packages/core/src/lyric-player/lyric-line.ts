@@ -479,10 +479,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			} else if (du >= 2000 && du < 3000) {
 				amount = 1.5;
 				blur = 0.3;
-			} else if (du >= 3000 && du < 4500) {
+			} else if (du >= 3000 && du < 4000) {
 				amount = 2;
 				blur = 0.4;
-			} else if (du >= 4500) {
+			} else if (du >= 4000) {
 				amount = 3;
 				blur = 0.4;
 			}
@@ -539,7 +539,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
-			console.log(word.startTime + " " + this.getLine().startTime);
 			if (wordEl) {
 				const wordPaddingInline = parseFloat(
 					getComputedStyle(wordEl).paddingInline,

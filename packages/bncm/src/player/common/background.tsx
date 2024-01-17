@@ -67,7 +67,7 @@ export const Background: FC = () => {
 					0.8,
 				) -
 					1.0) *
-				5.0;
+				2.0;
 			setLowFreqVolume(curValue);
 
 			const increasing = curValue < value;
@@ -75,12 +75,12 @@ export const Background: FC = () => {
 			if (increasing) {
 				curValue = Math.min(
 					value,
-					curValue + (value - curValue) * 0.0008 * delta + 0.001,
+					curValue + (value - curValue) * 0.001 * delta + 0.001,
 				);
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.0008 * delta - 0.001,
+					curValue + (value - curValue) * 0.001 * delta - 0.001,
 				);
 			}
 

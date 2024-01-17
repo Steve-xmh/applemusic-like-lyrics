@@ -79,7 +79,7 @@ export const AudioFFTContext: FC = () => {
 			sampleRate: 48000,
 			fftSize: fftData.length,
 			outBandsQty: 61,
-			startFrequency: 100,
+			startFrequency: 60,
 			endFrequency: 14000,
 			aWeight: true,
 		});
