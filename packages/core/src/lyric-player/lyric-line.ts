@@ -487,7 +487,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			// 	blur = 0.4;
 			// }
 			if (duration >= 1500) {
-				amount = (arr.length - i + 1) / arr.length ** 3 * (du / 5000) ** 2 * arr.length ** 2 * 10.0;
+				amount = (arr.length - i + 1) / arr.length ** 3 * Math.min(0.5, du / 5000) ** 2 * arr.length ** 2 * 10.0;
 				blur = 0.4;
 			}
 			const glowAnimation = el.animate(
