@@ -75,7 +75,7 @@ export class InterludeDots implements HasElement, Disposable {
 
 				scale *=
 					Math.sin(1.5 * Math.PI - (currentDuration / breatheDuration) * 2) /
-						10 +
+					20 +
 					1;
 
 				if (currentDuration < 1000) {
@@ -103,7 +103,7 @@ export class InterludeDots implements HasElement, Disposable {
 					);
 				}
 
-				scale = Math.max(0, scale);
+				scale = Math.max(0, scale) * 0.7;
 
 				curStyle += ` scale(${scale})`;
 
@@ -116,14 +116,14 @@ export class InterludeDots implements HasElement, Disposable {
 					0.25,
 					(((currentDuration - interludeDuration / 3) * 3) /
 						interludeDuration) *
-						0.75,
+					0.75,
 					1,
 				);
 				const dot2Opacity = clamp(
 					0.25,
 					(((currentDuration - (interludeDuration / 3) * 2) * 3) /
 						interludeDuration) *
-						0.75,
+					0.75,
 					1,
 				);
 
