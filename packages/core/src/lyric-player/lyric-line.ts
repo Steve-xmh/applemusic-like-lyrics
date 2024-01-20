@@ -470,20 +470,24 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.max(1000, word.endTime - word.startTime);
-			const de = delay + (duration / 2 / arr.length) * i;
+			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0,
 				blur = 0;
-			if (du >= 1500 && du < 2000) {
-				amount = 1;
-				blur = 0.2;
-			} else if (du >= 2000 && du < 3000) {
-				amount = 1.5;
-				blur = 0.3;
-			} else if (du >= 3000 && du < 4000) {
-				amount = 2;
-				blur = 0.4;
-			} else if (du >= 4000) {
-				amount = 3;
+			// if (du >= 1500 && du < 2000) {
+			// 	amount = 1;
+			// 	blur = 0.2;
+			// } else if (du >= 2000 && du < 3000) {
+			// 	amount = 1.5;
+			// 	blur = 0.3;
+			// } else if (du >= 3000 && du < 4000) {
+			// 	amount = 2;
+			// 	blur = 0.4;
+			// } else if (du >= 4000) {
+			// 	amount = 3;
+			// 	blur = 0.4;
+			// }
+			if (duration >= 1500) {
+				amount = (arr.length - i + 1) / arr.length ** 3 * (du / 5000) ** 2 * arr.length ** 2 * 10.0;
 				blur = 0.4;
 			}
 			const glowAnimation = el.animate(
@@ -494,7 +498,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: `translateZ(${amount}vw) translateY(-0.05em)`,
+						transform: `translateZ(${amount}vw) translateY(-${du / 50000}em)`,
 						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 0.15em`,
 					},
 					{
