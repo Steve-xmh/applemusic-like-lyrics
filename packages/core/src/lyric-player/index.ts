@@ -736,7 +736,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						: 1 / 3
 				: hasBuffered
 					? 1
-					: i < this.scrollToIndex || (interlude && i < interlude[2] + 1 || i == this.lyricLinesEl.length - 1) || this.isNonDynamic ? 1 / 3 : /*el.getLine().translatedLyric || el.getLine().romanLyric ? 1 / 3 :*/ 1;
+					: i < this.scrollToIndex || (interlude && (i < interlude[2] + 1 || i == this.lyricLinesEl.length - 1)) || this.isNonDynamic ? 1 / 3 : /*el.getLine().translatedLyric || el.getLine().romanLyric ? 1 / 3 :*/ 1;
 			el.setTransform(
 				this.padding,
 				curPos,

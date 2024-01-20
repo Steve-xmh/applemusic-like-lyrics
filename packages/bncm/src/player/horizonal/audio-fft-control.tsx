@@ -68,9 +68,9 @@ export const AudioFFTControl: FC = () => {
 							ctx.lineTo(
 								x,
 								height -
-									barWidth -
-									Math.min(1, Math.max(0, buf[i] / maxValue)) ** 2 *
-										(height - barWidth * 2),
+								barWidth -
+								Math.min(1, Math.max(0, buf[i] / maxValue)) ** 2 *
+								(height - barWidth * 2),
 							);
 						}
 

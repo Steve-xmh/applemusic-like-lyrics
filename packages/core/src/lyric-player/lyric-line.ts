@@ -450,7 +450,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					transform: "translateY(0px)",
 				},
 				{
-					transform: "translateY(-0.03em)",
+					transform: "translateY(-0.05em)",
 				},
 			],
 			{
@@ -459,7 +459,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				id: "float-word",
 				composite: "add",
 				fill: "both",
-				easing: "ease-in",
+				easing: "ease-out",
 			},
 		);
 		a.pause();
@@ -494,7 +494,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: `translateZ(${amount}vw) translateY(-0.03em)`,
+						transform: `translateZ(${amount}vw) translateY(-0.05em)`,
 						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 0.15em`,
 					},
 					{

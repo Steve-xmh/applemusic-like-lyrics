@@ -49,6 +49,7 @@ export const Background: FC = () => {
 
 		let stopped = false;
 		let lt = 0;
+		let lastValue = 0;
 		const onFrame = (dt: number) => {
 			if (stopped) return;
 			const delta = dt - lt;
@@ -56,31 +57,40 @@ export const Background: FC = () => {
 
 			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
+			const targetMaxValue = Math.max.apply(Math, fftData);
+			const maxValue = Math.max(targetMaxValue * 0.1 + 100 * 0.9, 100);
+
 			const value =
 				(Math.pow(
 					Math.max(
-						Math.sqrt(fftData[0] + fftData[1] + fftData[2] * 0.5) * 0.001 - 0.2,
+						Math.sqrt(fftData[0] + fftData[1] + fftData[2]) * 0.001 - 0.2,
 						0.0,
 					) *
 					4.0 +
 					1.0,
-					0.8,
+					1.2,
 				) -
 					1.0) *
-				2.0;
+				1.0;
 			setLowFreqVolume(curValue);
 
-			const increasing = curValue < value;
+			if (Math.abs(value - lastValue) >= 0.5) {
+				lastValue = value;
+			} else if (Math.abs(value - lastValue) <= 0.1 && value <= 0.1) {
+				lastValue = 0;
+			}
+
+			const increasing = curValue < lastValue;
 
 			if (increasing) {
 				curValue = Math.min(
-					value,
-					curValue + (value - curValue) * 0.001 * delta + 0.001,
+					lastValue,
+					curValue + (lastValue - curValue) * 0.005 * delta + 0.001,
 				);
 			} else {
 				curValue = Math.max(
-					value,
-					curValue + (value - curValue) * 0.001 * delta - 0.001,
+					lastValue,
+					curValue + (lastValue - curValue) * 0.003 * delta - 0.001,
 				);
 			}
 

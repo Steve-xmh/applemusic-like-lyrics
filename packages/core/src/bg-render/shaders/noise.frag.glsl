@@ -30,7 +30,7 @@ void main() {
     float dither = (1.0 / 255.0) * gradientNoise(gl_FragCoord.xy) - (0.5 / 255.0);
 
     vec4 color = texture(src, tex_coord);
-    #if 1
+    #if 0
     int count = 0;
     vec3 sampled_color = vec3(0.0f);
     for(float i = -2.f; i <= 2.f; i += 1.f) {
@@ -42,8 +42,10 @@ void main() {
     }
     sampled_color /= vec3(count);
     #else
-    vec2 offset = blur_radius * (fract(vec2(0.61803398875f, 0.38196601125f) * 1.f) - 0.5f) + dither * .5;
+    vec2 offset = blur_radius * (fract(vec2(0.61803398875f, 0.38196601125f) * 1.f) - 0.5f) + dither * .1;
     vec3 sampled_color = textureLod(src, offset - tex_coord, 3.0f).xyz;
+    sampled_color += textureLod(src, offset + tex_coord, 3.0f).xyz;
+    sampled_color /= 2.0;
     #endif
 
     vec3 deviation = sampled_color - color.rgb;
