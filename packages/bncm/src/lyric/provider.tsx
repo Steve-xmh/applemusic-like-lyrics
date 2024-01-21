@@ -105,7 +105,11 @@ type TransLine = {
 }[keyof CoreLyricLine];
 
 function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
-	if (line.words.length === 0) return;
+	if (
+		line.words.length === 0 ||
+		line.words.reduce((pv: string, cv) => pv + cv.word, "").trim().length === 0
+	)
+		return;
 	const joined = line.words.map((w) => w.word).join("");
 	let nearestLine: CoreLyricLine | undefined = undefined;
 	for (const coreLine of lines) {
@@ -286,15 +290,31 @@ async function getLyricFromNCM(
 		const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
 		converted = lines.map(transformDynamicLyricLine);
 		processLyric(converted);
-		log("已解析 YRC 歌词", JSON.parse(JSON.stringify(converted)));
+		log("已解析 YRC 歌词", structuredClone(converted));
 
 		if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {
 			const trans = parseLrc(currentRawLyricResp.ytlrc.lyric);
-			trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+			if (trans.length === converted.length) {
+				trans.forEach((line, i) => {
+					converted[i].translatedLyric = line.words
+						.reduce((pv: string, cv) => pv + cv.word, "")
+						.trim();
+				});
+			} else {
+				trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+			}
 		}
 		if (showRomanLine && currentRawLyricResp?.yromalrc?.lyric) {
-			const trans = parseLrc(currentRawLyricResp.yromalrc.lyric);
-			trans.forEach((line) => pairLyric(line, converted, "romanLyric"));
+			const roman = parseLrc(currentRawLyricResp.yromalrc.lyric);
+			if (roman.length === converted.length) {
+				roman.forEach((line, i) => {
+					converted[i].romanLyric = line.words
+						.reduce((pv: string, cv) => pv + cv.word, "")
+						.trim();
+				});
+			} else {
+				roman.forEach((line) => pairLyric(line, converted, "romanLyric"));
+			}
 		}
 	} else {
 		log(currentRawLyricResp?.lrc?.lyric || "");
@@ -303,11 +323,27 @@ async function getLyricFromNCM(
 
 		if (showTranslatedLine && currentRawLyricResp?.tlyric?.lyric) {
 			const trans = parseLrc(currentRawLyricResp.tlyric.lyric);
-			trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+			if (trans.length === converted.length) {
+				trans.forEach((line, i) => {
+					converted[i].translatedLyric = line.words
+						.reduce((pv: string, cv) => pv + cv.word, "")
+						.trim();
+				});
+			} else {
+				trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+			}
 		}
 		if (showRomanLine && currentRawLyricResp?.romalrc?.lyric) {
-			const trans = parseLrc(currentRawLyricResp.romalrc.lyric);
-			trans.forEach((line) => pairLyric(line, converted, "romanLyric"));
+			const roman = parseLrc(currentRawLyricResp.romalrc.lyric);
+			if (roman.length === converted.length) {
+				roman.forEach((line, i) => {
+					converted[i].romanLyric = line.words
+						.reduce((pv: string, cv) => pv + cv.word, "")
+						.trim();
+				});
+			} else {
+				roman.forEach((line) => pairLyric(line, converted, "romanLyric"));
+			}
 		}
 	}
 
