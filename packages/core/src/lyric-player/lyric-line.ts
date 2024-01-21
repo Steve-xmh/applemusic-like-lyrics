@@ -469,7 +469,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
-			const du = Math.max(1000, word.endTime - word.startTime);
+			const du = Math.min(5000, word.endTime - word.startTime);
 			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0,
 				blur = 0;
@@ -498,7 +498,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: 0.1,
-						transform: `translateZ(${amount}vw) translateY(-${du / 50000}em)`,
+						transform: `translateZ(${amount}vw) translateY(-${Math.min(0.05, du / 50000)}em)`,
 						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 0.15em`,
 					},
 					{
