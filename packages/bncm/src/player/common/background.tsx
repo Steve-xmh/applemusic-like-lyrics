@@ -57,13 +57,13 @@ export const Background: FC = () => {
 
 			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
-			const targetMaxValue = Math.max.apply(Math, fftData);
-			const maxValue = Math.max(targetMaxValue * 0.1 + 100 * 0.9, 100);
+			const targetMaxValue = Math.max(fftData[0], Math.max(fftData[1], fftData[2]));
+			const maxValue = Math.max(targetMaxValue * 0.01 + 1000 * 0.99, 1000);
 
 			const value =
 				(Math.pow(
 					Math.max(
-						Math.sqrt(fftData[0] + fftData[1] + fftData[2]) * 0.001 - 0.2,
+						Math.sqrt(fftData[0]) / maxValue * 2.5 - 0.2,
 						0.0,
 					) *
 					4.0 +
@@ -74,23 +74,23 @@ export const Background: FC = () => {
 				1.0;
 			setLowFreqVolume(curValue);
 
-			if (Math.abs(value - lastValue) >= 0.5) {
-				lastValue = value;
-			} else if (Math.abs(value - lastValue) <= 0.1 && value <= 0.1) {
-				lastValue = 0;
-			}
+			// if (Math.abs(value - lastValue) >= 0.9) {
+			// 	lastValue = value;
+			// } else if (value <= 0.1) {
+			// 	lastValue = 0;
+			// }
 
-			const increasing = curValue < lastValue;
+			const increasing = curValue < value;
 
 			if (increasing) {
 				curValue = Math.min(
-					lastValue,
-					curValue + (lastValue - curValue) * 0.005 * delta + 0.001,
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
 				);
 			} else {
 				curValue = Math.max(
-					lastValue,
-					curValue + (lastValue - curValue) * 0.003 * delta - 0.001,
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
 				);
 			}
 
