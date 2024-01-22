@@ -702,12 +702,24 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private setupGL() {
-		const gl = this.canvas.getContext("webgl2", {
+		const config: WebGLContextAttributes = {
 			alpha: true,
 			depth: false,
 			powerPreference: "low-power",
-		});
-		if (!gl) throw new Error("WebGL2 not supported");
+		};
+		let gl: WebGL2RenderingContext | null = this.canvas.getContext(
+			"webgl2",
+			config,
+		);
+		if (!gl) {
+			gl = this.canvas.getContext(
+				"experimental-webgl2",
+				config,
+			) as WebGL2RenderingContext | null;
+			if (!gl) {
+				throw new Error("WebGL2 is not supported for EplorRenderer");
+			}
+		}
 		this.gl = gl;
 		gl.enable(gl.BLEND);
 		gl.disable(gl.DEPTH_TEST);
