@@ -702,24 +702,12 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private setupGL() {
-		const config: WebGLContextAttributes = {
+		const gl = this.canvas.getContext("webgl2", {
 			alpha: true,
 			depth: false,
 			powerPreference: "low-power",
-		};
-		let gl: WebGL2RenderingContext | null = this.canvas.getContext(
-			"webgl2",
-			config,
-		);
-		if (!gl) {
-			gl = this.canvas.getContext(
-				"experimental-webgl2",
-				config,
-			) as WebGL2RenderingContext | null;
-			if (!gl) {
-				throw new Error("WebGL2 is not supported for EplorRenderer");
-			}
-		}
+		});
+		if (!gl) throw new Error("WebGL2 not supported");
 		this.gl = gl;
 		gl.enable(gl.BLEND);
 		gl.disable(gl.DEPTH_TEST);
@@ -789,7 +777,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 6;
+		const blurRadius = 8;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw = img.naturalWidth;

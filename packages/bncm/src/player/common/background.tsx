@@ -85,12 +85,12 @@ export const Background: FC = () => {
 			if (increasing) {
 				curValue = Math.min(
 					value,
-					curValue + (value - curValue) * 0.003 * delta,
+					curValue + (value - curValue) * 0.005 * delta,
 				);
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.003 * delta,
+					curValue + (value - curValue) * 0.002 * delta,
 				);
 			}
 
