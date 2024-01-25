@@ -473,7 +473,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0,
 				blur = 0;
-			if (du >= 1500 && du < 2000) {
+			if (du >= 1200 && du < 2000) {
 				amount = 1.5;
 				blur = 0.2;
 			} else if (du >= 2000 && du < 3000) {
@@ -498,7 +498,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				[
 					{
 						offset: 0,
-						textShadow: "rgba(255, 255, 255, 0) 0 0 0.15em",
+						textShadow: "rgba(255, 255, 255, 0) 0 0 10px",
 					},
 					{
 						offset: 0.1,
@@ -506,28 +506,28 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							0.05,
 							du / 50000,
 						)}em)`,
-						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 0.15em`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 10px`,
 					},
 					{
 						offset: 0.2,
-						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 0.2em`,
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
 					},
 					{
 						offset: 0.5,
-						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 0.2em`,
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
 					},
 					{
 						offset: 0.7,
-						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 0.2em`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
 					},
 					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: "rgba(255, 255, 255, 0.0) 0 0 0.2em",
+						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 6px`,
 					},
 				],
 				{
-					duration: isFinite(du) ? du * (i / arr.length * 0.3 + 1.0) : 0,
+					duration: isFinite(du) ? du * ((i + 1) / arr.length * 0.3 + 1.0) : 0,
 					delay: isFinite(de) ? de : 0,
 					id: "glow-word",
 					iterations: 1,
