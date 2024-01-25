@@ -23,8 +23,7 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
-			(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
 		}%)`,
 		widthInTotal,
 		totalAspect,
@@ -100,9 +99,9 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in
-		keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-		? evt
-		: never;
+	keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
+	? evt
+	: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -307,10 +306,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-			.getCurrentPosition()
-			.toFixed(1)}px) scale(${this.lineTransforms.scale
-			.getCurrentPosition()
-			.toFixed(4)});`;
+				.getCurrentPosition()
+				.toFixed(1)}px) scale(${this.lineTransforms.scale
+					.getCurrentPosition()
+					.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -470,31 +469,31 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
-			const du = Math.min(5000, word.endTime - word.startTime);
+			const du = Math.min(2400, word.endTime - word.startTime);
 			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0,
 				blur = 0;
-			// if (du >= 1500 && du < 2000) {
-			// 	amount = 1;
-			// 	blur = 0.2;
-			// } else if (du >= 2000 && du < 3000) {
-			// 	amount = 1.5;
-			// 	blur = 0.3;
-			// } else if (du >= 3000 && du < 4000) {
-			// 	amount = 2;
-			// 	blur = 0.4;
-			// } else if (du >= 4000) {
-			// 	amount = 3;
-			// 	blur = 0.4;
-			// }
-			if (duration >= 1500) {
-				amount =
-					((arr.length - i + 1) / arr.length ** 3) *
-					Math.min(0.5, du / 5000) ** 2 *
-					arr.length ** 2 *
-					10.0;
+			if (du >= 1500 && du < 2000) {
+				amount = 1.5;
+				blur = 0.2;
+			} else if (du >= 2000 && du < 3000) {
+				amount = 2;
+				blur = 0.3;
+			} else if (du >= 3000 && du < 4000) {
+				amount = 3;
+				blur = 0.4;
+			} else if (du >= 4000) {
+				amount = 3.5;
 				blur = 0.4;
 			}
+			// if (duration >= 1200) {
+			// 	amount =
+			// 		Math.min(((arr.length - i + 1) / arr.length ** 3) *
+			// 			Math.min(0.5, du / 5000) ** 2 *
+			// 			arr.length ** 2 *
+			// 			16.0, 3);
+			// 	// blur = 0.4;
+			// }
 			const glowAnimation = el.animate(
 				[
 					{
@@ -528,12 +527,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 				],
 				{
-					duration: isFinite(du) ? du : 0,
+					duration: isFinite(du) ? du * (i / arr.length * 0.3 + 1.0) : 0,
 					delay: isFinite(de) ? de : 0,
 					id: "glow-word",
 					iterations: 1,
 					composite: "replace",
-					easing: "ease-in",
+					easing: "cubic-bezier(.7,0,.5,1)",
 					fill: "both",
 				},
 			);
@@ -577,11 +576,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
-					word.startTime
-				})*${
-					w / Math.max(1, Math.abs(word.endTime - word.startTime))
-				}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
+					})*${w / Math.max(1, Math.abs(word.endTime - word.startTime))
+					}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
