@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState, type FC, useEffect, useRef, RefObject } from "react";
 import {
 	currentTimeAtom,
@@ -22,18 +22,34 @@ import {
 	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
 	lyricSpringEffectAtom,
+	playPositionOffsetAtom,
 	showAMLLTTMLDBTipAtom,
 } from "../../components/config/atoms";
 import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 import "./player.sass";
 import { PlayState } from "../../music-context";
 
+const offsetedCurrentTimeAtom = atom(
+	(get) => {
+		const offset = get(playPositionOffsetAtom);
+		const currentTime = get(currentTimeAtom);
+		if (offset.state === "hasData") {
+			return currentTime + offset.data;
+		} else {
+			return currentTime;
+		}
+	},
+	(_get, set, action: number) => {
+		set(currentTimeAtom, action);
+	},
+);
+
 export const CoreLyricPlayer: FC<{
 	albumCoverRef?: RefObject<HTMLElement | null>;
 	isVertical?: boolean;
 }> = (props) => {
 	const playerRef = useRef<LyricPlayerRef>(null);
-	const [currentTime, setCurrentTime] = useAtom(currentTimeAtom);
+	const [currentTime, setCurrentTime] = useAtom(offsetedCurrentTimeAtom);
 	const artists = useAtomValue(musicArtistsAtom);
 	const keepBuiltinPlayerWhenConnected = useAtomValue(
 		keepBuiltinPlayerWhenConnectedAtom,

@@ -32,6 +32,13 @@ export const showAudioQualityTagAtom = atomWithConfig({
 	desc: "是否显示音质标签",
 });
 
+export const playPositionOffsetAtom = atomWithConfig({
+	key: "play-position-offset",
+	loadable: true,
+	default: 0,
+	desc: "全局播放时间偏移，单位毫秒，正数提前，负数推迟",
+});
+
 export const showAlbumImageAtom = atomWithConfig({
 	key: "show-album-image",
 	default: true,

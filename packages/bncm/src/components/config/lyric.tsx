@@ -11,9 +11,15 @@ import {
 	fontColorAtom,
 	lyricSpringEffectAtom,
 	primaryColorAtom,
+	playPositionOffsetAtom,
 } from "./atoms";
+import { TextField } from "../appkit/text-field";
+import { useAtom } from "jotai";
 
 export const LyricConfig: FC = () => {
+	const [playPositionOffset, setPlayPositionOffset] = useAtom(
+		playPositionOffsetAtom,
+	);
 	return (
 		<>
 			<GroupBox>
@@ -28,6 +34,50 @@ export const LyricConfig: FC = () => {
 					atom={swapTranslatedRomanLineAtom}
 					label="交换翻译和音译歌词顺序"
 				/>
+			</GroupBox>
+			<GroupBox>
+				<div
+					style={{
+						display: "flex",
+						gap: "1em",
+						alignItems: "center",
+					}}
+				>
+					<div
+						style={{
+							flex: "1",
+						}}
+					>
+						<div
+							style={{
+								fontSize: "13px",
+							}}
+						>
+							歌词时间位移
+						</div>
+						<div
+							style={{
+								opacity: "0.5",
+							}}
+						>
+							单位毫秒，正值为提前，负值为推迟，留空为 0
+						</div>
+					</div>
+					<TextField
+						style={{
+							width: "8em",
+						}}
+						value={
+							playPositionOffset.state === "hasData"
+								? playPositionOffset.data
+								: 0
+						}
+						onChange={(e) =>
+							setPlayPositionOffset(Number(e.currentTarget.value))
+						}
+						type="number"
+					/>
+				</div>
 			</GroupBox>
 			<GroupBox>
 				<SwitchConfigComponent
