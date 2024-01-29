@@ -6,9 +6,6 @@ jobs:
   deploy-docs:
     name: 构建并部署开发文档
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
@@ -25,12 +22,8 @@ jobs:
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true
-      - uses: actions/upload-pages-artifact@v2
-        name: 上传为 Artifact
+      - name: 部署到 Github Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: packages/docs/out
-      - name: 部署到 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          token: ${{ github.token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: packages/docs/out
