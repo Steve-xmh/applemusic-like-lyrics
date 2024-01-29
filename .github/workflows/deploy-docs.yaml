@@ -22,7 +22,7 @@ jobs:
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true
-      - uses: actions/upload-pages-artifact@latest
+      - uses: actions/upload-pages-artifact@v2
         name: 上传为 Artifact
         with:
           path: packages/docs/out
