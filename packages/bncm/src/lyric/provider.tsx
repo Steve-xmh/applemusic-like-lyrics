@@ -290,7 +290,7 @@ async function getLyricFromNCM(
 		const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
 		converted = lines.map(transformDynamicLyricLine);
 		processLyric(converted);
-		log("已解析 YRC 歌词", structuredClone(converted));
+		log("已解析 YRC 歌词", JSON.parse(JSON.stringify(converted)));
 
 		if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {
 			const trans = parseLrc(currentRawLyricResp.ytlrc.lyric);

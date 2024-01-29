@@ -1,0 +1,33 @@
+name: "构建并部署开发文档"
+
+on: push
+
+jobs:
+  deploy-docs:
+    name: 构建并部署开发文档
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: 克隆仓库
+      - name: 安装 wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: latest
+      - name: 安装 wasm32 目标
+        run: rustup target add wasm32-unknown-unknown
+      - name: 安装依赖并构建网站
+        run: |
+          yarn
+          yarn workspace @applemusic-like-lyrics/docs build
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+          AMLL_GITHUB_IS_ACTION: true
+      - uses: actions/upload-pages-artifact@latest
+        name: 上传为 Artifact
+        with:
+          path: packages/docs/out
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}

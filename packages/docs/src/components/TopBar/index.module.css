@@ -1,0 +1,53 @@
+.header {
+    background-color: #1d1d1f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    line-height: 3em;
+    border-bottom: solid 1px #FFF2;
+    white-space: nowrap;
+}
+
+.header > a {
+    padding: 0 2em;
+    position: relative;
+}
+
+.header > a:hover {
+    background-color: #fff1;
+}
+
+.header > a:hover > .menu {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.divider {
+    height: 2em;
+    border-left: solid 1px #FFF1;
+    margin: 0.1em
+}
+
+.menu {
+    position: absolute;
+    border-radius: 0.5em;
+    line-height: 2em;
+    background-color: #1d1d1f;
+    border: solid 1px #FFF2;
+    overflow: hidden;
+    /* left: 0; */
+    right: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+}
+
+.menu a {
+    padding: 0.5em 1em;
+    display: block;
+}
+
+.menu a:hover {
+    background-color: #fff1;
+}

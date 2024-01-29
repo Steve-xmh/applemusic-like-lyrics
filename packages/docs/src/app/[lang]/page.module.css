@@ -1,0 +1,22 @@
+.main {
+    text-align: center;
+}
+
+.main > * {
+    margin: auto;
+}
+
+.logo {
+    margin: 2em auto;
+    margin-top: 10vh;
+    display: block;
+}
+
+.warn {
+    border-radius: 0.5em;
+    background-color: #F804;
+    border: solid 1px #F804;
+    width: fit-content;
+    padding: 0.5em 1em;
+    margin: 1em auto;
+}
