@@ -1,13 +1,5 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { useLayoutEffect } from "react";
+import { redirect } from "next/navigation";
 
 export default function MainPage() {
-    const router = useRouter();
-    useLayoutEffect(() => {
-        router.replace("/zh-CN");
-    }, [])
-	return (
-        <></>
-	);
+    redirect("/zh-CN");
 }

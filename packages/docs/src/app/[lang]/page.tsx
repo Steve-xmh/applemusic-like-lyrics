@@ -1,13 +1,8 @@
-import { LANGUAGES } from "@/lib/lang";
 import Image from "next/image";
 import styles from "./page.module.css";
 
 interface LangParam {
 	lang: string;
-}
-
-export async function generateStaticParams(): Promise<LangParam[]> {
-	return LANGUAGES;
 }
 
 export default function MainPage({ params }: { params: LangParam }) {

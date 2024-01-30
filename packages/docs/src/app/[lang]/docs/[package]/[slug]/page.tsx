@@ -1,4 +1,3 @@
-import "server-only";
 import { compileMDX } from "next-mdx-remote/rsc";
 import fs from "fs/promises";
 import path from "path/posix";
@@ -59,7 +58,7 @@ export async function generateMetadata({
 	const packageName =
 		params.package.charAt(0).toUpperCase() + params.package.slice(1);
 	return {
-		title: `${frontmatter.title} - ${packageName} 模块 - AMLL`,
+		title: `${frontmatter.title ?? "无标题"} - ${packageName} 模块 - AMLL`,
 	} as Metadata;
 }
 
