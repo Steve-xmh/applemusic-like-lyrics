@@ -1,4 +1,15 @@
-main {
-    max-width: 50em;
-    margin: auto;
+main pre {
+    overflow: auto;
+    max-width: 100%;
+    border: solid 1px var(--border-color);
+    border-radius: 0.5em;
+}
+
+main a {
+    color: var(--text-primary-color);
+    user-select: auto;
+}
+
+main a:visited {
+    color: var(--text-primary-color);
 }

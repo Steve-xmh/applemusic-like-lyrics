@@ -1,9 +1,12 @@
 :root {
     --background: #000;
     --text-color: #FFF;
+    --text-primary-color: #FB5C74;
+    --border-color: #FFF2;
 }
 
 html, body {
+    box-sizing: border-box;
     background: var(--background);
     color: var(--text-color);
     margin: 0;

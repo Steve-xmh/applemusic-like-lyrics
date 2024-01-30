@@ -1,0 +1,50 @@
+.docsLayout {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+}
+
+.docsLayout > main {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden auto;
+    padding: 1em 2em;
+}
+
+.docsSidebar {
+    flex: 0;
+    padding: 1em 2em;
+    white-space: nowrap;
+}
+
+.docsSidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-left: 1em;
+}
+
+.docsSidebar > ul {
+    margin-left: 0;
+}
+
+.docsSidebar h2 {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.docsSidebar a {
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.docsSidebar a:hover {
+    opacity: 0.9;
+}
+
+.dragHandler {
+    width: 4px;
+    border-left: solid 1px var(--border-color);
+}

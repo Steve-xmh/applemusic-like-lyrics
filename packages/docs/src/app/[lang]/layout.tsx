@@ -1,4 +1,6 @@
 import { LANGUAGES } from "@/lib/lang";
+import styles from "./layout.module.css";
+import { TopBar } from "@/components/TopBar";
 
 export async function generateStaticParams() {
 	return LANGUAGES;
@@ -6,10 +8,17 @@ export async function generateStaticParams() {
 
 export default function RootLayout({
 	children,
+	params,
 }: Readonly<{
 	children: React.ReactNode;
+	params: { lang: string };
 }>) {
 	return (
-        <>{children}</>
+		<html lang={params.lang}>
+			<body>
+				<TopBar lang={params.lang} />
+				{children}
+			</body>
+		</html>
 	);
 }

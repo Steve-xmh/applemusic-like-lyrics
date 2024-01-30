@@ -1,7 +1,9 @@
-import { compileMDX } from "next-mdx-remote/rsc";
+import { MDXRemote, compileMDX } from "next-mdx-remote/rsc";
 import fs from "fs/promises";
 import path from "path/posix";
 import { Metadata } from "next";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css"
 import "./globals.css";
 
 export interface DocumationPageParam {
@@ -65,6 +67,23 @@ export async function generateMetadata({
 export default async function DocumationPage({
 	params,
 }: { params: DocumationPageParam }) {
-	const { content, frontmatter } = await compileDoc(params);
-	return <main>{content}</main>;
+	const rawContent = await fs.readFile(
+		path.resolve(docsPath, params.package, `${params.slug}.${params.lang}.mdx`),
+		{
+			encoding: "utf8",
+		},
+	);
+	return (
+		<main>
+			<MDXRemote
+				source={rawContent}
+				options={{
+					parseFrontmatter: true,
+					mdxOptions: {
+						rehypePlugins: [rehypeHighlight as any],
+					},
+				}}
+			/>
+		</main>
+	);
 }

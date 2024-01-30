@@ -5,7 +5,7 @@
     align-items: center;
     font-size: 13px;
     line-height: 3em;
-    border-bottom: solid 1px #FFF2;
+    border-bottom: solid 1px var(--border-color);
     white-space: nowrap;
 }
 
