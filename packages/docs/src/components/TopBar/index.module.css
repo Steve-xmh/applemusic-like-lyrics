@@ -9,16 +9,16 @@
     white-space: nowrap;
 }
 
-.header > a {
+.header > a, .topbarItem {
     padding: 0 2em;
     position: relative;
 }
 
-.header > a:hover {
+.header > a:hover, .topbarItem:hover {
     background-color: #fff1;
 }
 
-.header > a:hover > .menu {
+.header > a:hover > .menu, .topbarItem:hover > .menu {
     opacity: 1;
     pointer-events: all;
 }
