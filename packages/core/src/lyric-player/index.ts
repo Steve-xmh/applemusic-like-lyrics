@@ -728,38 +728,57 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				curPos += this.interludeDotsSize[1] + 40;
 			}
-			const targetOpacity = this.hidePassedLines
-				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
-					? 0
-					: hasBuffered
-					? this.isNonDynamic
-						? 0.85
-						: 1
-					: 1 / 3
-				: hasBuffered
-				? this.isNonDynamic
-					? 0.85
-					: 1
-				: i < this.scrollToIndex ||
-				  (interlude &&
-						(i < interlude[2] + 1 || i == this.lyricLinesEl.length - 1)) ||
-				  this.isNonDynamic
-				? 1 / 5
-				: /*el.getLine().translatedLyric || el.getLine().romanLyric ? 1 / 3 :*/ 1 /
-				  2;
+			let targetOpacity = 1;
+			if (!isActive && i < (interlude ? interlude[2] + 1 : this.scrollToIndex)) {
+				if (this.hidePassedLines) {
+					targetOpacity = 0;
+				} else if (this.isNonDynamic) {
+					targetOpacity = 0.25;
+				} else {
+					targetOpacity = 0.15;
+				}
+			} else if (hasBuffered) {
+				if (this.isNonDynamic) {
+					targetOpacity = 0.85;
+				} else {
+					targetOpacity = 1;
+				}
+			} else {
+				if (this.isNonDynamic) {
+					targetOpacity = 0.25;
+				} else {
+					targetOpacity = 0.5;
+				}
+			}
+			if (this.invokedByScrollEvent) {
+				if (this.isNonDynamic) {
+					targetOpacity = 0.85;
+				} else {
+					targetOpacity = 1;
+				}
+			}
+			let blurLevel = 0;
+			if (this.enableBlur) {
+				if (isActive) {
+					blurLevel = 0;
+				} else {
+					blurLevel = 1;
+					if (i < this.scrollToIndex) {
+						blurLevel += Math.abs(this.scrollToIndex - i) / 2;
+					} else {
+						blurLevel += Math.abs(i - Math.max(this.scrollToIndex, latestIndex));
+					}
+				}
+			}
+			if (this.invokedByScrollEvent) {
+				blurLevel = 0;
+			}
 			el.setTransform(
 				this.padding,
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
 				targetOpacity,
-				!this.invokedByScrollEvent && this.enableBlur
-					? isActive
-						? 0
-						: 1 +
-						  (i < this.scrollToIndex
-								? Math.abs(this.scrollToIndex - i)
-								: Math.abs(i - Math.max(this.scrollToIndex, latestIndex)))
-					: 0,
+				blurLevel,
 				force,
 				delay,
 			);

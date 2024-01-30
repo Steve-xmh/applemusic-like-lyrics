@@ -471,8 +471,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return word.subElements.map((el, i, arr) => {
 			const du = Math.min(2400, word.endTime - word.startTime);
 			const de = delay + (du / 4 / arr.length) * i;
-			let amount = 0,
-				blur = 0;
+			let amount = 0;
+			let blur = 0;
 			if (du >= 1200 && du < 2000) {
 				amount = 1.5;
 				blur = 0.2;
