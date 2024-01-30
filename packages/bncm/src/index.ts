@@ -69,30 +69,31 @@ async function initDevelopmentReload() {
 
 	const checkFileOrReloadFunc = new Map<string, Function>();
 
-	betterncm_native?.fs?.watchDirectory(
-		plugin.pluginPath,
-		(dirPath, filename) => {
-			const normalizedDirPath = normalizePath(dirPath);
-			const fullPath = normalizePath(`${dirPath}/${filename}`);
-			const relPath = fullPath.replace(normalizedDirPath, "");
-			if (!checkFileOrReloadFunc.has(relPath))
-				checkFileOrReloadFunc.set(
-					relPath,
-					betterncm.utils.debounce(() => checkFileOrReload(relPath), 1000),
-				);
-			const func = checkFileOrReloadFunc.get(relPath);
-			if (func) {
-				func();
-			} else {
-				const newFunc = betterncm.utils.debounce(
-					() => checkFileOrReload(relPath),
-					1000,
-				);
-				checkFileOrReloadFunc.set(relPath, newFunc);
-				newFunc();
-			}
-		},
-	);
+	if ("betterncm_native" in window)
+		betterncm_native?.fs?.watchDirectory(
+			plugin.pluginPath,
+			(dirPath, filename) => {
+				const normalizedDirPath = normalizePath(dirPath);
+				const fullPath = normalizePath(`${dirPath}/${filename}`);
+				const relPath = fullPath.replace(normalizedDirPath, "");
+				if (!checkFileOrReloadFunc.has(relPath))
+					checkFileOrReloadFunc.set(
+						relPath,
+						betterncm.utils.debounce(() => checkFileOrReload(relPath), 1000),
+					);
+				const func = checkFileOrReloadFunc.get(relPath);
+				if (func) {
+					func();
+				} else {
+					const newFunc = betterncm.utils.debounce(
+						() => checkFileOrReload(relPath),
+						1000,
+					);
+					checkFileOrReloadFunc.set(relPath, newFunc);
+					newFunc();
+				}
+			},
+		);
 
 	log("已启用开发重载功能！");
 }
