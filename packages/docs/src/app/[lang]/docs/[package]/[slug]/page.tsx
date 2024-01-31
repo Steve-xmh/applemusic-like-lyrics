@@ -3,7 +3,9 @@ import fs from "fs/promises";
 import path from "path/posix";
 import { Metadata } from "next";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css"
+import remarkGfm from "remark-gfm";
+import "geist/font/mono";
+import "highlight.js/styles/github-dark.css";
 import "./globals.css";
 
 export interface DocumationPageParam {
@@ -49,7 +51,12 @@ async function compileDoc(params: DocumationPageParam) {
 	);
 	return await compileMDX<{ title: string }>({
 		source: rawContent,
-		options: { parseFrontmatter: true },
+		options: {
+			parseFrontmatter: true,
+			mdxOptions: {
+				rehypePlugins: [rehypeHighlight as any],
+			},
+		},
 	});
 }
 
@@ -81,6 +88,8 @@ export default async function DocumationPage({
 					parseFrontmatter: true,
 					mdxOptions: {
 						rehypePlugins: [rehypeHighlight as any],
+						remarkPlugins: [remarkGfm],
+						format: "mdx",
 					},
 				}}
 			/>

@@ -5,6 +5,12 @@ main pre {
     border-radius: 0.5em;
 }
 
+main code {
+    font-size: 14px;
+    line-height: 1.5em;
+    font-family: var(--font-geist-mono);
+}
+
 main a {
     color: var(--text-primary-color);
     user-select: auto;
@@ -12,4 +18,32 @@ main a {
 
 main a:visited {
     color: var(--text-primary-color);
+}
+
+main > hr {
+    margin: 2em 0;
+    border: none;
+    border-top: solid 1px var(--border-color);
+}
+
+main p > img:only-child {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    overflow: auto;
+    border: solid 1px var(--border-color);
+    border-radius: 0.5em;
+    object-fit: cover;
+    object-position: center;
+    image-resolution: from-image 75dpi;
+}
+
+main table {
+    border-spacing: 2px;
+    border: solid 1px var(--border-color);
+}
+
+main table td, main table th {
+    border: solid 1px var(--border-color);
+    padding: 0.6em 1em;
 }
