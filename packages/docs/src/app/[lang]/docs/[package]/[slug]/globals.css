@@ -9,6 +9,7 @@ main code {
     font-size: 14px;
     line-height: 1.5em;
     font-family: var(--font-geist-mono);
+    padding: 1em;
 }
 
 main a {
@@ -25,8 +26,11 @@ main > hr {
     border: none;
     border-top: solid 1px var(--border-color);
 }
+main img {
+    max-width: 100%;
+}
 
-main p > img:only-child {
+main p > img:only-child, main p > a > img:only-child {
     display: block;
     margin: 0 auto;
     max-width: 100%;
