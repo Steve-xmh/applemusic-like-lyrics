@@ -16,7 +16,7 @@ title: 快速入门
 
 ### 1.创建一个React项目
 
-React项目可以使用多种方式创建。本文档将使用与[MDN React教程](https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started)相同的create-react-app来作为示例。
+React项目可以使用多种方式创建。本文档将使用与[MDN React教程](https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started)相同的create-react-app + jsx来作为示例。
 你可以参考[MDN React教程](https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started)创建一个React项目。并使用例如Visual Studio Code等开发软件打开你的项目。
 
 ### 2.使用包管理软件安装AMLL
@@ -56,7 +56,7 @@ Lyric Player是AMLL的核心组件之一，提供歌词的显示功能。
 
 下面是一段示例。
 
-```React
+```jsx
 import React from "react";
 import { LyricPlayer } from "@applemusic-like-lyrics/react";
 
@@ -72,7 +72,7 @@ export default App;
 
 现在，我们对代码稍做修改，使其满足我们的要求。
 
-```React
+```jsx
 import React,{ useState } from "react";
 import { LyricPlayer } from "@applemusic-like-lyrics/react";
 import { parseTTML } from '@applemusic-like-lyrics/core';
@@ -131,7 +131,7 @@ BackgroundRender是AMLL的另一个核心组件。提供了歌曲播放背景显
 > 在最新的dev分支中，EplorRenderer也为默认的BackgroundRender
 
 我们需要通过
-```React
+```jsx
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
 import { EplorRenderer } from '@applemusic-like-lyrics/core';
 ```
@@ -139,7 +139,7 @@ import { EplorRenderer } from '@applemusic-like-lyrics/core';
 
 我们将第三部分中的代码作为示例进行修改。
 
-```React
+```jsx
 import React,{ useState } from "react";
 import { LyricPlayer, BackgroundRender } from "@applemusic-like-lyrics/react";
 import { EplorRenderer } from '@applemusic-like-lyrics/core';
