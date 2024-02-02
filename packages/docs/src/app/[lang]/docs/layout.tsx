@@ -24,7 +24,10 @@ async function loadAllPages() {
 	const modules = await fs.readdir(path.resolve(docsPath));
 	modules.sort();
 	for (const module of modules) {
-		const posts = await fs.readdir(path.resolve(docsPath, module));
+		if (await fs.stat(path.resolve(docsPath, module)).then((v) => !v.isDirectory())) {
+			continue;
+		}
+		const posts = (await fs.readdir(path.resolve(docsPath, module))).filter(v => v.endsWith(".mdx"));
 		posts.sort();
 		// File name format: slug.lang.mdx
 		const splitedPosts = posts.map((v) => v.split("."));

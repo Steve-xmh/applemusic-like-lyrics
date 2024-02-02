@@ -23,6 +23,9 @@ export async function generateStaticParams(): Promise<DocumationPageParam[]> {
 	const modules = await fs.readdir(path.resolve(docsPath));
 
 	for (const module of modules) {
+		if (await fs.stat(path.resolve(docsPath, module)).then((v) => !v.isDirectory())) {
+			continue;
+		}
 		const posts = await fs.readdir(path.resolve(docsPath, module));
 		// File name format: slug.lang.mdx
 		const distinctedPosts = [...new Set(posts.map((v) => v.split(".")[0]))];
