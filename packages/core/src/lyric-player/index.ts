@@ -729,7 +729,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos += this.interludeDotsSize[1] + 40;
 			}
 			let targetOpacity = 1;
-			if (!isActive && i < (interlude ? interlude[2] + 1 : this.scrollToIndex)) {
+			if (
+				!isActive &&
+				i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
+			) {
 				if (this.hidePassedLines) {
 					targetOpacity = 0;
 				} else if (this.isNonDynamic) {
@@ -766,7 +769,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					if (i < this.scrollToIndex) {
 						blurLevel += Math.abs(this.scrollToIndex - i) / 2;
 					} else {
-						blurLevel += Math.abs(i - Math.max(this.scrollToIndex, latestIndex));
+						blurLevel += Math.abs(
+							i - Math.max(this.scrollToIndex, latestIndex),
+						);
 					}
 				}
 			}

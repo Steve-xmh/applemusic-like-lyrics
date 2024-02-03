@@ -777,7 +777,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 8;
+		const blurRadius = 10;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw = img.naturalWidth;

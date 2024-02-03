@@ -469,10 +469,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = word.endTime - word.startTime;
 		return word.subElements.map((el, i, arr) => {
-			const du = Math.min(2400, word.endTime - word.startTime);
+			const du = Math.max(1000, word.endTime - word.startTime);
 			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0;
 			let blur = 0;
+			let slope = 0.05;
 			if (du >= 1200 && du < 2000) {
 				amount = 1.5;
 				blur = 0.2;
@@ -486,6 +487,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				amount = 3.5;
 				blur = 0.4;
 			}
+			// slope = du / 20000;
 			// if (duration >= 1200) {
 			// 	amount =
 			// 		Math.min(((arr.length - i + 1) / arr.length ** 3) *
@@ -501,7 +503,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						textShadow: "rgba(255, 255, 255, 0) 0 0 10px",
 					},
 					{
-						offset: 0.1,
+						offset: slope,
 						transform: `translateZ(${amount}vw) translateY(-${Math.min(
 							0.05,
 							du / 50000,
@@ -509,32 +511,34 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 10px`,
 					},
 					{
+						offset: slope + 0.1,
+						transform: `translateZ(${amount}vw) translateY(-${Math.min(
+							0.05,
+							du / 50000,
+						)}em)`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
+					},
+					{
 						offset: 0.2,
 						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
 					},
 					{
-						offset: 0.5,
-						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
-					},
-					{
-						offset: 0.7,
-						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
-					},
-					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 6px`,
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 6px`,
 					},
 				],
 				{
-					duration: isFinite(du) ? du * ((i + 1) / arr.length * 0.3 + 1.0) : 0,
+					duration: isFinite(du)
+						? du * (((i + 1) / arr.length) * 0.3 + 1.0)
+						: 0,
 					delay: isFinite(de) ? de : 0,
 					id: "glow-word",
 					iterations: 1,
 					composite: "replace",
-					easing: "cubic-bezier(.7,0,.5,1)",
+					easing: "cubic-bezier(.8,0,.6,1)",
 					fill: "both",
-				},
+				}
 			);
 			glowAnimation.pause();
 			return glowAnimation;
