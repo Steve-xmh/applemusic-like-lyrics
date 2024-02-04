@@ -599,7 +599,7 @@ export class EplorRenderer extends BaseRenderer {
 			this.renderSize[0],
 			this.renderSize[1],
 		);
-		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
+		this.mainProgram.setUniform1f("lIIIlllllIllIl", this.hasLyric ? tickTime / 1000 : 0);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
 			"IIIlllIlIIllll",
@@ -799,8 +799,7 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		if (this.hasLyric) this.playTime = Math.random() * 100000;
-		else this.playTime = 0;
+		this.playTime = Math.random() * 100000;
 		this.lastFrameTime = performance.now();
 		this.requestTick();
 	}

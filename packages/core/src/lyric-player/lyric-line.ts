@@ -476,16 +476,16 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			let slope = 0.05;
 			if (du >= 1200 && du < 2000) {
 				amount = 1.5;
-				blur = 0.2;
+				blur = 0.4;
 			} else if (du >= 2000 && du < 3000) {
 				amount = 2;
-				blur = 0.3;
+				blur = 0.5;
 			} else if (du >= 3000 && du < 4000) {
 				amount = 3;
-				blur = 0.4;
+				blur = 0.6;
 			} else if (du >= 4000) {
-				amount = 3.5;
-				blur = 0.4;
+				amount = 3;
+				blur = 0.6;
 			}
 			// slope = du / 20000;
 			// if (duration >= 1200) {
@@ -504,19 +504,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{
 						offset: slope,
-						transform: `translateZ(${amount}vw) translateY(-${Math.min(
-							0.05,
-							du / 50000,
-						)}em)`,
-						textShadow: `rgba(255, 255, 255, ${blur * 0.5}) 0 0 10px`,
+						transform: `translateZ(${amount}vw) translateY(-0.05em)`,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
 					},
 					{
 						offset: slope + 0.1,
-						transform: `translateZ(${amount}vw) translateY(-${Math.min(
-							0.05,
-							du / 50000,
-						)}em)`,
-						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
+						transform: `translateZ(${amount}vw) translateY(-0.05em)`,
+						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
 					},
 					{
 						offset: 0.2,
@@ -525,7 +519,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 6px`,
+						textShadow: `rgba(255, 255, 255, 0) 0 0 6px`,
 					},
 				],
 				{
