@@ -87,8 +87,7 @@ function chunkLyricWords<T>(
 export function shouldEmphasize(word: LyricWord): boolean {
 	return (
 		word.endTime - word.startTime >= 1000 &&
-		word.word.length <= 7 &&
-		word.word.length > 1
+		word.word.trim().length <= 7 && word.word.trim().length >= 1
 	);
 }
 
@@ -476,29 +475,30 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const de = delay + (du / 4 / arr.length) * i;
 			let amount = 0;
 			let blur = 0;
-			let slope = 0.05;
+			let slope = 0.1;
 			if (du >= 1200 && du < 2000) {
-				amount = 1.5;
+				// amount = 1.5;
 				blur = 0.4;
 			} else if (du >= 2000 && du < 3000) {
-				amount = 2;
+				// amount = 2;
 				blur = 0.5;
 			} else if (du >= 3000 && du < 4000) {
-				amount = 3;
+				// amount = 3;
 				blur = 0.6;
 			} else if (du >= 4000) {
-				amount = 3;
+				// amount = 3;
 				blur = 0.6;
 			}
 			// slope = du / 20000;
-			// if (duration >= 1200) {
-			// 	amount =
-			// 		Math.min(((arr.length - i + 1) / arr.length ** 3) *
-			// 			Math.min(0.5, du / 5000) ** 2 *
-			// 			arr.length ** 2 *
-			// 			16.0, 3);
-			// 	// blur = 0.4;
-			// }
+			if (duration >= 1200) {
+				// amount =
+				// 	Math.min(((arr.length - i + 1) / arr.length ** 3) *
+				// 		Math.min(0.5, du / 5000) ** 2 *
+				// 		arr.length ** 2 *
+				// 		16.0, 3);
+				// blur = 0.4;
+				amount = Math.min(du / 1000, 3);
+			}
 			const glowAnimation = el.animate(
 				[
 					{
@@ -520,20 +520,24 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
 					},
 					{
+						offset: 0.9,
+						textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`
+					},
+					{
 						offset: 1,
 						transform: "translateZ(0vw)",
-						textShadow: `rgba(255, 255, 255, 0) 0 0 6px`,
+						textShadow: `rgba(255, 255, 255, 0) 0 0 10px`,
 					},
 				],
 				{
 					duration: isFinite(du)
-						? du * (((i + 1) / arr.length) * 0.3 + 1.0)
+						? du * (((i + 1) / arr.length) * 0.3 + 0.8)
 						: 0,
 					delay: isFinite(de) ? de : 0,
 					id: "glow-word",
 					iterations: 1,
 					composite: "replace",
-					easing: "cubic-bezier(.8,0,.6,1)",
+					easing: "cubic-bezier(.6,0,.6,1)",
 					fill: "both",
 				},
 			);

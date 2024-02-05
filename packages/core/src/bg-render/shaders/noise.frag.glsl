@@ -42,7 +42,7 @@ void main() {
     }
     sampled_color /= vec3(count);
     #else
-    vec2 offset = blur_radius * (fract(vec2(0.61803398875f, 0.38196601125f) * 1.f) - 0.5f) + dither * .1;
+    vec2 offset = blur_radius * (fract(vec2(0.61803398875f, 0.38196601125f) * 1.f) - 0.5f) + dither * .2;
     vec3 sampled_color = textureLod(src, offset - tex_coord, 3.0f).xyz;
     sampled_color += textureLod(src, offset + tex_coord, 3.0f).xyz;
     sampled_color /= 2.0;

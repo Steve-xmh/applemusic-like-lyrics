@@ -441,6 +441,7 @@ export class EplorRenderer extends BaseRenderer {
 	private ampTransition = 0;
 	private playTime = 0;
 	private frameTime = 0;
+	private IllIlllIlIIlllI = 0;
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -608,6 +609,7 @@ export class EplorRenderer extends BaseRenderer {
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
+		this.mainProgram.setUniform1i("IllIlllIlIIlllI", this.IllIlllIlIIlllI);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
@@ -790,7 +792,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.8);
-		saturateImage(imageData, 1.0);
+		saturateImage(imageData, 1.5);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 4);
@@ -804,6 +806,7 @@ export class EplorRenderer extends BaseRenderer {
 		this.sprites.push(sprite);
 		this.playTime = Math.random() * 100000;
 		this.lastFrameTime = performance.now();
+		this.IllIlllIlIIlllI = Math.random() * 10000;
 		this.requestTick();
 	}
 
