@@ -190,7 +190,8 @@ async function getLyricFromExternal(
 				lines = parseLrc(rawLyricData).map(transformLyricLine);
 				break;
 			case LyricFormat.TTML:
-				lines = parseTTML(rawLyricData);
+				// TODO: 提供歌词元数据
+				lines = parseTTML(rawLyricData).lyricLines;
 				break;
 			case LyricFormat.YRC:
 				lines = parseYrc(rawLyricData).map(transformLyricLine);
@@ -228,10 +229,10 @@ async function getLyricFromDB(
 ) {
 	try {
 		const urls = [
-			`https://gitcode.net/sn/amll-ttml-db/-/raw/main/lyrics/${musicId}.ttml?inline=false`,
-			`https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/${musicId}.ttml`,
-			`https://mirror.ghproxy.com/https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/${musicId}.ttml`,
-			`https://gh.api.99988866.xyz/https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/lyrics/${musicId}.ttml`,
+			`https://gitcode.net/sn/amll-ttml-db/-/raw/main/ncm-lyrics/${musicId}.ttml?inline=false`,
+			`https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/ncm-lyrics/${musicId}.ttml`,
+			`https://mirror.ghproxy.com/https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/ncm-lyrics/${musicId}.ttml`,
+			`https://gh.api.99988866.xyz/https://raw.githubusercontent.com/Steve-xmh/amll-ttml-db/main/ncm-lyrics/${musicId}.ttml`,
 		];
 		const res = await Promise.any(
 			urls.map((url) =>
@@ -240,7 +241,7 @@ async function getLyricFromDB(
 				})
 					.then((res) => {
 						if (res.ok) return res;
-						else throw res;
+						throw res;
 					})
 					.catch((v) => {
 						throw v;
@@ -248,7 +249,8 @@ async function getLyricFromDB(
 			),
 		);
 		if (res.ok) {
-			const lines = parseTTML(await res.text());
+			// TODO: 提供歌词元数据
+			const lines = parseTTML(await res.text()).lyricLines;
 			if (!showTranslatedLine)
 				lines.forEach((line) => {
 					line.translatedLyric = "";
@@ -301,7 +303,9 @@ async function getLyricFromNCM(
 						.trim();
 				});
 			} else {
-				trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+				for (const line of trans) {
+					pairLyric(line, converted, "translatedLyric");
+				}
 			}
 		}
 		if (showRomanLine && currentRawLyricResp?.yromalrc?.lyric) {
@@ -313,7 +317,9 @@ async function getLyricFromNCM(
 						.trim();
 				});
 			} else {
-				roman.forEach((line) => pairLyric(line, converted, "romanLyric"));
+				for (const line of roman) {
+					pairLyric(line, converted, "romanLyric");
+				}
 			}
 		}
 	} else {
@@ -330,7 +336,9 @@ async function getLyricFromNCM(
 						.trim();
 				});
 			} else {
-				trans.forEach((line) => pairLyric(line, converted, "translatedLyric"));
+				for (const line of trans) {
+					pairLyric(line, converted, "translatedLyric");
+				}
 			}
 		}
 		if (showRomanLine && currentRawLyricResp?.romalrc?.lyric) {
@@ -342,7 +350,9 @@ async function getLyricFromNCM(
 						.trim();
 				});
 			} else {
-				roman.forEach((line) => pairLyric(line, converted, "romanLyric"));
+				for (const line of roman) {
+					pairLyric(line, converted, "romanLyric");
+				}
 			}
 		}
 	}
@@ -396,15 +406,15 @@ export const lyricLinesAtom = atom(
 			) {
 				if (lyricOverrideTranslatedLyricData) {
 					const translated = parseLrc(lyricOverrideTranslatedLyricData);
-					translated.forEach((line) =>
-						pairLyric(line, overrideLines, "translatedLyric"),
-					);
+					for (const line of translated) {
+						pairLyric(line, overrideLines, "translatedLyric");
+					}
 				}
 				if (lyricOverrideRomanLyricData) {
 					const translated = parseLrc(lyricOverrideRomanLyricData);
-					translated.forEach((line) =>
-						pairLyric(line, overrideLines, "romanLyric"),
-					);
+					for (const line of translated) {
+						pairLyric(line, overrideLines, "romanLyric");
+					}
 				}
 			}
 
@@ -447,9 +457,10 @@ export const lyricLinesAtom = atom(
 					break;
 				case LyricOverrideType.LocalTTML:
 					if (overrideData.data.lyricOverrideOriginalLyricData)
+						// TODO: 提供歌词元数据
 						overrideLines = parseTTML(
 							overrideData.data.lyricOverrideOriginalLyricData,
-						);
+						).lyricLines;
 					break;
 				default:
 			}
@@ -524,9 +535,8 @@ export const LyricProvider: FC = () => {
 						);
 						if (lines) {
 							return lines;
-						} else {
-							throw new LyricNotExistError();
 						}
+						throw new LyricNotExistError();
 					}
 					case "builtin:amll-ttml-db": {
 						const lines = await getLyricFromDB(
@@ -537,9 +547,8 @@ export const LyricProvider: FC = () => {
 						);
 						if (lines) {
 							return lines;
-						} else {
-							throw new LyricNotExistError();
 						}
+						throw new LyricNotExistError();
 					}
 					case "builtin:ncm": {
 						const lines = await getLyricFromNCM(
@@ -551,11 +560,11 @@ export const LyricProvider: FC = () => {
 						);
 						if (lines.type === "music") {
 							return lines.lines;
-						} else if (lines.type === "pure-music") {
-							return [];
-						} else {
-							throw new LyricNotExistError();
 						}
+						if (lines.type === "pure-music") {
+							return [];
+						}
+						throw new LyricNotExistError();
 					}
 				}
 			},

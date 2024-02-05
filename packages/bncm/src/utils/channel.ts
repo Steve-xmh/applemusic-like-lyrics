@@ -4,7 +4,7 @@ import { warn } from "./logger";
 const registeredEvt = new Set<string>();
 const callbacks = new Map<string, Set<Function>>();
 
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const onRegisterCallEvent = (name: string, args: any[]) => {
 	for (const callback of callbacks.get(name) ?? []) {
 		try {

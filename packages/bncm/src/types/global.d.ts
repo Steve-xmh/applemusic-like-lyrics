@@ -36,7 +36,7 @@ interface EAPILyric {
 	lyric: string;
 }
 
-// rome-ignore lint/correctness/noUnusedVariables: <explanation>
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface EAPILyricResponse extends EAPIResponse {
 	lrc?: EAPILyric;
 	tlyric?: EAPILyric;
@@ -46,7 +46,7 @@ interface EAPILyricResponse extends EAPIResponse {
 }
 
 declare namespace channel {
-	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	export function call(command: string, callback: Function, args: any[]);
 	export function registerCall(name: string, callback: Function);
 	export function encryptId(data: string): string;
@@ -76,7 +76,7 @@ interface AMLLInjectPlugin extends NCMInjectPlugin {
 	musicStatus: import("/Users/stevexmh/Documents/programs/applemusic-like-lyrics/packages/bncm/src/music-context/v2").MusicStatusGetterV2;
 }
 
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 declare let APP_CONF: any;
 declare let pluginPath: string;
 declare let plugin: AMLLInjectPlugin;
@@ -85,17 +85,17 @@ declare let loadedPlugins: {
 	[pluginId: string]: import("plugin").NCMInjectPlugin | undefined;
 };
 declare const betterncm: typeof import("betterncm-api/index").default;
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 declare const legacyNativeCmder: any;
 declare const DEBUG: boolean;
 declare const OPEN_PAGE_DIRECTLY: boolean;
 declare const isOSX: boolean;
-// rome-ignore lint/correctness/noUnusedVariables: <explanation>
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface Document {
 	webkitIsFullScreen: boolean;
 }
 
-// rome-ignore lint/correctness/noUnusedVariables: <explanation>
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 interface HTMLElement {
 	webkitRequestFullScreen: Function;
 }

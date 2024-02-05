@@ -2,7 +2,7 @@ export function debounce<T extends Function>(callback: T, waitTime: number): T {
 	let timer = 0;
 	return function debounceClosure() {
 		const self = this;
-		// rome-ignore lint/style/noArguments: 防抖函数
+		// biome-ignore lint/style/noArguments: 防抖函数
 		const args = arguments;
 		if (timer) {
 			clearTimeout(timer);

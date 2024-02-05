@@ -1,7 +1,19 @@
-import type { LyricLine, LyricWord } from "@applemusic-like-lyrics/core";
+/**
+ * @fileoverview
+ * 解析 TTML 歌词文档到歌词数组的解析器
+ * 用于解析从 Apple Music 来的歌词文件，且扩展并支持翻译和音译文本。
+ * @see https://www.w3.org/TR/2018/REC-ttml1-20181108/
+ */
+
+import type {
+	LyricLine,
+	LyricWord,
+	TTMLLyric,
+	TTMLMetadata,
+} from "./ttml-types";
 
 const timeRegexp =
-	/^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([\.:]([0-9]+))?)/;
+	/^(((?<hour>[0-9]+):)?(?<min>[0-9]+):)?(?<sec>[0-9]+([.:]([0-9]+))?)/;
 function parseTimespan(timeSpan: string): number {
 	const matches = timeRegexp.exec(timeSpan);
 	if (matches) {
@@ -9,12 +21,11 @@ function parseTimespan(timeSpan: string): number {
 		const min = Number(matches.groups?.min || "0");
 		const sec = Number(matches.groups?.sec.replace(/:/, ".") || "0");
 		return Math.floor((hour * 3600 + min * 60 + sec) * 1000);
-	} else {
-		throw new TypeError("时间戳字符串解析失败");
 	}
+	throw new TypeError(`时间戳字符串解析失败：${timeSpan}`);
 }
 
-export function parseTTML(ttmlText: string): LyricLine[] {
+export function parseTTML(ttmlText: string): TTMLLyric {
 	const domParser = new DOMParser();
 	const ttmlDoc: XMLDocument = domParser.parseFromString(
 		ttmlText,
@@ -22,6 +33,27 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 	);
 
 	let mainAgentId = "v1";
+
+	const metadata: TTMLMetadata[] = [];
+	for (const meta of ttmlDoc.querySelectorAll("meta")) {
+		if (meta.tagName === "amll:meta") {
+			const key = meta.getAttribute("key");
+			if (key) {
+				const value = meta.getAttribute("value");
+				if (value) {
+					const existing = metadata.find((m) => m.key === key);
+					if (existing) {
+						existing.value.push(value);
+					} else {
+						metadata.push({
+							key,
+							value: [value],
+						});
+					}
+				}
+			}
+		}
+	}
 
 	for (const agent of ttmlDoc.querySelectorAll("ttm\\:agent")) {
 		if (agent.getAttribute("type") === "person") {
@@ -32,107 +64,37 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 		}
 	}
 
-	const result: LyricLine[] = [];
+	const lyricLines: LyricLine[] = [];
 
-	for (const lineEl of ttmlDoc.querySelectorAll("body p[begin][end]")) {
+	function parseParseLine(lineEl: Element, isBG = false) {
 		const line: LyricLine = {
 			words: [],
-			startTime: parseTimespan(lineEl.getAttribute("begin") ?? "0:0"),
-			endTime: parseTimespan(lineEl.getAttribute("end") ?? "0:0"),
 			translatedLyric: "",
 			romanLyric: "",
-			isBG: false,
-			isDuet: lineEl.getAttribute("ttm:agent") !== mainAgentId,
+			isBG,
+			isDuet:
+				!!lineEl.getAttribute("ttm:agent") &&
+				lineEl.getAttribute("ttm:agent") !== mainAgentId,
+			startTime: 0,
+			endTime: 0,
 		};
-		let curBGLine: LyricLine | null = null;
+		let haveBg = false;
 
 		for (const wordNode of lineEl.childNodes) {
 			if (wordNode.nodeType === Node.TEXT_NODE) {
-				const word = wordNode.textContent ?? "";
-				if (/^(\s+)$/.test(word)) {
-					line.words.push({
-						word: " ",
-						startTime: 0,
-						endTime: 0,
-					});
-				} else {
-					line.words.push({
-						word: word,
-						startTime: 0,
-						endTime: 0,
-					});
-				}
+				line.words?.push({
+					word: wordNode.textContent ?? "",
+					startTime: 0,
+					endTime: 0,
+				});
 			} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
 				const wordEl = wordNode as Element;
 				const role = wordEl.getAttribute("ttm:role");
 
 				if (wordEl.nodeName === "span" && role) {
 					if (role === "x-bg") {
-						const bgLine: LyricLine = {
-							words: [],
-							startTime: line.startTime,
-							endTime: line.endTime,
-							translatedLyric: "",
-							romanLyric: "",
-							isBG: true,
-							isDuet: line.isDuet,
-						};
-
-						for (const wordNode of wordEl.childNodes) {
-							if (wordNode.nodeType === Node.TEXT_NODE) {
-								const word = wordNode.textContent ?? "";
-								if (/^(\s+)$/.test(word)) {
-									bgLine.words.push({
-										word: " ",
-										startTime: 0,
-										endTime: 0,
-									});
-								} else {
-									bgLine.words.push({
-										word: word,
-										startTime: 0,
-										endTime: 0,
-									});
-								}
-							} else if (wordNode.nodeType === Node.ELEMENT_NODE) {
-								const wordEl = wordNode as Element;
-								const role = wordEl.getAttribute("ttm:role");
-								if (wordEl.nodeName === "span" && role) {
-									if (role === "x-translation") {
-										bgLine.translatedLyric = wordEl.innerHTML.trim();
-									} else if (role === "x-roman") {
-										bgLine.romanLyric = wordEl.innerHTML.trim();
-									}
-								} else if (
-									wordEl.hasAttribute("begin") &&
-									wordEl.hasAttribute("end")
-								) {
-									const word = {
-										word: wordNode.textContent,
-										startTime: parseTimespan(wordEl.getAttribute("begin")!!),
-										endTime: parseTimespan(wordEl.getAttribute("end")!!),
-									} as LyricWord;
-									bgLine.words.push(word);
-								}
-							}
-						}
-
-						const firstWord = bgLine.words[0];
-						bgLine.startTime = firstWord.startTime;
-						if (firstWord?.word.startsWith("(")) {
-							firstWord.word = firstWord.word.substring(1);
-						}
-
-						const lastWord = bgLine.words[bgLine.words.length - 1];
-						bgLine.endTime = lastWord.endTime;
-						if (lastWord?.word.endsWith(")")) {
-							lastWord.word = lastWord.word.substring(
-								0,
-								lastWord.word.length - 1,
-							);
-						}
-
-						curBGLine = bgLine;
+						parseParseLine(wordEl, true);
+						haveBg = true;
 					} else if (role === "x-translation") {
 						line.translatedLyric = wordEl.innerHTML;
 					} else if (role === "x-roman") {
@@ -141,23 +103,64 @@ export function parseTTML(ttmlText: string): LyricLine[] {
 				} else if (wordEl.hasAttribute("begin") && wordEl.hasAttribute("end")) {
 					const word: LyricWord = {
 						word: wordNode.textContent ?? "",
-						startTime: parseTimespan(wordEl.getAttribute("begin")!!),
-						endTime: parseTimespan(wordEl.getAttribute("end")!!),
+						startTime: parseTimespan(wordEl.getAttribute("begin") ?? ""),
+						endTime: parseTimespan(wordEl.getAttribute("end") ?? ""),
 					};
+					const emptyBeat = wordEl.getAttribute("amll:empty-beat");
+					if (emptyBeat) {
+						word.emptyBeat = Number(emptyBeat);
+					}
 					line.words.push(word);
 				}
 			}
 		}
 
-		result.push(line);
-		if (curBGLine) {
-			// line.startTime = Math.min(line.startTime, curBGLine.startTime);
-			// line.endTime = Math.max(line.endTime, curBGLine.endTime);
-			// curBGLine.startTime = line.startTime;
-			// curBGLine.endTime = line.endTime;
-			result.push(curBGLine);
+		if (line.isBG) {
+			const firstWord = line.words?.[0];
+			if (firstWord?.word.startsWith("(")) {
+				firstWord.word = firstWord.word.substring(1);
+				if (firstWord.word.length === 0) {
+					line.words.shift();
+				}
+			}
+
+			const lastWord = line.words?.[line.words.length - 1];
+			if (lastWord?.word.endsWith(")")) {
+				lastWord.word = lastWord.word.substring(0, lastWord.word.length - 1);
+				if (lastWord.word.length === 0) {
+					line.words.pop();
+				}
+			}
+		}
+
+		const startTime = lineEl.getAttribute("begin");
+		const endTime = lineEl.getAttribute("end");
+		if (startTime && endTime) {
+			line.startTime = parseTimespan(startTime);
+			line.endTime = parseTimespan(endTime);
+		} else {
+			line.startTime = line.words.reduce(
+				(pv, cv) => Math.min(pv, cv.startTime),
+				Infinity,
+			);
+			line.endTime = line.words.reduce((pv, cv) => Math.max(pv, cv.endTime), 0);
+		}
+
+		if (haveBg) {
+			const bgLine = lyricLines.pop();
+			lyricLines.push(line);
+			if (bgLine) lyricLines.push(bgLine);
+		} else {
+			lyricLines.push(line);
 		}
 	}
 
-	return result;
+	for (const lineEl of ttmlDoc.querySelectorAll("body p[begin][end]")) {
+		parseParseLine(lineEl);
+	}
+
+	return {
+		metadata,
+		lyricLines: lyricLines,
+	};
 }

@@ -54,7 +54,7 @@ export class MusicContextV3 extends MusicContextBase {
 	private readonly unsubscribeStore: Function;
 	private audioId = "";
 	private audioQuality = AudioQualityType.Normal;
-	// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private store: any;
 	private forcePlayPositionLerp = false;
 	constructor() {
@@ -65,7 +65,7 @@ export class MusicContextV3 extends MusicContextBase {
 		this.bindedOnPlayStateChanged = this.onPlayStateChanged.bind(this);
 		this.bindedOnVolumeChanged = this.onVolumeChanged.bind(this);
 
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const store = (document.getElementById("root") as any)?._reactRootContainer
 			?._internalRoot?.current?.child?.child?.memoizedProps?.store;
 		if (store) {

@@ -2,7 +2,7 @@ import { LyricPlayer, type LyricPlayerRef } from "./lyric-player";
 import { BackgroundRender } from "./bg-render";
 import type { FC } from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
-import { ttml } from "@applemusic-like-lyrics/core";
+import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import type { LyricLine } from "@applemusic-like-lyrics/core";
 
 export const App: FC = () => {
@@ -53,7 +53,7 @@ export const App: FC = () => {
 			const file = input.files?.[0];
 			if (file) {
 				const text = await file.text();
-				setLyricLines(ttml.parseTTML(text));
+				setLyricLines(parseTTML(text));
 			}
 		};
 		input.click();
@@ -84,7 +84,7 @@ export const App: FC = () => {
 	useEffect(() => {
 		// 调试用途，暴露到 Window
 		if (lyricPlayerRef.current) {
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			(window as any).lyricPlayer = lyricPlayerRef.current;
 		}
 	}, [lyricPlayerRef.current]);
@@ -144,7 +144,7 @@ export const App: FC = () => {
 				<button type="button" onClick={onClickOpenTTMLLyric}>
 					加载歌词
 				</button>
-				{/* rome-ignore lint/a11y/useMediaCaption: <explanation> */}
+				{/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
 				<audio controls ref={audioRef} src={audioUrl} preload="auto" />
 			</div>
 		</>

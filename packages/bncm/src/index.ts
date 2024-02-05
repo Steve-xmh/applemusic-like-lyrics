@@ -123,10 +123,7 @@ plugin.onLoad(async () => {
 
 		if (isNCMV3()) {
 			await betterncm.utils.waitForFunction(() => {
-				return (
-					document.getElementById("root") as any
-				)
-					?._reactRootContainer
+				return (document.getElementById("root") as any)?._reactRootContainer
 					?._internalRoot?.current?.child?.child?.memoizedProps?.store;
 			});
 			injectLyricPageV3();

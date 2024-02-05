@@ -7913,7 +7913,7 @@ class zv extends U1 {
   unsubscribeStore;
   audioId = "";
   audioQuality = ve.Normal;
-  // rome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   store;
   forcePlayPositionLerp = !1;
   constructor() {
@@ -9037,7 +9037,7 @@ const Ja = (e) => {
       let [I, s] = t.current;
       I + r.width >= window.innerWidth && (I = window.innerWidth - r.width), s + r.height >= window.innerHeight && (s = window.innerHeight - r.height), g([I, s]);
     }
-  }, [e.opened]), // rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+  }, [e.opened]), // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
   Fo.createPortal(
     /* @__PURE__ */ c.jsx(
       "div",
@@ -9317,7 +9317,7 @@ const Jt = (e) => /* @__PURE__ */ c.jsx("div", { className: `sidebar-item${e.sel
 };
 const Ne = ({ className: e, ...A }) => /* @__PURE__ */ c.jsx("div", { className: "appkit-group-box " + e, ...A }), te = () => /* @__PURE__ */ c.jsx("div", { className: "appkit-group-box-devider" });
 const xa = (e) => (
-  // rome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+  // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
   /* @__PURE__ */ c.jsxs(
     "div",
     {

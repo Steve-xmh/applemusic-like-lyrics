@@ -35,9 +35,8 @@ const offsetedCurrentTimeAtom = atom(
 		const currentTime = get(currentTimeAtom);
 		if (offset.state === "hasData") {
 			return currentTime + offset.data;
-		} else {
-			return currentTime;
 		}
+		return currentTime;
 	},
 	(_get, set, action: number) => {
 		set(currentTimeAtom, action);
@@ -84,9 +83,8 @@ export const CoreLyricPlayer: FC<{
 			return () => {
 				window.removeEventListener("resize", onResize);
 			};
-		} else {
-			setAlighPosition(0.5);
 		}
+		setAlighPosition(0.5);
 	}, [props.albumCoverRef?.current, lyricPageOpened]);
 
 	if (
@@ -101,87 +99,86 @@ export const CoreLyricPlayer: FC<{
 				</div>
 			</div>
 		);
-	} else {
-		return (
-			<>
-				<LyricPlayerComponent
-					className="amll-lyric-player-wrapper"
-					disabled={!lyricPageOpened}
-					alignAnchor={
-						!props.isVertical && props.albumCoverRef ? "center" : "top"
-					}
-					alignPosition={
-						!props.isVertical && props.albumCoverRef ? alignPosition : 0.1
-					}
-					playing={playStatus === PlayState.Playing}
-					currentTime={currentTime}
-					enableBlur={lyricBlurEffect}
-					enableSpring={lyricSpringEffect}
-					enableScale={lyricScaleEffect}
-					hidePassedLines={lyricHidePassed}
-					lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
-					ref={playerRef}
-					onLyricLineClick={(line) => {
-						line.preventDefault();
-						line.stopPropagation();
-						line.stopImmediatePropagation();
-						setCurrentTime(line.line.getLine().startTime);
-						playerRef.current?.lyricPlayer?.resetScroll();
-						playerRef.current?.lyricPlayer?.calcLayout();
-					}}
-					onLyricLineContextMenu={(line) => {
-						line.preventDefault();
-						line.stopPropagation();
-						line.stopImmediatePropagation();
-						setRightClickedLyric(line.line.getLine());
-					}}
-					bottomLine={
-						lyricLines.state === "hasData" ? (
-							<div className="amll-contributors">
-								<div>创作者：{artists.map((v) => v.name).join("、")}</div>
-								{usingLyricSource.state === "hasData" &&
-								usingLyricSource.data.type === "builtin:amll-ttml-db" &&
-								showAMLLTTMLDBTip ? (
-									<div className="ttml-db-tip">
-										{/* rome-ignore lint/a11y/useValidAnchor: <explanation> */}
-										<a
-											href="javascript:void(0);"
-											onClick={() => {
-												betterncm.ncm.openUrl(
-													"https://github.com/Steve-xmh/amll-ttml-db",
-												);
-											}}
-											title="点击可以一起贡献更加出色的 TTML 歌词哦！"
-										>
-											本歌词由 AMLL TTML 歌词数据库强力驱动
-										</a>
-									</div>
-								) : null}
-							</div>
-						) : null
-					}
-				/>
-				{lyricLines.state === "loading" && (
-					<>
-						{amllEnvironment === AMLLEnvironment.AMLLPlayer && (
-							<div className="amll-lyric-player-wrapper load-status">
-								<div>等待连接中</div>
-							</div>
-						)}
-						{amllEnvironment === AMLLEnvironment.BetterNCM && (
-							<div className="amll-lyric-player-wrapper load-status">
-								<div>歌词加载中</div>
-							</div>
-						)}
-					</>
-				)}
-				{lyricLines.state === "hasError" && (
-					<div className="amll-lyric-player-wrapper load-status">
-						<div>歌词加载失败或歌词不存在</div>
-						<div>可前往设置页 - 歌词源设置下查询搜索日志分析原因</div>
-					</div>
-				)}
-			</>
-		);
 	}
+	return (
+		<>
+			<LyricPlayerComponent
+				className="amll-lyric-player-wrapper"
+				disabled={!lyricPageOpened}
+				alignAnchor={
+					!props.isVertical && props.albumCoverRef ? "center" : "top"
+				}
+				alignPosition={
+					!props.isVertical && props.albumCoverRef ? alignPosition : 0.1
+				}
+				playing={playStatus === PlayState.Playing}
+				currentTime={currentTime}
+				enableBlur={lyricBlurEffect}
+				enableSpring={lyricSpringEffect}
+				enableScale={lyricScaleEffect}
+				hidePassedLines={lyricHidePassed}
+				lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
+				ref={playerRef}
+				onLyricLineClick={(line) => {
+					line.preventDefault();
+					line.stopPropagation();
+					line.stopImmediatePropagation();
+					setCurrentTime(line.line.getLine().startTime);
+					playerRef.current?.lyricPlayer?.resetScroll();
+					playerRef.current?.lyricPlayer?.calcLayout();
+				}}
+				onLyricLineContextMenu={(line) => {
+					line.preventDefault();
+					line.stopPropagation();
+					line.stopImmediatePropagation();
+					setRightClickedLyric(line.line.getLine());
+				}}
+				bottomLine={
+					lyricLines.state === "hasData" ? (
+						<div className="amll-contributors">
+							<div>创作者：{artists.map((v) => v.name).join("、")}</div>
+							{usingLyricSource.state === "hasData" &&
+							usingLyricSource.data.type === "builtin:amll-ttml-db" &&
+							showAMLLTTMLDBTip ? (
+								<div className="ttml-db-tip">
+									{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
+									<a
+										href="javascript:void(0);"
+										onClick={() => {
+											betterncm.ncm.openUrl(
+												"https://github.com/Steve-xmh/amll-ttml-db",
+											);
+										}}
+										title="点击可以一起贡献更加出色的 TTML 歌词哦！"
+									>
+										本歌词由 AMLL TTML 歌词数据库强力驱动
+									</a>
+								</div>
+							) : null}
+						</div>
+					) : null
+				}
+			/>
+			{lyricLines.state === "loading" && (
+				<>
+					{amllEnvironment === AMLLEnvironment.AMLLPlayer && (
+						<div className="amll-lyric-player-wrapper load-status">
+							<div>等待连接中</div>
+						</div>
+					)}
+					{amllEnvironment === AMLLEnvironment.BetterNCM && (
+						<div className="amll-lyric-player-wrapper load-status">
+							<div>歌词加载中</div>
+						</div>
+					)}
+				</>
+			)}
+			{lyricLines.state === "hasError" && (
+				<div className="amll-lyric-player-wrapper load-status">
+					<div>歌词加载失败或歌词不存在</div>
+					<div>可前往设置页 - 歌词源设置下查询搜索日志分析原因</div>
+				</div>
+			)}
+		</>
+	);
 };

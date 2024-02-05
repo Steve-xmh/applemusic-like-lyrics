@@ -5,12 +5,12 @@ import { log, warn } from "../../utils/logger";
 import { type WritableAtom, atom } from "jotai";
 import { Loadable } from "jotai/vanilla/utils/loadable";
 
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 type AMLLStorage = Map<string, any>;
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 async function loadConfig(): Promise<Map<string, any>> {
 	try {
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		let storeValue: any;
 		if ("betterncm" in window) {
 			const configPath = normalizePath(
@@ -18,8 +18,8 @@ async function loadConfig(): Promise<Map<string, any>> {
 			);
 			storeValue = JSON.parse(await betterncm.fs.readFileText(configPath));
 		} else {
-			// rome-ignore lint/style/noNonNullAssertion: <explanation>
-			// rome-ignore lint/suspicious/noExtraNonNullAssertion: <explanation>
+			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+			// biome-ignore lint/suspicious/noExtraNonNullAssertion: <explanation>
 			storeValue = JSON.parse(localStorage.getItem("amll-config")!!);
 		}
 		return new Map(Object.entries(storeValue));
@@ -29,10 +29,10 @@ async function loadConfig(): Promise<Map<string, any>> {
 	return new Map();
 }
 
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const saveConfig = debounce(async (config: Map<string, any>) => {
 	try {
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		const storeValue: any = {};
 		config.forEach((v, k) => {
 			storeValue[k] = v;
@@ -120,11 +120,10 @@ function atomWithConfigInner<Value>(
 				state: "hasData",
 				data: data,
 			} as Loadable<Value>;
-		} else {
-			return {
-				state: "loading",
-			} as Loadable<Value>;
 		}
+		return {
+			state: "loading",
+		} as Loadable<Value>;
 	});
 	if ("loadable" in info && info.loadable) {
 		const derived = atom(
@@ -134,21 +133,20 @@ function atomWithConfigInner<Value>(
 			},
 		);
 		return derived;
-	} else {
-		const derived = atom(
-			(get) => {
-				const loadableValue = get(load);
-				if (loadableValue.state === "hasData") {
-					return loadableValue.data;
-				}
-				return info.default;
-			},
-			(_get, set, update: Value) => {
-				set(orig, update);
-			},
-		);
-		return derived;
 	}
+	const derived = atom(
+		(get) => {
+			const loadableValue = get(load);
+			if (loadableValue.state === "hasData") {
+				return loadableValue.data;
+			}
+			return info.default;
+		},
+		(_get, set, update: Value) => {
+			set(orig, update);
+		},
+	);
+	return derived;
 }
 
 export function atomWithConfig<Value>(

@@ -18,7 +18,7 @@ import {
 	playStatusAtom,
 } from "../../music-context/wrapper";
 import { lyricLinesAtom } from "../../lyric/provider";
-import { stringifyTTML } from "@applemusic-like-lyrics/ttml";
+import { exportTTML } from "@applemusic-like-lyrics/ttml";
 
 const DebugValue: FC<{
 	label: string;
@@ -41,11 +41,36 @@ const DebugValue: FC<{
 
 const TTMLDebugValue: FC = () => {
 	const lyricLines = useAtomValue(lyricLinesAtom);
+	const musicId = useAtomValue(musicIdAtom);
+	const musicName = useAtomValue(musicNameAtom);
+	const musicArtists = useAtomValue(musicArtistsAtom);
 	return (
 		<>
 			<div>TTML 歌词数据</div>
 			<div>
-				{lyricLines.state === "hasData" ? stringifyTTML(lyricLines.data) : null}
+				{lyricLines.state === "hasData"
+					? exportTTML({
+							lyricLines: lyricLines.data,
+							metadata: [
+								{
+									key: "ncmMusicId",
+									value: [`${musicId}`],
+								},
+								{
+									key: "musicName",
+									value: [`${musicName}`],
+								},
+								{
+									key: "artists",
+									value: musicArtists.map((v) => v.name),
+								},
+								{
+									key: "album",
+									value: musicArtists.map((v) => v.name),
+								},
+							],
+					  })
+					: null}
 			</div>
 		</>
 	);

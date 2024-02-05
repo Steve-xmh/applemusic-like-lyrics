@@ -1,14 +1,14 @@
 declare module "betterncm-api/utils" {
 	export namespace utils {
-		function waitForElement<K extends keyof HTMLElementTagNameMap,>(
+		function waitForElement<K extends keyof HTMLElementTagNameMap>(
 			selector: K,
 			interval?: number,
 		): Promise<HTMLElementTagNameMap[K] | null>;
-		function waitForElement<K extends keyof SVGElementTagNameMap,>(
+		function waitForElement<K extends keyof SVGElementTagNameMap>(
 			selector: K,
 			interval?: number,
 		): Promise<SVGElementTagNameMap[K] | null>;
-		function waitForElement<E extends Element = Element,>(
+		function waitForElement<E extends Element = Element>(
 			selector: string,
 			interval?: number,
 		): Promise<E | null>;
@@ -42,7 +42,7 @@ declare module "betterncm-api/utils" {
 		 */
 		function dom(
 			tag: string,
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			settings: any,
 			...children: HTMLElement[]
 		): HTMLElement;
@@ -227,7 +227,7 @@ declare module "betterncm-api/app" {
 		 * @returns 当前主题是否为亮色主题
 		 */
 
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		function isLightTheme(): Promise<any>;
 		/**
 		 * 获取执行成功的 Hijack 日志
@@ -249,42 +249,42 @@ declare module "betterncm-api/ncm" {
 		function getNCMBuild(): number;
 		function searchApiFunction(
 			nameOrFinder: string | ((func: Function) => boolean),
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			root?: any,
 			currentPath?: string[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			prevObjects?: any[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			result?: [Function, any, string[]][],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		): [Function, any, string[]][];
 		function searchForData(
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			finder: (func: any) => boolean,
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			root?: any,
 			currentPath?: string[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			prevObjects?: any[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			result?: [any, any, string[]][],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		): [any, any, string[]][];
 		function findApiFunction(
 			nameOrFinder: string | ((func: Function) => boolean),
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			root?: any,
 			currentPath?: string[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 			prevObjects?: any[],
-			// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+			// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		): [Function, any, string[]] | null;
 		/**
 		 * 获取当前正在播放的歌曲的信息，包括歌曲信息，来源，当前播放状态等
 		 * @todo 补全返回值类型
 		 * @returns 当前歌曲的播放信息
 		 */
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		function getPlayingSong(): any;
 		/**
 		 * 获取当前正在播放的歌曲的简要信息
@@ -400,7 +400,7 @@ declare module "plugin" {
 		finished: boolean;
 		constructor(mainPlugin: NCMPlugin, filePath: string);
 		onLoad(fn: (selfPlugin: NCMPlugin, evt: CustomEvent) => void): void;
-		// rome-ignore lint/suspicious/noExplicitAny: <explanation>
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		onConfig(fn: (toolsBox: any) => HTMLElement): void;
 		onAllPluginsLoaded(
 			fn: (

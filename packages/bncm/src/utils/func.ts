@@ -1,12 +1,12 @@
 let cachedFunctionMap: Map<string, Function> = new Map();
 
-// rome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
-export function callCachedSearchFunction<F extends (...args: any[]) => any,>(
+// biome-ignore lint/suspicious/noExplicitAny: 函数类型可随意
+export function callCachedSearchFunction<F extends (...args: any[]) => any>(
 	searchFunctionName:
 		| string
 		| ((func: Function, funcPath: string[]) => boolean),
 	args: Parameters<F>,
-	// rome-ignore lint/suspicious/noExplicitAny: 根对象可以是任意的
+	// biome-ignore lint/suspicious/noExplicitAny: 根对象可以是任意的
 	root: any = window,
 	currentPath = ["window"],
 ): ReturnType<F> {
@@ -38,15 +38,15 @@ function* getKeys(obj: any) {
 
 export function searchApiFunction(
 	nameOrFinder: string | ((func: Function, funcPath: string[]) => boolean),
-	// rome-ignore lint/suspicious/noExplicitAny: 根对象可以是任意的
+	// biome-ignore lint/suspicious/noExplicitAny: 根对象可以是任意的
 	root: any = window,
 	currentPath = ["window"],
-	// rome-ignore lint/suspicious/noExplicitAny: 已检索对象可以是任意的
+	// biome-ignore lint/suspicious/noExplicitAny: 已检索对象可以是任意的
 	prevObjects: any[] = [],
-	// rome-ignore lint/suspicious/noExplicitAny: 返回该函数的携带对象，方便做 bind 绑定
+	// biome-ignore lint/suspicious/noExplicitAny: 返回该函数的携带对象，方便做 bind 绑定
 	result: [Function, any, string[]][] = [],
 	traveledObjects: Set<any> = new Set(),
-	// rome-ignore lint/suspicious/noExplicitAny: 返回该函数的携带对象，方便做 bind 绑定
+	// biome-ignore lint/suspicious/noExplicitAny: 返回该函数的携带对象，方便做 bind 绑定
 ): [Function, any, string[]][] {
 	if (root === undefined || root === null) {
 		return result;

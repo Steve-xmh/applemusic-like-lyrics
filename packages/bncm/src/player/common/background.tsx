@@ -64,11 +64,14 @@ export const Background: FC = () => {
 			const maxValue = Math.max(targetMaxValue * 0.01 + 1000 * 0.99, 1000);
 
 			const value =
-				(Math.pow(
-					Math.max((Math.sqrt(fftData[0] + fftData[1] + fftData[2]) / maxValue) * 1.5 - 0.2, 0.0) * 4.0 +
-					1.0,
-					1.2,
-				) -
+				((Math.max(
+					(Math.sqrt(fftData[0] + fftData[1] + fftData[2]) / maxValue) * 1.5 -
+						0.2,
+					0.0,
+				) *
+					4.0 +
+					1.0) **
+					1.2 -
 					1.0) *
 				1.0;
 			setLowFreqVolume(curValue);
@@ -130,8 +133,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-									? undefined
-									: false
+								  ? undefined
+								  : false
 						}
 						flowSpeed={flowSpeed}
 						renderer={

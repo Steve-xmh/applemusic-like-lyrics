@@ -25,6 +25,7 @@ __metadata:
     "@applemusic-like-lyrics/react": "npm:*"
     "@applemusic-like-lyrics/ttml": "npm:*"
     "@applemusic-like-lyrics/ws-protocol": "npm:*"
+    "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -58,7 +59,6 @@ __metadata:
     react-slider: "npm:^2.0.6"
     react-sortablejs: "npm:^6.1.4"
     react-use: "npm:^17.4.0"
-    rome: "npm:^12.1.3"
     sass: "npm:^1.69.3"
     semver: "npm:^7.5.4"
     sortablejs: "npm:^1.15.0"
@@ -80,9 +80,10 @@ __metadata:
   resolution: "@applemusic-like-lyrics/core@workspace:packages/core"
   dependencies:
     "@applemusic-like-lyrics/lyric": "npm:^0.0.2"
+    "@applemusic-like-lyrics/ttml": "workspace:^"
+    "@biomejs/biome": "npm:1.5.3"
     "@types/stats.js": "npm:^0.17.0"
     lil-gui: "npm:^0.18.2"
-    rome: "npm:^12.1.3"
     stats.js: "npm:^0.17.0"
     typedoc: "npm:^0.25.2"
     typedoc-plugin-markdown: "npm:^3.16.0"
@@ -155,6 +156,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:
     "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -167,7 +169,6 @@ __metadata:
     jss-preset-default: "npm:^10.10.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    rome: "npm:^12.1.3"
     typedoc: "npm:^0.25.2"
     typedoc-plugin-markdown: "npm:^3.16.0"
     typescript: "npm:^5.2.2"
@@ -179,16 +180,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/ttml@npm:*, @applemusic-like-lyrics/ttml@workspace:packages/ttml":
+"@applemusic-like-lyrics/ttml@npm:*, @applemusic-like-lyrics/ttml@workspace:^, @applemusic-like-lyrics/ttml@workspace:packages/ttml":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/ttml@workspace:packages/ttml"
   dependencies:
-    rome: "npm:^12.1.3"
+    "@biomejs/biome": "npm:1.5.3"
     typescript: "npm:^5.2.2"
     vite: "npm:^4.4.11"
     vite-plugin-dts: "npm:^3.6.0"
-  peerDependencies:
-    "@applemusic-like-lyrics/core": ^0.0.15
   languageName: unknown
   linkType: soft
 
@@ -197,6 +196,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/vue@workspace:packages/vue"
   dependencies:
     "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -207,7 +207,6 @@ __metadata:
     "@vue/tsconfig": "npm:^0.4.0"
     jss: "npm:^10.10.0"
     jss-preset-default: "npm:^10.10.0"
-    rome: "npm:^12.1.3"
     typedoc: "npm:^0.25.2"
     typedoc-plugin-markdown: "npm:^3.16.0"
     typescript: "npm:^5.2.2"
@@ -485,6 +484,97 @@ __metadata:
     "@babel/helper-validator-identifier": "npm:^7.22.20"
     to-fast-properties: "npm:^2.0.0"
   checksum: 07e70bb94d30b0231396b5e9a7726e6d9227a0a62e0a6830c0bd3232f33b024092e3d5a7d1b096a65bbf2bb43a9ab4c721bf618e115bfbb87b454fa060f88cbf
+  languageName: node
+  linkType: hard
+
+"@biomejs/biome@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/biome@npm:1.5.3"
+  dependencies:
+    "@biomejs/cli-darwin-arm64": "npm:1.5.3"
+    "@biomejs/cli-darwin-x64": "npm:1.5.3"
+    "@biomejs/cli-linux-arm64": "npm:1.5.3"
+    "@biomejs/cli-linux-arm64-musl": "npm:1.5.3"
+    "@biomejs/cli-linux-x64": "npm:1.5.3"
+    "@biomejs/cli-linux-x64-musl": "npm:1.5.3"
+    "@biomejs/cli-win32-arm64": "npm:1.5.3"
+    "@biomejs/cli-win32-x64": "npm:1.5.3"
+  dependenciesMeta:
+    "@biomejs/cli-darwin-arm64":
+      optional: true
+    "@biomejs/cli-darwin-x64":
+      optional: true
+    "@biomejs/cli-linux-arm64":
+      optional: true
+    "@biomejs/cli-linux-arm64-musl":
+      optional: true
+    "@biomejs/cli-linux-x64":
+      optional: true
+    "@biomejs/cli-linux-x64-musl":
+      optional: true
+    "@biomejs/cli-win32-arm64":
+      optional: true
+    "@biomejs/cli-win32-x64":
+      optional: true
+  bin:
+    biome: bin/biome
+  checksum: 1bcdcc3a34de0871d91ecf37eae67f71847f3578723001f81616b1fd1d694d584accce37cf582f07aef3b920b47c32716e7244b7f67f52926c7c8526bc7cd5d9
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-darwin-arm64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-darwin-arm64@npm:1.5.3"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-darwin-x64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-darwin-x64@npm:1.5.3"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-linux-arm64-musl@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:1.5.3"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-linux-arm64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-linux-arm64@npm:1.5.3"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-linux-x64-musl@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-linux-x64-musl@npm:1.5.3"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-linux-x64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-linux-x64@npm:1.5.3"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-win32-arm64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-win32-arm64@npm:1.5.3"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@biomejs/cli-win32-x64@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@biomejs/cli-win32-x64@npm:1.5.3"
+  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -1686,48 +1776,6 @@ __metadata:
     rollup:
       optional: true
   checksum: abb15eaec5b36f159ec351b48578401bedcefdfa371d24a914cfdbb1e27d0ebfbf895299ec18ccc343d247e71f2502cba21202bc1362d7ef27d5ded699e5c2b2
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-darwin-arm64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-darwin-arm64@npm:12.1.3"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-darwin-x64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-darwin-x64@npm:12.1.3"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-linux-arm64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-linux-arm64@npm:12.1.3"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-linux-x64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-linux-x64@npm:12.1.3"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-win32-arm64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-win32-arm64@npm:12.1.3"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@rometools/cli-win32-x64@npm:12.1.3":
-  version: 12.1.3
-  resolution: "@rometools/cli-win32-x64@npm:12.1.3"
-  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -2971,6 +3019,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "applemusic-like-lyrics@workspace:."
   dependencies:
+    "@biomejs/biome": "npm:1.5.3"
     lerna: "npm:^7.3.1"
     vite-plugin-glsl: "npm:^1.2.1"
   languageName: unknown
@@ -9345,6 +9394,7 @@ __metadata:
     "@applemusic-like-lyrics/lyric": "npm:*"
     "@applemusic-like-lyrics/react": "npm:*"
     "@applemusic-like-lyrics/ws-protocol": "npm:*"
+    "@biomejs/biome": "npm:1.5.3"
     "@tauri-apps/api": "npm:^1.4.0"
     "@tauri-apps/cli": "npm:^1.4.0"
     "@types/react": "npm:^18.2.15"
@@ -9353,7 +9403,6 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-error-boundary: "npm:^4.0.11"
-    rome: "npm:^12.1.3"
     sass: "npm:^1.69.3"
     typescript: "npm:^5.2.2"
     vite: "npm:^4.4.11"
@@ -10102,35 +10151,6 @@ __metadata:
   bin:
     rollup: dist/bin/rollup
   checksum: 9e39d54e23731a4c4067e9c02910cdf7479a0f9a7584796e2dc6efaa34bb1e5e015c062c87d1e64d96038baca76cefd47681ff22604fae5827147f54123dc6d0
-  languageName: node
-  linkType: hard
-
-"rome@npm:^12.1.3":
-  version: 12.1.3
-  resolution: "rome@npm:12.1.3"
-  dependencies:
-    "@rometools/cli-darwin-arm64": "npm:12.1.3"
-    "@rometools/cli-darwin-x64": "npm:12.1.3"
-    "@rometools/cli-linux-arm64": "npm:12.1.3"
-    "@rometools/cli-linux-x64": "npm:12.1.3"
-    "@rometools/cli-win32-arm64": "npm:12.1.3"
-    "@rometools/cli-win32-x64": "npm:12.1.3"
-  dependenciesMeta:
-    "@rometools/cli-darwin-arm64":
-      optional: true
-    "@rometools/cli-darwin-x64":
-      optional: true
-    "@rometools/cli-linux-arm64":
-      optional: true
-    "@rometools/cli-linux-x64":
-      optional: true
-    "@rometools/cli-win32-arm64":
-      optional: true
-    "@rometools/cli-win32-x64":
-      optional: true
-  bin:
-    rome: bin/rome
-  checksum: a0021342ea339279aeed0111997144e2b703451b9a73b3bd21150408eb1c2e0563e8f59ea2f2792b261c9fe4f97f269759a9c66fc2cab87f4ffe5fb391120f77
   languageName: node
   linkType: hard
 

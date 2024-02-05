@@ -29,6 +29,10 @@
           "@applemusic-like-lyrics/react/*": ["../react/src/*"],
           "@applemusic-like-lyrics/bncm/*": ["../bncm/src/*"],
           "@applemusic-like-lyrics/ttml/*": ["../ttml/src/*"],
+          "@applemusic-like-lyrics/core": ["../core/src"],
+          "@applemusic-like-lyrics/react": ["../react/src"],
+          "@applemusic-like-lyrics/bncm": ["../bncm/src"],
+          "@applemusic-like-lyrics/ttml": ["../ttml/src"],
         }
     }
 }

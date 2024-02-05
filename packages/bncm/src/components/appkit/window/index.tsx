@@ -19,7 +19,7 @@ export const SidebarItem: FC<
 > = (props) => {
 	return (
 		<div className={`sidebar-item${props.selected ? " selected" : ""}`}>
-			{/* rome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 			<div onClick={props.onClick}>{props.children}</div>
 		</div>
 	);
