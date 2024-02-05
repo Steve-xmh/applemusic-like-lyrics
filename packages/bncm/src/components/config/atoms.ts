@@ -158,6 +158,12 @@ export const showTutoialAtom = atomWithConfig({
 	loadable: true,
 });
 
+export const hideCursorWhenHoveringCoverAtom = atomWithConfig({
+	key: "hide-cursor-when-hovering-cover",
+	default: false,
+	desc: "当光标悬浮在封面上时隐藏指针",
+});
+
 export const keepBuiltinPlayerWhenConnectedAtom = atomWithConfig({
 	key: "keep-builtin-player-when-connected",
 	default: false,

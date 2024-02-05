@@ -4,6 +4,7 @@ import { useSetAtom, useAtomValue } from "jotai";
 import {
 	disableMixBlendModeAtom,
 	fontColorAtom,
+	hideCursorWhenHoveringCoverAtom,
 	primaryColorAtom,
 	showAlbumImageAtom,
 	showControlThumbAtom,
@@ -17,6 +18,7 @@ import {
 	loadableMusicOverrideDataAtom,
 } from "../../music-context/wrapper";
 import { ControlThumb } from "../common/control-thumb";
+import classNames from "classnames";
 
 export const LyricPlayerVertical: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -28,6 +30,9 @@ export const LyricPlayerVertical: FC = () => {
 	const setMenuOpened = useSetAtom(topbarMenuOpenedAtom);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const albumCoverRef = useRef<HTMLDivElement>(null);
+	const hideCursorWhenHoveringCover = useAtomValue(
+		hideCursorWhenHoveringCoverAtom,
+	);
 	return (
 		<div
 			className="lyric-player-vertical"
@@ -56,7 +61,9 @@ export const LyricPlayerVertical: FC = () => {
 				(loadableMusicOverrideData.state === "hasData" &&
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
-						className="amll-cover-image amll-cover-image-video"
+						className={classNames("amll-cover-image amll-cover-image-video", {
+							"hide-cursor": hideCursorWhenHoveringCover,
+						})}
 						ref={albumCoverRef}
 					>
 						<video
@@ -76,7 +83,9 @@ export const LyricPlayerVertical: FC = () => {
 					</div>
 				) : (
 					<div
-						className="amll-cover-image"
+						className={classNames("amll-cover-image", {
+							"hide-cursor": hideCursorWhenHoveringCover,
+						})}
 						style={{
 							backgroundImage: `url(${musicCoverUrl})`,
 							imageRendering: "auto",

@@ -599,7 +599,10 @@ export class EplorRenderer extends BaseRenderer {
 			this.renderSize[0],
 			this.renderSize[1],
 		);
-		this.mainProgram.setUniform1f("lIIIlllllIllIl", this.hasLyric ? tickTime / 1000 : 0);
+		this.mainProgram.setUniform1f(
+			"lIIIlllllIllIl",
+			this.hasLyric ? tickTime / 1000 : 0,
+		);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
 			"IIIlllIlIIllll",

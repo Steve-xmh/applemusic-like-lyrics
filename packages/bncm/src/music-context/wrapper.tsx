@@ -45,18 +45,16 @@ export const displayMusicArtistsAtom = atom((get) => {
 					},
 			  ] as Artist[])
 			: get(musicArtistsAtom);
-	} else {
-		return get(musicArtistsAtom);
 	}
+	return get(musicArtistsAtom);
 });
 export const musicCoverAtom = atom("");
 export const displayMusicCoverAtom = atom((get) => {
 	const overrideData = get(loadableMusicOverrideDataAtom);
 	if (overrideData.state === "hasData") {
 		return overrideData.data.musicCoverUrl || get(musicCoverAtom);
-	} else {
-		return get(musicCoverAtom);
 	}
+	return get(musicCoverAtom);
 });
 
 export const musicAlbumIdAtom = atom("0");

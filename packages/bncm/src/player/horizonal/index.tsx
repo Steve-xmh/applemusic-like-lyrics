@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import { useEffect, useRef } from "react";
-import { closeLyricPage } from "../../injector";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
 	displayMusicCoverAtom,
@@ -11,6 +10,7 @@ import "./index.sass";
 import {
 	disableMixBlendModeAtom,
 	fontColorAtom,
+	hideCursorWhenHoveringCoverAtom,
 	primaryColorAtom,
 	showAlbumImageAtom,
 	showControlThumbAtom,
@@ -38,6 +38,9 @@ export const LyricPlayerHorizonal: FC = () => {
 	const albumCoverRef = useRef<HTMLDivElement>(null);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
+	const hideCursorWhenHoveringCover = useAtomValue(
+		hideCursorWhenHoveringCoverAtom,
+	);
 
 	useEffect(() => {
 		if (showStats) {
@@ -98,7 +101,7 @@ export const LyricPlayerHorizonal: FC = () => {
 			{showControlThumb ? <ControlThumb /> : <div />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-					loadableMusicOverrideData.data.musicCoverIsVideo ? (
+				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						style={{
 							boxShadow:
@@ -111,7 +114,9 @@ export const LyricPlayerHorizonal: FC = () => {
 									? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)"
 									: "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)",
 						}}
-						className="amll-cover-image amll-cover-image-video"
+						className={classNames("amll-cover-image amll-cover-image-video", {
+							"hide-cursor": hideCursorWhenHoveringCover,
+						})}
 						ref={albumCoverRef}
 					>
 						<video
@@ -144,7 +149,9 @@ export const LyricPlayerHorizonal: FC = () => {
 									? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)"
 									: "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)",
 						}}
-						className="amll-cover-image"
+						className={classNames("amll-cover-image", {
+							"hide-cursor": hideCursorWhenHoveringCover,
+						})}
 						ref={albumCoverRef}
 					/>
 				))}
@@ -161,7 +168,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => { }, []);
+					channel.call("winhelper.dragWindow", () => {}, []);
 				}}
 			/>
 		</div>

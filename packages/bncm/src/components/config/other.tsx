@@ -4,6 +4,7 @@ import { SwitchConfigComponent, SwitchLoadableConfigComponent } from "./common";
 import {
 	autoOpenLyricPageAtom,
 	disableMixBlendModeAtom,
+	hideCursorWhenHoveringCoverAtom,
 	keepBuiltinPlayerWhenConnectedAtom,
 	pauseWhenMusicLoadedAtom,
 	showBackgroundFFTLowFreqAtom,
@@ -36,6 +37,12 @@ export const OtherConfig: FC = () => {
 				<SwitchLoadableConfigComponent
 					atom={autoOpenLyricPageAtom}
 					label="启动时自动开启歌词页面"
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={hideCursorWhenHoveringCoverAtom}
+					label="当光标悬浮在封面上时隐藏指针"
+					description="虽然有点奇奇怪怪"
 				/>
 				<GroupBoxDevider />
 				<SwitchConfigComponent
