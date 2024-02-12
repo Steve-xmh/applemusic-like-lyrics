@@ -441,7 +441,7 @@ export class EplorRenderer extends BaseRenderer {
 	private ampTransition = 0;
 	private playTime = 0;
 	private frameTime = 0;
-	private IllIlllIlIIlllI = 0;
+	private IllIlllIlIIlllI: number[] = [-0.1, 0.0];
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
@@ -609,7 +609,7 @@ export class EplorRenderer extends BaseRenderer {
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
-		this.mainProgram.setUniform1i("IllIlllIlIIlllI", this.IllIlllIlIIlllI);
+		this.mainProgram.setUniform2f("IllIlllIlIIlllI", this.IllIlllIlIIlllI[0], this.IllIlllIlIIlllI[1]);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
@@ -806,7 +806,17 @@ export class EplorRenderer extends BaseRenderer {
 		this.sprites.push(sprite);
 		this.playTime = Math.random() * 100000;
 		this.lastFrameTime = performance.now();
-		this.IllIlllIlIIlllI = Math.random() * 10000;
+		console.info(Math.random() * 10000);
+		let r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
+		if (r == 0) {
+			this.IllIlllIlIIlllI = [-1.3, -.9];
+			// this.IllIlllIlIIlllI = [-1.1, -.9];
+		} else if (r == 1) {
+			// this.IllIlllIlIIlllI = [-0.3, -0.2];
+			this.IllIlllIlIIlllI = [-1.1, -.9];
+		} else {
+			this.IllIlllIlIIlllI = [-1.3, -.9];
+		}
 		this.requestTick();
 	}
 
