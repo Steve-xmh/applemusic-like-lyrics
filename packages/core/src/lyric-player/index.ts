@@ -794,7 +794,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
 				targetOpacity,
-				blurLevel,
+				blurLevel * 1.5,
 				force,
 				delay,
 			);
