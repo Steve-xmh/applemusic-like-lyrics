@@ -27,7 +27,7 @@ const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
 	music: new URL(location.href).searchParams.get("music") || "",
 	album: new URL(location.href).searchParams.get("album") || "noise.png",
-	enableSpring: true,
+	enableSpring: false,
 	bgFPS: 30,
 	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
 	bgScale: 0.5,
@@ -41,7 +41,7 @@ const debugValues = {
 		this.playing = true;
 		const startTime = Date.now();
 		const baseTime = this.currentTime * 1000;
-		while (this.playing && this.currentTime < 30) {
+		while (this.playing && this.currentTime < 300) {
 			const time = Date.now() - startTime;
 			this.currentTime = baseTime + time / 1000;
 			lyricPlayer.setCurrentTime(time);
@@ -294,11 +294,6 @@ async function loadLyric() {
 	}
 }
 
-const testLyric = `
-[0]Test (1000,1000)Syllable (2000,1000)Words (3000,1000)
-[0]Test(5000,1000)lonnnnnnnnnnnnnnng(6000,2000) syllable(8000,1000)words (9000,1000)
-`;
-
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
 	audio.style.display = "none";
@@ -309,8 +304,27 @@ const testLyric = `
 		player.appendChild(window.globalBackground.getElement());
 		player.appendChild(lyricPlayer.getElement());
 	}
+	if (!debugValues.enableSpring) {
+		lyricPlayer.setEnableSpring(false);
+	}
 	await loadLyric();
-	lyricPlayer.setLyricLines(parseLys(testLyric).map(mapLyric));
+	lyricPlayer.setLyricLines(
+		new Array(1000).fill(0).map((_, i) => ({
+			words: [
+				{
+					word: "Web Animation Spring Test " + i,
+					startTime: i * 2000,
+					endTime: i * 2000 + 2000,
+				},
+			],
+			translatedLyric: "",
+			romanLyric: "",
+			isBG: false,
+			isDuet: i % 2 === 1 && i % 4 === 1,
+			startTime: i * 2000,
+			endTime: i * 2000 + 2000,
+		})),
+	);
 	// debugValues.play();
 	debugValues.mockPlay();
 })();

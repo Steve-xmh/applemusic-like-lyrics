@@ -910,6 +910,7 @@ export class EplorRenderer extends BaseRenderer {
 		super.dispose();
 		this.vertexBuffer.dispose();
 		this.indexBuffer.dispose();
+		this.noiseTexture.dispose();
 		for (const s of this.sprites) {
 			s.dispose();
 		}
