@@ -6,25 +6,12 @@ import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
 import taaShader from "./shaders/taa.frag.glsl?raw";
+import noiseImage from "../assets/noise.png?inline";
 
 const NOISE_IMAGE_DATA = (() => {
-	const buf = [0x17, 0x43, 0x87, 0x65];
-	const result: number[] = [];
-	const SIZE = 32;
-	for (let i = 0; i < SIZE ** 2; i++) {
-		let v = buf.shift()!!;
-		v ^= buf[1] ^ (v << 1);
-		v ^= buf[2] ^ (v >> 1);
-		v ^= buf[3] ^ (v << 1);
-		buf.push(v);
-		result.push(v & 0xff);
-		result.push(v & 0xff);
-		result.push(v & 0xff);
-		result.push(0xff);
-	}
-	return new ImageData(new Uint8ClampedArray(result), SIZE, SIZE, {
-		colorSpace: "srgb",
-	});
+	const img = document.createElement("img");
+	img.src = noiseImage;
+	return img;
 })();
 
 function blurImage(imageData: ImageData, radius: number, quality: number) {
@@ -458,19 +445,21 @@ class NoiseTexture implements Disposable {
 		const tex = gl.createTexture();
 		if (!tex) throw new Error("Failed to create texture");
 		this.tex = tex;
-		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			gl.RGBA,
-			gl.UNSIGNED_BYTE,
-			NOISE_IMAGE_DATA,
-		);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		NOISE_IMAGE_DATA.decode().then(() => {
+			gl.bindTexture(gl.TEXTURE_2D, tex);
+			gl.texImage2D(
+				gl.TEXTURE_2D,
+				0,
+				gl.RGBA,
+				gl.RGBA,
+				gl.UNSIGNED_BYTE,
+				NOISE_IMAGE_DATA,
+			);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		});
 	}
 
 	active(texture: number = this.gl.TEXTURE1) {

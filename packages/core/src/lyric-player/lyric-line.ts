@@ -40,7 +40,8 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
+			(leftPos + widthInTotal) * 100
 		}%)`,
 		widthInTotal,
 		totalAspect,
@@ -157,8 +158,8 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-	? evt
-	: never;
+		? evt
+		: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -370,10 +371,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-				.getCurrentPosition()
-				.toFixed(1)}px) scale(${this.lineTransforms.scale
-					.getCurrentPosition()
-					.toFixed(4)});`;
+			.getCurrentPosition()
+			.toFixed(1)}px) scale(${this.lineTransforms.scale
+			.getCurrentPosition()
+			.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -595,8 +596,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 					return {
 						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${transX * 0.01 * amount}em,${-y * 0.05
-							}em)`,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${
+							transX * 0.01 * amount
+						}em,${-y * 0.05}em)`,
 						textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
 					};
 				});
@@ -652,9 +654,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
-					})*${w / Math.max(1, Math.abs(word.endTime - word.startTime))
-					}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
+					word.startTime
+				})*${
+					w / Math.max(1, Math.abs(word.endTime - word.startTime))
+				}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
