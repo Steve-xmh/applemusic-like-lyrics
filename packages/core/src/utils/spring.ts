@@ -1,3 +1,5 @@
+import { getVelocity } from "./derivative";
+
 /** MIT License github.com/pushkine/ */
 export interface SpringParams {
 	mass: number; // = 1.0
@@ -153,13 +155,4 @@ function solveSpring(
 				Math.E ** (t * dm)
 		);
 	};
-}
-
-function derivative(f: (x: number) => number) {
-	const h = 0.001;
-	return (x: number) => (f(x + h) - f(x - h)) / (2 * h);
-}
-
-function getVelocity(f: (t: seconds) => number): (t: seconds) => number {
-	return derivative(f);
 }

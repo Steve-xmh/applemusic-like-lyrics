@@ -3,6 +3,7 @@ import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
 import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
 import { Spring } from "../utils/spring";
 import bezier from "bezier-easing";
+import { WebAnimationSpring } from "../utils/wa-spring";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -180,6 +181,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(1),
 	};
+	// readonly lineWebAnimationTransforms = {
+	// 	posX: new WebAnimationSpring(this.element, "transform", (v) => `translateX(${v.toFixed(1)}px)`),
+	// 	posY: new WebAnimationSpring(this.element, "transform", (v) => `translateY(${v.toFixed(1)}px)`),
+	// 	scale: new WebAnimationSpring(this.element, "transform", (v) => `scale(${v.toFixed(4)})`, 1),
+	// };
 
 	constructor(
 		private lyricPlayer: LyricPlayer,
@@ -359,7 +365,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			return;
 		}
-		let style = `transform:translate(${this.lineTransforms.posX
+		let style = "";
+		// if (this.lyricPlayer.getEnableSpring()) {
+		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
 				.getCurrentPosition()
@@ -690,6 +698,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				this.element.classList.add(
 					this.lyricPlayer.style.classes.tmpDisableTransition,
 				);
+			// this.lineWebAnimationTransforms.posX.setTargetPosition(left);
+			// this.lineWebAnimationTransforms.posY.setTargetPosition(top);
+			// this.lineWebAnimationTransforms.scale.setTargetPosition(scale);
 			this.lineTransforms.posX.setPosition(left);
 			this.lineTransforms.posY.setPosition(top);
 			this.lineTransforms.scale.setPosition(scale);
@@ -708,6 +719,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					);
 				});
 		} else {
+			// this.lineWebAnimationTransforms.posX.stop();
+			// this.lineWebAnimationTransforms.posY.stop();
+			// this.lineWebAnimationTransforms.scale.stop();
 			this.lineTransforms.posX.setTargetPosition(left, delay);
 			this.lineTransforms.posY.setTargetPosition(top, delay);
 			this.lineTransforms.scale.setTargetPosition(scale);
