@@ -83,6 +83,7 @@ __metadata:
     "@applemusic-like-lyrics/ttml": "workspace:^"
     "@biomejs/biome": "npm:1.5.3"
     "@types/stats.js": "npm:^0.17.0"
+    bezier-easing: "npm:^2.1.0"
     lil-gui: "npm:^0.18.2"
     stats.js: "npm:^0.17.0"
     typedoc: "npm:^0.25.2"
@@ -3152,6 +3153,13 @@ __metadata:
   version: 2.2.3
   resolution: "before-after-hook@npm:2.2.3"
   checksum: e676f769dbc4abcf4b3317db2fd2badb4a92c0710e0a7da12cf14b59c3482d4febf835ad7de7874499060fd4e13adf0191628e504728b3c5bb4ec7a878c09940
+  languageName: node
+  linkType: hard
+
+"bezier-easing@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "bezier-easing@npm:2.1.0"
+  checksum: 086dfd042ccf91c3a9de811b635381aa6580e9f83d1951ed4ce4d4007645d8f3cebd491cb6259719ce9320df213316b99dd8e39e78997944b1c252a1d4b424b5
   languageName: node
   linkType: hard
 

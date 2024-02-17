@@ -56,5 +56,8 @@
     "@pixi/sprite": "*",
     "jss": "*",
     "jss-preset-default": "*"
+  },
+  "dependencies": {
+    "bezier-easing": "^2.1.0"
   }
 }

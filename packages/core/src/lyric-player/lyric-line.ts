@@ -1,6 +1,12 @@
 import { LyricPlayer } from ".";
 import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
+import {
+	createMatrix4,
+	matrix4ToCSS,
+	scaleMatrix4,
+} from "../utils/matrix";
 import { Spring } from "../utils/spring";
+import bezier from "bezier-easing";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -13,9 +19,23 @@ interface RealWord extends LyricWord {
 	shouldEmphasize: boolean;
 }
 
+const ANIMATION_FRAME_QUANTITY = 64;
+
+const bezIn = bezier(0.25, 0, 0.25, 1);
+const bezOut = bezier(0.5, 0, 0.5, 1);
+const norNum = (min: number, max: number) => (x: number) =>
+	Math.min(1, Math.max(0, (x - min) / (max - min)));
+const EMP_EASING_MID = 0.5;
+const beginNum = norNum(0, EMP_EASING_MID);
+const endNum = norNum(EMP_EASING_MID, 1);
+
+function empEasing(x: number): number {
+	return x < EMP_EASING_MID ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x));
+}
+
 function generateFadeGradient(
 	width: number,
-	padding: number = 0,
+	padding = 0,
 	bright = "rgba(0,0,0,0.85)",
 	dark = "rgba(0,0,0,0.5)",
 ): [string, number, number] {
@@ -23,7 +43,8 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
+			(leftPos + widthInTotal) * 100
 		}%)`,
 		widthInTotal,
 		totalAspect,
@@ -31,18 +52,56 @@ function generateFadeGradient(
 }
 
 // 将输入的单词重新分组，之间没有空格的单词将会组合成一个单词数组
-// 例如输入：["Life", " ", "is", " a", " su", "gar"]
-// 应该返回：["Life", " ", "is", " a", [" su", "gar"]]
-function chunkLyricWords<T>(
-	words: T[],
-	wordGetter: (word: T) => string,
-): (T | T[])[] {
-	let wordChunk: string[] = [];
-	let wChunk: T[] = [];
-	const result: (T | T[])[] = [];
+// 例如输入：["Life", " ", "is", " a", " su", "gar so", "sweet"]
+// 应该返回：["Life", " ", "is", " a", [" su", "gar"], "so", "sweet"]
+function chunkAndSplitLyricWords(
+	words: LyricWord[],
+): (LyricWord | LyricWord[])[] {
+	const resplitedWords: LyricWord[] = [];
 
 	for (const w of words) {
-		const word = wordGetter(w);
+		const realLength = w.word.replace(/\s/g, "").length;
+		const splited = w.word.split(" ").filter((v) => v.trim().length > 0);
+		if (splited.length > 1) {
+			if (w.word.startsWith(" ")) {
+				resplitedWords.push({
+					word: " ",
+					startTime: 0,
+					endTime: 0,
+				});
+			}
+			let charPos = 0;
+			for (const s of splited) {
+				const word: LyricWord = {
+					word: s,
+					startTime:
+						w.startTime + (charPos / realLength) * (w.endTime - w.startTime),
+					endTime:
+						w.startTime +
+						((charPos + s.length) / realLength) * (w.endTime - w.startTime),
+				};
+				resplitedWords.push(word);
+				resplitedWords.push({
+					word: " ",
+					startTime: 0,
+					endTime: 0,
+				});
+				charPos += s.length;
+			}
+			if (!w.word.endsWith(" ")) {
+				resplitedWords.pop();
+			}
+		} else {
+			resplitedWords.push(w);
+		}
+	}
+
+	let wordChunk: string[] = [];
+	let wChunk: LyricWord[] = [];
+	const result: (LyricWord | LyricWord[])[] = [];
+
+	for (const w of resplitedWords) {
+		const word = w.word;
 		wordChunk.push(word);
 		wChunk.push(w);
 		if (word.length > 0 && word.trim().length === 0) {
@@ -86,7 +145,8 @@ function chunkLyricWords<T>(
 export function shouldEmphasize(word: LyricWord): boolean {
 	return (
 		word.endTime - word.startTime >= 1000 &&
-		word.word.trim().length <= 7 && word.word.trim().length >= 1
+		word.word.trim().length <= 7 &&
+		word.word.trim().length >= 1
 	);
 }
 
@@ -101,8 +161,8 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-	? evt
-	: never;
+		? evt
+		: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -184,7 +244,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		if (callback) {
 			const listeners = this.listenersMap.get(type) ?? new Set();
 			if (listeners.size === 0)
-				this.element.addEventListener(type, this.onMouseEvent);
+				this.element.addEventListener(type, this.onMouseEvent, options);
 			listeners.add(callback);
 			this.listenersMap.set(type, listeners);
 		}
@@ -200,7 +260,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			if (listeners) {
 				listeners.delete(callback);
 				if (listeners.size === 0)
-					this.element.removeEventListener(type, this.onMouseEvent);
+					this.element.removeEventListener(type, this.onMouseEvent, options);
 			}
 		}
 	}
@@ -210,13 +270,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.isEnabled = true;
 		this.element.classList.add("active");
 		const main = this.element.children[0] as HTMLDivElement;
-		this.splittedWords.forEach((word) => {
-			word.elementAnimations.forEach((a) => {
+		for (const word of this.splittedWords) {
+			for (const a of word.elementAnimations) {
 				a.currentTime = 0;
 				a.playbackRate = 1;
 				a.play();
-			});
-		});
+			}
+		}
 		main.classList.add("active");
 	}
 	measureSize(): [number, number] {
@@ -244,14 +304,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.isEnabled = false;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
-		this.splittedWords.forEach((word) => {
-			word.elementAnimations.forEach((a) => {
+		for (const word of this.splittedWords) {
+			for (const a of word.elementAnimations) {
 				if (a.id === "float-word") {
 					a.playbackRate = -1;
 					a.play();
 				}
-			});
-		});
+			}
+		}
 		main.classList.remove("active");
 	}
 	setLine(line: LyricLine) {
@@ -307,10 +367,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-				.getCurrentPosition()
-				.toFixed(1)}px) scale(${this.lineTransforms.scale
-					.getCurrentPosition()
-					.toFixed(4)});`;
+			.getCurrentPosition()
+			.toFixed(1)}px) scale(${this.lineTransforms.scale
+			.getCurrentPosition()
+			.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -331,11 +391,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			roman.innerText = this.lyricLine.romanLyric;
 			return;
 		}
-		const chunkedWords = chunkLyricWords(this.lyricLine.words, (w) => w.word);
+		const chunkedWords = chunkAndSplitLyricWords(this.lyricLine.words);
 		main.innerHTML = "";
 		this.splittedWords = [];
 		for (const chunk of chunkedWords) {
-			if (chunk instanceof Array) {
+			if (Array.isArray(chunk)) {
+				// 多个没有空格的单词组合成的一个单词数组
+				if (chunk.length === 0) continue;
 				const emp = chunk
 					.map((word) => shouldEmphasize(word))
 					.reduce((a, b) => a || b, false);
@@ -348,14 +410,16 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{ word: "", startTime: Infinity, endTime: -Infinity },
 				);
+				console.log("merged", merged.word, emp);
 				const wrapperWordEl = document.createElement("span");
 				wrapperWordEl.classList.add("emphasize-wrapper");
+				const characterElements: HTMLElement[] = [];
 				for (const word of chunk) {
 					const mainWordEl = document.createElement("span");
-					const mainWordFloatAnimation = this.initFloatAnimation(
-						merged,
-						mainWordEl,
-					);
+					// const mainWordFloatAnimation = this.initFloatAnimation(
+					// 	merged,
+					// 	mainWordEl,
+					// );
 					if (emp) {
 						mainWordEl.classList.add("emphasize");
 						const charEls: HTMLSpanElement[] = [];
@@ -363,20 +427,18 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							const charEl = document.createElement("span");
 							charEl.innerText = char;
 							charEls.push(charEl);
+							characterElements.push(charEl);
 							mainWordEl.appendChild(charEl);
 						}
 						const realWord: RealWord = {
 							...word,
 							mainElement: mainWordEl,
 							subElements: charEls,
-							elementAnimations: [],
+							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
 							width: 0,
 							height: 0,
 							shouldEmphasize: emp,
 						};
-						realWord.elementAnimations.push(
-							...this.initEmphasizeAnimation(realWord),
-						);
 						this.splittedWords.push(realWord);
 					} else {
 						mainWordEl.innerText = word.word;
@@ -384,13 +446,24 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							...word,
 							mainElement: mainWordEl,
 							subElements: [],
-							elementAnimations: [mainWordFloatAnimation],
+							elementAnimations: [],
 							width: 0,
 							height: 0,
 							shouldEmphasize: emp,
 						});
 					}
 					wrapperWordEl.appendChild(mainWordEl);
+				}
+				if (emp) {
+					this.splittedWords[
+						this.splittedWords.length - 1
+					].elementAnimations.push(
+						...this.initEmphasizeAnimation(
+							characterElements,
+							merged.endTime - merged.startTime,
+							merged.startTime - this.lyricLine.startTime,
+						),
+					);
 				}
 				if (merged.word.trimStart() !== merged.word) {
 					main.appendChild(document.createTextNode(" "));
@@ -400,8 +473,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					main.appendChild(document.createTextNode(" "));
 				}
 			} else if (chunk.word.trim().length === 0) {
+				// 纯空格
 				main.appendChild(document.createTextNode(" "));
 			} else {
+				// 单个单词
 				const emp = shouldEmphasize(chunk);
 				const mainWordEl = document.createElement("span");
 				const realWord: RealWord = {
@@ -423,7 +498,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						mainWordEl.appendChild(charEl);
 					}
 					realWord.subElements = charEls;
-					realWord.elementAnimations.push(...this.initEmphasizeAnimation(realWord),);
+					const duration = Math.abs(realWord.endTime - realWord.startTime);
+					realWord.elementAnimations.push(
+						...this.initEmphasizeAnimation(
+							charEls,
+							duration,
+							realWord.startTime - this.lyricLine.startTime,
+						),
+					);
 					// realWord.elementAnimations = this.initEmphasizeAnimation(realWord);
 				} else {
 					mainWordEl.innerText = chunk.word.trim();
@@ -444,22 +526,18 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = Math.max(1000, word.endTime - word.startTime);
-		let up = 0.05;
-		if (shouldEmphasize(word) && duration < 1200) {
-			up = 0;
-		}
 		const a = wordEl.animate(
 			[
 				{
 					transform: "translateY(0px)",
 				},
 				{
-					transform: `translateY(${-up}em)`,
+					transform: "translateY(-0.05em)",
 				},
 			],
 			{
-				duration: isFinite(duration) ? duration : 0,
-				delay: isFinite(delay) ? delay : 0,
+				duration: Number.isFinite(duration) ? duration : 0,
+				delay: Number.isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
 				fill: "both",
@@ -469,110 +547,57 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		a.pause();
 		return a;
 	}
-	private initEmphasizeAnimation(word: RealWord): Animation[] {
-		const delay = word.startTime - this.lyricLine.startTime;
-		const duration = word.endTime - word.startTime;
-		return word.subElements.map((el, i, arr) => {
-			const du = Math.max(1000, word.endTime - word.startTime);
-			const de = delay + 150 + (du / 4 / arr.length) * i;
-			let amount = 0;
-			let blur = 0;
-			let slope = 0.07;
-			if (du >= 1200 && du < 2000) {
-				// amount = 1.5;
-				blur = 0.4;
-			} else if (du >= 2000 && du < 3000) {
-				// amount = 2;
-				blur = 0.5;
-			} else if (du >= 3000 && du < 4000) {
-				// amount = 3;
-				blur = 0.6;
-			} else if (du >= 4000) {
-				// amount = 3;
-				blur = 0.6;
-			}
-			// slope = du / 20000;
-			if (duration >= 1200) {
-				// amount =
-				// 	Math.min(((arr.length - i + 1) / arr.length ** 3) *
-				// 		Math.min(0.5, du / 5000) ** 2 *
-				// 		arr.length ** 2 *
-				// 		16.0, 3);
-				// blur = 0.4;
-				amount = Math.min(du / 1000, 3);
-			}
-			let glowAnimation;
-			if (duration >= 1200) {
-				glowAnimation = el.animate(
-					[
-						{
-							offset: 0,
-							textShadow: "rgba(255, 255, 255, 0) 0 0 10px",
-						},
-						{
-							offset: slope,
-							transform: `translateZ(${amount}vw) translateY(-0.05em)`,
-							textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`,
-						},
-						{
-							offset: slope + 0.1,
-							transform: `translateZ(${amount}vw) translateY(-0.05em)`,
-							textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
-						},
-						{
-							offset: 0.2,
-							textShadow: `rgba(255, 255, 255, ${blur}) 0 0 10px`,
-						},
-						{
-							offset: 0.9,
-							textShadow: `rgba(255, 255, 255, ${blur * 0.75}) 0 0 10px`
-						},
-						{
-							offset: 1,
-							transform: "translateZ(0vw)",
-							textShadow: `rgba(255, 255, 255, 0) 0 0 10px`,
-						},
-					],
-					{
-						duration: isFinite(du)
-							? du * (((i + 1) / arr.length) * 0.5 + 1.0)
-							: 0,
-						delay: isFinite(de) ? de : 0,
-						id: "glow-word",
-						iterations: 1,
-						composite: "replace",
-						easing: "cubic-bezier(.6,0,.6,1)",
-						fill: "both",
-					},
-				);
-			} else {
-				glowAnimation = el.animate(
-					[
-						{
-							transform: "translateY(0em)",
-						},
-						{
-							offset: 0.2,
-							transform: "translateY(-0.05em)",
-						},
-						{
-							offset: 1.0,
-							transform: "translateY(-0.05em)",
-						},
-					],
-					{
-						duration: isFinite(duration) ? duration : 0,
-						delay: isFinite(de) ? de : 0,
-						id: "float-word",
-						composite: "add",
-						fill: "both",
-						easing: "ease-in",
-					},
-				);
-			}
-			glowAnimation.pause();
-			return glowAnimation;
+	// 按照原 Apple Music 参考，强调效果只应用缩放、轻微左右位移和辉光效果，原主要的悬浮位移效果不变
+	// 为了避免产生锯齿抖动感，使用 matrix3d 来实现缩放和位移
+	private initEmphasizeAnimation(
+		characterElements: HTMLElement[],
+		duration: number,
+		delay: number,
+	): Animation[] {
+		const de = Math.max(0, delay);
+		const du = Math.max(1000, duration);
+
+		const result = characterElements.flatMap((el, i, arr) => {
+			const wordDe = de + (du / arr.length) * i;
+			const result: Animation[] = [];
+
+			const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+				.fill(0)
+				.map((_, i) => {
+					const x = (i + 1) / ANIMATION_FRAME_QUANTITY;
+					const y = empEasing(x);
+					const transX = Math.sin(x * Math.PI * 2);
+					const glowLevel =
+						Math.max(0, x < EMP_EASING_MID ? y / 2 : y - 0.5) * 0.25;
+
+					const mat = scaleMatrix4(createMatrix4(), 1 + y * 0.1);
+
+					return {
+						offset: x,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${transX * 0.01}em,${
+							-y * 0.005
+						}em)`,
+						textShadow: `rgba(255, 255, 255, 0.25) 0 0 ${glowLevel}em`,
+					};
+				});
+			const ani = el.animate(frames, {
+				duration: Number.isFinite(du) ? du * 1.5 : 0,
+				delay: Number.isFinite(wordDe) ? wordDe : 0,
+				id: `emphasize-word-${el.innerText}-${i}`,
+				iterations: 1,
+				composite: "replace",
+				easing: "linear",
+				fill: "both",
+			});
+			ani.onfinish = () => {
+				ani.pause();
+			};
+			ani.pause();
+			result.push(ani);
+
+			return result;
 		});
+		return result;
 	}
 	updateMaskImage() {
 		if (this._hide) {
@@ -585,9 +610,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				const wordPaddingInline = parseFloat(
-					getComputedStyle(wordEl).paddingInline,
-				);
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
 				const fadeWidth = word.height / 2;
@@ -610,9 +632,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
-					})*${w / Math.max(1, Math.abs(word.endTime - word.startTime))
-					}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
+					word.startTime
+				})*${
+					w / Math.max(1, Math.abs(word.endTime - word.startTime))
+				}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}

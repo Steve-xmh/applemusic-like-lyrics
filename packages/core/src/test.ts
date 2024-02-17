@@ -9,9 +9,16 @@ import GUI from "lil-gui";
 import { BackgroundRender, PixiRenderer, EplorRenderer } from "./bg-render";
 import Stats from "stats.js";
 import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
-import { parseTTML } from "./lyric/ttml";
+import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { SpringParams } from "./utils/spring";
-import { parseLrc } from "@applemusic-like-lyrics/lyric";
+import {
+	type LyricLine as RawLyricLine,
+	parseLrc,
+	parseYrc,
+	parseLys,
+	parseQrc,
+} from "@applemusic-like-lyrics/lyric";
+import { LyricLine } from ".";
 
 const audio = document.createElement("audio");
 audio.preload = "auto";
@@ -19,7 +26,7 @@ audio.preload = "auto";
 const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
 	music: new URL(location.href).searchParams.get("music") || "",
-	album: new URL(location.href).searchParams.get("album") || "",
+	album: new URL(location.href).searchParams.get("album") || "noise.png",
 	enableSpring: true,
 	bgFPS: 30,
 	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
@@ -29,11 +36,25 @@ const debugValues = {
 	bgStaticMode: false,
 	currentTime: 0,
 	enableBlur: true,
+	playing: false,
+	async mockPlay() {
+		this.playing = true;
+		const startTime = Date.now();
+		const baseTime = this.currentTime * 1000;
+		while (this.playing && this.currentTime < 30) {
+			const time = Date.now() - startTime;
+			this.currentTime = baseTime + time / 1000;
+			lyricPlayer.setCurrentTime(time);
+			await waitFrame();
+		}
+	},
 	play() {
+		this.playing = true;
 		audio.load();
 		audio.play();
 	},
 	pause() {
+		this.playing = false;
 		if (audio.paused) {
 			audio.play();
 		} else {
@@ -241,36 +262,47 @@ declare global {
 
 window.globalLyricPlayer = lyricPlayer;
 
+const waitFrame = (): Promise<void> =>
+	new Promise((resolve) => requestAnimationFrame(resolve));
+const mapLyric = (
+	line: RawLyricLine,
+	i: number,
+	lines: RawLyricLine[],
+): LyricLine => ({
+	words: line.words,
+	startTime: line.words[0]?.startTime ?? 0,
+	endTime: line.words[line.words.length - 1]?.startTime ?? Infinity,
+	translatedLyric: "",
+	romanLyric: "",
+	isBG: false,
+	isDuet: false,
+});
+
 async function loadLyric() {
 	const lyricFile = debugValues.lyric;
 	const content = await (await fetch(lyricFile)).text();
 	if (lyricFile.endsWith(".ttml")) {
 		lyricPlayer.setLyricLines(parseTTML(content));
 	} else if (lyricFile.endsWith(".lrc")) {
-		lyricPlayer.setLyricLines(
-			parseLrc(content).map((line, i, lines) => ({
-				words: [
-					{
-						word: line.words[0]?.word ?? "",
-						startTime: line.words[0]?.startTime ?? 0,
-						endTime: lines[i + 1]?.words?.[0]?.startTime ?? Infinity,
-					},
-				],
-				startTime: line.words[0]?.startTime ?? 0,
-				endTime: lines[i + 1]?.words?.[0]?.startTime ?? Infinity,
-				translatedLyric: "",
-				romanLyric: "",
-				isBG: false,
-				isDuet: false,
-			})),
-		);
+		lyricPlayer.setLyricLines(parseLrc(content).map(mapLyric));
+	} else if (lyricFile.endsWith(".yrc")) {
+		lyricPlayer.setLyricLines(parseYrc(content).map(mapLyric));
+	} else if (lyricFile.endsWith(".lys")) {
+		lyricPlayer.setLyricLines(parseLys(content).map(mapLyric));
+	} else if (lyricFile.endsWith(".qrc")) {
+		lyricPlayer.setLyricLines(parseQrc(content).map(mapLyric));
 	}
 }
+
+const testLyric = `
+[0]Test (1000,1000)Syllable (2000,1000)Words (3000,1000)
+[0]Test(5000,1000)lonnnnnnnnnnnnnnng(6000,2000) syllable(8000,1000)words (9000,1000)
+`;
 
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
 	audio.style.display = "none";
-	lyricPlayer.getBottomLineElement().innerHTML = "Test Bottom Line";
+	// lyricPlayer.getBottomLineElement().innerHTML = "Test Bottom Line";
 	const player = document.getElementById("player");
 	if (player) {
 		player.appendChild(audio);
@@ -278,5 +310,7 @@ async function loadLyric() {
 		player.appendChild(lyricPlayer.getElement());
 	}
 	await loadLyric();
-	debugValues.play();
+	lyricPlayer.setLyricLines(parseLys(testLyric).map(mapLyric));
+	// debugValues.play();
+	debugValues.mockPlay();
 })();

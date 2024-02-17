@@ -2,8 +2,6 @@
 precision highp float;
 
 uniform sampler2D src;
-uniform float frameTime;
-uniform vec2 renderSize;
 in vec2 f_v_coord;
 out vec4 fragColor;
 

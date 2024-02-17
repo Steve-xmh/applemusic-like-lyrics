@@ -138,24 +138,21 @@ function solveSpring(
 			if (t < 0) return from;
 			return to - (delta + t * leftover) * Math.E ** (t * angular_frequency);
 		};
-	} else {
-		const damping_frequency = Math.sqrt(
-			4.0 * mass * stiffness - damping ** 2.0,
-		);
-		const leftover =
-			(damping * delta - 2.0 * mass * velocity) / damping_frequency;
-		const dfm = (0.5 * damping_frequency) / mass;
-		const dm = -(0.5 * damping) / mass;
-		return (t: seconds) => {
-			t -= delay;
-			if (t < 0) return from;
-			return (
-				to -
-				(Math.cos(t * dfm) * delta + Math.sin(t * dfm) * leftover) *
-					Math.E ** (t * dm)
-			);
-		};
 	}
+	const damping_frequency = Math.sqrt(4.0 * mass * stiffness - damping ** 2.0);
+	const leftover =
+		(damping * delta - 2.0 * mass * velocity) / damping_frequency;
+	const dfm = (0.5 * damping_frequency) / mass;
+	const dm = -(0.5 * damping) / mass;
+	return (t: seconds) => {
+		t -= delay;
+		if (t < 0) return from;
+		return (
+			to -
+			(Math.cos(t * dfm) * delta + Math.sin(t * dfm) * leftover) *
+				Math.E ** (t * dm)
+		);
+	};
 }
 
 function derivative(f: (x: number) => number) {

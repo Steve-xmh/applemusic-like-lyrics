@@ -38,6 +38,10 @@ export class LyricLineMouseEvent extends MouseEvent {
 	}
 }
 
+export interface LyricLineMouseEventListener {
+	(evt: LyricLineMouseEvent): void;
+}
+
 /**
  * 歌词播放组件，本框架的核心组件
  *
@@ -239,11 +243,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			},
 			"& > span, span.emphasize-wrapper": {
 				whiteSpace: "pre-wrap",
-				maxLines: "1",
 				willChange: "transform,display,mask-image",
+				display: "inline-block",
 				"&.emphasize, span.emphasize": {
-					transformStyle: "preserve-3d",
-					perspective: "min(50vw, 50vh)",
 					padding: "1em",
 					margin: "-1em",
 					"& > span": {
@@ -295,8 +297,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transition: "none !important",
 		},
 	});
+	private _baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
+	public get baseFontSize() {
+		return this._baseFontSize;
+	}
+	private isPageVisible = true;
 	private onPageShow = () => {
-		this.calcLayout(true, true);
+		this.isPageVisible = true;
+		this.setCurrentTime(this.currentTime, true);
+	};
+	private onPageHide = () => {
+		this.isPageVisible = false;
 	};
 	constructor() {
 		super();
@@ -313,6 +324,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.style.attach();
 		this.interludeDots.setTransform(0, 200);
 		window.addEventListener("pageshow", this.onPageShow);
+		window.addEventListener("pagehide", this.onPageHide);
 		let startScrollY = 0;
 		let direction: "up" | "down" | "none" = "none";
 		let startTouchPosY = 0;
@@ -470,6 +482,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * 这个只允许内部调用
 	 */
 	rebuildStyle() {
+		this._baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
 		let style = "";
 		style += "--amll-lyric-player-width:";
 		style += this.innerSize[0] - this.padding * 2;
@@ -504,11 +517,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param lines 歌词数组
 	 */
 	setLyricLines(lines: LyricLine[]) {
-		lines.forEach((line) => {
-			line.words.forEach((word) => {
+		for (const line of lines) {
+			for (const word of line.words) {
 				word.word = word.word.replace(/\s+/g, " ");
-			});
-		});
+			}
+		}
 		this.lyricLines = lines;
 		const timeOffset = 750;
 		this.processedLines = lines
@@ -521,39 +534,37 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					return {
 						...line,
 					};
-				else {
-					if (i === 0) {
+
+				if (i === 0) {
+					return {
+						...line,
+						startTime: Math.max(line.startTime - timeOffset, 0),
+					};
+				}
+				const lastLine = lines[i - 1];
+				const pastLine = lines[i - 2];
+				if (lastLine?.isBG && pastLine) {
+					if (pastLine.endTime < line.startTime) {
 						return {
 							...line,
-							startTime: Math.max(line.startTime - timeOffset, 0),
+							startTime:
+								Math.max(pastLine.endTime, line.startTime - timeOffset) ||
+								line.startTime,
 						};
-					} else {
-						const lastLine = lines[i - 1];
-						const pastLine = lines[i - 2];
-						if (lastLine?.isBG && pastLine) {
-							if (pastLine.endTime < line.startTime) {
-								return {
-									...line,
-									startTime:
-										Math.max(pastLine.endTime, line.startTime - timeOffset) ||
-										line.startTime,
-								};
-							}
-						} else if (lastLine?.endTime) {
-							if (lastLine.endTime < line.startTime) {
-								return {
-									...line,
-									startTime:
-										Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
-										line.startTime,
-								};
-							}
-						}
+					}
+				} else if (lastLine?.endTime) {
+					if (lastLine.endTime < line.startTime) {
 						return {
 							...line,
+							startTime:
+								Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
+								line.startTime,
 						};
 					}
 				}
+				return {
+					...line,
+				};
 			});
 		this.isNonDynamic = true;
 		for (const line of this.processedLines) {
@@ -871,6 +882,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.currentTime = time;
+		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic())
 			this.element.style.setProperty("--amll-player-time", `${time}`);
 		if (this.isScrolled) return;
@@ -1004,6 +1016,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
 	 */
 	update(delta = 0) {
+		if (!this.isPageVisible) return;
 		const deltaS = delta / 1000;
 		this.interludeDots.update(delta);
 		this.bottomLine.update(deltaS);

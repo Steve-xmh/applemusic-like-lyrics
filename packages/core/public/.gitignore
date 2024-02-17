@@ -9,3 +9,4 @@
 *.jpg
 *.png
 *.webp
+!empty.png

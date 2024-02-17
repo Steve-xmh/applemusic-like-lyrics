@@ -179,6 +179,7 @@ class GLProgram implements Disposable {
 		gl: WebGL2RenderingContext,
 		vertexShaderSource: string,
 		fragmentShaderSource: string,
+		private readonly label = "unknown",
 	) {
 		this.gl = gl;
 		this.vertexShader = this.createShader(gl.VERTEX_SHADER, vertexShaderSource);
@@ -190,7 +191,9 @@ class GLProgram implements Disposable {
 
 		const coordPos = gl.getAttribLocation(this.program, "v_coord");
 		if (coordPos === -1)
-			throw new Error("Failed to get attribute location v_coord");
+			throw new Error(
+				`Failed to get attribute location v_coord for "${this.label}"`,
+			);
 		this.coordPos = coordPos;
 	}
 	private createShader(type: number, source: string) {
@@ -201,9 +204,9 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type}: ${gl.getShaderInfoLog(
-					shader,
-				)}`,
+				`Failed to compile shader for type ${type} "${
+					this.label
+				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
 		return shader;
@@ -219,7 +222,7 @@ class GLProgram implements Disposable {
 		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
 			const errLog = gl.getProgramInfoLog(program);
 			gl.deleteProgram(program);
-			throw new Error(`Failed to link program: ${errLog}`);
+			throw new Error(`Failed to link program "${this.label}": ${errLog}`);
 		}
 		return program;
 	}
@@ -233,7 +236,9 @@ class GLProgram implements Disposable {
 	private warnUniformNotFound(name: string) {
 		if (this.notFoundUniforms.has(name)) return;
 		this.notFoundUniforms.add(name);
-		console.warn(`Failed to get uniform location: ${name}`);
+		console.warn(
+			`Failed to get uniform location for program "${this.label}": ${name}`,
+		);
 	}
 	setUniform1f(name: string, value: number) {
 		const gl = this.gl;
@@ -470,21 +475,25 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl,
 		vertShader,
 		eplorShader,
+		"main",
 	);
 	private blendProgram: GLProgram = new GLProgram(
 		this.gl,
 		vertShader,
 		blendShader,
+		"blend",
 	);
 	private copyProgram: GLProgram = new GLProgram(
 		this.gl,
 		vertShader,
 		fragShader,
+		"copy",
 	);
 	private noiseProgram: GLProgram = new GLProgram(
 		this.gl,
 		vertShader,
 		noiseShader,
+		"noise",
 	);
 	private taaProgram: GLProgram = new GLProgram(this.gl, vertShader, taaShader);
 
@@ -526,10 +535,10 @@ export class EplorRenderer extends BaseRenderer {
 			new Framebuffer(this.gl, width, height),
 			new Framebuffer(this.gl, width, height),
 		];
-		this.fb.forEach((fb) => {
+		for (const fb of this.fb) {
 			fb.bind();
 			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-		});
+		}
 		this.historyFrameBuffer = new Array(2)
 			.fill(0)
 			.map(() => new Framebuffer(this.gl, width, height));
@@ -542,7 +551,11 @@ export class EplorRenderer extends BaseRenderer {
 
 	protected override onResize(width: number, height: number): void {
 		// super.onResize(width, height);
-		this._targetSize = [Math.round(width), Math.round(height)];
+		this._targetSize = [
+			Math.max(1, Math.round(width)),
+			Math.max(1, Math.round(height)),
+		];
+		if (this.staticMode) this.requestTick();
 	}
 
 	private checkResize() {
@@ -609,7 +622,11 @@ export class EplorRenderer extends BaseRenderer {
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
-		this.mainProgram.setUniform2f("IllIlllIlIIlllI", this.IllIlllIlIIlllI[0], this.IllIlllIlIIlllI[1]);
+		this.mainProgram.setUniform2f(
+			"IllIlllIlIIlllI",
+			this.IllIlllIlIIlllI[0],
+			this.IllIlllIlIIlllI[1],
+		);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
@@ -638,14 +655,14 @@ export class EplorRenderer extends BaseRenderer {
 		// 增加噪点以缓解色带现象
 		this.noiseProgram.use();
 		if (!taa) {
-			this.blendProgram.setUniform1i("src", 0);
+			this.noiseProgram.setUniform1i("src", 0);
 		}
-		this.noiseProgram.setUniform2f(
-			"renderSize",
-			this.renderSize[0],
-			this.renderSize[1],
-		);
-		this.noiseProgram.setUniform1f("frameTime", this.frameTime);
+		// this.noiseProgram.setUniform2f(
+		// 	"renderSize",
+		// 	this.renderSize[0],
+		// 	this.renderSize[1],
+		// );
+		// this.noiseProgram.setUniform1f("frameTime", this.frameTime);
 		fba.bind();
 		fbb.active();
 		if (taa) {
@@ -689,7 +706,12 @@ export class EplorRenderer extends BaseRenderer {
 				}
 			}
 		}
-		return this.sprites.length === 1 && this.sprites[0].alpha >= 1;
+		const isOnlyOneSprite =
+			this.sprites.length === 1 && this.sprites[0].alpha >= 1;
+		const isTweeningValues = this.hasLyric
+			? this.hasLyricValue > 0.00001
+			: this.hasLyricValue < 0.99999;
+		return isOnlyOneSprite || !isTweeningValues;
 	}
 
 	private copyFrameBuffer(src: Framebuffer, dst: Framebuffer | null = null) {
@@ -807,15 +829,15 @@ export class EplorRenderer extends BaseRenderer {
 		this.playTime = Math.random() * 100000;
 		this.lastFrameTime = performance.now();
 		console.info(Math.random() * 10000);
-		let r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
-		if (r == 0) {
-			this.IllIlllIlIIlllI = [-1.3, -.9];
+		const r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
+		if (r === 0) {
+			this.IllIlllIlIIlllI = [-1.3, -0.9];
 			// this.IllIlllIlIIlllI = [-1.1, -.9];
-		} else if (r == 1) {
+		} else if (r === 1) {
 			// this.IllIlllIlIIlllI = [-0.3, -0.2];
-			this.IllIlllIlIIlllI = [-1.1, -.9];
+			this.IllIlllIlIIlllI = [-1.1, -0.9];
 		} else {
-			this.IllIlllIlIIlllI = [-1.3, -.9];
+			this.IllIlllIlIIlllI = [-1.3, -0.9];
 		}
 		this.requestTick();
 	}
@@ -832,12 +854,18 @@ export class EplorRenderer extends BaseRenderer {
 		super.dispose();
 		this.vertexBuffer.dispose();
 		this.indexBuffer.dispose();
-		this.sprites.forEach((v) => v.dispose());
+		for (const s of this.sprites) {
+			s.dispose();
+		}
 		this.copyProgram.dispose();
 		this.blendProgram.dispose();
 		this.mainProgram.dispose();
-		this.fb.forEach((v) => v.dispose());
-		this.historyFrameBuffer.forEach((v) => v.dispose());
+		for (const fb of this.fb) {
+			fb.dispose();
+		}
+		for (const fb of this.historyFrameBuffer) {
+			fb.dispose();
+		}
 		if (this.tickHandle) {
 			cancelAnimationFrame(this.tickHandle);
 			this.tickHandle = 0;
