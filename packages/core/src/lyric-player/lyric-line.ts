@@ -1,10 +1,6 @@
 import { LyricPlayer } from ".";
 import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
-import {
-	createMatrix4,
-	matrix4ToCSS,
-	scaleMatrix4,
-} from "../utils/matrix";
+import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
 import { Spring } from "../utils/spring";
 import bezier from "bezier-easing";
 

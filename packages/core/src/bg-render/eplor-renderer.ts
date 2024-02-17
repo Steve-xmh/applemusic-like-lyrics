@@ -7,6 +7,26 @@ import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
 import taaShader from "./shaders/taa.frag.glsl?raw";
 
+const NOISE_IMAGE_DATA = (() => {
+	const buf = [0x17, 0x43, 0x87, 0x65];
+	const result: number[] = [];
+	const SIZE = 32;
+	for (let i = 0; i < SIZE ** 2; i++) {
+		let v = buf.shift()!!;
+		v ^= buf[1] ^ (v << 1);
+		v ^= buf[2] ^ (v >> 1);
+		v ^= buf[3] ^ (v << 1);
+		buf.push(v);
+		result.push(v & 0xff);
+		result.push(v & 0xff);
+		result.push(v & 0xff);
+		result.push(0xff);
+	}
+	return new ImageData(new Uint8ClampedArray(result), SIZE, SIZE, {
+		colorSpace: "srgb",
+	});
+})();
+
 function blurImage(imageData: ImageData, radius: number, quality: number) {
 	const pixels = imageData.data;
 	const width = imageData.width;
@@ -430,6 +450,39 @@ class AlbumTexture implements Disposable {
 	}
 }
 
+class NoiseTexture implements Disposable {
+	private tex: WebGLTexture;
+	alpha = 0;
+
+	constructor(private gl: WebGL2RenderingContext) {
+		const tex = gl.createTexture();
+		if (!tex) throw new Error("Failed to create texture");
+		this.tex = tex;
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			NOISE_IMAGE_DATA,
+		);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	}
+
+	active(texture: number = this.gl.TEXTURE1) {
+		this.gl.activeTexture(texture);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
+	}
+
+	dispose(): void {
+		this.gl.deleteTexture(this.tex);
+	}
+}
+
 export class EplorRenderer extends BaseRenderer {
 	private hasLyric = true;
 	private hasLyricValue = 1;
@@ -517,6 +570,8 @@ export class EplorRenderer extends BaseRenderer {
 		this.gl.STATIC_DRAW,
 	);
 
+	private noiseTexture = new NoiseTexture(this.gl);
+
 	private fb: [Framebuffer, Framebuffer];
 	private historyFrameBuffer: Framebuffer[] = [];
 
@@ -599,6 +654,7 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
+		this.noiseTexture.active();
 		const taa = false;
 		this.checkResize();
 		this.hasLyricValue =
