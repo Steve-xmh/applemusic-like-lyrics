@@ -594,10 +594,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					amount = 1.0;
 					blur = 0.6;
 				}
-				const animateDu = Number.isFinite(du) ? du * 1.5 : 0;
+				const animateDu = Number.isFinite(du) ? du * 1.25 : 0;
 				const empEasing = makeEmpEasing(EMP_EASING_MID);
 				result = characterElements.flatMap((el, i, arr) => {
-					const wordDe = de + (du / arr.length) * i;
+					const wordDe = de + (du / 3 / arr.length) * i;
 					const result: Animation[] = [];
 
 					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
@@ -653,7 +653,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 							return {
 								offset: x,
-								transform: `translateY(${-y * 0.05}em)`,
+								transform: `translateY(${-y * 0.03}em)`,
 							};
 						});
 					const ani = el.animate(frames, {

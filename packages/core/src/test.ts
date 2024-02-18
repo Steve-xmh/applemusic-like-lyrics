@@ -27,7 +27,7 @@ const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
 	music: new URL(location.href).searchParams.get("music") || "",
 	album: new URL(location.href).searchParams.get("album") || "noise.png",
-	enableSpring: false,
+	enableSpring: true,
 	bgFPS: 30,
 	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
 	bgScale: 0.5,
@@ -271,7 +271,7 @@ const mapLyric = (
 ): LyricLine => ({
 	words: line.words,
 	startTime: line.words[0]?.startTime ?? 0,
-	endTime: line.words[line.words.length - 1]?.startTime ?? Infinity,
+	endTime: line.words[line.words.length - 1]?.endTime ?? Infinity,
 	translatedLyric: "",
 	romanLyric: "",
 	isBG: false,
@@ -294,6 +294,10 @@ async function loadLyric() {
 	}
 }
 
+const lys = String.raw`
+[0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
+`.trim();
+
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
 	audio.style.display = "none";
@@ -308,23 +312,7 @@ async function loadLyric() {
 		lyricPlayer.setEnableSpring(false);
 	}
 	await loadLyric();
-	lyricPlayer.setLyricLines(
-		new Array(1000).fill(0).map((_, i) => ({
-			words: [
-				{
-					word: "Web Animation Spring Test " + i,
-					startTime: i * 2000,
-					endTime: i * 2000 + 2000,
-				},
-			],
-			translatedLyric: "",
-			romanLyric: "",
-			isBG: false,
-			isDuet: i % 2 === 1 && i % 4 === 1,
-			startTime: i * 2000,
-			endTime: i * 2000 + 2000,
-		})),
-	);
+	lyricPlayer.setLyricLines(parseLys(lys).map(mapLyric));
 	// debugValues.play();
 	debugValues.mockPlay();
 })();
