@@ -139,11 +139,12 @@ export function parseTTML(ttmlText: string): TTMLLyric {
 			line.startTime = parseTimespan(startTime);
 			line.endTime = parseTimespan(endTime);
 		} else {
-			line.startTime = line.words.reduce(
-				(pv, cv) => Math.min(pv, cv.startTime),
-				Infinity,
-			);
-			line.endTime = line.words.reduce((pv, cv) => Math.max(pv, cv.endTime), 0);
+			line.startTime = line.words
+				.filter((v) => v.word.trim().length > 0)
+				.reduce((pv, cv) => Math.min(pv, cv.startTime), Infinity);
+			line.endTime = line.words
+				.filter((v) => v.word.trim().length > 0)
+				.reduce((pv, cv) => Math.max(pv, cv.endTime), 0);
 		}
 
 		if (haveBg) {
