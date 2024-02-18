@@ -5,7 +5,6 @@ import fragShader from "./shaders/base.frag.glsl?raw";
 import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
-import taaShader from "./shaders/taa.frag.glsl?raw";
 import noiseImage from "../assets/noise.png?inline";
 
 const NOISE_IMAGE_DATA = (() => {
@@ -537,7 +536,6 @@ export class EplorRenderer extends BaseRenderer {
 		noiseShader,
 		"noise",
 	);
-	private taaProgram: GLProgram = new GLProgram(this.gl, vertShader, taaShader);
 
 	private static readonly rawVertexBuffer = new Float32Array([
 		-1, -1, 1, -1, -1, 1, 1, 1,
@@ -644,7 +642,6 @@ export class EplorRenderer extends BaseRenderer {
 
 	private onRedraw(tickTime: number, delta: number) {
 		this.noiseTexture.active();
-		const taa = false;
 		this.checkResize();
 		this.hasLyricValue =
 			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
@@ -699,9 +696,7 @@ export class EplorRenderer extends BaseRenderer {
 
 		// 增加噪点以缓解色带现象
 		this.noiseProgram.use();
-		if (!taa) {
-			this.noiseProgram.setUniform1i("src", 0);
-		}
+		this.noiseProgram.setUniform1i("src", 0);
 		// this.noiseProgram.setUniform2f(
 		// 	"renderSize",
 		// 	this.renderSize[0],
@@ -710,39 +705,9 @@ export class EplorRenderer extends BaseRenderer {
 		// this.noiseProgram.setUniform1f("frameTime", this.frameTime);
 		fba.bind();
 		fbb.active();
-		if (taa) {
-			this.blendProgram.setUniform1i("src", 0);
-		} else {
-			this.bindDefaultFrameBuffer();
-		}
+		this.bindDefaultFrameBuffer();
 		this.drawScreen();
-
-		if (taa) {
-			const nextFB = this.historyFrameBuffer.pop();
-			if (nextFB) {
-				// 应用 TAA 抗锯齿以缓解噪点带来的颗粒感
-				nextFB.bind();
-				this.copyFrameBuffer(fba, nextFB);
-				this.taaProgram.use();
-				this.taaProgram.setUniform1f("scale", this.currerntRenderScale);
-				this.taaProgram.setUniform1f("frameTime", this.frameTime);
-				this.taaProgram.setUniform2f(
-					"renderSize",
-					this.renderSize[0],
-					this.renderSize[1],
-				);
-				this.historyFrameBuffer.forEach((historyFB, index) => {
-					historyFB.active(gl.TEXTURE0 + index + 1);
-					this.taaProgram.setUniform1i(`historyFrame${index}`, index + 1);
-				});
-				this.drawScreen();
-				this.copyFrameBuffer(nextFB, null);
-				this.historyFrameBuffer.unshift(nextFB);
-			} else {
-				this.copyFrameBuffer(fba, null);
-			}
-		}
-
+		
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
 			if (coveredIndex.alpha >= 1) {

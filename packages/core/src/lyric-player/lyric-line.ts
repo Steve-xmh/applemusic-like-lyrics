@@ -7,6 +7,11 @@ import { WebAnimationSpring } from "../utils/wa-spring";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
+enum EmphasizeAnimationMethod {
+	FloatAndGlow = "float-and-glow",
+	FloatOnly = "float-only",
+}
+
 interface RealWord extends LyricWord {
 	mainElement: HTMLSpanElement;
 	subElements: HTMLSpanElement[];
@@ -16,7 +21,7 @@ interface RealWord extends LyricWord {
 	shouldEmphasize: boolean;
 }
 
-const ANIMATION_FRAME_QUANTITY = 64;
+const ANIMATION_FRAME_QUANTITY = 32;
 
 const bezIn = bezier(0.25, 0, 0.25, 1);
 const bezOut = bezier(0.5, 0, 0.5, 1);
@@ -26,9 +31,9 @@ const EMP_EASING_MID = 0.5;
 const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
-function empEasing(x: number): number {
-	return x < EMP_EASING_MID ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x));
-}
+const makeEmpEasing = (mid: number) => (x: number) =>
+	x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x));
+const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
 function generateFadeGradient(
 	width: number,
@@ -561,64 +566,114 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const de = Math.max(0, delay);
 		const du = Math.max(1000, duration);
 
-		let amount = 0;
-		let blur = 0;
-		if (du >= 1200 && du < 2000) {
-			amount = 0.7;
-			blur = 0.3;
-		} else if (du >= 2000 && du < 3000) {
-			amount = 0.8;
-			blur = 0.5;
-		} else if (du >= 3000 && du < 4000) {
-			amount = 0.9;
-			blur = 0.6;
-		} else if (du >= 4000) {
-			amount = 1.0;
-			blur = 0.6;
+		let method = EmphasizeAnimationMethod.FloatAndGlow;
+
+		if (du < 1200) {
+			method = EmphasizeAnimationMethod.FloatOnly;
 		}
 
-		const result = characterElements.flatMap((el, i, arr) => {
-			const wordDe = de + (du / arr.length) * i;
-			const result: Animation[] = [];
+		let result: Animation[] = [];
 
-			const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
-				.fill(0)
-				.map((_, i) => {
-					const x = (i + 1) / ANIMATION_FRAME_QUANTITY;
-					const y = empEasing(x);
-					const transX = Math.sin(x * Math.PI * 2);
-					const glowLevel =
-						Math.max(0, x < EMP_EASING_MID ? y / 2 : y - 0.5) * blur;
-					// const floatLevel =
-					// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
+		switch (method) {
+			case EmphasizeAnimationMethod.FloatAndGlow: {
+				let amount = 0;
+				let blur = 0;
+				if (du >= 1200 && du < 2000) {
+					amount = 0.7;
+					blur = 0.3;
+				} else if (du >= 2000 && du < 3000) {
+					amount = 0.8;
+					blur = 0.5;
+				} else if (du >= 3000 && du < 4000) {
+					amount = 0.9;
+					blur = 0.6;
+				} else if (du >= 4000) {
+					amount = 1.0;
+					blur = 0.6;
+				}
+				const animateDu = Number.isFinite(du) ? du * 1.5 : 0;
+				const empEasing = makeEmpEasing(duration / animateDu || EMP_EASING_MID);
+				result = characterElements.flatMap((el, i, arr) => {
+					const wordDe = de + (du / arr.length) * i;
+					const result: Animation[] = [];
 
-					const mat = scaleMatrix4(createMatrix4(), 1 + y * 0.1 * amount);
+					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+						.fill(0)
+						.map((_, i) => {
+							const x = (i + 1) / ANIMATION_FRAME_QUANTITY;
+							const y = empEasing(x);
+							const transX = Math.sin(x * Math.PI * 2);
+							const glowLevel =
+								Math.max(0, x < EMP_EASING_MID ? y / 2 : y - 0.5) * blur;
+							// const floatLevel =
+							// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
 
-					return {
-						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${
-							transX * 0.01 * amount
-						}em,${-y * 0.05}em)`,
-						textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
+							const mat = scaleMatrix4(createMatrix4(), 1 + y * 0.1 * amount);
+
+							return {
+								offset: x,
+								transform: `${matrix4ToCSS(mat, 4)} translate(${
+									transX * 0.01 * amount
+								}em,${-y * 0.05}em)`,
+								textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
+							};
+						});
+					const ani = el.animate(frames, {
+						duration: Number.isFinite(du) ? du * 1.5 : 0,
+						delay: Number.isFinite(wordDe) ? wordDe : 0,
+						id: `emphasize-word-float-and-glow-${el.innerText}-${i}`,
+						iterations: 1,
+						composite: "replace",
+						easing: "linear",
+						fill: "both",
+					});
+					ani.onfinish = () => {
+						ani.pause();
 					};
-				});
-			const ani = el.animate(frames, {
-				duration: Number.isFinite(du) ? du * 1.5 : 0,
-				delay: Number.isFinite(wordDe) ? wordDe : 0,
-				id: `emphasize-word-${el.innerText}-${i}`,
-				iterations: 1,
-				composite: "replace",
-				easing: "linear",
-				fill: "both",
-			});
-			ani.onfinish = () => {
-				ani.pause();
-			};
-			ani.pause();
-			result.push(ani);
+					ani.pause();
+					result.push(ani);
 
-			return result;
-		});
+					return result;
+				});
+				break;
+			}
+			case EmphasizeAnimationMethod.FloatOnly: {
+				result = characterElements.flatMap((el, i, arr) => {
+					const wordDe = de + (du / 1.5 / arr.length) * i;
+					const result: Animation[] = [];
+
+					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+						.fill(0)
+						.map((_, i) => {
+							const x = ((i + 1) / ANIMATION_FRAME_QUANTITY) * EMP_EASING_MID;
+							const y = defaultEmpEasing(x);
+
+							return {
+								offset: x,
+								transform: `translateY(${-y * 0.05}em)`,
+							};
+						});
+					const ani = el.animate(frames, {
+						duration: Number.isFinite(du) ? du * 2 : 0,
+						delay: Number.isFinite(wordDe) ? wordDe : 0,
+						id: `emphasize-word-float-only-${el.innerText}-${i}`,
+						iterations: 1,
+						composite: "replace",
+						easing: "linear",
+						fill: "both",
+					});
+					ani.onfinish = () => {
+						ani.pause();
+					};
+					ani.pause();
+					result.push(ani);
+
+					return result;
+				});
+				break;
+			}
+		}
+
 		return result;
 	}
 	updateMaskImage() {
