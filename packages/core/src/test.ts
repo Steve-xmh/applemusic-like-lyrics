@@ -26,14 +26,14 @@ audio.preload = "auto";
 const debugValues = {
 	lyric: new URL(location.href).searchParams.get("lyric") || "",
 	music: new URL(location.href).searchParams.get("music") || "",
-	album: new URL(location.href).searchParams.get("album") || "noise.png",
+	album: new URL(location.href).searchParams.get("album") || "",
 	enableSpring: true,
 	bgFPS: 30,
 	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
 	bgScale: 0.5,
 	bgFlowSpeed: 2,
 	bgPlaying: true,
-	bgStaticMode: false,
+	bgStaticMode: true,
 	currentTime: 0,
 	enableBlur: true,
 	playing: false,
@@ -43,8 +43,9 @@ const debugValues = {
 		const baseTime = this.currentTime * 1000;
 		while (this.playing && this.currentTime < 300) {
 			const time = Date.now() - startTime;
-			this.currentTime = baseTime + time / 1000;
-			lyricPlayer.setCurrentTime(time);
+			this.currentTime = (baseTime + time) / 1000;
+			progress.updateDisplay();
+			lyricPlayer.setCurrentTime(baseTime + time);
 			await waitFrame();
 		}
 	},
@@ -94,6 +95,7 @@ function recreateBGRenderer(mode: string) {
 	}
 	const bg = window.globalBackground;
 	bg.setFPS(30);
+	bg.setStaticMode(debugValues.bgStaticMode);
 	bg.getElement().style.position = "absolute";
 	bg.getElement().style.top = "0";
 	bg.getElement().style.left = "0";
@@ -295,8 +297,9 @@ async function loadLyric() {
 }
 
 const lys = String.raw`
-[0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
+[0]The(212585,131) (0,0)memories(212716,618) (0,0)are(213334,147) (0,0)fading,(213481,2148) (0,0)I(215629,109)’(215738,88)ll(215826,76) (0,0)say(215902,220) (0,0)goodbye(216122,306) (0,0)to(216428,106) (0,0)eve(216534,1539)ry(218073,1564)thing(219637,3163)
 `.trim();
+// [0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
 
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
@@ -314,5 +317,6 @@ const lys = String.raw`
 	await loadLyric();
 	lyricPlayer.setLyricLines(parseLys(lys).map(mapLyric));
 	// debugValues.play();
+	debugValues.currentTime = 211;
 	debugValues.mockPlay();
 })();

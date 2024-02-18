@@ -909,19 +909,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						this.hotLines.delete(lastHotId + 1);
 						removedHotIds.add(lastHotId + 1);
 						if (isSeek) {
-							this.lyricLinesEl[lastHotId].disable();
-							this.lyricLinesEl[lastHotId + 1].disable();
+							this.lyricLinesEl[lastHotId].disable(time);
+							this.lyricLinesEl[lastHotId + 1].disable(time);
 						}
 					}
 				} else if (line.startTime > time || line.endTime <= time) {
 					this.hotLines.delete(lastHotId);
 					removedHotIds.add(lastHotId);
-					if (isSeek) this.lyricLinesEl[lastHotId].disable();
+					if (isSeek) this.lyricLinesEl[lastHotId].disable(time);
 				}
 			} else {
 				this.hotLines.delete(lastHotId);
 				removedHotIds.add(lastHotId);
-				if (isSeek) this.lyricLinesEl[lastHotId].disable();
+				if (isSeek) this.lyricLinesEl[lastHotId].disable(time);
 			}
 		});
 		this.processedLines.forEach((line, id, arr) => {
@@ -929,11 +929,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				if (!this.hotLines.has(id)) {
 					this.hotLines.add(id);
 					addedIds.add(id);
-					if (isSeek) this.lyricLinesEl[id].enable();
+					if (isSeek) this.lyricLinesEl[id].enable(time);
 					if (arr[id + 1]?.isBG) {
 						this.hotLines.add(id + 1);
 						addedIds.add(id + 1);
-						if (isSeek) this.lyricLinesEl[id + 1].enable();
+						if (isSeek) this.lyricLinesEl[id + 1].enable(time);
 					}
 				}
 			}
@@ -941,7 +941,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.bufferedLines.forEach((v) => {
 			if (!this.hotLines.has(v)) {
 				removedIds.add(v);
-				if (isSeek) this.lyricLinesEl[v].disable();
+				if (isSeek) this.lyricLinesEl[v].disable(time);
 			}
 		});
 		if (isSeek) {
@@ -966,7 +966,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				// debugLog();
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);
-					this.lyricLinesEl[v].enable();
+					this.lyricLinesEl[v].enable(time);
 				});
 				this.scrollToIndex = Math.min(...this.bufferedLines);
 				this.calcLayout();
@@ -976,7 +976,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					this.bufferedLines.forEach((v) => {
 						if (!this.hotLines.has(v)) {
 							this.bufferedLines.delete(v);
-							this.lyricLinesEl[v].disable();
+							this.lyricLinesEl[v].disable(time);
 						}
 					});
 					this.calcLayout();
@@ -985,11 +985,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				// debugLog();
 				addedIds.forEach((v) => {
 					this.bufferedLines.add(v);
-					this.lyricLinesEl[v].enable();
+					this.lyricLinesEl[v].enable(time);
 				});
 				removedIds.forEach((v) => {
 					this.bufferedLines.delete(v);
-					this.lyricLinesEl[v].disable();
+					this.lyricLinesEl[v].disable(time);
 				});
 				if (this.bufferedLines.size > 0)
 					this.scrollToIndex = Math.min(...this.bufferedLines);

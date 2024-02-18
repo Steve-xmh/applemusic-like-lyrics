@@ -16,8 +16,10 @@ interface RealWord extends LyricWord {
 	mainElement: HTMLSpanElement;
 	subElements: HTMLSpanElement[];
 	elementAnimations: Animation[];
+	maskAnimations: Animation[];
 	width: number;
 	height: number;
+	padding: number;
 	shouldEmphasize: boolean;
 }
 
@@ -36,12 +38,32 @@ const makeEmpEasing = (mid: number) => {
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
+// function generateFadeGradient(
+// 	width: number,
+// 	padding = 0,
+// 	bright = "rgba(0,0,0,0.85)",
+// 	dark = "rgba(0,0,0,0.5)",
+// ): [string, number, number] {
+// 	const totalAspect = 2 + width + padding;
+// 	const widthInTotal = width / totalAspect;
+// 	const leftPos = (1 - widthInTotal) / 2;
+// 	return [
+// 		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
+// 			leftPos * 100
+// 		}%,${bright} ${(leftPos + widthInTotal) * 100}%,${dark} ${
+// 			(leftPos + widthInTotal) * 100
+// 		}%)`,
+// 		widthInTotal,
+// 		totalAspect,
+// 	];
+// }
+
 function generateFadeGradient(
 	width: number,
 	padding = 0,
 	bright = "rgba(0,0,0,0.85)",
 	dark = "rgba(0,0,0,0.5)",
-): [string, number, number] {
+): [string, number] {
 	const totalAspect = 2 + width + padding;
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
@@ -49,7 +71,6 @@ function generateFadeGradient(
 		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
 			(leftPos + widthInTotal) * 100
 		}%)`,
-		widthInTotal,
 		totalAspect,
 	];
 }
@@ -139,8 +160,6 @@ function chunkAndSplitLyricWords(
 	} else {
 		result.push(wChunk);
 	}
-
-	console.log("result", result);
 
 	return result;
 }
@@ -276,13 +295,18 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private isEnabled = false;
-	enable() {
+	enable(maskAnimationTime = 0) {
 		this.isEnabled = true;
 		this.element.classList.add("active");
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				a.currentTime = 0;
+				a.playbackRate = 1;
+				a.play();
+			}
+			for (const a of word.maskAnimations) {
+				a.currentTime = maskAnimationTime;
 				a.playbackRate = 1;
 				a.play();
 			}
@@ -310,7 +334,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		return size;
 	}
-	disable() {
+	disable(maskAnimationTime = 0) {
 		this.isEnabled = false;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
@@ -320,6 +344,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					a.playbackRate = -1;
 					a.play();
 				}
+			}
+			for (const a of word.maskAnimations) {
+				a.currentTime = Math.min(
+					this.totalDuration,
+					Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+				);
+				a.pause();
 			}
 		}
 		main.classList.remove("active");
@@ -422,7 +453,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				const emp = chunk
 					.map((word) => shouldEmphasize(word))
 					.reduce((a, b) => a || b, shouldEmphasize(merged));
-				console.log("merged", merged.word, emp);
 				const wrapperWordEl = document.createElement("span");
 				wrapperWordEl.classList.add("emphasize-wrapper");
 				const characterElements: HTMLElement[] = [];
@@ -447,8 +477,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							mainElement: mainWordEl,
 							subElements: charEls,
 							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
+							maskAnimations: [],
 							width: 0,
 							height: 0,
+							padding: 0,
 							shouldEmphasize: emp,
 						};
 						this.splittedWords.push(realWord);
@@ -459,8 +491,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							mainElement: mainWordEl,
 							subElements: [],
 							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
+							maskAnimations: [],
 							width: 0,
 							height: 0,
+							padding: 0,
 							shouldEmphasize: emp,
 						});
 					}
@@ -496,8 +530,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					mainElement: mainWordEl,
 					subElements: [],
 					elementAnimations: [this.initFloatAnimation(chunk, mainWordEl)],
+					maskAnimations: [],
 					width: 0,
 					height: 0,
+					padding: 0,
 					shouldEmphasize: emp,
 				};
 				if (emp) {
@@ -679,6 +715,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 		return result;
 	}
+	private get totalDuration() {
+		return this.lyricLine.endTime - this.lyricLine.startTime;
+	}
 	updateMaskImage() {
 		if (this._hide) {
 			if (this._prevParentEl) {
@@ -687,14 +726,25 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.element.style.display = "";
 			this.element.style.visibility = "hidden";
 		}
+		for (const word of this.splittedWords) {
+			const el = word.mainElement;
+			if (el) {
+				word.padding = parseFloat(getComputedStyle(el).paddingLeft);
+				word.width = el.clientWidth - word.padding * 2;
+				word.height = el.clientHeight - word.padding * 2;
+			} else {
+				word.width = 0;
+				word.height = 0;
+				word.padding = 0;
+			}
+		}
+		const totalDuration = this.totalDuration;
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				word.width = wordEl.clientWidth;
-				word.height = wordEl.clientHeight;
-				const fadeWidth = word.height / 2;
-				const [maskImage, _widthInTotal, totalAspect] = generateFadeGradient(
-					fadeWidth / word.width,
+				const fadeWidth = word.height;
+				const [maskImage, totalAspect] = generateFadeGradient(
+					fadeWidth / (word.width + word.padding * 2),
 					0,
 					"rgba(0,0,0,0.85)",
 					"rgba(0,0,0,0.25)",
@@ -711,14 +761,74 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskOrigin = "left";
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
-				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
-					word.startTime
-				})*${
-					w / Math.max(1, Math.abs(word.endTime - word.startTime))
-				}px),0px) 0px, left top`;
-				wordEl.style.maskPosition = maskPos;
-				wordEl.style.webkitMaskPosition = maskPos;
+				// 为了尽可能将渐变动画在相连的每个单词间近似衔接起来
+				// 要综合每个单词的效果时间和间隙生成动画帧数组
+				const widthBeforeSelf = this.splittedWords
+					.slice(0, i)
+					.reduce((a, b) => a + b.width, 0);
+				const clampOffset = (x: number) =>
+					Math.max(
+						-(word.width + word.padding * 2 + fadeWidth),
+						Math.min(0, x),
+					);
+				let curPos =
+					-widthBeforeSelf - word.width - word.padding * 2 - fadeWidth;
+				let timeOffset = 0;
+				const frames: Keyframe[] = [];
+				const pushFrame = () => {
+					console.log("pushFrame", curPos, timeOffset * totalDuration);
+					if (timeOffset === frames[frames.length - 1]?.offset) {
+						frames[frames.length - 1] = {
+							offset: timeOffset,
+							maskPosition: `${clampOffset(curPos)}px 0px, left top`,
+							webkitMaskPosition: `${clampOffset(curPos)}px 0px, left top`,
+						};
+					} else {
+						frames.push({
+							offset: timeOffset,
+							maskPosition: `${clampOffset(curPos)}px 0px, left top`,
+							webkitMaskPosition: `${clampOffset(curPos)}px 0px, left top`,
+						});
+					}
+				};
+				pushFrame();
+				let lastTimeStamp = 0;
+				// TODO: 需要修正这里的动画帧生成逻辑，勿动
+				this.splittedWords.forEach((otherWord, j) => {
+					{
+						const curTimeStamp = otherWord.startTime - this.lyricLine.startTime;
+						const space = curTimeStamp - lastTimeStamp;
+						timeOffset += space / totalDuration;
+						pushFrame();
+						lastTimeStamp = curTimeStamp;
+					}
+					{
+						const space = otherWord.endTime - otherWord.startTime;
+						timeOffset += space / totalDuration;
+						curPos += otherWord.width;
+						if (j === i) curPos = 0;
+						pushFrame();
+						lastTimeStamp += space;
+					}
+				});
+				frames[frames.length - 1].offset = 1;
+				frames[frames.length - 1].maskPosition = "0px 0px, left top";
+				frames[frames.length - 1].webkitMaskPosition = "0px 0px, left top";
+				for (const a of word.maskAnimations) {
+					a.cancel();
+				}
+				try {
+					const ani = wordEl.animate(frames, {
+						duration: totalDuration || 1,
+						id: `fade-word-${word.word}-${i}`,
+						easing: "linear",
+						fill: "both",
+					});
+					ani.pause();
+					word.maskAnimations = [ani];
+				} catch (err) {
+					console.warn("应用渐变动画发生错误", frames, totalDuration, err);
+				}
 			}
 		});
 		if (this._hide) {
