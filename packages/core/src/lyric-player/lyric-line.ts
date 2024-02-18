@@ -23,16 +23,17 @@ interface RealWord extends LyricWord {
 
 const ANIMATION_FRAME_QUANTITY = 32;
 
-const bezIn = bezier(0.25, 0, 0.25, 1);
-const bezOut = bezier(0.5, 0, 0.5, 1);
 const norNum = (min: number, max: number) => (x: number) =>
 	Math.min(1, Math.max(0, (x - min) / (max - min)));
 const EMP_EASING_MID = 0.5;
 const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
-const makeEmpEasing = (mid: number) => (x: number) =>
-	x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x));
+const makeEmpEasing = (mid: number) => {
+	const bezIn = bezier(0.25, 0, 0.5, 1);
+	const bezOut = bezier(0.25, 0, 0.5, 1);
+	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
+};
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
 function generateFadeGradient(
@@ -138,6 +139,8 @@ function chunkAndSplitLyricWords(
 	} else {
 		result.push(wChunk);
 	}
+
+	console.log("result", result);
 
 	return result;
 }
@@ -407,9 +410,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			if (Array.isArray(chunk)) {
 				// 多个没有空格的单词组合成的一个单词数组
 				if (chunk.length === 0) continue;
-				const emp = chunk
-					.map((word) => shouldEmphasize(word))
-					.reduce((a, b) => a || b, false);
 				const merged = chunk.reduce(
 					(a, b) => {
 						a.endTime = Math.max(a.endTime, b.endTime);
@@ -419,6 +419,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					},
 					{ word: "", startTime: Infinity, endTime: -Infinity },
 				);
+				const emp = chunk
+					.map((word) => shouldEmphasize(word))
+					.reduce((a, b) => a || b, shouldEmphasize(merged));
 				console.log("merged", merged.word, emp);
 				const wrapperWordEl = document.createElement("span");
 				wrapperWordEl.classList.add("emphasize-wrapper");
@@ -455,7 +458,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							...word,
 							mainElement: mainWordEl,
 							subElements: [],
-							elementAnimations: [],
+							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
 							width: 0,
 							height: 0,
 							shouldEmphasize: emp,
@@ -592,7 +595,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					blur = 0.6;
 				}
 				const animateDu = Number.isFinite(du) ? du * 1.5 : 0;
-				const empEasing = makeEmpEasing(duration / animateDu || EMP_EASING_MID);
+				const empEasing = makeEmpEasing(EMP_EASING_MID);
 				result = characterElements.flatMap((el, i, arr) => {
 					const wordDe = de + (du / arr.length) * i;
 					const result: Animation[] = [];
@@ -619,7 +622,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							};
 						});
 					const ani = el.animate(frames, {
-						duration: Number.isFinite(du) ? du * 1.5 : 0,
+						duration: animateDu,
 						delay: Number.isFinite(wordDe) ? wordDe : 0,
 						id: `emphasize-word-float-and-glow-${el.innerText}-${i}`,
 						iterations: 1,
