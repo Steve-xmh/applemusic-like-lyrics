@@ -66,7 +66,7 @@ export function parseTTML(ttmlText: string): TTMLLyric {
 
 	const lyricLines: LyricLine[] = [];
 
-	function parseParseLine(lineEl: Element, isBG = false) {
+	function parseParseLine(lineEl: Element, isBG = false, isDuet = false) {
 		const line: LyricLine = {
 			words: [],
 			translatedLyric: "",
@@ -78,6 +78,7 @@ export function parseTTML(ttmlText: string): TTMLLyric {
 			startTime: 0,
 			endTime: 0,
 		};
+		if (isBG) line.isDuet = isDuet;
 		let haveBg = false;
 
 		for (const wordNode of lineEl.childNodes) {
@@ -93,7 +94,7 @@ export function parseTTML(ttmlText: string): TTMLLyric {
 
 				if (wordEl.nodeName === "span" && role) {
 					if (role === "x-bg") {
-						parseParseLine(wordEl, true);
+						parseParseLine(wordEl, true, line.isDuet);
 						haveBg = true;
 					} else if (role === "x-translation") {
 						line.translatedLyric = wordEl.innerHTML;
