@@ -707,7 +707,7 @@ export class EplorRenderer extends BaseRenderer {
 		fbb.active();
 		this.bindDefaultFrameBuffer();
 		this.drawScreen();
-		
+
 		if (this.sprites.length > 1) {
 			const coveredIndex = this.sprites[this.sprites.length - 1];
 			if (coveredIndex.alpha >= 1) {

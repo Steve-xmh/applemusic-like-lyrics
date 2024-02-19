@@ -883,8 +883,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.currentTime = time;
 		if (!this.isPageVisible) return;
-		if (!this._getIsNonDynamic())
-			this.element.style.setProperty("--amll-player-time", `${time}`);
+		// if (!this._getIsNonDynamic())
+		// 	this.element.style.setProperty("--amll-player-time", `${time}`);
 		if (this.isScrolled) return;
 		const removedHotIds = new Set<number>();
 		const removedIds = new Set<number>();

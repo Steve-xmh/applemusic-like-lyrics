@@ -301,6 +301,8 @@ const lys = String.raw`
 `.trim();
 // [0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
 
+const l = parseLys(lys).map(mapLyric);
+
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
 	audio.style.display = "none";
@@ -315,7 +317,7 @@ const lys = String.raw`
 		lyricPlayer.setEnableSpring(false);
 	}
 	await loadLyric();
-	lyricPlayer.setLyricLines(parseLys(lys).map(mapLyric));
+	lyricPlayer.setLyricLines(l);
 	// debugValues.play();
 	debugValues.currentTime = 211;
 	debugValues.mockPlay();

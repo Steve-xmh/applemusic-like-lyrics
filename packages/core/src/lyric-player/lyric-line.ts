@@ -42,8 +42,8 @@ const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 // 	width: number,
 // 	padding = 0,
 // 	bright = "rgba(0,0,0,0.85)",
-// 	dark = "rgba(0,0,0,0.5)",
-// ): [string, number, number] {
+// 	dark = "rgba(0,0,0,0.25)",
+// ): [string, number] {
 // 	const totalAspect = 2 + width + padding;
 // 	const widthInTotal = width / totalAspect;
 // 	const leftPos = (1 - widthInTotal) / 2;
@@ -53,7 +53,6 @@ const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 // 		}%,${bright} ${(leftPos + widthInTotal) * 100}%,${dark} ${
 // 			(leftPos + widthInTotal) * 100
 // 		}%)`,
-// 		widthInTotal,
 // 		totalAspect,
 // 	];
 // }
@@ -62,7 +61,7 @@ function generateFadeGradient(
 	width: number,
 	padding = 0,
 	bright = "rgba(0,0,0,0.85)",
-	dark = "rgba(0,0,0,0.5)",
+	dark = "rgba(0,0,0,0.25)",
 ): [string, number] {
 	const totalAspect = 2 + width + padding;
 	const widthInTotal = width / totalAspect;
@@ -742,12 +741,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				const fadeWidth = word.height;
+				const fadeWidth = word.height / 2;
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / (word.width + word.padding * 2),
-					0,
-					"rgba(0,0,0,0.85)",
-					"rgba(0,0,0,0.25)",
 				);
 				const totalAspectStr = `${totalAspect * 100}% 100%`;
 				if (this.lyricPlayer.supportMaskImage) {
@@ -763,57 +759,107 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 				// 为了尽可能将渐变动画在相连的每个单词间近似衔接起来
 				// 要综合每个单词的效果时间和间隙生成动画帧数组
-				const widthBeforeSelf = this.splittedWords
-					.slice(0, i)
-					.reduce((a, b) => a + b.width, 0);
-				const clampOffset = (x: number) =>
-					Math.max(
-						-(word.width + word.padding * 2 + fadeWidth),
-						Math.min(0, x),
-					);
-				let curPos =
-					-widthBeforeSelf - word.width - word.padding * 2 - fadeWidth;
+				const widthBeforeSelf =
+					this.splittedWords.slice(0, i).reduce((a, b) => a + b.width, 0) +
+					(this.splittedWords[0] ? fadeWidth : 0);
+				const minOffset = -(word.width + word.padding * 2 + fadeWidth);
+				const clampOffset = (x: number) => Math.max(minOffset, Math.min(0, x));
+				let curPos = -widthBeforeSelf - word.width - word.padding - fadeWidth;
 				let timeOffset = 0;
 				const frames: Keyframe[] = [];
+				let lastPos = curPos;
+				let lastTime = 0;
 				const pushFrame = () => {
-					console.log("pushFrame", curPos, timeOffset * totalDuration);
-					if (timeOffset === frames[frames.length - 1]?.offset) {
-						frames[frames.length - 1] = {
-							offset: timeOffset,
-							maskPosition: `${clampOffset(curPos)}px 0px, left top`,
-							webkitMaskPosition: `${clampOffset(curPos)}px 0px, left top`,
+					const moveOffset = curPos - lastPos;
+					const time = Math.max(0, Math.min(1, timeOffset));
+					const duration = time - lastTime;
+					const d = Math.abs(duration / moveOffset);
+					console.log(
+						"        pushFrame",
+						frames.length,
+						curPos,
+						timeOffset * totalDuration,
+						"moved",
+						moveOffset,
+					);
+					// 因为有可能会和之前的动画有边界
+					if (curPos > minOffset && lastPos < minOffset) {
+						const staticTime = Math.abs(lastPos - minOffset) * d;
+						console.log(
+							"          Meet min boundary",
+							lastPos,
+							staticTime * totalDuration,
+							(lastTime + staticTime) * totalDuration,
+						);
+						const value = `${clampOffset(lastPos)}px 0px, right top`;
+						const frame: Keyframe = {
+							offset: lastTime + staticTime,
+							maskPosition: value,
+							webkitMaskPosition: value,
 						};
-					} else {
-						frames.push({
-							offset: timeOffset,
-							maskPosition: `${clampOffset(curPos)}px 0px, left top`,
-							webkitMaskPosition: `${clampOffset(curPos)}px 0px, left top`,
-						});
+						frames.push(frame);
 					}
+					if (curPos > 0 && lastPos < 0) {
+						const staticTime = Math.abs(lastPos) * d;
+						console.log(
+							"          Meet max boundary",
+							lastPos,
+							staticTime * totalDuration,
+							(lastTime + staticTime) * totalDuration,
+						);
+						const value = `${clampOffset(lastPos)}px 0px, right top`;
+						const frame: Keyframe = {
+							offset: lastTime + staticTime,
+							maskPosition: value,
+							webkitMaskPosition: value,
+						};
+						frames.push(frame);
+					}
+					const value = `${clampOffset(curPos)}px 0px, right top`;
+					const frame: Keyframe = {
+						offset: time,
+						maskPosition: value,
+						webkitMaskPosition: value,
+					};
+					frames.push(frame);
+					lastPos = curPos;
+					lastTime = time;
 				};
+				console.log(
+					"Generating",
+					word.word,
+					"width",
+					word.width,
+					"padding",
+					word.padding,
+					"fadeWidth",
+					fadeWidth,
+				);
 				pushFrame();
 				let lastTimeStamp = 0;
 				// TODO: 需要修正这里的动画帧生成逻辑，勿动
 				this.splittedWords.forEach((otherWord, j) => {
+					console.log("    Processing", otherWord.word, otherWord.width);
+					// 停顿
 					{
 						const curTimeStamp = otherWord.startTime - this.lyricLine.startTime;
-						const space = curTimeStamp - lastTimeStamp;
-						timeOffset += space / totalDuration;
-						pushFrame();
+						const staticDuration = curTimeStamp - lastTimeStamp;
+						timeOffset += staticDuration / totalDuration;
+						if (staticDuration > 0) pushFrame();
 						lastTimeStamp = curTimeStamp;
 					}
+					// 移动
 					{
-						const space = otherWord.endTime - otherWord.startTime;
-						timeOffset += space / totalDuration;
+						const fadeDuration = otherWord.endTime - otherWord.startTime;
+						timeOffset += fadeDuration / totalDuration;
 						curPos += otherWord.width;
-						if (j === i) curPos = 0;
-						pushFrame();
-						lastTimeStamp += space;
+						if (j === 0) {
+							curPos += fadeWidth * 2;
+						}
+						if (fadeDuration > 0) pushFrame();
+						lastTimeStamp += fadeDuration;
 					}
 				});
-				frames[frames.length - 1].offset = 1;
-				frames[frames.length - 1].maskPosition = "0px 0px, left top";
-				frames[frames.length - 1].webkitMaskPosition = "0px 0px, left top";
 				for (const a of word.maskAnimations) {
 					a.cancel();
 				}
