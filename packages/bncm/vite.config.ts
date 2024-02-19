@@ -157,7 +157,10 @@ const CopyBetterNCMPlugin = ({
 					recursive: true,
 				});
 			} catch {}
-			await cp(resolve(__dirname, "preview.svg"), resolve(fullDistDir, "preview.svg"));
+			await cp(
+				resolve(__dirname, "preview.svg"),
+				resolve(fullDistDir, "preview.svg"),
+			);
 			if (packPlugin) {
 				const zip = new JSZip();
 				for (const file of await readdir(fullDistDir)) {
@@ -268,7 +271,13 @@ export default defineConfig(({ mode }) => {
 				"@applemusic-like-lyrics/core": resolve(__dirname, "../core/src"),
 				"@applemusic-like-lyrics/react": resolve(__dirname, "../react/src"),
 				"@applemusic-like-lyrics/ttml": resolve(__dirname, "../ttml/src"),
-			}
+				"@applemusic-like-lyrics/fft": resolve(__dirname, "../fft/pkg"),
+				"@applemusic-like-lyrics/lyric": resolve(__dirname, "../lyric/pkg"),
+				"@applemusic-like-lyrics/ws-protocol": resolve(
+					__dirname,
+					"../ws-protocol/pkg",
+				),
+			},
 		},
 		define:
 			env.AMLL_DEV === "true"

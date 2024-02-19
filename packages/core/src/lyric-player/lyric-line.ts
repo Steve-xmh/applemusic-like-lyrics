@@ -294,7 +294,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private isEnabled = false;
-	enable(maskAnimationTime = 0) {
+	enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
 		this.element.classList.add("active");
 		const main = this.element.children[0] as HTMLDivElement;
@@ -305,33 +305,15 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				a.play();
 			}
 			for (const a of word.maskAnimations) {
-				a.currentTime = maskAnimationTime;
+				a.currentTime = Math.min(
+					this.totalDuration,
+					Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+				);
 				a.playbackRate = 1;
 				a.play();
 			}
 		}
 		main.classList.add("active");
-	}
-	measureSize(): [number, number] {
-		if (this._hide) {
-			if (this._prevParentEl) {
-				this._prevParentEl.appendChild(this.element);
-			}
-			this.element.style.display = "";
-			this.element.style.visibility = "hidden";
-		}
-		const size: [number, number] = [
-			this.element.clientWidth,
-			this.element.clientHeight,
-		];
-		if (this._hide) {
-			if (this._prevParentEl) {
-				this.element.remove();
-			}
-			this.element.style.display = "none";
-			this.element.style.visibility = "";
-		}
-		return size;
 	}
 	disable(maskAnimationTime = 0) {
 		this.isEnabled = false;
@@ -353,6 +335,57 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 		}
 		main.classList.remove("active");
+	}
+	resume() {
+		if (!this.isEnabled) return;
+		for (const word of this.splittedWords) {
+			for (const a of word.maskAnimations) {
+				a.play();
+			}
+		}
+	}
+	pause() {
+		if (!this.isEnabled) return;
+		for (const word of this.splittedWords) {
+			for (const a of word.maskAnimations) {
+				a.pause();
+			}
+		}
+	}
+	setMaskAnimationState(maskAnimationTime = 0) {
+		const t = maskAnimationTime - this.lyricLine.startTime;
+		for (const word of this.splittedWords) {
+			for (const a of word.maskAnimations) {
+				a.currentTime = Math.min(
+					this.totalDuration,
+					Math.max(0, t),
+				);
+				a.playbackRate = 1;
+				if (t >= 0 && t < this.totalDuration) a.play();
+				else a.pause();
+			}
+		}
+	}
+	measureSize(): [number, number] {
+		if (this._hide) {
+			if (this._prevParentEl) {
+				this._prevParentEl.appendChild(this.element);
+			}
+			this.element.style.display = "";
+			this.element.style.visibility = "hidden";
+		}
+		const size: [number, number] = [
+			this.element.clientWidth,
+			this.element.clientHeight,
+		];
+		if (this._hide) {
+			if (this._prevParentEl) {
+				this.element.remove();
+			}
+			this.element.style.display = "none";
+			this.element.style.visibility = "";
+		}
+		return size;
 	}
 	setLine(line: LyricLine) {
 		this.lyricLine = line;
@@ -741,6 +774,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
+				// TODO: 可选配置渐变宽度
+				// Apple Music for iPad 上是 `word.height / 2`
+				// Apple Music for Android 上是 `word.height`
 				const fadeWidth = word.height / 2;
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / (word.width + word.padding * 2),
@@ -774,23 +810,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;
 					const d = Math.abs(duration / moveOffset);
-					console.log(
-						"        pushFrame",
-						frames.length,
-						curPos,
-						timeOffset * totalDuration,
-						"moved",
-						moveOffset,
-					);
 					// 因为有可能会和之前的动画有边界
 					if (curPos > minOffset && lastPos < minOffset) {
 						const staticTime = Math.abs(lastPos - minOffset) * d;
-						console.log(
-							"          Meet min boundary",
-							lastPos,
-							staticTime * totalDuration,
-							(lastTime + staticTime) * totalDuration,
-						);
 						const value = `${clampOffset(lastPos)}px 0px, right top`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
@@ -801,13 +823,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					}
 					if (curPos > 0 && lastPos < 0) {
 						const staticTime = Math.abs(lastPos) * d;
-						console.log(
-							"          Meet max boundary",
-							lastPos,
-							staticTime * totalDuration,
-							(lastTime + staticTime) * totalDuration,
-						);
-						const value = `${clampOffset(lastPos)}px 0px, right top`;
+						const value = `${clampOffset(curPos)}px 0px, right top`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
 							maskPosition: value,
@@ -825,21 +841,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					lastPos = curPos;
 					lastTime = time;
 				};
-				console.log(
-					"Generating",
-					word.word,
-					"width",
-					word.width,
-					"padding",
-					word.padding,
-					"fadeWidth",
-					fadeWidth,
-				);
 				pushFrame();
 				let lastTimeStamp = 0;
-				// TODO: 需要修正这里的动画帧生成逻辑，勿动
 				this.splittedWords.forEach((otherWord, j) => {
-					console.log("    Processing", otherWord.word, otherWord.width);
 					// 停顿
 					{
 						const curTimeStamp = otherWord.startTime - this.lyricLine.startTime;
@@ -854,7 +858,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						timeOffset += fadeDuration / totalDuration;
 						curPos += otherWord.width;
 						if (j === 0) {
-							curPos += fadeWidth * 2;
+							curPos += fadeWidth * 1.5;
+						}
+						if (j === this.splittedWords.length - 1) {
+							curPos += fadeWidth * 0.5;
 						}
 						if (fadeDuration > 0) pushFrame();
 						lastTimeStamp += fadeDuration;

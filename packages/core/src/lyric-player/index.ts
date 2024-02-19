@@ -889,6 +889,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		const removedHotIds = new Set<number>();
 		const removedIds = new Set<number>();
 		const addedIds = new Set<number>();
+		
+		if (isSeek) {
+			for (const line of this.lyricLinesEl) {
+				line.setMaskAnimationState(time);
+			}
+		}
 
 		// 先检索当前已经超出时间范围的缓冲行，列入待删除集内
 		this.hotLines.forEach((lastHotId) => {
@@ -1002,12 +1008,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	pause() {
 		this.interludeDots.pause();
+		for (const line of this.lyricLinesEl) {
+			line.pause();
+		}
 	}
 	/**
 	 * 恢复部分效果演出，目前会恢复播放间奏点的动画
 	 */
 	resume() {
 		this.interludeDots.resume();
+		for (const line of this.lyricLinesEl) {
+			line.resume();
+		}
 	}
 	/**
 	 * 更新动画，这个函数应该被逐帧调用或者在以下情况下调用一次：

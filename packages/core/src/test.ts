@@ -297,11 +297,11 @@ async function loadLyric() {
 }
 
 const lys = String.raw`
-[0]The(212585,131) (0,0)memories(212716,618) (0,0)are(213334,147) (0,0)fading,(213481,2148) (0,0)I(215629,109)’(215738,88)ll(215826,76) (0,0)say(215902,220) (0,0)goodbye(216122,306) (0,0)to(216428,106) (0,0)eve(216534,1539)ry(218073,1564)thing(219637,3163)
+[35610,4170](35610,360,0)I (35970,540,0)cast (36510,390,0)us (36900,390,0)out (37290,1050,0)of (38340,1440,0)paradise
 `.trim();
 // [0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
 
-const l = parseLys(lys).map(mapLyric);
+const l = parseYrc(lys).map(mapLyric);
 
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
@@ -319,6 +319,6 @@ const l = parseLys(lys).map(mapLyric);
 	await loadLyric();
 	lyricPlayer.setLyricLines(l);
 	// debugValues.play();
-	debugValues.currentTime = 211;
+	debugValues.currentTime = 34;
 	debugValues.mockPlay();
 })();
