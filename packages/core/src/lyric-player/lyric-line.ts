@@ -356,10 +356,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const t = maskAnimationTime - this.lyricLine.startTime;
 		for (const word of this.splittedWords) {
 			for (const a of word.maskAnimations) {
-				a.currentTime = Math.min(
-					this.totalDuration,
-					Math.max(0, t),
-				);
+				a.currentTime = Math.min(this.totalDuration, Math.max(0, t));
 				a.playbackRate = 1;
 				if (t >= 0 && t < this.totalDuration) a.play();
 				else a.pause();
@@ -770,6 +767,54 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				word.padding = 0;
 			}
 		}
+		if (this.lyricPlayer.supportMaskImage) {
+			this.generateWebAnimationBasedMaskImage();
+		} else {
+			this.generateCalcBasedMaskImage();
+		}
+		if (this._hide) {
+			if (this._prevParentEl) {
+				this.element.remove();
+			}
+			this.element.style.display = "none";
+			this.element.style.visibility = "";
+		}
+	}
+	private generateCalcBasedMaskImage() {
+		for (const word of this.splittedWords) {
+			const wordEl = word.mainElement;
+			if (wordEl) {
+				word.width = wordEl.clientWidth;
+				word.height = wordEl.clientHeight;
+				const fadeWidth = word.height / 2;
+				const [maskImage, totalAspect] = generateFadeGradient(
+					fadeWidth / word.width,
+				);
+				const totalAspectStr = `${totalAspect * 100}% 100%`;
+				if (this.lyricPlayer.supportMaskImage) {
+					wordEl.style.maskImage = maskImage;
+					wordEl.style.maskRepeat = "no-repeat";
+					wordEl.style.maskOrigin = "left";
+					wordEl.style.maskSize = totalAspectStr;
+				} else {
+					wordEl.style.webkitMaskImage = maskImage;
+					wordEl.style.webkitMaskRepeat = "no-repeat";
+					wordEl.style.webkitMaskOrigin = "left";
+					wordEl.style.webkitMaskSize = totalAspectStr;
+				}
+				const w = word.width + fadeWidth;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
+					word.startTime
+				})*${
+					w / Math.abs(word.endTime - word.startTime)
+				}px),0px) 0px, left top`;
+				// const maskPos = `clamp(0px,${w}px,${w}px) 0px, left top`;
+				wordEl.style.maskPosition = maskPos;
+				wordEl.style.webkitMaskPosition = maskPos;
+			}
+		}
+	}
+	private generateWebAnimationBasedMaskImage() {
 		const totalDuration = this.totalDuration;
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
@@ -813,29 +858,29 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					// 因为有可能会和之前的动画有边界
 					if (curPos > minOffset && lastPos < minOffset) {
 						const staticTime = Math.abs(lastPos - minOffset) * d;
-						const value = `${clampOffset(lastPos)}px 0px, right top`;
+						const value = `${clampOffset(lastPos)}px`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
-							maskPosition: value,
-							webkitMaskPosition: value,
+							maskPositionX: value,
+							webkitMaskPositionX: value,
 						};
 						frames.push(frame);
 					}
 					if (curPos > 0 && lastPos < 0) {
 						const staticTime = Math.abs(lastPos) * d;
-						const value = `${clampOffset(curPos)}px 0px, right top`;
+						const value = `${clampOffset(curPos)}px`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
-							maskPosition: value,
-							webkitMaskPosition: value,
+							maskPositionX: value,
+							webkitMaskPositionX: value,
 						};
 						frames.push(frame);
 					}
-					const value = `${clampOffset(curPos)}px 0px, right top`;
+					const value = `${clampOffset(curPos)}px`;
 					const frame: Keyframe = {
 						offset: time,
-						maskPosition: value,
-						webkitMaskPosition: value,
+						maskPositionX: value,
+						webkitMaskPositionX: value,
 					};
 					frames.push(frame);
 					lastPos = curPos;
@@ -884,13 +929,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 			}
 		});
-		if (this._hide) {
-			if (this._prevParentEl) {
-				this.element.remove();
-			}
-			this.element.style.display = "none";
-			this.element.style.visibility = "";
-		}
 	}
 	getElement() {
 		return this.element;
