@@ -5,7 +5,7 @@ import fragShader from "./shaders/base.frag.glsl?raw";
 import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
-import noiseImage from "../assets/noise.png?inline";
+import noiseImage from "../assets/noise 5.png?inline";
 
 const NOISE_IMAGE_DATA = (() => {
 	const img = document.createElement("img");
@@ -210,8 +210,7 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${
-					this.label
+				`Failed to compile shader for type ${type} "${this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -454,8 +453,8 @@ class NoiseTexture implements Disposable {
 				gl.UNSIGNED_BYTE,
 				NOISE_IMAGE_DATA,
 			);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 		});
@@ -641,7 +640,6 @@ export class EplorRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
-		this.noiseTexture.active();
 		this.checkResize();
 		this.hasLyricValue =
 			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
@@ -650,6 +648,8 @@ export class EplorRenderer extends BaseRenderer {
 		this.indexBuffer.bind();
 
 		this.mainProgram.use();
+		this.noiseTexture.active();
+		this.mainProgram.setUniform1i("noisetex", 1);
 		this.mainProgram.setUniform2f(
 			"IIlIlIIlIlIllI",
 			this.renderSize[0],
