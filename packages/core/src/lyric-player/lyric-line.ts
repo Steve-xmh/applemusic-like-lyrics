@@ -858,29 +858,26 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					// 因为有可能会和之前的动画有边界
 					if (curPos > minOffset && lastPos < minOffset) {
 						const staticTime = Math.abs(lastPos - minOffset) * d;
-						const value = `${clampOffset(lastPos)}px`;
+						const value = `${clampOffset(lastPos)}px 0`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
-							maskPositionX: value,
-							webkitMaskPositionX: value,
+							maskPosition: value,
 						};
 						frames.push(frame);
 					}
 					if (curPos > 0 && lastPos < 0) {
 						const staticTime = Math.abs(lastPos) * d;
-						const value = `${clampOffset(curPos)}px`;
+						const value = `${clampOffset(curPos)}px 0`;
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
-							maskPositionX: value,
-							webkitMaskPositionX: value,
+							maskPosition: value,
 						};
 						frames.push(frame);
 					}
-					const value = `${clampOffset(curPos)}px`;
+					const value = `${clampOffset(curPos)}px 0`;
 					const frame: Keyframe = {
 						offset: time,
-						maskPositionX: value,
-						webkitMaskPositionX: value,
+						maskPosition: value,
 					};
 					frames.push(frame);
 					lastPos = curPos;
@@ -916,6 +913,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					a.cancel();
 				}
 				try {
+					console.log(frames);
 					const ani = wordEl.animate(frames, {
 						duration: totalDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
