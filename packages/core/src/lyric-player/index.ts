@@ -742,7 +742,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			let targetOpacity = 1;
 			if (
 				!isActive &&
-				i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
+				i <= (interlude ? interlude[2] : this.scrollToIndex)
 			) {
 				if (this.hidePassedLines) {
 					targetOpacity = 0;
