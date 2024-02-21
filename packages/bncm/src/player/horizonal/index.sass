@@ -1,4 +1,4 @@
-$info-size-fract: 0.75fr
+$info-size-fract: 0.85fr
 $player-size-fract: 1fr
 
 .lyric-player-horizonal
@@ -74,12 +74,27 @@ $player-size-fract: 1fr
         justify-self: center
         width: min(50vh,40vw)
         height: min(50vh,40vw)
-        transition: background-image 0.5s linear, transform 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)
+        transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)
+        image-rendering: auto
         background-position: center
         background-size: cover
         border-radius: 3%
         overflow: hidden
-        box-shadow: rgba(0,0,0,0.2) 0px 16px 32px
+        
+        $scale-level: 0.75
+        $base-box-shadow-v-0: rgba(0,0,0,0.25)
+        $base-box-shadow-y-0: 16px
+        $base-box-shadow-r-0: 24px
+        $base-box-shadow-v-1: rgba(0,0,0,0.2)
+        $base-box-shadow-y-1: 32px
+        $base-box-shadow-r-1: 64px
+        
+        box-shadow: $base-box-shadow-v-0 0px calc($base-box-shadow-y-0 / $scale-level) calc($base-box-shadow-r-0 / $scale-level), $base-box-shadow-v-1 0px calc($base-box-shadow-y-1 / $scale-level) calc($base-box-shadow-r-1 / $scale-level)
+        transform: scale($scale-level)
+        &.is-playing
+            transform: scale(1)
+            transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)
+            box-shadow: $base-box-shadow-v-0 0px $base-box-shadow-y-0 $base-box-shadow-r-0, $base-box-shadow-v-1 0px $base-box-shadow-y-1 $base-box-shadow-r-1
         &.hide-cursor
             cursor: none
     .amll-music-name
@@ -88,7 +103,7 @@ $player-size-fract: 1fr
         cursor: text
         user-select: text
         min-width: 0
-        font-weight: 600
+        font-weight: 500
         letter-spacing: 0.3px
 
     .am-music-main-menu
@@ -117,7 +132,7 @@ $player-size-fract: 1fr
         width: 8vh !important
         padding: 0
         > *
-            $base-scale: 1.05
+            $base-scale: 1.15
             transform: scale($base-scale, calc($base-scale * 1.1))
 
     .amll-music-album, .amll-music-artists

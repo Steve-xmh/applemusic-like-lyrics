@@ -175,7 +175,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 10vw), 12px))",
+			fontSize: "var(--amll-lyric-player-font-size,max(min(6vh, 8vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
@@ -740,10 +740,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos += this.interludeDotsSize[1] + 40;
 			}
 			let targetOpacity = 1;
-			if (
-				!isActive &&
-				i <= (interlude ? interlude[2] : this.scrollToIndex)
-			) {
+			if (!isActive && i <= (interlude ? interlude[2] : this.scrollToIndex)) {
 				if (this.hidePassedLines) {
 					targetOpacity = 0;
 				} else if (this.isNonDynamic) {

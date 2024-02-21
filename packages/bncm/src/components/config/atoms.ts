@@ -306,6 +306,12 @@ export const musicControlTypeAtom = atomWithConfig({
 	desc: "音乐控制组件的类型",
 });
 
+export const showVolumeSliderAtom = atomWithConfig({
+	key: "show-colume-slider-type",
+	default: true,
+	desc: "是否显示音量控制条",
+});
+
 export const processBarFFTAtom = atomWithConfig({
 	key: "process-bar-fft",
 	default: true,

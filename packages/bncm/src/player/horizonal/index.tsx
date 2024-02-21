@@ -103,19 +103,9 @@ export const LyricPlayerHorizonal: FC = () => {
 				(loadableMusicOverrideData.state === "hasData" &&
 				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
-						style={{
-							boxShadow:
-								playStatus === PlayState.Playing
-									? "rgba(0,0,0,0.4) 0px 16px 32px"
-									: "rgba(0,0,0,0.2) 0px 8px 16px",
-							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
-							transition:
-								playStatus === PlayState.Playing
-									? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)"
-									: "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)",
-						}}
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
+							"is-playing": playStatus === PlayState.Playing,
 						})}
 						ref={albumCoverRef}
 					>
@@ -137,20 +127,11 @@ export const LyricPlayerHorizonal: FC = () => {
 				) : (
 					<div
 						style={{
-							boxShadow:
-								playStatus === PlayState.Playing
-									? "rgba(0,0,0,0.4) 0px 16px 32px"
-									: "rgba(0,0,0,0.2) 0px 8px 16px",
 							backgroundImage: `url(${musicCoverUrl})`,
-							imageRendering: "auto",
-							transform: playStatus === PlayState.Playing ? "" : "scale(0.75)",
-							transition:
-								playStatus === PlayState.Playing
-									? "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4)"
-									: "background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)",
 						}}
 						className={classNames("amll-cover-image", {
 							"hide-cursor": hideCursorWhenHoveringCover,
+							"is-playing": playStatus === PlayState.Playing,
 						})}
 						ref={albumCoverRef}
 					/>

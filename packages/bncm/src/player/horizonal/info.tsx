@@ -8,6 +8,7 @@ import {
 	showMenuButtonAtom,
 	showMusicArtistsAtom,
 	showMusicNameAtom,
+	showVolumeSliderAtom,
 } from "../../components/config/atoms";
 import {
 	currentTimeAtom,
@@ -51,6 +52,7 @@ export const MusicInfo: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const showQualityTag = useAtomValue(showAudioQualityTagAtom);
 	const musicControlType = useAtomValue(musicControlTypeAtom);
+	const showVolumeSlider = useAtomValue(showVolumeSliderAtom);
 	const wsConnectionStatus = useAtomValue(wsConnectionStatusAtom);
 
 	const showMusicName = useAtomValue(showMusicNameAtom);
@@ -143,7 +145,7 @@ export const MusicInfo: FC = () => {
 			{musicControlType === MusicControlType.Default && (
 				<>
 					<PlayControls />
-					<VolumeControl />
+					{showVolumeSlider && <VolumeControl />}
 				</>
 			)}
 			{musicControlType === MusicControlType.BarVisualizer &&

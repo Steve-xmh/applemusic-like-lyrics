@@ -15,6 +15,7 @@ import {
 	rightControlButtonTypeAtom,
 	showAMLLTTMLDBTipAtom,
 	processBarFFTAtom,
+	showVolumeSliderAtom,
 } from "./atoms";
 import { Select } from "../appkit/select";
 import { useAtom } from "jotai";
@@ -137,6 +138,15 @@ export const LyricStyleConfig: FC = () => {
 						]}
 					/>
 				</div>
+				{musicControlType === MusicControlType.Default && (
+					<>
+						<GroupBoxDevider />
+						<SwitchConfigComponent
+							atom={showVolumeSliderAtom}
+							label="是否显示音量控制条"
+						/>
+					</>
+				)}
 			</GroupBox>
 			{musicControlType === MusicControlType.Default && (
 				<>
