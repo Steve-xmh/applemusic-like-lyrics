@@ -27,13 +27,13 @@ const ANIMATION_FRAME_QUANTITY = 32;
 
 const norNum = (min: number, max: number) => (x: number) =>
 	Math.min(1, Math.max(0, (x - min) / (max - min)));
-const EMP_EASING_MID = 0.5;
+const EMP_EASING_MID = 0.4;
 const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
 const makeEmpEasing = (mid: number) => {
 	const bezIn = bezier(0.3, 0, 0.25, 1);
-	const bezOut = bezier(0.5, 0, 0.6, 1);
+	const bezOut = bezier(0.5, 0, 0.3, 1);
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
@@ -504,7 +504,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							...word,
 							mainElement: mainWordEl,
 							subElements: charEls,
-							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
+							elementAnimations: [this.initFloatAnimation(merged, mainWordEl)],
 							maskAnimations: [],
 							width: 0,
 							height: 0,
@@ -602,22 +602,22 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = Math.max(1000, word.endTime - word.startTime);
-		let amount = 1;
-		if (shouldEmphasize(word) && duration < 1100) {
-			amount = 0;
+		let up = 0.05;
+		if (shouldEmphasize(word) && duration < 1200) {
+			up = 0;
 		}
 		const a = wordEl.animate(
 			[
 				{
-					transform: "translateY(0)",
+					transform: "translateY(0px)",
 				},
 				{
-					transform: `translateY(-${amount * 2}px)`,
+					transform: `translateY(${-up}em)`,
 				},
 			],
 			{
-				duration: Number.isFinite(duration) ? duration : 0,
-				delay: Number.isFinite(delay) ? delay : 0,
+				duration: isFinite(duration) ? duration : 0,
+				delay: isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
 				fill: "both",
@@ -639,7 +639,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 		let method = EmphasizeAnimationMethod.FloatAndGlow;
 
-		if (du < 1100) {
+		if (du < 1200) {
 			method = EmphasizeAnimationMethod.FloatOnly;
 		}
 
@@ -651,18 +651,18 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let blur = 0;
 				if (du >= 1200 && du < 2000) {
 					amount = 0.7;
-					blur = 0.3;
+					blur = 0.5;
 				} else if (du >= 2000 && du < 3000) {
 					amount = 0.8;
-					blur = 0.5;
-				} else if (du >= 3000 && du < 4000) {
-					amount = 0.9;
 					blur = 0.6;
+				} else if (du >= 3000 && du < 4000) {
+					amount = 1.0;
+					blur = 0.8;
 				} else if (du >= 4000) {
 					amount = 1.0;
-					blur = 0.6;
+					blur = 0.8;
 				}
-				const animateDu = Number.isFinite(du) ? du * 1.2 : 0;
+				const animateDu = Number.isFinite(du) ? Math.max(du * 1.2, 2000) : 0;
 				const empEasing = makeEmpEasing(EMP_EASING_MID);
 				result = characterElements.flatMap((el, i, arr) => {
 					const wordDe = de + (du / 3 / arr.length) * i;
@@ -684,7 +684,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							return {
 								offset: x,
 								transform: `${matrix4ToCSS(mat, 4)} translate(${transX * 0.005 * amount
-									}em,${-y * 2}px)`,
+									}em,${-y * 0.05}em)`,
 								textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
 							};
 						});
@@ -720,7 +720,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 							return {
 								offset: x,
-								transform: `translateY(${-y * 2}px)`,
+								transform: `translateY(${-y * 0.05}em)`,
 							};
 						});
 					const ani = el.animate(frames, {
