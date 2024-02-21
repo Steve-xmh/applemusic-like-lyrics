@@ -603,6 +603,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const delay = word.startTime - this.lyricLine.startTime;
 		const duration = Math.max(1000, word.endTime - word.startTime);
 		let up = 0.05;
+		if (this.lyricLine.isBG) {
+			up *= 2;
+		}
 		if (shouldEmphasize(word) && duration < 1200) {
 			up = 0;
 		}
