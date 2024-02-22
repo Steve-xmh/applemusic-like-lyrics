@@ -98,7 +98,7 @@ export const App: FC = () => {
 					width: "100%",
 					height: "100%",
 				}}
-				albumImageUrl={albumUrl}
+				album={albumUrl}
 			/>
 			<LyricPlayer
 				style={{

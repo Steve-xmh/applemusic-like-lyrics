@@ -101,7 +101,7 @@ function recreateBGRenderer(mode: string) {
 	bg.getElement().style.left = "0";
 	bg.getElement().style.width = "100%";
 	bg.getElement().style.height = "100%";
-	bg.setAlbumImage(debugValues.album);
+	bg.setAlbum(debugValues.album);
 }
 
 audio.src = debugValues.music;
@@ -127,7 +127,7 @@ gui
 	.add(debugValues, "album")
 	.name("专辑图片")
 	.onFinishChange((v: string) => {
-		window.globalBackground.setAlbumImage(v);
+		window.globalBackground.setAlbum(v);
 	});
 
 const bgGui = gui.addFolder("背景");

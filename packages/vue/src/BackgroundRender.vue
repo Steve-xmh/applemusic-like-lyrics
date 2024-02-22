@@ -28,8 +28,8 @@ onUnmounted(() => {
 });
 
 watchEffect(() => {
-    if (props.albumImageUrl)
-        bgRenderRef.value?.setAlbumImage(props.albumImageUrl);
+    if (props.album)
+        bgRenderRef.value?.setAlbum(props.album, props.albumIsVideo);
 });
 
 watchEffect(() => {

@@ -10,16 +10,26 @@ import {
 	forwardRef,
 	useImperativeHandle,
 	type HTMLProps,
+	useMemo,
 } from "react";
+export {
+	BaseRenderer,
+	EplorRenderer,
+	PixiRenderer,
+} from "@applemusic-like-lyrics/core";
 
 /**
  * 背景渲染组件的属性
  */
 export interface BackgroundRenderProps {
 	/**
-	 * 设置背景专辑图片
+	 * 设置背景专辑资源
 	 */
-	albumImageUrl?: string;
+	album?: string | HTMLImageElement | HTMLVideoElement;
+	/**
+	 * 设置专辑资源是否为视频
+	 */
+	albumIsVideo?: boolean;
 	/**
 	 * 设置当前背景动画帧率，如果为 `undefined` 则默认为 `30`
 	 */
@@ -87,7 +97,8 @@ export const BackgroundRender = forwardRef<
 >(
 	(
 		{
-			albumImageUrl,
+			album,
+			albumIsVideo,
 			fps,
 			playing,
 			flowSpeed,
@@ -102,38 +113,30 @@ export const BackgroundRender = forwardRef<
 	) => {
 		const coreBGRenderRef = useRef<AbstractBaseRenderer>();
 		const wrapperRef = useRef<HTMLDivElement>(null);
+		const lastRendererRef = useRef<{ new (canvas: HTMLCanvasElement): BaseRenderer }>();
+		const curRenderer = renderer ?? EplorRenderer;
 
 		useEffect(() => {
-			coreBGRenderRef.current = CoreBackgroundRender.new(
-				renderer ?? EplorRenderer,
-			);
-			if (albumImageUrl) coreBGRenderRef.current?.setAlbumImage(albumImageUrl);
-			if (fps) coreBGRenderRef.current?.setFPS(fps);
-			if (playing === undefined) {
-				coreBGRenderRef.current?.resume();
-			} else if (playing) {
-				coreBGRenderRef.current?.resume();
-			} else {
-				coreBGRenderRef.current?.pause();
-			}
-			if (flowSpeed) coreBGRenderRef.current?.setFlowSpeed(flowSpeed);
-			coreBGRenderRef.current?.setStaticMode(staticMode ?? false);
-			if (renderScale)
-				coreBGRenderRef.current?.setRenderScale(renderScale ?? 0.5);
-			return () => {
+			if (lastRendererRef.current !== curRenderer || coreBGRenderRef.current === undefined) {
+				lastRendererRef.current = curRenderer;
+				console.log("new renderer", curRenderer);
 				coreBGRenderRef.current?.dispose();
-			};
-		}, [renderer]);
+				coreBGRenderRef.current = CoreBackgroundRender.new(
+					curRenderer,
+				);
+			}
+		}, [curRenderer]);
 
 		useEffect(() => {
-			if (albumImageUrl) coreBGRenderRef.current?.setAlbumImage(albumImageUrl);
-		}, [albumImageUrl]);
+			if (curRenderer && album) coreBGRenderRef.current?.setAlbum(album, albumIsVideo);
+		}, [curRenderer, album, albumIsVideo]);
 
 		useEffect(() => {
-			if (fps) coreBGRenderRef.current?.setFPS(fps);
-		}, [fps]);
+			if (curRenderer && fps) coreBGRenderRef.current?.setFPS(fps);
+		}, [curRenderer, fps]);
 
 		useEffect(() => {
+			if (!curRenderer) return;
 			if (playing === undefined) {
 				coreBGRenderRef.current?.resume();
 			} else if (playing) {
@@ -141,31 +144,34 @@ export const BackgroundRender = forwardRef<
 			} else {
 				coreBGRenderRef.current?.pause();
 			}
-		}, [playing]);
+		}, [curRenderer, playing]);
 
 		useEffect(() => {
+			if (!curRenderer) return;
 			if (flowSpeed) coreBGRenderRef.current?.setFlowSpeed(flowSpeed);
-		}, [flowSpeed]);
+		}, [curRenderer, flowSpeed]);
 
 		useEffect(() => {
+			if (!curRenderer) return;
 			coreBGRenderRef.current?.setStaticMode(staticMode ?? false);
-		}, [staticMode]);
+		}, [curRenderer, staticMode]);
 
 		useEffect(() => {
-			if (renderScale)
+			if (curRenderer && renderScale)
 				coreBGRenderRef.current?.setRenderScale(renderScale ?? 0.5);
-		}, [renderScale]);
+		}, [curRenderer, renderScale]);
 
 		useEffect(() => {
-			if (lowFreqVolume)
+			if (curRenderer && lowFreqVolume)
 				coreBGRenderRef.current?.setLowFreqVolume(lowFreqVolume ?? 1.0);
-		}, [lowFreqVolume]);
+		}, [curRenderer, lowFreqVolume]);
 
 		useEffect(() => {
-			if (hasLyric !== undefined)
+			if (curRenderer && hasLyric !== undefined)
 				coreBGRenderRef.current?.setHasLyric(hasLyric ?? true);
-		}, [hasLyric]);
+		}, [curRenderer, hasLyric]);
 
+		// biome-ignore lint/correctness/useExhaustiveDependencies: coreBGRenderRef.current
 		useEffect(() => {
 			if (coreBGRenderRef.current) {
 				const el = coreBGRenderRef.current.getElement();
@@ -175,6 +181,7 @@ export const BackgroundRender = forwardRef<
 			}
 		}, [coreBGRenderRef.current]);
 
+		// biome-ignore lint/correctness/useExhaustiveDependencies: wrapperRef.current, coreBGRenderRef.current
 		useImperativeHandle(
 			ref,
 			() => ({

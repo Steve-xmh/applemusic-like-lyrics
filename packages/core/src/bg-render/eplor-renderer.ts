@@ -6,6 +6,7 @@ import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
 import noiseImage from "../assets/noise 5.png?inline";
+import { loadResourceFromElement, loadResourceFromUrl } from "../utils/resource";
 
 const NOISE_IMAGE_DATA = (() => {
 	const img = document.createElement("img");
@@ -783,32 +784,31 @@ export class EplorRenderer extends BaseRenderer {
 		this.paused = false;
 		this.requestTick();
 	}
-	private loadImage(imageUrl: string): Promise<HTMLImageElement> {
-		return new Promise((resolve, reject) => {
-			const img = document.createElement("img");
-			img.onload = () => resolve(img);
-			img.onerror = reject;
-			img.src = imageUrl;
-			img.crossOrigin = "anonymous";
-		});
-	}
-	override async setAlbumImage(albumUrl: string): Promise<void> {
-		if (albumUrl.trim().length === 0) return;
+	override async setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo = false): Promise<void> {
+		if (typeof albumSource === "string" && albumSource.trim().length === 0) throw new Error("Empty album url");
+		let res: HTMLImageElement | HTMLVideoElement | null = null;
 		let remainRetryTimes = 5;
-		let img: HTMLImageElement | null = null;
-		while (!img && remainRetryTimes > 0) {
+		console.log("setAlbum", albumSource);
+		while (!res && remainRetryTimes > 0) {
 			try {
-				img = await this.loadImage(albumUrl);
+				if (typeof albumSource === "string") {
+					res = await loadResourceFromUrl(albumSource, isVideo)
+				} else {
+					res = await loadResourceFromElement(albumSource);
+				}
 			} catch (error) {
 				console.warn(
-					`failed on loading album image, retrying (${remainRetryTimes})`,
-					albumUrl,
-					error,
+					`failed on loading album resource, retrying (${remainRetryTimes})`,
+					{
+						albumSource,
+						error,
+					}
 				);
 				remainRetryTimes--;
 			}
 		}
-		if (!img) return;
+		console.log("loaded album resource", res);
+		if (!res) return;
 		// resize image
 		const c = this.reduceImageSizeCanvas;
 		const ctx = c.getContext("2d");
@@ -818,9 +818,10 @@ export class EplorRenderer extends BaseRenderer {
 		const blurRadius = 10;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
-		const imgw = img.naturalWidth;
-		const imgh = img.naturalHeight;
-		ctx.drawImage(img, 0, 0, imgw, imgh, 0, 0, c.width, c.height);
+		const imgw = res instanceof HTMLVideoElement ? res.videoWidth : res.naturalWidth;
+		const imgh = res instanceof HTMLVideoElement ? res.videoHeight : res.naturalHeight;
+		if (imgw * imgh === 0) throw new Error("Invalid image size");
+		ctx.drawImage(res, 0, 0, imgw, imgh, 0, 0, c.width, c.height);
 		// ctx.fillStyle = "white";
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);

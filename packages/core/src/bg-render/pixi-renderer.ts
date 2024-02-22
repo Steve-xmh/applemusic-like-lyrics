@@ -6,6 +6,7 @@ import { Texture } from "@pixi/core";
 import { Sprite } from "@pixi/sprite";
 import { BulgePinchFilter } from "@pixi/filter-bulge-pinch";
 import { BaseRenderer } from "./base";
+import { loadResourceFromElement, loadResourceFromUrl } from "../utils/resource";
 
 class TimedContainer extends Container {
 	public time = 0;
@@ -190,17 +191,19 @@ export class PixiRenderer extends BaseRenderer {
 		// NOOP
 	}
 
-	override async setAlbumImage(albumUrl: string) {
-		if (albumUrl.trim().length === 0) return;
-		const img = new Image();
-		img.src = albumUrl;
-		img.crossOrigin = "anonymous";
+	override async setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo?: boolean): Promise<void> {
+		if (typeof albumSource === "string" && albumSource.trim().length === 0) return;
+		let res: HTMLImageElement | HTMLVideoElement | null = null;
 		let remainRetryTimes = 5;
-		let tex;
+		let tex: Texture | null = null;
 		while (!tex?.baseTexture?.resource?.valid && remainRetryTimes > 0) {
 			try {
-				await img.decode();
-				tex = Texture.from(img, {
+				if (typeof albumSource === "string") {
+					res = await loadResourceFromUrl(albumSource, isVideo)
+				} else {
+					res = await loadResourceFromElement(albumSource);
+				}
+				tex = Texture.from(res, {
 					resourceOptions: {
 						autoLoad: false,
 					},
@@ -209,10 +212,10 @@ export class PixiRenderer extends BaseRenderer {
 			} catch (error) {
 				console.warn(
 					`failed on loading album image, retrying (${remainRetryTimes})`,
-					albumUrl,
+					albumSource,
 					error,
 				);
-				tex = undefined;
+				tex = null;
 				remainRetryTimes--;
 			}
 		}

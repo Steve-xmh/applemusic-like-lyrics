@@ -132,9 +132,13 @@ export interface LyricPlayerRef {
  */
 export interface BackgroundRenderProps {
 	/**
-	 * 设置背景专辑图片
+	 * 设置背景专辑资源
 	 */
-	albumImageUrl?: string;
+	album?: string | HTMLImageElement | HTMLVideoElement;
+	/**
+	 * 设置专辑资源是否为视频
+	 */
+	albumIsVideo?: boolean;
 	/**
 	 * 设置当前背景动画帧率，如果为 `undefined` 则默认为 `30`
 	 */

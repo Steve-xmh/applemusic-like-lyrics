@@ -18,10 +18,11 @@ import {
 import { BackgroundRender } from "@applemusic-like-lyrics/react";
 import {
 	displayMusicCoverAtom,
+	loadableMusicOverrideDataAtom,
 	lyricPageOpenedAtom,
 } from "../../music-context/wrapper";
 import "./background.sass";
-import { EplorRenderer } from "@applemusic-like-lyrics/core";
+import { EplorRenderer, PixiRenderer } from "@applemusic-like-lyrics/core";
 import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
 import { lyricLinesAtom } from "../../lyric/provider";
@@ -34,6 +35,7 @@ export const Background: FC = () => {
 	const showBackgroundFFTLowFreq = useAtomValue(showBackgroundFFTLowFreqAtom);
 	const backgroundRenderScale = useAtomValue(backgroundRenderScaleAtom);
 	const flowSpeed = useAtomValue(backgroundFlowSpeedAtom);
+	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const backgroundCustomSolidColor = useAtomValue(
 		backgroundCustomSolidColorAtom,
 	);
@@ -125,7 +127,8 @@ export const Background: FC = () => {
 						className="amll-background-render-wrapper"
 						staticMode={backgroundFakeLiquidStaticMode}
 						disabled={!lyricPageOpened}
-						albumImageUrl={musicCoverUrl}
+						album={musicCoverUrl}
+						albumIsVideo={loadableMusicOverrideData.state === "hasData" && loadableMusicOverrideData.data?.musicCoverIsVideo}
 						fps={backgroundMaxFPS}
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
@@ -140,7 +143,7 @@ export const Background: FC = () => {
 						renderer={
 							backgroundType === BackgroundType.LiquidEplor
 								? EplorRenderer
-								: undefined
+								: PixiRenderer
 						}
 					/>
 					{showBackgroundFFTLowFreq && (
