@@ -17,7 +17,7 @@ export function loadVideo(videoUrl: string): Promise<HTMLVideoElement> {
 		const video = document.createElement("video");
 		let playing = false;
 		let timeupdate = false;
-        let rejected = false;
+		let rejected = false;
 		video.addEventListener(
 			"playing",
 			() => {
@@ -37,7 +37,7 @@ export function loadVideo(videoUrl: string): Promise<HTMLVideoElement> {
 		video.addEventListener(
 			"error",
 			(err) => {
-                rejected = true;
+				rejected = true;
 				reject(err);
 			},
 			true,

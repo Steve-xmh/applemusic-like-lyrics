@@ -113,22 +113,26 @@ export const BackgroundRender = forwardRef<
 	) => {
 		const coreBGRenderRef = useRef<AbstractBaseRenderer>();
 		const wrapperRef = useRef<HTMLDivElement>(null);
-		const lastRendererRef = useRef<{ new (canvas: HTMLCanvasElement): BaseRenderer }>();
+		const lastRendererRef = useRef<{
+			new (canvas: HTMLCanvasElement): BaseRenderer;
+		}>();
 		const curRenderer = renderer ?? EplorRenderer;
 
 		useEffect(() => {
-			if (lastRendererRef.current !== curRenderer || coreBGRenderRef.current === undefined) {
+			if (
+				lastRendererRef.current !== curRenderer ||
+				coreBGRenderRef.current === undefined
+			) {
 				lastRendererRef.current = curRenderer;
 				console.log("new renderer", curRenderer);
 				coreBGRenderRef.current?.dispose();
-				coreBGRenderRef.current = CoreBackgroundRender.new(
-					curRenderer,
-				);
+				coreBGRenderRef.current = CoreBackgroundRender.new(curRenderer);
 			}
 		}, [curRenderer]);
 
 		useEffect(() => {
-			if (curRenderer && album) coreBGRenderRef.current?.setAlbum(album, albumIsVideo);
+			if (curRenderer && album)
+				coreBGRenderRef.current?.setAlbum(album, albumIsVideo);
 		}, [curRenderer, album, albumIsVideo]);
 
 		useEffect(() => {

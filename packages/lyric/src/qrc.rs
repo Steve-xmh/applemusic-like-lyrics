@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::{utils::process_lyrics, LyricLine, LyricWord};
@@ -5,8 +6,9 @@ use crate::{utils::process_lyrics, LyricLine, LyricWord};
 use std::fmt::Write;
 use std::{borrow::Cow, str::FromStr};
 
-use nom::{bytes::complete::*, combinator::opt, multi::many0};
-use nom::{character::complete::line_ending, IResult};
+use nom::{
+    bytes::complete::*, character::complete::line_ending, combinator::opt, multi::many0, IResult,
+};
 
 fn process_time<'a>(
     src: &'a str,
@@ -154,11 +156,13 @@ pub fn stringify_qrc(lines: &[LyricLine]) -> String {
     result
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "parseQrc", skip_typescript)]
 pub fn parse_qrc_js(src: &str) -> JsValue {
     serde_wasm_bindgen::to_value(&parse_qrc(src)).unwrap()
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "stringifyQrc", skip_typescript)]
 pub fn stringify_qrc_js(lrc: JsValue) -> String {
     let lines: Vec<LyricLine> = serde_wasm_bindgen::from_value(lrc).unwrap();

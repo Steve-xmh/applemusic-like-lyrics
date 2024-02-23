@@ -1,50 +1,57 @@
-mod ass;
+#[cfg(feature = "ass")]
+pub mod ass;
+#[cfg(feature = "eqrc")]
+pub mod eqrc;
+#[cfg(feature = "eslrc")]
+pub mod eslrc;
+#[cfg(feature = "lrc")]
+pub mod lrc;
+#[cfg(feature = "lys")]
+pub mod lys;
 #[cfg(feature = "qrc")]
-mod eqrc;
-mod eslrc;
-mod lrc;
-mod lys;
-mod qrc;
-mod utils;
-mod yrc;
+pub mod qrc;
+#[cfg(feature = "ttml")]
+pub mod ttml;
+#[cfg(feature = "yrc")]
+pub mod yrc;
+
+pub mod utils;
+#[cfg(target_arch = "wasm32")]
 mod types {
     include!(concat!(env!("OUT_DIR"), "/types.rs"));
 }
 
 use std::borrow::Cow;
 
+#[cfg(feature = "serde")]
 use serde::*;
-use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
-#[cfg(feature = "wee_alloc")]
+#[cfg(all(target_arch = "wasm32", feature = "wee_alloc"))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct LyricWord<'a> {
     pub start_time: usize,
     pub end_time: usize,
     pub word: Cow<'a, str>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Default)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct LyricLine<'a> {
     pub words: Vec<LyricWord<'a>>,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     pub translated_lyric: String,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     pub roman_lyric: String,
-    #[serde(default, rename = "isBG")]
+    #[cfg_attr(feature = "serde", serde(default, rename = "isBG"))]
     pub is_bg: bool,
-    #[serde(default)]
+    #[cfg_attr(feature = "serde", serde(default))]
     pub is_duet: bool,
 }

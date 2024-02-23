@@ -1,5 +1,5 @@
 [package]
-name = "lyric"
+name = "amll-lyric"
 version = "0.1.1"
 authors = ["SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"]
 edition = "2021"
@@ -11,31 +11,41 @@ license = "GPL-3.0"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["console_error_panic_hook", "qrc", "wee_alloc"]
-qrc = ["dep:cipher", "cipher/zeroize", "dep:cc"]
+default = [
+    "ass",
+    "lrc",
+    "yrc",
+    "qrc",
+    "lys",
+    "eslrc",
+    "ttml",
+    "eqrc",
+    "serde",
+]
+ass = []
+lrc = ["dep:nom"]
+yrc = ["dep:nom"]
+qrc = ["dep:nom"]
+lys = ["dep:nom"]
+eslrc = ["dep:nom", "lrc"]
+ttml = ["dep:quick-xml", "dep:thiserror"]
+eqrc = ["dep:miniz_oxide", "dep:cc"]
+serde = ["dep:serde"]
 
 [dependencies]
-wasm-bindgen = "0.2"
-
-# The `console_error_panic_hook` crate provides better debugging of panics by
-# logging them with `console.error`. This is great for development, but requires
-# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
-# code size when deploying.
-console_error_panic_hook = { version = "0.1", optional = true }
-
-# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
-# compared to the default allocator's ~10K. It is slower than the default
-# allocator, however.
-wee_alloc = { version = "0.4", optional = true }
-nom = "7.1.3"
-js-sys = "0.3.64"
-serde = { version = "1.0", features = ["derive"] }
-serde-wasm-bindgen = "0.6"
+nom = { version = "7.1", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
 cipher = { version = "0.4", optional = true }
-miniz_oxide = "0.7"
+miniz_oxide = { version = "0.7", optional = true }
+quick-xml = { version = "0.31", optional = true }
+thiserror = { version = "1", optional = true }
 
-[dev-dependencies]
-wasm-bindgen-test = "0.3"
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2" }
+serde-wasm-bindgen = { version = "0.6" }
+console_error_panic_hook = { version = "0.1", optional = true }
+wee_alloc = { version = "0.4", optional = true }
+js-sys = { version = "0.3", optional = true }
 
 [build-dependencies]
 cc = { version = "1.0", optional = true }

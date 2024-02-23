@@ -1,3 +1,5 @@
+#[allow(unused)]
+#[allow(clippy::upper_case_acronyms)]
 mod bindgen;
 
 pub struct TripleQDES {

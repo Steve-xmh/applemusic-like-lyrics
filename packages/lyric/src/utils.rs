@@ -1,15 +1,16 @@
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::LyricLine;
 
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen(start))]
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then
 /// we will get better error messages if our code ever panics.
 ///
 /// For more details see
 /// https://github.com/rustwasm/console_error_panic_hook#readme
-pub fn set_panic_hook() {
+pub fn wasm_start() {
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
 }

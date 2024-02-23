@@ -6,7 +6,10 @@ import { Texture } from "@pixi/core";
 import { Sprite } from "@pixi/sprite";
 import { BulgePinchFilter } from "@pixi/filter-bulge-pinch";
 import { BaseRenderer } from "./base";
-import { loadResourceFromElement, loadResourceFromUrl } from "../utils/resource";
+import {
+	loadResourceFromElement,
+	loadResourceFromUrl,
+} from "../utils/resource";
 
 class TimedContainer extends Container {
 	public time = 0;
@@ -191,15 +194,19 @@ export class PixiRenderer extends BaseRenderer {
 		// NOOP
 	}
 
-	override async setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo?: boolean): Promise<void> {
-		if (typeof albumSource === "string" && albumSource.trim().length === 0) return;
+	override async setAlbum(
+		albumSource: string | HTMLImageElement | HTMLVideoElement,
+		isVideo?: boolean,
+	): Promise<void> {
+		if (typeof albumSource === "string" && albumSource.trim().length === 0)
+			return;
 		let res: HTMLImageElement | HTMLVideoElement | null = null;
 		let remainRetryTimes = 5;
 		let tex: Texture | null = null;
 		while (!tex?.baseTexture?.resource?.valid && remainRetryTimes > 0) {
 			try {
 				if (typeof albumSource === "string") {
-					res = await loadResourceFromUrl(albumSource, isVideo)
+					res = await loadResourceFromUrl(albumSource, isVideo);
 				} else {
 					res = await loadResourceFromElement(albumSource);
 				}

@@ -37,7 +37,10 @@ export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 	 * 设置背景专辑资源，纹理加载并设置完成后会返回
 	 * @param albumSource 专辑的资源链接，可以是图片或视频链接，抑或是任意 img/video 元素，如果提供字符串链接且为视频则需要指定第二个参数
 	 */
-	abstract setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo?: boolean): Promise<void>;
+	abstract setAlbum(
+		albumSource: string | HTMLImageElement | HTMLVideoElement,
+		isVideo?: boolean,
+	): Promise<void>;
 	/**
 	 * 设置低频的音量大小，范围在 80hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
 	 *
@@ -135,7 +138,10 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 	 * 设置背景专辑资源，纹理加载并设置完成后会返回
 	 * @param albumSource 专辑的资源链接，可以是图片或视频链接，抑或是任意 img/video 元素，如果提供字符串链接且为视频则需要指定第二个参数
 	 */
-	abstract setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo?: boolean): Promise<void>;
+	abstract setAlbum(
+		albumSource: string | HTMLImageElement | HTMLVideoElement,
+		isVideo?: boolean,
+	): Promise<void>;
 	dispose(): void {
 		this.observer.disconnect();
 		this.canvas.remove();

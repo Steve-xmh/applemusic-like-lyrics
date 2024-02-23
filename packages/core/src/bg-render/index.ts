@@ -55,7 +55,10 @@ export class BackgroundRender<Renderer extends BaseRenderer>
 	setHasLyric(hasLyric: boolean): void {
 		this.renderer.setHasLyric(hasLyric);
 	}
-	setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo?: boolean): Promise<void> {
+	setAlbum(
+		albumSource: string | HTMLImageElement | HTMLVideoElement,
+		isVideo?: boolean,
+	): Promise<void> {
 		return this.renderer.setAlbum(albumSource, isVideo);
 	}
 	getElement() {

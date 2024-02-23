@@ -1,4 +1,4 @@
-#[cfg(feature = "qrc")]
+#[cfg(feature = "eqrc")]
 fn build_qdec() {
     let arch = std::env::var("CARGO_CFG_TARGET_POINTER_WIDTH").unwrap();
     let define_arch = format!("RS_PTR_WIDTH_{}", arch.to_uppercase());
@@ -14,7 +14,7 @@ fn build_qdec() {
 }
 
 fn main() {
-    #[cfg(feature = "qrc")]
+    #[cfg(feature = "eqrc")]
     build_qdec();
 
     println!("cargo:rerun-if-changed=./src/types.d.ts");

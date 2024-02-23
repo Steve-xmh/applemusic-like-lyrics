@@ -1,6 +1,7 @@
 //! 针对加密的 QRC （此处定义为 Encrypted QRC (EQRC)）格式的解密模块
 //!
 //! 参考自 <https://github.com/WXRIW/Lyricify-Lyrics-Helper/blob/07d495c3b36ef24dbe5bc29c261e77bd16ff15d0/Lyricify.Lyrics.Helper/Decrypter/Qrc/Helper.cs#L49>
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 pub(super) mod qdec;
 
@@ -30,6 +31,7 @@ pub fn decrypt_qrc_raw(data: &mut [u8]) -> String {
     String::from_utf8_lossy(&decompressed).to_string()
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "decryptQrcHex", skip_typescript)]
 pub fn decrypt_qrc_hex_js(hex_data: &str) -> String {
     decrypt_qrc_hex(hex_data)

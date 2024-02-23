@@ -6,7 +6,10 @@ import blendShader from "./shaders/blend.frag.glsl?raw";
 import eplorShader from "./shaders/eplor.frag.glsl?raw";
 import noiseShader from "./shaders/noise.frag.glsl?raw";
 import noiseImage from "../assets/noise 5.png?inline";
-import { loadResourceFromElement, loadResourceFromUrl } from "../utils/resource";
+import {
+	loadResourceFromElement,
+	loadResourceFromUrl,
+} from "../utils/resource";
 
 const NOISE_IMAGE_DATA = (() => {
 	const img = document.createElement("img");
@@ -784,15 +787,19 @@ export class EplorRenderer extends BaseRenderer {
 		this.paused = false;
 		this.requestTick();
 	}
-	override async setAlbum(albumSource: string | HTMLImageElement | HTMLVideoElement, isVideo = false): Promise<void> {
-		if (typeof albumSource === "string" && albumSource.trim().length === 0) throw new Error("Empty album url");
+	override async setAlbum(
+		albumSource: string | HTMLImageElement | HTMLVideoElement,
+		isVideo = false,
+	): Promise<void> {
+		if (typeof albumSource === "string" && albumSource.trim().length === 0)
+			throw new Error("Empty album url");
 		let res: HTMLImageElement | HTMLVideoElement | null = null;
 		let remainRetryTimes = 5;
 		console.log("setAlbum", albumSource);
 		while (!res && remainRetryTimes > 0) {
 			try {
 				if (typeof albumSource === "string") {
-					res = await loadResourceFromUrl(albumSource, isVideo)
+					res = await loadResourceFromUrl(albumSource, isVideo);
 				} else {
 					res = await loadResourceFromElement(albumSource);
 				}
@@ -802,7 +809,7 @@ export class EplorRenderer extends BaseRenderer {
 					{
 						albumSource,
 						error,
-					}
+					},
 				);
 				remainRetryTimes--;
 			}
@@ -818,8 +825,10 @@ export class EplorRenderer extends BaseRenderer {
 		const blurRadius = 10;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
-		const imgw = res instanceof HTMLVideoElement ? res.videoWidth : res.naturalWidth;
-		const imgh = res instanceof HTMLVideoElement ? res.videoHeight : res.naturalHeight;
+		const imgw =
+			res instanceof HTMLVideoElement ? res.videoWidth : res.naturalWidth;
+		const imgh =
+			res instanceof HTMLVideoElement ? res.videoHeight : res.naturalHeight;
 		if (imgw * imgh === 0) throw new Error("Invalid image size");
 		ctx.drawImage(res, 0, 0, imgw, imgh, 0, 0, c.width, c.height);
 		// ctx.fillStyle = "white";

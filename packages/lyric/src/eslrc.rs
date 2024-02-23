@@ -5,12 +5,13 @@
 //!
 //! 例子：
 //!
-//! ```
+//! ```text
 //! [00:10.82]Test[00:10.97] Word[00:12.62]
 //! ```
 //!
 
 use nom::{bytes::complete::take_until1, IResult};
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::{utils::process_lyrics, LyricLine};
@@ -71,11 +72,13 @@ pub fn stringify_eslrc(lines: &[LyricLine]) -> String {
     result
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "parseEslrc", skip_typescript)]
 pub fn parse_eslrc_js(src: &str) -> wasm_bindgen::JsValue {
     serde_wasm_bindgen::to_value(&parse_eslrc(src)).unwrap()
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "stringifyEslrc", skip_typescript)]
 pub fn stringify_eslrc_js(lrc: wasm_bindgen::JsValue) -> String {
     let lines: Vec<LyricLine> = serde_wasm_bindgen::from_value(lrc).unwrap();

@@ -1,5 +1,6 @@
 /// Lyricify Syllable 歌词格式
 ///
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::{utils::process_lyrics, LyricLine, LyricWord};
@@ -180,11 +181,13 @@ pub fn stringify_lys(lines: &[LyricLine]) -> String {
     result
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "parseLys", skip_typescript)]
 pub fn parse_lys_js(src: &str) -> JsValue {
     serde_wasm_bindgen::to_value(&parse_lys(src)).unwrap()
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "stringifyLys", skip_typescript)]
 pub fn stringify_lys_js(lrc: JsValue) -> String {
     let lines: Vec<LyricLine> = serde_wasm_bindgen::from_value(lrc).unwrap();

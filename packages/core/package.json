@@ -10,7 +10,10 @@
   },
   "license": "GPL-3.0",
   "files": [
-    "dist"
+    "dist/**/*.js",
+    "dist/**/*.ts",
+    "dist/**/*.cjs",
+    "dist/**/*.map"
   ],
   "scripts": {
     "build:docs": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",

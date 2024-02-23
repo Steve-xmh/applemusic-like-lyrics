@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use crate::{utils::process_lyrics, LyricLine, LyricWord};
@@ -149,11 +150,13 @@ pub fn stringify_yrc(lines: &[LyricLine]) -> String {
     result
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "parseYrc", skip_typescript)]
 pub fn parse_yrc_js(src: &str) -> JsValue {
     serde_wasm_bindgen::to_value(&parse_yrc(src)).unwrap()
 }
 
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
 #[wasm_bindgen(js_name = "stringifyYrc", skip_typescript)]
 pub fn stringify_yrc_js(lrc: JsValue) -> String {
     let lines: Vec<LyricLine> = serde_wasm_bindgen::from_value(lrc).unwrap();

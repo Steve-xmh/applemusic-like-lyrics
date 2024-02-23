@@ -9,6 +9,9 @@
 use crate::*;
 use std::fmt::Write;
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
 fn write_timestamp(result: &mut String, time: usize) {
     let ms = time % 1000;
     let sec = (time - ms) / 1000;
@@ -105,6 +108,7 @@ pub fn stringify_ass(lines: &[LyricLine]) -> String {
     result
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "stringifyAss", skip_typescript)]
 pub fn stringify_ass_js(lrc: JsValue) -> String {
     let lines: Vec<LyricLine> = serde_wasm_bindgen::from_value(lrc).unwrap();
