@@ -62,8 +62,7 @@ async function getLyric(
 	signal?: AbortSignal,
 ): Promise<EAPILyricResponse> {
 	const v = await fetch(
-		`${
-			window?.APP_CONF?.domain ?? "https://music.163.com"
+		`${window?.APP_CONF?.domain ?? "https://music.163.com"
 		}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
 		{
 			signal,
@@ -120,7 +119,7 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 			} else if (
 				nearestLine &&
 				Math.abs(nearestLine.startTime - line.words[0].startTime) <
-					Math.abs(coreLine.startTime - line.words[0].startTime)
+				Math.abs(coreLine.startTime - line.words[0].startTime)
 			) {
 				nearestLine = coreLine;
 			} else if (nearestLine === undefined) {
@@ -383,7 +382,7 @@ async function getLyricFromNCM(
 	};
 }
 
-class LyricNotExistError extends Error {}
+class LyricNotExistError extends Error { }
 
 const rawLyricLinesAtom = atom({
 	state: "loading",
@@ -477,6 +476,15 @@ export const lyricLinesAtom = atom(
 					})),
 				}));
 			}
+			// overrideLines.forEach((line) => {
+			// 	if (line.words.length > 0) {
+			// 		const delta = Math.abs(
+			// 			Math.max(0, line.startTime - 500) - line.startTime,
+			// 		);
+			// 		line.startTime -= delta;
+			// 		line.endTime -= delta;
+			// 	}
+			// });
 			return {
 				state: "hasData",
 				data: overrideLines,

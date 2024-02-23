@@ -35,7 +35,7 @@ $player-size-fract: 1fr
         grid-row: 1 / 7
         width: 100%
         height: 100%
-        font-weight: 600
+        font-weight: 700
         box-sizing: border-box
         padding-right: 10%
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
@@ -80,7 +80,7 @@ $player-size-fract: 1fr
         background-size: cover
         border-radius: 3%
         overflow: hidden
-        
+
         $scale-level: 0.75
         $base-box-shadow-v-0: rgba(0,0,0,0.25)
         $base-box-shadow-y-0: 16px
@@ -88,7 +88,7 @@ $player-size-fract: 1fr
         $base-box-shadow-v-1: rgba(0,0,0,0.2)
         $base-box-shadow-y-1: 32px
         $base-box-shadow-r-1: 64px
-        
+
         box-shadow: $base-box-shadow-v-0 0px calc($base-box-shadow-y-0 / $scale-level) calc($base-box-shadow-r-0 / $scale-level), $base-box-shadow-v-1 0px calc($base-box-shadow-y-1 / $scale-level) calc($base-box-shadow-r-1 / $scale-level)
         transform: scale($scale-level)
         &.is-playing
