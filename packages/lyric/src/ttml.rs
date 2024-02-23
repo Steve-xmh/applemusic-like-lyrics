@@ -2,8 +2,10 @@ use quick_xml::{
     events::{attributes::AttrError, Event},
     *,
 };
-use std::{collections::HashMap, error::Error, fs::read, io::BufRead};
+use std::{borrow::Cow, collections::HashMap, io::BufRead};
 use thiserror::Error;
+
+use crate::LyricWord;
 
 enum CurrentStatus {
     None,
@@ -36,20 +38,28 @@ pub enum TTMLError {
     XmlError(#[from] quick_xml::Error),
 }
 
-pub struct TTMLLyricLine {
+#[derive(Debug, Default, Clone)]
+pub struct TTMLLyricLine<'a> {
+    pub words: Vec<LyricWord<'a>>,
+    pub translated_lyric: Option<Cow<'a, str>>,
+    pub roman_lyric: Option<Cow<'a, str>>,
+    pub is_bg: bool,
+    pub is_duet: bool,
     pub start_time: u64,
     pub end_time: u64,
 }
 
-pub struct TTMLLyric {
-    pub lines: Vec<TTMLLyricLine>,
-    pub metadata: HashMap<String, Vec<String>>,
+#[derive(Debug, Default, Clone)]
+pub struct TTMLLyric<'a> {
+    pub lines: Vec<TTMLLyricLine<'a>>,
+    pub metadata: Vec<(Cow<'a, str>, Vec<Cow<'a, str>>)>,
 }
 
 pub fn parse_ttml(data: impl BufRead) -> std::result::Result<(), TTMLError> {
     let mut reader = Reader::from_reader(data);
-    let mut buf = Vec::with_capacity(64);
+    let mut buf = Vec::with_capacity(256);
     let mut status = CurrentStatus::None;
+    let mut result = TTMLLyric::default();
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Eof) => break,
@@ -166,6 +176,7 @@ pub fn parse_ttml(data: impl BufRead) -> std::result::Result<(), TTMLError> {
                     },
                     _ => {}
                 }
+                buf.clear();
             }
             Ok(Event::Text(e)) => match e.unescape() {
                 Ok(txt) => {
