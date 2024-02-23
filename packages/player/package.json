@@ -1,7 +1,7 @@
 {
   "name": "player",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,10 +11,10 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@applemusic-like-lyrics/bncm": "*",
-    "@applemusic-like-lyrics/lyric": "*",
-    "@applemusic-like-lyrics/react": "*",
-    "@applemusic-like-lyrics/ws-protocol": "*",
+    "@applemusic-like-lyrics/bncm": "^0.0.2",
+    "@applemusic-like-lyrics/lyric": "^0.1.2",
+    "@applemusic-like-lyrics/react": "^0.0.16",
+    "@applemusic-like-lyrics/ws-protocol": "^0.0.3",
     "@tauri-apps/api": "^1.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

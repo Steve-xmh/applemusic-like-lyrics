@@ -15,16 +15,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@applemusic-like-lyrics/bncm@npm:*, @applemusic-like-lyrics/bncm@workspace:packages/bncm":
+"@applemusic-like-lyrics/bncm@npm:^0.0.2, @applemusic-like-lyrics/bncm@workspace:packages/bncm":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/bncm@workspace:packages/bncm"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:*"
-    "@applemusic-like-lyrics/fft": "npm:*"
-    "@applemusic-like-lyrics/lyric": "npm:*"
-    "@applemusic-like-lyrics/react": "npm:*"
-    "@applemusic-like-lyrics/ttml": "npm:*"
-    "@applemusic-like-lyrics/ws-protocol": "npm:*"
+    "@applemusic-like-lyrics/core": "npm:^0.0.16"
+    "@applemusic-like-lyrics/fft": "npm:^0.1.1"
+    "@applemusic-like-lyrics/lyric": "npm:^0.1.2"
+    "@applemusic-like-lyrics/react": "npm:^0.0.16"
+    "@applemusic-like-lyrics/ttml": "npm:^0.0.2"
+    "@applemusic-like-lyrics/ws-protocol": "npm:^0.0.3"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
@@ -75,7 +75,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/core@npm:*, @applemusic-like-lyrics/core@npm:^0.0.15, @applemusic-like-lyrics/core@workspace:packages/core":
+"@applemusic-like-lyrics/core@npm:^0.0.16, @applemusic-like-lyrics/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/core@workspace:packages/core"
   dependencies:
@@ -133,15 +133,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/fft@npm:*, @applemusic-like-lyrics/fft@workspace:packages/fft":
+"@applemusic-like-lyrics/fft@npm:^0.1.1, @applemusic-like-lyrics/fft@workspace:packages/fft":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/fft@workspace:packages/fft"
-  languageName: unknown
-  linkType: soft
-
-"@applemusic-like-lyrics/lyric@npm:*, @applemusic-like-lyrics/lyric@workspace:packages/lyric":
-  version: 0.0.0-use.local
-  resolution: "@applemusic-like-lyrics/lyric@workspace:packages/lyric"
   languageName: unknown
   linkType: soft
 
@@ -152,11 +146,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@applemusic-like-lyrics/react@npm:*, @applemusic-like-lyrics/react@workspace:packages/react":
+"@applemusic-like-lyrics/lyric@npm:^0.1.2, @applemusic-like-lyrics/lyric@workspace:packages/lyric":
+  version: 0.0.0-use.local
+  resolution: "@applemusic-like-lyrics/lyric@workspace:packages/lyric"
+  languageName: unknown
+  linkType: soft
+
+"@applemusic-like-lyrics/react@npm:^0.0.16, @applemusic-like-lyrics/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@applemusic-like-lyrics/core": "npm:^0.0.16"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
@@ -181,7 +181,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/ttml@npm:*, @applemusic-like-lyrics/ttml@workspace:^, @applemusic-like-lyrics/ttml@workspace:packages/ttml":
+"@applemusic-like-lyrics/ttml@npm:^0.0.2, @applemusic-like-lyrics/ttml@workspace:^, @applemusic-like-lyrics/ttml@workspace:packages/ttml":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/ttml@workspace:packages/ttml"
   dependencies:
@@ -196,7 +196,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/vue@workspace:packages/vue"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@applemusic-like-lyrics/core": "npm:^0.0.16"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
@@ -219,7 +219,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/ws-protocol@npm:*, @applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol":
+"@applemusic-like-lyrics/ws-protocol@npm:^0.0.3, @applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol"
   languageName: unknown
@@ -9398,10 +9398,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "player@workspace:packages/player"
   dependencies:
-    "@applemusic-like-lyrics/bncm": "npm:*"
-    "@applemusic-like-lyrics/lyric": "npm:*"
-    "@applemusic-like-lyrics/react": "npm:*"
-    "@applemusic-like-lyrics/ws-protocol": "npm:*"
+    "@applemusic-like-lyrics/bncm": "npm:^0.0.2"
+    "@applemusic-like-lyrics/lyric": "npm:^0.1.2"
+    "@applemusic-like-lyrics/react": "npm:^0.0.16"
+    "@applemusic-like-lyrics/ws-protocol": "npm:^0.0.3"
     "@biomejs/biome": "npm:1.5.3"
     "@tauri-apps/api": "npm:^1.4.0"
     "@tauri-apps/cli": "npm:^1.4.0"
