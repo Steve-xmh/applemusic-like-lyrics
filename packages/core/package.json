@@ -1,7 +1,7 @@
 {
   "name": "@applemusic-like-lyrics/core",
   "packageManager": "yarn@3.6.1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AMLL 的纯 JS 核心组件框架，包括歌词显示组件和背景组件等其它可以复用的组件",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
