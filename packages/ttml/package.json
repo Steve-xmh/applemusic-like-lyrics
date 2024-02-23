@@ -1,7 +1,7 @@
 {
   "name": "@applemusic-like-lyrics/ttml",
   "packageManager": "yarn@3.6.1",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "AMLL 的 TTML 歌词文件序列化和反序列化模块",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",

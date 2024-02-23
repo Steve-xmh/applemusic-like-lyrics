@@ -33,28 +33,28 @@
 
 ## 歌词组件截图展示
 
-![AMLL 歌词组件展示图，歌曲： Leave The Door Open ，TTML 歌词贡献者：Y-CIAO](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/8a6a671f-7d67-4b86-a152-b1d0aa53c24b)
+![AMLL 歌词组件展示图，歌曲： Jake Miller, HOYO-MiX - WHITE NIGHT (不眠之夜) ，TTML 歌词贡献者： @Xionghaizi001](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/776939ff-24af-4bd0-aba6-262e903ab816)
 
 <div align=center>
-歌曲： Leave The Door Open
+歌曲： Jake Miller, HOYO-MiX - WHITE NIGHT (不眠之夜)
 <br/>
-TTML 歌词贡献者：Y-CIAO
+TTML 歌词贡献者： @Xionghaizi001
 </div>
 
-![AMLL 歌词组件展示图，歌曲： Sugar ，TTML 歌词贡献者：Y-CIAO](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/1c4fc650-474b-4bf4-9ded-6a73b3d7fe9d)
+![AMLL 歌词组件展示图，歌曲： Maroon 5 - Sugar ，TTML 歌词贡献者： @Y-CIAO](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/02ecc483-565e-45d3-8ff7-06f65cfd4c0d)
 
 <div align=center>
-歌曲： Sugar
+歌曲： Maroon 5 - Sugar
 <br/>
-TTML 歌词贡献者：Y-CIAO
+TTML 歌词贡献者： @Y-CIAO
 </div>
 
-![AMLL 歌词组件展示图，歌曲： Idol ，TTML 歌词贡献者：SteveXMH](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/f6a14ee5-36fd-4529-99fc-1c123864819f)
+![AMLL 歌词组件展示图，歌曲： Taylor Swift, Brendon Urie - ME! ，TTML 歌词贡献者： @Xionghaizi001](https://github.com/Steve-xmh/applemusic-like-lyrics/assets/39523898/b19bf9b4-352b-4459-9293-439836cea231)
 
 <div align=center>
-歌曲： Idol
+歌曲： Taylor Swift, Brendon Urie - ME!
 <br/>
-TTML 歌词贡献者：SteveXMH
+TTML 歌词贡献者： @Xionghaizi001
 </div>
 
 ## 浏览器兼容性提醒
@@ -97,7 +97,6 @@ yarn lerna run build --scope "@applemusic-like-lyrics/*" # 发行构建
 
 ## 鸣谢
 
-- [Barba828/color-quantize](https://github.com/Barba828/color-quantize)
 - [woshizja/sound-processor](https://github.com/woshizja/sound-processor)
 - 还有很多被 AMLL 使用的框架和库，非常感谢！
 
