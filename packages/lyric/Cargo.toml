@@ -28,7 +28,7 @@ yrc = ["dep:nom"]
 qrc = ["dep:nom"]
 lys = ["dep:nom"]
 eslrc = ["dep:nom", "lrc"]
-ttml = ["dep:quick-xml", "dep:thiserror"]
+ttml = ["dep:quick-xml", "dep:thiserror", "dep:nom"]
 eqrc = ["dep:miniz_oxide", "dep:cc"]
 serde = ["dep:serde"]
 
