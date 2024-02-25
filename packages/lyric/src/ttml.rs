@@ -34,6 +34,8 @@ pub enum TTMLError {
     UnexpectedSpanElement(usize),
     #[error("xml attr error: {0}")]
     XmlAttrError(#[from] AttrError),
+    #[error("xml error on parsing attr timestamp at {0}")]
+    XmlTimeStampError(usize),
     #[error("xml error: {0}")]
     XmlError(#[from] quick_xml::Error),
 }
@@ -66,7 +68,7 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
             Ok(Event::Eof) => break,
             Ok(Event::Start(e)) => {
                 let attr_name = e.name();
-                println!("start {}", String::from_utf8_lossy(attr_name.as_ref()));
+                // println!("start {}", String::from_utf8_lossy(attr_name.as_ref()));
                 match attr_name.as_ref() {
                     b"tt" => {
                         if let CurrentStatus::None = status {
@@ -123,20 +125,40 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
                 for attr in e.attributes() {
                     match attr {
                         Ok(a) => {
-                            println!(
-                                "  attr: {} = {}",
-                                String::from_utf8_lossy(a.key.as_ref()),
-                                String::from_utf8_lossy(a.value.as_ref())
-                            );
+                            // println!(
+                            //     "  attr: {} = {}",
+                            //     String::from_utf8_lossy(a.key.as_ref()),
+                            //     String::from_utf8_lossy(a.value.as_ref())
+                            // );
                             match a.key.as_ref() {
                                 b"begin" => {
                                     if let CurrentStatus::InP = status {
-                                        result.lines.last_mut().unwrap().start_time = 0;
+                                        if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
+                                            result.lines.last_mut().unwrap().start_time = time as _;
+                                        } else {
+                                            return Err(TTMLError::XmlTimeStampError(e.len()));
+                                        }
+                                    } else if let CurrentStatus::InSpan = status {
+                                        if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
+                                            result.lines.last_mut().unwrap().words.last_mut().unwrap().start_time = time as _;
+                                        } else {
+                                            return Err(TTMLError::XmlTimeStampError(e.len()));
+                                        }
                                     }
                                 }
                                 b"end" => {
                                     if let CurrentStatus::InP = status {
-                                        result.lines.last_mut().unwrap().end_time = 0;
+                                        if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
+                                            result.lines.last_mut().unwrap().end_time = time as _;
+                                        } else {
+                                            return Err(TTMLError::XmlTimeStampError(e.len()));
+                                        }
+                                    } else if let CurrentStatus::InSpan = status {
+                                        if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
+                                            result.lines.last_mut().unwrap().words.last_mut().unwrap().end_time = time as _;
+                                        } else {
+                                            return Err(TTMLError::XmlTimeStampError(e.len()));
+                                        }
                                     }
                                 }
                                 _ => {}
@@ -148,7 +170,7 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
             }
             Ok(Event::End(e)) => {
                 let attr_name = e.name();
-                println!("end {}", String::from_utf8_lossy(attr_name.as_ref()));
+                // println!("end {}", String::from_utf8_lossy(attr_name.as_ref()));
                 match attr_name.as_ref() {
                     b"tt" => {
                         if let CurrentStatus::InTtml = status {
@@ -208,9 +230,9 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
             }
             Ok(Event::Text(e)) => match e.unescape() {
                 Ok(txt) => {
-                    println!("  text: {}", txt);
+                    // println!("  text: {:?}", txt);
                     match status {
-                        CurrentStatus::InDiv => {
+                        CurrentStatus::InP => {
                             result.lines.last_mut().unwrap().words.push(LyricWord {
                                 word: txt.to_string().into(),
                                 start_time: 0,
@@ -237,171 +259,114 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
 fn test_ttml() {
     const TEST_TTML: &str = include_str!("../test/test.ttml");
     let t = std::time::Instant::now();
-    let _ = dbg!(parse_ttml(TEST_TTML.as_bytes()));
-    println!("ttml: {:?}", t.elapsed());
+    let r = parse_ttml(TEST_TTML.as_bytes());
+    let t = t.elapsed();
+    println!("ttml: {:#?}", r);
+    println!("ttml: {:?}", t);
 }
 
-use nom::{bytes::complete::*, character::complete::one_of, combinator::*, *};
+use nom::{bytes::complete::*, combinator::*, sequence::tuple, *};
 use std::str::FromStr;
+
+pub fn parse_hour(input: &[u8]) -> IResult<&[u8], u64> {
+    let (input, result) = take_while_m_n(2, 3, |x: u8| x.is_dec_digit())(input)?;
+    let result = u64::from_str(std::str::from_utf8(result).unwrap()).unwrap();
+    Ok((input, result))
+}
+
+pub fn parse_minutes_or_seconds(input: &[u8]) -> IResult<&[u8], u64> {
+    let (input, result) = take_while_m_n(1, 2, |x: u8| x.is_dec_digit())(input)?;
+    let result = u64::from_str(std::str::from_utf8(result).unwrap()).unwrap();
+    Ok((input, result))
+}
+
+pub fn parse_fraction(input: &[u8]) -> IResult<&[u8], u64> {
+    let (input, _) = tag(b".")(input)?;
+    let (input, result) = take_while1(|x: u8| x.is_dec_digit())(input)?;
+    let frac_str = std::str::from_utf8(result).unwrap();
+    let result = match frac_str.len() {
+        0 => unreachable!(),
+        1 => u64::from_str(frac_str).unwrap() * 100,
+        2 => u64::from_str(frac_str).unwrap() * 10,
+        3 => u64::from_str(frac_str).unwrap(),
+        _ => u64::from_str(&frac_str[0..3]).unwrap(),
+    };
+    Ok((input, result))
+}
+
 // HH:MM:SS.MS
 // or MM:SS.MS
-pub fn parse_timestamp(src: &[u8]) -> IResult<&[u8], usize> {
-    let (src, hour_or_min) = map_res(take_while1(|c: u8| c.is_ascii_digit()), |s: &[u8]| {
-        std::str::from_utf8(s)
-            .map_err(|_| nom::Err::Error(nom::error::Error::new(s, nom::error::ErrorKind::Digit)))
-            .and_then(|s| {
-                usize::from_str(s).map_err(|_| {
-                    nom::Err::Error(nom::error::Error::new(
-                        s.as_bytes(),
-                        nom::error::ErrorKind::Digit,
-                    ))
-                })
-            })
-    })(src)?;
-    let (src, _) = tag(":")(src)?;
-    let (src, min_or_sec) = map_res(take_while1(|c: u8| c.is_ascii_digit()), |s: &[u8]| {
-        std::str::from_utf8(s)
-            .map_err(|_| nom::Err::Error(nom::error::Error::new(s, nom::error::ErrorKind::Digit)))
-            .and_then(|s| {
-                usize::from_str(s).map_err(|_| {
-                    nom::Err::Error(nom::error::Error::new(
-                        s.as_bytes(),
-                        nom::error::ErrorKind::Digit,
-                    ))
-                })
-            })
-    })(src)?;
-    
-    if src.is_empty() {
-        let time = hour_or_min * 60 * 1000 + min_or_sec * 1000;
-        return Ok((src, time));
-    }
-    
-    let (src, dot_or_colon) = one_of(".:")(src)?;
+pub fn parse_timestamp(input: &[u8]) -> IResult<&[u8], u64> {
+    match tuple((
+        parse_hour,
+        tag(b":"),
+        parse_minutes_or_seconds,
+        tag(b":"),
+        parse_minutes_or_seconds,
+        opt(parse_fraction),
+        eof,
+    ))(input)
+    {
+        Ok((input, result)) => {
+            let time = result.0 * 60 * 60 * 1000 + result.2 * 60 * 1000 + result.4 * 1000;
 
-    match dot_or_colon {
-        '.' => {
-            let min = hour_or_min;
-            let sec = min_or_sec;
-
-            let (src, mss) = map_res(take_while1(|c: u8| c.is_ascii_digit()), |s: &[u8]| {
-                std::str::from_utf8(s).map_err(|_| {
-                    nom::Err::Error(nom::error::Error::new(s, nom::error::ErrorKind::Digit))
-                })
-            })(src)?;
-
-            let mut ms = usize::from_str(mss).map_err(|_| {
-                nom::Err::Error(nom::error::Error::new(src, nom::error::ErrorKind::Digit))
-            })?;
-
-            match mss.len() {
-                0 => {}
-                1 => {
-                    ms *= 100;
-                }
-                2 => {
-                    ms *= 10;
-                }
-                3 => {}
-                _ => {
-                    return Err(nom::Err::Error(nom::error::Error::new(
-                        src,
-                        nom::error::ErrorKind::Digit,
-                    )))
+            if let Some(frac) = result.5 {
+                Ok((input, time + frac))
+            } else {
+                Ok((input, time))
+            }
+        }
+        Err(_) => match tuple((
+            parse_minutes_or_seconds,
+            tag(b":"),
+            parse_minutes_or_seconds,
+            opt(parse_fraction),
+            eof,
+        ))(input)
+        {
+            Ok((input, result)) => {
+                let time = result.0 * 60 * 1000 + result.2 * 1000;
+                if let Some(frac) = result.3 {
+                    Ok((input, time + frac))
+                } else {
+                    Ok((input, time))
                 }
             }
-
-            let time = min * 60 * 1000 + sec * 1000 + ms;
-
-            Ok((src, time))
-        }
-        ':' => {
-            let hour = hour_or_min;
-            let min = min_or_sec;
-
-            let (src, sec) = map_res(take_while1(|c: u8| c.is_ascii_digit()), |s: &[u8]| {
-                std::str::from_utf8(s)
-                    .map_err(|_| {
-                        nom::Err::Error(nom::error::Error::new(s, nom::error::ErrorKind::Digit))
-                    })
-                    .and_then(|s| {
-                        usize::from_str(s).map_err(|_| {
-                            nom::Err::Error(nom::error::Error::new(
-                                s.as_bytes(),
-                                nom::error::ErrorKind::Digit,
-                            ))
-                        })
-                    })
-            })(src)?;
-            
-            let mut ms = 0;
-            
-            if let Ok((src, _)) = tag::<&str, &[u8], nom::error::Error<_>>(".")(src) {
-                let (src, mss) = map_res(take_while1(|c: u8| c.is_ascii_digit()), |s: &[u8]| {
-                    std::str::from_utf8(s).map_err(|_| {
-                        nom::Err::Error(nom::error::Error::new(s, nom::error::ErrorKind::Digit))
-                    })
-                })(src)?;
-    
-                ms = usize::from_str(mss).map_err(|_| {
-                    nom::Err::Error(nom::error::Error::new(src, nom::error::ErrorKind::Digit))
-                })?;
-    
-                match mss.len() {
-                    0 => {}
-                    1 => {
-                        ms *= 100;
-                    }
-                    2 => {
-                        ms *= 10;
-                    }
-                    3 => {}
-                    _ => {
-                        return Err(nom::Err::Error(nom::error::Error::new(
-                            src,
-                            nom::error::ErrorKind::Digit,
-                        )))
+            Err(_) => match tuple((parse_minutes_or_seconds, opt(parse_fraction), eof))(input) {
+                Ok((input, result)) => {
+                    let time = result.0 * 1000;
+                    if let Some(frac) = result.1 {
+                        Ok((input, time + frac))
+                    } else {
+                        Ok((input, time))
                     }
                 }
-            }
-
-            let time = hour * 60 * 60 * 1000 + min * 60 * 1000 + sec * 1000 + ms;
-
-            Ok((src, time))
-        }
-        _ => unreachable!(),
+                Err(err) => Err(err),
+            },
+        },
     }
 }
 
 #[test]
 fn test_timestamp() {
-    let t = std::time::Instant::now();
     assert_eq!(
-        parse_timestamp("1.123".as_bytes()),
-        Ok(("".as_bytes(), 1123))
+        parse_timestamp("00:00.088".as_bytes()),
+        Ok(("".as_bytes(), 88))
     );
     assert_eq!(
-        parse_timestamp("1.1".as_bytes()),
-        Ok(("".as_bytes(), 1100))
-    );
-    assert_eq!(
-        parse_timestamp("1.45".as_bytes()),
-        Ok(("".as_bytes(), 1450))
-    );
-    assert_eq!(
-        parse_timestamp("45:12.2".as_bytes()),
+        parse_timestamp("00:45:12.2".as_bytes()),
         Ok(("".as_bytes(), 2712200))
     );
     assert_eq!(
-        parse_timestamp("00:10.254".as_bytes()),
+        parse_timestamp("00:00:10.254".as_bytes()),
         Ok(("".as_bytes(), 10254))
     );
     assert_eq!(
-        parse_timestamp("1:10".as_bytes()),
+        parse_timestamp("00:01:10".as_bytes()),
         Ok(("".as_bytes(), 70000))
     );
     assert_eq!(
-        parse_timestamp("1:10:24".as_bytes()),
+        parse_timestamp("01:10:24".as_bytes()),
         Ok(("".as_bytes(), 4224000))
     );
 }
