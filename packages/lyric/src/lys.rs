@@ -15,8 +15,8 @@ fn process_time<'a>(
     src: &'a str,
     start_time: &'a str,
     duration: &'a str,
-) -> IResult<&'a str, (usize, usize)> {
-    let start_time = match usize::from_str(start_time) {
+) -> IResult<&'a str, (u64, u64)> {
+    let start_time = match u64::from_str(start_time) {
         Ok(start_time) => start_time,
         Err(_) => {
             return Err(nom::Err::Error(nom::error::Error {
@@ -25,7 +25,7 @@ fn process_time<'a>(
             }))
         }
     };
-    let duration = match usize::from_str(duration) {
+    let duration = match u64::from_str(duration) {
         Ok(duration) => duration,
         Err(_) => {
             return Err(nom::Err::Error(nom::error::Error {
@@ -62,7 +62,7 @@ pub fn parse_property(src: &str) -> IResult<&str, (bool, bool)> {
     ))
 }
 
-pub fn parse_word_time(src: &str) -> IResult<&str, (usize, usize)> {
+pub fn parse_word_time(src: &str) -> IResult<&str, (u64, u64)> {
     let (src, _) = tag("(")(src)?;
     let (src, start_time) = take_until1(",")(src)?;
     let (src, _) = tag(",")(src)?;

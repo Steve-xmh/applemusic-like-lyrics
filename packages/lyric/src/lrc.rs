@@ -10,7 +10,7 @@ use nom::{bytes::complete::*, combinator::opt, multi::many1};
 use nom::{character::complete::line_ending, IResult};
 
 #[inline]
-pub fn parse_time(src: &str) -> IResult<&str, usize> {
+pub fn parse_time(src: &str) -> IResult<&str, u64> {
     let (src, _start) = tag("[")(src)?;
 
     let (src, min) = take_until1(":")(src)?;
@@ -28,7 +28,7 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
     let (src, _) = take(1usize)(src)?;
     let (src, sec) = take_till1(|c: char| c == ':' || c == '.')(src)?;
 
-    let sec = match usize::from_str(sec) {
+    let sec = match u64::from_str(sec) {
         Ok(v) => v,
         Err(_) => {
             return IResult::Err(nom::Err::Error(nom::error::Error::new(
@@ -40,7 +40,7 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
 
     let (src, _) = take(1usize)(src)?;
     let (src, mss) = take_while_m_n(1, 3, |c: char| c.is_ascii_digit())(src)?;
-    let mut ms = usize::from_str(mss).unwrap_or_default();
+    let mut ms = u64::from_str(mss).unwrap_or_default();
 
     match mss.len() {
         0 => {}
@@ -54,7 +54,7 @@ pub fn parse_time(src: &str) -> IResult<&str, usize> {
         _ => unreachable!(),
     }
 
-    let time = min as usize * 60 * 1000 + sec as usize * 1000 + ms as usize;
+    let time = min as u64 * 60 * 1000 + sec as u64 * 1000 + ms as u64;
 
     let (src, _) = tag("]")(src)?;
     Ok((src, time))
@@ -184,7 +184,7 @@ pub fn parse_lrc(src: &str) -> Vec<LyricLine> {
     result
 }
 
-pub fn write_timestamp(result: &mut String, time: usize) {
+pub fn write_timestamp(result: &mut String, time: u64) {
     let ms = time % 1000;
     let sec = (time - ms) / 1000;
     let min = (sec - sec % 60) / 60;

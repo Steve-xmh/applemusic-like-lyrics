@@ -14,8 +14,8 @@ fn process_time<'a>(
     src: &'a str,
     start_time: &'a str,
     duration: &'a str,
-) -> IResult<&'a str, (usize, usize)> {
-    let start_time = usize::from_str(start_time);
+) -> IResult<&'a str, (u64, u64)> {
+    let start_time = u64::from_str(start_time);
     if start_time.is_err() {
         return Err(nom::Err::Error(nom::error::Error {
             input: src,
@@ -23,7 +23,7 @@ fn process_time<'a>(
         }));
     }
     let start_time = start_time.unwrap();
-    let duration = usize::from_str(duration);
+    let duration = u64::from_str(duration);
     if duration.is_err() {
         return Err(nom::Err::Error(nom::error::Error {
             input: src,
@@ -35,7 +35,7 @@ fn process_time<'a>(
     Ok((src, (start_time, duration)))
 }
 
-pub fn parse_time(src: &str) -> IResult<&str, (usize, usize)> {
+pub fn parse_time(src: &str) -> IResult<&str, (u64, u64)> {
     let (src, _) = tag("[")(src)?;
     let (src, start_time) = nom::character::complete::digit1(src)?;
     let (src, _) = tag(",")(src)?;
@@ -45,7 +45,7 @@ pub fn parse_time(src: &str) -> IResult<&str, (usize, usize)> {
     process_time(src, start_time, duration)
 }
 
-pub fn parse_word_time(src: &str) -> IResult<&str, (usize, usize)> {
+pub fn parse_word_time(src: &str) -> IResult<&str, (u64, u64)> {
     let (src, _) = tag("(")(src)?;
     let (src, start_time) = take_until1(",")(src)?;
     let (src, _) = tag(",")(src)?;
@@ -141,7 +141,7 @@ pub fn stringify_qrc(lines: &[LyricLine]) -> String {
     for line in lines {
         if !line.words.is_empty() {
             let start_time = line.words[0].start_time;
-            let duration: usize = line.words.iter().map(|x| x.end_time - x.start_time).sum();
+            let duration: u64 = line.words.iter().map(|x| x.end_time - x.start_time).sum();
             write!(result, "[{start_time},{duration}]").unwrap();
             for word in line.words.iter() {
                 let start_time = word.start_time;

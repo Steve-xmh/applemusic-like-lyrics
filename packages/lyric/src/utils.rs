@@ -22,4 +22,8 @@ pub fn process_lyrics(lines: &mut [LyricLine]) {
             .map(|x| x.start_time)
             .cmp(&b.words.first().map(|x| x.start_time))
     });
+    for line in lines.iter_mut() {
+        line.start_time = line.words.first().map(|x| x.start_time).unwrap_or(0);
+        line.end_time = line.words.last().map(|x| x.end_time).unwrap_or(0);
+    }
 }

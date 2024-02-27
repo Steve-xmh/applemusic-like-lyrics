@@ -32,12 +32,12 @@ use serde::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct LyricWord<'a> {
-    pub start_time: usize,
-    pub end_time: usize,
+    pub start_time: u64,
+    pub end_time: u64,
     pub word: Cow<'a, str>,
 }
 
@@ -47,11 +47,15 @@ pub struct LyricWord<'a> {
 pub struct LyricLine<'a> {
     pub words: Vec<LyricWord<'a>>,
     #[cfg_attr(feature = "serde", serde(default))]
-    pub translated_lyric: String,
+    pub translated_lyric: Cow<'a, str>,
     #[cfg_attr(feature = "serde", serde(default))]
-    pub roman_lyric: String,
+    pub roman_lyric: Cow<'a, str>,
     #[cfg_attr(feature = "serde", serde(default, rename = "isBG"))]
     pub is_bg: bool,
     #[cfg_attr(feature = "serde", serde(default))]
     pub is_duet: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub start_time: u64,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub end_time: u64,
 }

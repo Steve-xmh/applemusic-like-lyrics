@@ -12,7 +12,7 @@ use std::fmt::Write;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
-fn write_timestamp(result: &mut String, time: usize) {
+fn write_timestamp(result: &mut String, time: u64) {
     let ms = time % 1000;
     let sec = (time - ms) / 1000;
     let min = (sec - sec % 60) / 60;
