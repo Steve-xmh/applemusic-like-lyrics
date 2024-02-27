@@ -583,9 +583,7 @@ pub fn parse_ttml<'a>(data: impl BufRead) -> std::result::Result<TTMLLyric<'a>, 
             if let Some(first_word) = line.words.first_mut() {
                 match &mut first_word.word {
                     Cow::Borrowed(word) => {
-                        if let Some(new_word) = word.strip_prefix('(') {
-                            *word = new_word
-                        }
+                        *word = word.strip_suffix('(').unwrap_or(word);
                     }
                     Cow::Owned(word) => {
                         if let Some(new_word) = word.strip_prefix('(') {
@@ -597,9 +595,7 @@ pub fn parse_ttml<'a>(data: impl BufRead) -> std::result::Result<TTMLLyric<'a>, 
             if let Some(last_word) = line.words.last_mut() {
                 match &mut last_word.word {
                     Cow::Borrowed(word) => {
-                        if let Some(new_word) = word.strip_suffix(')') {
-                            *word = new_word
-                        }
+                        *word = word.strip_suffix(')').unwrap_or(word);
                     }
                     Cow::Owned(word) => {
                         if let Some(new_word) = word.strip_suffix(')') {
