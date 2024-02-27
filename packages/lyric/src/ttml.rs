@@ -140,7 +140,14 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
                                         }
                                     } else if let CurrentStatus::InSpan = status {
                                         if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
-                                            result.lines.last_mut().unwrap().words.last_mut().unwrap().start_time = time as _;
+                                            result
+                                                .lines
+                                                .last_mut()
+                                                .unwrap()
+                                                .words
+                                                .last_mut()
+                                                .unwrap()
+                                                .start_time = time as _;
                                         } else {
                                             return Err(TTMLError::XmlTimeStampError(e.len()));
                                         }
@@ -155,7 +162,14 @@ pub fn parse_ttml<'a, 'b: 'a>(data: impl BufRead) -> std::result::Result<TTMLLyr
                                         }
                                     } else if let CurrentStatus::InSpan = status {
                                         if let Ok((_, time)) = parse_timestamp(a.value.as_bytes()) {
-                                            result.lines.last_mut().unwrap().words.last_mut().unwrap().end_time = time as _;
+                                            result
+                                                .lines
+                                                .last_mut()
+                                                .unwrap()
+                                                .words
+                                                .last_mut()
+                                                .unwrap()
+                                                .end_time = time as _;
                                         } else {
                                             return Err(TTMLError::XmlTimeStampError(e.len()));
                                         }

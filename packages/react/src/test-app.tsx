@@ -9,6 +9,7 @@ export const App: FC = () => {
 	const audioRef = useRef<HTMLAudioElement>(null);
 	const [audioUrl, setAudioUrl] = useState("");
 	const [albumUrl, setAlbumUrl] = useState("");
+	const [albumIsVideo, setAlbumIsVideo] = useState(false);
 	const lyricPlayerRef = useRef<LyricPlayerRef>(null);
 	const [lyricLines, setLyricLines] = useState<LyricLine[]>([]);
 	const onClickOpenAudio = useCallback(() => {
@@ -31,10 +32,11 @@ export const App: FC = () => {
 	const onClickOpenAlbumImage = useCallback(() => {
 		const input = document.createElement("input");
 		input.type = "file";
-		input.accept = "image/*";
+		input.accept = "image/*,video/*";
 		input.onchange = () => {
 			const file = input.files?.[0];
 			if (file) {
+				setAlbumIsVideo(file.type.startsWith("video/"));
 				setAlbumUrl((old) => {
 					if (old.trim().length > 0) {
 						URL.revokeObjectURL(old);
@@ -53,7 +55,7 @@ export const App: FC = () => {
 			const file = input.files?.[0];
 			if (file) {
 				const text = await file.text();
-				setLyricLines(parseTTML(text));
+				setLyricLines(parseTTML(text).lyricLines);
 			}
 		};
 		input.click();
@@ -99,6 +101,7 @@ export const App: FC = () => {
 					height: "100%",
 				}}
 				album={albumUrl}
+				albumIsVideo={albumIsVideo}
 			/>
 			<LyricPlayer
 				style={{
@@ -114,7 +117,7 @@ export const App: FC = () => {
 					mixBlendMode: "plus-lighter",
 				}}
 				ref={lyricPlayerRef}
-				alignAnchor={0.5}
+				alignAnchor="center"
 				lyricLines={lyricLines}
 			/>
 			<div
@@ -139,7 +142,7 @@ export const App: FC = () => {
 					加载音乐
 				</button>
 				<button type="button" onClick={onClickOpenAlbumImage}>
-					加载专辑图
+					加载专辑背景资源（图片/视频）
 				</button>
 				<button type="button" onClick={onClickOpenTTMLLyric}>
 					加载歌词

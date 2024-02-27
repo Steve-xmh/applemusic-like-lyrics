@@ -1,5 +1,5 @@
 <template>
-    <BackgroundRender :album-image-url="state.albumUrl"
+    <BackgroundRender :album="state.albumUrl" :album-is-video="state.albumIsVideo"
         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" />
     <LyricPlayer enable :lyric-lines="state.lyricLines" :current-time="state.currentTime"
         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; mix-blend-mode: plus-lighter;" />
@@ -13,7 +13,7 @@
             加载音乐
         </button>
         <button type="button" @click="onClickOpenAlbumImage">
-            加载专辑图
+            加载专辑背景资源（图片/视频）
         </button>
         <button type="button" @click="onClickOpenTTMLLyric">
             加载歌词
@@ -25,13 +25,15 @@
 <script setup lang="ts">
 import BackgroundRender from "./BackgroundRender.vue";
 import LyricPlayer from "./LyricPlayer.vue";
-import { reactive, ref, watch } from "vue";
-import { ttml, type LyricLine } from "@applemusic-like-lyrics/core";
+import { reactive, ref } from "vue";
+import { parseTTML } from "@applemusic-like-lyrics/ttml";
+import type { LyricLine } from "@applemusic-like-lyrics/core";
 
 const audioRef = ref<HTMLAudioElement>();
 const state = reactive({
     audioUrl: "",
     albumUrl: "",
+    albumIsVideo: false,
     currentTime: 0,
     lyricLines: [] as LyricLine[],
 });
@@ -57,6 +59,7 @@ function onClickOpenAudio() {
                 URL.revokeObjectURL(state.audioUrl);
             }
             state.audioUrl = URL.createObjectURL(file);
+            state.albumIsVideo = file.type.startsWith("video/");
         }
     };
     input.click();
@@ -65,7 +68,7 @@ function onClickOpenAudio() {
 function onClickOpenAlbumImage() {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*";
+    input.accept = "image/*,video/*";
     input.onchange = () => {
         const file = input.files?.[0];
         if (file) {
@@ -86,7 +89,7 @@ function onClickOpenTTMLLyric() {
         const file = input.files?.[0];
         if (file) {
             const text = await file.text();
-            state.lyricLines = ttml.parseTTML(text);
+            state.lyricLines = parseTTML(text).lyricLines;
         }
     };
     input.click();

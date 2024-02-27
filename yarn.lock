@@ -75,7 +75,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/core@npm:*, @applemusic-like-lyrics/core@workspace:packages/core":
+"@applemusic-like-lyrics/core@npm:*, @applemusic-like-lyrics/core@npm:^0.1.3, @applemusic-like-lyrics/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/core@workspace:packages/core"
   dependencies:
@@ -106,23 +106,6 @@ __metadata:
     jss-preset-default: "*"
   languageName: unknown
   linkType: soft
-
-"@applemusic-like-lyrics/core@npm:^0.0.15":
-  version: 0.0.15
-  resolution: "@applemusic-like-lyrics/core@npm:0.0.15"
-  peerDependencies:
-    "@pixi/app": "*"
-    "@pixi/core": "*"
-    "@pixi/display": "*"
-    "@pixi/filter-blur": "*"
-    "@pixi/filter-bulge-pinch": "*"
-    "@pixi/filter-color-matrix": "*"
-    "@pixi/sprite": "*"
-    jss: "*"
-    jss-preset-default: "*"
-  checksum: 91126d550d6d1f7532cc0fcc4075dbe93e2cdbcdcf1465fdb28799cd0ff77875fcf5d4b721ac0c41feb7075fd1925e0281cae52859d1fed06688c70cb7e4337c
-  languageName: node
-  linkType: hard
 
 "@applemusic-like-lyrics/docs@workspace:packages/docs":
   version: 0.0.0-use.local
@@ -173,7 +156,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@applemusic-like-lyrics/core": "npm:^0.1.3"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
@@ -213,7 +196,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/vue@workspace:packages/vue"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:^0.0.15"
+    "@applemusic-like-lyrics/core": "npm:^0.1.3"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"

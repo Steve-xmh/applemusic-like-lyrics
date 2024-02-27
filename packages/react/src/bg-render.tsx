@@ -10,7 +10,6 @@ import {
 	forwardRef,
 	useImperativeHandle,
 	type HTMLProps,
-	useMemo,
 } from "react";
 export {
 	BaseRenderer,
