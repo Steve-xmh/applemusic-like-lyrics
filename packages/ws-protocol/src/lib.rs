@@ -129,9 +129,7 @@ pub enum Body {
     #[brw(magic(17u16))]
     BackwardSong,
     #[brw(magic(18u16))]
-    SetVolume {
-        volume: f64,
-    }
+    SetVolume { volume: f64 },
 }
 
 pub fn parse_body(body: &[u8]) -> anyhow::Result<Body> {
