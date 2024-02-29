@@ -78,8 +78,8 @@ export const LyricPlayerHorizonal: FC = () => {
 					"--amll-lyric-font-color": fontColor,
 					"--amll-lyric-view-color": fontColor,
 					"--amll-lyric-primary-color": primaryColor,
-					"--amll-lyric-primary-color-t15": `${primaryColor}26`,
-					"--amll-lyric-primary-color-t30": `${primaryColor}4D`,
+					"--amll-lyric-primary-color-t15": `${primaryColor}15`,
+					"--amll-lyric-primary-color-t30": `${primaryColor}2D`,
 					"--amll-lyric-mix-blend-mode": disableMixBlendMode
 						? "normal"
 						: "plus-lighter",
@@ -101,7 +101,7 @@ export const LyricPlayerHorizonal: FC = () => {
 			{showControlThumb ? <ControlThumb /> : <div />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-				loadableMusicOverrideData.data.musicCoverIsVideo ? (
+					loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
@@ -149,7 +149,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => {}, []);
+					channel.call("winhelper.dragWindow", () => { }, []);
 				}}
 			/>
 		</div>

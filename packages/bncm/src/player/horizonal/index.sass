@@ -37,7 +37,7 @@ $player-size-fract: 1fr
         height: 100%
         font-weight: 700
         box-sizing: border-box
-        padding-right: 10%
+        padding-right: 5%
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         display: flex
         flex-direction: column
@@ -57,7 +57,7 @@ $player-size-fract: 1fr
         width: min(50vh, 40vw)
         justify-self: center
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
-        font-size: 150%
+        font-size: 2vh
         display: flex
         flex-direction: column
         justify-content: space-around
@@ -78,7 +78,7 @@ $player-size-fract: 1fr
         image-rendering: auto
         background-position: center
         background-size: cover
-        border-radius: 3%
+        border-radius: 2%
         overflow: hidden
 
         $scale-level: 0.75
@@ -104,7 +104,8 @@ $player-size-fract: 1fr
         user-select: text
         min-width: 0
         font-weight: 500
-        letter-spacing: 0.3px
+        letter-spacing: 0.4px
+        opacity: 0.9
 
     .am-music-main-menu
         aspect-ratio: 1 / 1
@@ -120,6 +121,7 @@ $player-size-fract: 1fr
         align-items: center
         justify-content: center
         padding: 0
+        scale: 0.9
         @media screen and (max-height: 768px)
             scale: 0.8
 
@@ -138,9 +140,9 @@ $player-size-fract: 1fr
     .amll-music-album, .amll-music-artists
         white-space: nowrap
         text-align: center
-        opacity: 0.5
-        font-weight: 400
-        letter-spacing: 0.3px
+        opacity: 0.45
+        font-weight: 300
+        letter-spacing: 0.4px
 
         a
             line-height: normal
@@ -155,11 +157,9 @@ $player-size-fract: 1fr
 
             &::after
                 content: var(--applemusic-like-lyrics-music-artists-separator, ", ")
-                opacity: 0.5
 
             &:nth-last-child(2)::after
                 content: " & "
-                opacity: 0.5
 
             &:last-child::after
                 content: ""

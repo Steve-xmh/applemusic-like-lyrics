@@ -110,7 +110,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	readonly supportMaskImage = CSS.supports("mask-image", "none");
 	private disableSpring = false;
 	private alignAnchor: "top" | "bottom" | "center" = "center";
-	private alignPosition = 0.5;
+	private alignPosition = 0.35;
 	private isNonDynamic = false;
 	private scrollBoundary = [0, 0];
 	readonly size: [number, number] = [0, 0];
@@ -200,11 +200,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "left",
 			width: "var(--amll-lyric-player-width,100%)",
 			height: "fit-content",
-			padding: "2vh 1.05em",
+			padding: "2vh 1.0em",
 			margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
-			transition: "filter 0.25s, background-color 0.25s, box-shadow 0.25s",
+			transition: "filter 0.5s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "content-box",
 			borderRadius: "8px",
 			"&:has(>*):hover": {
@@ -739,35 +739,15 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				curPos += this.interludeDotsSize[1] + 40;
 			}
-			let targetOpacity = 1;
-			if (!isActive && i <= (interlude ? interlude[2] : this.scrollToIndex)) {
-				if (this.hidePassedLines) {
-					targetOpacity = 0;
-				} else if (this.isNonDynamic) {
-					targetOpacity = 0.25;
-				} else {
-					targetOpacity = 0.15;
-				}
-			} else if (hasBuffered) {
-				if (this.isNonDynamic) {
-					targetOpacity = 0.85;
-				} else {
-					targetOpacity = 1;
-				}
-			} else {
-				if (this.isNonDynamic) {
-					targetOpacity = 0.25;
-				} else {
-					targetOpacity = 0.5;
-				}
-			}
-			if (this.invokedByScrollEvent) {
-				if (this.isNonDynamic) {
-					targetOpacity = 0.85;
-				} else {
-					targetOpacity = 1;
-				}
-			}
+			const targetOpacity = this.hidePassedLines
+				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
+					? 0
+					: hasBuffered
+						? this.isNonDynamic ? 0.85 : 1
+						: (1 / 3) * (this.isNonDynamic ? 0.25 : 1)
+				: hasBuffered
+					? this.isNonDynamic ? 0.85 : 1
+					: (1 / 3) * (this.isNonDynamic ? 0.25 : 1);
 			let blurLevel = 0;
 			if (this.enableBlur) {
 				if (isActive) {
@@ -791,7 +771,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
 				targetOpacity,
-				blurLevel * 1.5,
+				blurLevel,
 				force,
 				delay,
 			);

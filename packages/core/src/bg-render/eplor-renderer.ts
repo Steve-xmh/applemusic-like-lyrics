@@ -214,8 +214,7 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${
-					this.label
+				`Failed to compile shader for type ${type} "${this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -485,7 +484,7 @@ export class EplorRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private gl: WebGL2RenderingContext = this.setupGL();
-	private reduceImageSizeCanvas = new OffscreenCanvas(128, 128);
+	private reduceImageSizeCanvas = new OffscreenCanvas(64, 64);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
 	private ampTransition = 0;
@@ -504,7 +503,7 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed * 0.2;
+		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed * 0.1;
 		this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
@@ -822,7 +821,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 10;
+		const blurRadius = 4;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw =
@@ -838,7 +837,7 @@ export class EplorRenderer extends BaseRenderer {
 		saturateImage(imageData, 1.5);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
-		blurImage(imageData, blurRadius, 4);
+		blurImage(imageData, blurRadius, 2);
 		const sprite = new AlbumTexture(
 			this.gl,
 			this.mainProgram,
@@ -855,8 +854,8 @@ export class EplorRenderer extends BaseRenderer {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 			// this.IllIlllIlIIlllI = [-1.1, -.9];
 		} else if (r === 1) {
-			// this.IllIlllIlIIlllI = [-0.3, -0.2];
-			this.IllIlllIlIIlllI = [-1.1, -0.9];
+			this.IllIlllIlIIlllI = [-1.3, -0.9];
+			// this.IllIlllIlIIlllI = [-1.1, -0.9];
 		} else {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 		}
