@@ -175,7 +175,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(min(5vh, 8vw), 12px))",
+			fontSize: "var(--amll-lyric-player-font-size,max(min(4.6vh, 8vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
@@ -744,10 +744,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					? 0
 					: hasBuffered
 						? this.isNonDynamic ? 0.85 : 1
-						: (1 / 3) * (this.isNonDynamic ? 0.25 : 1)
+						: (1 / 2) * (this.isNonDynamic ? 0.3 : 1)
 				: hasBuffered
 					? this.isNonDynamic ? 0.85 : 1
-					: (1 / 3) * (this.isNonDynamic ? 0.25 : 1);
+					: (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
 			let blurLevel = 0;
 			if (this.enableBlur) {
 				if (isActive) {

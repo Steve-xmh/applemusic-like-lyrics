@@ -227,13 +227,13 @@ ___
 
 ▸ **setFlowSpeed**(`speed`): `void`
 
-修改背景的流动速度，数字越大越快，默认为 2
+修改背景的流动速度，数字越大越快，默认为 8
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `speed` | `number` | 背景的流动速度，默认为 2 |
+| `speed` | `number` | 背景的流动速度，默认为 8 |
 
 #### Returns
 

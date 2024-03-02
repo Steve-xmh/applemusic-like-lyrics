@@ -695,7 +695,7 @@ export class EplorRenderer extends BaseRenderer {
 			this.blendProgram.setUniform1f("scale", this.currerntRenderScale);
 			this.drawScreen();
 
-			sprite.alpha = Math.min(1, sprite.alpha + delta / 200);
+			sprite.alpha = Math.min(1, sprite.alpha + delta / 300);
 		}
 
 		// 增加噪点以缓解色带现象
@@ -833,7 +833,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillStyle = "white";
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
-		contrastImage(imageData, 0.8);
+		// contrastImage(imageData, 0.8);
 		saturateImage(imageData, 1.5);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
@@ -846,7 +846,8 @@ export class EplorRenderer extends BaseRenderer {
 			imageData,
 		);
 		this.sprites.push(sprite);
-		this.playTime = Math.random() * 100000;
+		// this.playTime = Math.random() * 100000;
+		// this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		console.info(Math.random() * 10000);
 		const r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;

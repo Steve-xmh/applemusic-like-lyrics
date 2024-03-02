@@ -2,8 +2,8 @@ import { Disposable, HasElement } from "../interfaces";
 
 export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 	/**
-	 * 修改背景的流动速度，数字越大越快，默认为 2
-	 * @param speed 背景的流动速度，默认为 2
+	 * 修改背景的流动速度，数字越大越快，默认为 8
+	 * @param speed 背景的流动速度，默认为 8
 	 */
 	abstract setFlowSpeed(speed: number): void;
 	/**
@@ -66,7 +66,7 @@ export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 
 export abstract class BaseRenderer extends AbstractBaseRenderer {
 	private observer: ResizeObserver;
-	protected flowSpeed = 2;
+	protected flowSpeed = 8;
 	protected currerntRenderScale = 0.75;
 	constructor(protected canvas: HTMLCanvasElement) {
 		super();
@@ -78,8 +78,8 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 			const height = Math.max(
 				1,
 				canvas.clientHeight *
-					window.devicePixelRatio *
-					this.currerntRenderScale,
+				window.devicePixelRatio *
+				this.currerntRenderScale,
 			);
 			this.onResize(width, height);
 		});
@@ -89,11 +89,11 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 		this.currerntRenderScale = scale;
 		this.onResize(
 			this.canvas.clientWidth *
-				window.devicePixelRatio *
-				this.currerntRenderScale,
+			window.devicePixelRatio *
+			this.currerntRenderScale,
 			this.canvas.clientHeight *
-				window.devicePixelRatio *
-				this.currerntRenderScale,
+			window.devicePixelRatio *
+			this.currerntRenderScale,
 		);
 	}
 	/**
@@ -108,8 +108,8 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 		this.canvas.height = height;
 	}
 	/**
-	 * 修改背景的流动速度，数字越大越快，默认为 2
-	 * @param speed 背景的流动速度，默认为 2
+	 * 修改背景的流动速度，数字越大越快，默认为 8
+	 * @param speed 背景的流动速度，默认为 8
 	 */
 	setFlowSpeed(speed: number) {
 		this.flowSpeed = speed;

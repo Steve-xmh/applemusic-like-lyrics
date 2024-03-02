@@ -61,7 +61,7 @@ function generateFadeGradient(
 	width: number,
 	padding = 0,
 	bright = "rgba(0,0,0,0.85)",
-	dark = "rgba(0,0,0,0.25)",
+	dark = "rgba(0,0,0,0.3)",
 ): [string, number] {
 	const totalAspect = 2 + width + padding;
 	const widthInTotal = width / totalAspect;
@@ -168,7 +168,7 @@ export function shouldEmphasize(word: LyricWord): boolean {
 	return (
 		word.endTime - word.startTime >= 1000 &&
 		word.word.trim().length <= 7 &&
-		word.word.trim().length >= 1
+		word.word.trim().length > 1
 	);
 }
 
@@ -679,7 +679,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				const animateDu = Number.isFinite(du) ? Math.max(du * 1.8, 2000) : 0;
 				const empEasing = makeEmpEasing(EMP_EASING_MID);
 				result = characterElements.flatMap((el, i, arr) => {
-					const wordDe = de + (du / 2.5 / arr.length) * i;
+					const wordDe = de + (du / 3 / arr.length) * i;
 					const result: Animation[] = [];
 
 					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
@@ -739,7 +739,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							};
 						});
 					const ani = el.animate(frames, {
-						duration: Number.isFinite(du) ? du * 2 : 0,
+						duration: Number.isFinite(du) ? du * 1.2 : 0,
 						delay: Number.isFinite(wordDe) ? wordDe : 0,
 						id: `emphasize-word-float-only-${el.innerText}-${i}`,
 						iterations: 1,
