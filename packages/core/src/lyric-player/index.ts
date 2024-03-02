@@ -90,7 +90,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.8,
+		mass: 0.85,
 		damping: 15,
 		stiffness: 100,
 	};
@@ -714,7 +714,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		let baseDelay = 0.05;
+		let baseDelay = 0.08;
 		let setDots = false;
 		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {

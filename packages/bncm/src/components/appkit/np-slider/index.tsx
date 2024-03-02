@@ -35,7 +35,7 @@ export const Slider: React.FC<
 		const outer = outerRef.current;
 		const inner = innerRef.current;
 		if (outer && inner) {
-			const heightSpring = new Spring(84);
+			const heightSpring = new Spring(80);
 			const bounceSpring = new Spring(0);
 			let dragging = false;
 			heightSpring.updateParams({
@@ -54,9 +54,8 @@ export const Slider: React.FC<
 
 				bounceSpring.update(delta);
 				heightSpring.update(delta);
-				outer.style.transform = `translateX(${
-					bounceSpring.getCurrentPosition() / 100
-				}px)`;
+				outer.style.transform = `translateX(${bounceSpring.getCurrentPosition() / 100
+					}px)`;
 				inner.style.height = `${heightSpring.getCurrentPosition() / 10}px`;
 
 				lastTime = dt;
@@ -97,7 +96,7 @@ export const Slider: React.FC<
 			};
 			const onMouseLeave = (evt: MouseEvent) => {
 				if (!dragging) {
-					heightSpring.setTargetPosition(84);
+					heightSpring.setTargetPosition(80);
 					evt.stopImmediatePropagation();
 					evt.stopPropagation();
 					evt.preventDefault();
@@ -121,7 +120,7 @@ export const Slider: React.FC<
 				evt.stopImmediatePropagation();
 				evt.stopPropagation();
 				evt.preventDefault();
-				heightSpring.setTargetPosition(84);
+				heightSpring.setTargetPosition(80);
 				lastTime = null;
 				dragging = false;
 				window.removeEventListener("mousemove", onMouseMove);

@@ -646,7 +646,7 @@ export class EplorRenderer extends BaseRenderer {
 	private onRedraw(tickTime: number, delta: number) {
 		this.checkResize();
 		this.hasLyricValue =
-			(this.hasLyricValue * 19 + (this.hasLyric ? 1 : 0)) / 20;
+			(this.hasLyricValue * 54 + (this.hasLyric ? 1 : 0)) / 55;
 		const gl = this.gl;
 		this.vertexBuffer.bind();
 		this.indexBuffer.bind();
@@ -723,8 +723,8 @@ export class EplorRenderer extends BaseRenderer {
 		const isOnlyOneSprite =
 			this.sprites.length === 1 && this.sprites[0].alpha >= 1;
 		const isTweeningValues = this.hasLyric
-			? this.hasLyricValue > 0.00001
-			: this.hasLyricValue < 0.99999;
+			? this.hasLyricValue > 0.01
+			: this.hasLyricValue < 0.99;
 		return isOnlyOneSprite || !isTweeningValues;
 	}
 

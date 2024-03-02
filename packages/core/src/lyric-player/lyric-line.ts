@@ -320,7 +320,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
-				if (a.id === "float-word" || a.id.includes("emphasize-word-only-float")) {
+				if (a.id === "float-word" || a.id.includes("emphasize-word-float-only")) {
 					a.playbackRate = -1;
 					a.play();
 				}
@@ -688,7 +688,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
 							// const trans = empEasing(x);
 							const transX = Math.sin(x * Math.PI) ** 2.;
-							const y = x < EMP_EASING_MID ? transX : Math.max(transX, 0.8);
+							let y = x < EMP_EASING_MID ? transX : Math.max(transX, 0.8);
+							if (this.lyricLine.isBG) {
+								y *= 2;
+							}
 							const glowLevel =
 								empEasing(x) * blur;
 							// const floatLevel =
@@ -739,7 +742,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							};
 						});
 					const ani = el.animate(frames, {
-						duration: Number.isFinite(du) ? du * 1.2 : 0,
+						duration: Number.isFinite(du) ? du * 1.5 : 0,
 						delay: Number.isFinite(wordDe) ? wordDe : 0,
 						id: `emphasize-word-float-only-${el.innerText}-${i}`,
 						iterations: 1,
