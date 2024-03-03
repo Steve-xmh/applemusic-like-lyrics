@@ -6,6 +6,7 @@ export interface SliderProps {
 	onAfterChange?: (v: number) => void;
 	onBeforeChange?: () => void;
 	onChange?: (v: number) => void;
+	onSeeking?: (v: boolean) => void;
 	value: number;
 	min: number;
 	max: number;
@@ -21,6 +22,7 @@ export const Slider: React.FC<
 		onAfterChange,
 		onBeforeChange,
 		onChange,
+		onSeeking,
 		value,
 		min,
 		max,
@@ -82,6 +84,7 @@ export const Slider: React.FC<
 				}
 				const v = Math.min(max, Math.max(min, min + (max - min) * relPos));
 				onChange?.(v);
+				onSeeking?.(true);
 				setCurValue(v);
 				if (handler) cancelAnimationFrame(handler);
 				handler = requestAnimationFrame(onFrame);
@@ -102,6 +105,7 @@ export const Slider: React.FC<
 					evt.preventDefault();
 					if (handler) cancelAnimationFrame(handler);
 					handler = requestAnimationFrame(onFrame);
+					onSeeking?.(false);
 				}
 			};
 			const onMouseDown = (evt: MouseEvent) => {
@@ -147,6 +151,7 @@ export const Slider: React.FC<
 		innerRef.current,
 		onAfterChange,
 		onChange,
+		onSeeking,
 		onBeforeChange,
 		min,
 		max,

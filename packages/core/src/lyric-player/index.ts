@@ -132,6 +132,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	_getIsNonDynamic() {
 		return this.isNonDynamic;
 	}
+	setIsSeeking(isSeeking: boolean) {
+		this.isSeeking = isSeeking;
+	}
 	/**
 	 * 设置是否使用物理弹簧算法实现歌词动画效果，默认启用
 	 *
@@ -232,14 +235,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// scale: 0.6,
 			fontSize: "max(70%, 10px)",
 			transition: "opacity 0.25s, scale 0.5s",
-			transform: "translateX(-4px)",
-			transformOrigin: "bottom right",
+			marginLeft: "-1.2em",
 			"&.active": {
 				transition: "opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
 				opacity: 0.4,
+				marginLeft: "-1.2em",
 				// scale: 1,
-				transform: "translateX(-4px)",
-				transformOrigin: "bottom right",
 			},
 		},
 		lyricMainLine: {
@@ -798,7 +799,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
-			if (curPos >= 0) {
+			if (curPos >= 0 && !this.isSeeking) {
 				delay += baseDelay;
 				// baseDelay *= 1.1;
 				// baseDelay /= 1.2;
@@ -878,7 +879,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前仍有缓冲行的情况下加入新热行，则不会解除当前缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
-		this.isSeeking = isSeek;
 		this.currentTime = time;
 		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic() && !this.supportMaskImage)

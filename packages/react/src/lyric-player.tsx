@@ -76,6 +76,7 @@ export interface LyricPlayerProps {
 	 * 内部会根据调用间隔和播放进度自动决定如何滚动和显示歌词，所以这个的调用频率越快越准确越好
 	 */
 	currentTime?: number;
+	isSeeking?: boolean;
 
 	/**
 	 * 设置是否应用提前歌词行时序，默认为 `true`
@@ -152,6 +153,7 @@ export const LyricPlayer = forwardRef<
 			hidePassedLines,
 			lyricLines,
 			currentTime,
+			isSeeking,
 			enableLyricAdvanceDynamicLyricTime,
 			linePosXSpringParams,
 			linePosYSpringParams,
@@ -258,6 +260,10 @@ export const LyricPlayer = forwardRef<
 				corePlayerRef.current?.setCurrentTime(currentTime);
 			else corePlayerRef.current?.setCurrentTime(0);
 		}, [currentTime]);
+
+		useEffect(() => {
+			corePlayerRef.current?.setIsSeeking(isSeeking);
+		}, [isSeeking]);
 
 		useEffect(() => {
 			if (linePosXSpringParams !== undefined)

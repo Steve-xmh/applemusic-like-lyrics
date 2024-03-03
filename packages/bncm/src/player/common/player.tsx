@@ -2,6 +2,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState, type FC, useEffect, useRef, RefObject } from "react";
 import {
 	currentTimeAtom,
+	seekingAtom,
 	lyricPageOpenedAtom,
 	musicArtistsAtom,
 	playStatusAtom,
@@ -30,10 +31,13 @@ import { AMLLEnvironment, amllEnvironmentAtom } from "../../injector";
 import "./player.sass";
 import { PlayState } from "../../music-context";
 
+let isSeeking = false;
+
 const offsetedCurrentTimeAtom = atom(
 	(get) => {
 		const offset = get(playPositionOffsetAtom);
 		const currentTime = get(currentTimeAtom);
+		isSeeking = get(seekingAtom);
 		if (offset.state === "hasData") {
 			return currentTime + offset.data;
 		}
@@ -115,6 +119,7 @@ export const CoreLyricPlayer: FC<{
 				}
 				playing={playStatus === PlayState.Playing}
 				currentTime={currentTime}
+				isSeeking={isSeeking}
 				enableLyricAdvanceDynamicLyricTime={lyricAdvanceDynamicLyricTime}
 				enableBlur={lyricBlurEffect}
 				enableSpring={lyricSpringEffect}

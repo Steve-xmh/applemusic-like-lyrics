@@ -642,7 +642,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
 		const delay = word.startTime - this.lyricLine.startTime;
-		const duration = Math.max(1000, word.endTime - word.startTime);
+		const duration = word.endTime - word.startTime;
 		let up = 0.05;
 		if (this.lyricLine.isBG) {
 			up *= 2;
@@ -660,7 +660,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				},
 			],
 			{
-				duration: isFinite(duration) ? duration : 0,
+				duration: isFinite(duration) ? duration * 5 : 0,
 				delay: isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",

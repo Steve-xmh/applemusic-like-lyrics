@@ -17,6 +17,7 @@ import {
 	musicAlbumIdAtom,
 	musicAlbumNameAtom,
 	musicDurationAtom,
+	seekingAtom,
 } from "../../music-context/wrapper";
 import IconMore from "../../assets/icon_more.svg?react";
 import { SongInfoTextMarquee } from "../../components/song-info/song-info-text-marquee";
@@ -64,6 +65,8 @@ export const MusicInfo: FC = () => {
 
 	const playProgressText = toDuration(currentTime / 1000);
 	const remainText = toDuration((currentTime - musicDuration) / 1000);
+
+	const [seeking, setSeekingAtom] = useAtom(seekingAtom);
 
 	return (
 		<div className="amll-music-info">
@@ -132,6 +135,7 @@ export const MusicInfo: FC = () => {
 			<div className="am-music-progress-control">
 				<Slider
 					onChange={setCurrentTime}
+					onSeeking={setSeekingAtom}
 					value={currentTime}
 					min={0}
 					max={musicDuration}

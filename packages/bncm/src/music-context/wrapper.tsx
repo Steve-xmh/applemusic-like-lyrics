@@ -39,11 +39,11 @@ export const displayMusicArtistsAtom = atom((get) => {
 	if (overrideData.state === "hasData") {
 		return overrideData.data.musicArtists
 			? ([
-					{
-						id: "0",
-						name: overrideData.data.musicArtists,
-					},
-			  ] as Artist[])
+				{
+					id: "0",
+					name: overrideData.data.musicArtists,
+				},
+			] as Artist[])
 			: get(musicArtistsAtom);
 	}
 	return get(musicArtistsAtom);
@@ -83,6 +83,18 @@ export const playStatusAtom = atom(
 	},
 );
 export const rawPlayStatusAtom = atom(PlayState.Pausing);
+export const isSeekingAtom = atom(false);
+export const seekingAtom = atom(
+	(get) => get(isSeekingAtom),
+	(get, set, update: boolean | { raw: boolean }) => {
+		if (typeof update === "boolean") {
+			set(isSeekingAtom, update);
+		} else {
+			set(isSeekingAtom, update.raw);
+		}
+	}
+);
+
 export const currentTimeAtom = atom(
 	(get) => get(rawCurrentTimeAtom),
 	(
@@ -91,12 +103,15 @@ export const currentTimeAtom = atom(
 		update:
 			| number
 			| {
-					raw: number;
-			  },
+				raw: number;
+			},
 	) => {
 		const musicCtx = get(rawMusicContextAtom);
-		if (typeof update === "number") musicCtx?.seekToPosition(update);
-		else set(rawCurrentTimeAtom, update.raw);
+		if (typeof update === "number") {
+			musicCtx?.seekToPosition(update);
+		} else {
+			set(rawCurrentTimeAtom, update.raw);
+		}
 	},
 );
 export const rawCurrentTimeAtom = atom(0);
