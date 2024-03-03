@@ -695,7 +695,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			du *= 1.2;
 		}
 		amount = Math.min(1.2, amount);
-		blur = Math.min(0.65, blur);
+		blur = Math.min(0.6, blur);
 		// if (du >= 1200 && du < 2000) {
 		// 	amount = 0.7;
 		// 	blur = 0.2;
@@ -735,7 +735,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						offset: x,
 						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * (((arr.length - i) / arr.length) ** 2)
 							}em, ${-transX * 0.03 * amount}em)`,
-						textShadow: `0 0 ${Math.min(0.3, blur * 0.5)}em rgba(255, 255, 255, ${glowLevel})`,
+						textShadow: `0 0 ${Math.min(0.3, blur * 0.4)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
 			const glow = el.animate(frames, {

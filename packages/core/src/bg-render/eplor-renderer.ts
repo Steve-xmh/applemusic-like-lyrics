@@ -833,7 +833,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillStyle = "white";
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
-		// contrastImage(imageData, 0.8);
+		contrastImage(imageData, 0.6);
 		// saturateImage(imageData, 1.4);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
