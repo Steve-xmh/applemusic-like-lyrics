@@ -18,7 +18,7 @@ interface RealWord extends LyricWord {
 	shouldEmphasize: boolean;
 }
 
-const ANIMATION_FRAME_QUANTITY = 16;
+const ANIMATION_FRAME_QUANTITY = 32;
 
 const norNum = (min: number, max: number) => (x: number) =>
 	Math.min(1, Math.max(0, (x - min) / (max - min)));
@@ -348,10 +348,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			for (const a of word.maskAnimations) {
 				if (this.lyricAdvanceDynamicLyricTime) {
-					setTimeout(() => {
-						a.currentTime = 0;
-						a.pause();
-					}, 500);
+					// setTimeout(() => {
+					// 	a.currentTime = 0;
+					// 	a.pause();
+					// }, 500);
 					a.finished.then(() => {
 						a.currentTime = 0;
 						a.pause();
@@ -642,7 +642,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
 		const delay = word.startTime - this.lyricLine.startTime;
-		const duration = word.endTime - word.startTime;
+		const duration = Math.max(500, word.endTime - word.startTime);
 		let up = 0.05;
 		if (this.lyricLine.isBG) {
 			up *= 2;
@@ -660,7 +660,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				},
 			],
 			{
-				duration: isFinite(duration) ? duration * 5 : 0,
+				duration: isFinite(duration) ? duration * 2 : 0,
 				delay: isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
@@ -680,21 +680,22 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		delay: number,
 	): Animation[] {
 		const de = Math.max(0, delay) - 300;
-		const du = Math.max(1000, duration);
+		let du = Math.max(1000, duration);
 
 		let result: Animation[] = [];
 
 		let amount = du / 2000;
 		amount = amount > 1 ? Math.sqrt(amount) : amount ** 3;
 		let blur = du / 3000;
-		blur = blur > 1 ? Math.sqrt(blur) : blur ** 2;
-		amount = Math.min(1.0, amount * 0.6);
-		blur = Math.min(0.6, blur);
+		blur = blur > 1 ? Math.sqrt(blur) : blur ** 3;
+		amount *= 0.6;
 		if (word.word.includes(this.lyricLine.words.at(this.lyricLine.words.length - 1)?.word)) {
-			console.log("includes" + word.word);
 			amount *= 2.0;
 			blur *= 1.5;
+			du *= 1.2;
 		}
+		amount = Math.min(1.2, amount);
+		blur = Math.min(0.65, blur);
 		// if (du >= 1200 && du < 2000) {
 		// 	amount = 0.7;
 		// 	blur = 0.2;
@@ -722,7 +723,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
 					// const trans = empEasing(x);
 					let transX = Math.sin(x * Math.PI);
-					transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
+					// transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
 					const glowLevel =
 						empEasing(x) * blur;
 					// const floatLevel =
@@ -734,7 +735,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						offset: x,
 						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * (((arr.length - i) / arr.length) ** 2)
 							}em, ${-transX * 0.03 * amount}em)`,
-						textShadow: `0 0 0.3em rgba(255, 255, 255, ${glowLevel})`,
+						textShadow: `0 0 ${Math.min(0.3, blur * 0.5)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
 			const glow = el.animate(frames, {

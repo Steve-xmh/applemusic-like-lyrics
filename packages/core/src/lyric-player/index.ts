@@ -751,7 +751,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(this.padding - 20, curPos + 10);
+				this.interludeDots.setTransform(this.padding - 45, curPos + 10);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
