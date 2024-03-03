@@ -110,6 +110,12 @@ export const swapTranslatedRomanLineAtom = atomWithConfig({
 	desc: "是否交换翻译行和音译行的位置",
 });
 
+
+export const lyricAdvanceDynamicLyricTimeAtom = atomWithConfig({
+	key: "lyric-advance-dynamic-lyric-time",
+	default: true,
+	desc: "是否应用提前歌词行时序",
+});
 export const lyricBlurEffectAtom = atomWithConfig({
 	key: "lyric-blur-effect",
 	default: true,

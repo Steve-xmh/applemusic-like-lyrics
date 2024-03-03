@@ -12,6 +12,7 @@ import {
 	lyricSpringEffectAtom,
 	primaryColorAtom,
 	playPositionOffsetAtom,
+	lyricAdvanceDynamicLyricTimeAtom,
 } from "./atoms";
 import { TextField } from "../appkit/text-field";
 import { useAtom } from "jotai";
@@ -78,6 +79,12 @@ export const LyricConfig: FC = () => {
 						type="number"
 					/>
 				</div>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={lyricAdvanceDynamicLyricTimeAtom}
+					description="即将原歌词行的初始时间时序提前，以便在歌词滚动结束后刚好开始播放（逐词）歌词效果。这个行为更加接近 Apple Music 的效果，但是大部分情况下会导致歌词行末尾的歌词尚未播放完成便被切换到下一行。"
+					label="提前歌词行时序"
+				/>
 			</GroupBox>
 			<GroupBox>
 				<SwitchConfigComponent

@@ -18,6 +18,7 @@ import { lyricLinesAtom, usingLyricSourceAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {
 	keepBuiltinPlayerWhenConnectedAtom,
+	lyricAdvanceDynamicLyricTimeAtom,
 	lyricBlurEffectAtom,
 	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
@@ -58,6 +59,7 @@ export const CoreLyricPlayer: FC<{
 	const playStatus = useAtomValue(playStatusAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 	const usingLyricSource = useAtomValue(usingLyricSourceAtom);
+	const lyricAdvanceDynamicLyricTime = useAtomValue(lyricAdvanceDynamicLyricTimeAtom);
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
 	const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom);
 	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
@@ -113,6 +115,7 @@ export const CoreLyricPlayer: FC<{
 				}
 				playing={playStatus === PlayState.Playing}
 				currentTime={currentTime}
+				enableLyricAdvanceDynamicLyricTime={lyricAdvanceDynamicLyricTime}
 				enableBlur={lyricBlurEffect}
 				enableSpring={lyricSpringEffect}
 				enableScale={lyricScaleEffect}
@@ -138,8 +141,8 @@ export const CoreLyricPlayer: FC<{
 						<div className="amll-contributors">
 							<div>创作者：{artists.map((v) => v.name).join("、")}</div>
 							{usingLyricSource.state === "hasData" &&
-							usingLyricSource.data.type === "builtin:amll-ttml-db" &&
-							showAMLLTTMLDBTip ? (
+								usingLyricSource.data.type === "builtin:amll-ttml-db" &&
+								showAMLLTTMLDBTip ? (
 								<div className="ttml-db-tip">
 									{/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
 									<a

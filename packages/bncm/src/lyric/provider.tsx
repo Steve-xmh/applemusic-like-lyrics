@@ -28,6 +28,7 @@ import {
 } from "@applemusic-like-lyrics/lyric";
 import { log, warn } from "../utils/logger";
 import {
+	lyricAdvanceDynamicLyricTimeAtom,
 	lyricSourcesAtom,
 	showRomanLineAtom,
 	showTranslatedLineAtom,
@@ -476,15 +477,18 @@ export const lyricLinesAtom = atom(
 					})),
 				}));
 			}
-			// overrideLines.forEach((line) => {
-			// 	if (line.words.length > 0) {
-			// 		const delta = Math.abs(
-			// 			Math.max(0, line.startTime - 500) - line.startTime,
-			// 		);
-			// 		line.startTime -= delta;
-			// 		line.endTime -= delta;
-			// 	}
-			// });
+			const lyricAdvanceDynamicLyricTime = get(lyricAdvanceDynamicLyricTimeAtom);
+			if (lyricAdvanceDynamicLyricTime) {
+				overrideLines.forEach((line) => {
+					if (line.words.length > 0) {
+						const delta = Math.abs(
+							Math.max(0, line.startTime - 500) - line.startTime,
+						);
+						line.startTime -= delta;
+						line.endTime -= 500;
+					}
+				});
+			}
 			return {
 				state: "hasData",
 				data: overrideLines,

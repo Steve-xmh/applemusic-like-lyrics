@@ -46,6 +46,43 @@ export const Background: FC = () => {
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
 	const [dbgValue, setDbgValue] = useState<number[]>([]);
 
+	const gradient: number[] = [];
+
+	function normalizeFFTData(fftData: number[]): number[] {
+		// Find the maximum value in the FFT data
+		// let max = 0;
+		// for (let i = 0; i < fftData.length; i++) {
+		// 	if (fftData[i] > max) {
+		// 		max = fftData[i];
+		// 	}
+		// }
+		const max = Math.max.apply(Math, fftData);
+
+		// Normalize the FFT data
+		const normalizedData: number[] = [];
+		for (let i = 0; i < fftData.length; i++) {
+			normalizedData[i] = fftData[i] / max;
+		}
+
+		return normalizedData;
+	}
+
+	function calculateGradient(fftData: number[]): number {
+		const window = 40;
+		if (gradient.length < window) {
+			gradient.push(fftData[1]);
+			return 0;
+		} else {
+			gradient.shift();
+			gradient.push(fftData[1]);
+
+			const maxInInterval = Math.max(...gradient);
+			const minInInterval = Math.min(...gradient);
+			const difference = maxInInterval - minInInterval;
+			return difference > 0.5 ? maxInInterval : minInInterval ** 2 * 0.1;
+		}
+	}
+
 	useEffect(() => {
 		let curValue = 1;
 
@@ -59,23 +96,27 @@ export const Background: FC = () => {
 
 			if (showBackgroundFFTLowFreq) setDbgValue(fftData.slice(0, 3));
 
-			const targetMaxValue = Math.max(
-				fftData[0],
-				Math.max(fftData[1], fftData[2]),
-			);
-			const maxValue = Math.max(targetMaxValue * 0.01 + 1000 * 0.99, 1000);
+			// const targetMaxValue = Math.max(
+			// 	fftData[0],
+			// 	Math.max(fftData[1], fftData[2]),
+			// );
+			// const maxValue = Math.max(targetMaxValue * 0.01 + 1000 * 0.99, 1000);
 
-			const value =
-				((Math.max(
-					(Math.sqrt(fftData[0] + fftData[1] + fftData[2]) / maxValue) * 1.5 -
-					0.2,
-					0.0,
-				) *
-					4.0 +
-					1.0) **
-					1.2 -
-					1.0) *
-				1.0;
+			// const value =
+			// 	((Math.max(
+			// 		(Math.sqrt(fftData[0] + fftData[1] + fftData[2]) / maxValue) * 1.5 -
+			// 		0.2,
+			// 		0.0,
+			// 	) *
+			// 		4.0 +
+			// 		1.0) **
+			// 		1.2 -
+			// 		1.0) *
+			// 	1.0;
+
+			const normalizeData = normalizeFFTData(fftData);
+
+			const value = calculateGradient(normalizeData) * 0.6;
 			setLowFreqVolume(curValue);
 
 			// if (Math.abs(value - lastValue) >= 0.9) {
@@ -94,7 +135,7 @@ export const Background: FC = () => {
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.002 * delta,
+					curValue + (value - curValue) * 0.0015 * delta,
 				);
 			}
 
@@ -155,14 +196,30 @@ export const Background: FC = () => {
 								fontFamily: "monospace",
 							}}
 						>
-							<div style={{ fontFamily: "monospace" }}>
-								{lowFreqVolume.toFixed(4)}
+							<div>
+								<div
+									style={{
+										position: "absolute",
+										width: `${Math.min(lowFreqVolume * 100, 100)}px`,
+										height: "10px",
+										backgroundColor: "white",
+									}}
+								/>
+								<div
+									style={{
+										position: "relative",
+										width: `100px`,
+										height: "10px",
+										backgroundColor: "rgba(255, 255, 255, 0.2)",
+									}}
+								/>
 							</div>
 							{dbgValue.map((v) => (
 								<div style={{ fontFamily: "monospace" }}>{v.toFixed(4)}</div>
 							))}
 						</div>
 					)}
+
 				</>
 			);
 		} else if (backgroundType === BackgroundType.CustomSolidColor) {

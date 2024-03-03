@@ -7,11 +7,6 @@ import { WebAnimationSpring } from "../utils/wa-spring";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
-enum EmphasizeAnimationMethod {
-	FloatAndGlow = "float-and-glow",
-	FloatOnly = "float-only",
-}
-
 interface RealWord extends LyricWord {
 	mainElement: HTMLSpanElement;
 	subElements: HTMLSpanElement[];
@@ -23,7 +18,7 @@ interface RealWord extends LyricWord {
 	shouldEmphasize: boolean;
 }
 
-const ANIMATION_FRAME_QUANTITY = 64;
+const ANIMATION_FRAME_QUANTITY = 16;
 
 const norNum = (min: number, max: number) => (x: number) =>
 	Math.min(1, Math.max(0, (x - min) / (max - min)));
@@ -32,9 +27,9 @@ const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
 const makeEmpEasing = (mid: number) => {
-	const bezIn = bezier(.2, 0, .5, 1);
-	const bezOut = bezier(0, 0, .7, 1);
-	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezIn(endNum(x)));
+	const bezIn = bezier(.2, .5, .5, 1);
+	const bezOut = bezier(.45, 0, 1, .45);
+	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
@@ -193,6 +188,7 @@ type MouseEventListener = (
 ) => void;
 
 export class LyricLineEl extends EventTarget implements HasElement, Disposable {
+	private lyricAdvanceDynamicLyricTime = true;
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -212,6 +208,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	// 	posY: new WebAnimationSpring(this.element, "transform", (v) => `translateY(${v.toFixed(1)}px)`),
 	// 	scale: new WebAnimationSpring(this.element, "transform", (v) => `scale(${v.toFixed(4)})`, 1),
 	// };
+
+	setLyricAdvanceDynamicLyricTime(enable: boolean) {
+		this.lyricAdvanceDynamicLyricTime = enable;
+	}
 
 	constructor(
 		private lyricPlayer: LyricPlayer,
@@ -326,16 +326,23 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 			}
 			for (const a of word.maskAnimations) {
-				a.currentTime = 0;
-				a.pause();
+				// a.currentTime = 0;
+				// a.pause();
 				// a.onfinish = () => {
 				// 	a.currentTime = 0;
 				// 	a.pause();
 				// }
-				// a.currentTime = Math.min(
-				// 	this.totalDuration,
-				// 	Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-				// );
+
+				if (this.lyricAdvanceDynamicLyricTime) {
+					a.finished.then(() => {
+						a.currentTime = 0;
+						a.pause();
+					});
+					a.currentTime = this.totalDuration - 300;
+				} else {
+					a.currentTime = 0;
+					a.pause();
+				}
 				// a.pause();
 			}
 		}
@@ -646,126 +653,109 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		duration: number,
 		delay: number,
 	): Animation[] {
-		const de = Math.max(0, delay);
+		const de = Math.max(0, delay) - 300;
 		const du = Math.max(1000, duration);
-
-		let method = EmphasizeAnimationMethod.FloatAndGlow;
-
-		if (du < 1200) {
-			method = EmphasizeAnimationMethod.FloatOnly;
-		}
 
 		let result: Animation[] = [];
 
-		switch (method) {
-			case EmphasizeAnimationMethod.FloatAndGlow: {
-				let amount = 0;
-				let blur = 0;
-				if (du >= 1200 && du < 2000) {
-					amount = 0.7;
-					blur = 0.2;
-				} else if (du >= 2000 && du < 3000) {
-					amount = 0.9;
-					blur = 0.4;
-				} else if (du >= 3000 && du < 4000) {
-					amount = 1.1;
-					blur = 0.6;
-				} else if (du >= 4000) {
-					amount = 1.2;
-					blur = 0.8;
-				}
-				console.log(word.word + " " + word.word.trim().length);
-				// const animateDu = Number.isFinite(du) ? du * (word.word.trim().length >= 4 ? 1. : 1.5) : 0;
-				const animateDu = Number.isFinite(du) ? Math.max(du * 1.8, 2000) : 0;
-				const empEasing = makeEmpEasing(EMP_EASING_MID);
-				result = characterElements.flatMap((el, i, arr) => {
-					const wordDe = de + (du / 3 / arr.length) * i;
-					const result: Animation[] = [];
-
-					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
-						.fill(0)
-						.map((_, j) => {
-							const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
-							// const trans = empEasing(x);
-							const transX = Math.sin(x * Math.PI) ** 2.;
-							let y = x < EMP_EASING_MID ? transX : Math.max(transX, 0.8);
-							if (this.lyricLine.isBG) {
-								y *= 2;
-							}
-							const glowLevel =
-								empEasing(x) * blur;
-							// const floatLevel =
-							// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
-
-							const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
-
-							return {
-								offset: x,
-								transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.03 * amount * (((arr.length - i) / arr.length) ** 2)
-									}em,${-y * 0.05}em)`,
-								textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
-							};
-						});
-					const ani = el.animate(frames, {
-						duration: animateDu,
-						delay: Number.isFinite(wordDe) ? wordDe : 0,
-						id: `emphasize-word-float-and-glow-${el.innerText}-${i}`,
-						iterations: 1,
-						composite: "replace",
-						easing: "ease-out",
-						fill: "both",
-					});
-					ani.onfinish = () => {
-						ani.pause();
-					};
-					ani.pause();
-					result.push(ani);
-
-					return result;
-				});
-				break;
-			}
-			case EmphasizeAnimationMethod.FloatOnly: {
-				result = characterElements.flatMap((el, i, arr) => {
-					const wordDe = de + (du / 1.5 / arr.length) * i;
-					const result: Animation[] = [];
-
-					const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
-						.fill(0)
-						.map((_, i) => {
-							const x = (i + 1) / ANIMATION_FRAME_QUANTITY;
-							const y = x < EMP_EASING_MID ? defaultEmpEasing(x) : 1;
-
-							return {
-								offset: x,
-								transform: `translateY(${-y * 0.05}em)`,
-							};
-						});
-					const ani = el.animate(frames, {
-						duration: Number.isFinite(du) ? du * 1.5 : 0,
-						delay: Number.isFinite(wordDe) ? wordDe : 0,
-						id: `emphasize-word-float-only-${el.innerText}-${i}`,
-						iterations: 1,
-						composite: "replace",
-						easing: "linear",
-						fill: "both",
-					});
-					ani.onfinish = () => {
-						ani.pause();
-					};
-					ani.pause();
-					result.push(ani);
-
-					return result;
-				});
-				break;
-			}
+		let amount = 0;
+		let blur = 0;
+		if (du >= 1200 && du < 2000) {
+			amount = 0.7;
+			blur = 0.2;
+		} else if (du >= 2000 && du < 3000) {
+			amount = 0.9;
+			blur = 0.4;
+		} else if (du >= 3000 && du < 4000) {
+			amount = 1.1;
+			blur = 0.6;
+		} else if (du >= 4000) {
+			amount = 1.2;
+			blur = 0.8;
 		}
+		console.log(word.word + " " + word.word.trim().length);
+		// const animateDu = Number.isFinite(du) ? du * (word.word.trim().length >= 4 ? 1. : 1.5) : 0;
+		const animateDu = Number.isFinite(du) ? Math.max(du * 1.2, 2000) : 0;
+		const empEasing = makeEmpEasing(EMP_EASING_MID);
+		result = characterElements.flatMap((el, i, arr) => {
+			const wordDe = de + (du / 2.5 / arr.length) * i;
+			const result: Animation[] = [];
+
+			if (du >= 1200) {
+				const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+					.fill(0)
+					.map((_, j) => {
+						const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
+						// const trans = empEasing(x);
+						let transX = Math.sin(x * Math.PI);
+						transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
+						const glowLevel =
+							empEasing(x) * blur;
+						// const floatLevel =
+						// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
+
+						const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
+
+						return {
+							offset: x,
+							transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.03 * amount * (((arr.length - i) / arr.length) ** 2)
+								}em, ${-transX * 0.01 * amount}em)`,
+							textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
+						};
+					});
+				const glow = el.animate(frames, {
+					duration: animateDu,
+					delay: Number.isFinite(wordDe) ? wordDe : 0,
+					id: `emphasize-word-${el.innerText}-${i}`,
+					iterations: 1,
+					composite: "replace",
+					easing: "ease-in-out",
+					fill: "both",
+				});
+				glow.onfinish = () => {
+					glow.pause();
+				};
+				glow.pause();
+				result.push(glow);
+			}
+
+			const floatFrame: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+				.fill(0)
+				.map((_, j) => {
+					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
+					let y = Math.sin(x * Math.PI);
+					y = x < 0.5 ? y : Math.max(y, 1.0);
+					if (this.lyricLine.isBG) {
+						y *= 2;
+					}
+
+					return {
+						offset: x,
+						transform: `translateY(${-y * 0.05}em)`,
+					};
+				});
+			const float = el.animate(floatFrame, {
+				duration: animateDu,
+				delay: Number.isFinite(wordDe) ? wordDe : 0,
+				id: `float-word`,
+				iterations: 1,
+				composite: "add",
+				easing: "ease-in-out",
+				fill: "both",
+			});
+			float.onfinish = () => {
+				float.pause();
+			};
+			float.pause();
+			result.push(float);
+
+			return result;
+		});
 
 		return result;
 	}
 	private get totalDuration() {
-		return this.lyricLine.endTime - this.lyricLine.startTime;
+		return this.lyricLine.endTime + (this.lyricAdvanceDynamicLyricTime ? 500 : 0) - this.lyricLine.startTime;
 	}
 	updateMaskImage() {
 		if (this._hide) {
@@ -869,6 +859,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastPos = curPos;
 				let lastTime = 0;
 				const pushFrame = () => {
+					const easing = "ease-out";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;
@@ -880,6 +871,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
 							maskPosition: value,
+							easing: easing,
 						};
 						frames.push(frame);
 					}
@@ -889,6 +881,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
 							maskPosition: value,
+							easing: easing,
 						};
 						frames.push(frame);
 					}
@@ -896,6 +889,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const frame: Keyframe = {
 						offset: time,
 						maskPosition: value,
+						easing: easing,
 					};
 					frames.push(frame);
 					lastPos = curPos;
@@ -934,7 +928,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const ani = wordEl.animate(frames, {
 						duration: totalDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
-						easing: "linear",
 						fill: "both",
 					});
 					ani.pause();

@@ -62,6 +62,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private allowScroll = true;
 	private scrolledHandler = 0;
 	private isScrolled = false;
+	private isSeeking = false;
 	private invokedByScrollEvent = false;
 	private scrollOffset = 0;
 	private hidePassedLines = false;
@@ -90,17 +91,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.85,
+		mass: 0.8,
 		damping: 15,
 		stiffness: 100,
 	};
 	private scaleSpringParams: Partial<SpringParams> = {
-		mass: 0.7,
+		mass: 1,
 		damping: 20,
 		stiffness: 100,
 	};
 	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
 	private padding = this.emUnit;
+	private lyricAdvanceDynamicLyricTime = true;
 	private enableBlur = true;
 	private enableScale = true;
 	private interludeDots: InterludeDots;
@@ -512,6 +514,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.enableBlur = enable;
 		this.calcLayout();
 	}
+
+	setLyricAdvanceDynamicLyricTime(enable: boolean) {
+		this.lyricAdvanceDynamicLyricTime = enable;
+		this.calcLayout(true, true);
+		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
+	}
 	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
 	 * @param lines 歌词数组
@@ -714,10 +722,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		let baseDelay = 0.08;
+		let baseDelay = 0.02;
 		let setDots = false;
 		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {
+			el.setLyricAdvanceDynamicLyricTime(this.lyricAdvanceDynamicLyricTime);
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);
@@ -755,7 +764,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				} else {
 					blurLevel = 1;
 					if (i < this.scrollToIndex) {
-						blurLevel += Math.abs(this.scrollToIndex - i) / 2;
+						blurLevel += Math.abs(this.scrollToIndex - i) / 2 + 1;
 					} else {
 						blurLevel += Math.abs(
 							i - Math.max(this.scrollToIndex, latestIndex),
@@ -783,7 +792,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 			if (curPos >= 0) {
 				delay += baseDelay;
-				baseDelay /= 1.2;
+				baseDelay *= 1.2;
+				// baseDelay /= 1.2;
+				// baseDelay = Math.min(baseDelay, 0.08);
+				baseDelay = baseDelay > 0.08 ? 0 : baseDelay;
 			}
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
@@ -858,6 +870,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前仍有缓冲行的情况下加入新热行，则不会解除当前缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
+		this.isSeeking = isSeek;
 		this.currentTime = time;
 		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic() && !this.supportMaskImage)

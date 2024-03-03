@@ -646,7 +646,7 @@ export class EplorRenderer extends BaseRenderer {
 	private onRedraw(tickTime: number, delta: number) {
 		this.checkResize();
 		this.hasLyricValue =
-			(this.hasLyricValue * 54 + (this.hasLyric ? 1 : 0)) / 55;
+			(this.hasLyricValue * 49 + (this.hasLyric ? 1 : 0)) / 50;
 		const gl = this.gl;
 		this.vertexBuffer.bind();
 		this.indexBuffer.bind();
@@ -723,8 +723,8 @@ export class EplorRenderer extends BaseRenderer {
 		const isOnlyOneSprite =
 			this.sprites.length === 1 && this.sprites[0].alpha >= 1;
 		const isTweeningValues = this.hasLyric
-			? this.hasLyricValue > 0.01
-			: this.hasLyricValue < 0.99;
+			? this.hasLyricValue > 0.1
+			: this.hasLyricValue < 0.9;
 		return isOnlyOneSprite || !isTweeningValues;
 	}
 
@@ -834,7 +834,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		// contrastImage(imageData, 0.8);
-		saturateImage(imageData, 1.5);
+		// saturateImage(imageData, 1.5);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 2);

@@ -76,6 +76,11 @@ export interface LyricPlayerProps {
 	 * 内部会根据调用间隔和播放进度自动决定如何滚动和显示歌词，所以这个的调用频率越快越准确越好
 	 */
 	currentTime?: number;
+
+	/**
+	 * 设置是否应用提前歌词行时序，默认为 `true`
+	 */
+	enableLyricAdvanceDynamicLyricTime?: boolean;
 	/**
 	 * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
 	 *
@@ -147,6 +152,7 @@ export const LyricPlayer = forwardRef<
 			hidePassedLines,
 			lyricLines,
 			currentTime,
+			enableLyricAdvanceDynamicLyricTime,
 			linePosXSpringParams,
 			linePosYSpringParams,
 			lineScaleSpringParams,
@@ -234,6 +240,10 @@ export const LyricPlayer = forwardRef<
 		}, [enableBlur]);
 
 		useEffect(() => {
+			corePlayerRef.current?.setLyricAdvanceDynamicLyricTime(enableLyricAdvanceDynamicLyricTime ?? true);
+		}, [enableLyricAdvanceDynamicLyricTime]);
+
+		useEffect(() => {
 			if (lyricLines !== undefined) {
 				corePlayerRef.current?.setLyricLines(lyricLines);
 				corePlayerRef.current?.update();
@@ -301,9 +311,9 @@ export const LyricPlayer = forwardRef<
 				<div {...props} ref={wrapperRef} />
 				{corePlayerRef.current?.getBottomLineElement() && bottomLine
 					? createPortal(
-							bottomLine,
-							corePlayerRef.current?.getBottomLineElement(),
-					  )
+						bottomLine,
+						corePlayerRef.current?.getBottomLineElement(),
+					)
 					: null}
 			</>
 		);
