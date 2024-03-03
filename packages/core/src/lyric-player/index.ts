@@ -91,7 +91,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.8,
+		mass: 0.85,
 		damping: 15,
 		stiffness: 100,
 	};
@@ -225,21 +225,29 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		lyricDuetLine: {
 			textAlign: "right",
 			transformOrigin: "right",
+			paddingLeft: "20%",
 		},
 		lyricBgLine: {
 			opacity: 0,
-			fontSize: "max(50%, 10px)",
-			transition: "opacity 0.25s",
+			// scale: 0.6,
+			fontSize: "max(70%, 10px)",
+			transition: "opacity 0.25s, scale 0.5s",
+			transform: "translateX(-4px)",
+			transformOrigin: "bottom right",
 			"&.active": {
-				transition: "opacity 0.25s 0.25s",
+				transition: "opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
 				opacity: 0.4,
+				// scale: 1,
+				transform: "translateX(-4px)",
+				transformOrigin: "bottom right",
 			},
 		},
 		lyricMainLine: {
 			transition: "opacity 0.3s 0.25s",
 			willChange: "opacity",
 			margin: "-1em",
-			padding: "1em",
+			padding: "1em 0.5em",
+			paddingRight: "25%",
 			"& span": {
 				display: "inline-block",
 			},
@@ -695,7 +703,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		} else {
 			this.interludeDots.setInterlude(undefined);
 		}
-		const SCALE_ASPECT = this.enableScale ? 0.95 : 1;
+		const SCALE_ASPECT = this.enableScale ? 0.98 : 1;
 		const scrollOffset = this.lyricLinesEl
 			.slice(0, targetAlignIndex)
 			.reduce(
@@ -722,7 +730,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		let baseDelay = 0.02;
+		let baseDelay = 0.06;
 		let setDots = false;
 		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {
@@ -792,10 +800,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 			if (curPos >= 0) {
 				delay += baseDelay;
-				baseDelay *= 1.2;
+				// baseDelay *= 1.1;
 				// baseDelay /= 1.2;
 				// baseDelay = Math.min(baseDelay, 0.08);
-				baseDelay = baseDelay > 0.08 ? 0 : baseDelay;
+				// baseDelay = baseDelay > 0.15 ? 0 : baseDelay;
 			}
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;

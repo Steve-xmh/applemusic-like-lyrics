@@ -28,7 +28,7 @@ const endNum = norNum(EMP_EASING_MID, 1);
 
 const makeEmpEasing = (mid: number) => {
 	const bezIn = bezier(.2, .5, .5, 1);
-	const bezOut = bezier(.45, 0, 1, .45);
+	const bezOut = bezier(.75, 0, 1, .75);
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
@@ -196,6 +196,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private blur = 0;
 	private delay = 0;
 	private splittedWords: RealWord[] = [];
+	private animations: Animation[] = [];
 	// 由 LyricPlayer 来设置
 	lineSize: number[] = [0, 0];
 	readonly lineTransforms = {
@@ -292,6 +293,25 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 	}
 
+	areWordsOnSameLine(word1: RealWord, word2: RealWord) {
+		if (word1 && word1.mainElement
+			&& word2 && word2.mainElement) {
+			let word1el: HTMLSpanElement = word1.mainElement;
+			let word2el: HTMLSpanElement = word2.mainElement;
+
+			const rect1 = word1el.getBoundingClientRect();
+			const rect2 = word2el.getBoundingClientRect();
+
+			// 检查两个单词的顶部距离是否相等（或者差值很小）
+			const topDifference = Math.abs(rect1.top - rect2.top);
+
+			// 如果顶部距离相差很小，可以认为它们在同一行上
+			return topDifference < 1;
+		}
+
+		return true;
+	}
+
 	private isEnabled = false;
 	enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
@@ -318,6 +338,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.isEnabled = false;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
+		let i = 0;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				if (a.id === "float-word" || a.id.includes("emphasize-word-float-only")) {
@@ -326,25 +347,30 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 			}
 			for (const a of word.maskAnimations) {
-				// a.currentTime = 0;
-				// a.pause();
-				// a.onfinish = () => {
-				// 	a.currentTime = 0;
-				// 	a.pause();
-				// }
-
 				if (this.lyricAdvanceDynamicLyricTime) {
+					setTimeout(() => {
+						a.currentTime = 0;
+						a.pause();
+					}, 500);
 					a.finished.then(() => {
 						a.currentTime = 0;
 						a.pause();
 					});
-					a.currentTime = this.totalDuration - 300;
+					const start = word.startTime - this.lyricLine.startTime;
+					const current = maskAnimationTime - this.lyricLine.startTime;
+					if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i], this.splittedWords[i - 1]) && current < start - 200) {
+						a.currentTime = start;
+						a.playbackRate = 1;
+					} else {
+						a.currentTime = this.totalDuration - 500;
+						a.playbackRate = 2;
+					}
 				} else {
 					a.currentTime = 0;
 					a.pause();
 				}
-				// a.pause();
 			}
+			i++;
 		}
 		main.classList.remove("active");
 	}
@@ -658,66 +684,74 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 		let result: Animation[] = [];
 
-		let amount = 0;
-		let blur = 0;
-		if (du >= 1200 && du < 2000) {
-			amount = 0.7;
-			blur = 0.2;
-		} else if (du >= 2000 && du < 3000) {
-			amount = 0.9;
-			blur = 0.4;
-		} else if (du >= 3000 && du < 4000) {
-			amount = 1.1;
-			blur = 0.6;
-		} else if (du >= 4000) {
-			amount = 1.2;
-			blur = 0.8;
+		let amount = du / 2000;
+		amount = amount > 1 ? Math.sqrt(amount) : amount ** 3;
+		let blur = du / 3000;
+		blur = blur > 1 ? Math.sqrt(blur) : blur ** 2;
+		amount = Math.min(1.0, amount * 0.6);
+		blur = Math.min(0.6, blur);
+		if (word.word.includes(this.lyricLine.words.at(this.lyricLine.words.length - 1)?.word)) {
+			console.log("includes" + word.word);
+			amount *= 2.0;
+			blur *= 1.5;
 		}
-		console.log(word.word + " " + word.word.trim().length);
+		// if (du >= 1200 && du < 2000) {
+		// 	amount = 0.7;
+		// 	blur = 0.2;
+		// } else if (du >= 2000 && du < 3000) {
+		// 	amount = 0.9;
+		// 	blur = 0.4;
+		// } else if (du >= 3000 && du < 4000) {
+		// 	amount = 1.1;
+		// 	blur = 0.6;
+		// } else if (du >= 4000) {
+		// 	amount = 1.2;
+		// 	blur = 0.8;
+		// }
+		// console.log(word.word + " " + word.word.trim().length);
 		// const animateDu = Number.isFinite(du) ? du * (word.word.trim().length >= 4 ? 1. : 1.5) : 0;
-		const animateDu = Number.isFinite(du) ? Math.max(du * 1.2, 2000) : 0;
+		const animateDu = Number.isFinite(du) ? du * 1.1 : 0;
 		const empEasing = makeEmpEasing(EMP_EASING_MID);
 		result = characterElements.flatMap((el, i, arr) => {
 			const wordDe = de + (du / 2.5 / arr.length) * i;
 			const result: Animation[] = [];
 
-			if (du >= 1200) {
-				const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
-					.fill(0)
-					.map((_, j) => {
-						const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
-						// const trans = empEasing(x);
-						let transX = Math.sin(x * Math.PI);
-						transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
-						const glowLevel =
-							empEasing(x) * blur;
-						// const floatLevel =
-						// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
+			const frames: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
+				.fill(0)
+				.map((_, j) => {
+					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
+					// const trans = empEasing(x);
+					let transX = Math.sin(x * Math.PI);
+					transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
+					const glowLevel =
+						empEasing(x) * blur;
+					// const floatLevel =
+					// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
 
-						const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
+					const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
 
-						return {
-							offset: x,
-							transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.03 * amount * (((arr.length - i) / arr.length) ** 2)
-								}em, ${-transX * 0.01 * amount}em)`,
-							textShadow: `rgba(255, 255, 255, ${glowLevel}) 0 0 10px`,
-						};
-					});
-				const glow = el.animate(frames, {
-					duration: animateDu,
-					delay: Number.isFinite(wordDe) ? wordDe : 0,
-					id: `emphasize-word-${el.innerText}-${i}`,
-					iterations: 1,
-					composite: "replace",
-					easing: "ease-in-out",
-					fill: "both",
+					return {
+						offset: x,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * (((arr.length - i) / arr.length) ** 2)
+							}em, ${-transX * 0.03 * amount}em)`,
+						textShadow: `0 0 0.3em rgba(255, 255, 255, ${glowLevel})`,
+					};
 				});
-				glow.onfinish = () => {
-					glow.pause();
-				};
+			const glow = el.animate(frames, {
+				duration: animateDu,
+				delay: Number.isFinite(wordDe) ? wordDe : 0,
+				id: `emphasize-word-${el.innerText}-${i}`,
+				iterations: 1,
+				composite: "replace",
+				easing: "ease-in-out",
+				fill: "both",
+			});
+			glow.onfinish = () => {
 				glow.pause();
-				result.push(glow);
-			}
+			};
+			glow.pause();
+			result.push(glow);
+
 
 			const floatFrame: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
 				.fill(0)
@@ -735,7 +769,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					};
 				});
 			const float = el.animate(floatFrame, {
-				duration: animateDu,
+				duration: animateDu * 1.4,
 				delay: Number.isFinite(wordDe) ? wordDe : 0,
 				id: `float-word`,
 				iterations: 1,
@@ -859,7 +893,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastPos = curPos;
 				let lastTime = 0;
 				const pushFrame = () => {
-					const easing = "ease-out";
+					const easing = "cubic-bezier(0,0,.7,1)";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;

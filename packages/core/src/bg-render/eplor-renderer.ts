@@ -834,10 +834,10 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		// contrastImage(imageData, 0.8);
-		// saturateImage(imageData, 1.5);
+		// saturateImage(imageData, 1.4);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
-		blurImage(imageData, blurRadius, 2);
+		blurImage(imageData, blurRadius, 4);
 		const sprite = new AlbumTexture(
 			this.gl,
 			this.mainProgram,
