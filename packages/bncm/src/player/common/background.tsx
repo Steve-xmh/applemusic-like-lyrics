@@ -67,19 +67,45 @@ export const Background: FC = () => {
 		return normalizedData;
 	}
 
+	function calculateAmplitude(fftData: number[]): number[] {
+		const amplitudes: number[] = [];
+		// for (let i = 0; i < fftData.length; i += 2) {
+		// 	const real = fftData[i];
+		// 	const imaginary = fftData[i + 1];
+		// 	const amplitude = Math.sqrt(real * real + imaginary * imaginary);
+		// 	amplitudes.push(amplitude);
+		// }
+		for (let i = 0; i < fftData.length; i++) {
+			let t = fftData[i];
+			t = t * Math.min(((i + 5) / fftData.length) * 4, 1);
+			amplitudes[i] = t * 2;
+			amplitudes[i] /= 3;
+		}
+		return amplitudes;
+	}
+
+	function amplitudeToLevel(amplitude: number): number {
+		const normalizedAmplitude = amplitude / 255;
+		const level = 0.5 * Math.log10(normalizedAmplitude + 1);
+		return level;
+	}
+
+
 	function calculateGradient(fftData: number[]): number {
-		const window = 40;
-		if (gradient.length < window) {
-			gradient.push(fftData[1]);
+		const window = 10;
+		let volume = (amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1])) * 0.5;
+		if (gradient.length < window && !gradient.includes(volume)) {
+			gradient.push(volume);
 			return 0;
 		} else {
 			gradient.shift();
-			gradient.push(fftData[1]);
+			gradient.push(volume);
 
-			const maxInInterval = Math.max(...gradient);
+			const maxInInterval = Math.max(...gradient) ** 2;
 			const minInInterval = Math.min(...gradient);
 			const difference = maxInInterval - minInInterval;
-			return difference > 0.5 ? maxInInterval : minInInterval ** 2 * 0.1;
+			// console.log(volume, maxInInterval, minInInterval, difference);
+			return difference > 0.2 ? maxInInterval : minInInterval * 0.1;
 		}
 	}
 
@@ -114,9 +140,9 @@ export const Background: FC = () => {
 			// 		1.0) *
 			// 	1.0;
 
-			const normalizeData = normalizeFFTData(fftData);
+			const normalizeData = (fftData);
 
-			const value = calculateGradient(normalizeData) * 0.6;
+			const value = calculateGradient(normalizeData) * 0.2;
 			setLowFreqVolume(curValue);
 
 			// if (Math.abs(value - lastValue) >= 0.9) {
@@ -130,12 +156,12 @@ export const Background: FC = () => {
 			if (increasing) {
 				curValue = Math.min(
 					value,
-					curValue + (value - curValue) * 0.01 * delta,
+					curValue + (value - curValue) * 0.02 * delta,
 				);
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.0015 * delta,
+					curValue + (value - curValue) * 0.002 * delta,
 				);
 			}
 

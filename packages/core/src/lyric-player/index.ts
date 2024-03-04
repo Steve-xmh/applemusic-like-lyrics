@@ -646,6 +646,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
 		this.setCurrentTime(0, true);
+		this.resetScroll();
 		this.calcLayout(true, true);
 	}
 	/**
@@ -800,7 +801,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
-			console.log(this.isSeeking, this.initializeSeeking, this.isSeeking || this.initializeSeeking);
 			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
 				delay += baseDelay;
 				// baseDelay *= 1.1;

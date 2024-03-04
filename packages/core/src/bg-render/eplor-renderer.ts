@@ -855,8 +855,8 @@ export class EplorRenderer extends BaseRenderer {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 			// this.IllIlllIlIIlllI = [-1.1, -.9];
 		} else if (r === 1) {
-			this.IllIlllIlIIlllI = [-1.3, -0.9];
-			// this.IllIlllIlIIlllI = [-1.1, -0.9];
+			// this.IllIlllIlIIlllI = [-1.3, -0.9];
+			this.IllIlllIlIIlllI = [-1.1, -0.8];
 		} else {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 		}

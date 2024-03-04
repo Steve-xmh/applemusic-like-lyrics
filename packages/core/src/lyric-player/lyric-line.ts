@@ -306,7 +306,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const topDifference = Math.abs(rect1.top - rect2.top);
 
 			// 如果顶部距离相差很小，可以认为它们在同一行上
-			return topDifference < 1;
+			// console.log(word1.word, word2.word, topDifference);
+			return topDifference < 10;
 		}
 
 		return true;
@@ -348,20 +349,20 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			for (const a of word.maskAnimations) {
 				if (this.lyricAdvanceDynamicLyricTime) {
-					// setTimeout(() => {
-					// 	a.currentTime = 0;
-					// 	a.pause();
-					// }, 500);
-					a.finished.then(() => {
-						a.currentTime = 0;
-						a.pause();
-					});
 					const start = word.startTime - this.lyricLine.startTime;
 					const current = maskAnimationTime - this.lyricLine.startTime;
-					if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i], this.splittedWords[i - 1]) && current < start - 200) {
+					if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i - 1], this.splittedWords[i]) && current < start - 300) {
 						a.currentTime = start;
+						setTimeout(() => {
+							a.currentTime = 0;
+							a.pause();
+						}, 300);
 						a.playbackRate = 1;
 					} else {
+						a.finished.then(() => {
+							a.currentTime = 0;
+							a.pause();
+						});
 						a.currentTime = this.totalDuration - 500;
 						a.playbackRate = 2;
 					}
