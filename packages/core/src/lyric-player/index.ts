@@ -206,19 +206,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "left",
 			width: "var(--amll-lyric-player-width,100%)",
 			height: "fit-content",
-			padding: "2vh 1.0em",
-			margin: "0 -1em",
+			padding: "2vh 0.4em",
+			// margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
 			transition: "filter 0.5s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "content-box",
-			borderRadius: "8px",
+			borderRadius: "16px",
 			"&:has(>*):hover": {
 				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
-				boxShadow: "0 0 0 8px var(--amll-lyric-view-hover-bg-color,#fff1)",
+				boxShadow: "0 0 0 4px var(--amll-lyric-view-hover-bg-color,#fff1)",
 			},
 			"&:has(>*):active": {
-				boxShadow: "0 0 0 4px var(--amll-lyric-view-hover-bg-color,#fff1)",
+				boxShadow: "0 0 0 var(--amll-lyric-view-hover-bg-color,#fff1)",
 			},
 		},
 		"@media (max-width: 1024px)": {
@@ -226,30 +226,26 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				padding: "1vh 1em",
 			},
 		},
-		lyricDuetLine: {
-			textAlign: "right",
-			transformOrigin: "right",
-			paddingLeft: "20%",
-		},
 		lyricBgLine: {
 			opacity: 0,
 			// scale: 0.6,
 			fontSize: "max(70%, 10px)",
 			transition: "opacity 0.25s, scale 0.5s",
-			marginLeft: "-1.2em",
 			"&.active": {
 				transition: "opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
 				opacity: 0.4,
-				marginLeft: "-1.2em",
 				// scale: 1,
 			},
+		},
+		lyricDuetLine: {
+			textAlign: "right",
+			transformOrigin: "right",
 		},
 		lyricMainLine: {
 			transition: "opacity 0.3s 0.25s",
 			willChange: "opacity",
 			margin: "-1em",
-			padding: "1em 0.5em",
-			paddingRight: "25%",
+			padding: "1em",
 			"& span": {
 				display: "inline-block",
 			},
@@ -497,10 +493,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this._baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
 		let style = "";
 		style += "--amll-lyric-player-width:";
-		style += this.innerSize[0] - this.padding * 2;
+		style += this.innerSize[0] - this.padding * 4;
 		style += "px;";
 		style += "--amll-lyric-player-height:";
-		style += this.innerSize[1] - this.padding * 2;
+		style += this.innerSize[1] - this.padding * 4;
 		style += "px;";
 		// style += "--amll-player-time:";
 		// style += this.currentTime;
@@ -645,8 +641,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLinePosXSpringParams({});
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
-		this.setCurrentTime(0, true);
 		this.resetScroll();
+		this.setCurrentTime(0, true);
 		this.calcLayout(true, true);
 	}
 	/**
@@ -735,6 +731,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		let delay = 0;
 		let baseDelay = 0.06;
 		let setDots = false;
+		let padding = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
 		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {
 			el.setLyricAdvanceDynamicLyricTime(this.lyricAdvanceDynamicLyricTime);
@@ -742,9 +739,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);
 			const line = el.getLine();
-			let left = 0;
+			let left = 20;
 			if (line.isDuet) {
-				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0);
+				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0) - 20;
 			}
 			if (
 				!setDots &&
@@ -753,21 +750,30 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(this.padding - 45, curPos + 10);
+				this.interludeDots.setTransform(24, curPos + 10);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
 				curPos += this.interludeDotsSize[1] + 40;
 			}
-			const targetOpacity = this.hidePassedLines
-				? i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
-					? 0
-					: hasBuffered
-						? this.isNonDynamic ? 0.85 : 1
-						: (1 / 2) * (this.isNonDynamic ? 0.3 : 1)
-				: hasBuffered
-					? this.isNonDynamic ? 0.85 : 1
-					: (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
+			let targetOpacity;
+
+			if (this.hidePassedLines) {
+				if (i < (interlude ? interlude[2] + 1 : this.scrollToIndex)) {
+					targetOpacity = 0;
+				} else if (hasBuffered) {
+					targetOpacity = this.isNonDynamic ? 0.85 : 1;
+				} else {
+					targetOpacity = (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
+				}
+			} else {
+				if (hasBuffered) {
+					targetOpacity = this.isNonDynamic ? 0.85 : 1;
+				} else {
+					targetOpacity = (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
+				}
+			}
+
 			let blurLevel = 0;
 			if (this.enableBlur) {
 				if (isActive) {
@@ -787,13 +793,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				blurLevel = 0;
 			}
 			el.setTransform(
-				this.padding,
+				left,
 				curPos,
 				isActive ? 1 : SCALE_ASPECT,
 				targetOpacity,
 				blurLevel,
 				force,
 				delay,
+				i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
 			);
 			// console.log(i, el._getDebugTargetPos());
 			if (line.isBG && isActive) {
@@ -811,7 +818,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
 		// console.groupEnd();
-		this.bottomLine.setTransform(this.padding, curPos, force, delay);
+		this.bottomLine.setTransform(20, curPos, force, delay);
 	}
 	/**
 	 * 获取当前歌词的播放位置

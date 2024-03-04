@@ -196,7 +196,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private blur = 0;
 	private delay = 0;
 	private splittedWords: RealWord[] = [];
-	private animations: Animation[] = [];
 	// 由 LyricPlayer 来设置
 	lineSize: number[] = [0, 0];
 	readonly lineTransforms = {
@@ -314,8 +313,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private isEnabled = false;
+	private isDisabled = false;
 	enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
+		this.isDisabled = false;
 		this.element.classList.add("active");
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
@@ -337,6 +338,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	disable(maskAnimationTime = 0) {
 		this.isEnabled = false;
+		this.isDisabled = true;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
 		let i = 0;
@@ -351,23 +353,28 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				if (this.lyricAdvanceDynamicLyricTime) {
 					const start = word.startTime - this.lyricLine.startTime;
 					const current = maskAnimationTime - this.lyricLine.startTime;
-					if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i - 1], this.splittedWords[i]) && current < start - 300) {
+					a.finished.then(() => {
+						// a.currentTime = 0;
+						a.pause();
+					});
+					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
+						a.currentTime = 0;
+						a.pause();
+					} else if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i - 1], this.splittedWords[i]) && current < start - 300) {
 						a.currentTime = start;
-						setTimeout(() => {
-							a.currentTime = 0;
-							a.pause();
-						}, 300);
 						a.playbackRate = 1;
 					} else {
-						a.finished.then(() => {
-							a.currentTime = 0;
-							a.pause();
-						});
-						a.currentTime = this.totalDuration - 500;
+						a.currentTime = Math.min(
+							this.totalDuration,
+							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+						);
 						a.playbackRate = 2;
 					}
 				} else {
-					a.currentTime = 0;
+					a.currentTime = Math.min(
+						this.totalDuration,
+						Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+					);
 					a.pause();
 				}
 			}
@@ -477,11 +484,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		// if (this.lyricPlayer.getEnableSpring()) {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
-			.toFixed(1)}px,${this.lineTransforms.posY
+			.toFixed(2)}px,${this.lineTransforms.posY
 				.getCurrentPosition()
-				.toFixed(1)}px) scale(${this.lineTransforms.scale
-					.getCurrentPosition()
-					.toFixed(4)});`;
+				.toFixed(2)}px);`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -985,6 +990,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		blur = 0,
 		force = false,
 		delay = 0,
+		currentAbove = true,
 	) {
 		const roundedBlur = Math.round(blur);
 		const beforeInSight = this.isInSight;
@@ -996,7 +1002,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.style.opacity = `${opacity}`;
+		main.style.opacity = `${opacity * (!currentAbove ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : this.isDisabled ? 0.3 : 1)}`;
 		trans.style.opacity = `${opacity / 2}`;
 		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {

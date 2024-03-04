@@ -646,7 +646,7 @@ export class EplorRenderer extends BaseRenderer {
 	private onRedraw(tickTime: number, delta: number) {
 		this.checkResize();
 		this.hasLyricValue =
-			(this.hasLyricValue * 49 + (this.hasLyric ? 1 : 0)) / 50;
+			(this.hasLyricValue * 29 + (this.hasLyric ? 1 : 0)) / 30;
 		const gl = this.gl;
 		this.vertexBuffer.bind();
 		this.indexBuffer.bind();
