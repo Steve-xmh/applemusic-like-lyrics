@@ -313,10 +313,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private isEnabled = false;
-	private isDisabled = false;
+	private hasFaded = false;
 	enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
-		this.isDisabled = false;
+		this.hasFaded = false;
 		this.element.classList.add("active");
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
@@ -338,7 +338,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	disable(maskAnimationTime = 0) {
 		this.isEnabled = false;
-		this.isDisabled = true;
+		this.hasFaded = true;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
 		let i = 0;
@@ -351,6 +351,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			for (const a of word.maskAnimations) {
 				if (this.lyricAdvanceDynamicLyricTime) {
+					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
+						this.hasFaded = false;
+					}
 					const start = word.startTime - this.lyricLine.startTime;
 					const current = maskAnimationTime - this.lyricLine.startTime;
 					a.finished.then(() => {
@@ -650,7 +653,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 	private initFloatAnimation(word: LyricWord, wordEl: HTMLSpanElement) {
 		const delay = word.startTime - this.lyricLine.startTime;
-		const duration = Math.max(500, word.endTime - word.startTime);
+		const duration = Math.max(1000, word.endTime - word.startTime);
 		let up = 0.05;
 		if (this.lyricLine.isBG) {
 			up *= 2;
@@ -668,7 +671,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				},
 			],
 			{
-				duration: isFinite(duration) ? duration * 2 : 0,
+				duration: isFinite(duration) ? duration : 0,
 				delay: isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
@@ -1004,7 +1007,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.style.opacity = `${opacity * (!currentAbove ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : this.isDisabled ? 0.3 : 1)}`;
+		main.style.opacity = `${opacity * (!this.hasFaded ? 1 : (this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3))}`;
 		trans.style.opacity = `${opacity / 2}`;
 		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {
