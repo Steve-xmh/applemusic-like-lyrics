@@ -484,9 +484,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		// if (this.lyricPlayer.getEnableSpring()) {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
-			.toFixed(2)}px,${this.lineTransforms.posY
+			.toFixed(1)}px,${this.lineTransforms.posY
 				.getCurrentPosition()
-				.toFixed(2)}px);`;
+				.toFixed(1)}px) scale(${this.lineTransforms.scale
+					.getCurrentPosition()
+					.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}

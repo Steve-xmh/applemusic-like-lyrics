@@ -792,10 +792,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (this.invokedByScrollEvent) {
 				blurLevel = 0;
 			}
+
 			el.setTransform(
 				left,
 				curPos,
-				isActive ? 1 : SCALE_ASPECT,
+				isActive ? 1 : (line.isBG ? 0 : SCALE_ASPECT),
 				targetOpacity,
 				blurLevel,
 				force,
