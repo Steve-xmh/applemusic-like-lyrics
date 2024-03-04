@@ -503,7 +503,7 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		this.playTime += frameDelta * this.flowSpeed * 0.1;
+		this.playTime += frameDelta * this.flowSpeed * 0.1 * (this.hasLyricValue * 0.8 + 0.2);
 		this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
@@ -661,7 +661,7 @@ export class EplorRenderer extends BaseRenderer {
 		);
 		this.mainProgram.setUniform1f(
 			"lIIIlllllIllIl",
-			tickTime / 1000 * (this.hasLyricValue * 0.8 + 0.2),
+			tickTime / 1000,
 		);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
