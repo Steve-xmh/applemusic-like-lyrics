@@ -529,7 +529,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					// 	merged,
 					// 	mainWordEl,
 					// );
-					if (emp) {
+					if (shouldEmphasize(merged)) {
 						mainWordEl.classList.add("emphasize");
 						const charEls: HTMLSpanElement[] = [];
 						for (const char of word.word.trim().split("")) {
@@ -567,7 +567,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					}
 					wrapperWordEl.appendChild(mainWordEl);
 				}
-				if (emp) {
+				if (shouldEmphasize(merged)) {
 					this.splittedWords[
 						this.splittedWords.length - 1
 					].elementAnimations.push(
@@ -604,7 +604,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					padding: 0,
 					shouldEmphasize: emp,
 				};
-				if (emp) {
+				if (shouldEmphasize(chunk)) {
 					mainWordEl.classList.add("emphasize");
 					const charEls: HTMLSpanElement[] = [];
 					for (const char of chunk.word.trim().split("")) {
@@ -894,7 +894,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastPos = curPos;
 				let lastTime = 0;
 				const pushFrame = () => {
-					const easing = "cubic-bezier(0,0,.7,1)";
+					const easing = "cubic-bezier(0,.32,.71,.8)";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;

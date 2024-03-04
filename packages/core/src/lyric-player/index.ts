@@ -63,6 +63,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private scrolledHandler = 0;
 	private isScrolled = false;
 	private isSeeking = false;
+	private initializeSeeking = false;
 	private invokedByScrollEvent = false;
 	private scrollOffset = 0;
 	private hidePassedLines = false;
@@ -799,7 +800,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
-			if (curPos >= 0 && !this.isSeeking) {
+			console.log(this.isSeeking, this.initializeSeeking, this.isSeeking || this.initializeSeeking);
+			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
 				delay += baseDelay;
 				// baseDelay *= 1.1;
 				// baseDelay /= 1.2;
@@ -879,6 +881,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前仍有缓冲行的情况下加入新热行，则不会解除当前缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且没有新热行加入，则删除所有缓冲行，且也不会修改当前滚动位置
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
+		this.initializeSeeking = isSeek;
 		this.currentTime = time;
 		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic() && !this.supportMaskImage)

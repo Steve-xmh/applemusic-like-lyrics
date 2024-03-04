@@ -503,7 +503,7 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		if (this.hasLyric) this.playTime += frameDelta * this.flowSpeed * 0.1;
+		this.playTime += frameDelta * this.flowSpeed * 0.1;
 		this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
@@ -661,7 +661,7 @@ export class EplorRenderer extends BaseRenderer {
 		);
 		this.mainProgram.setUniform1f(
 			"lIIIlllllIllIl",
-			this.hasLyric ? tickTime / 1000 : 0,
+			tickTime / 1000 * (this.hasLyricValue * 0.8 + 0.2),
 		);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
@@ -834,7 +834,7 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
 		contrastImage(imageData, 0.6);
-		// saturateImage(imageData, 1.4);
+		saturateImage(imageData, 1.2);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 4);
