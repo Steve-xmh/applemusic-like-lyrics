@@ -905,7 +905,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastPos = curPos;
 				let lastTime = 0;
 				const pushFrame = () => {
-					const easing = "cubic-bezier(0,.32,.71,.8)";
+					const easing = "cubic-bezier(.33,.12,.83,.9)";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;

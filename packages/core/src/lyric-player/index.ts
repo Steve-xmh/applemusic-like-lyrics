@@ -101,6 +101,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		damping: 20,
 		stiffness: 100,
 	};
+	private scaleForBGSpringParams: Partial<SpringParams> = {
+		mass: 1,
+		damping: 20,
+		stiffness: 30,
+	};
 	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
 	private padding = this.emUnit;
 	private lyricAdvanceDynamicLyricTime = true;
@@ -206,7 +211,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "left",
 			width: "var(--amll-lyric-player-width,100%)",
 			height: "fit-content",
-			padding: "2vh 0.4em",
+			padding: "2vh 20px",
 			// margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
@@ -223,7 +228,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		"@media (max-width: 1024px)": {
 			lyricLine: {
-				padding: "1vh 1em",
+				padding: "1vh 20px",
 			},
 		},
 		lyricBgLine: {
@@ -497,11 +502,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this._baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
 		let style = "";
 		style += "--amll-lyric-player-width:";
-		style += this.innerSize[0] - this.padding * 4;
-		style += "px;";
+		if (window.innerWidth <= 1024) {
+			style += (this.innerSize[0] - this.padding * 2) + "px;";
+		} else {
+			style += (this.innerSize[0] - this.padding * 4) + "px;";
+		}
 		style += "--amll-lyric-player-height:";
-		style += this.innerSize[1] - this.padding * 4;
-		style += "px;";
+		style += (this.innerSize[1] - this.padding * 4) + "px;";
+
 		// style += "--amll-player-time:";
 		// style += this.currentTime;
 		// style += ";";
@@ -800,9 +808,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			el.setTransform(
 				left,
 				curPos,
-				isActive ? 1 : (line.isBG ? 0 : SCALE_ASPECT),
+				isActive ? 1 : (line.isBG ? 0.8 : SCALE_ASPECT),
 				targetOpacity,
-				blurLevel,
+				window.innerWidth <= 1024 ? blurLevel * 0.8 : blurLevel,
 				force,
 				delay,
 				i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
@@ -1087,9 +1095,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...this.scaleSpringParams,
 			...params,
 		};
-		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.scale.updateParams(this.scaleSpringParams),
-		);
+		this.scaleForBGSpringParams = {
+			...this.scaleForBGSpringParams,
+			...params,
+		};
+		this.lyricLinesEl.forEach((line) => {
+			if (line.getLine().isBG) {
+				line.lineTransforms.scale.updateParams(
+					this.scaleForBGSpringParams,
+				);
+			} else {
+				line.lineTransforms.scale.updateParams(this.scaleSpringParams);
+			}
+		});
 	}
 	dispose(): void {
 		this.element.remove();

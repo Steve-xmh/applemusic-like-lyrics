@@ -484,7 +484,7 @@ export class EplorRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private gl: WebGL2RenderingContext = this.setupGL();
-	private reduceImageSizeCanvas = new OffscreenCanvas(64, 64);
+	private reduceImageSizeCanvas = new OffscreenCanvas(32, 32);
 	private tickHandle = 0;
 	private sprites: AlbumTexture[] = [];
 	private ampTransition = 0;
@@ -668,11 +668,17 @@ export class EplorRenderer extends BaseRenderer {
 			"IIIlllIlIIllll",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
 		);
+		if (window.innerWidth > 1024) {
+			this.IllIlllIlIIlllI = [-1.3, -0.9];
+		} else {
+			this.IllIlllIlIIlllI = [-2.4, -1.4];
+		}
 		this.mainProgram.setUniform2f(
 			"IllIlllIlIIlllI",
 			this.IllIlllIlIIlllI[0],
 			this.IllIlllIlIIlllI[1],
 		);
+		this.mainProgram.setUniform1f("IIIIIllllllIll", window.innerWidth > 1024 ? 1 : 0);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);
@@ -821,7 +827,7 @@ export class EplorRenderer extends BaseRenderer {
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// const baseFilter = "saturate(3) contrast(0.8) saturate(8) brightness(0.4)";
-		const blurRadius = 4;
+		const blurRadius = 2;
 		// Safari 不支持 filter
 		// ctx.filter = baseFilter;
 		const imgw =
@@ -855,8 +861,8 @@ export class EplorRenderer extends BaseRenderer {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 			// this.IllIlllIlIIlllI = [-1.1, -.9];
 		} else if (r === 1) {
-			// this.IllIlllIlIIlllI = [-1.3, -0.9];
-			this.IllIlllIlIIlllI = [-1.1, -0.8];
+			this.IllIlllIlIIlllI = [-1.3, -0.9];
+			// this.IllIlllIlIIlllI = [-1.1, -0.8];
 		} else {
 			this.IllIlllIlIIlllI = [-1.3, -0.9];
 		}
