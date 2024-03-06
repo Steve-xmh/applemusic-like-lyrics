@@ -256,9 +256,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				"&.emphasize, span.emphasize": {
 					padding: "1em",
 					margin: "-1em",
+					willChange: "transform",
+					backfaceVisibility: "hidden",
 					"& > span": {
 						padding: "1em",
 						margin: "-1em",
+						willChange: "transform",
+						backfaceVisibility: "hidden",
 					},
 				},
 			},
