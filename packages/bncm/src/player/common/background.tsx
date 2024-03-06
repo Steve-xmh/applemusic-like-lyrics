@@ -90,23 +90,22 @@ export const Background: FC = () => {
 		return level;
 	}
 
-
 	function calculateGradient(fftData: number[]): number {
 		const window = 10;
-		let volume = (amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1])) * 0.5;
+		const volume =
+			(amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1])) * 0.5;
 		if (gradient.length < window && !gradient.includes(volume)) {
 			gradient.push(volume);
 			return 0;
-		} else {
-			gradient.shift();
-			gradient.push(volume);
-
-			const maxInInterval = Math.max(...gradient) ** 2;
-			const minInInterval = Math.min(...gradient);
-			const difference = maxInInterval - minInInterval;
-			// console.log(volume, maxInInterval, minInInterval, difference);
-			return difference > 0.2 ? maxInInterval : minInInterval * 0.1;
 		}
+		gradient.shift();
+		gradient.push(volume);
+
+		const maxInInterval = Math.max(...gradient) ** 2;
+		const minInInterval = Math.min(...gradient);
+		const difference = maxInInterval - minInInterval;
+		// console.log(volume, maxInInterval, minInInterval, difference);
+		return difference > 0.2 ? maxInInterval : minInInterval * 0.1;
 	}
 
 	useEffect(() => {
@@ -140,7 +139,7 @@ export const Background: FC = () => {
 			// 		1.0) *
 			// 	1.0;
 
-			const normalizeData = (fftData);
+			const normalizeData = fftData;
 
 			const value = calculateGradient(normalizeData) * 0.2;
 			setLowFreqVolume(curValue);
@@ -195,7 +194,10 @@ export const Background: FC = () => {
 						staticMode={backgroundFakeLiquidStaticMode}
 						disabled={!lyricPageOpened}
 						album={musicCoverUrl}
-						albumIsVideo={loadableMusicOverrideData.state === "hasData" && loadableMusicOverrideData.data?.musicCoverIsVideo}
+						albumIsVideo={
+							loadableMusicOverrideData.state === "hasData" &&
+							loadableMusicOverrideData.data?.musicCoverIsVideo
+						}
 						fps={backgroundMaxFPS}
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
@@ -203,8 +205,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-									? undefined
-									: false
+								  ? undefined
+								  : false
 						}
 						flowSpeed={flowSpeed}
 						renderer={
@@ -245,10 +247,10 @@ export const Background: FC = () => {
 							))}
 						</div>
 					)}
-
 				</>
 			);
-		} else if (backgroundType === BackgroundType.CustomSolidColor) {
+		}
+		if (backgroundType === BackgroundType.CustomSolidColor) {
 			return (
 				<div
 					style={{

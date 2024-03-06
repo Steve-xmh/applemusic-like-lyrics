@@ -214,7 +214,8 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${this.label
+				`Failed to compile shader for type ${type} "${
+					this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -503,7 +504,8 @@ export class EplorRenderer extends BaseRenderer {
 			return;
 		}
 
-		this.playTime += frameDelta * this.flowSpeed * 0.1 * (this.hasLyricValue * 0.8 + 0.2);
+		this.playTime +=
+			frameDelta * this.flowSpeed * 0.1 * (this.hasLyricValue * 0.8 + 0.2);
 		this.frameTime += frameDelta;
 
 		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
@@ -659,10 +661,7 @@ export class EplorRenderer extends BaseRenderer {
 			this.renderSize[0],
 			this.renderSize[1],
 		);
-		this.mainProgram.setUniform1f(
-			"lIIIlllllIllIl",
-			tickTime / 1000,
-		);
+		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
 		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f(
 			"IIIlllIlIIllll",

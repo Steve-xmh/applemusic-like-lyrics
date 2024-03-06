@@ -101,7 +101,7 @@ export const LyricPlayerHorizonal: FC = () => {
 			{showControlThumb ? <ControlThumb /> : <div />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-					loadableMusicOverrideData.data.musicCoverIsVideo ? (
+				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
@@ -149,7 +149,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => { }, []);
+					channel.call("winhelper.dragWindow", () => {}, []);
 				}}
 			/>
 		</div>

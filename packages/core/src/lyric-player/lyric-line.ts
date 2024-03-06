@@ -27,8 +27,8 @@ const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
 const makeEmpEasing = (mid: number) => {
-	const bezIn = bezier(.2, .5, .5, 1);
-	const bezOut = bezier(.75, 0, 1, .75);
+	const bezIn = bezier(0.2, 0.5, 0.5, 1);
+	const bezOut = bezier(0.75, 0, 1, 0.75);
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
@@ -62,7 +62,8 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
+			(leftPos + widthInTotal) * 100
 		}%)`,
 		totalAspect,
 	];
@@ -178,8 +179,8 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-	? evt
-	: never;
+		? evt
+		: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -293,10 +294,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	areWordsOnSameLine(word1: RealWord, word2: RealWord) {
-		if (word1 && word1.mainElement
-			&& word2 && word2.mainElement) {
-			let word1el: HTMLSpanElement = word1.mainElement;
-			let word2el: HTMLSpanElement = word2.mainElement;
+		if (word1?.mainElement && word2?.mainElement) {
+			const word1el = word1.mainElement;
+			const word2el = word2.mainElement;
 
 			const rect1 = word1el.getBoundingClientRect();
 			const rect2 = word2el.getBoundingClientRect();
@@ -344,7 +344,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let i = 0;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
-				if (a.id === "float-word" || a.id.includes("emphasize-word-float-only")) {
+				if (
+					a.id === "float-word" ||
+					a.id.includes("emphasize-word-float-only")
+				) {
 					a.playbackRate = -1;
 					a.play();
 				}
@@ -363,7 +366,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
 						a.currentTime = 0;
 						a.pause();
-					} else if (i === this.splittedWords.length - 1 && !this.areWordsOnSameLine(this.splittedWords[i - 1], this.splittedWords[i]) && current < start - 300) {
+					} else if (
+						i === this.splittedWords.length - 1 &&
+						!this.areWordsOnSameLine(
+							this.splittedWords[i - 1],
+							this.splittedWords[i],
+						) &&
+						current < start - 300
+					) {
 						a.currentTime = start;
 						a.playbackRate = 1;
 					} else {
@@ -488,10 +498,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-				.getCurrentPosition()
-				.toFixed(1)}px) scale(${this.lineTransforms.scale
-					.getCurrentPosition()
-					.toFixed(4)});`;
+			.getCurrentPosition()
+			.toFixed(1)}px) scale(${this.lineTransforms.scale
+			.getCurrentPosition()
+			.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -671,8 +681,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				},
 			],
 			{
-				duration: isFinite(duration) ? duration : 0,
-				delay: isFinite(delay) ? delay : 0,
+				duration: Number.isFinite(duration) ? duration : 0,
+				delay: Number.isFinite(delay) ? delay : 0,
 				id: "float-word",
 				composite: "add",
 				fill: "both",
@@ -700,7 +710,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let blur = du / 3000;
 		blur = blur > 1 ? Math.sqrt(blur) : blur ** 3;
 		amount *= 0.6;
-		if (word.word.includes(this.lyricLine.words.at(this.lyricLine.words.length - 1)?.word)) {
+		if (
+			this.lyricLine.words.length > 0 &&
+			word.word.includes(
+				this.lyricLine.words[this.lyricLine.words.length - 1].word,
+			)
+		) {
 			amount *= 2.0;
 			blur *= 1.5;
 			du *= 1.2;
@@ -733,10 +748,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				.map((_, j) => {
 					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
 					// const trans = empEasing(x);
-					let transX = Math.sin(x * Math.PI);
+					const transX = Math.sin(x * Math.PI);
 					// transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
-					const glowLevel =
-						empEasing(x) * blur;
+					const glowLevel = empEasing(x) * blur;
 					// const floatLevel =
 					// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
 
@@ -744,9 +758,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 					return {
 						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * (((arr.length - i) / arr.length) ** 2)
-							}em, ${-transX * 0.03 * amount}em)`,
-						textShadow: `0 0 ${Math.min(0.3, blur * 0.4)}em rgba(255, 255, 255, ${glowLevel})`,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${
+							-transX * 0.05 * amount * ((arr.length - i) / arr.length) ** 2
+						}em, ${-transX * 0.03 * amount}em)`,
+						textShadow: `0 0 ${Math.min(
+							0.3,
+							blur * 0.4,
+						)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
 			const glow = el.animate(frames, {
@@ -763,7 +781,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			};
 			glow.pause();
 			result.push(glow);
-
 
 			const floatFrame: Keyframe[] = new Array(ANIMATION_FRAME_QUANTITY)
 				.fill(0)
@@ -783,7 +800,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const float = el.animate(floatFrame, {
 				duration: animateDu * 1.4,
 				delay: Number.isFinite(wordDe) ? wordDe : 0,
-				id: `float-word`,
+				id: "float-word",
 				iterations: 1,
 				composite: "add",
 				easing: "ease-in-out",
@@ -801,7 +818,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return result;
 	}
 	private get totalDuration() {
-		return this.lyricLine.endTime + (this.lyricAdvanceDynamicLyricTime ? 500 : 0) - this.lyricLine.startTime;
+		return (
+			this.lyricLine.endTime +
+			(this.lyricAdvanceDynamicLyricTime ? 500 : 0) -
+			this.lyricLine.startTime
+		);
 	}
 	updateMaskImage() {
 		if (this._hide) {
@@ -859,9 +880,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
-					})*${w / Math.abs(word.endTime - word.startTime)
-					}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
+					word.startTime
+				})*${
+					w / Math.abs(word.endTime - word.startTime)
+				}px),0px) 0px, left top`;
 				// const maskPos = `clamp(0px,${w}px,${w}px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
@@ -1007,7 +1030,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.style.opacity = `${opacity * (!this.hasFaded ? 1 : (this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3))}`;
+		main.style.opacity = `${
+			opacity *
+			(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
+		}`;
 		trans.style.opacity = `${opacity / 2}`;
 		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {

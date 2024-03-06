@@ -230,6 +230,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			lyricLine: {
 				padding: "1vh 20px",
 			},
+			lyricBgLine: {
+				padding: "1vh 1.428571em",
+			},
 		},
 		lyricBgLine: {
 			opacity: 0,
@@ -237,7 +240,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			fontSize: "max(70%, 10px)",
 			transition: "opacity 0.25s, scale 0.5s",
 			"&.active": {
-				transition: "opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
+				transition:
+					"opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
 				opacity: 0.4,
 				// scale: 1,
 			},
@@ -808,12 +812,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			el.setTransform(
 				left,
 				curPos,
-				isActive ? 1 : (line.isBG ? 0.8 : SCALE_ASPECT),
+				isActive ? 1 : line.isBG ? 0 : SCALE_ASPECT,
 				targetOpacity,
 				window.innerWidth <= 1024 ? blurLevel * 0.8 : blurLevel,
 				force,
 				delay,
-				i < (interlude ? interlude[2] + 1 : this.scrollToIndex)
+				i < (interlude ? interlude[2] + 1 : this.scrollToIndex),
 			);
 			// console.log(i, el._getDebugTargetPos());
 			if (line.isBG && isActive) {
