@@ -62,8 +62,7 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
-			(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
 		}%)`,
 		totalAspect,
 	];
@@ -179,8 +178,8 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-		? evt
-		: never;
+	? evt
+	: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -423,6 +422,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 	}
 	measureSize(): [number, number] {
+		this.hasFaded = false;
 		if (this._hide) {
 			if (this._prevParentEl) {
 				this._prevParentEl.appendChild(this.element);
@@ -498,10 +498,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-			.getCurrentPosition()
-			.toFixed(1)}px) scale(${this.lineTransforms.scale
-			.getCurrentPosition()
-			.toFixed(4)});`;
+				.getCurrentPosition()
+				.toFixed(1)}px) scale(${this.lineTransforms.scale
+					.getCurrentPosition()
+					.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -758,9 +758,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 					return {
 						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${
-							-transX * 0.05 * amount * ((arr.length - i) / arr.length) ** 2
-						}em, ${-transX * 0.03 * amount}em)`,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * ((arr.length - i) / arr.length) ** 2
+							}em, ${-transX * 0.03 * amount}em)`,
 						textShadow: `0 0 ${Math.min(
 							0.3,
 							blur * 0.4,
@@ -880,11 +879,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
-					word.startTime
-				})*${
-					w / Math.abs(word.endTime - word.startTime)
-				}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
+					})*${w / Math.abs(word.endTime - word.startTime)
+					}px),0px) 0px, left top`;
 				// const maskPos = `clamp(0px,${w}px,${w}px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
@@ -1030,10 +1027,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.style.opacity = `${
-			opacity *
+		main.style.opacity = `${opacity *
 			(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
-		}`;
+			}`;
 		trans.style.opacity = `${opacity / 2}`;
 		roman.style.opacity = `${opacity / 2}`;
 		if (force || !enableSpring) {
