@@ -170,7 +170,7 @@ const AboutBNCMConfig: FC = () => {
 				>
 					<UpdateInfo />
 				</Suspense>
-				<div className="author">By SteveXMH</div>
+				<div className="author">By SteveXMH & Eplor</div>
 				<div className="ext-links">
 					<Button
 						onClick={() => {
@@ -243,7 +243,7 @@ const AboutAMLLPlayerConfig: FC = () => {
 				<div className="version">
 					{manifest.version} ({manifest.branch} - {manifest.commit.slice(0, 8)})
 				</div>
-				<div className="author">By SteveXMH</div>
+				<div className="author">By SteveXMH & Eplor</div>
 				<div className="ext-links">
 					<Button
 						onClick={() => {
@@ -289,7 +289,7 @@ const AboutAMLLComponentConfig: FC = () => {
 				<div className="version">
 					{manifest.version} ({manifest.branch} - {manifest.commit.slice(0, 8)})
 				</div>
-				<div className="author">By SteveXMH</div>
+				<div className="author">By SteveXMH & Eplor</div>
 				<div className="ext-links">
 					<Button
 						onClick={() => {
