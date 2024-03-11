@@ -141,7 +141,7 @@ export const Background: FC = () => {
 
 			const normalizeData = fftData;
 
-			const value = calculateGradient(normalizeData) * 0.2;
+			const value = calculateGradient(normalizeData) * 0.5;
 			setLowFreqVolume(curValue);
 
 			// if (Math.abs(value - lastValue) >= 0.9) {
@@ -155,12 +155,12 @@ export const Background: FC = () => {
 			if (increasing) {
 				curValue = Math.min(
 					value,
-					curValue + (value - curValue) * 0.02 * delta,
+					curValue + (value - curValue) * 0.015 * delta,
 				);
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.002 * delta,
+					curValue + (value - curValue) * 0.0015 * delta,
 				);
 			}
 
@@ -205,8 +205,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-								  ? undefined
-								  : false
+									? undefined
+									: false
 						}
 						flowSpeed={flowSpeed}
 						renderer={

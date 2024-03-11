@@ -33,6 +33,8 @@ const makeEmpEasing = (mid: number) => {
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
+let lastWord: RealWord | undefined;
+
 // function generateFadeGradient(
 // 	width: number,
 // 	padding = 0,
@@ -394,19 +396,39 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		main.classList.remove("active");
 	}
-	resume() {
+	resume(currentTime = 0) {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
+			for (const a of word.elementAnimations) {
+				console.log(lastWord?.word, this.splittedWords.indexOf(lastWord), this.splittedWords.indexOf(word), word.word);
+				if (this.splittedWords.indexOf(lastWord) < this.splittedWords.indexOf(word)) {
+					console.log(word.word);
+					a.play();
+				}
+			}
 			for (const a of word.maskAnimations) {
-				a.play();
+				if (this.splittedWords.indexOf(lastWord) < this.splittedWords.indexOf(word)) {
+					a.play();
+				}
 			}
 		}
 	}
-	pause() {
+	pause(currentTime = 0) {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
+			for (const a of word.elementAnimations) {
+				if (word.startTime >= currentTime) {
+					a.pause();
+				} else {
+					lastWord = word;
+				}
+			}
 			for (const a of word.maskAnimations) {
-				a.pause();
+				if (word.startTime >= currentTime) {
+					a.pause();
+				} else {
+					lastWord = word;
+				}
 			}
 		}
 	}

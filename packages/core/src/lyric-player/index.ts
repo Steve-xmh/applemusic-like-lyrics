@@ -1034,7 +1034,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	pause() {
 		this.interludeDots.pause();
 		for (const line of this.lyricLinesEl) {
-			line.pause();
+			line.pause(this.currentTime);
 		}
 	}
 	/**
@@ -1043,7 +1043,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	resume() {
 		this.interludeDots.resume();
 		for (const line of this.lyricLinesEl) {
-			line.resume();
+			line.resume(this.currentTime);
 		}
 	}
 	/**
