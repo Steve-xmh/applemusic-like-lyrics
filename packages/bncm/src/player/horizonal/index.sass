@@ -113,7 +113,7 @@ $player-size-fract: 1fr
         position: relative
         border: none
         background: var(--amll-lyric-primary-color-t15, white) !important
-        width: 32px
+        width: 2.5vh
         margin-left: 16px
         border-radius: 50%
         align-self: center
@@ -121,9 +121,12 @@ $player-size-fract: 1fr
         align-items: center
         justify-content: center
         padding: 0
-        scale: 0.9
-        @media screen and (max-height: 768px)
-            scale: 0.8
+        // scale: 0.9
+        // @media screen and (max-height: 768px)
+        //     scale: 0.8
+        svg
+            width: 70% // 让SVG元素的宽度与父容器相同
+            height: auto // 让高度自适应内容
 
     .amll-contributors
         font-size: 50%

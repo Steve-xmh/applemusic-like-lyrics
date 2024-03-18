@@ -732,6 +732,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let blur = du / 3000;
 		blur = blur > 1 ? Math.sqrt(blur) : blur ** 3;
 		amount *= 0.6;
+		blur *= 0.8;
 		if (
 			this.lyricLine.words.length > 0 &&
 			word.word.includes(
@@ -743,7 +744,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			du *= 1.2;
 		}
 		amount = Math.min(1.2, amount);
-		blur = Math.min(0.6, blur);
+		blur = Math.min(0.8, blur);
 		// if (du >= 1200 && du < 2000) {
 		// 	amount = 0.7;
 		// 	blur = 0.2;

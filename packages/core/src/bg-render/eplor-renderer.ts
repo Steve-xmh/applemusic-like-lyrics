@@ -214,8 +214,7 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${
-					this.label
+				`Failed to compile shader for type ${type} "${this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -855,16 +854,17 @@ export class EplorRenderer extends BaseRenderer {
 		// this.playTime = 0;
 		this.lastFrameTime = performance.now();
 		console.info(Math.random() * 10000);
-		const r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
-		if (r === 0) {
-			this.IllIlllIlIIlllI = [-1.3, -0.9];
-			// this.IllIlllIlIIlllI = [-1.1, -.9];
-		} else if (r === 1) {
-			this.IllIlllIlIIlllI = [-1.3, -0.9];
-			// this.IllIlllIlIIlllI = [-1.1, -0.8];
-		} else {
-			this.IllIlllIlIIlllI = [-1.3, -0.9];
-		}
+		// const r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
+		// if (r === 0) {
+		// 	this.IllIlllIlIIlllI = [-1.3, -0.9];
+		// 	// this.IllIlllIlIIlllI = [-1.1, -.9];
+		// } else if (r === 1) {
+		// 	// this.IllIlllIlIIlllI = [-1.3, -0.9];
+		// 	// this.IllIlllIlIIlllI = [-1.1, -0.9];
+		// 	this.IllIlllIlIIlllI = [-0.25, -0.2];
+		// } else {
+		// 	this.IllIlllIlIIlllI = [-1.3, -0.9];
+		// }
 		this.requestTick();
 	}
 
