@@ -253,7 +253,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "right",
 		},
 		lyricMainLine: {
-			transition: "opacity 0.3s 0.25s",
+			transition: "opacity 0.2s 0.25s",
 			willChange: "opacity",
 			margin: "-1em",
 			padding: "1em",
@@ -280,7 +280,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		},
 		lyricSubLine: {
 			fontSize: "max(0.5em, 10px)",
-			transition: "opacity 0.3s 0.25s",
+			transition: "opacity 0.2s 0.25s",
 			opacity: 0.3,
 		},
 		disableSpring: {
