@@ -20,10 +20,10 @@
     "pkg/*.js",
     "pkg/*.d.ts"
   ],
-  "module": "pkg/lyric.js",
-  "types": "pkg/lyric.d.ts",
+  "module": "pkg/amll_lyric.js",
+  "types": "pkg/amll_lyric.d.ts",
   "sideEffects": [
-    "./pkg/lyric.js",
+    "./pkg/amll_lyric.js",
     "./pkg/snippets/*"
   ]
 }
