@@ -214,7 +214,8 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${this.label
+				`Failed to compile shader for type ${type} "${
+					this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -676,7 +677,10 @@ export class EplorRenderer extends BaseRenderer {
 			this.IllIlllIlIIlllI[0],
 			this.IllIlllIlIIlllI[1],
 		);
-		this.mainProgram.setUniform1f("IIIIIllllllIll", window.innerWidth > 1024 ? 1 : 0);
+		this.mainProgram.setUniform1f(
+			"IIIIIllllllIll",
+			window.innerWidth > 1024 ? 1 : 0,
+		);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
 		gl.clearColor(0, 0, 0, 0);

@@ -41,7 +41,7 @@ jobs:
       - name: 构建 AMLL 包
         run: |
           yarn
-          yarn lerna run build:dev --scope "@applemusic-like-lyrics/*"
+          yarn lerna run build --scope player
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true

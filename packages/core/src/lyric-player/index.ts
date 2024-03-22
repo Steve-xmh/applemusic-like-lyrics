@@ -84,7 +84,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.innerSize[1] = innerHeight;
 		this.rebuildStyle();
 		this.calcLayout(true, true);
-		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
+		for (const el of this.lyricLinesEl) {
+			el.updateMaskImage();
+		}
 	});
 	private posXSpringParams: Partial<SpringParams> = {
 		mass: 1,
@@ -507,12 +509,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		let style = "";
 		style += "--amll-lyric-player-width:";
 		if (window.innerWidth <= 1024) {
-			style += (this.innerSize[0] - this.padding * 2) + "px;";
+			style += `${this.innerSize[0] - this.padding * 2}px;`;
 		} else {
-			style += (this.innerSize[0] - this.padding * 4) + "px;";
+			style += `${this.innerSize[0] - this.padding * 4}px;`;
 		}
 		style += "--amll-lyric-player-height:";
-		style += (this.innerSize[1] - this.padding * 4) + "px;";
+		style += `${this.innerSize[1] - this.padding * 4}px;`;
 
 		// style += "--amll-player-time:";
 		// style += this.currentTime;
@@ -540,7 +542,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	setLyricAdvanceDynamicLyricTime(enable: boolean) {
 		this.lyricAdvanceDynamicLyricTime = enable;
 		this.calcLayout(true, true);
-		this.lyricLinesEl.forEach((el) => el.updateMaskImage());
+		for (const el of this.lyricLinesEl) {
+			el.updateMaskImage();
+		}
 	}
 	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
@@ -623,11 +627,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				nextLine.startTime = Math.min(nextLine.startTime, line.startTime);
 			}
 		});
-		this.lyricLinesEl.forEach((line) => {
+		for (const line of this.lyricLinesEl) {
 			line.removeMouseEventListener("click", this.onLineClickedHandler);
 			line.removeMouseEventListener("contextmenu", this.onLineClickedHandler);
 			line.dispose();
-		});
+		}
 		// const prevLinesEl = this.lyricLinesEl;
 		this.lyricLinesEl = this.processedLines.map((line) => {
 			// if (this.lyricLinesEl[i]) {
@@ -693,11 +697,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
 			this.emUnit = parseFloat(getComputedStyle(this.element).fontSize);
-			this.lyricLinesEl.forEach((el) => {
+			for (const el of this.lyricLinesEl) {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);
 				el.lineSize = size;
-			});
+			}
 			this.interludeDotsSize[0] = this.interludeDots.getElement().clientWidth;
 			this.interludeDotsSize[1] = this.interludeDots.getElement().clientHeight;
 
@@ -745,10 +749,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		let baseDelay = 0.06;
+		const baseDelay = 0.06;
 		let setDots = false;
-		let padding = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
-		// console.groupCollapsed("calcLayout");
 		this.lyricLinesEl.forEach((el, i) => {
 			el.setLyricAdvanceDynamicLyricTime(this.lyricAdvanceDynamicLyricTime);
 			const hasBuffered = this.bufferedLines.has(i);
@@ -772,7 +774,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				curPos += this.interludeDotsSize[1] + 40;
 			}
-			let targetOpacity;
+			let targetOpacity: number;
 
 			if (this.hidePassedLines) {
 				if (i < (interlude ? interlude[2] + 1 : this.scrollToIndex)) {
@@ -922,7 +924,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 
 		// 先检索当前已经超出时间范围的缓冲行，列入待删除集内
-		this.hotLines.forEach((lastHotId) => {
+		for (const lastHotId of this.hotLines) {
 			const line = this.processedLines[lastHotId];
 			if (line) {
 				if (line.isBG) return;
@@ -954,7 +956,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				removedHotIds.add(lastHotId);
 				if (isSeek) this.lyricLinesEl[lastHotId].disable(time);
 			}
-		});
+		}
 		this.processedLines.forEach((line, id, arr) => {
 			if (!line.isBG && line.startTime <= time && line.endTime > time) {
 				if (!this.hotLines.has(id)) {
@@ -969,12 +971,12 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 			}
 		});
-		this.bufferedLines.forEach((v) => {
+		for (const v of this.bufferedLines) {
 			if (!this.hotLines.has(v)) {
 				removedIds.add(v);
 				if (isSeek) this.lyricLinesEl[v].disable(time);
 			}
-		});
+		}
 		if (isSeek) {
 			if (this.bufferedLines.size > 0) {
 				this.scrollToIndex = Math.min(...this.bufferedLines);
@@ -984,7 +986,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				);
 			}
 			this.bufferedLines.clear();
-			this.hotLines.forEach((v) => this.bufferedLines.add(v));
+			for (const v of this.hotLines) {
+				this.bufferedLines.add(v);
+			}
 			this.calcLayout(true);
 		} else if (removedIds.size > 0 || addedIds.size > 0) {
 			// function debugLog() {
@@ -995,33 +999,33 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// }
 			if (removedIds.size === 0 && addedIds.size > 0) {
 				// debugLog();
-				addedIds.forEach((v) => {
+				for (const v of addedIds) {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable(time);
-				});
+				}
 				this.scrollToIndex = Math.min(...this.bufferedLines);
 				this.calcLayout();
 			} else if (addedIds.size === 0 && removedIds.size > 0) {
 				if (eqSet(removedIds, this.bufferedLines)) {
 					// debugLog();
-					this.bufferedLines.forEach((v) => {
+					for (const v of this.bufferedLines) {
 						if (!this.hotLines.has(v)) {
 							this.bufferedLines.delete(v);
 							this.lyricLinesEl[v].disable(time);
 						}
-					});
+					}
 					this.calcLayout();
 				}
 			} else {
 				// debugLog();
-				addedIds.forEach((v) => {
+				for (const v of addedIds) {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable(time);
-				});
-				removedIds.forEach((v) => {
+				}
+				for (const v of removedIds) {
 					this.bufferedLines.delete(v);
 					this.lyricLinesEl[v].disable(time);
-				});
+				}
 				if (this.bufferedLines.size > 0)
 					this.scrollToIndex = Math.min(...this.bufferedLines);
 				this.calcLayout();
@@ -1057,7 +1061,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		const deltaS = delta / 1000;
 		this.interludeDots.update(delta);
 		this.bottomLine.update(deltaS);
-		this.lyricLinesEl.forEach((line) => line.update(deltaS));
+		for (const line of this.lyricLinesEl) {
+			line.update(deltaS);
+		}
 	}
 	/**
 	 * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
@@ -1070,9 +1076,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...params,
 		};
 		this.bottomLine.lineTransforms.posX.updateParams(this.posXSpringParams);
-		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.posX.updateParams(this.posXSpringParams),
-		);
+		for (const line of this.lyricLinesEl) {
+			line.lineTransforms.posX.updateParams(this.posXSpringParams);
+		}
 	}
 	/**
 	 * 设置所有歌词行在​纵坐标上的弹簧属性，包括重量、弹力和阻力。
@@ -1085,9 +1091,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...params,
 		};
 		this.bottomLine.lineTransforms.posY.updateParams(this.posYSpringParams);
-		this.lyricLinesEl.forEach((line) =>
-			line.lineTransforms.posY.updateParams(this.posYSpringParams),
-		);
+		for (const line of this.lyricLinesEl) {
+			line.lineTransforms.posY.updateParams(this.posYSpringParams);
+		}
 	}
 	/**
 	 * 设置所有歌词行在​缩放大小上的弹簧属性，包括重量、弹力和阻力。
@@ -1103,21 +1109,21 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			...this.scaleForBGSpringParams,
 			...params,
 		};
-		this.lyricLinesEl.forEach((line) => {
+		for (const line of this.lyricLinesEl) {
 			if (line.getLine().isBG) {
-				line.lineTransforms.scale.updateParams(
-					this.scaleForBGSpringParams,
-				);
+				line.lineTransforms.scale.updateParams(this.scaleForBGSpringParams);
 			} else {
 				line.lineTransforms.scale.updateParams(this.scaleSpringParams);
 			}
-		});
+		}
 	}
 	dispose(): void {
 		this.element.remove();
 		this.resizeObserver.disconnect();
 		this.style.detach();
-		this.lyricLinesEl.forEach((el) => el.dispose());
+		for (const el of this.lyricLinesEl) {
+			el.dispose();
+		}
 		window.removeEventListener("pageshow", this.onPageShow);
 		this.bottomLine.dispose();
 		this.interludeDots.dispose();

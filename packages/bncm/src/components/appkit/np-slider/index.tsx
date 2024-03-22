@@ -56,8 +56,9 @@ export const Slider: React.FC<
 
 				bounceSpring.update(delta);
 				heightSpring.update(delta);
-				outer.style.transform = `translateX(${bounceSpring.getCurrentPosition() / 100
-					}px)`;
+				outer.style.transform = `translateX(${
+					bounceSpring.getCurrentPosition() / 100
+				}px)`;
 				inner.style.height = `${heightSpring.getCurrentPosition() / 10}px`;
 
 				lastTime = dt;

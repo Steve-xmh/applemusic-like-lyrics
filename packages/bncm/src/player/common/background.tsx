@@ -205,8 +205,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-									? undefined
-									: false
+								  ? undefined
+								  : false
 						}
 						flowSpeed={flowSpeed}
 						renderer={

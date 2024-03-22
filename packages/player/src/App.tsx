@@ -1,4 +1,4 @@
-import { FC, Suspense, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import "./App.css";
 import {
 	globalStore,
@@ -7,7 +7,7 @@ import {
 } from "@applemusic-like-lyrics/bncm/src/injector/index.tsx";
 import { LyricPlayer } from "@applemusic-like-lyrics/bncm/src/player/index.tsx";
 import "@applemusic-like-lyrics/bncm/src/index.sass";
-import { Provider, useAtom, useSetAtom, useStore } from "jotai";
+import { Provider, useSetAtom } from "jotai";
 import { Client, ResponseType, getClient } from "@tauri-apps/api/http";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -27,7 +27,6 @@ import {
 	rawCurrentTimeAtom,
 	rawCurrentVolumeAtom,
 	rawMusicContextAtom,
-	rawPlayModeAtom,
 	rawPlayStatusAtom,
 } from "@applemusic-like-lyrics/bncm/src/music-context/wrapper";
 import { MusicContextAMLLPlayer } from "./player-context";
@@ -154,7 +153,7 @@ function App() {
 				{ responseType: ResponseType.JSON },
 			);
 			if (res.ok) return res.data as EAPILyricResponse;
-			else throw `${res.status} ${res.data}`;
+			throw `${res.status} ${res.data}`;
 		},
 	});
 	return (
