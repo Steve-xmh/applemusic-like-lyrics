@@ -111,7 +111,9 @@ function chunkAndSplitLyricWords(
 				resplitedWords.pop();
 			}
 		} else {
-			resplitedWords.push(w);
+			resplitedWords.push({
+				...w,
+			});
 		}
 	}
 
@@ -534,6 +536,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 	}
 	rebuildElement() {
+		this.disposeElements();
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
@@ -546,7 +549,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		const chunkedWords = chunkAndSplitLyricWords(this.lyricLine.words);
 		main.innerHTML = "";
-		this.splittedWords = [];
 		for (const chunk of chunkedWords) {
 			if (Array.isArray(chunk)) {
 				// 多个没有空格的单词组合成的一个单词数组
@@ -1119,7 +1121,28 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const pb = this.lyricPlayer.size[1];
 		return !(l > pr || r < 0 || t > pb || b < 0);
 	}
+	private disposeElements() {
+		for (const realWord of this.splittedWords) {
+			for (const a of realWord.elementAnimations) {
+				a.cancel();
+			}
+			for (const a of realWord.maskAnimations) {
+				a.cancel();
+			}
+			for (const sub of realWord.subElements) {
+				sub.remove();
+				sub.parentNode?.removeChild(sub);
+			}
+			realWord.elementAnimations = [];
+			realWord.maskAnimations = [];
+			realWord.subElements = [];
+			realWord.mainElement.remove();
+			realWord.mainElement.parentNode?.removeChild(realWord.mainElement);
+		}
+		this.splittedWords = [];
+	}
 	dispose(): void {
+		this.disposeElements();
 		this.element.remove();
 	}
 }
