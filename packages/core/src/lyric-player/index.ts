@@ -59,6 +59,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private hotLines: Set<number> = new Set();
 	private bufferedLines: Set<number> = new Set();
 	private scrollToIndex = 0;
+	private _wordFadeWidth = 0.5;
 	private allowScroll = true;
 	private scrolledHandler = 0;
 	private isScrolled = false;
@@ -110,7 +111,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	};
 	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
 	private padding = this.emUnit;
-	private lyricAdvanceDynamicLyricTime = true;
 	private enableBlur = true;
 	private enableScale = true;
 	private interludeDots: InterludeDots;
@@ -539,13 +539,28 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.calcLayout();
 	}
 
-	setLyricAdvanceDynamicLyricTime(enable: boolean) {
-		this.lyricAdvanceDynamicLyricTime = enable;
-		this.calcLayout(true, true);
+	public get wordFadeWidth() {
+		return this._wordFadeWidth;
+	}
+
+	/**
+	 * 设置文字动画的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度
+	 *
+	 * 如果要模拟 Apple Music for Android 的效果，可以设置为 1
+	 *
+	 * 如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5
+	 *
+	 * 如果想要近乎禁用渐变效果，可以设置成非常接近 0 的小数（例如 `0.0001` ），但是**不可以为 0**
+	 *
+	 * @param value 需要设置的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5
+	 */
+	setWordFadeWidth(value = 0.5) {
+		this._wordFadeWidth = Math.max(0.0001, value);
 		for (const el of this.lyricLinesEl) {
 			el.updateMaskImage();
 		}
 	}
+
 	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
 	 * @param lines 歌词数组
@@ -752,7 +767,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		const baseDelay = 0.06;
 		let setDots = false;
 		this.lyricLinesEl.forEach((el, i) => {
-			el.setLyricAdvanceDynamicLyricTime(this.lyricAdvanceDynamicLyricTime);
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);

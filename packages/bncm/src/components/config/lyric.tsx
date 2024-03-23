@@ -1,6 +1,10 @@
 import { FC } from "react";
 import { GroupBox, GroupBoxDevider } from "../appkit/group-box";
-import { ColorConfigComponent, SwitchConfigComponent } from "./common";
+import {
+	ColorConfigComponent,
+	NumberTextFieldConfigComponent,
+	SwitchConfigComponent,
+} from "./common";
 import {
 	showTranslatedLineAtom,
 	showRomanLineAtom,
@@ -13,6 +17,7 @@ import {
 	primaryColorAtom,
 	playPositionOffsetAtom,
 	lyricAdvanceDynamicLyricTimeAtom,
+	lyricWordFadeWidthAtom,
 } from "./atoms";
 import { TextField } from "../appkit/text-field";
 import { useAtom } from "jotai";
@@ -84,6 +89,14 @@ export const LyricConfig: FC = () => {
 					atom={lyricAdvanceDynamicLyricTimeAtom}
 					description="即将原歌词行的初始时间时序提前，以便在歌词滚动结束后刚好开始播放（逐词）歌词效果。这个行为更加接近 Apple Music 的效果，但是大部分情况下会导致歌词行末尾的歌词尚未播放完成便被切换到下一行。"
 					label="提前歌词行时序"
+				/>
+				<GroupBoxDevider />
+				<NumberTextFieldConfigComponent
+					atom={lyricWordFadeWidthAtom}
+					description={
+						"单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度\n如果要模拟 Apple Music for Android 的效果，可以设置为 1\n如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5"
+					}
+					label="渐变宽度"
 				/>
 			</GroupBox>
 			<GroupBox>

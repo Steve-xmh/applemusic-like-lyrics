@@ -75,6 +75,16 @@ export interface LyricPlayerProps {
 	 */
 	currentTime?: number;
 	/**
+	 * 设置文字动画的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度
+	 *
+	 * 如果要模拟 Apple Music for Android 的效果，可以设置为 1
+	 *
+	 * 如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5
+	 *
+	 * 如果想要近乎禁用渐变效果，可以设置成非常接近 0 的小数（例如 `0.0001` ），但是**不可以为 0**
+	 */
+	wordFadeWidth?: number;
+	/**
 	 * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
 	 *
 	 * @param params 需要设置的弹簧属性，提供的属性将会覆盖原来的属性，未提供的属性将会保持原样

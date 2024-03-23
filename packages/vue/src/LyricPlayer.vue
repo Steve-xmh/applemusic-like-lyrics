@@ -116,6 +116,11 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
+    if (props.wordFadeWidth !== undefined)
+        playerRef.value?.setWordFadeWidth(props.wordFadeWidth);
+});
+
+watchEffect(() => {
     if (props.linePosXSpringParams !== undefined)
         playerRef.value?.setLinePosXSpringParams(props.linePosXSpringParams);
 });

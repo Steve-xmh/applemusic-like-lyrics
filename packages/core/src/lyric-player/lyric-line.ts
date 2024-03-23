@@ -193,7 +193,6 @@ type MouseEventListener = (
 ) => void;
 
 export class LyricLineEl extends EventTarget implements HasElement, Disposable {
-	private lyricAdvanceDynamicLyricTime = true;
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -208,15 +207,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(1),
 	};
-	// readonly lineWebAnimationTransforms = {
-	// 	posX: new WebAnimationSpring(this.element, "transform", (v) => `translateX(${v.toFixed(1)}px)`),
-	// 	posY: new WebAnimationSpring(this.element, "transform", (v) => `translateY(${v.toFixed(1)}px)`),
-	// 	scale: new WebAnimationSpring(this.element, "transform", (v) => `scale(${v.toFixed(4)})`, 1),
-	// };
-
-	setLyricAdvanceDynamicLyricTime(enable: boolean) {
-		this.lyricAdvanceDynamicLyricTime = enable;
-	}
 
 	constructor(
 		private lyricPlayer: LyricPlayer,
@@ -345,7 +335,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.hasFaded = true;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
-		let i = 0;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				if (
@@ -357,45 +346,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 			}
 			for (const a of word.maskAnimations) {
-				if (this.lyricAdvanceDynamicLyricTime) {
-					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
-						this.hasFaded = false;
-					}
-					const start = word.startTime - this.lyricLine.startTime;
-					const current = maskAnimationTime - this.lyricLine.startTime;
-					a.finished.then(() => {
-						// a.currentTime = 0;
-						a.pause();
-					});
-					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
-						a.currentTime = 0;
-						a.pause();
-					} else if (
-						i === this.splittedWords.length - 1 &&
-						!this.areWordsOnSameLine(
-							this.splittedWords[i - 1],
-							this.splittedWords[i],
-						) &&
-						current < start - 300
-					) {
-						a.currentTime = start;
-						a.playbackRate = 1;
-					} else {
-						a.currentTime = Math.min(
-							this.totalDuration,
-							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-						);
-						a.playbackRate = 2;
-					}
-				} else {
-					a.currentTime = Math.min(
-						this.totalDuration,
-						Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-					);
-					a.pause();
-				}
+				a.currentTime = Math.min(
+					this.totalDuration,
+					Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+				);
+				a.pause();
 			}
-			i++;
 		}
 		main.classList.remove("active");
 	}
@@ -403,21 +359,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
-				if (
-					this.splittedWords.indexOf(lastWord) <
-					this.splittedWords.indexOf(word)
-				) {
-					console.log(word.word);
-					a.play();
-				}
+				console.log(word.word);
+				a.play();
 			}
 			for (const a of word.maskAnimations) {
-				if (
-					this.splittedWords.indexOf(lastWord) <
-					this.splittedWords.indexOf(word)
-				) {
-					a.play();
-				}
+				a.play();
 			}
 		}
 	}
@@ -849,11 +795,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return result;
 	}
 	private get totalDuration() {
-		return (
-			this.lyricLine.endTime +
-			(this.lyricAdvanceDynamicLyricTime ? 500 : 0) -
-			this.lyricLine.startTime
-		);
+		return this.lyricLine.endTime + this.lyricLine.startTime;
 	}
 	updateMaskImage() {
 		if (this._hide) {
@@ -894,7 +836,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			if (wordEl) {
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
-				const fadeWidth = word.height / 2;
+				const fadeWidth = word.height * this.lyricPlayer.wordFadeWidth;
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / word.width,
 				);
@@ -926,10 +868,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				// TODO: 可选配置渐变宽度
-				// Apple Music for iPad 上是 `word.height / 2`
-				// Apple Music for Android 上是 `word.height`
-				const fadeWidth = word.height / 2;
+				const fadeWidth = word.height * this.lyricPlayer.wordFadeWidth;
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / (word.width + word.padding * 2),
 				);

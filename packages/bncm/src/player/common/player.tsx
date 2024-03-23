@@ -19,11 +19,11 @@ import { lyricLinesAtom, usingLyricSourceAtom } from "../../lyric/provider";
 import { rightClickedLyricAtom } from "./lyric-line-menu";
 import {
 	keepBuiltinPlayerWhenConnectedAtom,
-	lyricAdvanceDynamicLyricTimeAtom,
 	lyricBlurEffectAtom,
 	lyricHidePassedAtom,
 	lyricScaleEffectAtom,
 	lyricSpringEffectAtom,
+	lyricWordFadeWidthAtom,
 	playPositionOffsetAtom,
 	showAMLLTTMLDBTipAtom,
 } from "../../components/config/atoms";
@@ -63,13 +63,11 @@ export const CoreLyricPlayer: FC<{
 	const playStatus = useAtomValue(playStatusAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
 	const usingLyricSource = useAtomValue(usingLyricSourceAtom);
-	const lyricAdvanceDynamicLyricTime = useAtomValue(
-		lyricAdvanceDynamicLyricTimeAtom,
-	);
 	const lyricBlurEffect = useAtomValue(lyricBlurEffectAtom);
 	const lyricScaleEffect = useAtomValue(lyricScaleEffectAtom);
 	const lyricSpringEffect = useAtomValue(lyricSpringEffectAtom);
 	const lyricHidePassed = useAtomValue(lyricHidePassedAtom);
+	const lyricWordFadeWidth = useAtomValue(lyricWordFadeWidthAtom);
 	const amllEnvironment = useAtomValue(amllEnvironmentAtom);
 	const showAMLLTTMLDBTip = useAtomValue(showAMLLTTMLDBTipAtom);
 	const setRightClickedLyric = useSetAtom(rightClickedLyricAtom);
@@ -122,11 +120,11 @@ export const CoreLyricPlayer: FC<{
 				playing={playStatus === PlayState.Playing}
 				currentTime={currentTime}
 				isSeeking={isSeeking}
-				enableLyricAdvanceDynamicLyricTime={lyricAdvanceDynamicLyricTime}
 				enableBlur={lyricBlurEffect}
 				enableSpring={lyricSpringEffect}
 				enableScale={lyricScaleEffect}
 				hidePassedLines={lyricHidePassed}
+				wordFadeWidth={lyricWordFadeWidth}
 				lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
 				ref={playerRef}
 				onLyricLineClick={(line) => {

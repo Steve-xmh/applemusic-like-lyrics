@@ -110,6 +110,12 @@ export const swapTranslatedRomanLineAtom = atomWithConfig({
 	desc: "是否交换翻译行和音译行的位置",
 });
 
+export const lyricWordFadeWidthAtom = atomWithConfig({
+	key: "lyric-word-fade-width",
+	default: 0.5,
+	desc: "单词的渐变宽度",
+});
+
 export const lyricAdvanceDynamicLyricTimeAtom = atomWithConfig({
 	key: "lyric-advance-dynamic-lyric-time",
 	default: true,
