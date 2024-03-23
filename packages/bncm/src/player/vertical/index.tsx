@@ -99,6 +99,7 @@ export const LyricPlayerVertical: FC = () => {
 					gridColumn: "1 / 5",
 					gridRow: "1",
 					zIndex: "1",
+					pointerEvents: "none",
 				}}
 				onMouseDown={(evt) => {
 					evt.preventDefault();
