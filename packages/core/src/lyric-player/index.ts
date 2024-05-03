@@ -137,6 +137,10 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			e.stopImmediatePropagation();
 		}
 	};
+	/**
+	 * 是否为非逐词歌词
+	 * @internal
+	 */
 	_getIsNonDynamic() {
 		return this.isNonDynamic;
 	}

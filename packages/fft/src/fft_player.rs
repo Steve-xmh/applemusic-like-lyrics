@@ -1,5 +1,5 @@
 use instant::Instant;
-use std::{cell::Cell, collections::VecDeque, ops::Sub};
+use std::{cell::Cell, collections::VecDeque};
 
 use spectrum_analyzer::*;
 use symphonia_core::conv::{FromSample, IntoSample};

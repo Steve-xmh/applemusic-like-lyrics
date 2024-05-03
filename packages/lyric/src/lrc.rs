@@ -54,7 +54,7 @@ pub fn parse_time(src: &str) -> IResult<&str, u64> {
         _ => unreachable!(),
     }
 
-    let time = min as u64 * 60 * 1000 + sec as u64 * 1000 + ms as u64;
+    let time = min as u64 * 60 * 1000 + sec * 1000 + ms;
 
     let (src, _) = tag("]")(src)?;
     Ok((src, time))

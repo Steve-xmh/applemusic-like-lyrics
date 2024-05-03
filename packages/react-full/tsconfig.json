@@ -1,5 +1,6 @@
 {
-    "include": ["./src/**/*.ts"],
+    "include": ["./src/**/*.ts", "./src/**/*.tsx"],
+    "exclude": ["./src/test-app.tsx"],
     "compilerOptions": {
         "target": "ESNext",
         "lib": [
@@ -8,14 +9,14 @@
             "DOM.Iterable"
         ],
         "module": "ESNext",
-        "types": ["vite-plugin-glsl/ext"],
+        "jsx": "react-jsx",
+        "types": [],
         "strict": true,
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "strictNullChecks": true,
         "allowSyntheticDefaultImports": true,
         "allowJs": false,
-        "stripInternal": true,
         "skipLibCheck": true
     }
 }
