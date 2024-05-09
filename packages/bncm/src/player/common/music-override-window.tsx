@@ -251,37 +251,37 @@ const RawLyricInfoPage: FC = () => {
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.lrc?.lyric || ""}
+						value={rawMusicInfo?.data?.lrc?.lyric || ""}
 					/>
 					<div>翻译歌词</div>
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.tlyric?.lyric || ""}
+						value={rawMusicInfo?.data?.tlyric?.lyric || ""}
 					/>
 					<div>音译歌词</div>
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.romalrc?.lyric || ""}
+						value={rawMusicInfo?.data?.romalrc?.lyric || ""}
 					/>
 					<div>逐词原文歌词</div>
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.yrc?.lyric || ""}
+						value={rawMusicInfo?.data?.yrc?.lyric || ""}
 					/>
 					<div>逐词翻译歌词</div>
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.ytlrc?.lyric || ""}
+						value={rawMusicInfo?.data?.ytlrc?.lyric || ""}
 					/>
 					<div>逐词音译歌词</div>
 					<textarea
 						className="raw-lyric-info-textarea"
 						readOnly
-						value={rawMusicInfo.data.yromalrc?.lyric || ""}
+						value={rawMusicInfo?.data?.yromalrc?.lyric || ""}
 					/>
 				</>
 			)}

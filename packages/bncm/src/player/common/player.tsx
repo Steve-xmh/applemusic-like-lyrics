@@ -1,5 +1,12 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useState, type FC, useEffect, useRef, RefObject } from "react";
+import {
+	useState,
+	type FC,
+	useEffect,
+	useRef,
+	RefObject,
+	useMemo,
+} from "react";
 import {
 	currentTimeAtom,
 	seekingAtom,
@@ -93,6 +100,11 @@ export const CoreLyricPlayer: FC<{
 		setAlighPosition(0.5);
 	}, [props.albumCoverRef?.current, lyricPageOpened]);
 
+	const cachedLyricLines = useMemo(
+		() => (lyricLines.state === "hasData" ? lyricLines.data : []),
+		[lyricLines],
+	);
+
 	if (
 		wsStatus.color === ConnectionColor.Active &&
 		!keepBuiltinPlayerWhenConnected
@@ -125,7 +137,7 @@ export const CoreLyricPlayer: FC<{
 				enableScale={lyricScaleEffect}
 				hidePassedLines={lyricHidePassed}
 				wordFadeWidth={lyricWordFadeWidth}
-				lyricLines={lyricLines.state === "hasData" ? lyricLines.data : []}
+				lyricLines={cachedLyricLines}
 				ref={playerRef}
 				onLyricLineClick={(line) => {
 					line.preventDefault();

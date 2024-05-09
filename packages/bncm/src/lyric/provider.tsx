@@ -482,7 +482,7 @@ export const lyricLinesAtom = atom(
 				lyricAdvanceDynamicLyricTimeAtom,
 			);
 			if (lyricAdvanceDynamicLyricTime) {
-				overrideLines.forEach((line) => {
+				for (const line of overrideLines) {
 					if (line.words.length > 0) {
 						const delta = Math.abs(
 							Math.max(0, line.startTime - 500) - line.startTime,
@@ -490,7 +490,7 @@ export const lyricLinesAtom = atom(
 						line.startTime -= delta;
 						line.endTime -= 500;
 					}
-				});
+				}
 			}
 			return {
 				state: "hasData",
@@ -584,7 +584,7 @@ export const LyricProvider: FC = () => {
 				}
 			},
 			(source, _index, result) => {
-				// log("已设置歌词为来自歌词源", source, "的", result);
+				log("已设置歌词为来自歌词源", source, "的", result);
 				setLyricSource({
 					state: "hasData",
 					data: source,
