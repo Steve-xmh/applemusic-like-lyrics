@@ -568,8 +568,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	/**
 	 * 设置当前播放歌词，要注意传入后这个数组内的信息不得修改，否则会发生错误
 	 * @param lines 歌词数组
+	 * @param initialTime 初始时间，默认为 0
 	 */
-	setLyricLines(lines: LyricLine[]) {
+	setLyricLines(lines: LyricLine[], initialTime = 0) {
 		for (const line of lines) {
 			for (const word of line.words) {
 				word.word = word.word.replace(/\s+/g, " ");
@@ -681,8 +682,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
 		this.resetScroll();
-		this.setCurrentTime(0, true);
+		this.setCurrentTime(initialTime, true);
 		this.calcLayout(true, true);
+		console.log("设置歌词行，触发强制重排", initialTime);
 	}
 	/**
 	 * 重置用户滚动状态
@@ -1007,6 +1009,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			for (const v of this.hotLines) {
 				this.bufferedLines.add(v);
 			}
+			console.log("强制修改时间，触发强制重排", time);
 			this.calcLayout(true);
 		} else if (removedIds.size > 0 || addedIds.size > 0) {
 			// function debugLog() {
@@ -1022,6 +1025,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					this.lyricLinesEl[v].enable(time);
 				}
 				this.scrollToIndex = Math.min(...this.bufferedLines);
+				console.log("时间更新，触发重排", time);
 				this.calcLayout();
 			} else if (addedIds.size === 0 && removedIds.size > 0) {
 				if (eqSet(removedIds, this.bufferedLines)) {
@@ -1032,6 +1036,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 							this.lyricLinesEl[v].disable(time);
 						}
 					}
+					console.log("时间更新，触发重排", time);
 					this.calcLayout();
 				}
 			} else {
@@ -1046,6 +1051,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				if (this.bufferedLines.size > 0)
 					this.scrollToIndex = Math.min(...this.bufferedLines);
+				console.log("时间更新，触发重排", time);
 				this.calcLayout();
 			}
 		}

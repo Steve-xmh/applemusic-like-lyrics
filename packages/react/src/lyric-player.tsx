@@ -79,11 +79,11 @@ export interface LyricPlayerProps {
 	isSeeking?: boolean;
 	/**
 	 * 设置文字动画的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度
-	 * 
+	 *
 	 * 如果要模拟 Apple Music for Android 的效果，可以设置为 1
-	 * 
+	 *
 	 * 如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5
-	 * 
+	 *
 	 * 如果想要近乎禁用渐变效果，可以设置成非常接近 0 的小数（例如 `0.0001` ），但是**不可以为 0**
 	 */
 	wordFadeWidth?: number;
@@ -172,6 +172,7 @@ export const LyricPlayer = forwardRef<
 	) => {
 		const corePlayerRef = useRef<CoreLyricPlayer>();
 		const wrapperRef = useRef<HTMLDivElement>(null);
+		const currentTimeRef = useRef(currentTime);
 
 		useEffect(() => {
 			corePlayerRef.current = new CoreLyricPlayer();
@@ -247,20 +248,24 @@ export const LyricPlayer = forwardRef<
 		}, [enableBlur]);
 
 		useEffect(() => {
+			if (currentTime !== undefined) {
+				corePlayerRef.current?.setCurrentTime(currentTime);
+				currentTimeRef.current = currentTime;
+			} else corePlayerRef.current?.setCurrentTime(0);
+		}, [currentTime]);
+
+		useEffect(() => {
 			if (lyricLines !== undefined) {
-				corePlayerRef.current?.setLyricLines(lyricLines);
+				corePlayerRef.current?.setLyricLines(
+					lyricLines,
+					currentTimeRef.current,
+				);
 				corePlayerRef.current?.update();
 			} else {
 				corePlayerRef.current?.setLyricLines([]);
 				corePlayerRef.current?.update();
 			}
 		}, [lyricLines]);
-
-		useEffect(() => {
-			if (currentTime !== undefined)
-				corePlayerRef.current?.setCurrentTime(currentTime);
-			else corePlayerRef.current?.setCurrentTime(0);
-		}, [currentTime]);
 
 		useEffect(() => {
 			corePlayerRef.current?.setIsSeeking(isSeeking);
