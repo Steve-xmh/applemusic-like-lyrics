@@ -35,7 +35,7 @@ import {
 } from "../components/config/atoms";
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
 import { LyricFormat, LyricSource, SourceStringError } from "./source";
-import { processLyric } from "./processor";
+import { processLyric, processLyric2 } from "./processor";
 import { Loadable } from "jotai/vanilla/utils/loadable";
 import { raceLoad } from "../utils/race-load";
 
@@ -292,7 +292,7 @@ async function getLyricFromNCM(
 	if (canUseDynamicLyric) {
 		const lines = parseYrc(currentRawLyricResp?.yrc?.lyric || "");
 		converted = lines.map(transformDynamicLyricLine);
-		processLyric(converted);
+		processLyric2(converted);
 		log("已解析 YRC 歌词", JSON.parse(JSON.stringify(converted)));
 
 		if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {

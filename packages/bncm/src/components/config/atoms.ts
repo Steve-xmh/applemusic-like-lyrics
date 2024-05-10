@@ -238,6 +238,7 @@ export const enableBackgroundAtom = atomWithConfig({
 export enum BackgroundType {
 	LiquidEplor = "liquid-eplor",
 	FakeLiquid = "fake-liquid",
+	NewLiquidEplor = "new-liquid-eplor",
 	CustomSolidColor = "custom-solid-color",
 }
 

@@ -27,8 +27,8 @@ const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
 const makeEmpEasing = (mid: number) => {
-	const bezIn = bezier(0.2, 0.5, 0.5, 1);
-	const bezOut = bezier(0.75, 0, 1, 0.75);
+	const bezIn = bezier(0.3, 0.5, 0.5, 1);
+	const bezOut = bezier(0.28, 0.2, 0.5, 1);
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
@@ -193,6 +193,7 @@ type MouseEventListener = (
 ) => void;
 
 export class LyricLineEl extends EventTarget implements HasElement, Disposable {
+	private lyricAdvanceDynamicLyricTime = true;
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -207,6 +208,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(1),
 	};
+
+	/**
+	 * 设置是否应用提前歌词行时序，默认为 `true`
+	 */
+	setLyricAdvanceDynamicLyricTime(enable: boolean) {
+		this.lyricAdvanceDynamicLyricTime = enable;
+	}
 
 	constructor(
 		private lyricPlayer: LyricPlayer,
@@ -335,6 +343,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.hasFaded = true;
 		this.element.classList.remove("active");
 		const main = this.element.children[0] as HTMLDivElement;
+		let i = 0;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				if (
@@ -346,12 +355,45 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 			}
 			for (const a of word.maskAnimations) {
-				a.currentTime = Math.min(
-					this.totalDuration,
-					Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-				);
-				a.pause();
+				if (this.lyricAdvanceDynamicLyricTime) {
+					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
+						this.hasFaded = false;
+					}
+					const start = word.startTime - this.lyricLine.startTime;
+					const current = maskAnimationTime - this.lyricLine.startTime;
+					a.finished.then(() => {
+						// a.currentTime = 0;
+						a.pause();
+					});
+					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
+						a.currentTime = 0;
+						a.pause();
+					} else if (
+						i === this.splittedWords.length - 1 &&
+						!this.areWordsOnSameLine(
+							this.splittedWords[i - 1],
+							this.splittedWords[i],
+						) &&
+						current < start - 300
+					) {
+						a.currentTime = start;
+						a.playbackRate = 1;
+					} else {
+						a.currentTime = Math.min(
+							this.totalDuration,
+							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+						);
+						a.playbackRate = 2;
+					}
+				} else {
+					a.currentTime = Math.min(
+						this.totalDuration,
+						Math.max(0, maskAnimationTime - this.lyricLine.startTime),
+					);
+					a.pause();
+				}
 			}
+			i++;
 		}
 		main.classList.remove("active");
 	}
@@ -359,11 +401,21 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
-				console.log(word.word);
-				a.play();
+				if (
+					this.splittedWords.indexOf(lastWord) <
+					this.splittedWords.indexOf(word)
+				) {
+					console.log(word.word);
+					a.play();
+				}
 			}
 			for (const a of word.maskAnimations) {
-				a.play();
+				if (
+					this.splittedWords.indexOf(lastWord) <
+					this.splittedWords.indexOf(word)
+				) {
+					a.play();
+				}
 			}
 		}
 	}
@@ -676,7 +728,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		duration: number,
 		delay: number,
 	): Animation[] {
-		const de = Math.max(0, delay) - 300;
+		const de = Math.max(0, delay);
 		let du = Math.max(1000, duration);
 
 		let result: Animation[] = [];
@@ -714,7 +766,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		// }
 		// console.log(word.word + " " + word.word.trim().length);
 		// const animateDu = Number.isFinite(du) ? du * (word.word.trim().length >= 4 ? 1. : 1.5) : 0;
-		const animateDu = Number.isFinite(du) ? du * 1.1 : 0;
+		const animateDu = Number.isFinite(du) ? du : 0;
 		const empEasing = makeEmpEasing(EMP_EASING_MID);
 		result = characterElements.flatMap((el, i, arr) => {
 			const wordDe = de + (du / 2.5 / arr.length) * i;
@@ -724,8 +776,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				.fill(0)
 				.map((_, j) => {
 					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
-					// const trans = empEasing(x);
-					const transX = Math.sin(x * Math.PI);
+					const transX = empEasing(x);
+					// const transX = Math.sin(x * Math.PI);
 					// transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
 					const glowLevel = empEasing(x) * blur;
 					// const floatLevel =
@@ -750,7 +802,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				id: `emphasize-word-${el.innerText}-${i}`,
 				iterations: 1,
 				composite: "replace",
-				easing: "ease-in-out",
+				easing: "linear",
 				fill: "both",
 			});
 			glow.onfinish = () => {
@@ -776,7 +828,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				});
 			const float = el.animate(floatFrame, {
 				duration: animateDu * 1.4,
-				delay: Number.isFinite(wordDe) ? wordDe : 0,
+				delay: Number.isFinite(wordDe) ? wordDe - 400 : 0,
 				id: "float-word",
 				iterations: 1,
 				composite: "add",
@@ -795,7 +847,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		return result;
 	}
 	private get totalDuration() {
-		return this.lyricLine.endTime + this.lyricLine.startTime;
+		return (
+			this.lyricLine.endTime +
+			(this.lyricAdvanceDynamicLyricTime ? 500 : 0) -
+			this.lyricLine.startTime
+		);
 	}
 	updateMaskImage() {
 		if (this._hide) {

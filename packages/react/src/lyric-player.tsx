@@ -78,6 +78,10 @@ export interface LyricPlayerProps {
 	currentTime?: number;
 	isSeeking?: boolean;
 	/**
+	 * 设置是否应用提前歌词行时序，默认为 `true`
+	 */
+	enableLyricAdvanceDynamicLyricTime?: boolean;
+	/**
 	 * 设置文字动画的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度
 	 *
 	 * 如果要模拟 Apple Music for Android 的效果，可以设置为 1
@@ -159,6 +163,7 @@ export const LyricPlayer = forwardRef<
 			lyricLines,
 			currentTime,
 			isSeeking,
+			enableLyricAdvanceDynamicLyricTime,
 			wordFadeWidth,
 			linePosXSpringParams,
 			linePosYSpringParams,
@@ -255,6 +260,12 @@ export const LyricPlayer = forwardRef<
 		}, [currentTime]);
 
 		useEffect(() => {
+			corePlayerRef.current?.setLyricAdvanceDynamicLyricTime(
+				enableLyricAdvanceDynamicLyricTime ?? true,
+			);
+		}, [enableLyricAdvanceDynamicLyricTime]);
+
+		useEffect(() => {
 			if (lyricLines !== undefined) {
 				corePlayerRef.current?.setLyricLines(
 					lyricLines,
@@ -268,7 +279,7 @@ export const LyricPlayer = forwardRef<
 		}, [lyricLines]);
 
 		useEffect(() => {
-			corePlayerRef.current?.setIsSeeking(isSeeking);
+			corePlayerRef.current?.setIsSeeking(!!isSeeking);
 		}, [isSeeking]);
 
 		useEffect(() => {

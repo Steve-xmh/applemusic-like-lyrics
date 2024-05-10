@@ -1089,6 +1089,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			line.update(deltaS);
 		}
 	}
+	setLyricAdvanceDynamicLyricTime(enable: boolean) {
+		for (const line of this.lyricLinesEl) {
+			line.setLyricAdvanceDynamicLyricTime(enable);
+		}
+	}
 	/**
 	 * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
 	 *

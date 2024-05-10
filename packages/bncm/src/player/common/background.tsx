@@ -1,5 +1,5 @@
-import { useAtomValue } from "jotai";
-import { useState, type FC, useEffect } from "react";
+import { atom, useAtomValue } from "jotai";
+import { useState, type FC, useEffect, useMemo } from "react";
 import {
 	backgroundStaticModeAtom,
 	backgroundTypeAtom,
@@ -22,10 +22,19 @@ import {
 	lyricPageOpenedAtom,
 } from "../../music-context/wrapper";
 import "./background.sass";
-import { EplorRenderer, PixiRenderer } from "@applemusic-like-lyrics/core";
+import {
+	BaseRenderer,
+	EplorRenderer,
+} from "@applemusic-like-lyrics/core";
 import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
 import { lyricLinesAtom } from "../../lyric/provider";
+
+type AnyRenderer = { new (canvas: HTMLCanvasElement): BaseRenderer };
+
+export const forceOverrideBgRendererAtom = atom<{
+	renderer: AnyRenderer
+} | null>(null);
 
 export const Background: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -33,6 +42,7 @@ export const Background: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const backgroundMaxFPS = useAtomValue(backgroundMaxFPSAtom);
 	const showBackgroundFFTLowFreq = useAtomValue(showBackgroundFFTLowFreqAtom);
+	const forceOverrideBgRenderer = useAtomValue(forceOverrideBgRendererAtom);
 	const backgroundRenderScale = useAtomValue(backgroundRenderScaleAtom);
 	const flowSpeed = useAtomValue(backgroundFlowSpeedAtom);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
@@ -47,6 +57,18 @@ export const Background: FC = () => {
 	const [dbgValue, setDbgValue] = useState<number[]>([]);
 
 	const gradient: number[] = [];
+
+	const targetRenderer = useMemo<AnyRenderer>(() => {
+		if (forceOverrideBgRenderer?.renderer) return forceOverrideBgRenderer?.renderer;
+		switch (backgroundType) {
+			case BackgroundType.LiquidEplor:
+				return EplorRenderer;
+			case BackgroundType.FakeLiquid:
+				return EplorRenderer;
+			default:
+				return EplorRenderer;
+		}
+	}, [forceOverrideBgRenderer, backgroundType]);
 
 	function normalizeFFTData(fftData: number[]): number[] {
 		// Find the maximum value in the FFT data
@@ -94,6 +116,12 @@ export const Background: FC = () => {
 		const window = 10;
 		const volume =
 			(amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1])) * 0.5;
+		// const volume =
+		// 	amplitudeToLevel(fftData[0]);
+		// const volume =
+		// 	amplitudeToLevel(fftData[1]);
+		// const volume =
+		// 	(amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1]) + amplitudeToLevel(fftData[2])) / 3.0;
 		if (gradient.length < window && !gradient.includes(volume)) {
 			gradient.push(volume);
 			return 0;
@@ -105,7 +133,7 @@ export const Background: FC = () => {
 		const minInInterval = Math.min(...gradient);
 		const difference = maxInInterval - minInInterval;
 		// console.log(volume, maxInInterval, minInInterval, difference);
-		return difference > 0.2 ? maxInInterval : minInInterval * 0.1;
+		return difference > 0.35 ? maxInInterval : minInInterval * 0.5 ** 2;
 	}
 
 	useEffect(() => {
@@ -114,6 +142,7 @@ export const Background: FC = () => {
 		let stopped = false;
 		let lt = 0;
 		let lastValue = 0;
+		let count = 0;
 		const onFrame = (dt: number) => {
 			if (stopped) return;
 			const delta = dt - lt;
@@ -139,9 +168,19 @@ export const Background: FC = () => {
 			// 		1.0) *
 			// 	1.0;
 
-			const normalizeData = fftData;
+			const gradient = calculateGradient(fftData);
+			// let value = 0;
 
-			const value = calculateGradient(normalizeData) * 0.5;
+			// if (count === 20) {
+			// 	value = gradient;
+			// 	count = 0;
+			// } else {
+			// 	value = lastValue;
+			// }
+
+			// lastValue = value;
+			const value = gradient;
+			// count++;
 			setLowFreqVolume(curValue);
 
 			// if (Math.abs(value - lastValue) >= 0.9) {
@@ -155,12 +194,12 @@ export const Background: FC = () => {
 			if (increasing) {
 				curValue = Math.min(
 					value,
-					curValue + (value - curValue) * 0.01 * delta,
+					curValue + (value - curValue) * 0.003 * delta,
 				);
 			} else {
 				curValue = Math.max(
 					value,
-					curValue + (value - curValue) * 0.001 * delta,
+					curValue + (value - curValue) * 0.003 * delta,
 				);
 			}
 
@@ -185,7 +224,8 @@ export const Background: FC = () => {
 	if (wsStatus.color !== ConnectionColor.Active && enableBackground) {
 		if (
 			backgroundType === BackgroundType.FakeLiquid ||
-			backgroundType === BackgroundType.LiquidEplor
+			backgroundType === BackgroundType.LiquidEplor ||
+			backgroundType === BackgroundType.NewLiquidEplor
 		) {
 			return (
 				<>
@@ -209,11 +249,7 @@ export const Background: FC = () => {
 								  : false
 						}
 						flowSpeed={flowSpeed}
-						renderer={
-							backgroundType === BackgroundType.LiquidEplor
-								? EplorRenderer
-								: PixiRenderer
-						}
+						renderer={targetRenderer}
 					/>
 					{showBackgroundFFTLowFreq && (
 						<div

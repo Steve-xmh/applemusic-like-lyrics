@@ -17,6 +17,7 @@ import {
 } from "./atoms";
 import { Select } from "../appkit/select";
 import { useAtom, useAtomValue } from "jotai";
+import { Alert } from "../appkit/alert";
 
 export const BackgroundConfig: FC = () => {
 	const enableBackground = useAtomValue(enableBackgroundAtom);
@@ -49,6 +50,10 @@ export const BackgroundConfig: FC = () => {
 										label: "流体背景 (Eplor)",
 									},
 									{
+										value: BackgroundType.NewLiquidEplor,
+										label: "新流体背景 (Eplor) (仅私有)",
+									},
+									{
 										value: BackgroundType.FakeLiquid,
 										label: "伪流体背景",
 									},
@@ -62,6 +67,15 @@ export const BackgroundConfig: FC = () => {
 					</>
 				)}
 			</GroupBox>
+			{backgroundType === BackgroundType.NewLiquidEplor && (
+				<>
+					<Alert type="warning" title="注意">
+						由于渲染器作者要求，此渲染器仅私有版本的 AMLL 组件可用
+						<br />
+						默认会回滚到 “流体背景 (Eplor)” 渲染器。
+					</Alert>
+				</>
+			)}
 			{enableBackground && (
 				<>
 					{backgroundType !== BackgroundType.CustomSolidColor && (

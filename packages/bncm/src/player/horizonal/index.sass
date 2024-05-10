@@ -37,28 +37,28 @@ $player-size-fract: 1fr
         height: 100%
         font-weight: 700
         box-sizing: border-box
-        padding-right: 7.5vw
+        // padding-right: 7.5vw
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         display: flex
         flex-direction: column
         justify-content: center
         align-items: center
         gap: 16px
-        mask-image: linear-gradient(to bottom, transparent 5%, white 20%, white 80%, transparent 95%)
-        -webkit-mask-image: linear-gradient(to bottom, transparent 5%, white 20%, white 80%, transparent 95%)
+        mask-image: linear-gradient(to bottom, transparent 5%, white 20%, white 80%, transparent 93%)
+        -webkit-mask-image: linear-gradient(to bottom, transparent 5%, white 20%, white 80%, transparent 93%)
         > *
             mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
-            margin-left: 2.5vw
+            // margin-left: 2.5vw
         &.load-status
             opacity: 0.5
     .amll-music-info
         grid-column: info-side
         grid-row: music-info
-        max-width: min(50vh, 40vw)
-        width: min(50vh, 40vw)
+        // max-width: min(60vh, 40vw)
+        width: min(60vh, 38vw)
         justify-self: center
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
-        font-size: 2vh
+        font-size: 1.9vh
         display: flex
         flex-direction: column
         justify-content: space-around
@@ -73,8 +73,8 @@ $player-size-fract: 1fr
         grid-row: cover
         align-self: center
         justify-self: center
-        width: min(50vh,40vw)
-        height: min(50vh,40vw)
+        width: min(60vh, 38vw)
+        height: min(60vh, 38vw)
         transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)
         image-rendering: auto
         background-position: center
@@ -83,14 +83,14 @@ $player-size-fract: 1fr
         overflow: hidden
 
         $scale-level: 0.75
-        $base-box-shadow-v-0: rgba(0,0,0,0.25)
+        $base-box-shadow-v-0: rgba(0,0,0,0.35)
         $base-box-shadow-y-0: 16px
-        $base-box-shadow-r-0: 24px
+        $base-box-shadow-r-0: 32px
         $base-box-shadow-v-1: rgba(0,0,0,0.25)
         $base-box-shadow-y-1: 32px
         $base-box-shadow-r-1: 64px
 
-        box-shadow: $base-box-shadow-v-0 0px calc($base-box-shadow-y-0 / $scale-level) calc($base-box-shadow-r-0 / $scale-level), $base-box-shadow-v-1 0px calc($base-box-shadow-y-1 / $scale-level) calc($base-box-shadow-r-1 / $scale-level)
+        box-shadow: $base-box-shadow-v-0 0px calc($base-box-shadow-y-0 / $scale-level / 2) calc($base-box-shadow-r-0 / $scale-level / 2), $base-box-shadow-v-1 0px calc($base-box-shadow-y-1 / $scale-level / 2) calc($base-box-shadow-r-1 / $scale-level / 2)
         transform: scale($scale-level)
         &.is-playing
             transform: scale(1)
@@ -114,7 +114,7 @@ $player-size-fract: 1fr
         position: relative
         border: none
         background: var(--amll-lyric-primary-color-t15, white) !important
-        width: 2.5vh
+        width: 2.6vh
         margin-left: 16px
         border-radius: 50%
         align-self: center
@@ -126,11 +126,11 @@ $player-size-fract: 1fr
         // @media screen and (max-height: 768px)
         //     scale: 0.8
         svg
-            width: 70% // 让SVG元素的宽度与父容器相同
+            width: 72% // 让SVG元素的宽度与父容器相同
             height: auto // 让高度自适应内容
 
     .amll-contributors
-        font-size: 50%
+        font-size: 45%
         opacity: 0.5
 
     .am-music-play
@@ -145,8 +145,8 @@ $player-size-fract: 1fr
         white-space: nowrap
         text-align: center
         opacity: 0.45
-        font-weight: 300
-        letter-spacing: 0.4px
+        font-weight: 200
+        letter-spacing: 1px
 
         a
             line-height: normal

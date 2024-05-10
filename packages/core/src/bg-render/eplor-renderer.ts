@@ -586,9 +586,9 @@ export class EplorRenderer extends BaseRenderer {
 			fb.bind();
 			gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 		}
-		this.historyFrameBuffer = new Array(2)
-			.fill(0)
-			.map(() => new Framebuffer(this.gl, width, height));
+		// this.historyFrameBuffer = new Array(2)
+		// 	.fill(0)
+		// 	.map(() => new Framebuffer(this.gl, width, height));
 		this.onResize(width, height);
 	}
 	private _currentSize = [0, 0];
@@ -627,9 +627,9 @@ export class EplorRenderer extends BaseRenderer {
 		for (const fb of this.fb) {
 			fb.resize(width, height);
 		}
-		for (const fb of this.historyFrameBuffer) {
-			fb.resize(realWidth, realHeight);
-		}
+		// for (const fb of this.historyFrameBuffer) {
+		// 	fb.resize(realWidth, realHeight);
+		// }
 	}
 
 	private requestTick() {
@@ -654,26 +654,15 @@ export class EplorRenderer extends BaseRenderer {
 		this.indexBuffer.bind();
 
 		this.mainProgram.use();
-		this.noiseTexture.active();
+		// this.noiseTexture.active();
 		this.mainProgram.setUniform1i("noisetex", 1);
-		this.mainProgram.setUniform2f(
-			"IIlIlIIlIlIllI",
-			this.renderSize[0],
-			this.renderSize[1],
-		);
 		this.mainProgram.setUniform2f(
 			"renderSize",
 			this.renderSize[0],
 			this.renderSize[1],
 		);
-		this.mainProgram.setUniform1f("lIIIlllllIllIl", tickTime / 1000);
 		this.mainProgram.setUniform1f("frameTime", tickTime / 1000);
-		this.mainProgram.setUniform1f("IIIlllllllIIIllIl", this.hasLyricValue);
 		this.mainProgram.setUniform1f("hasLyric", this.hasLyricValue);
-		this.mainProgram.setUniform1f(
-			"IIIlllIlIIllll",
-			this.hasLyric ? this._lowFreqVolume : 0.0,
-		);
 		this.mainProgram.setUniform1f(
 			"lowFreq",
 			this.hasLyric ? this._lowFreqVolume : 0.0,
@@ -684,13 +673,9 @@ export class EplorRenderer extends BaseRenderer {
 			this.IllIlllIlIIlllI = [-2.4, -1.4];
 		}
 		this.mainProgram.setUniform2f(
-			"IllIlllIlIIlllI",
+			"noiseOffset",
 			this.IllIlllIlIIlllI[0],
 			this.IllIlllIlIIlllI[1],
-		);
-		this.mainProgram.setUniform1f(
-			"IIIIIllllllIll",
-			window.innerWidth > 1024 ? 1 : 0,
 		);
 		this.mainProgram.setUniform1f(
 			"isHorizonal",
@@ -698,16 +683,15 @@ export class EplorRenderer extends BaseRenderer {
 		);
 		const [fba, fbb] = this.fb;
 		fbb.bind();
-		gl.clearColor(0, 0, 0, 0);
-		gl.clear(this.gl.COLOR_BUFFER_BIT);
+		// gl.clearColor(0, 0, 0, 0);
+		// gl.clear(this.gl.COLOR_BUFFER_BIT);
 
 		for (const sprite of this.sprites) {
 			fba.bind();
-			gl.clearColor(0, 0, 0, 0);
-			gl.clear(this.gl.COLOR_BUFFER_BIT);
+			// gl.clearColor(0, 0, 0, 0);
+			// gl.clear(this.gl.COLOR_BUFFER_BIT);
 
 			this.mainProgram.use();
-			sprite.draw("IlllIIlIlllIll");
 			sprite.draw("tex");
 
 			fbb.bind();
@@ -857,8 +841,8 @@ export class EplorRenderer extends BaseRenderer {
 		// ctx.fillStyle = "white";
 		// ctx.fillRect(0, 0, c.width, c.height);
 		const imageData = ctx.getImageData(0, 0, c.width, c.height);
-		contrastImage(imageData, 0.6);
-		saturateImage(imageData, 1.2);
+		contrastImage(imageData, 0.4);
+		saturateImage(imageData, 3.0);
 		//		contrastImage(imageData, 0.8);
 		//		brightnessImage(imageData, 0.9);
 		blurImage(imageData, blurRadius, 4);
@@ -873,19 +857,18 @@ export class EplorRenderer extends BaseRenderer {
 		// this.playTime = Math.random() * 100000;
 		// this.playTime = 0;
 		this.lastFrameTime = performance.now();
-		console.info(Math.random() * 10000);
 		// const r = Number.parseInt((Math.random() * 10000).toFixed(0)) % 3;
 		// if (r === 0) {
 		// 	this.IllIlllIlIIlllI = [-1.3, -0.9];
 		// 	// this.IllIlllIlIIlllI = [-1.1, -.9];
 		// } else if (r === 1) {
 		// 	// this.IllIlllIlIIlllI = [-1.3, -0.9];
-		// 	// this.IllIlllIlIIlllI = [-1.1, -0.9];
-		// 	this.IllIlllIlIIlllI = [-0.25, -0.2];
+		// 	this.IllIlllIlIIlllI = [-1.1, -0.9];
+		// 	// this.IllIlllIlIIlllI = [-0.25, -0.2];
 		// } else {
 		// 	this.IllIlllIlIIlllI = [-1.3, -0.9];
 		// }
-		this.requestTick();
+		// this.requestTick();
 	}
 
 	override setHasLyric(hasLyric: boolean): void {
@@ -900,19 +883,20 @@ export class EplorRenderer extends BaseRenderer {
 		super.dispose();
 		this.vertexBuffer.dispose();
 		this.indexBuffer.dispose();
-		this.noiseTexture.dispose();
+		// this.noiseTexture.dispose();
 		for (const s of this.sprites) {
 			s.dispose();
 		}
-		this.copyProgram.dispose();
+		// this.copyProgram.dispose();
 		this.blendProgram.dispose();
 		this.mainProgram.dispose();
+		this.noiseProgram.dispose();
 		for (const fb of this.fb) {
 			fb.dispose();
 		}
-		for (const fb of this.historyFrameBuffer) {
-			fb.dispose();
-		}
+		// for (const fb of this.historyFrameBuffer) {
+		// 	fb.dispose();
+		// }
 		if (this.tickHandle) {
 			cancelAnimationFrame(this.tickHandle);
 			this.tickHandle = 0;
