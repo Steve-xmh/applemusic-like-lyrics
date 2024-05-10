@@ -1,6 +1,6 @@
 [package]
 name = "amll-lyric"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"]
 edition = "2021"
 repository = "https://github.com/Steve-xmh/applemusic-like-lyrics"

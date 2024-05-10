@@ -4,7 +4,7 @@
     "SteveXMH <39523898+Steve-xmh@users.noreply.github.com>"
   ],
   "description": "一个歌词解析/生成模块，着重于歌词内容解析，支持多种格式",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",

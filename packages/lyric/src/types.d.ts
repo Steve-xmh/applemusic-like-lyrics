@@ -123,3 +123,17 @@ export interface LyricLine {
  * @returns 被解密出来的歌词字符串，是前后有 XML 混合的 QRC 歌词
  */
 export function decryptQrcHex(hexData: string): string;
+
+/**
+ * 一个 TTML 歌词行对象，存储了歌词行信息和元数据信息
+ */
+export interface TTMLLyric {
+    /**
+     * TTML 中存储的歌词行信息
+     */
+    lines: LyricLine[];
+    /**
+     * 一个元数据表，以 `[键, 值数组]` 的形式存储
+     */
+    metadata: [string, string[]][];
+}

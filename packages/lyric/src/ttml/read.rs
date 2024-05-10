@@ -1,3 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
 use quick_xml::{
     events::{attributes::AttrError, BytesStart, Event},
     *,
@@ -580,6 +583,12 @@ pub fn parse_ttml<'a>(data: impl BufRead) -> std::result::Result<TTMLLyric<'a>, 
         }
     }
     Ok(result)
+}
+
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
+#[wasm_bindgen(js_name = "parseTTML", skip_typescript)]
+pub fn parse_ttml_js(src: &str) -> JsValue {
+    serde_wasm_bindgen::to_value(&parse_ttml(src.as_bytes()).unwrap()).unwrap()
 }
 
 #[test]

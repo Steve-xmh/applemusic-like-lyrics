@@ -1,3 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::*;
+
 use std::io::Cursor;
 
 use quick_xml::{events::*, Writer};
@@ -195,6 +198,13 @@ pub fn stringify_ttml(lyric: &TTMLLyric) -> Result<String, quick_xml::Error> {
     writer.write_event(Event::Eof)?;
 
     Ok(String::from_utf8(writer.into_inner().into_inner()).unwrap())
+}
+
+#[cfg(all(target_arch = "wasm32", feature = "serde"))]
+#[wasm_bindgen(js_name = "stringifyTTML", skip_typescript)]
+pub fn stringify_ttml_js(lrc: JsValue) -> String {
+    let lyric: TTMLLyric = serde_wasm_bindgen::from_value(lrc).unwrap();
+    stringify_ttml(&lyric).unwrap()
 }
 
 #[test]
