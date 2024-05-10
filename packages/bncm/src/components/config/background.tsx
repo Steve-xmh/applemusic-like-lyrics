@@ -54,6 +54,10 @@ export const BackgroundConfig: FC = () => {
 										label: "新流体背景 (Eplor) (仅私有)",
 									},
 									{
+										value: BackgroundType.NewLiquidEplorTest,
+										label: "新流体背景测试版 (Eplor) (仅私有)",
+									},
+									{
 										value: BackgroundType.FakeLiquid,
 										label: "伪流体背景",
 									},
@@ -68,6 +72,15 @@ export const BackgroundConfig: FC = () => {
 				)}
 			</GroupBox>
 			{backgroundType === BackgroundType.NewLiquidEplor && (
+				<>
+					<Alert type="warning" title="注意">
+						由于渲染器作者要求，此渲染器仅私有版本的 AMLL 组件可用
+						<br />
+						默认会回滚到 “流体背景 (Eplor)” 渲染器。
+					</Alert>
+				</>
+			)}
+			{backgroundType === BackgroundType.NewLiquidEplorTest && (
 				<>
 					<Alert type="warning" title="注意">
 						由于渲染器作者要求，此渲染器仅私有版本的 AMLL 组件可用

@@ -30,7 +30,7 @@ import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
 import { lyricLinesAtom } from "../../lyric/provider";
 
-type AnyRenderer = { new (canvas: HTMLCanvasElement): BaseRenderer };
+type AnyRenderer = { new(canvas: HTMLCanvasElement): BaseRenderer };
 
 export const forceOverrideBgRendererAtom = atom<{
 	renderer: AnyRenderer
@@ -225,7 +225,8 @@ export const Background: FC = () => {
 		if (
 			backgroundType === BackgroundType.FakeLiquid ||
 			backgroundType === BackgroundType.LiquidEplor ||
-			backgroundType === BackgroundType.NewLiquidEplor
+			backgroundType === BackgroundType.NewLiquidEplor ||
+			backgroundType === BackgroundType.NewLiquidEplorTest
 		) {
 			return (
 				<>
@@ -245,8 +246,8 @@ export const Background: FC = () => {
 							lyricLines.state === "hasData" && lyricLines.data.length > 0
 								? true
 								: lyricLines.state === "loading"
-								  ? undefined
-								  : false
+									? undefined
+									: false
 						}
 						flowSpeed={flowSpeed}
 						renderer={targetRenderer}

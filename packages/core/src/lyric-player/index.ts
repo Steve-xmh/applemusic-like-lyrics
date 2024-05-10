@@ -95,19 +95,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.85,
+		mass: 0.8,
 		damping: 15,
 		stiffness: 100,
 	};
 	private scaleSpringParams: Partial<SpringParams> = {
 		mass: 1,
 		damping: 20,
-		stiffness: 100,
+		stiffness: 90,
 	};
 	private scaleForBGSpringParams: Partial<SpringParams> = {
 		mass: 1,
 		damping: 20,
-		stiffness: 30,
+		stiffness: 50,
 	};
 	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
 	private padding = this.emUnit;
@@ -122,6 +122,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private alignAnchor: "top" | "bottom" | "center" = "center";
 	private alignPosition = 0.35;
 	private isNonDynamic = false;
+	private isNonDuet = false;
 	private scrollBoundary = [0, 0];
 	readonly size: [number, number] = [0, 0];
 	readonly innerSize: [number, number] = [0, 0];
@@ -192,7 +193,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(min(4.6vh, 8vw), 12px))",
+			fontSize: "var(--amll-lyric-player-font-size,max(min(4.65vh, 8vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
@@ -245,6 +246,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// scale: 0.6,
 			fontSize: "max(70%, 10px)",
 			transition: "opacity 0.25s, scale 0.5s",
+			padding: "1vh 20px",
 			"&.active": {
 				transition:
 					"opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
@@ -257,7 +259,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "right",
 		},
 		lyricMainLine: {
-			transition: "opacity 0.2s 0.25s",
+			transition: "opacity 0.4s",
 			willChange: "opacity",
 			margin: "-1em",
 			padding: "1em",
@@ -515,7 +517,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		if (window.innerWidth <= 1024) {
 			style += `${this.innerSize[0] - this.padding * 2}px;`;
 		} else {
-			style += `${this.innerSize[0] - this.padding * 4}px;`;
+			style += `${this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 3)
+				}px;`;
 		}
 		style += "--amll-lyric-player-height:";
 		style += `${this.innerSize[1] - this.padding * 4}px;`;
@@ -620,10 +623,16 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					...line,
 				};
 			});
-		this.isNonDynamic = true;
+		this.isNonDuet = true;
 		for (const line of this.processedLines) {
 			if (line.words.length > 1) {
 				this.isNonDynamic = false;
+				break;
+			}
+		}
+		for (const line of this.processedLines) {
+			if (line.isDuet) {
+				this.isNonDuet = false;
 				break;
 			}
 		}
@@ -770,16 +779,16 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		const baseDelay = 0.06;
+		let baseDelay = 0.04;
 		let setDots = false;
 		this.lyricLinesEl.forEach((el, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);
 			const line = el.getLine();
-			let left = 20;
+			let left = 24;
 			if (line.isDuet) {
-				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0) - 20;
+				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0) - 24;
 			}
 			if (
 				!setDots &&
@@ -849,10 +858,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
 				delay += baseDelay;
-				// baseDelay *= 1.1;
-				// baseDelay /= 1.2;
-				// baseDelay = Math.min(baseDelay, 0.08);
+				if (i >= this.scrollToIndex) baseDelay *= 1.2;
+				baseDelay = Math.min(baseDelay, 0.05);
+
+				// delay += 0.05;
+
 				// baseDelay = baseDelay > 0.15 ? 0 : baseDelay;
+				// delay = (i - this.scrollToIndex) * 0.06;
 			}
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
@@ -908,7 +920,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param alignPosition 一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置
 	 */
 	setAlignPosition(alignPosition: number) {
-		this.alignPosition = alignPosition;
+		this.alignPosition = alignPosition - 0.02;
 	}
 	/**
 	 * 设置当前播放进度，单位为毫秒且**必须是整数**，此时将会更新内部的歌词进度信息
