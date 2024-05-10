@@ -125,7 +125,7 @@ export interface LyricLine {
 export function decryptQrcHex(hexData: string): string;
 
 /**
- * 一个 TTML 歌词行对象，存储了歌词行信息和元数据信息
+ * 一个 TTML 歌词行对象，存储了歌词行信息和 AMLL 元数据信息
  */
 export interface TTMLLyric {
     /**
@@ -137,3 +137,16 @@ export interface TTMLLyric {
      */
     metadata: [string, string[]][];
 }
+
+/**
+ * 解析 TTML 格式（包含 AMLL 特有属性信息）的歌词字符串
+ * @param src 歌词字符串
+ * @returns 成功解析出来的 TTML 歌词对象
+ */
+export function parseTTML(src: string): TTMLLyric;
+
+/**
+ * 将歌词数组转换为 TTML 格式（包含 AMLL 特有属性信息）的歌词字符串
+ * @param lyric TTML 歌词对象
+ */
+export function stringifyTTML(lyric: TTMLLyric): string;
