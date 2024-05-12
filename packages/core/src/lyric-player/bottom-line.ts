@@ -38,8 +38,8 @@ export class BottomLineEl implements HasElement, Disposable {
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(2)}px,${this.lineTransforms.posY
-			.getCurrentPosition()
-			.toFixed(2)}px);`;
+				.getCurrentPosition()
+				.toFixed(2)}px);`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}

@@ -95,7 +95,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.8,
+		mass: 0.7,
 		damping: 15,
 		stiffness: 100,
 	};
@@ -222,7 +222,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
-			transition: "filter 0.5s, background-color 0.25s, box-shadow 0.25s",
+			transition: "filter 0.2s ease, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "content-box",
 			borderRadius: "16px",
 			"&:has(>*):hover": {
@@ -623,6 +623,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					...line,
 				};
 			});
+		this.isNonDynamic = true;
 		this.isNonDuet = true;
 		for (const line of this.processedLines) {
 			if (line.words.length > 1) {
@@ -691,7 +692,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.setLinePosYSpringParams({});
 		this.setLineScaleSpringParams({});
 		this.resetScroll();
-		this.setCurrentTime(initialTime, true);
+		this.setCurrentTime(0, true);
 		this.calcLayout(true, true);
 		console.log("设置歌词行，触发强制重排", initialTime);
 	}
@@ -752,7 +753,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		} else {
 			this.interludeDots.setInterlude(undefined);
 		}
-		const SCALE_ASPECT = this.enableScale ? 0.98 : 1;
+		const SCALE_ASPECT = this.enableScale ? 0.97 : 1;
 		const scrollOffset = this.lyricLinesEl
 			.slice(0, targetAlignIndex)
 			.reduce(
@@ -828,7 +829,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				} else {
 					blurLevel = 1;
 					if (i < this.scrollToIndex) {
-						blurLevel += Math.abs(this.scrollToIndex - i) / 2 + 1;
+						blurLevel += Math.abs(this.scrollToIndex - i) + 1;
 					} else {
 						blurLevel += Math.abs(
 							i - Math.max(this.scrollToIndex, latestIndex),
@@ -859,7 +860,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
 				delay += baseDelay;
 				if (i >= this.scrollToIndex) baseDelay *= 1.2;
-				baseDelay = Math.min(baseDelay, 0.05);
+				baseDelay = Math.min(baseDelay, 0.045);
 
 				// delay += 0.05;
 
@@ -869,7 +870,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
 		// console.groupEnd();
-		this.bottomLine.setTransform(20, curPos, force, delay);
+		this.bottomLine.setTransform(24, curPos, force, delay);
 	}
 	/**
 	 * 获取当前歌词的播放位置
