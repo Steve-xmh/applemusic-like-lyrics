@@ -51,11 +51,11 @@ export const BackgroundConfig: FC = () => {
 									},
 									{
 										value: BackgroundType.NewLiquidEplor,
-										label: "新流体背景 (Eplor) (仅私有)",
+										label: "新流体背景2 (Eplor) (仅私有)",
 									},
 									{
 										value: BackgroundType.NewLiquidEplorTest,
-										label: "新流体背景测试版 (Eplor) (仅私有)",
+										label: "新流体背景(Eplor) (仅私有)",
 									},
 									{
 										value: BackgroundType.FakeLiquid,
