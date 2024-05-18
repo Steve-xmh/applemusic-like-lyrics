@@ -848,7 +848,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private get totalDuration() {
 		return (
 			this.lyricLine.endTime +
-			(this.lyricAdvanceDynamicLyricTime ? 500 : 0) -
+			(this.lyricAdvanceDynamicLyricTime ? 300 : 0) -
 			this.lyricLine.startTime
 		);
 	}

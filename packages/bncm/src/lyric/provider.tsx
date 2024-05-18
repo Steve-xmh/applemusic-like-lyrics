@@ -492,10 +492,10 @@ export const lyricLinesAtom = atom(
 				for (const line of overrideLines) {
 					if (line.words.length > 0) {
 						const delta = Math.abs(
-							Math.max(0, line.startTime - 500) - line.startTime,
+							Math.max(0, line.startTime - 300) - line.startTime,
 						);
 						line.startTime -= delta;
-						line.endTime -= 500;
+						line.endTime -= 300;
 					}
 				}
 			}

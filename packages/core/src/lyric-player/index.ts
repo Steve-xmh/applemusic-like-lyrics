@@ -193,7 +193,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(min(4.65vh, 8vw), 12px))",
+			fontSize: "var(--amll-lyric-player-font-size,max(min(4.7vh, 8vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
