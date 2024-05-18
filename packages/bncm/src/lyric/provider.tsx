@@ -359,11 +359,19 @@ async function getLyricFromNCM(
 
 	// 是否为纯音乐
 	console.log(converted);
+	// console.log(converted.length === 1,
+	// 	converted[0].startTime === 5940000,
+	// 	converted[0].endTime === Infinity,
+	// 	converted[0].words[0].startTime === 5940000,
+	// 	converted[0].words[0].endTime === Infinity,
+	// 	converted[0].words[0].word === "纯音乐，请欣赏",
+	// 	converted[0].translatedLyric === "",
+	// 	converted[0].romanLyric === "",
+	// 	converted[0].isBG === false,
+	// 	converted[0].isDuet === false);
 	if (
 		converted.length === 1 &&
-		converted[0].startTime === 5940000 &&
 		converted[0].endTime === Infinity &&
-		converted[0].words[0].startTime === 5940000 &&
 		converted[0].words[0].endTime === Infinity &&
 		converted[0].words[0].word === "纯音乐，请欣赏" &&
 		converted[0].translatedLyric === "" &&
@@ -484,10 +492,10 @@ export const lyricLinesAtom = atom(
 				for (const line of overrideLines) {
 					if (line.words.length > 0) {
 						const delta = Math.abs(
-							Math.max(0, line.startTime - 300) - line.startTime,
+							Math.max(0, line.startTime - 500) - line.startTime,
 						);
 						line.startTime -= delta;
-						line.endTime -= 300;
+						line.endTime -= 500;
 					}
 				}
 			}

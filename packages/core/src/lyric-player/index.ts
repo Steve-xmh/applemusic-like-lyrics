@@ -259,7 +259,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "right",
 		},
 		lyricMainLine: {
-			transition: "opacity 0.4s",
+			transition: "opacity 0.25s 0.1s",
 			willChange: "opacity",
 			margin: "-1em",
 			padding: "1em",
@@ -812,13 +812,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				} else if (hasBuffered) {
 					targetOpacity = this.isNonDynamic ? 0.85 : 1;
 				} else {
-					targetOpacity = (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
+					targetOpacity = 0.6 * (this.isNonDynamic ? 0.3 : 1);
 				}
 			} else {
 				if (hasBuffered) {
 					targetOpacity = this.isNonDynamic ? 0.85 : 1;
 				} else {
-					targetOpacity = (1 / 2) * (this.isNonDynamic ? 0.3 : 1);
+					targetOpacity = 0.6 * (this.isNonDynamic ? 0.3 : 1);
 				}
 			}
 
@@ -860,7 +860,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
 				delay += baseDelay;
 				if (i >= this.scrollToIndex) baseDelay *= 1.2;
-				baseDelay = Math.min(baseDelay, 0.045);
+				baseDelay = Math.min(baseDelay, 0.05);
 
 				// delay += 0.05;
 

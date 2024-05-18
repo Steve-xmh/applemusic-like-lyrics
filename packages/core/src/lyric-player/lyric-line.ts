@@ -382,7 +382,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							this.totalDuration,
 							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
 						);
-						a.playbackRate = 2;
+						a.playbackRate = 1;
 					}
 				} else {
 					a.currentTime = Math.min(
@@ -848,7 +848,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private get totalDuration() {
 		return (
 			this.lyricLine.endTime +
-			(this.lyricAdvanceDynamicLyricTime ? 300 : 0) -
+			(this.lyricAdvanceDynamicLyricTime ? 500 : 0) -
 			this.lyricLine.startTime
 		);
 	}
