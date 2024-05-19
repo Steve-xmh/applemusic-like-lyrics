@@ -24,6 +24,7 @@ import { CoreLyricPlayer } from "../common/player";
 import classNames from "classnames";
 import { lyricLinesAtom } from "../../lyric/provider";
 import { ControlThumb } from "../common/control-thumb";
+import boxDropShadow from "../../assets/box-dropshadow@2000px.png";
 
 export const LyricPlayerHorizonal: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
@@ -38,9 +39,7 @@ export const LyricPlayerHorizonal: FC = () => {
 	const albumCoverRef = useRef<HTMLDivElement>(null);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
-	const hideCursorWhenHoveringCover = useAtomValue(
-		hideCursorWhenHoveringCoverAtom,
-	);
+	const hideCursorWhenHoveringCover = useAtomValue(hideCursorWhenHoveringCoverAtom);
 
 	useEffect(() => {
 		if (showStats) {
@@ -99,9 +98,17 @@ export const LyricPlayerHorizonal: FC = () => {
 				}}
 			/>
 			{showControlThumb ? <ControlThumb /> : <div />}
+			{/* {showAlbumImage && (
+				<div
+					style={{
+						backgroundImage: `url(${boxDropShadow})`,
+					}}
+					className="amll-cover-shadow"
+				/>
+			)} */}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-				loadableMusicOverrideData.data.musicCoverIsVideo ? (
+					loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
@@ -149,7 +156,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => {}, []);
+					channel.call("winhelper.dragWindow", () => { }, []);
 				}}
 			/>
 		</div>

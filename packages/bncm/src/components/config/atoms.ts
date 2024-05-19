@@ -218,6 +218,12 @@ export const showBackgroundFFTLowFreqAtom = atomWithConfig({
 	desc: "显示实时背景音频状态数据",
 });
 
+export const forceHasLyricsBackgroundAtom = atomWithConfig({
+	key: "force-has-lyrics-background",
+	default: false,
+	desc: "强制进入有歌词样式背景",
+});
+
 export const enableWSPlayer = atomWithConfig({
 	key: "enable-ws-player",
 	default: false,

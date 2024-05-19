@@ -55,10 +55,10 @@ $player-size-fract: 1fr
         grid-column: info-side
         grid-row: music-info
         // max-width: min(60vh, 40vw)
-        width: min(60vh, 38vw)
+        width: min(52vh, 38vw)
         justify-self: center
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
-        font-size: 1.9vh
+        font-size: 2.0vh
         display: flex
         flex-direction: column
         justify-content: space-around
@@ -67,14 +67,24 @@ $player-size-fract: 1fr
         @media screen and (max-height: 768px)
             margin-top: 2.0vh
             font-size: 111%
+
+    .amll-cover-shadow
+        position: absolute
+        top: 3em
+        left: -2em
+        width: 100%
+        height: 100%
+        background-size: 50%
+        background-repeat: no-repeat
+        opacity: 0.6
     .amll-cover-image
         aspect-ratio: 1/1
         grid-column: info-side
         grid-row: cover
         align-self: center
         justify-self: center
-        width: min(60vh, 38vw)
-        height: min(60vh, 38vw)
+        width: min(52vh, 38vw)
+        height: min(52vh, 38vw)
         transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)
         image-rendering: auto
         background-position: center

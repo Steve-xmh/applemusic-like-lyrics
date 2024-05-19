@@ -66,6 +66,8 @@ export const defaultAMLLConfig = {
 	disableMixBlendMode: false,
 	/** 显示实时背景音频状态数据 */
 	showBackgroundFftLowFreq: false,
+	/** 强制进入有歌词样式背景 */
+	forceHasLyricsBackgroundAtom: false,
 	/** 是否启用歌词播放器连接 */
 	enableWsPlayer: false,
 	/** 将会连接到的歌词播放器的地址 */

@@ -9,6 +9,7 @@ import {
 	backgroundMaxFPSAtom,
 	backgroundRenderScaleAtom,
 	showBackgroundFFTLowFreqAtom,
+	forceHasLyricsBackgroundAtom,
 	backgroundFlowSpeedAtom,
 } from "../../components/config/atoms";
 import {
@@ -42,6 +43,7 @@ export const Background: FC = () => {
 	const musicCoverUrl = useAtomValue(displayMusicCoverAtom);
 	const backgroundMaxFPS = useAtomValue(backgroundMaxFPSAtom);
 	const showBackgroundFFTLowFreq = useAtomValue(showBackgroundFFTLowFreqAtom);
+	const forceHasLyricsBackground = useAtomValue(forceHasLyricsBackgroundAtom);
 	const forceOverrideBgRenderer = useAtomValue(forceOverrideBgRendererAtom);
 	const backgroundRenderScale = useAtomValue(backgroundRenderScaleAtom);
 	const flowSpeed = useAtomValue(backgroundFlowSpeedAtom);
@@ -243,11 +245,12 @@ export const Background: FC = () => {
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
 						hasLyric={
-							lyricLines.state === "hasData" && lyricLines.data.length > 0
-								? true
-								: lyricLines.state === "loading"
-									? undefined
-									: false
+							forceHasLyricsBackground ? true :
+								lyricLines.state === "hasData" && lyricLines.data.length > 0
+									? true
+									: lyricLines.state === "loading"
+										? undefined
+										: false
 						}
 						flowSpeed={flowSpeed}
 						renderer={targetRenderer}

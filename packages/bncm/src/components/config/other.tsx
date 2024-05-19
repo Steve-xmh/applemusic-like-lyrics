@@ -11,6 +11,7 @@ import {
 	showStatsAtom,
 	showTutoialAtom,
 	usePlayPositionLerpAtom,
+	forceHasLyricsBackgroundAtom,
 } from "./atoms";
 
 export const OtherConfig: FC = () => {
@@ -25,6 +26,11 @@ export const OtherConfig: FC = () => {
 				<SwitchConfigComponent
 					atom={showBackgroundFFTLowFreqAtom}
 					label="显示实时背景音频状态数据"
+				/>
+				<GroupBoxDevider />
+				<SwitchConfigComponent
+					atom={forceHasLyricsBackgroundAtom}
+					label="强制进入有歌词样式背景"
 				/>
 			</GroupBox>
 			<GroupBox>
