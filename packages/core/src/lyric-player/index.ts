@@ -50,6 +50,7 @@ export interface LyricLineMouseEventListener {
 export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
 	private currentTime = 0;
+	private lastCurrentTime = 0;
 	private lyricLines: LyricLine[] = [];
 	private processedLines: LyricLine[] = [];
 	private lyricLinesEl: LyricLineEl[] = [];
@@ -942,6 +943,11 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.initializeSeeking = isSeek;
 		this.currentTime = time;
+		// console.log(Math.abs(this.currentTime - this.lastCurrentTime));
+		if (Math.abs(this.currentTime - this.lastCurrentTime) >= 100) {
+			this.initializeSeeking = true;
+		}
+		else this.initializeSeeking = false;
 		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic() && !this.supportMaskImage)
 			this.element.style.setProperty("--amll-player-time", `${time}`);
@@ -1068,6 +1074,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.calcLayout();
 			}
 		}
+		this.lastCurrentTime = time;
 	}
 	/**
 	 * 暂停部分效果演出，目前会暂停播放间奏点的动画

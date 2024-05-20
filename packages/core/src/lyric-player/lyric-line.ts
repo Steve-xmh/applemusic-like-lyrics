@@ -382,7 +382,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							this.totalDuration,
 							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
 						);
-						a.playbackRate = 1;
+						a.playbackRate = 0.8;
 					}
 				} else {
 					a.currentTime = Math.min(
@@ -791,7 +791,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							}em, ${-transX * 0.03 * amount}em)`,
 						textShadow: `0 0 ${Math.min(
 							0.3,
-							blur * 0.4,
+							blur * 0.2,
 						)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
@@ -848,7 +848,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private get totalDuration() {
 		return (
 			this.lyricLine.endTime +
-			(this.lyricAdvanceDynamicLyricTime ? 300 : 0) -
+			(this.lyricAdvanceDynamicLyricTime ? 400 : 0) -
 			this.lyricLine.startTime
 		);
 	}
