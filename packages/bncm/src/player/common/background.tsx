@@ -1,5 +1,5 @@
-import { atom, useAtomValue } from "jotai";
-import { useState, type FC, useEffect, useMemo } from "react";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { useState, type FC, useEffect, useMemo, useLayoutEffect } from "react";
 import {
 	backgroundStaticModeAtom,
 	backgroundTypeAtom,
@@ -31,6 +31,9 @@ import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
 import { lyricLinesAtom } from "../../lyric/provider";
 
+import { playStatusAtom } from "../../music-context/wrapper";
+import { PlayState } from "../../music-context";
+
 type AnyRenderer = { new(canvas: HTMLCanvasElement): BaseRenderer };
 
 export const forceOverrideBgRendererAtom = atom<{
@@ -57,6 +60,8 @@ export const Background: FC = () => {
 	const backgroundType = useAtomValue(backgroundTypeAtom);
 	const [lowFreqVolume, setLowFreqVolume] = useState(1);
 	const [dbgValue, setDbgValue] = useState<number[]>([]);
+
+	const playstate = useAtomValue(playStatusAtom);
 
 	const gradient: number[] = [];
 
@@ -138,6 +143,16 @@ export const Background: FC = () => {
 		return difference > 0.35 ? maxInInterval : minInInterval * 0.5 ** 2;
 	}
 
+	let pausing = false;
+
+	useLayoutEffect(() => {
+		if (playstate === PlayState.Pausing) {
+			pausing = true;
+		} else {
+			pausing = false;
+		}
+	}, [playstate]);
+
 	useEffect(() => {
 		let curValue = 1;
 
@@ -181,7 +196,14 @@ export const Background: FC = () => {
 			// }
 
 			// lastValue = value;
-			const value = gradient;
+			let value = gradient;
+
+			// console.log(playstate);
+
+			if (pausing) {
+				value = 0;
+			}
+
 			// count++;
 			setLowFreqVolume(curValue);
 
