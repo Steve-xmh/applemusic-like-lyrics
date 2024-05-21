@@ -63,7 +63,8 @@ async function getLyric(
 	signal?: AbortSignal,
 ): Promise<EAPILyricResponse> {
 	const v = await fetch(
-		`${window?.APP_CONF?.domain ?? "https://music.163.com"
+		`${
+			window?.APP_CONF?.domain ?? "https://music.163.com"
 		}/api/song/lyric/v1?tv=0&lv=0&rv=0&kv=0&yv=0&ytv=0&yrv=0&cp=false&id=${songId}`,
 		{
 			signal,
@@ -72,7 +73,7 @@ async function getLyric(
 		throw v;
 	});
 	if (v.ok) return await v.json();
-	else throw v.statusText;
+	throw v.statusText;
 }
 
 export const getLyricFromNCMAtom = atom({ getLyric });
@@ -106,21 +107,38 @@ type TransLine = {
 
 function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 	if (
-		line.words.length === 0 ||
-		line.words.reduce((pv: string, cv) => pv + cv.word, "").trim().length === 0
+		line.words
+			.map((v) => v.word)
+			.join("")
+			.trim().length === 0
 	)
 		return;
-	const joined = line.words.map((w) => w.word).join("");
-	let nearestLine: CoreLyricLine | undefined = undefined;
-	for (const coreLine of lines) {
-		if (coreLine.words.length > 0) {
+	interface PairedLine {
+		startTime: number;
+		lineText: string;
+		origIndex: number;
+		original: CoreLyricLine;
+	}
+	const processed: PairedLine[] = lines.map((v, i) => ({
+		startTime: Math.min(v.startTime, ...v.words.map((v) => v.startTime)),
+		origIndex: i,
+		lineText: v.words
+			.map((v) => v.word)
+			.join("")
+			.trim(),
+		original: v,
+	}));
+	let nearestLine: PairedLine | undefined = undefined;
+	for (const coreLine of processed) {
+		if (coreLine.lineText.length > 0) {
 			if (coreLine.startTime === line.words[0].startTime) {
 				nearestLine = coreLine;
 				break;
-			} else if (
+			}
+			if (
 				nearestLine &&
-				Math.abs(nearestLine.startTime - line.words[0].startTime) <
-				Math.abs(coreLine.startTime - line.words[0].startTime)
+				Math.abs(nearestLine.startTime - line.words[0].startTime) >
+					Math.abs(coreLine.startTime - line.words[0].startTime)
 			) {
 				nearestLine = coreLine;
 			} else if (nearestLine === undefined) {
@@ -129,8 +147,10 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 		}
 	}
 	if (nearestLine) {
-		if (nearestLine[key].length > 0) nearestLine[key] += joined;
-		else nearestLine[key] = joined;
+		const joined = line.words.map((w) => w.word).join("");
+		if (nearestLine.original[key].length > 0)
+			nearestLine.original[key] += joined;
+		else nearestLine.original[key] = joined;
 	}
 }
 
@@ -208,17 +228,11 @@ async function getLyricFromExternal(
 				);
 		}
 		if (!showTranslatedLine)
-			lines.forEach((line) => {
-				line.translatedLyric = "";
-			});
-		if (!showRomanLine)
-			lines.forEach((line) => {
-				line.romanLyric = "";
-			});
+			for (const line of lines) line.translatedLyric = "";
+		if (!showRomanLine) for (const line of lines) line.romanLyric = "";
 		return lines;
-	} else {
-		return undefined;
 	}
+	return undefined;
 }
 
 async function getLyricFromDB(
@@ -252,17 +266,11 @@ async function getLyricFromDB(
 			// TODO: 提供歌词元数据
 			const lines = parseTTML(await res.text()).lyricLines;
 			if (!showTranslatedLine)
-				lines.forEach((line) => {
-					line.translatedLyric = "";
-				});
-			if (!showRomanLine)
-				lines.forEach((line) => {
-					line.romanLyric = "";
-				});
+				for (const line of lines) line.translatedLyric = "";
+			if (!showRomanLine) for (const line of lines) line.romanLyric = "";
 			return lines;
-		} else {
-			return undefined;
 		}
+		return undefined;
 	} catch {
 		return undefined;
 	}
@@ -296,6 +304,7 @@ async function getLyricFromNCM(
 
 		if (showTranslatedLine && currentRawLyricResp?.ytlrc?.lyric) {
 			const trans = parseLrc(currentRawLyricResp.ytlrc.lyric);
+			log("已解析译文歌词", JSON.parse(JSON.stringify(trans)));
 			if (trans.length === converted.length) {
 				trans.forEach((line, i) => {
 					converted[i].translatedLyric = line.words
@@ -310,6 +319,7 @@ async function getLyricFromNCM(
 		}
 		if (showRomanLine && currentRawLyricResp?.yromalrc?.lyric) {
 			const roman = parseLrc(currentRawLyricResp.yromalrc.lyric);
+			log("已解析音译歌词", JSON.parse(JSON.stringify(roman)));
 			if (roman.length === converted.length) {
 				roman.forEach((line, i) => {
 					converted[i].romanLyric = line.words
@@ -391,7 +401,7 @@ async function getLyricFromNCM(
 	};
 }
 
-class LyricNotExistError extends Error { }
+class LyricNotExistError extends Error {}
 
 const rawLyricLinesAtom = atom({
 	state: "loading",
