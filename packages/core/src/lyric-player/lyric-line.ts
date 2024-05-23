@@ -382,7 +382,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							this.totalDuration,
 							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
 						);
-						a.playbackRate = 0.8;
+						a.playbackRate = 1;
 					}
 				} else {
 					a.currentTime = Math.min(
