@@ -8,6 +8,8 @@
 
 这是你能在前端系里能见到的最像 iPad Apple Music 的播放页面了。
 
+尽管这个项目的目标并非完全模仿，但是会更好地打磨一些细节，以优于现阶段最好的歌词播放器。
+
 **—— AMLL 生态作品 ——**
 
 [AMLL TTML DB 逐词歌词仓库](https://github.com/Steve-xmh/amll-ttml-db)
