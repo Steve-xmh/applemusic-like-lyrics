@@ -172,86 +172,86 @@ export class MusicContextAMLLPlayer extends MusicContextBase {
 				break;
 		}
 	}
-	override getMusicId(): string {
+	getMusicId(): string {
 		return this.musicId;
 	}
-	override getMusicDuration(): number {
+	getMusicDuration(): number {
 		return this.musicDuration;
 	}
-	override getMusicName(): string {
+	getMusicName(): string {
 		return this.musicName;
 	}
-	override getMusicArtists(): Artist[] {
+	getMusicArtists(): Artist[] {
 		return this.musicArtists;
 	}
-	override getMusicQuality(): AudioQualityType {
+	getMusicQuality(): AudioQualityType {
 		return AudioQualityType.HiRes;
 	}
-	override getMusicCoverImage(): string {
+	getMusicCoverImage(): string {
 		return this.musicCoverImage;
 	}
-	override getMusicAlbumId(): string {
+	getMusicAlbumId(): string {
 		return this.musicAlbumId;
 	}
-	override getMusicAlbumName(): string {
+	getMusicAlbumName(): string {
 		return this.musicAlbumName;
 	}
-	override getPlayState(): PlayState {
+	getPlayState(): PlayState {
 		// throw new Error("Method not implemented.");
 		return PlayState.Playing;
 	}
-	override getPlayMode(): PlayMode {
+	getPlayMode(): PlayMode {
 		// throw new Error("Method not implemented.");
 		return PlayMode.Random;
 	}
-	override setPlayMode(playMode: PlayMode): void {
+	setPlayMode(playMode: PlayMode): void {
 		// throw new Error("Method not implemented.");
 	}
-	override seekToPosition(timeMS: number): void {
+	seekToPosition(timeMS: number): void {
 		// throw new Error("Method not implemented.");
 	}
-	override forwardSong(): void {
+	forwardSong(): void {
 		// throw new Error("Method not implemented.");
 	}
-	override rewindSong(): void {
+	rewindSong(): void {
 		// throw new Error("Method not implemented.");
 	}
-	override setVolume(value: number): void {
+	setVolume(value: number): void {
 		// throw new Error("Method not implemented.");
 		this.volume = value;
 	}
-	override getVolume(): number {
+	getVolume(): number {
 		// throw new Error("Method not implemented.");
 		return 0.5;
 	}
-	override pause(): void {
+	pause(): void {
 		// throw new Error("Method not implemented.");
 	}
-	override resume(): void {
+	resume(): void {
 		// throw new Error("Method not implemented.");
 	}
-	override getDataDir(): string {
+	getDataDir(): string {
 		return this.dataDir;
 	}
-	override isFileExists(path: string): Promise<boolean> {
+	isFileExists(path: string): Promise<boolean> {
 		return exists(path);
 	}
-	override makeDirectory(path: string): Promise<void> {
+	makeDirectory(path: string): Promise<void> {
 		return createDir(path);
 	}
-	override readFileText(path: string): Promise<string> {
+	readFileText(path: string): Promise<string> {
 		return readTextFile(path);
 	}
-	override writeFileText(path: string, data: string): Promise<void> {
+	writeFileText(path: string, data: string): Promise<void> {
 		return writeTextFile(path, data);
 	}
-	override deleteFile(path: string): Promise<void> {
+	deleteFile(path: string): Promise<void> {
 		return removeFile(path);
 	}
-	override dispose(): void {
+	dispose(): void {
 		this.cancel();
 	}
-	override async setFullscreen(isFullscreen?: boolean): Promise<void> {
+	async setFullscreen(isFullscreen?: boolean): Promise<void> {
 		if (isFullscreen) {
 			getCurrent().setFullscreen(isFullscreen)
 		} else {

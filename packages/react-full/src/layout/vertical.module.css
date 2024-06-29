@@ -1,0 +1,95 @@
+.verticalLayout {
+    display: grid;
+    grid-template-rows:
+        /* 保证可以拖动窗口的区域 */
+        [drag-area] 20px
+        /* 控制条的空间 */
+        [thumb] 30px
+        /* 主视图，包括是否展示歌词的两种布局 */
+        [main-view] 1fr
+        /* 主要控制栏的区域 */
+        [control] 0fr;
+    gap: 2px;
+}
+
+.thumb {
+    grid-row: thumb;
+    
+    border: 1px solid aqua;
+
+    @media screen and (max-width: 768px) {
+        margin: 4px
+    }
+}
+
+/* 封面的位置由 JS 设定 */
+.cover {
+    aspect-ratio: 1 / 1;
+    position: absolute;
+}
+
+.lyricLayout {
+    grid-row: main-view;
+    /* 强制和 .noLyricLayout 占用同一区域 */
+    grid-column: 1 / 2;
+    display: grid;
+    grid-template-rows:
+        1em [controls] 0fr [lyric-view] 1fr;
+    grid-template-columns:
+        3em [cover-side] 0fr [info-side] 1fr 3em;
+}
+
+.noLyricLayout {
+    grid-row: main-view;
+    /* 强制和 .lyricLayout 占用同一区域 */
+    grid-column: 1 / 2;
+    overflow-y: hidden;
+    display: grid;
+    grid-template-rows:
+        1em [cover-view] 0fr [lyric-view] 1fr;
+    grid-template-columns:
+        3em [main-view] 1fr 3em;
+}
+
+/* 辅助定位的小封面图位置 */
+.phonySmallCover {
+    grid-row: controls;
+    grid-column: cover-side;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
+    
+    width: 6em;
+
+    border: 1px solid greenyellow;
+}
+
+/* 辅助定位的大封面图位置 */
+.phonyBigCover {
+    grid-row: cover-view;
+    grid-column: 2 / 3;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
+    
+    border: 1px solid pink;
+}
+
+.smallControls {
+    grid-row: controls;
+    grid-column: info-side;
+    
+    border: 1px solid yellow;
+}
+
+.lyric {
+    grid-row: lyric-view;
+    grid-column: 1 / 5;
+    
+    border: 1px solid blue;
+}
+
+.bigControls {
+    grid-row: lyric-view;
+    grid-column: 2 / 3;
+    
+    border: 1px solid red;
+}

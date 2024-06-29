@@ -1,0 +1,56 @@
+.horizontalLayout {
+    /* --info-size-fract: 0.85fr; */
+    /* --player-size-fract: 1fr; */
+    position: relative;
+    display: grid;
+    grid-template-rows:
+        [drag-area] minmax(30px, 0.9fr)
+        [thumb] auto
+        [cover] auto
+        [music-info] 3fr
+        1fr;
+    grid-template-columns:
+        [info-side] 0.85fr
+        [player-side] 1fr;
+    gap: 8px;
+    transition: 0.5s ease-in-out;
+    left: 0%;
+    &.hideLyric {
+        /* percentage(calc((1 - var(--info-size-fract) / (var(--info-size-fract) + var(--player-size-fract))) / 2)) */
+        left: 27.02702702702703%;
+        .lyric {
+            transition: opacity 0.5s cubic-bezier(0.5, 0, 0.5, 1), transform 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+            opacity: 0;
+        }
+    }
+}
+
+.thumb {
+    grid-column: info-side;
+    grid-row: thumb;
+    margin: 2vh;
+}
+
+.cover {
+    aspect-ratio: 1/1;
+    grid-column: info-side;
+    grid-row: cover;
+    align-self: center;
+    justify-self: center;
+    width: min(52vh, 38vw);
+    height: min(52vh, 38vw);
+}
+
+.controls {
+    grid-column: info-side;
+    grid-row: music-info;
+    justify-self: center;
+}
+
+.lyric {
+    grid-column: player-side;
+    grid-row: 1 / 7;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.5s 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+}

@@ -166,6 +166,7 @@ __metadata:
     "@pixi/sprite": "npm:^7.2.4"
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.0.3"
+    classnames: "npm:^2.5.1"
     jss: "npm:^10.10.0"
     jss-preset-default: "npm:^10.10.0"
     react: "npm:^18.2.0"

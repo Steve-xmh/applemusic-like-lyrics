@@ -112,6 +112,6 @@ export const defaultAMLLConfig = {
 	showColumeSliderType: true,
 	/** 是否进行可视化动画频谱数据的后处理以更适合观赏 */
 	processBarFft: true,
-};
+} as const;
 
 export type AMLLConfig = typeof defaultAMLLConfig;

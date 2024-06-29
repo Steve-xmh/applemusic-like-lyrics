@@ -14,6 +14,10 @@ export default defineConfig({
 		rollupOptions: {
 			external: ["react", "react-dom", "react/jsx-runtime", "@applemusic-like-lyrics/core"],
 		},
+		cssMinify: 'lightningcss',
+	},
+	css: {
+		transformer: 'lightningcss'
 	},
 	plugins: [
 		react(),

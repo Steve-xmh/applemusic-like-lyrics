@@ -54,7 +54,8 @@
     "vite-plugin-dts": "^3.6.0"
   },
   "dependencies": {
-    "@applemusic-like-lyrics/core": "^0.1.3"
+    "@applemusic-like-lyrics/core": "^0.1.3",
+    "classnames": "^2.5.1"
   },
   "peerDependencies": {
     "react": "*",
