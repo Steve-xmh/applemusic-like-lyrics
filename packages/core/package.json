@@ -61,6 +61,7 @@
     "jss-preset-default": "*"
   },
   "dependencies": {
-    "bezier-easing": "^2.1.0"
+    "bezier-easing": "^2.1.0",
+    "gl-matrix": "^4.0.0-beta.2"
   }
 }

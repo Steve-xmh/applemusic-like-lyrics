@@ -6,7 +6,7 @@
  */
 
 import GUI from "lil-gui";
-import { BackgroundRender, PixiRenderer, EplorRenderer } from "./bg-render";
+import { BackgroundRender, PixiRenderer, EplorRenderer, MeshGradientRenderer } from "./bg-render";
 import Stats from "stats.js";
 import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
@@ -28,9 +28,9 @@ const debugValues = {
 	music: new URL(location.href).searchParams.get("music") || "",
 	album: new URL(location.href).searchParams.get("album") || "",
 	enableSpring: true,
-	bgFPS: 30,
-	bgMode: new URL(location.href).searchParams.get("bg") || "eplor",
-	bgScale: 0.5,
+	bgFPS: 60,
+	bgMode: new URL(location.href).searchParams.get("bg") || "mg",
+	bgScale: 1,
 	bgFlowSpeed: 2,
 	bgPlaying: true,
 	bgStaticMode: true,
@@ -88,13 +88,16 @@ function recreateBGRenderer(mode: string) {
 	window.globalBackground?.dispose();
 	if (mode === "pixi") {
 		window.globalBackground = BackgroundRender.new(PixiRenderer);
+	} else if (mode === "mg") {
+		window.globalBackground = BackgroundRender.new(MeshGradientRenderer);
 	} else if (mode === "eplor") {
 		window.globalBackground = BackgroundRender.new(EplorRenderer);
 	} else {
 		throw new Error("Unknown renderer mode");
 	}
 	const bg = window.globalBackground;
-	bg.setFPS(30);
+	bg.setFPS(debugValues.bgFPS);
+	bg.setRenderScale(debugValues.bgScale)
 	bg.setStaticMode(debugValues.bgStaticMode);
 	bg.getElement().style.position = "absolute";
 	bg.getElement().style.top = "0";
@@ -258,6 +261,7 @@ declare global {
 		globalLyricPlayer: LyricPlayer;
 		globalBackground:
 			| BackgroundRender<PixiRenderer>
+			| BackgroundRender<MeshGradientRenderer>
 			| BackgroundRender<EplorRenderer>;
 	}
 }
@@ -297,9 +301,9 @@ async function loadLyric() {
 }
 
 const lys = String.raw`
-[35610,4170](35610,360,0)I (35970,540,0)cast (36510,390,0)us (36900,390,0)out (37290,1050,0)of (38340,1440,0)paradise
 `.trim();
 // [0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
+// [35610,4170](35610,360,0)I (35970,540,0)cast (36510,390,0)us (36900,390,0)out (37290,1050,0)of (38340,1440,0)paradise
 
 const l = parseYrc(lys).map(mapLyric);
 
@@ -319,6 +323,6 @@ const l = parseYrc(lys).map(mapLyric);
 	await loadLyric();
 	lyricPlayer.setLyricLines(l);
 	// debugValues.play();
-	debugValues.currentTime = 34;
-	debugValues.mockPlay();
+	// debugValues.currentTime = 34;
+	// debugValues.mockPlay();
 })();

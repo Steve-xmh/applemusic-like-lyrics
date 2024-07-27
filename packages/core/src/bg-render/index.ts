@@ -7,6 +7,7 @@
 export { AbstractBaseRenderer, BaseRenderer } from "./base";
 import { AbstractBaseRenderer, BaseRenderer } from "./base";
 export { PixiRenderer } from "./pixi-renderer";
+export { MeshGradientRenderer } from "./mg-renderer";
 export { EplorRenderer } from "./eplor-renderer";
 
 export class BackgroundRender<Renderer extends BaseRenderer>

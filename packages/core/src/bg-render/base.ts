@@ -146,4 +146,7 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 		this.observer.disconnect();
 		this.canvas.remove();
 	}
+	override getElement(): HTMLElement {
+		return this.canvas;
+	}
 }

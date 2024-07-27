@@ -98,6 +98,7 @@ yarn lerna run build --scope "@applemusic-like-lyrics/*" # 发行构建
 ## 鸣谢
 
 - [woshizja/sound-processor](https://github.com/woshizja/sound-processor)
+- [MovingParts - Gradient Meshes in SceneKit](https://movingparts.io/gradient-meshes)
 - 还有很多被 AMLL 使用的框架和库，非常感谢！
 
 ### 特别鸣谢
