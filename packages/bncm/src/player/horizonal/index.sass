@@ -55,7 +55,7 @@ $player-size-fract: 1fr
         grid-column: info-side
         grid-row: music-info
         // max-width: min(60vh, 40vw)
-        width: min(52vh, 38vw)
+        width: min(58vh, 38vw)
         justify-self: center
         mix-blend-mode: var(--amll-lyric-mix-blend-mode, plus-lighter)
         font-size: 2.0vh
@@ -83,8 +83,8 @@ $player-size-fract: 1fr
         grid-row: cover
         align-self: center
         justify-self: center
-        width: min(52vh, 38vw)
-        height: min(52vh, 38vw)
+        width: min(58vh, 38vw)
+        height: min(58vh, 38vw)
         transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1)
         image-rendering: auto
         background-position: center
@@ -108,6 +108,7 @@ $player-size-fract: 1fr
             box-shadow: $base-box-shadow-v-0 0px $base-box-shadow-y-0 $base-box-shadow-r-0, $base-box-shadow-v-1 0px $base-box-shadow-y-1 $base-box-shadow-r-1
         &.hide-cursor
             cursor: none
+
     .amll-music-name
         white-space: nowrap
         line-height: normal
@@ -117,6 +118,7 @@ $player-size-fract: 1fr
         font-weight: 400
         letter-spacing: 0.4px
         opacity: 0.9
+        mix-blend-mode: normal !important
 
     .am-music-main-menu
         aspect-ratio: 1 / 1

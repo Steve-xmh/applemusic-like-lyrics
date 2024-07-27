@@ -38,7 +38,7 @@ export const LyricPlayerVertical: FC = () => {
 			className="lyric-player-vertical"
 			style={
 				{
-					"--amll-lyric-player-font-size": "min(3.5vh, 10vw, 45px)",
+					"--amll-lyric-player-font-size": "min(3.5vh, 8vw)",
 					"--amll-lyric-font-color": fontColor,
 					"--amll-lyric-view-color": fontColor,
 					"--amll-lyric-primary-color": primaryColor,
@@ -59,7 +59,7 @@ export const LyricPlayerVertical: FC = () => {
 			{showControlThumb && <ControlThumb />}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-				loadableMusicOverrideData.data.musicCoverIsVideo ? (
+					loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
@@ -104,7 +104,7 @@ export const LyricPlayerVertical: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => {}, []);
+					channel.call("winhelper.dragWindow", () => { }, []);
 				}}
 			/>
 			<MusicInfo />

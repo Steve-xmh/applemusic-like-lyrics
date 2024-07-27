@@ -96,15 +96,20 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		stiffness: 100,
 	};
 	private posYSpringParams: Partial<SpringParams> = {
-		mass: 0.75,
+		mass: 0.9,
 		damping: 15,
-		stiffness: 100,
-	};
-	private scaleSpringParams: Partial<SpringParams> = {
-		mass: 1,
-		damping: 20,
 		stiffness: 90,
 	};
+	private scaleSpringParams: Partial<SpringParams> = {
+		mass: 2,
+		damping: 25,
+		stiffness: 100,
+	};
+	// private scaleSpringParams: Partial<SpringParams> = {
+	// 	mass: 1,
+	// 	damping: 25,
+	// 	stiffness: 40,
+	// };
 	private scaleForBGSpringParams: Partial<SpringParams> = {
 		mass: 1,
 		damping: 20,
@@ -194,7 +199,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(min(4.7vh, 8vw), 12px))",
+			fontSize: "var(--amll-lyric-player-font-size,max(max(4.7vh, 3.2vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
@@ -223,7 +228,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			// margin: "0 -1em",
 			contain: "content",
 			willChange: "filter,transform,opacity",
-			transition: "filter 0.2s ease, background-color 0.25s, box-shadow 0.25s",
+			transition: "filter 0.2s, background-color 0.25s, box-shadow 0.25s",
 			boxSizing: "content-box",
 			borderRadius: "16px",
 			"&:has(>*):hover": {
@@ -260,7 +265,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			transformOrigin: "right",
 		},
 		lyricMainLine: {
-			transition: "opacity 0.25s 0.1s",
+			transition: "opacity 0.3s 0.1s",
 			willChange: "opacity",
 			margin: "-1em",
 			padding: "1em",
@@ -486,6 +491,18 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						-2,
 						this.processedLines[0].isDuet,
 					];
+				} else {
+					if (
+						this.processedLines[1].startTime > currentTime &&
+						this.processedLines[0].endTime < currentTime
+					) {
+						return [
+							Math.max(this.processedLines[0].endTime, currentTime),
+							this.processedLines[1].startTime,
+							0,
+							this.processedLines[1].isDuet,
+						];
+					}
 				}
 			}
 		} else if (
@@ -501,6 +518,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					this.processedLines[i + 1].startTime,
 					i,
 					this.processedLines[i + 1].isDuet,
+				];
+			} else if (
+				this.processedLines[i + 2]?.startTime &&
+				this.processedLines[i + 2].startTime > currentTime &&
+				this.processedLines[i + 1].endTime < currentTime
+			) {
+				return [
+					Math.max(this.processedLines[i + 1].endTime, currentTime),
+					this.processedLines[i + 2].startTime,
+					i + 1,
+					this.processedLines[i + 2].isDuet,
 				];
 			}
 		}
@@ -624,24 +652,25 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					...line,
 				};
 			});
+
 		this.isNonDynamic = true;
-		this.isNonDuet = true;
-		for (const line of this.processedLines) {
+		this.processedLines.forEach((line) => {
 			if (line.words.length > 1) {
 				this.isNonDynamic = false;
-				break;
 			}
-		}
-		for (const line of this.processedLines) {
+		});
+		this.isNonDuet = true;
+		this.processedLines.forEach((line) => {
 			if (line.isDuet) {
 				this.isNonDuet = false;
-				break;
 			}
-		}
+		});
+		this.rebuildStyle();
+
 		this.processedLines.forEach((line, i, lines) => {
 			const nextLine = lines[i + 1];
 			const lastWord = line.words[line.words.length - 1];
-			if (lastWord && shouldEmphasize(lastWord)) {
+			if (lastWord) {
 				if (nextLine) {
 					if (nextLine.startTime > line.endTime) {
 						line.endTime = Math.min(line.endTime + 1500, nextLine.startTime);
@@ -675,6 +704,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			return lineEl;
 			// }
 		});
+
 		// while (prevLinesEl.length > this.processedLines.length) {
 		// 	const rest = prevLinesEl.pop();
 		// 	rest?.removeEventListener("click", this.onLineClickedHandler);
@@ -745,7 +775,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		let interludeDuration = 0;
 		if (interlude) {
 			interludeDuration = interlude[1] - interlude[0];
-			if (interludeDuration >= 5000) {
+			if (interludeDuration >= 4000) {
 				const nextLine = this.lyricLinesEl[interlude[2] + 1];
 				if (nextLine) {
 					targetAlignIndex = interlude[2] + 1;
@@ -754,7 +784,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		} else {
 			this.interludeDots.setInterlude(undefined);
 		}
-		const SCALE_ASPECT = this.enableScale ? 0.97 : 1;
 		const scrollOffset = this.lyricLinesEl
 			.slice(0, targetAlignIndex)
 			.reduce(
@@ -781,7 +810,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		const latestIndex = Math.max(...this.bufferedLines);
 		let delay = 0;
-		let baseDelay = 0.04;
+		let baseDelay = 0.05;
 		let setDots = false;
 		this.lyricLinesEl.forEach((el, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
@@ -794,7 +823,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 			if (
 				!setDots &&
-				interludeDuration >= 5000 &&
+				interludeDuration >= 4000 &&
 				((i === this.scrollToIndex && interlude?.[2] === -2) ||
 					i === this.scrollToIndex + 1)
 			) {
@@ -806,20 +835,26 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				curPos += this.interludeDotsSize[1] + 40;
 			}
 			let targetOpacity: number;
+			let targetSubOpacity: number;
 
 			if (this.hidePassedLines) {
 				if (i < (interlude ? interlude[2] + 1 : this.scrollToIndex)) {
 					targetOpacity = 0;
+					targetSubOpacity = 0;
 				} else if (hasBuffered) {
-					targetOpacity = this.isNonDynamic ? 0.85 : 1;
+					targetOpacity = 0.85;
+					targetSubOpacity = 0.4;
 				} else {
-					targetOpacity = 0.6 * (this.isNonDynamic ? 0.3 : 1);
+					targetOpacity = this.isNonDynamic ? 0.2 : 1;
+					targetSubOpacity = 0.2;
 				}
 			} else {
 				if (hasBuffered) {
-					targetOpacity = this.isNonDynamic ? 0.85 : 1;
+					targetOpacity = 0.85;
+					targetSubOpacity = 0.4;
 				} else {
-					targetOpacity = 0.6 * (this.isNonDynamic ? 0.3 : 1);
+					targetOpacity = this.isNonDynamic ? 0.2 : 1;
+					targetSubOpacity = 0.2;
 				}
 			}
 
@@ -842,15 +877,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				blurLevel = 0;
 			}
 
+			const currentAbove = i < (interlude ? interlude[2] + 1 : this.scrollToIndex);
+			const SCALE_ASPECT = this.enableScale ? 97 : 100;
+
 			el.setTransform(
 				left,
 				curPos,
-				isActive ? 1 : line.isBG ? 0.75 : SCALE_ASPECT,
+				isActive ? 100 : line.isBG ? 75 : SCALE_ASPECT,
 				targetOpacity,
+				targetSubOpacity,
 				window.innerWidth <= 1024 ? blurLevel * 0.8 : blurLevel,
 				force,
 				delay,
-				i < (interlude ? interlude[2] + 1 : this.scrollToIndex),
+				currentAbove,
 			);
 			// console.log(i, el._getDebugTargetPos());
 			if (line.isBG && isActive) {
@@ -858,15 +897,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
-			if (curPos >= 0 && !(this.isSeeking || this.initializeSeeking)) {
-				delay += baseDelay;
-				if (i >= this.scrollToIndex) baseDelay *= 1.2;
-				baseDelay = Math.min(baseDelay, 0.05);
+			if (curPos >= 0 && !(this.isSeeking)) {
+				if (!line.isBG) delay += baseDelay;
+				// if (i >= this.scrollToIndex - 1) baseDelay *= 1.05;
+				// baseDelay = Math.min(baseDelay, 0.055);
 
 				// delay += 0.05;
 
 				// baseDelay = baseDelay > 0.15 ? 0 : baseDelay;
 				// delay = (i - this.scrollToIndex) * 0.06;
+				if (i >= this.scrollToIndex) baseDelay /= 1.05;
+				// baseDelay = Math.max(baseDelay, 0.04);
 			}
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
@@ -922,7 +963,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * @param alignPosition 一个 `[0.0-1.0]` 之间的任意数字，代表组件高度由上到下的比例位置
 	 */
 	setAlignPosition(alignPosition: number) {
-		this.alignPosition = alignPosition - 0.02;
+		this.alignPosition = alignPosition;
 	}
 	/**
 	 * 设置当前播放进度，单位为毫秒且**必须是整数**，此时将会更新内部的歌词进度信息

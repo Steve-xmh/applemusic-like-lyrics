@@ -26,9 +26,10 @@ const EMP_EASING_MID = 0.5;
 const beginNum = norNum(0, EMP_EASING_MID);
 const endNum = norNum(EMP_EASING_MID, 1);
 
+const bezIn = bezier(0.2, 0.4, 0.58, 1.0);
+const bezOut = bezier(0.3, 0.0, 0.58, 1.0);
+
 const makeEmpEasing = (mid: number) => {
-	const bezIn = bezier(0.3, 0.5, 0.5, 1);
-	const bezOut = bezier(0.28, 0.2, 0.5, 1);
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
@@ -54,11 +55,38 @@ let lastWord: RealWord | undefined;
 // 	];
 // }
 
+// function generateFadeGradient(
+// 	width: number,
+// 	padding = 0,
+// 	bright = "rgba(0,0,0,var(--bright-mask-alpha, 1.0))",
+// 	dark = "rgba(0,0,0,0.3)",
+// 	brightAlpha = 1.0 // 新增参数：用于动态调整 bright alpha 值
+// ) {
+// 	const totalAspect = 2 + width + padding;
+// 	const widthInTotal = width / totalAspect;
+// 	const leftPos = (1 - widthInTotal) / 2;
+
+// 	const steps = 50;
+// 	const gradientStops = [];
+// 	const brightAlphaValue = parseFloat(bright.slice(-4, -1)) * brightAlpha; // 动态调整 bright alpha 值
+// 	for (let i = 0; i <= steps; i++) {
+// 		const progress = i / steps;
+// 		const intensity = 0.5 * (1 - Math.cos(Math.PI * progress));
+// 		const darkAlpha = parseFloat(dark.slice(-4, -1));
+// 		const color = `rgba(0,0,0,${darkAlpha * intensity + brightAlphaValue * (1 - intensity)})`;
+// 		const position = leftPos * 100 + (progress * widthInTotal * 100);
+// 		gradientStops.push(`${color} ${position}%`);
+// 	}
+// 	const gradientString = `linear-gradient(to right, ${gradientStops.join(", ")})`;
+
+// 	return [gradientString, totalAspect];
+// }
+
 function generateFadeGradient(
 	width: number,
 	padding = 0,
-	bright = "rgba(0,0,0,0.85)",
-	dark = "rgba(0,0,0,0.3)",
+	bright = "rgba(0,0,0,var(--bright-mask-alpha, 1.0))",
+	dark = "rgba(0,0,0,var(--dark-mask-alpha, 1.0))",
 ): [string, number] {
 	const totalAspect = 2 + width + padding;
 	const widthInTotal = width / totalAspect;
@@ -69,6 +97,7 @@ function generateFadeGradient(
 		totalAspect,
 	];
 }
+
 
 // 将输入的单词重新分组，之间没有空格的单词将会组合成一个单词数组
 // 例如输入：["Life", " ", "is", " a", " su", "gar so", "sweet"]
@@ -180,6 +209,17 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 	}
 }
 
+function getScaleFromTransform(transform: string): number {
+	const match = transform.match(/matrix\(([^)]+)\)/);
+	if (match) {
+		const values = match[1].split(', ');
+		const scaleX = parseFloat(values[0]);
+		const scaleY = parseFloat(values[3]);
+		return (scaleX + scaleY) / 2; // Average of scaleX and scaleY
+	}
+	return 1; // Default scale value if not found
+}
+
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
 	? evt
@@ -205,7 +245,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	readonly lineTransforms = {
 		posX: new Spring(0),
 		posY: new Spring(0),
-		scale: new Spring(1),
+		scale: new Spring(100),
 	};
 
 	/**
@@ -373,7 +413,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							this.splittedWords[i - 1],
 							this.splittedWords[i],
 						) &&
-						current < start - 300
+						current < start
 					) {
 						a.currentTime = start;
 						a.playbackRate = 1;
@@ -526,8 +566,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
 				.getCurrentPosition()
-				.toFixed(1)}px) scale(${this.lineTransforms.scale
-					.getCurrentPosition()
+				.toFixed(1)}px) scale(${(this.lineTransforms.scale
+					.getCurrentPosition() / 100)
 					.toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
@@ -738,36 +778,23 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let blur = du / 3000;
 		blur = blur > 1 ? Math.sqrt(blur) : blur ** 3;
 		amount *= 0.6;
-		blur *= 0.8;
+		blur *= 0.5;
 		if (
 			this.lyricLine.words.length > 0 &&
 			word.word.includes(
 				this.lyricLine.words[this.lyricLine.words.length - 1].word,
 			)
 		) {
-			amount *= 2.0;
+			amount *= 1.6;
 			blur *= 1.5;
 			du *= 1.2;
 		}
 		amount = Math.min(1.2, amount);
 		blur = Math.min(0.8, blur);
-		// if (du >= 1200 && du < 2000) {
-		// 	amount = 0.7;
-		// 	blur = 0.2;
-		// } else if (du >= 2000 && du < 3000) {
-		// 	amount = 0.9;
-		// 	blur = 0.4;
-		// } else if (du >= 3000 && du < 4000) {
-		// 	amount = 1.1;
-		// 	blur = 0.6;
-		// } else if (du >= 4000) {
-		// 	amount = 1.2;
-		// 	blur = 0.8;
-		// }
-		// console.log(word.word + " " + word.word.trim().length);
-		// const animateDu = Number.isFinite(du) ? du * (word.word.trim().length >= 4 ? 1. : 1.5) : 0;
+
 		const animateDu = Number.isFinite(du) ? du : 0;
 		const empEasing = makeEmpEasing(EMP_EASING_MID);
+
 		result = characterElements.flatMap((el, i, arr) => {
 			const wordDe = de + (du / 2.5 / arr.length) * i;
 			const result: Animation[] = [];
@@ -777,24 +804,19 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				.map((_, j) => {
 					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
 					const transX = empEasing(x);
-					// const transX = Math.sin(x * Math.PI);
-					// transX = x < EMP_EASING_MID ? transX : Math.max(transX, 0);
 					const glowLevel = empEasing(x) * blur;
-					// const floatLevel =
-					// 	Math.max(0, x < EMP_EASING_MID ? y : y - 0.5);
 
 					const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
+					const offsetX = -transX * 0.03 * amount * ((arr.length / 2 - i));
+					const offsetY = -transX * 0.025 * amount;
 
 					return {
 						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${-transX * 0.05 * amount * ((arr.length - i) / arr.length) ** 2
-							}em, ${-transX * 0.03 * amount}em)`,
-						textShadow: `0 0 ${Math.min(
-							0.3,
-							blur * 0.2,
-						)}em rgba(255, 255, 255, ${glowLevel})`,
+						transform: `${matrix4ToCSS(mat, 4)} translate(${offsetX}em, ${offsetY}em)`,
+						textShadow: `0 0 ${Math.min(0.3, blur * 0.3)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
+
 			const glow = el.animate(frames, {
 				duration: animateDu,
 				delay: Number.isFinite(wordDe) ? wordDe : 0,
@@ -845,6 +867,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 		return result;
 	}
+
+
 	private get totalDuration() {
 		return (
 			this.lyricLine.endTime +
@@ -951,6 +975,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastTime = 0;
 				const pushFrame = () => {
 					const easing = "cubic-bezier(.33,.12,.83,.9)";
+					// const easing = "cubic-bezier(.41,.07,.79,.94)";
+					// const easing = "ease-in-out";
+					// const easing = "linear";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;
@@ -1020,6 +1047,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						duration: totalDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
 						fill: "both",
+						easing: "cubic-bezier(1,1,.66,.99)",
 					});
 					ani.pause();
 					word.maskAnimations = [ani];
@@ -1037,6 +1065,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		top: number = this.top,
 		scale: number = this.scale,
 		opacity = 1,
+		subopacity = 0.4,
 		blur = 0,
 		force = false,
 		delay = 0,
@@ -1052,11 +1081,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.style.opacity = `${opacity *
-			(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
-			}`;
-		trans.style.opacity = `${opacity / 2}`;
-		roman.style.opacity = `${opacity / 2}`;
+		// main.style.opacity = `${opacity *
+		// 	(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
+		// 	}`;
+		main.style.opacity = `${opacity}`;
+		trans.style.opacity = `${subopacity}`;
+		roman.style.opacity = `${(subopacity)}`;
 		if (force || !enableSpring) {
 			this.blur = Math.min(32, roundedBlur);
 			if (force)
@@ -1106,6 +1136,20 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		} else {
 			this.hide();
 		}
+		if (this.lyricPlayer.getEnableSpring()) {
+			this.element.style.setProperty("--bright-mask-alpha", `${Math.max(0.0, Math.min(1.0, (this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97)) / 0.03) * 0.8 + 0.2}`);
+			this.element.style.setProperty("--dark-mask-alpha", `${Math.max(0.0, Math.min(1.0, (this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97)) / 0.03) * 0.2 + 0.2}`);
+		} else {
+			const computedStyle = window.getComputedStyle(this.element);
+			const transform = computedStyle.transform;
+
+			// Extract the scale value from the transform property
+			const scale = getScaleFromTransform(transform);
+
+			this.element.style.setProperty("--bright-mask-alpha", `${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.8 + 0.2}`);
+			this.element.style.setProperty("--dark-mask-alpha", `${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.2 + 0.2}`);
+		}
+
 	}
 
 	_getDebugTargetPos(): string {

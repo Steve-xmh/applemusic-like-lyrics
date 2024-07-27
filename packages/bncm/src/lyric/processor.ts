@@ -48,19 +48,21 @@ export function processLyric(original: LyricLine[]) {
 
 export function processLyric2(original: LyricLine[]) {
 	// 判断是否有括号存在的标志
-	let hasBrackets = false;
+	let needNonDynamic = false;
 
 	// 遍历原始歌词行
 	for (const origLine of original) {
 		// 检查当前歌词行中的单词是否包含括号
 		if (origLine.words.some((word) => /[\(\)（）]/.test(word.word))) {
-			hasBrackets = true;
-			break; // 如果存在括号，立即跳出循环
+			needNonDynamic = true;
 		}
+		if (origLine.words.some((word) => (word.endTime - word.startTime) >= 6000)) {
+			needNonDynamic = true;
+		}
+		if (needNonDynamic) break;
 	}
 
-	// 根据是否存在括号执行不同的逻辑
-	if (hasBrackets) {
+	if (needNonDynamic) {
 		for (const origLine of original) {
 			let newLineStr = "";
 			origLine.words.forEach((word, i) => {
@@ -70,6 +72,13 @@ export function processLyric2(original: LyricLine[]) {
 				word.word = word.word.replace("）", ") ");
 				newLineStr += word.word;
 			});
+			if (newLineStr.length > 0) {
+				if (newLineStr.charAt(0) === "'") {
+					newLineStr = newLineStr.charAt(0) + newLineStr.charAt(1).toUpperCase() + newLineStr.slice(2);
+				} else {
+					newLineStr = newLineStr.charAt(0).toUpperCase() + newLineStr.slice(1);
+				}
+			}
 			let newLine: LyricWord = {
 				word: newLineStr,
 				startTime: origLine.words[0].startTime,
@@ -83,7 +92,6 @@ export function processLyric2(original: LyricLine[]) {
 		for (const origLine of original) {
 			const newWords: LyricWord[] = [];
 			let prependWord: LyricWord | undefined = undefined;
-			// 合并单独作为标点符号的单词
 			origLine.words.forEach((word, i) => {
 				if (prependWord) {
 					word.word = prependWord.word + word.word;
@@ -106,6 +114,15 @@ export function processLyric2(original: LyricLine[]) {
 			});
 			if (prependWord) {
 				newWords.push(prependWord);
+			}
+			if (newWords.length > 0) {
+				// 处理 newWords 中整句的第一个单词
+				if (newWords[0].word.charAt(0) === "'") {
+					newWords[0].word = newWords[0].word.charAt(0) + newWords[0].word.charAt(1).toUpperCase() + newWords[0].word.slice(2);
+				} else {
+					newWords[0].word = newWords[0].word.charAt(0).toUpperCase() + newWords[0].word.slice(1);
+				}
+
 			}
 			origLine.words = newWords;
 		}
