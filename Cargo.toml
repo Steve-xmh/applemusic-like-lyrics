@@ -4,6 +4,7 @@ members = [
     "./packages/lyric",
     "./packages/fft",
     "./packages/ws-protocol",
+    "./packages/player-core",
 ]
 exclude = [
     "./packages/player/src-tauri",

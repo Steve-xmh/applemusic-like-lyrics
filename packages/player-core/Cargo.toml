@@ -1,0 +1,26 @@
+[package]
+name = "amll-player-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "^1.0"
+concat-string = "^1.0"
+cpal = "^0.15"
+futures = "0.3"
+md5 = "^0.7"
+rb = "^0.4"
+ringbuf = "^0.3"
+rubato = "^0.15"
+arrayvec = "^0.7"
+segmap = "0.1"
+serde = { version = "^1.0", features = ["derive"] }
+serde_json = "^1.0"
+spectrum-analyzer = "1.5"
+symphonia = { version = "^0.5", features = ["all"] }
+tauri-runtime = { version = "2.0.0-beta" }
+tempfile = "^3.8"
+tokio = { version = "1.35.0", features = ["time", "sync", "rt", "rt-multi-thread"] }
+tracing = "0.1"
+
+[build-dependencies]

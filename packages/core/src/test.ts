@@ -6,7 +6,12 @@
  */
 
 import GUI from "lil-gui";
-import { BackgroundRender, PixiRenderer, EplorRenderer, MeshGradientRenderer } from "./bg-render";
+import {
+	BackgroundRender,
+	PixiRenderer,
+	EplorRenderer,
+	MeshGradientRenderer,
+} from "./bg-render";
 import Stats from "stats.js";
 import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
 import { parseTTML } from "@applemusic-like-lyrics/ttml";
@@ -97,7 +102,7 @@ function recreateBGRenderer(mode: string) {
 	}
 	const bg = window.globalBackground;
 	bg.setFPS(debugValues.bgFPS);
-	bg.setRenderScale(debugValues.bgScale)
+	bg.setRenderScale(debugValues.bgScale);
 	bg.setStaticMode(debugValues.bgStaticMode);
 	bg.getElement().style.position = "absolute";
 	bg.getElement().style.top = "0";

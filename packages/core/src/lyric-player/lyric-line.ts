@@ -92,12 +92,12 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
+			(leftPos + widthInTotal) * 100
 		}%)`,
 		totalAspect,
 	];
 }
-
 
 // 将输入的单词重新分组，之间没有空格的单词将会组合成一个单词数组
 // 例如输入：["Life", " ", "is", " a", " su", "gar so", "sweet"]
@@ -212,7 +212,7 @@ export class RawLyricLineMouseEvent extends MouseEvent {
 function getScaleFromTransform(transform: string): number {
 	const match = transform.match(/matrix\(([^)]+)\)/);
 	if (match) {
-		const values = match[1].split(', ');
+		const values = match[1].split(", ");
 		const scaleX = parseFloat(values[0]);
 		const scaleY = parseFloat(values[3]);
 		return (scaleX + scaleY) / 2; // Average of scaleX and scaleY
@@ -222,8 +222,8 @@ function getScaleFromTransform(transform: string): number {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-	? evt
-	: never;
+		? evt
+		: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -565,10 +565,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-				.getCurrentPosition()
-				.toFixed(1)}px) scale(${(this.lineTransforms.scale
-					.getCurrentPosition() / 100)
-					.toFixed(4)});`;
+			.getCurrentPosition()
+			.toFixed(1)}px) scale(${(
+			this.lineTransforms.scale.getCurrentPosition() / 100
+		).toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -807,13 +807,19 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const glowLevel = empEasing(x) * blur;
 
 					const mat = scaleMatrix4(createMatrix4(), 1 + transX * 0.1 * amount);
-					const offsetX = -transX * 0.03 * amount * ((arr.length / 2 - i));
+					const offsetX = -transX * 0.03 * amount * (arr.length / 2 - i);
 					const offsetY = -transX * 0.025 * amount;
 
 					return {
 						offset: x,
-						transform: `${matrix4ToCSS(mat, 4)} translate(${offsetX}em, ${offsetY}em)`,
-						textShadow: `0 0 ${Math.min(0.3, blur * 0.3)}em rgba(255, 255, 255, ${glowLevel})`,
+						transform: `${matrix4ToCSS(
+							mat,
+							4,
+						)} translate(${offsetX}em, ${offsetY}em)`,
+						textShadow: `0 0 ${Math.min(
+							0.3,
+							blur * 0.3,
+						)}em rgba(255, 255, 255, ${glowLevel})`,
 					};
 				});
 
@@ -867,7 +873,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 		return result;
 	}
-
 
 	private get totalDuration() {
 		return (
@@ -932,9 +937,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
-					})*${w / Math.abs(word.endTime - word.startTime)
-					}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
+					word.startTime
+				})*${
+					w / Math.abs(word.endTime - word.startTime)
+				}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
@@ -1086,7 +1093,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		// 	}`;
 		main.style.opacity = `${opacity}`;
 		trans.style.opacity = `${subopacity}`;
-		roman.style.opacity = `${(subopacity)}`;
+		roman.style.opacity = `${subopacity}`;
 		if (force || !enableSpring) {
 			this.blur = Math.min(32, roundedBlur);
 			if (force)
@@ -1137,8 +1144,34 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.hide();
 		}
 		if (this.lyricPlayer.getEnableSpring()) {
-			this.element.style.setProperty("--bright-mask-alpha", `${Math.max(0.0, Math.min(1.0, (this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97)) / 0.03) * 0.8 + 0.2}`);
-			this.element.style.setProperty("--dark-mask-alpha", `${Math.max(0.0, Math.min(1.0, (this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97)) / 0.03) * 0.2 + 0.2}`);
+			this.element.style.setProperty(
+				"--bright-mask-alpha",
+				`${
+					Math.max(
+						0.0,
+						Math.min(
+							1.0,
+							this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
+						) / 0.03,
+					) *
+						0.8 +
+					0.2
+				}`,
+			);
+			this.element.style.setProperty(
+				"--dark-mask-alpha",
+				`${
+					Math.max(
+						0.0,
+						Math.min(
+							1.0,
+							this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
+						) / 0.03,
+					) *
+						0.2 +
+					0.2
+				}`,
+			);
 		} else {
 			const computedStyle = window.getComputedStyle(this.element);
 			const transform = computedStyle.transform;
@@ -1146,10 +1179,15 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			// Extract the scale value from the transform property
 			const scale = getScaleFromTransform(transform);
 
-			this.element.style.setProperty("--bright-mask-alpha", `${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.8 + 0.2}`);
-			this.element.style.setProperty("--dark-mask-alpha", `${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.2 + 0.2}`);
+			this.element.style.setProperty(
+				"--bright-mask-alpha",
+				`${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.8 + 0.2}`,
+			);
+			this.element.style.setProperty(
+				"--dark-mask-alpha",
+				`${Math.max(0.0, Math.min(1.0, (scale - 0.97) / 0.03)) * 0.2 + 0.2}`,
+			);
 		}
-
 	}
 
 	_getDebugTargetPos(): string {

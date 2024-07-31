@@ -199,7 +199,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	public readonly style = jss.createStyleSheet({
 		lyricPlayer: {
 			userSelect: "none",
-			fontSize: "var(--amll-lyric-player-font-size,max(max(4.7vh, 3.2vw), 12px))",
+			fontSize:
+				"var(--amll-lyric-player-font-size,max(max(4.7vh, 3.2vw), 12px))",
 			padding: "1em",
 			margin: "-1em",
 			width: "100%",
@@ -546,8 +547,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		if (window.innerWidth <= 1024) {
 			style += `${this.innerSize[0] - this.padding * 2}px;`;
 		} else {
-			style += `${this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 4)
-				}px;`;
+			style += `${
+				this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 4)
+			}px;`;
 		}
 		style += "--amll-lyric-player-height:";
 		style += `${this.innerSize[1] - this.padding * 4}px;`;
@@ -877,7 +879,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				blurLevel = 0;
 			}
 
-			const currentAbove = i < (interlude ? interlude[2] + 1 : this.scrollToIndex);
+			const currentAbove =
+				i < (interlude ? interlude[2] + 1 : this.scrollToIndex);
 			const SCALE_ASPECT = this.enableScale ? 97 : 100;
 
 			el.setTransform(
@@ -897,7 +900,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			} else if (!line.isBG) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			}
-			if (curPos >= 0 && !(this.isSeeking)) {
+			if (curPos >= 0 && !this.isSeeking) {
 				if (!line.isBG) delay += baseDelay;
 				// if (i >= this.scrollToIndex - 1) baseDelay *= 1.05;
 				// baseDelay = Math.min(baseDelay, 0.055);
@@ -987,8 +990,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// console.log(Math.abs(this.currentTime - this.lastCurrentTime));
 		if (Math.abs(this.currentTime - this.lastCurrentTime) >= 100) {
 			this.initializeSeeking = true;
-		}
-		else this.initializeSeeking = false;
+		} else this.initializeSeeking = false;
 		if (!this.isPageVisible) return;
 		if (!this._getIsNonDynamic() && !this.supportMaskImage)
 			this.element.style.setProperty("--amll-player-time", `${time}`);

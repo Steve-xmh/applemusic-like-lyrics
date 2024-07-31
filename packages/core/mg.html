@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AMLL Core Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="src/mg-test.ts" type="module" defer></script>
+    <style>
+        :root {
+            font-family: "SF Pro Display", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            max-width: 100vw;
+            width: 100vw;
+            max-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            background: #222;
+            margin: 0;
+        }
+
+        #bg {
+            max-height: 100vh;
+            height: 100vh;
+            max-width: 100vw;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        #result {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            width: 50em;
+            height: 20em;
+            border: solid 1px #3337;
+            background-color: #1117;
+            color: white;
+            font-family: "Fira Code", "SF Pro Display", "PingFang SC", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        #result::placeholder {
+            color: #888;
+        }
+
+        .dragger {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: solid 3px #fff8;
+            cursor: move;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="bg"></canvas>
+    <textarea id="result" placeholder="控制点代码将会在这里显示" readonly></textarea>
+</body>
+
+</html>

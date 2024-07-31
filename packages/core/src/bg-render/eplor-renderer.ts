@@ -214,7 +214,8 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${this.label
+				`Failed to compile shader for type ${type} "${
+					this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}

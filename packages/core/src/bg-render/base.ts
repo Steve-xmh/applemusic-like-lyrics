@@ -78,8 +78,8 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 			const height = Math.max(
 				1,
 				canvas.clientHeight *
-				window.devicePixelRatio *
-				this.currerntRenderScale,
+					window.devicePixelRatio *
+					this.currerntRenderScale,
 			);
 			this.onResize(width, height);
 		});
@@ -89,11 +89,11 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 		this.currerntRenderScale = scale;
 		this.onResize(
 			this.canvas.clientWidth *
-			window.devicePixelRatio *
-			this.currerntRenderScale,
+				window.devicePixelRatio *
+				this.currerntRenderScale,
 			this.canvas.clientHeight *
-			window.devicePixelRatio *
-			this.currerntRenderScale,
+				window.devicePixelRatio *
+				this.currerntRenderScale,
 		);
 	}
 	/**
