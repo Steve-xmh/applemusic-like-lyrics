@@ -6,14 +6,11 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 
 use tracing::*;
 
-use tauri::Manager;
-
 use self::audio_quality::AudioQuality;
 use serde::*;
 
 mod audio_quality;
 mod fft_player;
-mod network_audio;
 mod output;
 mod player;
 mod resampler;
@@ -32,17 +29,20 @@ pub enum SongData<T = ()> {
     Custom(T),
 }
 
-trait HasSongId {
+trait SongSource {
     fn get_id(&self) -> String;
+    async fn fetch_source(&self) -> std::result::Result<Vec<u8>, String> {
+        Err("未实现".to_string())
+    }
 }
 
-impl HasSongId for () {
+impl SongSource for () {
     fn get_id(&self) -> String {
         "".to_string()
     }
 }
 
-impl<T: HasSongId> HasSongId for SongData<T> {
+impl<T: SongSource> SongSource for SongData<T> {
     fn get_id(&self) -> String {
         match self {
             SongData::Local { file_path, .. } => format!("local:{:x}", md5::compute(file_path)),
@@ -113,6 +113,32 @@ pub enum AudioThreadMessage<T = ()> {
     SyncStatus,
 }
 
+pub type AudioPlayerEventSender<T> = tokio::sync::mpsc::Sender<AudioThreadEvent<T>>;
+
+impl<T> AudioThreadMessage<T> {
+    pub fn ret(&self, sender: AudioPlayerEventSender<T>, data: AudioThreadEvent<T>) -> AudioThreadEventMessage<T> {
+        AudioThreadEventMessage {
+            callback_id: match self {
+                AudioThreadMessage::ResumeAudio { callback_id } => callback_id,
+                AudioThreadMessage::PauseAudio { callback_id } => callback_id,
+                AudioThreadMessage::ResumeOrPauseAudio { callback_id } => callback_id,
+                AudioThreadMessage::SeekAudio { callback_id, .. } => callback_id,
+                AudioThreadMessage::JumpToSong { callback_id, .. } => callback_id,
+                AudioThreadMessage::PrevSong { callback_id } => callback_id,
+                AudioThreadMessage::NextSong { callback_id } => callback_id,
+                AudioThreadMessage::SetPlaylist { callback_id, .. } => callback_id,
+                AudioThreadMessage::SetCookie { callback_id, .. } => callback_id,
+                AudioThreadMessage::SetVolume { callback_id, .. } => callback_id,
+                AudioThreadMessage::SetVolumeRelative { callback_id, .. } => callback_id,
+                AudioThreadMessage::SetAudioOutput { callback_id, .. } => callback_id,
+                AudioThreadMessage::SyncStatus => "",
+            }
+            .to_string(),
+            data,
+        }
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "type", content = "data")]
@@ -177,12 +203,6 @@ pub fn send_msg_to_audio_thread_inner(msg: AudioThreadMessage) -> std::result::R
 }
 
 pub fn send_msg_to_audio_thread(msg: AudioThreadMessage) -> std::result::Result<(), String> {
-    if let AudioThreadMessage::SetCookie { cookie, .. } = &msg {
-        let url = "https://music.163.com".parse().unwrap();
-        for pair in cookie.split(';') {
-            HTTP_COOKIE_JAR.add_cookie_str(&concat_string!(pair, "; Domain=music.163.com"), &url);
-        }
-    }
     send_msg_to_audio_thread_inner(msg)
 }
 

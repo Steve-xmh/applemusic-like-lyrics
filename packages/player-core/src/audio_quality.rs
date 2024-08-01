@@ -1,7 +1,7 @@
 use serde::*;
 use symphonia::core::{codecs::*, formats::Track, sample::SampleFormat};
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone, TS)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AudioQuality {
     pub sample_rate: Option<u32>,

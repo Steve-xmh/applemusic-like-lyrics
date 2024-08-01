@@ -1,7 +1,5 @@
 use std::{
-    io::ErrorKind,
-    sync::Arc,
-    time::{Duration, Instant},
+    fmt::Debug, io::ErrorKind, sync::Arc, time::{Duration, Instant}
 };
 
 use anyhow::Context;
@@ -17,7 +15,7 @@ use tokio::{
 };
 use tracing::*;
 
-use crate::{AudioThreadEvent, HasSongId};
+use crate::{AudioPlayerEventSender, AudioThreadEvent, SongSource};
 
 use super::{
     audio_quality::AudioQuality, fft_player::FFTPlayer, output::AudioOutputSender,
@@ -25,7 +23,7 @@ use super::{
 };
 
 #[derive(Debug, Default, Clone, PartialEq)]
-struct AudioPlayerTaskData<T = ()> {
+struct AudioPlayerTaskData<T> {
     pub current_song: Option<SongData<T>>,
     pub audio_quality: AudioQuality,
 }
@@ -47,8 +45,6 @@ struct AudioInfo {
     pub position: f64,
 }
 
-pub type AudioPlayerEventSender<T> = tokio::sync::mpsc::Sender<AudioThreadEvent<T>>;
-
 pub struct AudioPlayer<T> {
     evt_sender: AudioPlayerEventSender<T>,
 
@@ -69,18 +65,11 @@ pub struct AudioPlayer<T> {
     play_pos_sx: UnboundedSender<Option<(bool, f64)>>,
 
     play_task_sx: UnboundedSender<AudioThreadMessage>,
-    play_task_data: Arc<Mutex<AudioPlayerTaskData>>,
+    play_task_data: Arc<Mutex<AudioPlayerTaskData<T>>>,
 }
 
-impl<T: HasSongId> AudioPlayer<T> {
+impl<T: SongSource + Debug> AudioPlayer<T> {
     pub fn new(evt_sender: AudioPlayerEventSender<T>, player: AudioOutputSender) -> Self {
-        let audio_cache_dir = evt_sender
-            .path()
-            .app_cache_dir()
-            .unwrap()
-            .join("audio-cache");
-        let _ = std::fs::create_dir_all(audio_cache_dir);
-
         let playlist = Vec::<SongData<T>>::with_capacity(4096);
 
         let fft_player = Arc::new(Mutex::new(FFTPlayer::new()));
@@ -191,7 +180,7 @@ impl<T: HasSongId> AudioPlayer<T> {
         let _ = self.evt_sender.send(data).await;
     }
 
-    pub async fn process_message(&mut self, msg: AudioThreadMessage) {
+    pub async fn process_message(&mut self, msg: AudioThreadMessage<T>) {
         match &msg {
             AudioThreadMessage::SetCookie { cookie, .. } => {
                 info!("已设置 Cookie 头，长度为 {}", cookie.len());
@@ -388,7 +377,7 @@ impl<T: HasSongId> AudioPlayer<T> {
         }
     }
 
-    async fn play_audio(ctx: AudioPlayerTaskContext, song_data: SongData<T>) -> anyhow::Result<()> {
+    async fn play_audio(ctx: AudioPlayerTaskContext<T>, song_data: SongData<T>) -> anyhow::Result<()> {
         let app_clone = ctx.app.clone();
         if let Err(err) = {
             let music_id = song_data.get_id();
@@ -426,7 +415,7 @@ impl<T: HasSongId> AudioPlayer<T> {
     }
 
     async fn play_audio_from_local(
-        ctx: AudioPlayerTaskContext,
+        ctx: AudioPlayerTaskContext<T>,
         music_id: String,
         file_path: impl AsRef<std::path::Path> + std::fmt::Debug,
     ) -> anyhow::Result<()> {
@@ -440,7 +429,7 @@ impl<T: HasSongId> AudioPlayer<T> {
 
     #[allow(clippy::too_many_arguments)]
     async fn play_media_stream(
-        mut ctx: AudioPlayerTaskContext,
+        mut ctx: AudioPlayerTaskContext<T>,
         music_id: String,
         source: impl MediaSource + 'static,
     ) -> anyhow::Result<()> {
