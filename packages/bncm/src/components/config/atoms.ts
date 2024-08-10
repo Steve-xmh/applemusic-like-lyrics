@@ -243,6 +243,7 @@ export const enableBackgroundAtom = atomWithConfig({
 
 export enum BackgroundType {
 	LiquidEplor = "liquid-eplor",
+	MeshLiquid = "mesh-liquid",
 	NewLiquidEplor = "new-liquid-eplor",
 	FakeLiquid = "fake-liquid",
 	NewLiquidEplorTest = "new-liquid-eplor-test",

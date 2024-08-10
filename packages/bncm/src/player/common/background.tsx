@@ -249,6 +249,7 @@ export const Background: FC = () => {
 		if (
 			backgroundType === BackgroundType.FakeLiquid ||
 			backgroundType === BackgroundType.LiquidEplor ||
+			backgroundType === BackgroundType.MeshLiquid ||
 			backgroundType === BackgroundType.NewLiquidEplor ||
 			backgroundType === BackgroundType.NewLiquidEplorTest
 		) {
