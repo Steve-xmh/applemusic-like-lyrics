@@ -19,14 +19,19 @@ mod resampler;
 #[serde(tag = "type")]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
-pub enum SongData<T = ()> {
+pub enum SongData {
     #[serde(rename_all = "camelCase")]
     Local {
         file_path: String,
         orig_order: usize,
     },
+    /// 自定义的歌曲数据，可以交由宿主程序注册的歌曲元数据处理器处理
     #[serde(rename_all = "camelCase")]
-    Custom(T),
+    Custom {
+        id: String,
+        song_json_data: String,
+        orig_order: usize,
+    },
 }
 
 trait SongSource {
@@ -42,11 +47,14 @@ impl SongSource for () {
     }
 }
 
-impl<T: SongSource> SongSource for SongData<T> {
+impl SongSource for SongData {
     fn get_id(&self) -> String {
         match self {
             SongData::Local { file_path, .. } => format!("local:{:x}", md5::compute(file_path)),
-            SongData::Custom(x) => x.get_id(),
+            SongData::Custom {
+                id,
+                ..
+            } => concat_string!("custom:", id),
         }
     }
 }
@@ -54,7 +62,7 @@ impl<T: SongSource> SongSource for SongData<T> {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]
 #[serde(rename_all = "camelCase")]
-pub enum AudioThreadMessage<T = ()> {
+pub enum AudioThreadMessage {
     #[serde(rename_all = "camelCase")]
     ResumeAudio {
         callback_id: String,
@@ -88,7 +96,7 @@ pub enum AudioThreadMessage<T = ()> {
     #[serde(rename_all = "camelCase")]
     SetPlaylist {
         callback_id: String,
-        songs: Vec<SongData<T>>,
+        songs: Vec<SongData>,
     },
     #[serde(rename_all = "camelCase")]
     SetCookie {
@@ -113,11 +121,15 @@ pub enum AudioThreadMessage<T = ()> {
     SyncStatus,
 }
 
-pub type AudioPlayerEventSender<T> = tokio::sync::mpsc::Sender<AudioThreadEvent<T>>;
+pub type AudioPlayerEventSender = tokio::sync::mpsc::Sender<AudioThreadEventMessage<AudioThreadEvent>>;
 
-impl<T> AudioThreadMessage<T> {
-    pub fn ret(&self, sender: AudioPlayerEventSender<T>, data: AudioThreadEvent<T>) -> AudioThreadEventMessage<T> {
-        AudioThreadEventMessage {
+impl AudioThreadMessage {
+    pub fn ret(
+        &self,
+        sender: AudioPlayerEventSender,
+        data: AudioThreadEvent,
+    ) {
+        let msg = AudioThreadEventMessage {
             callback_id: match self {
                 AudioThreadMessage::ResumeAudio { callback_id } => callback_id,
                 AudioThreadMessage::PauseAudio { callback_id } => callback_id,
@@ -135,14 +147,16 @@ impl<T> AudioThreadMessage<T> {
             }
             .to_string(),
             data,
-        }
+        };
+
+        let _ = sender.blocking_send(msg);
     }
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[serde(tag = "type", content = "data")]
-pub enum AudioThreadEvent<T> {
+pub enum AudioThreadEvent {
     #[serde(rename_all = "camelCase")]
     PlayPosition { position: f64 },
     #[serde(rename_all = "camelCase")]
@@ -163,7 +177,7 @@ pub enum AudioThreadEvent<T> {
         position: f64,
         volume: f64,
         load_position: f64,
-        playlist: Vec<SongData<T>>,
+        playlist: Vec<SongData>,
         playlist_inited: bool,
         quality: AudioQuality,
     },

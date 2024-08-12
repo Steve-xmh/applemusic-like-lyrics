@@ -46,16 +46,16 @@ struct AudioInfo {
 }
 
 pub struct AudioPlayer<T> {
-    evt_sender: AudioPlayerEventSender<T>,
+    evt_sender: AudioPlayerEventSender,
 
     player: AudioOutputSender,
     volume: f64,
     is_playing: bool,
 
-    playlist: Vec<SongData<T>>,
+    playlist: Vec<SongData>,
     playlist_inited: bool,
     current_play_index: usize,
-    current_song: Option<SongData<T>>,
+    current_song: Option<SongData>,
     current_audio_info: Arc<RwLock<AudioInfo>>,
 
     current_play_task_handle: Option<AbortHandle>,
@@ -69,8 +69,8 @@ pub struct AudioPlayer<T> {
 }
 
 impl<T: SongSource + Debug> AudioPlayer<T> {
-    pub fn new(evt_sender: AudioPlayerEventSender<T>, player: AudioOutputSender) -> Self {
-        let playlist = Vec::<SongData<T>>::with_capacity(4096);
+    pub fn new(evt_sender: AudioPlayerEventSender, player: AudioOutputSender) -> Self {
+        let playlist = Vec::<SongData>::with_capacity(4096);
 
         let fft_player = Arc::new(Mutex::new(FFTPlayer::new()));
         let (fft_has_data_sx, mut rx) = tokio::sync::mpsc::unbounded_channel();
