@@ -1,6 +1,7 @@
 import { LyricPlayer } from ".";
 import { Disposable, HasElement } from "../interfaces";
 import { Spring } from "../utils/spring";
+import styles from "../styles/lyric-player.module.css";
 
 export class BottomLineEl implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
@@ -14,10 +15,7 @@ export class BottomLineEl implements HasElement, Disposable {
 		posY: new Spring(0),
 	};
 	constructor(private lyricPlayer: LyricPlayer) {
-		this.element.setAttribute(
-			"class",
-			this.lyricPlayer.style.classes.lyricLine,
-		);
+		this.element.setAttribute("class", styles.lyricLine);
 		this.rebuildStyle();
 	}
 	measureSize(): [number, number] {
@@ -61,19 +59,14 @@ export class BottomLineEl implements HasElement, Disposable {
 		this.top = top;
 		this.delay = (delay * 1000) | 0;
 		if (force || !this.lyricPlayer.getEnableSpring()) {
-			if (force)
-				this.element.classList.add(
-					this.lyricPlayer.style.classes.tmpDisableTransition,
-				);
+			if (force) this.element.classList.add(styles.tmpDisableTransition);
 			this.lineTransforms.posX.setPosition(left);
 			this.lineTransforms.posY.setPosition(top);
 			if (!this.lyricPlayer.getEnableSpring()) this.show();
 			else this.rebuildStyle();
 			if (force)
 				requestAnimationFrame(() => {
-					this.element.classList.remove(
-						this.lyricPlayer.style.classes.tmpDisableTransition,
-					);
+					this.element.classList.remove(styles.tmpDisableTransition);
 				});
 		} else {
 			this.lineTransforms.posX.setTargetPosition(left, delay);

@@ -3,7 +3,7 @@ import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
 import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
 import { Spring } from "../utils/spring";
 import bezier from "bezier-easing";
-import { WebAnimationSpring } from "../utils/wa-spring";
+import styles from "../styles/lyric-player.module.css";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -33,54 +33,6 @@ const makeEmpEasing = (mid: number) => {
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
 const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
-
-let lastWord: RealWord | undefined;
-
-// function generateFadeGradient(
-// 	width: number,
-// 	padding = 0,
-// 	bright = "rgba(0,0,0,0.85)",
-// 	dark = "rgba(0,0,0,0.25)",
-// ): [string, number] {
-// 	const totalAspect = 2 + width + padding;
-// 	const widthInTotal = width / totalAspect;
-// 	const leftPos = (1 - widthInTotal) / 2;
-// 	return [
-// 		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
-// 			leftPos * 100
-// 		}%,${bright} ${(leftPos + widthInTotal) * 100}%,${dark} ${
-// 			(leftPos + widthInTotal) * 100
-// 		}%)`,
-// 		totalAspect,
-// 	];
-// }
-
-// function generateFadeGradient(
-// 	width: number,
-// 	padding = 0,
-// 	bright = "rgba(0,0,0,var(--bright-mask-alpha, 1.0))",
-// 	dark = "rgba(0,0,0,0.3)",
-// 	brightAlpha = 1.0 // 新增参数：用于动态调整 bright alpha 值
-// ) {
-// 	const totalAspect = 2 + width + padding;
-// 	const widthInTotal = width / totalAspect;
-// 	const leftPos = (1 - widthInTotal) / 2;
-
-// 	const steps = 50;
-// 	const gradientStops = [];
-// 	const brightAlphaValue = parseFloat(bright.slice(-4, -1)) * brightAlpha; // 动态调整 bright alpha 值
-// 	for (let i = 0; i <= steps; i++) {
-// 		const progress = i / steps;
-// 		const intensity = 0.5 * (1 - Math.cos(Math.PI * progress));
-// 		const darkAlpha = parseFloat(dark.slice(-4, -1));
-// 		const color = `rgba(0,0,0,${darkAlpha * intensity + brightAlphaValue * (1 - intensity)})`;
-// 		const position = leftPos * 100 + (progress * widthInTotal * 100);
-// 		gradientStops.push(`${color} ${position}%`);
-// 	}
-// 	const gradientString = `linear-gradient(to right, ${gradientStops.join(", ")})`;
-
-// 	return [gradientString, totalAspect];
-// }
 
 function generateFadeGradient(
 	width: number,
@@ -269,15 +221,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	) {
 		super();
 		this._prevParentEl = lyricPlayer.getElement();
-		this.element.setAttribute(
-			"class",
-			this.lyricPlayer.style.classes.lyricLine,
-		);
+		this.element.setAttribute("class", styles.lyricLine);
 		if (this.lyricLine.isBG) {
-			this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine);
+			this.element.classList.add(styles.lyricBgLine);
 		}
 		if (this.lyricLine.isDuet) {
-			this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine);
+			this.element.classList.add(styles.lyricDuetLine);
 		}
 		this.element.appendChild(document.createElement("div")); // 歌词行
 		this.element.appendChild(document.createElement("div")); // 翻译行
@@ -285,9 +234,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		const main = this.element.children[0] as HTMLDivElement;
 		const trans = this.element.children[1] as HTMLDivElement;
 		const roman = this.element.children[2] as HTMLDivElement;
-		main.setAttribute("class", this.lyricPlayer.style.classes.lyricMainLine);
-		trans.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine);
-		roman.setAttribute("class", this.lyricPlayer.style.classes.lyricSubLine);
+		main.setAttribute("class", styles.lyricMainLine);
+		trans.setAttribute("class", styles.lyricSubLine);
+		roman.setAttribute("class", styles.lyricSubLine);
 		this.rebuildElement();
 		this.rebuildStyle();
 	}
@@ -358,7 +307,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
 		this.hasFaded = false;
-		this.element.classList.add("active");
+		this.element.classList.add(styles.active);
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
@@ -375,12 +324,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				a.play();
 			}
 		}
-		main.classList.add("active");
+		main.classList.add(styles.active);
 	}
 	disable(maskAnimationTime = 0) {
 		this.isEnabled = false;
 		this.hasFaded = true;
-		this.element.classList.remove("active");
+		this.element.classList.remove(styles.active);
 		const main = this.element.children[0] as HTMLDivElement;
 		let i = 0;
 		for (const word of this.splittedWords) {
@@ -434,24 +383,26 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 			i++;
 		}
-		main.classList.remove("active");
+		main.classList.remove(styles.active);
 	}
+	private lastWord?: RealWord;
 	resume(currentTime = 0) {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				if (
-					this.splittedWords.indexOf(lastWord) <
-					this.splittedWords.indexOf(word)
+					!this.lastWord ||
+					this.splittedWords.indexOf(this.lastWord) <
+						this.splittedWords.indexOf(word)
 				) {
-					console.log(word.word);
 					a.play();
 				}
 			}
 			for (const a of word.maskAnimations) {
 				if (
-					this.splittedWords.indexOf(lastWord) <
-					this.splittedWords.indexOf(word)
+					!this.lastWord ||
+					this.splittedWords.indexOf(this.lastWord) <
+						this.splittedWords.indexOf(word)
 				) {
 					a.play();
 				}
@@ -465,14 +416,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				if (word.startTime >= currentTime) {
 					a.pause();
 				} else {
-					lastWord = word;
+					this.lastWord = word;
 				}
 			}
 			for (const a of word.maskAnimations) {
 				if (word.startTime >= currentTime) {
 					a.pause();
 				} else {
-					lastWord = word;
+					this.lastWord = word;
 				}
 			}
 		}
@@ -513,16 +464,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	setLine(line: LyricLine) {
 		this.lyricLine = line;
 		if (this.lyricLine.isBG) {
-			this.element.classList.add(this.lyricPlayer.style.classes.lyricBgLine);
+			this.element.classList.add(styles.lyricBgLine);
 		} else {
-			this.element.classList.remove(this.lyricPlayer.style.classes.lyricBgLine);
+			this.element.classList.remove(styles.lyricBgLine);
 		}
 		if (this.lyricLine.isDuet) {
-			this.element.classList.add(this.lyricPlayer.style.classes.lyricDuetLine);
+			this.element.classList.add(styles.lyricDuetLine);
 		} else {
-			this.element.classList.remove(
-				this.lyricPlayer.style.classes.lyricDuetLine,
-			);
+			this.element.classList.remove(styles.lyricDuetLine);
 		}
 		this.rebuildElement();
 		this.rebuildStyle();
@@ -609,7 +558,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					.map((word) => shouldEmphasize(word))
 					.reduce((a, b) => a || b, shouldEmphasize(merged));
 				const wrapperWordEl = document.createElement("span");
-				wrapperWordEl.classList.add("emphasize-wrapper");
+				wrapperWordEl.classList.add(styles.emphasizeWrapper);
 				const characterElements: HTMLElement[] = [];
 				for (const word of chunk) {
 					const mainWordEl = document.createElement("span");
@@ -618,7 +567,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					// 	mainWordEl,
 					// );
 					if (shouldEmphasize(merged)) {
-						mainWordEl.classList.add("emphasize");
+						mainWordEl.classList.add(styles.emphasize);
 						const charEls: HTMLSpanElement[] = [];
 						for (const char of word.word.trim().split("")) {
 							const charEl = document.createElement("span");
@@ -694,7 +643,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					shouldEmphasize: emp,
 				};
 				if (shouldEmphasize(chunk)) {
-					mainWordEl.classList.add("emphasize");
+					mainWordEl.classList.add(styles.emphasize);
 					const charEls: HTMLSpanElement[] = [];
 					for (const char of chunk.word.trim().split("")) {
 						const charEl = document.createElement("span");
@@ -1078,7 +1027,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		delay = 0,
 		currentAbove = true,
 	) {
-		const roundedBlur = blur.toFixed(3);
 		const beforeInSight = this.isInSight;
 		const enableSpring = this.lyricPlayer.getEnableSpring();
 		this.left = left;
@@ -1095,11 +1043,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		trans.style.opacity = `${subopacity}`;
 		roman.style.opacity = `${subopacity}`;
 		if (force || !enableSpring) {
-			this.blur = Math.min(32, roundedBlur);
-			if (force)
-				this.element.classList.add(
-					this.lyricPlayer.style.classes.tmpDisableTransition,
-				);
+			this.blur = Math.min(32, blur);
+			if (force) this.element.classList.add(styles.tmpDisableTransition);
 			// this.lineWebAnimationTransforms.posX.setTargetPosition(left);
 			// this.lineWebAnimationTransforms.posY.setTargetPosition(top);
 			// this.lineWebAnimationTransforms.scale.setTargetPosition(scale);
@@ -1116,9 +1061,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			} else this.rebuildStyle();
 			if (force)
 				requestAnimationFrame(() => {
-					this.element.classList.remove(
-						this.lyricPlayer.style.classes.tmpDisableTransition,
-					);
+					this.element.classList.remove(styles.tmpDisableTransition);
 				});
 		} else {
 			// this.lineWebAnimationTransforms.posX.stop();
@@ -1127,9 +1070,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.lineTransforms.posX.setTargetPosition(left, delay);
 			this.lineTransforms.posY.setTargetPosition(top, delay);
 			this.lineTransforms.scale.setTargetPosition(scale);
-			if (this.blur !== Math.min(32, roundedBlur)) {
-				this.blur = Math.min(32, roundedBlur);
-				this.element.style.filter = `blur(${Math.min(32, roundedBlur)}px)`;
+			if (this.blur !== Math.min(32, blur)) {
+				this.blur = Math.min(32, blur);
+				const roundedBlur = blur.toFixed(3);
+				this.element.style.filter = `blur(${roundedBlur}px)`;
 			}
 		}
 	}

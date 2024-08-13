@@ -25,7 +25,7 @@ import {
 import "./background.sass";
 import {
 	BaseRenderer,
-	EplorRenderer,
+	MeshGradientRenderer,
 } from "@applemusic-like-lyrics/core";
 import { fftDataAtom } from "./fft-context";
 import { globalStore } from "../../injector";
@@ -69,11 +69,11 @@ export const Background: FC = () => {
 		if (forceOverrideBgRenderer?.renderer) return forceOverrideBgRenderer?.renderer;
 		switch (backgroundType) {
 			case BackgroundType.LiquidEplor:
-				return EplorRenderer;
+				return MeshGradientRenderer;
 			case BackgroundType.FakeLiquid:
-				return EplorRenderer;
+				return MeshGradientRenderer;
 			default:
-				return EplorRenderer;
+				return MeshGradientRenderer;
 		}
 	}, [forceOverrideBgRenderer, backgroundType]);
 

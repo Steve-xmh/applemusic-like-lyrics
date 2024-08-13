@@ -1,0 +1,132 @@
+/*
+    给各个内部元素使用的样式
+*/
+
+/* 给每行歌词应用的样式 */
+.lyricLine {
+    position: absolute;
+    backface-visibility: hidden;
+    transform-origin: left;
+    width: var(--amll-lp-width, 100%);
+    height: fit-content;
+    padding: 2vh 2px;
+    contain: content;
+    will-change: filter, transform, opacity;
+    transition: filter 0.2s, background-color 0.25s, box-shadow 0.25s;
+    box-sizing: content-box;
+    border-radius: 16px;
+
+    &:has(> *):hover {
+        background-color: var(--amll-lp-hover-bg-color, #fff1);
+        box-shadow: 0 0 0 4px var(--amll-lp-hover-bg-color, #fff1);
+    }
+
+    &:has(> *):active {
+        box-shadow: 0 0 0 var(--amll-lp-hover-bg-color, #fff1);
+    }
+}
+
+@media (max-width: 1024px) {
+    .lyricLine {
+        padding: 1vh 20px;
+    }
+
+    .lyricBgLine {
+        padding: 1vh 1.428571em;
+    }
+}
+
+.lyricBgLine {
+    opacity: 0;
+    font-size: max(70%, 10px);
+    transition: opacity 0.25s, scale 0.5s;
+    padding: 1vh 20px;
+
+    &.active {
+        transition: opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0, 1, 0, 1) 0.25s;
+        opacity: 0.4;
+    }
+}
+
+.lyricDuetLine {
+    text-align: right;
+    transform-origin: right;
+}
+
+.lyricMainLine {
+    transition: opacity 0.3s 0.1s;
+    will-change: opacity;
+    margin: -1em;
+    padding: 1em;
+
+    & span {
+        display: inline-block;
+    }
+
+    &>span,
+    span.emphasizeWrapper {
+        white-space: pre-wrap;
+        will-change: transform, display, mask-image;
+        display: inline-block;
+
+        &.emphasize,
+        span.emphasize {
+            padding: 1em;
+            margin: -1em;
+            will-change: transform;
+            backface-visibility: hidden;
+
+            &>span {
+                padding: 1em;
+                margin: -1em;
+                will-change: transform;
+                backface-visibility: hidden;
+            }
+        }
+    }
+}
+
+.lyricSubLine {
+    font-size: max(0.5em, 10px);
+    transition: opacity 0.2s 0.25s;
+    opacity: 0.3;
+}
+
+.disableSpring>* {
+    transition: filter 0.25s, transform 0.5s, background-color 0.25s, box-shadow 0.25s;
+}
+
+.interludeDots {
+    height: clamp(0.5em, 1vh, 3em);
+    transform-origin: center;
+    width: fit-content;
+    padding: 2.5% 0;
+    position: absolute;
+    display: flex;
+    gap: 0.25em;
+    left: 1em;
+
+    &>* {
+        height: clamp(0.5em, 1vh, 3em);
+        display: inline-block;
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+        background-color: var(--amll-lp-color, white);
+        margin-right: 4px;
+    }
+
+    &.duet {
+        right: 1em;
+        transform-origin: center;
+    }
+}
+
+@supports (mix-blend-mode: plus-lighter) {
+    .lyricSubLine {
+        opacity: 0.3;
+    }
+}
+
+.tmpDisableTransition {
+    transition: none !important;
+}

@@ -1,5 +1,6 @@
 import { LyricPlayer } from ".";
 import type { Disposable, HasElement } from "../interfaces";
+import styles from "../styles/lyric-player.module.css";
 
 function easeInOutBack(x: number): number {
 	const c1 = 1.70158;
@@ -28,7 +29,7 @@ export class InterludeDots implements HasElement, Disposable {
 	private interludeTime = 0;
 	private targetBreatheDuration = 1500;
 	constructor(private readonly lyricPlayer: LyricPlayer) {
-		this.element.className = this.lyricPlayer.style.classes.interludeDots;
+		this.element.className = styles.interludeDots;
 		this.element.appendChild(this.dot0);
 		this.element.appendChild(this.dot1);
 		this.element.appendChild(this.dot2);

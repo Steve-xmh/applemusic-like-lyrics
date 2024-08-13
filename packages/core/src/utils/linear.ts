@@ -1,3 +1,5 @@
+type seconds = number;
+
 export interface LinearParams {
 	duration: number; // Duration of the transition in seconds
 }

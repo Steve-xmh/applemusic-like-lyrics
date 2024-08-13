@@ -9,14 +9,15 @@ import GUI from "lil-gui";
 import { BackgroundRender, MeshGradientRenderer } from "./bg-render";
 
 const debugValues = {
-	controlPointSize: 3,
+	controlPointSize: 4,
 	subdivideDepth: 15,
 	wireFrame: false,
 };
 
 const canvas = document.getElementById("bg")!! as HTMLCanvasElement;
 const mgRenderer = new MeshGradientRenderer(canvas);
-
+// mgRenderer.setAlbum("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAADUExURf///6fEG8gAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAKSURBVBjTY2AAAAACAAGYY2zXAAAAAElFTkSuQmCC");
+mgRenderer.setAlbum("bigsur.jpg");
 mgRenderer.setManualControl(true);
 mgRenderer.setFPS(Infinity);
 
@@ -37,19 +38,23 @@ const resultTextArea = document.getElementById(
 )!! as HTMLTextAreaElement;
 resultTextArea.value = "// 控制点的设置代码将会在这里显示";
 function updateResult() {
-	const result = ["let point: ControlPoint;"];
+	const result = [
+		`preset(${debugValues.controlPointSize}, ${debugValues.controlPointSize}, [`,
+	];
 	for (let y = 0; y < debugValues.controlPointSize; y++) {
 		for (let x = 0; x < debugValues.controlPointSize; x++) {
 			const point = mgRenderer.getControlPoint(x, y);
-			result.push("");
-			result.push(`point = this.getControlPoint(${x}, ${y});`);
-			result.push(`point.color.r = ${point.color.r};`);
-			result.push(`point.color.g = ${point.color.g};`);
-			result.push(`point.color.b = ${point.color.b};`);
-			result.push(`point.location.x = ${point.location.x};`);
-			result.push(`point.location.y = ${point.location.y};`);
+			result.push(`	p(${x}, ${y}, ${point.location.x}, ${point.location.y}),`);
+			// result.push("");
+			// result.push(`point = this.getControlPoint(${x}, ${y});`);
+			// result.push(`point.color.r = ${point.color.r};`);
+			// result.push(`point.color.g = ${point.color.g};`);
+			// result.push(`point.color.b = ${point.color.b};`);
+			// result.push(`point.location.x = ${point.location.x};`);
+			// result.push(`point.location.y = ${point.location.y};`);
 		}
 	}
+	result.push("]),");
 	resultTextArea.value = result.join("\n");
 }
 
@@ -81,10 +86,10 @@ function resizeControlPoint() {
 			}%`;
 			draggerInput.addEventListener("input", () => {
 				// mgRenderer.getControlPoint(x, y).color = dragger.value;
-				dragger.style.backgroundColor = draggerInput.value;
-				const color = draggerInput.value.match(
-					/#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i,
-				);
+				const c = draggerInput.value;
+				console.log(c);
+				dragger.style.backgroundColor = c;
+				const color = c.match(/#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
 				if (color) {
 					point.color.r = parseInt(color[1], 16) / 255;
 					point.color.g = parseInt(color[2], 16) / 255;

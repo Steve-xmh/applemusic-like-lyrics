@@ -5,11 +5,19 @@
  * 参考内容 https://movingparts.io/gradient-meshes
  */
 
-import { Disposable } from "../interfaces";
-import { BaseRenderer } from "./base";
+import { Disposable } from "../../interfaces";
+import { BaseRenderer } from "../base";
 import { Mat4, Vec2, Vec3, Vec4 } from "gl-matrix";
-import vertShader from "./shaders/base-color.vert.glsl?raw";
-import fragShader from "./shaders/base-color.frag.glsl?raw";
+import meshVertShader from "./mesh.vert.glsl?raw";
+import meshFragShader from "./mesh.frag.glsl?raw";
+import noiseVertShader from "./noise.vert.glsl?raw";
+import noiseFragShader from "./noise.frag.glsl?raw";
+import { blurImage, contrastImage, saturateImage } from "../img";
+import {
+	loadResourceFromElement,
+	loadResourceFromUrl,
+} from "../../utils/resource";
+import { CONTROL_POINT_PRESETS } from "./cp-presets";
 
 type RenderingContext = WebGLRenderingContext;
 
@@ -18,8 +26,7 @@ class GLProgram implements Disposable {
 	program: WebGLProgram;
 	private vertexShader: WebGLShader;
 	private fragmentShader: WebGLShader;
-	readonly attrPos: number;
-	readonly attrColor: number;
+	readonly attrs: { [name: string]: number };
 	constructor(
 		gl: RenderingContext,
 		vertexShaderSource: string,
@@ -34,19 +41,16 @@ class GLProgram implements Disposable {
 		);
 		this.program = this.createProgram();
 
-		const attrPos = gl.getAttribLocation(this.program, "a_pos");
-		if (attrPos === -1)
-			throw new Error(
-				`Failed to get attribute location a_pos for "${this.label}"`,
-			);
-		this.attrPos = attrPos;
-
-		const attrColor = gl.getAttribLocation(this.program, "a_color");
-		if (attrColor === -1)
-			throw new Error(
-				`Failed to get attribute location a_color for "${this.label}"`,
-			);
-		this.attrColor = attrColor;
+		const num = gl.getProgramParameter(this.program, gl.ACTIVE_ATTRIBUTES);
+		const attrs: { [name: string]: number } = {};
+		for (let i = 0; i < num; i++) {
+			const info = gl.getActiveAttrib(this.program, i);
+			if (!info) continue;
+			const location = gl.getAttribLocation(this.program, info.name);
+			if (location === -1) continue;
+			attrs[info.name] = location;
+		}
+		this.attrs = attrs;
 	}
 	private createShader(type: number, source: string) {
 		const gl = this.gl;
@@ -130,6 +134,7 @@ class Mesh implements Disposable {
 		private readonly gl: RenderingContext,
 		private readonly attrPos: number,
 		private readonly attrColor: number,
+		private readonly attrUV: number,
 	) {
 		const vertexBuf = gl.createBuffer();
 		if (!vertexBuf) throw new Error("Failed to create vertex buffer");
@@ -138,16 +143,13 @@ class Mesh implements Disposable {
 		if (!indexBuf) throw new Error("Failed to create index buffer");
 		this.indexBuffer = indexBuf;
 
-		gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-		gl.vertexAttribPointer(this.attrPos, 2, gl.FLOAT, false, 4 * 5, 0);
-		gl.enableVertexAttribArray(this.attrPos);
-		gl.vertexAttribPointer(this.attrColor, 3, gl.FLOAT, false, 4 * 5, 4 * 2);
-		gl.enableVertexAttribArray(this.attrColor);
+		this.bind();
 
 		this.vertexData = new Float32Array(0);
 		this.indexData = new Uint16Array(0);
 
 		this.resize(2, 2);
+		this.update();
 	}
 
 	setWireFrame(enable: boolean) {
@@ -156,7 +158,7 @@ class Mesh implements Disposable {
 	}
 
 	setVertexPos(vx: number, vy: number, x: number, y: number): void {
-		const idx = (vx + vy * this.vertexWidth) * 5;
+		const idx = (vx + vy * this.vertexWidth) * 7;
 		if (idx >= this.vertexData.length - 1) {
 			console.warn("Vertex position out of range", idx, this.vertexData.length);
 			return;
@@ -172,7 +174,7 @@ class Mesh implements Disposable {
 		g: number,
 		b: number,
 	): void {
-		const idx = (vx + vy * this.vertexWidth) * 5 + 2;
+		const idx = (vx + vy * this.vertexWidth) * 7 + 2;
 		if (idx >= this.vertexData.length - 1) {
 			console.warn("Vertex position out of range", idx, this.vertexData.length);
 			return;
@@ -182,12 +184,23 @@ class Mesh implements Disposable {
 		this.vertexData[idx + 2] = b;
 	}
 
+	setVertexUV(vx: number, vy: number, x: number, y: number): void {
+		const idx = (vx + vy * this.vertexWidth) * 7 + 2 + 3;
+		if (idx >= this.vertexData.length - 1) {
+			console.warn("Vertex position out of range", idx, this.vertexData.length);
+			return;
+		}
+		this.vertexData[idx] = x;
+		this.vertexData[idx + 1] = y;
+	}
+
 	getVertexIndexLength(): number {
 		return this.vertexIndexLength;
 	}
 
 	draw() {
 		const gl = this.gl;
+
 		if (this.wireFrame) {
 			gl.drawElements(gl.LINES, this.vertexIndexLength, gl.UNSIGNED_SHORT, 0);
 		} else {
@@ -203,12 +216,14 @@ class Mesh implements Disposable {
 	resize(vertexWidth: number, vertexHeight: number): void {
 		this.vertexWidth = vertexWidth;
 		this.vertexHeight = vertexHeight;
-		// 2 个顶点坐标 + 3 个颜色值
+		// 2 个顶点坐标 + 3 个颜色值 + 2 个 UV 坐标
 		this.vertexIndexLength = vertexWidth * vertexHeight * 6;
 		if (this.wireFrame) {
 			this.vertexIndexLength = vertexWidth * vertexHeight * 10;
 		}
-		const vertexData = new Float32Array(vertexWidth * vertexHeight * (2 + 3));
+		const vertexData = new Float32Array(
+			vertexWidth * vertexHeight * (2 + 3 + 2),
+		);
 		const indexData = new Uint16Array(this.vertexIndexLength);
 		this.vertexData = vertexData;
 		this.indexData = indexData;
@@ -218,6 +233,7 @@ class Mesh implements Disposable {
 				const py = (y / (vertexHeight - 1)) * 2 - 1;
 				this.setVertexPos(x, y, px || 0, py || 0);
 				this.setVertexColor(x, y, 1, 1, 1);
+				this.setVertexUV(x, y, x / (vertexWidth - 1), y / (vertexHeight - 1));
 			}
 		}
 		for (let y = 0; y < vertexHeight - 1; y++) {
@@ -251,24 +267,27 @@ class Mesh implements Disposable {
 			}
 		}
 		const gl = this.gl;
-		gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-		gl.bufferData(
-			this.gl.ELEMENT_ARRAY_BUFFER,
-			this.indexData,
-			this.gl.STATIC_DRAW,
-		);
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexData, gl.STATIC_DRAW);
 	}
 
 	bind() {
 		const gl = this.gl;
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+		gl.vertexAttribPointer(this.attrPos, 2, gl.FLOAT, false, 4 * 7, 0);
+		gl.enableVertexAttribArray(this.attrPos);
+		gl.vertexAttribPointer(this.attrColor, 3, gl.FLOAT, false, 4 * 7, 4 * 2);
+		gl.enableVertexAttribArray(this.attrColor);
+		gl.vertexAttribPointer(this.attrUV, 2, gl.FLOAT, false, 4 * 7, 4 * 5);
+		gl.enableVertexAttribArray(this.attrUV);
 	}
 
 	update() {
 		const gl = this.gl;
-		gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-		gl.bufferData(this.gl.ARRAY_BUFFER, this.vertexData, this.gl.DYNAMIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, this.vertexData, gl.DYNAMIC_DRAW);
 	}
 
 	dispose(): void {
@@ -278,7 +297,7 @@ class Mesh implements Disposable {
 }
 
 class ControlPoint {
-	color = Vec3.fromValues(0, 0, 0);
+	color = Vec3.fromValues(1, 1, 1);
 	location = Vec2.fromValues(0, 0);
 	uTangent = Vec2.fromValues(0, 0);
 	vTangent = Vec2.fromValues(0, 0);
@@ -455,8 +474,13 @@ class BHPMesh extends Mesh {
 	private _subDivisions = 10;
 	private _controlPoints: Map2D<ControlPoint> = new Map2D(3, 3);
 
-	constructor(gl: RenderingContext, attrPos: number, attrColor: number) {
-		super(gl, attrPos, attrColor);
+	constructor(
+		gl: RenderingContext,
+		attrPos: number,
+		attrColor: number,
+		attrUV: number,
+	) {
+		super(gl, attrPos, attrColor, attrUV);
 		this.resizeControlPoints(3, 3);
 	}
 	override setWireFrame(enable: boolean) {
@@ -519,6 +543,8 @@ class BHPMesh extends Mesh {
 	 */
 	updateMesh() {
 		const subDivM1 = this._subDivisions - 1;
+		const tW = subDivM1 * (this._controlPoints.height - 1);
+		const tH = subDivM1 * (this._controlPoints.width - 1);
 		for (let x = 0; x < this._controlPoints.width - 1; x++) {
 			for (let y = 0; y < this._controlPoints.height - 1; y++) {
 				const p00 = this._controlPoints.get(x, y);
@@ -533,6 +559,8 @@ class BHPMesh extends Mesh {
 				const G = colorCoefficients(p00, p01, p10, p11, "g", this.uMG);
 				const B = colorCoefficients(p00, p01, p10, p11, "b", this.uMB);
 
+				const sX = x / (this._controlPoints.width - 1);
+				const sY = y / (this._controlPoints.height - 1);
 				for (let u = 0; u < this._subDivisions; u++) {
 					for (let v = 0; v < this._subDivisions; v++) {
 						// 不知道为啥 x 和 y 要反过来
@@ -541,6 +569,7 @@ class BHPMesh extends Mesh {
 						const vy = x * this._subDivisions + v;
 						const [px, py] = surfacePoint(u / subDivM1, v / subDivM1, X, Y);
 						this.setVertexPos(vx, vy, px, py);
+						this.setVertexUV(vx, vy, sX + v / tH, 1 - sY - u / tW);
 						const [pr, pg, pb] = colorPoint(
 							u / subDivM1,
 							v / subDivM1,
@@ -557,6 +586,41 @@ class BHPMesh extends Mesh {
 	}
 }
 
+class GLTexture implements Disposable {
+	readonly tex: WebGLTexture;
+
+	constructor(
+		private gl: WebGLRenderingContext,
+		albumImageData: ImageData,
+	) {
+		const albumTexture = gl.createTexture();
+		if (!albumTexture) throw new Error("Failed to create texture");
+		this.tex = albumTexture;
+		gl.activeTexture(gl.TEXTURE0);
+		gl.bindTexture(gl.TEXTURE_2D, albumTexture);
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			albumImageData,
+		);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
+	}
+
+	bind() {
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
+	}
+
+	dispose(): void {
+		this.gl.deleteTexture(this.tex);
+	}
+}
+
 export class MeshGradientRenderer extends BaseRenderer {
 	private gl: RenderingContext;
 	private lastFrameTime = 0;
@@ -564,12 +628,18 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private lastTickTime = 0;
 	private playTime = 0;
 	private tickHandle = 0;
-	private maxFPS = 30;
+	private maxFPS = 60;
 	private paused = false;
 	private staticMode = false;
 	private mainMesh: BHPMesh;
+	private fullScreenMesh: Mesh;
 	private mainProgram: GLProgram;
+	private noiseProgram: GLProgram;
 	private manualControl = false;
+	private reduceImageSizeCanvas = new OffscreenCanvas(32, 32);
+	private albumTexture?: GLTexture;
+	private targetSize = Vec2.fromValues(0, 0);
+	private currentSize = Vec2.fromValues(0, 0);
 
 	setManualControl(enable: boolean) {
 		this.manualControl = enable;
@@ -605,24 +675,52 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		this.frameTime += frameDelta;
 
-		if (!(this.onRedraw(this.playTime, frameDelta) && this.staticMode)) {
+		if (!(this.onRedraw(this.frameTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
 		}
 
 		this.lastTickTime = tickTime;
 	}
 
+	private checkIfResize() {
+		const [tW, tH] = [this.targetSize.x, this.targetSize.y];
+		const [cW, cH] = [this.currentSize.x, this.currentSize.y];
+		if (tW !== cW || tH !== cH) {
+			super.onResize(tW, tH);
+			const gl = this.gl;
+			gl.viewport(0, 0, tW, tH);
+			this.currentSize.x = tW;
+			this.currentSize.y = tH;
+		}
+	}
+
 	private onRedraw(tickTime: number, delta: number) {
+		this.mainMesh.bind();
+		// const p = this.mainMesh.getControlPoint(1, 1);
+		// p.location.x = Math.sin(tickTime / 1000) * 0.05;
+		// p.location.y = Math.cos(tickTime / 1000) * 0.05;
 		this.mainMesh.updateMesh();
 
 		const gl = this.gl;
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.clearColor(0, 0, 0, 1);
+		this.checkIfResize();
 
-		this.mainMesh.bind();
 		this.mainProgram.use();
+		if (this.albumTexture) {
+			gl.activeTexture(gl.TEXTURE0);
+			this.albumTexture.bind();
+		}
+		this.mainProgram.setUniform1f("u_time", tickTime / 10000);
+		this.mainProgram.setUniform1i("u_texture", 0);
 		this.mainMesh.draw();
-		// gl.flush();
+
+		this.noiseProgram.use();
+		this.fullScreenMesh.bind();
+		this.fullScreenMesh.draw();
+
+		gl.flush();
 
 		return false;
 	}
@@ -637,6 +735,12 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		const gl = canvas.getContext("webgl");
 		if (!gl) throw new Error("WebGL not supported");
+		if (!gl.getExtension("EXT_color_buffer_float"))
+			console.warn("EXT_color_buffer_float not supported");
+		if (!gl.getExtension("EXT_float_blend"))
+			console.warn("EXT_float_blend not supported");
+		if (!gl.getExtension("OES_texture_float_linear"))
+			console.warn("OES_texture_float_linear not supported");
 		this.gl = gl;
 		gl.enable(gl.BLEND);
 
@@ -644,25 +748,40 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		this.mainProgram = new GLProgram(
 			gl,
-			vertShader,
-			fragShader,
+			meshVertShader,
+			meshFragShader,
 			"main-program-mg",
+		);
+		this.noiseProgram = new GLProgram(
+			gl,
+			noiseVertShader,
+			noiseFragShader,
+			"noise-program-mg",
 		);
 		this.mainMesh = new BHPMesh(
 			gl,
-			this.mainProgram.attrPos,
-			this.mainProgram.attrColor,
+			this.mainProgram.attrs["a_pos"],
+			this.mainProgram.attrs["a_color"],
+			this.mainProgram.attrs["a_uv"],
+		);
+		this.fullScreenMesh = new Mesh(
+			gl,
+			this.noiseProgram.attrs["a_pos"],
+			this.noiseProgram.attrs["a_color"],
+			this.noiseProgram.attrs["a_uv"],
 		);
 
+		const p = 5;
+		this.mainMesh.resizeControlPoints(p, p);
+		this.mainMesh.resetSubdivition(15);
 		this.mainMesh.updateMesh();
 
 		this.requestTick();
 	}
 
 	protected override onResize(width: number, height: number): void {
-		super.onResize(width, height);
-		const gl = this.gl;
-		gl.viewport(0, 0, width, height);
+		this.targetSize.x = width;
+		this.targetSize.y = height;
 	}
 
 	override setStaticMode(enable: boolean): void {
@@ -687,7 +806,67 @@ export class MeshGradientRenderer extends BaseRenderer {
 	override async setAlbum(
 		albumSource: string | HTMLImageElement | HTMLVideoElement,
 		isVideo?: boolean,
-	): Promise<void> {}
+	): Promise<void> {
+		if (typeof albumSource === "string" && albumSource.trim().length === 0)
+			throw new Error("Empty album url");
+		let res: HTMLImageElement | HTMLVideoElement | null = null;
+		let remainRetryTimes = 5;
+		while (!res && remainRetryTimes > 0) {
+			try {
+				if (typeof albumSource === "string") {
+					res = await loadResourceFromUrl(albumSource, isVideo);
+				} else {
+					res = await loadResourceFromElement(albumSource);
+				}
+			} catch (error) {
+				console.warn(
+					`failed on loading album resource, retrying (${remainRetryTimes})`,
+					{
+						albumSource,
+						error,
+					},
+				);
+				remainRetryTimes--;
+			}
+		}
+		if (!res) return;
+		// resize image
+		const c = this.reduceImageSizeCanvas;
+		const ctx = c.getContext("2d");
+		if (!ctx) throw new Error("Failed to create canvas context");
+		ctx.clearRect(0, 0, c.width, c.height);
+		// Safari 不支持 filter
+		// ctx.filter = baseFilter;
+		const imgw =
+			res instanceof HTMLVideoElement ? res.videoWidth : res.naturalWidth;
+		const imgh =
+			res instanceof HTMLVideoElement ? res.videoHeight : res.naturalHeight;
+		if (imgw * imgh === 0) throw new Error("Invalid image size");
+		ctx.drawImage(res, 0, 0, imgw, imgh, 0, 0, c.width, c.height);
+
+		const imageData = ctx.getImageData(0, 0, c.width, c.height);
+		contrastImage(imageData, 0.4);
+		saturateImage(imageData, 3.0);
+		contrastImage(imageData, 1.7);
+		blurImage(imageData, 2, 4);
+
+		if (!this.manualControl) {
+			const chosenPreset =
+				CONTROL_POINT_PRESETS[
+					Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
+				];
+			const p = this.mainMesh;
+			p.resizeControlPoints(chosenPreset.width, chosenPreset.height);
+			for (const cp of chosenPreset.conf) {
+				const p = this.mainMesh.getControlPoint(cp.cx, cp.cy);
+				p.location.x = cp.x;
+				p.location.y = cp.y;
+			}
+			p.updateMesh();
+		}
+
+		this.albumTexture = new GLTexture(this.gl, imageData);
+	}
 	override setLowFreqVolume(volume: number): void {
 		// TODO: 待实现
 	}

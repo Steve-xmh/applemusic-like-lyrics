@@ -2,7 +2,7 @@ import {
 	BackgroundRender as CoreBackgroundRender,
 	AbstractBaseRenderer,
 	BaseRenderer,
-	EplorRenderer,
+	MeshGradientRenderer,
 } from "@applemusic-like-lyrics/core";
 import {
 	useRef,
@@ -13,8 +13,8 @@ import {
 } from "react";
 export {
 	BaseRenderer,
-	EplorRenderer,
 	PixiRenderer,
+	MeshGradientRenderer,
 } from "@applemusic-like-lyrics/core";
 
 /**
@@ -115,7 +115,7 @@ export const BackgroundRender = forwardRef<
 		const lastRendererRef = useRef<{
 			new (canvas: HTMLCanvasElement): BaseRenderer;
 		}>();
-		const curRenderer = renderer ?? EplorRenderer;
+		const curRenderer = renderer ?? MeshGradientRenderer;
 
 		useEffect(() => {
 			if (

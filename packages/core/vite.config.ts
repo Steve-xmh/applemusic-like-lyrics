@@ -10,8 +10,9 @@ export default defineConfig({
 			entry: "src/index.ts",
 			name: "AppleMusicLikeLyricsCore",
 			fileName: "amll-core",
-			formats: ["es", "cjs"],
+			formats: ["es"],
 		},
+		cssMinify: "lightningcss",
 		rollupOptions: {
 			external: [
 				"@pixi/display",
@@ -21,8 +22,6 @@ export default defineConfig({
 				"@pixi/filter-bulge-pinch",
 				"@pixi/core",
 				"@pixi/sprite",
-				"jss",
-				"jss-preset-default",
 			],
 		},
 	},

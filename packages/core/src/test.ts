@@ -9,7 +9,6 @@ import GUI from "lil-gui";
 import {
 	BackgroundRender,
 	PixiRenderer,
-	EplorRenderer,
 	MeshGradientRenderer,
 } from "./bg-render";
 import Stats from "stats.js";
@@ -26,6 +25,7 @@ import {
 import { LyricLine } from ".";
 
 const audio = document.createElement("audio");
+audio.volume = 0.5;
 audio.preload = "auto";
 
 const debugValues = {
@@ -95,8 +95,6 @@ function recreateBGRenderer(mode: string) {
 		window.globalBackground = BackgroundRender.new(PixiRenderer);
 	} else if (mode === "mg") {
 		window.globalBackground = BackgroundRender.new(MeshGradientRenderer);
-	} else if (mode === "eplor") {
-		window.globalBackground = BackgroundRender.new(EplorRenderer);
 	} else {
 		throw new Error("Unknown renderer mode");
 	}
@@ -123,7 +121,9 @@ gui
 	.add(debugValues, "lyric")
 	.name("歌词文件")
 	.onFinishChange(async (url: string) => {
-		lyricPlayer.setLyricLines(parseTTML(await (await fetch(url)).text()));
+		lyricPlayer.setLyricLines(
+			parseTTML(await (await fetch(url)).text()).lyricLines,
+		);
 	});
 gui
 	.add(debugValues, "music")
@@ -150,7 +150,7 @@ bgGui
 		}
 	});
 bgGui
-	.add(debugValues, "bgMode", ["pixi", "eplor"])
+	.add(debugValues, "bgMode", ["pixi", "mg"])
 	.name("背景渲染器")
 	.onFinishChange((v: string) => {
 		recreateBGRenderer(v);
@@ -266,8 +266,7 @@ declare global {
 		globalLyricPlayer: LyricPlayer;
 		globalBackground:
 			| BackgroundRender<PixiRenderer>
-			| BackgroundRender<MeshGradientRenderer>
-			| BackgroundRender<EplorRenderer>;
+			| BackgroundRender<MeshGradientRenderer>;
 	}
 }
 
@@ -293,7 +292,7 @@ async function loadLyric() {
 	const lyricFile = debugValues.lyric;
 	const content = await (await fetch(lyricFile)).text();
 	if (lyricFile.endsWith(".ttml")) {
-		lyricPlayer.setLyricLines(parseTTML(content));
+		lyricPlayer.setLyricLines(parseTTML(content).lyricLines);
 	} else if (lyricFile.endsWith(".lrc")) {
 		lyricPlayer.setLyricLines(parseLrc(content).map(mapLyric));
 	} else if (lyricFile.endsWith(".yrc")) {
@@ -304,13 +303,6 @@ async function loadLyric() {
 		lyricPlayer.setLyricLines(parseQrc(content).map(mapLyric));
 	}
 }
-
-const lys = String.raw`
-`.trim();
-// [0]This (500,1100)is (1600,250)a (1850,250)long(2100,2000) syll(4100,400)a(4500,250)ble(4750,1000) lyrics(5750,500)
-// [35610,4170](35610,360,0)I (35970,540,0)cast (36510,390,0)us (36900,390,0)out (37290,1050,0)of (38340,1440,0)paradise
-
-const l = parseYrc(lys).map(mapLyric);
 
 (async () => {
 	recreateBGRenderer(debugValues.bgMode);
@@ -326,8 +318,7 @@ const l = parseYrc(lys).map(mapLyric);
 		lyricPlayer.setEnableSpring(false);
 	}
 	await loadLyric();
-	lyricPlayer.setLyricLines(l);
-	// debugValues.play();
+	debugValues.play();
 	// debugValues.currentTime = 34;
 	// debugValues.mockPlay();
 })();

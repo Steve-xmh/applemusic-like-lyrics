@@ -16,8 +16,8 @@ AMLL 的纯 JS 核心组件框架，包括歌词显示组件和背景组件等�
 
 安装使用的依赖（如果以下列出的依赖包没有安装的话需要自行安装）：
 ```bash
-npm install @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite jss jss-preset-default # 使用 npm
-yarn add @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite jss jss-preset-default # 使用 yarn
+npm install @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite # 使用 npm
+yarn add @pixi/app @pixi/core @pixi/display @pixi/filter-blur @pixi/filter-bulge-pinch @pixi/filter-color-matrix @pixi/sprite # 使用 yarn
 ```
 
 安装本体框架：

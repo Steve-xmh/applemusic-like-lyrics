@@ -9,15 +9,9 @@ import { eqSet } from "../utils/eq-set";
 import { SpringParams } from "../utils/spring";
 import { BottomLineEl } from "./bottom-line";
 import { InterludeDots } from "./interlude-dots";
-import {
-	LyricLineEl,
-	RawLyricLineMouseEvent,
-	shouldEmphasize,
-} from "./lyric-line";
-import { create } from "jss";
-import preset from "jss-preset-default";
-
-const jss = create(preset());
+import { LyricLineEl, RawLyricLineMouseEvent } from "./lyric-line";
+import "../styles/index.css";
+import styles from "../styles/lyric-player.module.css";
 
 /**
  * 歌词行鼠标相关事件，可以获取到歌词行的索引和歌词行元素
@@ -164,9 +158,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	setEnableSpring(enable = true) {
 		this.disableSpring = !enable;
 		if (enable) {
-			this.element.classList.remove(this.style.classes.disableSpring);
+			this.element.classList.remove(styles.disableSpring);
 		} else {
-			this.element.classList.add(this.style.classes.disableSpring);
+			this.element.classList.add(styles.disableSpring);
 		}
 		this.calcLayout(true);
 	}
@@ -196,143 +190,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	getEnableScale() {
 		return this.enableScale;
 	}
-	public readonly style = jss.createStyleSheet({
-		lyricPlayer: {
-			userSelect: "none",
-			fontSize:
-				"var(--amll-lyric-player-font-size,max(max(4.7vh, 3.2vw), 12px))",
-			padding: "1em",
-			margin: "-1em",
-			width: "100%",
-			height: "100%",
-			overflow: "hidden",
-			boxSizing: "content-box",
-			maxWidth: "100%",
-			maxHeight: "100%",
-			zIndex: 1,
-			color: "var(--amll-lyric-view-color,white)",
-			mixBlendMode: "plus-lighter",
-			contain: "strict",
-			"&:hover": {
-				"& $lyricLine": {
-					filter: "unset !important",
-				},
-			},
-		},
-		lyricLine: {
-			position: "absolute",
-			backfaceVisibility: "hidden",
-			transformOrigin: "left",
-			width: "var(--amll-lyric-player-width,100%)",
-			height: "fit-content",
-			padding: "2vh 20px",
-			// margin: "0 -1em",
-			contain: "content",
-			willChange: "filter,transform,opacity",
-			transition: "filter 0.2s, background-color 0.25s, box-shadow 0.25s",
-			boxSizing: "content-box",
-			borderRadius: "16px",
-			"&:has(>*):hover": {
-				backgroundColor: "var(--amll-lyric-view-hover-bg-color,#fff1)",
-				boxShadow: "0 0 0 4px var(--amll-lyric-view-hover-bg-color,#fff1)",
-			},
-			"&:has(>*):active": {
-				boxShadow: "0 0 0 var(--amll-lyric-view-hover-bg-color,#fff1)",
-			},
-		},
-		"@media (max-width: 1024px)": {
-			lyricLine: {
-				padding: "1vh 20px",
-			},
-			lyricBgLine: {
-				padding: "1vh 1.428571em",
-			},
-		},
-		lyricBgLine: {
-			opacity: 0,
-			// scale: 0.6,
-			fontSize: "max(70%, 10px)",
-			transition: "opacity 0.25s, scale 0.5s",
-			padding: "1vh 20px",
-			"&.active": {
-				transition:
-					"opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0,1,0,1) 0.25s",
-				opacity: 0.4,
-				// scale: 1,
-			},
-		},
-		lyricDuetLine: {
-			textAlign: "right",
-			transformOrigin: "right",
-		},
-		lyricMainLine: {
-			transition: "opacity 0.3s 0.1s",
-			willChange: "opacity",
-			margin: "-1em",
-			padding: "1em",
-			"& span": {
-				display: "inline-block",
-			},
-			"& > span, span.emphasize-wrapper": {
-				whiteSpace: "pre-wrap",
-				willChange: "transform,display,mask-image",
-				display: "inline-block",
-				"&.emphasize, span.emphasize": {
-					padding: "1em",
-					margin: "-1em",
-					willChange: "transform",
-					backfaceVisibility: "hidden",
-					"& > span": {
-						padding: "1em",
-						margin: "-1em",
-						willChange: "transform",
-						backfaceVisibility: "hidden",
-					},
-				},
-			},
-		},
-		lyricSubLine: {
-			fontSize: "max(0.5em, 10px)",
-			transition: "opacity 0.2s 0.25s",
-			opacity: 0.3,
-		},
-		disableSpring: {
-			"& > *": {
-				transition:
-					"filter 0.25s, transform 0.5s, background-color 0.25s, box-shadow 0.25s",
-			},
-		},
-		interludeDots: {
-			height: "clamp(0.5em,1vh,3em)",
-			transformOrigin: "center",
-			width: "fit-content",
-			padding: "2.5% 0",
-			position: "absolute",
-			display: "flex",
-			gap: "0.25em",
-			left: "1em",
-			"& > *": {
-				height: "clamp(0.5em,1vh,3em)",
-				display: "inline-block",
-				borderRadius: "50%",
-				aspectRatio: "1 / 1",
-				backgroundColor: "var(--amll-lyric-view-color,white)",
-				marginRight: "4px",
-			},
-			"&.duet": {
-				right: "1em",
-				transformOrigin: "center",
-			},
-		},
-		"@supports (mix-blend-mode: plus-lighter)": {
-			lyricSubLine: {
-				opacity: 0.3,
-			},
-		},
-		tmpDisableTransition: {
-			transition: "none !important",
-		},
-	});
 	private _baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
 	public get baseFontSize() {
 		return this._baseFontSize;
@@ -349,15 +206,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		super();
 		this.interludeDots = new InterludeDots(this);
 		this.bottomLine = new BottomLineEl(this);
-		this.element.setAttribute("class", this.style.classes.lyricPlayer);
+		this.element.setAttribute("class", "amll-lyric-player");
 		if (this.disableSpring) {
-			this.element.classList.add(this.style.classes.disableSpring);
+			this.element.classList.add(styles.disableSpring);
 		}
 		this.rebuildStyle();
 		this.resizeObserver.observe(this.element);
 		this.element.appendChild(this.interludeDots.getElement());
 		this.element.appendChild(this.bottomLine.getElement());
-		this.style.attach();
 		this.interludeDots.setTransform(0, 200);
 		window.addEventListener("pageshow", this.onPageShow);
 		window.addEventListener("pagehide", this.onPageHide);
@@ -543,7 +399,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	rebuildStyle() {
 		this._baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
 		let style = "";
-		style += "--amll-lyric-player-width:";
+		style += "--amll-lp-width:";
 		if (window.innerWidth <= 1024) {
 			style += `${this.innerSize[0] - this.padding * 2}px;`;
 		} else {
@@ -551,7 +407,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 4)
 			}px;`;
 		}
-		style += "--amll-lyric-player-height:";
+		style += "--amll-lp-height:";
 		style += `${this.innerSize[1] - this.padding * 4}px;`;
 
 		// style += "--amll-player-time:";
@@ -1212,7 +1068,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	dispose(): void {
 		this.element.remove();
 		this.resizeObserver.disconnect();
-		this.style.detach();
 		for (const el of this.lyricLinesEl) {
 			el.dispose();
 		}
