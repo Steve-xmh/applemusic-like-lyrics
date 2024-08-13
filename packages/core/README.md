@@ -34,6 +34,7 @@ yarn add @applemusic-like-lyrics/core # 使用 yarn
 
 ```typescript
 import { LyricPlayer } from "@applemusic-like-lyrics/core";
+import "@applemusic-like-lyrics/core/style.css"; // 导入需要的样式
 
 const player = new LyricPlayer(); // 创建歌词播放组件
 document.body.appendChild(player.getElement()); // 将组件的元素添加到页面
