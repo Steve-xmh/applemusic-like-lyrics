@@ -164,6 +164,7 @@ __metadata:
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
     classnames: "npm:^2.5.1"
+    jotai: "npm:^2.9.3"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     typedoc: "npm:^0.26.5"
@@ -172,6 +173,7 @@ __metadata:
     vite: "npm:^5.4.0"
     vite-plugin-dts: "npm:^4.0.2"
   peerDependencies:
+    jotai: "*"
     react: "*"
     react-dom: "*"
   languageName: unknown
@@ -6651,6 +6653,21 @@ __metadata:
     react:
       optional: true
   checksum: 7e635f4f5052582095ed3949aa46f26213b10237bc4876db242c936f0f4d4272129727d7419e4fd5b1b83fa55b7ad737575453116a955dcc6b3a26cba14591f2
+  languageName: node
+  linkType: hard
+
+"jotai@npm:^2.9.3":
+  version: 2.9.3
+  resolution: "jotai@npm:2.9.3"
+  peerDependencies:
+    "@types/react": ">=17.0.0"
+    react: ">=17.0.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 4366a50be8edd39f1430ac655677e559cfbb253101e4f2e750bca8ebd81e75ea09ea3828bce727482b15305ffe924dda75bd9a055e903e0cc804b6600478dc36
   languageName: node
   linkType: hard
 

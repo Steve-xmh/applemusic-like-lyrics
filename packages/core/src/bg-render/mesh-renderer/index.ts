@@ -627,6 +627,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private frameTime = 0;
 	private lastTickTime = 0;
 	private playTime = 0;
+	private volume = 0;
 	private tickHandle = 0;
 	private maxFPS = 60;
 	private paused = false;
@@ -713,6 +714,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 			this.albumTexture.bind();
 		}
 		this.mainProgram.setUniform1f("u_time", tickTime / 10000);
+		this.mainProgram.setUniform1f("u_volume", this.volume);
+		this.mainProgram.setUniform1f("u_aspect", this.canvas.width / this.canvas.height);
 		this.mainProgram.setUniform1i("u_texture", 0);
 		this.mainMesh.draw();
 
@@ -760,15 +763,15 @@ export class MeshGradientRenderer extends BaseRenderer {
 		);
 		this.mainMesh = new BHPMesh(
 			gl,
-			this.mainProgram.attrs["a_pos"],
-			this.mainProgram.attrs["a_color"],
-			this.mainProgram.attrs["a_uv"],
+			this.mainProgram.attrs.a_pos,
+			this.mainProgram.attrs.a_color,
+			this.mainProgram.attrs.a_uv,
 		);
 		this.fullScreenMesh = new Mesh(
 			gl,
-			this.noiseProgram.attrs["a_pos"],
-			this.noiseProgram.attrs["a_color"],
-			this.noiseProgram.attrs["a_uv"],
+			this.noiseProgram.attrs.a_pos,
+			this.noiseProgram.attrs.a_color,
+			this.noiseProgram.attrs.a_uv,
 		);
 
 		const p = 5;
@@ -868,9 +871,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 		this.albumTexture = new GLTexture(this.gl, imageData);
 	}
 	override setLowFreqVolume(volume: number): void {
-		// TODO: 待实现
+		this.volume = volume / 10;
 	}
 	override setHasLyric(hasLyric: boolean): void {
-		// TODO: 待实现
+		// 不再考虑实现
 	}
 }

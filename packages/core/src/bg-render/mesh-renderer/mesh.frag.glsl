@@ -4,6 +4,7 @@ varying vec3 v_color;
 varying vec2 v_uv;
 uniform sampler2D u_texture;
 uniform float u_time;
+uniform float u_volume;
 
 vec2 rot(vec2 v, float a) {
     float s = sin(a);
@@ -13,5 +14,8 @@ vec2 rot(vec2 v, float a) {
 }
 
 void main() {
-    gl_FragColor = vec4(v_color, 1.0) * texture2D(u_texture, rot(v_uv, u_time));
+    vec4 result = texture2D(u_texture, rot(v_uv * max(1.0, 1.0 + u_volume), u_time + u_volume));
+    result *= vec4(v_color, 1.0);
+    result *= vec4(1.0 - u_volume * 0.1);
+    gl_FragColor = result;
 }
