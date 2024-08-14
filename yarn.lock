@@ -73,7 +73,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/core@npm:*, @applemusic-like-lyrics/core@npm:^0.1.3, @applemusic-like-lyrics/core@workspace:packages/core":
+"@applemusic-like-lyrics/core@npm:*, @applemusic-like-lyrics/core@npm:^0.1.3, @applemusic-like-lyrics/core@workspace:^, @applemusic-like-lyrics/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/core@workspace:packages/core"
   dependencies:
@@ -153,7 +153,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/react-full@workspace:packages/react-full"
   dependencies:
-    "@applemusic-like-lyrics/core": "npm:^0.1.3"
+    "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/react": "workspace:^"
     "@biomejs/biome": "npm:1.5.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
@@ -179,7 +180,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/react@npm:*, @applemusic-like-lyrics/react@workspace:packages/react":
+"@applemusic-like-lyrics/react@npm:*, @applemusic-like-lyrics/react@workspace:^, @applemusic-like-lyrics/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:

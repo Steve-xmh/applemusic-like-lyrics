@@ -15,17 +15,25 @@
 .thumb {
     grid-row: thumb;
     
-    border: 1px solid aqua;
+    /* border: 1px solid aqua; */
 
     @media screen and (max-width: 768px) {
         margin: 4px
     }
 }
 
+.coverFrame {
+    position: relative;
+    width: 0px;
+    height: 0px;
+}
+
 /* 封面的位置由 JS 设定 */
 .cover {
     aspect-ratio: 1 / 1;
     position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .lyricLayout {
@@ -60,7 +68,7 @@
     
     width: 6em;
 
-    border: 1px solid greenyellow;
+    /* border: 1px solid greenyellow; */
 }
 
 /* 辅助定位的大封面图位置 */
@@ -70,26 +78,45 @@
     aspect-ratio: 1 / 1;
     pointer-events: none;
     
-    border: 1px solid pink;
+    /* border: 1px solid pink; */
 }
 
 .smallControls {
     grid-row: controls;
     grid-column: info-side;
     
-    border: 1px solid yellow;
+    /* border: 1px solid yellow; */
+    transition: opacity 0.5s 0.5s;
+    &.hideLyric {
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+    }
 }
 
 .lyric {
     grid-row: lyric-view;
     grid-column: 1 / 5;
     
-    border: 1px solid blue;
+    /* border: 1px solid blue; */
+    
+    transition: opacity 0.5s 0.5s;
+    opacity: 1;
+    &.hideLyric {
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+    }
 }
 
 .bigControls {
     grid-row: lyric-view;
     grid-column: 2 / 3;
     
-    border: 1px solid red;
+    /* border: 1px solid red; */
+    transition: opacity 0.5s;
+    opacity: 0;
+    &.hideLyric {
+        opacity: 1;
+    }
 }
