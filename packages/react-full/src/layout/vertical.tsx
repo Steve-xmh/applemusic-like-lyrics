@@ -40,18 +40,24 @@ export const VerticalLayout: React.FC<
 				: phonySmallCoverRef.current;
 			const coverFrameEl = coverFrameRef.current;
 			if (!targetCover || !coverFrameEl || !rootEl) return;
-			const targetCoverWidth = targetCover.clientWidth;
-			const targetCoverHeight = targetCover.clientHeight;
+			const targetCoverSize = Math.min(
+				targetCover.clientWidth,
+				targetCover.clientHeight,
+			);
 			const rootB = rootEl.getBoundingClientRect();
 			const targetCoverB = targetCover.getBoundingClientRect();
-			const targetCoverLeft = targetCoverB.x - rootB.x;
-			const targetCoverTop = targetCoverB.y - rootB.y;
-			const transitionValue = force ? "none" : "all 0.5s ease-out";
+			const targetCoverLeft =
+				targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
+			const targetCoverTop =
+				targetCoverB.y - rootB.y + (targetCoverB.height - targetCoverSize) / 2;
+			const transitionValue = force
+				? "none"
+				: "all 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)";
 			if (transitionValue !== coverFrameEl.style.transition) {
 				coverFrameEl.style.transition = transitionValue;
 			}
-			coverFrameEl.style.width = `${targetCoverWidth}px`;
-			coverFrameEl.style.height = `${targetCoverHeight}px`;
+			coverFrameEl.style.width = `${targetCoverSize}px`;
+			coverFrameEl.style.height = `${targetCoverSize}px`;
 			coverFrameEl.style.left = `${targetCoverLeft}px`;
 			coverFrameEl.style.top = `${targetCoverTop}px`;
 		},
@@ -78,7 +84,11 @@ export const VerticalLayout: React.FC<
 	}, [hideLyric, updateCoverLayout]);
 	return (
 		<div
-			className={classNames(styles.verticalLayout, className)}
+			className={classNames(
+				styles.verticalLayout,
+				hideLyric && styles.hideLyric,
+				className,
+			)}
 			ref={rootRef}
 			{...rest}
 		>
@@ -86,31 +96,13 @@ export const VerticalLayout: React.FC<
 			<div className={styles.lyricLayout}>
 				{/** 用于占位，测量布局的大小用 */}
 				<div className={styles.phonySmallCover} ref={phonySmallCoverRef} />
-				<div
-					className={classNames(
-						styles.smallControls,
-						hideLyric && styles.hideLyric,
-					)}
-				>
-					{smallControlsSlot}
-				</div>
-				<div
-					className={classNames(styles.lyric, hideLyric && styles.hideLyric)}
-				>
-					{lyricSlot}
-				</div>
+				<div className={styles.smallControls}>{smallControlsSlot}</div>
+				<div className={styles.lyric}>{lyricSlot}</div>
 			</div>
 			<div className={styles.noLyricLayout}>
 				{/** 用于占位，测量布局的大小用 */}
 				<div className={styles.phonyBigCover} ref={phonyBigCoverRef} />
-				<div
-					className={classNames(
-						styles.bigControls,
-						hideLyric && styles.hideLyric,
-					)}
-				>
-					{bigControlsSlot}
-				</div>
+				<div className={styles.bigControls}>{bigControlsSlot}</div>
 			</div>
 			<div className={styles.coverFrame}>
 				<div className={styles.cover} ref={coverFrameRef}>

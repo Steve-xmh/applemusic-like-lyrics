@@ -37,6 +37,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 1;
 }
 
 .lyricLayout {
@@ -47,7 +48,7 @@
     grid-template-rows:
         1em [controls] 0fr [lyric-view] 1fr;
     grid-template-columns:
-        3em [cover-side] 0fr [info-side] 1fr 3em;
+        4em [cover-side] 0fr [info-side] 1fr 3em;
 }
 
 .noLyricLayout {
@@ -57,16 +58,20 @@
     overflow-y: hidden;
     display: grid;
     grid-template-rows:
-        1em [cover-view] 0fr [lyric-view] 1fr;
+        1em [cover-view] 1fr [lyric-view] 0fr;
     grid-template-columns:
         3em [main-view] 1fr 3em;
+    pointer-events: none;
 }
 
 /* 辅助定位的小封面图位置 */
 .phonySmallCover {
     grid-row: controls;
     grid-column: cover-side;
+    justify-self: center;
+    align-self: center;
     aspect-ratio: 1 / 1;
+    opacity: 0;
     pointer-events: none;
 
     width: 6em;
@@ -78,7 +83,7 @@
 .phonyBigCover {
     grid-row: cover-view;
     grid-column: 2 / 3;
-    aspect-ratio: 1 / 1;
+    opacity: 0;
     pointer-events: none;
 
     /* border: 1px solid pink; */
@@ -90,12 +95,7 @@
 
     /* border: 1px solid yellow; */
     transition: opacity 0.5s 0.5s;
-
-    &.hideLyric {
-        opacity: 0;
-        transition: opacity 0.5s;
-        pointer-events: none;
-    }
+    padding-left: 1em;
 }
 
 .lyric {
@@ -106,12 +106,6 @@
 
     transition: opacity 0.5s 0.5s;
     opacity: 1;
-
-    &.hideLyric {
-        opacity: 0;
-        transition: opacity 0.5s;
-        pointer-events: none;
-    }
 }
 
 .bigControls {
@@ -121,8 +115,26 @@
     /* border: 1px solid red; */
     transition: opacity 0.5s;
     opacity: 0;
+}
 
-    &.hideLyric {
+.hideLyric {
+    .smallControls {
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+    }
+
+    .noLyricLayout {
+        pointer-events: auto;
+    }
+
+    .lyric {
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+    }
+
+    .bigControls {
         opacity: 1;
     }
 }

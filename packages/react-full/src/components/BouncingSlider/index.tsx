@@ -1,4 +1,4 @@
-import { HTMLProps, useEffect, useRef, useState } from "react";
+import { type HTMLProps, useEffect, useRef, useState } from "react";
 import styles from "./index.module.css";
 import { Spring } from "../../utils/spring";
 import classNames from "classnames";
@@ -15,7 +15,7 @@ export interface SliderProps {
 	afterIcon?: JSX.Element;
 }
 
-export const Slider: React.FC<
+export const BouncingSlider: React.FC<
 	SliderProps & Omit<HTMLProps<HTMLDivElement>, keyof SliderProps>
 > = (props) => {
 	const {
@@ -162,9 +162,9 @@ export const Slider: React.FC<
 			{...others}
 		>
 			{beforeIcon}
-			<div ref={innerRef} className="inner">
+			<div ref={innerRef} className={styles.inner}>
 				<div
-					className="thumb"
+					className={styles.thumb}
 					style={{
 						width: `${((curValue - min) / (max - min)) * 100}%`,
 					}}

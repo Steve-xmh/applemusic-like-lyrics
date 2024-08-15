@@ -13,7 +13,8 @@
     object-position: center;
     background-position: center;
     background-size: cover;
-    border-radius: 2%;
+    background-color: black;
+    border-radius: max(2%, 0.7vh);
     box-shadow: var(--base-box-shadow-v-0) 0px var(--base-box-shadow-y-0) var(--base-box-shadow-r-0), var(--base-box-shadow-v-1) 0px var(--base-box-shadow-y-1) var(--base-box-shadow-r-1);
     transform: scale(1);
 

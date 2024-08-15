@@ -1,0 +1,21 @@
+.menuButton {
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    position: relative;
+    border: none;
+    background: #FFFFFF15 !important;
+    width: 2.6vh;
+    margin-left: 16px;
+    border-radius: 50%;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    & svg {
+        width: 72%;
+        height: auto;
+        color: #FFFFFF;
+    }
+}

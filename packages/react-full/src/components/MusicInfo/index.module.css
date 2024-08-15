@@ -1,0 +1,59 @@
+.musicInfo {
+    display: flex;
+    padding: 3em 0;
+    color: white;
+    font-size: 2.0vh
+}
+
+.info {
+    flex: 1;
+}
+
+.name {
+    white-space: nowrap;
+    line-height: normal;
+    cursor: text;
+    user-select: text;
+    min-width: 0;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    opacity: 0.9;
+    mix-blend-mode: normal !important
+}
+
+.artists,
+.album {
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0.45;
+    font-weight: 200;
+
+    letter-spacing: 1px;
+
+    & a {
+        line-height: normal;
+        text-decoration: none;
+
+        user-select: text;
+
+        &:hover {
+            opacity: 0.75;
+        }
+
+        &:active {
+            opacity: 0.5
+        }
+
+        &::after {
+            content: var(--applemusic-like-lyrics-music-artists-separator, ", ")
+        }
+
+        &:nth-last-child(2)::after {
+            content: " & "
+        }
+
+        &:last-child::after {
+            content: ""
+        }
+    }
+}
