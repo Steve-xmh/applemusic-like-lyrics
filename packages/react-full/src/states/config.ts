@@ -4,10 +4,7 @@
  */
 
 import { atom } from "jotai";
-import {
-	MeshGradientRenderer,
-	BaseRenderer,
-} from "@applemusic-like-lyrics/core";
+import { MeshGradientRenderer } from "@applemusic-like-lyrics/core";
 import type { BackgroundRenderProps } from "@applemusic-like-lyrics/react";
 
 // ======================== 歌词效果配置 ========================

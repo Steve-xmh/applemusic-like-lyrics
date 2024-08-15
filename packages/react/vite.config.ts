@@ -9,7 +9,7 @@ export default defineConfig({
 			entry: "src/index.ts",
 			name: "AppleMusicLikeLyricsReact",
 			fileName: "amll-react",
-			formats: ["es", "cjs"],
+			formats: ["es"],
 		},
 		rollupOptions: {
 			external: ["react", "react-dom", "react/jsx-runtime", "@applemusic-like-lyrics/core"],

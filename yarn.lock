@@ -25,7 +25,7 @@ __metadata:
     "@applemusic-like-lyrics/react": "npm:*"
     "@applemusic-like-lyrics/ttml": "npm:*"
     "@applemusic-like-lyrics/ws-protocol": "npm:*"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -44,7 +44,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.3.1"
     classnames: "npm:^2.3.2"
     driver.js: "npm:^1.3.0"
-    framer-motion: "npm:^10.17.9"
+    framer-motion: "npm:^11.3.27"
     jotai: "npm:^2.4.3"
     jszip: "npm:^3.10.1"
     lightningcss: "npm:^1.22.0"
@@ -68,7 +68,7 @@ __metadata:
     uuid: "npm:^9.0.1"
     vite: "npm:^5.4.0"
     vite-plugin-lightningcss: "npm:^0.0.5"
-    vite-plugin-svgr: "npm:^4.1.0"
+    vite-plugin-svgr: "npm:^4.2.0"
     vite-plugin-wasm: "npm:^3.3.0"
   languageName: unknown
   linkType: soft
@@ -79,7 +79,7 @@ __metadata:
   dependencies:
     "@applemusic-like-lyrics/lyric": "npm:^0.0.2"
     "@applemusic-like-lyrics/ttml": "workspace:^"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@types/stats.js": "npm:^0.17.0"
     bezier-easing: "npm:^2.1.0"
     gl-matrix: "npm:^4.0.0-beta.2"
@@ -89,7 +89,7 @@ __metadata:
     typedoc-plugin-markdown: "npm:^4.2.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
-    vite-plugin-dts: "npm:^4.0.2"
+    vite-plugin-dts: "npm:^4.0.3"
     vite-plugin-glsl: "npm:^1.3.0"
     vite-plugin-top-level-await: "npm:^1.4.4"
     vite-plugin-wasm: "npm:^3.3.0"
@@ -155,7 +155,7 @@ __metadata:
   dependencies:
     "@applemusic-like-lyrics/core": "workspace:^"
     "@applemusic-like-lyrics/react": "workspace:^"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -165,6 +165,7 @@ __metadata:
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
     classnames: "npm:^2.5.1"
+    framer-motion: "npm:^11.3.27"
     jotai: "npm:^2.9.3"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -172,7 +173,8 @@ __metadata:
     typedoc-plugin-markdown: "npm:^4.2.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
-    vite-plugin-dts: "npm:^4.0.2"
+    vite-plugin-dts: "npm:^4.0.3"
+    vite-plugin-svgr: "npm:^4.2.0"
   peerDependencies:
     jotai: "*"
     react: "*"
@@ -185,7 +187,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/react@workspace:packages/react"
   dependencies:
     "@applemusic-like-lyrics/core": "npm:^0.1.3"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -200,7 +202,7 @@ __metadata:
     typedoc-plugin-markdown: "npm:^4.2.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
-    vite-plugin-dts: "npm:^4.0.2"
+    vite-plugin-dts: "npm:^4.0.3"
   peerDependencies:
     react: "*"
     react-dom: "*"
@@ -211,10 +213,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/ttml@workspace:packages/ttml"
   dependencies:
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
-    vite-plugin-dts: "npm:^4.0.2"
+    vite-plugin-dts: "npm:^4.0.3"
   languageName: unknown
   linkType: soft
 
@@ -223,7 +225,7 @@ __metadata:
   resolution: "@applemusic-like-lyrics/vue@workspace:packages/vue"
   dependencies:
     "@applemusic-like-lyrics/core": "npm:^0.1.3"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@pixi/app": "npm:^7.2.4"
     "@pixi/core": "npm:^7.2.4"
     "@pixi/display": "npm:^7.2.4"
@@ -236,7 +238,7 @@ __metadata:
     typedoc-plugin-markdown: "npm:^4.2.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
-    vite-plugin-dts: "npm:^4.0.2"
+    vite-plugin-dts: "npm:^4.0.3"
     vue: "npm:^3.3.4"
   peerDependencies:
     vue: "*"
@@ -702,18 +704,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/biome@npm:1.5.3"
+"@biomejs/biome@npm:^1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/biome@npm:1.8.3"
   dependencies:
-    "@biomejs/cli-darwin-arm64": "npm:1.5.3"
-    "@biomejs/cli-darwin-x64": "npm:1.5.3"
-    "@biomejs/cli-linux-arm64": "npm:1.5.3"
-    "@biomejs/cli-linux-arm64-musl": "npm:1.5.3"
-    "@biomejs/cli-linux-x64": "npm:1.5.3"
-    "@biomejs/cli-linux-x64-musl": "npm:1.5.3"
-    "@biomejs/cli-win32-arm64": "npm:1.5.3"
-    "@biomejs/cli-win32-x64": "npm:1.5.3"
+    "@biomejs/cli-darwin-arm64": "npm:1.8.3"
+    "@biomejs/cli-darwin-x64": "npm:1.8.3"
+    "@biomejs/cli-linux-arm64": "npm:1.8.3"
+    "@biomejs/cli-linux-arm64-musl": "npm:1.8.3"
+    "@biomejs/cli-linux-x64": "npm:1.8.3"
+    "@biomejs/cli-linux-x64-musl": "npm:1.8.3"
+    "@biomejs/cli-win32-arm64": "npm:1.8.3"
+    "@biomejs/cli-win32-x64": "npm:1.8.3"
   dependenciesMeta:
     "@biomejs/cli-darwin-arm64":
       optional: true
@@ -733,62 +735,62 @@ __metadata:
       optional: true
   bin:
     biome: bin/biome
-  checksum: 1bcdcc3a34de0871d91ecf37eae67f71847f3578723001f81616b1fd1d694d584accce37cf582f07aef3b920b47c32716e7244b7f67f52926c7c8526bc7cd5d9
+  checksum: 62dfa5147712ef21c384ea7b3c93c0ccac58291a85f2bbd2dee22c8381da5e347cd07bdb7bfcafcecb07fc112349e9d101e697774155553bde987fd47f9b12a1
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-arm64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-darwin-arm64@npm:1.5.3"
+"@biomejs/cli-darwin-arm64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-darwin-arm64@npm:1.8.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-x64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-darwin-x64@npm:1.5.3"
+"@biomejs/cli-darwin-x64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-darwin-x64@npm:1.8.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64-musl@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-linux-arm64-musl@npm:1.5.3"
+"@biomejs/cli-linux-arm64-musl@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:1.8.3"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-linux-arm64@npm:1.5.3"
+"@biomejs/cli-linux-arm64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-linux-arm64@npm:1.8.3"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64-musl@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-linux-x64-musl@npm:1.5.3"
+"@biomejs/cli-linux-x64-musl@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-linux-x64-musl@npm:1.8.3"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-linux-x64@npm:1.5.3"
+"@biomejs/cli-linux-x64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-linux-x64@npm:1.8.3"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-arm64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-win32-arm64@npm:1.5.3"
+"@biomejs/cli-win32-arm64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-win32-arm64@npm:1.8.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-x64@npm:1.5.3":
-  version: 1.5.3
-  resolution: "@biomejs/cli-win32-x64@npm:1.5.3"
+"@biomejs/cli-win32-x64@npm:1.8.3":
+  version: 1.8.3
+  resolution: "@biomejs/cli-win32-x64@npm:1.8.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -802,26 +804,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/is-prop-valid@npm:^0.8.2":
-  version: 0.8.8
-  resolution: "@emotion/is-prop-valid@npm:0.8.8"
-  dependencies:
-    "@emotion/memoize": "npm:0.7.4"
-  checksum: e85bdeb9d9d23de422f271e0f5311a0142b15055bb7e610440dbf250f0cdfd049df88af72a49e2c6081954481f1cbeca9172e2116ff536b38229397dfbed8082
-  languageName: node
-  linkType: hard
-
 "@emotion/memoize@npm:0.7.1":
   version: 0.7.1
   resolution: "@emotion/memoize@npm:0.7.1"
   checksum: fec25e74c3a4af920bfdb0f552c16f648c8f4343d51cb073af85fcec1a382ce041a4e082f458a999dc3599e9d768c0dd28e5accd6066169e01364b270b7036cf
-  languageName: node
-  linkType: hard
-
-"@emotion/memoize@npm:0.7.4":
-  version: 0.7.4
-  resolution: "@emotion/memoize@npm:0.7.4"
-  checksum: 4e3920d4ec95995657a37beb43d3f4b7d89fed6caa2b173a4c04d10482d089d5c3ea50bbc96618d918b020f26ed6e9c4026bbd45433566576c1f7b056c3271dc
   languageName: node
   linkType: hard
 
@@ -3552,7 +3538,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "applemusic-like-lyrics@workspace:."
   dependencies:
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     lerna: "npm:^7.3.1"
   languageName: unknown
   linkType: soft
@@ -5424,24 +5410,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^10.17.9":
-  version: 10.17.9
-  resolution: "framer-motion@npm:10.17.9"
+"framer-motion@npm:^11.3.27":
+  version: 11.3.27
+  resolution: "framer-motion@npm:11.3.27"
   dependencies:
-    "@emotion/is-prop-valid": "npm:^0.8.2"
     tslib: "npm:^2.4.0"
   peerDependencies:
+    "@emotion/is-prop-valid": "*"
     react: ^18.0.0
     react-dom: ^18.0.0
-  dependenciesMeta:
+  peerDependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  peerDependenciesMeta:
     react:
       optional: true
     react-dom:
       optional: true
-  checksum: 7ce3449885c49ea08cda429d82da45e688e321c49ac0443e56b595161e0a8b6d468efba7a13bf55194e7c0f030356383d9b38ca0e9ea48bcc113172b548c1876
+  checksum: ee5f3dcc0d024653f1039a856c77c5508aedcd3b0b79fcf8860dcd66a78c709584a19c4d1678936c424e3ae38ab9fa5ea0ca061356569c1bffce450a55313a90
   languageName: node
   linkType: hard
 
@@ -10102,7 +10087,7 @@ __metadata:
     "@applemusic-like-lyrics/lyric": "npm:*"
     "@applemusic-like-lyrics/react": "npm:*"
     "@applemusic-like-lyrics/ws-protocol": "npm:*"
-    "@biomejs/biome": "npm:1.5.3"
+    "@biomejs/biome": "npm:^1.8.3"
     "@tauri-apps/api": "npm:^1.4.0"
     "@tauri-apps/cli": "npm:^1.4.0"
     "@types/react": "npm:^18.2.15"
@@ -10115,7 +10100,7 @@ __metadata:
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
     vite-plugin-lightningcss: "npm:^0.0.5"
-    vite-plugin-svgr: "npm:^4.1.0"
+    vite-plugin-svgr: "npm:^4.2.0"
     vite-plugin-top-level-await: "npm:^1.4.4"
     vite-plugin-wasm: "npm:^3.3.0"
   languageName: unknown
@@ -12495,9 +12480,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-dts@npm:^4.0.2":
-  version: 4.0.2
-  resolution: "vite-plugin-dts@npm:4.0.2"
+"vite-plugin-dts@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "vite-plugin-dts@npm:4.0.3"
   dependencies:
     "@microsoft/api-extractor": "npm:7.47.4"
     "@rollup/pluginutils": "npm:^5.1.0"
@@ -12515,7 +12500,7 @@ __metadata:
   peerDependenciesMeta:
     vite:
       optional: true
-  checksum: 7028ee320d4e743317d244c553524a3dbfbf871651ad59368a6a5fba71ff4778548ce109fa5348500ff7d55c6b64570cfe14207489bad9ba9ef04948d62fe40d
+  checksum: 996603ffe81d5264da862ebcc85e05e09e1251fc456841e3f7233c4ae243c699d29889f3206be72b01873527d85beeaa4fcbacc61e31a71a5cab02fdb1d03e0d
   languageName: node
   linkType: hard
 
@@ -12540,7 +12525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-plugin-svgr@npm:^4.1.0":
+"vite-plugin-svgr@npm:^4.2.0":
   version: 4.2.0
   resolution: "vite-plugin-svgr@npm:4.2.0"
   dependencies:

@@ -1,0 +1,28 @@
+.cover {
+    --scale-level: 0.75;
+    --base-box-shadow-v-0: rgba(0, 0, 0, 0.35);
+    --base-box-shadow-y-0: 16px;
+    --base-box-shadow-r-0: 32px;
+    --base-box-shadow-v-1: rgba(0, 0, 0, 0.25);
+    --base-box-shadow-y-1: 32px;
+    --base-box-shadow-r-1: 64px;
+    aspect-ratio: 1/1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    background-position: center;
+    background-size: cover;
+    border-radius: 2%;
+    box-shadow: var(--base-box-shadow-v-0) 0px var(--base-box-shadow-y-0) var(--base-box-shadow-r-0), var(--base-box-shadow-v-1) 0px var(--base-box-shadow-y-1) var(--base-box-shadow-r-1);
+    transform: scale(1);
+
+    transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.3, 0.2, 0.2, 1.4);
+
+
+    &.musicPaused {
+        transform: scale(var(--scale-level));
+        box-shadow: var(--base-box-shadow-v-0) 0px calc(var(--base-box-shadow-y-0) / var(--scale-level) / 2) calc(var(--base-box-shadow-r-0) / var(--scale-level) / 2), var(--base-box-shadow-v-1) 0px calc(var(--base-box-shadow-y-1) / var(--scale-level) / 2) calc(var(--base-box-shadow-r-1) / var(--scale-level) / 2);
+        transition: background-image 0.5s linear, box-shadow 0.5s ease, transform 0.6s cubic-bezier(0.4, 0.2, 0.1, 1);
+    }
+}

@@ -1,11 +1,14 @@
-import { HTMLProps } from "react";
+import type { HTMLProps } from "react";
+import { useState, useRef } from "react";
 
 import styles from "./auto.module.css";
+import classNames from "classnames";
+import { useLayoutEffect } from "react";
+import { VerticalLayout } from "./vertical";
+import { HorizontalLayout } from "./horizontal";
 
 /**
- * 会根据当前视窗宽高比自动选择横向或者纵向布局的组件
- *
- * 此组件假设被全屏放置
+ * 会根据当前元素的宽高比自动选择横向或者纵向布局的组件
  */
 export const AutoLyricLayout: React.FC<
 	{
@@ -25,7 +28,48 @@ export const AutoLyricLayout: React.FC<
 	coverSlot,
 	lyricSlot,
 	hideLyric,
+	className,
 	...rest
 }) => {
-	return <div className={styles.autoLyricLayout}></div>;
+	const [isVertical, setIsVertical] = useState(false);
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		const rootEl = rootRef.current;
+		if (!rootEl) return;
+		setIsVertical(rootEl.clientWidth < rootEl.clientHeight);
+		const obz = new ResizeObserver(() => {
+			const rootB = rootEl.getBoundingClientRect();
+			setIsVertical(rootB.width < rootB.height);
+		});
+		obz.observe(rootEl);
+		return () => obz.disconnect();
+	}, []);
+
+	return (
+		<div
+			ref={rootRef}
+			className={classNames(styles.autoLyricLayout, className)}
+			{...rest}
+		>
+			{isVertical ? (
+				<VerticalLayout
+					thumbSlot={thumbSlot}
+					smallControlsSlot={smallControlsSlot}
+					bigControlsSlot={bigControlsSlot}
+					coverSlot={coverSlot}
+					lyricSlot={lyricSlot}
+					hideLyric={hideLyric}
+				/>
+			) : (
+				<HorizontalLayout
+					thumbSlot={thumbSlot}
+					controlsSlot={controlsSlot}
+					coverSlot={coverSlot}
+					lyricSlot={lyricSlot}
+					hideLyric={hideLyric}
+				/>
+			)}
+		</div>
+	);
 };

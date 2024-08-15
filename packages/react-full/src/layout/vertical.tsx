@@ -3,7 +3,8 @@
  * 一个适用于歌词页面竖向布局的组件
  */
 
-import { HTMLProps, useCallback, useLayoutEffect, useRef } from "react";
+import type { HTMLProps } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import styles from "./vertical.module.css";
 import classNames from "classnames";
 
@@ -23,6 +24,7 @@ export const VerticalLayout: React.FC<
 	bigControlsSlot,
 	lyricSlot,
 	hideLyric,
+	className,
 	...rest
 }) => {
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -75,7 +77,11 @@ export const VerticalLayout: React.FC<
 		updateCoverLayout(hideLyricRef.current, false);
 	}, [hideLyric, updateCoverLayout]);
 	return (
-		<div className={styles.verticalLayout} ref={rootRef} {...rest}>
+		<div
+			className={classNames(styles.verticalLayout, className)}
+			ref={rootRef}
+			{...rest}
+		>
 			<div className={styles.thumb}>{thumbSlot}</div>
 			<div className={styles.lyricLayout}>
 				{/** 用于占位，测量布局的大小用 */}

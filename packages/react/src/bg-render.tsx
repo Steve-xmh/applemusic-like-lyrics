@@ -123,7 +123,6 @@ export const BackgroundRender = forwardRef<
 				coreBGRenderRef.current === undefined
 			) {
 				lastRendererRef.current = curRenderer;
-				console.log("new renderer", curRenderer);
 				coreBGRenderRef.current?.dispose();
 				coreBGRenderRef.current = CoreBackgroundRender.new(curRenderer);
 			}

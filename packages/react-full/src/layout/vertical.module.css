@@ -1,4 +1,6 @@
 .verticalLayout {
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-rows:
         /* 保证可以拖动窗口的区域 */
@@ -14,7 +16,8 @@
 
 .thumb {
     grid-row: thumb;
-    
+    justify-self: center;
+
     /* border: 1px solid aqua; */
 
     @media screen and (max-width: 768px) {
@@ -65,7 +68,7 @@
     grid-column: cover-side;
     aspect-ratio: 1 / 1;
     pointer-events: none;
-    
+
     width: 6em;
 
     /* border: 1px solid greenyellow; */
@@ -77,16 +80,17 @@
     grid-column: 2 / 3;
     aspect-ratio: 1 / 1;
     pointer-events: none;
-    
+
     /* border: 1px solid pink; */
 }
 
 .smallControls {
     grid-row: controls;
     grid-column: info-side;
-    
+
     /* border: 1px solid yellow; */
     transition: opacity 0.5s 0.5s;
+
     &.hideLyric {
         opacity: 0;
         transition: opacity 0.5s;
@@ -97,11 +101,12 @@
 .lyric {
     grid-row: lyric-view;
     grid-column: 1 / 5;
-    
+
     /* border: 1px solid blue; */
-    
+
     transition: opacity 0.5s 0.5s;
     opacity: 1;
+
     &.hideLyric {
         opacity: 0;
         transition: opacity 0.5s;
@@ -112,10 +117,11 @@
 .bigControls {
     grid-row: lyric-view;
     grid-column: 2 / 3;
-    
+
     /* border: 1px solid red; */
     transition: opacity 0.5s;
     opacity: 0;
+
     &.hideLyric {
         opacity: 1;
     }

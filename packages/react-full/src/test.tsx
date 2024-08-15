@@ -1,14 +1,48 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { HorizontalLayout } from "./layout/horizontal";
 import { VerticalLayout } from "./layout/vertical";
+import { PrebuiltLyricPlayer } from "./components/PrebuiltLyricPlayer";
+import { Provider, useStore } from "jotai";
+import { musicLyricLinesAtom } from "./states/music";
 
 const App: FC = () => {
 	const [hideLyric, setHideLyric] = useState(false);
+	const store = useStore();
+
+	useEffect(() => {
+		store.set(musicLyricLinesAtom, [
+			{
+				words: [
+					{
+						word: "Test",
+						startTime: 0,
+						endTime: 1000,
+					},
+				],
+				startTime: 0,
+				endTime: 1000,
+				translatedLyric: "",
+				romanLyric: "",
+				isBG: false,
+				isDuet: false,
+			},
+		]);
+	}, [store]);
 
 	return (
 		<>
 			<h1>AMLL React Framework gallery</h1>
+			<h2>Prebuilt Player</h2>
+			<PrebuiltLyricPlayer
+				style={{
+					width: "100%",
+					maxWidth: "100vw",
+					overflow: "hidden",
+					height: "100vh",
+					backgroundColor: "#222",
+				}}
+			/>
 			<h2>Horizontal Layout</h2>
 			<label>
 				<input
@@ -119,4 +153,8 @@ const App: FC = () => {
 	);
 };
 
-createRoot(document.getElementById("root") as HTMLElement).render(<App />);
+createRoot(document.getElementById("root") as HTMLElement).render(
+	<Provider>
+		<App />
+	</Provider>,
+);

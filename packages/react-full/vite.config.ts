@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
 	build: {
@@ -23,6 +24,12 @@ export default defineConfig({
 		react(),
 		dts({
 			exclude: ["src/test.tsx", "src/test-app.tsx"],
+		}),
+		svgr({
+			svgrOptions: {
+				ref: true,
+			},
+			include: ["./src/**/*.svg?react"],
 		}),
 	],
 });

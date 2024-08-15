@@ -31,12 +31,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/amll-core.js",
       "require": "./dist/amll-core.cjs"
+    },
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
     }
   },
   "devDependencies": {
     "@applemusic-like-lyrics/lyric": "^0.0.2",
     "@applemusic-like-lyrics/ttml": "workspace:^",
-    "@biomejs/biome": "1.5.3",
+    "@biomejs/biome": "^1.8.3",
     "@types/stats.js": "^0.17.0",
     "lil-gui": "^0.18.2",
     "stats.js": "^0.17.0",
@@ -44,7 +48,7 @@
     "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
-    "vite-plugin-dts": "^4.0.2",
+    "vite-plugin-dts": "^4.0.3",
     "vite-plugin-glsl": "^1.3.0",
     "vite-plugin-top-level-await": "^1.4.4",
     "vite-plugin-wasm": "^3.3.0"

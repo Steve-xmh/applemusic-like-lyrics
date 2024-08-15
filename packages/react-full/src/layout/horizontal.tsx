@@ -3,7 +3,7 @@
  * 一个适用于歌词页面横向布局的组件
  */
 
-import { HTMLProps } from "react";
+import type { HTMLProps } from "react";
 import classnames from "classnames";
 import styles from "./horizontal.module.css";
 
