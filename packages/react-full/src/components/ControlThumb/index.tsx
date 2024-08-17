@@ -63,7 +63,7 @@ export const ControlThumb: FC<
 					duration: 0.5,
 				}}
 				onMouseMove={(evt) => {
-					onMouseMove(evt);
+					onMouseMove(evt.nativeEvent);
 				}}
 				onHoverStart={(evt, info) => {
 					onMouseMove(evt);

@@ -22,6 +22,12 @@ import { MusicInfo } from "../MusicInfo";
 import { BouncingSlider } from "../BouncingSlider";
 import { VolumeControl } from "../VolumeControlSlider";
 
+import IconRewind from "./icon_rewind.svg?react";
+import IconForward from "./icon_forward.svg?react";
+import IconPause from "./icon_pause.svg?react";
+import IconPlay from "./icon_play.svg?react";
+import { MediaButton } from "../MediaButton";
+
 const PrebuiltMusicInfo: FC<{
 	className?: string;
 	style?: React.CSSProperties;
@@ -62,13 +68,40 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 						}}
 					/>
 					<BouncingSlider value={0.5} min={0} max={1} />
-					<VolumeControl value={0.5} min={0} max={1} />
+					<div className={styles.bigControls}>
+						<MediaButton>
+							<IconRewind color="#FFFFFF" />
+						</MediaButton>
+						<MediaButton>
+							<IconPlay color="#FFFFFF" />
+						</MediaButton>
+						<MediaButton>
+							<IconForward color="#FFFFFF" />
+						</MediaButton>
+					</div>
+					<VolumeControl
+						value={0.5}
+						min={0}
+						max={1}
+						style={{ paddingBottom: "4em" }}
+					/>
 				</>
 			}
 			controlsSlot={
 				<>
 					<PrebuiltMusicInfo className={styles.horizontalControls} />
 					<BouncingSlider value={0.5} min={0} max={1} />
+					<div className={styles.controls}>
+						<MediaButton>
+							<IconRewind color="#FFFFFF" />
+						</MediaButton>
+						<MediaButton>
+							<IconPlay color="#FFFFFF" />
+						</MediaButton>
+						<MediaButton>
+							<IconForward color="#FFFFFF" />
+						</MediaButton>
+					</div>
 					<VolumeControl value={0.5} min={0} max={1} />
 				</>
 			}

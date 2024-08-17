@@ -1,3 +1,23 @@
 .horizontalControls {
+    padding: 2vh 0 !important;
     width: min(52vh, 38vw);
+}
+
+.controls, .bigControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2vh;
+}
+
+.bigControls {
+    padding: 2vh 4vh;
+}
+
+.bigControls > button {
+    height: 10vh !important;
+    width: 10vh !important;
+    & > svg {
+        scale: 1.75;
+    }
 }

@@ -17,8 +17,6 @@
     display: flex;
     align-items: center;
     flex-direction: row;
-    transition: margin-top 0.25s;
-    margin-top: 2.5vh;
     margin-left: -12px;
     margin-right: -8px;
   }
