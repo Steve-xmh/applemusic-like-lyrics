@@ -140,7 +140,7 @@ export const Background: FC = () => {
 		const minInInterval = Math.min(...gradient);
 		const difference = maxInInterval - minInInterval;
 		// console.log(volume, maxInInterval, minInInterval, difference);
-		return difference > 0.35 ? maxInInterval : minInInterval * 0.5 ** 2;
+		return difference > 0.35 ? maxInInterval : volume * 0.5;
 	}
 
 	let pausing = false;
@@ -215,12 +215,26 @@ export const Background: FC = () => {
 
 			const increasing = curValue < value;
 
+			// if (increasing) {
+			// 	curValue = Math.min(
+			// 		value,
+			// 		curValue + (value - curValue) * 0.003 * delta,
+			// 	);
+			// } else {
+			// 	curValue = Math.max(
+			// 		value,
+			// 		curValue + (value - curValue) * 0.003 * delta,
+			// 	);
+			// }
+
 			if (increasing) {
-				curValue = Math.min(
-					value,
-					curValue + (value - curValue) * 0.003 * delta,
-				);
+				curValue = Math.min(value, curValue + 0.003 * delta);
+				// curValue = Math.min(
+				// 	value,
+				// 	curValue + (value - curValue) * 0.003 * delta,
+				// );
 			} else {
+				// curValue = Math.max(value, curValue - 0.001 * delta);
 				curValue = Math.max(
 					value,
 					curValue + (value - curValue) * 0.003 * delta,

@@ -92,8 +92,7 @@ function generateFadeGradient(
 	const widthInTotal = width / totalAspect;
 	const leftPos = (1 - widthInTotal) / 2;
 	return [
-		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${
-			(leftPos + widthInTotal) * 100
+		`linear-gradient(to right,${bright} ${leftPos * 100}%,${dark} ${(leftPos + widthInTotal) * 100
 		}%)`,
 		totalAspect,
 	];
@@ -222,8 +221,8 @@ function getScaleFromTransform(transform: string): number {
 
 type MouseEventMap = {
 	[evt in keyof HTMLElementEventMap]: HTMLElementEventMap[evt] extends MouseEvent
-		? evt
-		: never;
+	? evt
+	: never;
 };
 type MouseEventTypes = MouseEventMap[keyof MouseEventMap];
 type MouseEventListener = (
@@ -565,10 +564,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		style += `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
-			.getCurrentPosition()
-			.toFixed(1)}px) scale(${(
-			this.lineTransforms.scale.getCurrentPosition() / 100
-		).toFixed(4)});`;
+				.getCurrentPosition()
+				.toFixed(1)}px) scale(${(
+					this.lineTransforms.scale.getCurrentPosition() / 100
+				).toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}
@@ -937,11 +936,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					wordEl.style.webkitMaskSize = totalAspectStr;
 				}
 				const w = word.width + fadeWidth;
-				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${
-					word.startTime
-				})*${
-					w / Math.abs(word.endTime - word.startTime)
-				}px),0px) 0px, left top`;
+				const maskPos = `clamp(${-w}px,calc(${-w}px + (var(--amll-player-time) - ${word.startTime
+					})*${w / Math.abs(word.endTime - word.startTime)
+					}px),0px) 0px, left top`;
 				wordEl.style.maskPosition = maskPos;
 				wordEl.style.webkitMaskPosition = maskPos;
 			}
@@ -1054,7 +1051,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						duration: totalDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
 						fill: "both",
-						easing: "cubic-bezier(1,1,.66,.99)",
+						// easing: "cubic-bezier(1,1,.66,.99)",
+						easing: "linear",
 					});
 					ani.pause();
 					word.maskAnimations = [ani];
@@ -1146,30 +1144,28 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		if (this.lyricPlayer.getEnableSpring()) {
 			this.element.style.setProperty(
 				"--bright-mask-alpha",
-				`${
-					Math.max(
-						0.0,
-						Math.min(
-							1.0,
-							this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
-						) / 0.03,
-					) *
-						0.8 +
-					0.2
+				`${Math.max(
+					0.0,
+					Math.min(
+						1.0,
+						this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
+					) / 0.03,
+				) *
+				0.8 +
+				0.2
 				}`,
 			);
 			this.element.style.setProperty(
 				"--dark-mask-alpha",
-				`${
-					Math.max(
-						0.0,
-						Math.min(
-							1.0,
-							this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
-						) / 0.03,
-					) *
-						0.2 +
-					0.2
+				`${Math.max(
+					0.0,
+					Math.min(
+						1.0,
+						this.lineTransforms.scale.getCurrentPosition() / 100 - 0.97,
+					) / 0.03,
+				) *
+				0.2 +
+				0.2
 				}`,
 			);
 		} else {

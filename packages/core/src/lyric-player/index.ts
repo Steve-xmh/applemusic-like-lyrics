@@ -547,9 +547,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		if (window.innerWidth <= 1024) {
 			style += `${this.innerSize[0] - this.padding * 2}px;`;
 		} else {
-			style += `${
-				this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 4)
-			}px;`;
+			style += `${this.innerSize[0] - this.padding * (this.isNonDuet ? 1.5 : 4)
+				}px;`;
 		}
 		style += "--amll-lyric-player-height:";
 		style += `${this.innerSize[1] - this.padding * 4}px;`;
