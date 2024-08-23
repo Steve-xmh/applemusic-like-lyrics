@@ -19,6 +19,7 @@ export const MusicInfo: React.FC<
 	album,
 	onArtistClicked,
 	onAlbumClicked,
+	onMenuButtonClicked,
 	className,
 	...rest
 }) => {
@@ -29,7 +30,7 @@ export const MusicInfo: React.FC<
 				<TextMarquee className={styles.artists}>{artists}</TextMarquee>
 				<TextMarquee className={styles.album}>{album}</TextMarquee>
 			</div>
-			<MenuButton />
+			<MenuButton onClick={onMenuButtonClicked} />
 		</div>
 	);
 };

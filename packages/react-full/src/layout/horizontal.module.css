@@ -11,10 +11,12 @@
         [thumb] auto
         [cover] auto
         [music-info] 3fr
+        [buttom-controls] 0fr
         1fr;
     grid-template-columns:
         [info-side] 0.85fr
-        [player-side] 1fr;
+        [player-side] 1fr
+        [side-controls] 0fr;
     gap: 8px;
     transition: 0.5s ease-in-out;
     left: 0%;
@@ -33,6 +35,8 @@
     grid-row: thumb;
     justify-self: center;
     margin: 2vh;
+    
+    mix-blend-mode: plus-lighter;
 }
 
 .cover {
@@ -49,6 +53,8 @@
     grid-column: info-side;
     grid-row: music-info;
     justify-self: center;
+    
+    mix-blend-mode: plus-lighter;
 }
 
 .lyric {
@@ -57,4 +63,6 @@
     width: 100%;
     height: 100%;
     transition: opacity 0.5s 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+    
+    mix-blend-mode: plus-lighter;
 }

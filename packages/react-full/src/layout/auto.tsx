@@ -18,6 +18,7 @@ export const AutoLyricLayout: React.FC<
 		bigControlsSlot?: React.ReactNode;
 		coverSlot?: React.ReactNode;
 		lyricSlot?: React.ReactNode;
+		backgroundSlot?: React.ReactNode;
 		hideLyric?: boolean;
 	} & HTMLProps<HTMLDivElement>
 > = ({
@@ -27,6 +28,7 @@ export const AutoLyricLayout: React.FC<
 	bigControlsSlot,
 	coverSlot,
 	lyricSlot,
+	backgroundSlot,
 	hideLyric,
 	className,
 	...rest
@@ -52,24 +54,27 @@ export const AutoLyricLayout: React.FC<
 			className={classNames(styles.autoLyricLayout, className)}
 			{...rest}
 		>
-			{isVertical ? (
-				<VerticalLayout
-					thumbSlot={thumbSlot}
-					smallControlsSlot={smallControlsSlot}
-					bigControlsSlot={bigControlsSlot}
-					coverSlot={coverSlot}
-					lyricSlot={lyricSlot}
-					hideLyric={hideLyric}
-				/>
-			) : (
-				<HorizontalLayout
-					thumbSlot={thumbSlot}
-					controlsSlot={controlsSlot}
-					coverSlot={coverSlot}
-					lyricSlot={lyricSlot}
-					hideLyric={hideLyric}
-				/>
-			)}
+			<div>{backgroundSlot}</div>
+			<div>
+				{isVertical ? (
+					<VerticalLayout
+						thumbSlot={thumbSlot}
+						smallControlsSlot={smallControlsSlot}
+						bigControlsSlot={bigControlsSlot}
+						coverSlot={coverSlot}
+						lyricSlot={lyricSlot}
+						hideLyric={hideLyric}
+					/>
+				) : (
+					<HorizontalLayout
+						thumbSlot={thumbSlot}
+						controlsSlot={controlsSlot}
+						coverSlot={coverSlot}
+						lyricSlot={lyricSlot}
+						hideLyric={hideLyric}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

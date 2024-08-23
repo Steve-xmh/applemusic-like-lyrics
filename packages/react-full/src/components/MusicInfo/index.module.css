@@ -1,12 +1,13 @@
 .musicInfo {
     display: flex;
-    padding: 3em 0;
     color: white;
-    font-size: 2.0vh
+    font-size: 2.0vh;
 }
 
 .info {
     flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
 }
 
 .name {

@@ -1,6 +1,6 @@
 {
     "include": ["./src/**/*.ts", "./src/**/*.tsx"],
-    "exclude": ["./src/test-app.tsx"],
+    "exclude": ["./src/test.tsx", "./src/test-prebuilt.tsx"],
     "compilerOptions": {
         "target": "ESNext",
         "lib": [
@@ -15,6 +15,7 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "strictNullChecks": true,
+        "downlevelIteration": true,
         "allowSyntheticDefaultImports": true,
         "allowJs": false,
         "skipLibCheck": true

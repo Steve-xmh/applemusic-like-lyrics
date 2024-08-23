@@ -46,9 +46,9 @@
     grid-column: 1 / 2;
     display: grid;
     grid-template-rows:
-        1em [controls] 0fr [lyric-view] 1fr;
+        1em [controls] 0fr [lyric-view] 1fr [bottom-controls] 0fr;
     grid-template-columns:
-        4em [cover-side] 0fr [info-side] 1fr 3em;
+        3em [cover-side] 0fr [info-side] 1fr 3em;
 }
 
 .noLyricLayout {
@@ -96,6 +96,10 @@
     /* border: 1px solid yellow; */
     transition: opacity 0.5s 0.5s;
     padding-left: 1em;
+    min-width: 0;
+    overflow-x: hidden;
+    height: fit-content;
+    z-index: 1;
 }
 
 .lyric {

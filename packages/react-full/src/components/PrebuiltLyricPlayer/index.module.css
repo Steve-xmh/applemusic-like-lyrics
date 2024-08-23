@@ -14,6 +14,23 @@
     padding: 2vh 4vh;
 }
 
+.progressBarLabels {
+    display: flex;
+    justify-content: space-between;
+    
+    & > * {
+        flex: 1;
+    }
+    
+    & > *:nth-child(2) {
+        flex: 0;
+    }
+    
+    & > *:last-child {
+        text-align: right;
+    }
+}
+
 .bigControls > button {
     height: 10vh !important;
     width: 10vh !important;

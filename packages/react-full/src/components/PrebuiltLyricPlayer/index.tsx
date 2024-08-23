@@ -3,7 +3,7 @@
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
 
-import { LyricPlayer } from "@applemusic-like-lyrics/react";
+import { LyricPlayer, BackgroundRender } from "@applemusic-like-lyrics/react";
 import { AutoLyricLayout } from "../../layout/auto";
 import { ControlThumb } from "../ControlThumb";
 import { Cover } from "../Cover";
@@ -11,12 +11,16 @@ import styles from "./index.module.css";
 import "@applemusic-like-lyrics/core/style.css";
 import { useAtomValue } from "jotai";
 import {
+	AudioQualityType,
 	hideVerticalLyricViewAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
+	musicCoverAtom,
+	musicCoverIsVideoAtom,
 	musicLyricLinesAtom,
 	musicNameAtom,
 } from "../../states/music";
+import { onRequestOpenMenuAtom } from "../../states/callback";
 import type { FC, HTMLProps } from "react";
 import { MusicInfo } from "../MusicInfo";
 import { BouncingSlider } from "../BouncingSlider";
@@ -27,6 +31,7 @@ import IconForward from "./icon_forward.svg?react";
 import IconPause from "./icon_pause.svg?react";
 import IconPlay from "./icon_play.svg?react";
 import { MediaButton } from "../MediaButton";
+import { AudioQualityTag } from "../AudioQualityTag";
 
 const PrebuiltMusicInfo: FC<{
 	className?: string;
@@ -35,6 +40,7 @@ const PrebuiltMusicInfo: FC<{
 	const musicName = useAtomValue(musicNameAtom);
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicAlbum = useAtomValue(musicAlbumNameAtom);
+	const onMenuClicked = useAtomValue(onRequestOpenMenuAtom);
 	return (
 		<MusicInfo
 			className={className}
@@ -42,6 +48,7 @@ const PrebuiltMusicInfo: FC<{
 			name={musicName}
 			artists={musicArtists.map((v) => v.name)}
 			album={musicAlbum}
+			onMenuButtonClicked={onMenuClicked.onEmit}
 		/>
 	);
 };
@@ -54,12 +61,24 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 }) => {
 	const lyricLines = useAtomValue(musicLyricLinesAtom);
 	const hideVerticalLyricView = useAtomValue(hideVerticalLyricViewAtom);
+	const musicCover = useAtomValue(musicCoverAtom);
+	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 
 	return (
 		<AutoLyricLayout
-			coverSlot={<Cover />}
+			coverSlot={<Cover coverUrl={musicCover} />}
 			thumbSlot={<ControlThumb />}
 			smallControlsSlot={<PrebuiltMusicInfo />}
+			backgroundSlot={
+				<BackgroundRender
+					album={musicCover}
+					albumIsVideo={musicCoverIsVideo}
+					renderScale={1}
+					style={{
+						zIndex: -1,
+					}}
+				/>
+			}
 			bigControlsSlot={
 				<>
 					<PrebuiltMusicInfo
@@ -68,6 +87,13 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 						}}
 					/>
 					<BouncingSlider value={0.5} min={0} max={1} />
+					<div className={styles.progressBarLabels}>
+						<div>0:00</div>
+						<div>
+							<AudioQualityTag quality={AudioQualityType.HiRes} />
+						</div>
+						<div>0:00</div>
+					</div>
 					<div className={styles.bigControls}>
 						<MediaButton>
 							<IconRewind color="#FFFFFF" />
@@ -91,6 +117,13 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				<>
 					<PrebuiltMusicInfo className={styles.horizontalControls} />
 					<BouncingSlider value={0.5} min={0} max={1} />
+					<div className={styles.progressBarLabels}>
+						<div>0:00</div>
+						<div>
+							<AudioQualityTag quality={AudioQualityType.HiRes} />
+						</div>
+						<div>0:00</div>
+					</div>
 					<div className={styles.controls}>
 						<MediaButton>
 							<IconRewind color="#FFFFFF" />
