@@ -5,10 +5,7 @@ export function loadImage(imageUrl: string): Promise<HTMLImageElement> {
 		img.onerror = reject;
 		img.src = imageUrl;
 		img.crossOrigin = "anonymous";
-		img
-			.decode()
-			.then(() => resolve(img))
-			.catch(reject);
+		img.loading = "eager";
 	});
 }
 

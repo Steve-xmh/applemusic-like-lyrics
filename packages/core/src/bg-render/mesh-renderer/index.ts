@@ -851,6 +851,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 		contrastImage(imageData, 0.4);
 		saturateImage(imageData, 3.0);
 		contrastImage(imageData, 1.7);
+		saturateImage(imageData, 2.0);
 		blurImage(imageData, 2, 4);
 
 		if (!this.manualControl) {
@@ -869,6 +870,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 		}
 
 		this.albumTexture = new GLTexture(this.gl, imageData);
+		console.log("Updated album texture", this.albumTexture);
 	}
 	override setLowFreqVolume(volume: number): void {
 		this.volume = volume / 10;
