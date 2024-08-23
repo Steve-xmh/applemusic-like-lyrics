@@ -502,17 +502,17 @@ export const lyricLinesAtom = atom(
 				for (const line of overrideLines) {
 					// if (line.words.length > 0) {
 					const delta = Math.abs(
-						Math.max(0, line.startTime - 400) - line.startTime,
+						Math.max(0, line.startTime - 500) - line.startTime,
 					);
 					const nextLine = overrideLines[i + 1];
 					if (nextLine) {
 						if (nextLine.startTime < line.endTime) {
-							line.endTime -= 400;
+							line.endTime -= 500;
 						} else if (nextLine.startTime - line.endTime < 5000) {
-							line.endTime = nextLine.startTime - 400;
+							line.endTime = nextLine.startTime - 500;
 						}
 					} else {
-						line.endTime -= 400;
+						line.endTime -= 500;
 					}
 					line.startTime -= delta;
 					// }
