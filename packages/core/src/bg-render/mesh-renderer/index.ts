@@ -60,8 +60,7 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${
-					this.label
+				`Failed to compile shader for type ${type} "${this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -621,6 +620,17 @@ class GLTexture implements Disposable {
 	}
 }
 
+function createOffscreenCanvas(width: number, height: number) {
+	if ("OffscreenCanvas" in window) {
+		return new OffscreenCanvas(width, height);
+	} else {
+		const canvas = document.createElement("canvas");
+		canvas.width = width;
+		canvas.height = height;
+		return canvas;
+	}
+}
+
 export class MeshGradientRenderer extends BaseRenderer {
 	private gl: RenderingContext;
 	private lastFrameTime = 0;
@@ -637,7 +647,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private mainProgram: GLProgram;
 	private noiseProgram: GLProgram;
 	private manualControl = false;
-	private reduceImageSizeCanvas = new OffscreenCanvas(32, 32);
+	private reduceImageSizeCanvas = createOffscreenCanvas(32, 32) as HTMLCanvasElement;
 	private albumTexture?: GLTexture;
 	private targetSize = Vec2.fromValues(0, 0);
 	private currentSize = Vec2.fromValues(0, 0);
@@ -857,7 +867,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (!this.manualControl) {
 			const chosenPreset =
 				CONTROL_POINT_PRESETS[
-					Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
+				Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
 				];
 			const p = this.mainMesh;
 			p.resizeControlPoints(chosenPreset.width, chosenPreset.height);
