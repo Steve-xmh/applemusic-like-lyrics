@@ -10,8 +10,6 @@ import { BaseRenderer } from "../base";
 import { Mat4, Vec2, Vec3, Vec4 } from "gl-matrix";
 import meshVertShader from "./mesh.vert.glsl?raw";
 import meshFragShader from "./mesh.frag.glsl?raw";
-import noiseVertShader from "./noise.vert.glsl?raw";
-import noiseFragShader from "./noise.frag.glsl?raw";
 import { blurImage, contrastImage, saturateImage } from "../img";
 import {
 	loadResourceFromElement,
@@ -60,7 +58,8 @@ class GLProgram implements Disposable {
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 			throw new Error(
-				`Failed to compile shader for type ${type} "${this.label
+				`Failed to compile shader for type ${type} "${
+					this.label
 				}": ${gl.getShaderInfoLog(shader)}`,
 			);
 		}
@@ -621,14 +620,17 @@ class GLTexture implements Disposable {
 }
 
 function createOffscreenCanvas(width: number, height: number) {
-	if ("OffscreenCanvas" in window) {
-		return new OffscreenCanvas(width, height);
-	} else {
-		const canvas = document.createElement("canvas");
-		canvas.width = width;
-		canvas.height = height;
-		return canvas;
-	}
+	if ("OffscreenCanvas" in window) return new OffscreenCanvas(width, height);
+	const canvas = document.createElement("canvas");
+	canvas.width = width;
+	canvas.height = height;
+	return canvas;
+}
+
+interface MeshState {
+	mesh: BHPMesh;
+	texture: GLTexture;
+	alpha: number;
 }
 
 export class MeshGradientRenderer extends BaseRenderer {
@@ -642,34 +644,34 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private maxFPS = 60;
 	private paused = false;
 	private staticMode = false;
-	private mainMesh: BHPMesh;
-	private fullScreenMesh: Mesh;
 	private mainProgram: GLProgram;
-	private noiseProgram: GLProgram;
 	private manualControl = false;
-	private reduceImageSizeCanvas = createOffscreenCanvas(32, 32) as HTMLCanvasElement;
-	private albumTexture?: GLTexture;
+	private reduceImageSizeCanvas = createOffscreenCanvas(
+		32,
+		32,
+	) as HTMLCanvasElement;
 	private targetSize = Vec2.fromValues(0, 0);
 	private currentSize = Vec2.fromValues(0, 0);
+	private meshStates: MeshState[] = [];
 
 	setManualControl(enable: boolean) {
 		this.manualControl = enable;
 	}
 
 	setWireFrame(enable: boolean) {
-		this.mainMesh.setWireFrame(enable);
+		// this.mainMesh.setWireFrame(enable);
 	}
 
 	getControlPoint(x: number, y: number) {
-		return this.mainMesh.getControlPoint(x, y);
+		// return this.mainMesh.getControlPoint(x, y);
 	}
 
 	resizeControlPoints(width: number, height: number) {
-		this.mainMesh.resizeControlPoints(width, height);
+		// this.mainMesh.resizeControlPoints(width, height);
 	}
 
 	resetSubdivition(subDivisions: number) {
-		this.mainMesh.resetSubdivition(subDivisions);
+		// this.mainMesh.resetSubdivition(subDivisions);
 	}
 
 	private onTick(tickTime: number) {
@@ -706,11 +708,19 @@ export class MeshGradientRenderer extends BaseRenderer {
 	}
 
 	private onRedraw(tickTime: number, delta: number) {
-		this.mainMesh.bind();
-		// const p = this.mainMesh.getControlPoint(1, 1);
-		// p.location.x = Math.sin(tickTime / 1000) * 0.05;
-		// p.location.y = Math.cos(tickTime / 1000) * 0.05;
-		this.mainMesh.updateMesh();
+		const latestMeshState = this.meshStates[this.meshStates.length - 1];
+		if (latestMeshState) {
+			latestMeshState.mesh.bind();
+			latestMeshState.mesh.updateMesh();
+			latestMeshState.alpha = Math.min(1, latestMeshState.alpha + delta / 500);
+			if (latestMeshState.alpha >= 1) {
+				const deleted = this.meshStates.splice(0, this.meshStates.length - 1);
+				for (const state of deleted) {
+					state.mesh.dispose();
+					state.texture.dispose();
+				}
+			}
+		}
 
 		const gl = this.gl;
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -719,19 +729,21 @@ export class MeshGradientRenderer extends BaseRenderer {
 		this.checkIfResize();
 
 		this.mainProgram.use();
-		if (this.albumTexture) {
-			gl.activeTexture(gl.TEXTURE0);
-			this.albumTexture.bind();
-		}
+		gl.activeTexture(gl.TEXTURE0);
 		this.mainProgram.setUniform1f("u_time", tickTime / 10000);
-		this.mainProgram.setUniform1f("u_volume", this.volume);
-		this.mainProgram.setUniform1f("u_aspect", this.canvas.width / this.canvas.height);
+		this.mainProgram.setUniform1f(
+			"u_aspect",
+			this.canvas.width / this.canvas.height,
+		);
 		this.mainProgram.setUniform1i("u_texture", 0);
-		this.mainMesh.draw();
 
-		this.noiseProgram.use();
-		this.fullScreenMesh.bind();
-		this.fullScreenMesh.draw();
+		this.mainProgram.setUniform1f("u_volume", this.volume);
+		for (const state of this.meshStates) {
+			this.mainProgram.setUniform1f("u_alpha", state.alpha);
+			state.texture.bind();
+			state.mesh.bind();
+			state.mesh.draw();
+		}
 
 		gl.flush();
 
@@ -756,6 +768,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 			console.warn("OES_texture_float_linear not supported");
 		this.gl = gl;
 		gl.enable(gl.BLEND);
+		gl.enable(gl.DEPTH_TEST);
+		gl.depthFunc(gl.ALWAYS);
 
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -765,29 +779,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 			meshFragShader,
 			"main-program-mg",
 		);
-		this.noiseProgram = new GLProgram(
-			gl,
-			noiseVertShader,
-			noiseFragShader,
-			"noise-program-mg",
-		);
-		this.mainMesh = new BHPMesh(
-			gl,
-			this.mainProgram.attrs.a_pos,
-			this.mainProgram.attrs.a_color,
-			this.mainProgram.attrs.a_uv,
-		);
-		this.fullScreenMesh = new Mesh(
-			gl,
-			this.noiseProgram.attrs.a_pos,
-			this.noiseProgram.attrs.a_color,
-			this.noiseProgram.attrs.a_uv,
-		);
-
-		const p = 5;
-		this.mainMesh.resizeControlPoints(p, p);
-		this.mainMesh.resetSubdivition(15);
-		this.mainMesh.updateMesh();
 
 		this.requestTick();
 	}
@@ -861,26 +852,40 @@ export class MeshGradientRenderer extends BaseRenderer {
 		contrastImage(imageData, 0.4);
 		saturateImage(imageData, 3.0);
 		contrastImage(imageData, 1.7);
-		saturateImage(imageData, 2.0);
 		blurImage(imageData, 2, 4);
 
-		if (!this.manualControl) {
+		const newMesh = new BHPMesh(
+			this.gl,
+			this.mainProgram.attrs.a_pos,
+			this.mainProgram.attrs.a_color,
+			this.mainProgram.attrs.a_uv,
+		);
+		newMesh.resetSubdivition(15);
+
+		if (this.manualControl) {
+			newMesh.resizeControlPoints(5, 5);
+		} else {
 			const chosenPreset =
 				CONTROL_POINT_PRESETS[
-				Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
+					Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
 				];
-			const p = this.mainMesh;
-			p.resizeControlPoints(chosenPreset.width, chosenPreset.height);
+			newMesh.resizeControlPoints(chosenPreset.width, chosenPreset.height);
 			for (const cp of chosenPreset.conf) {
-				const p = this.mainMesh.getControlPoint(cp.cx, cp.cy);
+				const p = newMesh.getControlPoint(cp.cx, cp.cy);
 				p.location.x = cp.x;
 				p.location.y = cp.y;
 			}
-			p.updateMesh();
 		}
+		newMesh.updateMesh();
 
-		this.albumTexture = new GLTexture(this.gl, imageData);
-		console.log("Updated album texture", this.albumTexture);
+		const albumTexture = new GLTexture(this.gl, imageData);
+		const newState: MeshState = {
+			mesh: newMesh,
+			texture: albumTexture,
+			alpha: 0,
+		};
+		this.meshStates.push(newState);
+		console.log("Updated album texture", newState);
 	}
 	override setLowFreqVolume(volume: number): void {
 		this.volume = volume / 10;

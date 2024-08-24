@@ -5,6 +5,7 @@ varying vec2 v_uv;
 uniform sampler2D u_texture;
 uniform float u_time;
 uniform float u_volume;
+uniform float u_alpha;
 
 /* Gradient noise from Jorge Jimenez's presentation: */
 /* http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare */
@@ -25,5 +26,5 @@ void main() {
     vec4 result = texture2D(u_texture, rot(v_uv * max(1.0, 1.0 + u_volume), u_time + u_volume));
     result *= vec4(v_color, 1.0);
     result *= vec4(1.0 - u_volume * 0.1);
-    gl_FragColor = result + vec4(dither);
+    gl_FragColor = result * vec4(u_alpha) + vec4(dither);
 }
