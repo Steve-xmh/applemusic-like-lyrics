@@ -5,12 +5,12 @@
  * 参考内容 https://movingparts.io/gradient-meshes
  */
 
-import { Disposable } from "../../interfaces";
+import type { Disposable } from "../../interfaces";
 import { BaseRenderer } from "../base";
 import { Mat4, Vec2, Vec3, Vec4 } from "gl-matrix";
 import meshVertShader from "./mesh.vert.glsl?raw";
 import meshFragShader from "./mesh.frag.glsl?raw";
-import { blurImage, contrastImage, saturateImage } from "../img";
+import { blurImage, brightnessImage, contrastImage, saturateImage } from "../img";
 import {
 	loadResourceFromElement,
 	loadResourceFromUrl,
@@ -852,6 +852,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 		contrastImage(imageData, 0.4);
 		saturateImage(imageData, 3.0);
 		contrastImage(imageData, 1.7);
+		brightnessImage(imageData, 0.75);
 		blurImage(imageData, 2, 4);
 
 		const newMesh = new BHPMesh(
