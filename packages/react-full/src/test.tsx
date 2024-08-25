@@ -4,7 +4,7 @@ import { HorizontalLayout } from "./layout/horizontal";
 import { VerticalLayout } from "./layout/vertical";
 import { PrebuiltLyricPlayer } from "./components/PrebuiltLyricPlayer";
 import { Provider, useStore } from "jotai";
-import { hideVerticalLyricViewAtom, musicLyricLinesAtom } from "./states/music";
+import { hideLyricViewAtom, musicLyricLinesAtom } from "./states/music";
 
 const App: FC = () => {
 	const [hideLyric, setHideLyric] = useState(false);
@@ -31,7 +31,7 @@ const App: FC = () => {
 	}, [store]);
 
 	useEffect(() => {
-		store.set(hideVerticalLyricViewAtom, hideLyric);
+		store.set(hideLyricViewAtom, hideLyric);
 	}, [hideLyric, store]);
 
 	return (

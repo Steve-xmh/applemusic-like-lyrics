@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * 所有有关用户可配置的状态都在这里
+ * 所有有关 PrebuiltLyricPlayer 组件中用户可配置的状态都在这里
  */
 
 import { atom } from "jotai";

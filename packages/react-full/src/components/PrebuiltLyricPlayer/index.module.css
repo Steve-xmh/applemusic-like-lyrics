@@ -43,7 +43,7 @@
     transition:
         transform 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
         opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-    transform: translateY(-5em);
+    transform: translateY(-25vh);
     opacity: 0;
 }
 
@@ -67,6 +67,6 @@
     transition:
         transform 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
         opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
-    transform: translateY(5em);
+    transform: translateY(25vh);
     opacity: 0;
 }

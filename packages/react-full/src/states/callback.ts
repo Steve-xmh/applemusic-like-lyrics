@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * 所有有关开发者需要在预设歌词组件中配置的回调函数状态在这里
+ * 所有有关 PrebuiltLyricPlayer 组件中开发者需要在预设歌词组件中配置的回调函数状态在这里
  */
 
 import { atom } from "jotai";

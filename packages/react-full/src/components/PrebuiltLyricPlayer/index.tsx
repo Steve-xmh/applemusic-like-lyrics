@@ -12,7 +12,7 @@ import "@applemusic-like-lyrics/core/style.css";
 import { useAtomValue } from "jotai";
 import {
 	AudioQualityType,
-	hideVerticalLyricViewAtom,
+	hideLyricViewAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
@@ -22,7 +22,7 @@ import {
 	musicPlayingAtom,
 } from "../../states/music";
 import { onRequestOpenMenuAtom } from "../../states/callback";
-import type { FC, HTMLProps } from "react";
+import { useRef, type FC, type HTMLProps } from "react";
 import { MusicInfo } from "../MusicInfo";
 import { BouncingSlider } from "../BouncingSlider";
 import { VolumeControl } from "../VolumeControlSlider";
@@ -104,13 +104,22 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	...rest
 }) => {
 	const lyricLines = useAtomValue(musicLyricLinesAtom);
-	const hideVerticalLyricView = useAtomValue(hideVerticalLyricViewAtom);
+	const hideVerticalLyricView = useAtomValue(hideLyricViewAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
+	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+
+	const coverElRef = useRef<HTMLElement>(null);
 
 	return (
 		<AutoLyricLayout
-			coverSlot={<Cover coverUrl={musicCover} />}
+			coverSlot={
+				<Cover
+					coverUrl={musicCover}
+					ref={coverElRef}
+					musicPaused={!musicIsPlaying}
+				/>
+			}
 			thumbSlot={<ControlThumb />}
 			smallControlsSlot={
 				<PrebuiltMusicInfo
@@ -161,6 +170,8 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 			lyricSlot={
 				<LyricPlayer
 					style={{ width: "100%", height: "100%" }}
+					playing={musicIsPlaying}
+					alignPosition={0.25}
 					lyricLines={lyricLines}
 				/>
 			}

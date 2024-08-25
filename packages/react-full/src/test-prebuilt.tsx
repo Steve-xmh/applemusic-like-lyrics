@@ -10,7 +10,7 @@ import { createRoot } from "react-dom/client";
 import { PrebuiltLyricPlayer } from "./components/PrebuiltLyricPlayer";
 import { Provider, useStore } from "jotai";
 import {
-	hideVerticalLyricViewAtom,
+	hideLyricViewAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
@@ -20,6 +20,30 @@ import {
 import { ContextMenu, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { onRequestOpenMenuAtom } from "./states/callback";
+import {
+	parseLrc,
+	parseQrc,
+	parseTTML,
+	parseYrc,
+	parseLys,
+	type LyricLine as RawLyricLine,
+} from "@applemusic-like-lyrics/lyric";
+import type { LyricLine } from "@applemusic-like-lyrics/core";
+
+const mapLyric = (
+	line: RawLyricLine,
+	i: number,
+	lines: RawLyricLine[],
+): LyricLine => ({
+	words: line.words,
+	startTime: line.words[0]?.startTime ?? 0,
+	endTime:
+		line.words[line.words.length - 1]?.endTime ?? Number.POSITIVE_INFINITY,
+	translatedLyric: "",
+	romanLyric: "",
+	isBG: false,
+	isDuet: false,
+});
 
 const App: FC = () => {
 	const [hideLyric, setHideLyric] = useState(false);
@@ -47,7 +71,7 @@ const App: FC = () => {
 	}, [store]);
 
 	useEffect(() => {
-		store.set(hideVerticalLyricViewAtom, hideLyric);
+		store.set(hideLyricViewAtom, hideLyric);
 	}, [hideLyric, store]);
 
 	const onRequestOpenMenu = useCallback(() => {
@@ -86,6 +110,63 @@ const App: FC = () => {
 		};
 		inputEl.click();
 	}, [store]);
+
+	const loadLyric = useCallback(
+		(format: "yrc" | "qrc" | "ttml" | "lrc" | "lys" | "") => {
+			let accept: string;
+			switch (format) {
+				case "yrc":
+					accept = ".yrc";
+					break;
+				case "qrc":
+					accept = ".qrc";
+					break;
+				case "ttml":
+					accept = ".ttml";
+					break;
+				case "lrc":
+					accept = ".lrc";
+					break;
+				case "lys":
+					accept = ".lys";
+					break;
+				default:
+					accept = "";
+					store.set(musicLyricLinesAtom, []);
+					return;
+			}
+			const inputEl = document.createElement("input");
+			inputEl.type = "file";
+			inputEl.accept = accept;
+			inputEl.onchange = async (e) => {
+				const files = (e.target as HTMLInputElement).files;
+				if (!files) return;
+				const file = files[0];
+				const raw = await file.text();
+				let lines: RawLyricLine[];
+				switch (format) {
+					case "yrc":
+						lines = parseYrc(raw);
+						break;
+					case "qrc":
+						lines = parseQrc(raw);
+						break;
+					case "ttml":
+						lines = parseTTML(raw).lines;
+						break;
+					case "lrc":
+						lines = parseLrc(raw);
+						break;
+					case "lys":
+						lines = parseLys(raw);
+						break;
+				}
+				store.set(musicLyricLinesAtom, lines.map(mapLyric));
+			};
+			inputEl.click();
+		},
+		[store],
+	);
 
 	useLayoutEffect(() => {}, []);
 
@@ -127,14 +208,26 @@ const App: FC = () => {
 					<ContextMenu.Sub>
 						<ContextMenu.SubTrigger>设置歌词</ContextMenu.SubTrigger>
 						<ContextMenu.SubContent>
-							<ContextMenu.Item>空歌词</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("")}>
+								空歌词
+							</ContextMenu.Item>
 							<ContextMenu.Separator />
-							<ContextMenu.Item>TTML 歌词</ContextMenu.Item>
-							<ContextMenu.Item>Lyricify Syllable 歌词</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("ttml")}>
+								TTML 歌词
+							</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("lys")}>
+								Lyricify Syllable 歌词
+							</ContextMenu.Item>
 							<ContextMenu.Separator />
-							<ContextMenu.Item>LyRiC 歌词</ContextMenu.Item>
-							<ContextMenu.Item>YRC 歌词</ContextMenu.Item>
-							<ContextMenu.Item>QRC 歌词</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("lrc")}>
+								LyRiC 歌词
+							</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("yrc")}>
+								YRC 歌词
+							</ContextMenu.Item>
+							<ContextMenu.Item onClick={() => loadLyric("qrc")}>
+								QRC 歌词
+							</ContextMenu.Item>
 						</ContextMenu.SubContent>
 					</ContextMenu.Sub>
 				</ContextMenu.Content>

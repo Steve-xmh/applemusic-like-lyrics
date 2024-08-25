@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * 所有有关开发者需要在预设歌词组件中根据当前播放内容实时更新的状态都在这里
+ * 所有有关 PrebuiltLyricPlayer 组件中开发者需要在预设歌词组件中根据当前播放内容实时更新的状态都在这里
  */
 
 import { atom } from "jotai";
@@ -52,10 +52,27 @@ export const musicPlayingAtom = atom(false);
  */
 export const musicPlayingPositionAtom = atom(false);
 /**
+ * 当前播放的音乐音量大小，范围在 [0.0-1.0] 之间
+ */
+export const musicVolumeAtom = atom(0.5);
+/**
  * 当前播放的音乐专辑封面 URL，除了图片也可以是视频资源
  */
 export const musicLyricLinesAtom = atom<LyricLine[]>([]);
 /**
- * 是否隐藏垂直布局下的歌词视图
+ * 是否隐藏歌词视图
  */
-export const hideVerticalLyricViewAtom = atom(false);
+export const hideLyricViewAtom = atom(false);
+/**
+ * 用于音频可视化频谱图的数据
+ * 如需呈现背景跳动效果，请设置 lowFreqVolumeAtom 的值
+ */
+export const fftDataAtom = atom<number[]>([]);
+/**
+ * 低频音量大小，范围在 80hz-120hz 之间为宜，取值范围在 [0.0-1.0] 之间
+ *
+ * 如果无法获取到类似的数据，请传入 undefined 或 1.0 作为默认值，或不做任何处理（默认值即 1.0）
+ *
+ * 如需呈现音频可视化频谱图，请设置 fftDataAtom 的值
+ */
+export const lowFreqVolumeAtom = atom<number>(1);
