@@ -97,7 +97,7 @@
     transition: opacity 0.5s 0.5s;
     padding-left: 1em;
     min-width: 0;
-    overflow-x: hidden;
+    overflow: hidden;
     height: fit-content;
     z-index: 1;
 }

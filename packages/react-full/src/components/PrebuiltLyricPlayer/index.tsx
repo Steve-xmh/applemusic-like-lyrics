@@ -19,6 +19,7 @@ import {
 	musicCoverIsVideoAtom,
 	musicLyricLinesAtom,
 	musicNameAtom,
+	musicPlayingAtom,
 } from "../../states/music";
 import { onRequestOpenMenuAtom } from "../../states/callback";
 import type { FC, HTMLProps } from "react";
@@ -32,6 +33,7 @@ import IconPause from "./icon_pause.svg?react";
 import IconPlay from "./icon_play.svg?react";
 import { MediaButton } from "../MediaButton";
 import { AudioQualityTag } from "../AudioQualityTag";
+import classNames from "classnames";
 
 const PrebuiltMusicInfo: FC<{
 	className?: string;
@@ -53,6 +55,48 @@ const PrebuiltMusicInfo: FC<{
 	);
 };
 
+const PrebuiltMediaButtons: FC = () => {
+	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+	return (
+		<>
+			<MediaButton>
+				<IconRewind color="#FFFFFF" />
+			</MediaButton>
+			<MediaButton>
+				{musicIsPlaying ? (
+					<IconPause color="#FFFFFF" />
+				) : (
+					<IconPlay color="#FFFFFF" />
+				)}
+			</MediaButton>
+			<MediaButton>
+				<IconForward color="#FFFFFF" />
+			</MediaButton>
+		</>
+	);
+};
+
+const PrebuiltProgressBar: FC = () => {
+	return (
+		<>
+			<BouncingSlider value={0.5} min={0} max={1} />
+			<div className={styles.progressBarLabels}>
+				<div>0:00</div>
+				<div>
+					<AudioQualityTag quality={AudioQualityType.HiRes} />
+				</div>
+				<div>0:00</div>
+			</div>
+		</>
+	);
+};
+
+const PrebuiltVolumeControl: FC<{
+	style?: React.CSSProperties;
+}> = ({ style }) => {
+	return <VolumeControl value={0.5} min={0} max={1} style={style} />;
+};
+
 /**
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
@@ -68,7 +112,14 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 		<AutoLyricLayout
 			coverSlot={<Cover coverUrl={musicCover} />}
 			thumbSlot={<ControlThumb />}
-			smallControlsSlot={<PrebuiltMusicInfo />}
+			smallControlsSlot={
+				<PrebuiltMusicInfo
+					className={classNames(
+						styles.smallMusicInfo,
+						hideVerticalLyricView && styles.hideLyric,
+					)}
+				/>
+			}
 			backgroundSlot={
 				<BackgroundRender
 					album={musicCover}
@@ -82,60 +133,29 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 			bigControlsSlot={
 				<>
 					<PrebuiltMusicInfo
+						className={classNames(
+							styles.bigMusicInfo,
+							hideVerticalLyricView && styles.hideLyric,
+						)}
 						style={{
-							paddingBottom: "2em",
+							padding: "2em 0",
 						}}
 					/>
-					<BouncingSlider value={0.5} min={0} max={1} />
-					<div className={styles.progressBarLabels}>
-						<div>0:00</div>
-						<div>
-							<AudioQualityTag quality={AudioQualityType.HiRes} />
-						</div>
-						<div>0:00</div>
-					</div>
+					<PrebuiltProgressBar />
 					<div className={styles.bigControls}>
-						<MediaButton>
-							<IconRewind color="#FFFFFF" />
-						</MediaButton>
-						<MediaButton>
-							<IconPlay color="#FFFFFF" />
-						</MediaButton>
-						<MediaButton>
-							<IconForward color="#FFFFFF" />
-						</MediaButton>
+						<PrebuiltMediaButtons />
 					</div>
-					<VolumeControl
-						value={0.5}
-						min={0}
-						max={1}
-						style={{ paddingBottom: "4em" }}
-					/>
+					<PrebuiltVolumeControl style={{ paddingBottom: "4em" }} />
 				</>
 			}
 			controlsSlot={
 				<>
 					<PrebuiltMusicInfo className={styles.horizontalControls} />
-					<BouncingSlider value={0.5} min={0} max={1} />
-					<div className={styles.progressBarLabels}>
-						<div>0:00</div>
-						<div>
-							<AudioQualityTag quality={AudioQualityType.HiRes} />
-						</div>
-						<div>0:00</div>
-					</div>
+					<PrebuiltProgressBar />
 					<div className={styles.controls}>
-						<MediaButton>
-							<IconRewind color="#FFFFFF" />
-						</MediaButton>
-						<MediaButton>
-							<IconPlay color="#FFFFFF" />
-						</MediaButton>
-						<MediaButton>
-							<IconForward color="#FFFFFF" />
-						</MediaButton>
+						<PrebuiltMediaButtons />
 					</div>
-					<VolumeControl value={0.5} min={0} max={1} />
+					<PrebuiltVolumeControl />
 				</>
 			}
 			lyricSlot={

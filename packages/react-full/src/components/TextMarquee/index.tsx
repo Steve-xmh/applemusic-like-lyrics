@@ -12,8 +12,6 @@ export const TextMarquee: FC<PropsWithChildren<HTMLProps<HTMLDivElement>>> = ({
 	const innerDiv = useRef<HTMLDivElement>(null);
 	const currentAnimationsRef = useRef(new Set<Animation>());
 
-	useEffect(() => {}, []);
-
 	const onMouseEnter = () => {
 		if (innerDiv.current && outerDiv.current) {
 			const outerWidth = outerDiv.current.clientWidth;
