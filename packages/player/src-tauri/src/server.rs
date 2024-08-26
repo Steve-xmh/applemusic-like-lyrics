@@ -8,7 +8,7 @@ use async_tungstenite::tungstenite::Message;
 use async_tungstenite::WebSocketStream;
 use futures::prelude::*;
 use futures::stream::SplitSink;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter};
 
 type Connections = Arc<Mutex<Vec<SplitSink<WebSocketStream<TcpStream>, Message>>>>;
 type ConnectionAddrs = Arc<std::sync::Mutex<HashSet<SocketAddr>>>;
@@ -101,7 +101,7 @@ impl AMLLWebSocketServer {
 
         let wss = async_tungstenite::accept_async(stream).await?;
         println!("已连接 WebSocket 客户端: {addr}");
-        app.emit_all("on-client-connected", addr)?;
+        app.emit("on-client-connected", addr)?;
         conn_addrs.lock().unwrap().insert(addr.to_owned());
 
         let (write, read) = wss.split();
@@ -112,12 +112,12 @@ impl AMLLWebSocketServer {
 
         while let Some(Ok(data)) = read.next().await {
             if let Ok(body) = ws_protocol::parse_body(&data.into_data()) {
-                app.emit_all("on-client-body", body)?;
+                app.emit("on-client-body", body)?;
             }
         }
 
         println!("已断开 WebSocket 客户端: {addr}");
-        app.emit_all("on-client-disconnected", addr)?;
+        app.emit("on-client-disconnected", addr)?;
         conn_addrs.lock().unwrap().remove(&addr);
         Ok(())
     }

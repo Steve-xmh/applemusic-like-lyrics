@@ -8,7 +8,6 @@ anyhow = "^1.0"
 concat-string = "^1.0"
 cpal = "^0.15"
 futures = "0.3"
-http-range-client = { version = "0.7.2", no-default-features = true, features = ["reqwest-sync"] }
 md5 = "^0.7"
 rb = "^0.4"
 ringbuf = "^0.3"
