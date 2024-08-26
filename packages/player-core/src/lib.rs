@@ -11,6 +11,8 @@ mod output;
 mod player;
 mod resampler;
 
+pub use player::*;
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[serde(tag = "type")]
 #[serde(rename_all = "camelCase")]
@@ -63,34 +65,25 @@ pub enum AudioThreadMessage {
     #[serde(rename_all = "camelCase")]
     ResumeOrPauseAudio,
     #[serde(rename_all = "camelCase")]
-    SeekAudio {
-        position: f64,
-    },
+    SeekAudio { position: f64 },
     #[serde(rename_all = "camelCase")]
-    JumpToSong {
-        song_index: usize,
-    },
+    JumpToSong { song_index: usize },
     #[serde(rename_all = "camelCase")]
     PrevSong,
     #[serde(rename_all = "camelCase")]
     NextSong,
     #[serde(rename_all = "camelCase")]
-    SetPlaylist {
-        songs: Vec<SongData>,
-    },
+    SetPlaylist { songs: Vec<SongData> },
     #[serde(rename_all = "camelCase")]
-    SetVolume {
-        volume: f64,
-    },
+    SetVolume { volume: f64 },
     #[serde(rename_all = "camelCase")]
-    SetVolumeRelative {
-        volume: f64,
-    },
+    SetVolumeRelative { volume: f64 },
     #[serde(rename_all = "camelCase")]
-    SetAudioOutput {
-        name: String,
-    },
+    SetAudioOutput { name: String },
+    #[serde(rename_all = "camelCase")]
     SyncStatus,
+    #[serde(rename_all = "camelCase")]
+    Close,
 }
 
 pub type AudioPlayerEventSender =
@@ -114,13 +107,17 @@ pub enum AudioThreadEvent {
     LoadAudio {
         music_id: String,
         duration: f64,
+        music_info: AudioInfo,
         quality: AudioQuality,
     },
     #[serde(rename_all = "camelCase")]
     LoadingAudio { music_id: String },
     #[serde(rename_all = "camelCase")]
+    AudioPlayFinished { music_id: String },
+    #[serde(rename_all = "camelCase")]
     SyncStatus {
         music_id: String,
+        music_info: AudioInfo,
         is_playing: bool,
         duration: f64,
         position: f64,

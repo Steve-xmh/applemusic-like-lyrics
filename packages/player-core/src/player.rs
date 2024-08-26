@@ -1,5 +1,6 @@
 use std::{
     fmt::Debug,
+    future::Future,
     io::ErrorKind,
     sync::Arc,
     time::{Duration, Instant},
@@ -8,8 +9,11 @@ use std::{
 use anyhow::Context;
 
 use output::create_audio_output_thread;
-use symphonia::core::io::{MediaSource, MediaSourceStream, MediaSourceStreamOptions};
 use symphonia::core::{errors::Error as DecodeError, units::Time};
+use symphonia::core::{
+    io::{MediaSource, MediaSourceStream, MediaSourceStreamOptions},
+    meta::StandardTagKey,
+};
 use tokio::{
     sync::{
         mpsc::{error::TryRecvError, UnboundedReceiver, UnboundedSender},
@@ -35,6 +39,7 @@ struct AudioPlayerTaskData {
 struct AudioPlayerTaskContext {
     pub emitter: AudioPlayerEventEmitter,
     pub handler: AudioPlayerHandle,
+    pub custom_song_loader: Option<CustomSongLoaderFn>,
     pub audio_tx: AudioOutputSender,
     pub play_rx: UnboundedReceiver<AudioThreadMessage>,
     pub fft_player: Arc<Mutex<FFTPlayer>>,
@@ -43,12 +48,40 @@ struct AudioPlayerTaskContext {
     pub current_audio_info: Arc<RwLock<AudioInfo>>,
 }
 
-#[derive(Debug, Default, Clone)]
-struct AudioInfo {
-    pub audio_name: String,
+#[derive(Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AudioInfo {
+    pub name: String,
+    pub artist: String,
+    pub album: String,
+    pub lyric: String,
+    pub cover_media_type: String,
+    pub cover: Option<Vec<u8>>,
+
     pub duration: f64,
     pub position: f64,
 }
+
+impl Debug for AudioInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("AudioInfo")
+            .field("name", &self.name)
+            .field("artist", &self.artist)
+            .field("album", &self.album)
+            .field("lyric", &self.lyric)
+            .field("cover_media_type", &self.cover_media_type)
+            .field("cover", &self.cover.as_ref().map(|x| x.len()))
+            .field("duration", &self.duration)
+            .field("position", &self.position)
+            .finish()
+    }
+}
+
+pub type CustomSongLoaderFn = fn(
+    String,
+) -> Box<
+    dyn Future<Output = anyhow::Result<Box<dyn MediaSource + 'static>>> + Unpin + Send,
+>;
 
 pub struct AudioPlayer {
     evt_sender: AudioPlayerEventSender,
@@ -77,6 +110,14 @@ pub struct AudioPlayer {
 
     fft_task: JoinHandle<()>,
     play_pos_task: JoinHandle<()>,
+
+    custom_song_loader: Option<CustomSongLoaderFn>,
+}
+
+impl Default for AudioPlayer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AudioPlayer {
@@ -187,7 +228,12 @@ impl AudioPlayer {
             play_task_data: Arc::new(Mutex::new(AudioPlayerTaskData::default())),
             fft_task,
             play_pos_task,
+            custom_song_loader: None,
         }
+    }
+
+    pub fn set_custom_song_loader(&mut self, loader: CustomSongLoaderFn) {
+        self.custom_song_loader = Some(loader);
     }
 
     pub fn handler(&self) -> AudioPlayerHandle {
@@ -203,6 +249,9 @@ impl AudioPlayer {
             tokio::select! {
                 msg = self.msg_receiver.recv() => {
                     if let Some(msg) = msg {
+                        if let Some(AudioThreadMessage::Close) = msg.data {
+                            break;
+                        }
                         if let Err(err) = self.process_message(msg).await {
                             warn!("处理音频线程消息时出错：{err:?}");
                         }
@@ -376,6 +425,7 @@ impl AudioPlayer {
                 is_playing: self.is_playing,
                 duration: audio_info.duration,
                 position: audio_info.position,
+                music_info: audio_info,
                 volume: self.volume,
                 load_position: 0.,
                 playlist_inited: self.playlist_inited,
@@ -396,6 +446,7 @@ impl AudioPlayer {
             let ctx = AudioPlayerTaskContext {
                 emitter: self.emitter(),
                 handler: self.handler(),
+                custom_song_loader: self.custom_song_loader,
                 audio_tx: self.player.clone(),
                 play_rx: rx,
                 fft_player: self.fft_player.clone(),
@@ -425,9 +476,42 @@ impl AudioPlayer {
                     info!("正在播放本地音乐文件 {file_path}");
                     Self::play_audio_from_local(ctx, music_id, file_path).await
                 }
-                _ => {
-                    // TODO: 自定义音乐来源
-                    Ok(())
+                SongData::Custom { song_json_data, .. } => {
+                    if let Some(loader) = ctx.custom_song_loader.as_ref() {
+                        let source_task = loader(song_json_data);
+                        tokio::pin!(source_task);
+                        let source = (&mut source_task).await?;
+
+                        struct BoxedMediaSource(Box<dyn MediaSource + 'static>);
+
+                        impl std::io::Read for BoxedMediaSource {
+                            fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+                                self.0.read(buf)
+                            }
+                        }
+
+                        impl std::io::Seek for BoxedMediaSource {
+                            fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
+                                self.0.seek(pos)
+                            }
+                        }
+
+                        impl MediaSource for BoxedMediaSource {
+                            fn is_seekable(&self) -> bool {
+                                self.0.is_seekable()
+                            }
+
+                            fn byte_len(&self) -> Option<u64> {
+                                self.0.byte_len()
+                            }
+                        }
+
+                        Self::play_media_stream(ctx, music_id, BoxedMediaSource(source)).await
+                    } else {
+                        Err(anyhow::anyhow!(
+                            "传入了自定义音乐源但未设置自定义音乐加载器"
+                        ))
+                    }
                 }
             }
         } {
@@ -500,6 +584,36 @@ impl AudioPlayer {
                 }
             }
         }
+        let mut new_audio_info = AudioInfo::default();
+        let mut metadata = format_result.format.metadata();
+        metadata.skip_to_latest();
+
+        if let Some(metadata) = metadata.skip_to_latest() {
+            for tag in metadata.tags() {
+                match tag.std_key {
+                    Some(StandardTagKey::TrackTitle) => {
+                        new_audio_info.name = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Artist) => {
+                        new_audio_info.artist = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Album) => {
+                        new_audio_info.album = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Lyrics) => {
+                        new_audio_info.lyric = tag.value.to_string();
+                    }
+                    Some(_) | None => {}
+                }
+            }
+            for visual in metadata.visuals() {
+                if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
+                    new_audio_info.cover_media_type = dbg!(visual.media_type.clone());
+                    new_audio_info.cover = Some(visual.data.to_vec());
+                }
+            }
+        }
+
         let track = format_result
             .format
             .default_track()
@@ -510,15 +624,19 @@ impl AudioPlayer {
             .context("无法为当前音频文件选择解码器")?;
         let duration = timebase.calc_time(track.codec_params.n_frames.unwrap_or_default());
         let play_duration = duration.seconds as f64 + duration.frac;
+        new_audio_info.duration = play_duration;
+        new_audio_info.position = 0.0;
+
         let mut current_audio_info = ctx.current_audio_info.write().await;
-        current_audio_info.duration = play_duration;
-        current_audio_info.position = 0.0;
+        *current_audio_info = dbg!(new_audio_info.clone());
         drop(current_audio_info);
+
         let audio_quality: AudioQuality = track.into();
         ctx.emitter
             .emit(AudioThreadEvent::LoadAudio {
-                music_id,
+                music_id: music_id.clone(),
                 duration: play_duration,
+                music_info: new_audio_info,
                 quality: audio_quality.to_owned(),
             })
             .await?;
@@ -640,6 +758,10 @@ impl AudioPlayer {
             error!("播放音频出错: {err:?}");
         }
 
+        ctx.emitter
+            .emit(AudioThreadEvent::AudioPlayFinished { music_id })
+            .await?;
+
         Ok(())
     }
 }
@@ -672,6 +794,14 @@ impl AudioPlayerHandle {
         Ok(())
     }
 
+    pub fn send_blocking(
+        &self,
+        msg: AudioThreadEventMessage<AudioThreadMessage>,
+    ) -> anyhow::Result<()> {
+        self.msg_sender.blocking_send(msg)?;
+        Ok(())
+    }
+
     pub async fn send_anonymous(&self, msg: AudioThreadMessage) -> anyhow::Result<()> {
         self.msg_sender
             .send(AudioThreadEventMessage {
@@ -679,6 +809,14 @@ impl AudioPlayerHandle {
                 data: Some(msg),
             })
             .await?;
+        Ok(())
+    }
+
+    pub fn send_anonymous_blocking(&self, msg: AudioThreadMessage) -> anyhow::Result<()> {
+        self.msg_sender.blocking_send(AudioThreadEventMessage {
+            callback_id: "".into(),
+            data: Some(msg),
+        })?;
         Ok(())
     }
 }
