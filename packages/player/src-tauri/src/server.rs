@@ -9,6 +9,7 @@ use async_tungstenite::WebSocketStream;
 use futures::prelude::*;
 use futures::stream::SplitSink;
 use tauri::{AppHandle, Emitter};
+use tracing::*;
 
 type Connections = Arc<Mutex<Vec<SplitSink<WebSocketStream<TcpStream>, Message>>>>;
 type ConnectionAddrs = Arc<std::sync::Mutex<HashSet<SocketAddr>>>;
@@ -33,16 +34,20 @@ impl AMLLWebSocketServer {
             if let Some(task) = self.server_handle.take() {
                 task.cancel().await;
             }
+            if addr.is_empty() {
+                info!("WebSocket 服务器已关闭");
+                return;
+            }
             let app = self.app.clone();
             let connections = self.connections.clone();
             let conn_addrs = self.connection_addrs.clone();
             self.server_handle = Some(async_std::task::spawn(async move {
                 loop {
-                    println!("正在开启 WebSocket 服务器到 {addr}");
+                    info!("正在开启 WebSocket 服务器到 {addr}");
                     let listener = TcpListener::bind(&addr).await;
                     match listener {
                         Ok(listener) => {
-                            println!("已开启 WebSocket 服务器到 {addr}");
+                            info!("已开启 WebSocket 服务器到 {addr}");
                             while let Ok((stream, _)) = listener.accept().await {
                                 async_std::task::spawn(Self::accept_conn(
                                     stream,
@@ -54,7 +59,7 @@ impl AMLLWebSocketServer {
                             break;
                         }
                         Err(err) => {
-                            println!("WebSocket 服务器 {addr} 开启失败: {err:?}");
+                            info!("WebSocket 服务器 {addr} 开启失败: {err:?}");
                         }
                     }
                     async_std::task::sleep(Duration::from_secs(1)).await;
@@ -82,8 +87,8 @@ impl AMLLWebSocketServer {
                 .send(Message::Binary(ws_protocol::to_body(&data).unwrap()))
                 .await
             {
-                println!("WebSocket 客户端 {:?} 发送失败: {err:?}", conns[i]);
-                conns.remove(i);
+                info!("WebSocket 客户端 {:?} 发送失败: {err:?}", conns[i]);
+                let _ = conns.remove(i);
             } else {
                 i += 1;
             }
@@ -97,10 +102,10 @@ impl AMLLWebSocketServer {
         conn_addrs: ConnectionAddrs,
     ) -> anyhow::Result<()> {
         let addr = stream.peer_addr()?;
-        println!("已接受套接字连接: {addr}");
+        info!("已接受套接字连接: {addr}");
 
         let wss = async_tungstenite::accept_async(stream).await?;
-        println!("已连接 WebSocket 客户端: {addr}");
+        info!("已连接 WebSocket 客户端: {addr}");
         app.emit("on-client-connected", addr)?;
         conn_addrs.lock().unwrap().insert(addr.to_owned());
 
@@ -116,7 +121,7 @@ impl AMLLWebSocketServer {
             }
         }
 
-        println!("已断开 WebSocket 客户端: {addr}");
+        info!("已断开 WebSocket 客户端: {addr}");
         app.emit("on-client-disconnected", addr)?;
         conn_addrs.lock().unwrap().remove(&addr);
         Ok(())

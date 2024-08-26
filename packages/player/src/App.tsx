@@ -1,27 +1,37 @@
 import styles from "./App.module.css";
 import {
 	MediaButton,
+	musicArtistsAtom,
+	musicCoverAtom,
+	musicNameAtom,
+	musicPlayingAtom,
 	PrebuiltLyricPlayer,
 	TextMarquee,
 } from "@applemusic-like-lyrics/react-full";
 import "@applemusic-like-lyrics/react-full/style.css";
-import { Provider } from "jotai";
+import { Provider, useAtomValue } from "jotai";
 import { ErrorBoundary } from "react-error-boundary";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import "./i18n";
 import {
 	Avatar,
 	Box,
-	Button,
 	Container,
-	Dialog,
 	Flex,
 	Heading,
+	IconButton,
 	Text,
 	TextField,
 	Theme,
 } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
+import { ListBulletIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { NewPlaylistButton } from "./components/NewPlaylistButton";
+import { SettingsButton } from "./components/SettingsButton";
+import IconPlay from "./assets/icon_play.svg?react";
+import IconPause from "./assets/icon_pause.svg?react";
+import IconForward from "./assets/icon_forward.svg?react";
+import IconRewind from "./assets/icon_rewind.svg?react";
 
 function ErrorRender({ error, resetErrorBoundary }) {
 	console.error(error);
@@ -40,50 +50,35 @@ function ErrorRender({ error, resetErrorBoundary }) {
 
 function App() {
 	const { t } = useTranslation();
-	
+	const musicName = useAtomValue(musicNameAtom);
+	const musicArtists = useAtomValue(musicArtistsAtom);
+	const musicPlaying = useAtomValue(musicPlayingAtom);
+	const musicCover = useAtomValue(musicCoverAtom);
+
 	return (
 		<ErrorBoundary fallbackRender={ErrorRender}>
 			<Provider>
 				<Theme appearance="dark">
 					<>
 						<Container mx="9" mb="9">
-							<Heading my="9">AMLL Player</Heading>
-							<Flex
-								direction="row"
-								justify="center"
-								gap="3"
-								height="4em"
-								align="stretch"
-							>
-								<Dialog.Root>
-									<Dialog.Trigger>
-										<Box asChild flexGrow="1" flexBasis="10%" height="100%">
-											<Button size="4">新建歌单</Button>
-										</Box>
-									</Dialog.Trigger>
-									<Dialog.Content maxWidth="450px">
-										<Dialog.Title>
-											<Trans key="newPlaylistDialogTitle">新建歌单</Trans>
-										</Dialog.Title>
-										<Text as="label">
-											<Trans key="newPlaylistDialogLabel">歌单名称</Trans>
-										</Text>
-										<TextField.Root placeholder="歌单名称" />
-									</Dialog.Content>
-								</Dialog.Root>
-								<Box asChild flexGrow="1" flexBasis="10%" height="100%">
-									<Button size="4">
-										<Trans key="searchPlaylistButtonText">搜索歌单</Trans>
-									</Button>
+							<Flex direction="row" align="center" wrap="wrap">
+								<Box asChild flexGrow="1">
+									<Heading wrap="nowrap" my="4">
+										AMLL Player
+									</Heading>
 								</Box>
-								<Box asChild flexGrow="1" flexBasis="10%" height="100%">
-									<Button size="4">
-										<Trans key="settingsButtonText">设置</Trans>
-									</Button>
-								</Box>
+								<Flex gap="1" wrap="wrap">
+									<TextField.Root placeholder="搜索……">
+										<TextField.Slot>
+											<MagnifyingGlassIcon />
+										</TextField.Slot>
+									</TextField.Root>
+									<NewPlaylistButton />
+									<SettingsButton />
+								</Flex>
 							</Flex>
 							<Text mt="9" as="div" align="center">
-								没有歌单，快去新建一个吧！
+								没有播放列表，快去新建一个吧！
 							</Text>
 						</Container>
 						<Container position="fixed" bottom="0" left="0" right="0">
@@ -95,10 +90,17 @@ function App() {
 									flexGrow="1"
 									flexBasis="33.3%"
 								>
-									<Avatar size="5" color="gray" fallback={<div />} />
+									<Avatar
+										size="5"
+										color="gray"
+										fallback={<div />}
+										src={musicCover}
+									/>
 									<Flex direction="column" justify="center" ml="4" flexGrow="1">
-										<TextMarquee>Artist</TextMarquee>
-										<TextMarquee>Song Name</TextMarquee>
+										<TextMarquee>{musicName}</TextMarquee>
+										<TextMarquee>
+											{musicArtists.map((v) => v.name).join(", ")}
+										</TextMarquee>
 									</Flex>
 								</Flex>
 								<Flex
@@ -107,7 +109,38 @@ function App() {
 									align="center"
 									flexGrow="1"
 									flexBasis="33.3%"
-								></Flex>
+									gap="5"
+								>
+									<MediaButton
+										style={{
+											scale: "1.5",
+										}}
+									>
+										<IconRewind
+											style={{
+												scale: "1.5",
+											}}
+										/>
+									</MediaButton>
+									<MediaButton
+										style={{
+											scale: "1.5",
+										}}
+									>
+										{musicPlaying ? <IconPause /> : <IconPlay />}
+									</MediaButton>
+									<MediaButton
+										style={{
+											scale: "1.5",
+										}}
+									>
+										<IconForward
+											style={{
+												scale: "1.5",
+											}}
+										/>
+									</MediaButton>
+								</Flex>
 								<Flex
 									direction="row"
 									justify="end"
@@ -115,21 +148,25 @@ function App() {
 									flexGrow="1"
 									flexBasis="33.3%"
 								>
-									<Button>Playlist</Button>
+									<IconButton variant="soft">
+										<ListBulletIcon />
+									</IconButton>
 								</Flex>
 							</Flex>
 						</Container>
 					</>
 				</Theme>
-				<PrebuiltLyricPlayer style={{
-					position: "fixed",
-					left: "0",
-					top: "0",
-					width: "100%",
-					height: "100%",
-					pointerEvents: "none",
-					opacity: "0",
-				}} />
+				<PrebuiltLyricPlayer
+					style={{
+						position: "fixed",
+						left: "0",
+						top: "0",
+						width: "100%",
+						height: "100%",
+						pointerEvents: "none",
+						opacity: "0",
+					}}
+				/>
 			</Provider>
 		</ErrorBoundary>
 	);

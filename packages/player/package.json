@@ -16,6 +16,7 @@
     "@applemusic-like-lyrics/react": "workspace:^",
     "@applemusic-like-lyrics/react-full": "workspace:^",
     "@applemusic-like-lyrics/ws-protocol": "workspace:^",
+    "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/themes": "^3.1.3",
     "@tauri-apps/api": "^2.0.0-rc.3",
     "dexie": "^4.0.8",

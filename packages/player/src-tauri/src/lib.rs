@@ -8,17 +8,17 @@ mod server;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn reopen_connection(addr: &str, ws: State<Mutex<AMLLWebSocketServer>>) {
+fn ws_reopen_connection(addr: &str, ws: State<Mutex<AMLLWebSocketServer>>) {
     ws.lock().unwrap().reopen(addr.to_string());
 }
 
 #[tauri::command]
-fn get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> {
+fn ws_get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> {
     ws.lock().unwrap().get_connections()
 }
 
 #[tauri::command]
-fn boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
+fn ws_boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
     let ws = ws.clone();
     tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
 }
@@ -26,7 +26,7 @@ fn boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protoco
 fn init_logging() {
     #[cfg(not(debug_assertions))]
     {
-        let log_file = std::fs::File::create("mrbncm.log");
+        let log_file = std::fs::File::create("amll-player.log");
         if let Ok(log_file) = log_file {
             tracing_subscriber::fmt()
                 .map_writer(move |_| log_file)
@@ -62,9 +62,9 @@ pub fn run() {
     info!("AMLL Player is starting!");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            reopen_connection,
-            get_connections,
-            boardcast_message,
+            ws_reopen_connection,
+            ws_get_connections,
+            ws_boardcast_message,
             player::local_player_send_msg,
         ])
         .setup(|app| {

@@ -25,6 +25,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "fullscreen": false,
         "resizable": true,
         "title": "AMLL Player",

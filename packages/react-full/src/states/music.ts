@@ -4,6 +4,7 @@
  */
 
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 import type { LyricLine } from "@applemusic-like-lyrics/core";
 
 export interface ArtistStateEntry {
@@ -53,8 +54,13 @@ export const musicPlayingAtom = atom(false);
 export const musicPlayingPositionAtom = atom(false);
 /**
  * 当前播放的音乐音量大小，范围在 [0.0-1.0] 之间
+ *
+ * 本状态将会保存在 localStorage 中
  */
-export const musicVolumeAtom = atom(0.5);
+export const musicVolumeAtom = atomWithStorage(
+	"amll-react-full.musicVolumeAtom",
+	0.5,
+);
 /**
  * 当前播放的音乐专辑封面 URL，除了图片也可以是视频资源
  */

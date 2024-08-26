@@ -6,5 +6,8 @@
   "windows": [
     "main"
   ],
-  "permissions": []
+  "permissions": [
+    "core:event:default",
+    "core:window:default"
+  ]
 }
