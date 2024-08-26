@@ -57,7 +57,7 @@ export const Cover = forwardRef<
 					muted
 					playsInline
 					crossOrigin="anonymous"
-					ref={videoRef}
+					ref={videoRef as any}
 					{...rest}
 				/>
 			);
@@ -67,7 +67,7 @@ export const Cover = forwardRef<
 				className={clsNames}
 				style={{ backgroundImage: `url(${coverUrl})` }}
 				alt="cover"
-				ref={ref}
+				ref={ref as any}
 				{...rest}
 			/>
 		);

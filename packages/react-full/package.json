@@ -10,6 +10,20 @@
   },
   "type": "module",
   "license": "GPL-3.0",
+  "main": "dist/amll-react-framework.cjs",
+  "module": "./dist/amll-react-framework.js",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/amll-react-framework.js",
+      "require": "./dist/amll-react-framework.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
   "files": [
     "dist/**/*.js",
     "dist/**/*.ts",
@@ -22,16 +36,6 @@
     "build:dev": "vite build",
     "fmt": "biome format --write ./src",
     "dev": "vite dev"
-  },
-  "main": "./dist/amll-react-framework.cjs",
-  "module": "./dist/amll-react-framework.js",
-  "typings": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/amll-react-framework.js",
-      "require": "./dist/amll-react-framework.cjs",
-      "types": "./dist/index.d.ts"
-    }
   },
   "devDependencies": {
     "@applemusic-like-lyrics/lyric": "workspace:^",
@@ -52,14 +56,15 @@
     "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
-    "vite-plugin-dts": "^4.0.3"
+    "vite-plugin-dts": "^4.0.3",
+    "vite-plugin-svgr": "^4.2.0",
+    "vite-plugin-wasm": "^3.3.0"
   },
   "dependencies": {
     "@applemusic-like-lyrics/core": "workspace:^",
     "@applemusic-like-lyrics/react": "workspace:^",
     "classnames": "^2.5.1",
-    "framer-motion": "^11.3.27",
-    "vite-plugin-svgr": "^4.2.0"
+    "framer-motion": "^11.3.27"
   },
   "peerDependencies": {
     "jotai": "*",

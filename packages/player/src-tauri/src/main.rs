@@ -8,6 +8,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tauri::{Manager, State};
+use tracing::*;
 
 mod server;
 
@@ -28,7 +29,42 @@ fn boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protoco
     tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
 }
 
+fn init_logging() {
+    #[cfg(not(debug_assertions))]
+    {
+        let log_file = std::fs::File::create("mrbncm.log");
+        if let Ok(log_file) = log_file {
+            tracing_subscriber::fmt()
+                .map_writer(move |_| log_file)
+                .with_thread_names(true)
+                .with_ansi(false)
+                .with_timer(tracing_subscriber::fmt::time::uptime())
+                .init();
+        } else {
+            tracing_subscriber::fmt()
+                .with_thread_names(true)
+                .with_timer(tracing_subscriber::fmt::time::uptime())
+                .init();
+        }
+    }
+    #[cfg(debug_assertions)]
+    {
+        tracing_subscriber::fmt()
+            .with_env_filter("player=trace")
+            .with_thread_names(true)
+            .with_timer(tracing_subscriber::fmt::time::uptime())
+            .init();
+    }
+    std::panic::set_hook(Box::new(move |info| {
+        error!("Fatal error occurred! AMLL Player will exit now.");
+        error!("Error:");
+        error!("{info:#?}");
+    }));
+}
+
 fn main() {
+    init_logging();
+    info!("AMLL Player is starting!");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             reopen_connection,

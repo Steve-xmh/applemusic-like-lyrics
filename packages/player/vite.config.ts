@@ -82,9 +82,7 @@ export default defineConfig(async () => ({
 		BNCMManifestPlugin({}),
 	],
 	resolve: {
-		alias: {
-			// "@applemusic-like-lyrics/bncm": "@applemusic-like-lyrics/bncm/src",
-		},
+		dedupe: ["react", "react-dom", "jotai"],
 	},
 	// Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
 	//

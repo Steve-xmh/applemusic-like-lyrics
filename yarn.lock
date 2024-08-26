@@ -15,7 +15,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@applemusic-like-lyrics/bncm@npm:*, @applemusic-like-lyrics/bncm@workspace:packages/bncm":
+"@applemusic-like-lyrics/bncm@workspace:packages/bncm":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/bncm@workspace:packages/bncm"
   dependencies:
@@ -149,7 +149,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@applemusic-like-lyrics/react-full@workspace:packages/react-full":
+"@applemusic-like-lyrics/react-full@workspace:^, @applemusic-like-lyrics/react-full@workspace:packages/react-full":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/react-full@workspace:packages/react-full"
   dependencies:
@@ -177,6 +177,7 @@ __metadata:
     vite: "npm:^5.4.0"
     vite-plugin-dts: "npm:^4.0.3"
     vite-plugin-svgr: "npm:^4.2.0"
+    vite-plugin-wasm: "npm:^3.3.0"
   peerDependencies:
     jotai: "*"
     react: "*"
@@ -247,7 +248,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@applemusic-like-lyrics/ws-protocol@npm:*, @applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol":
+"@applemusic-like-lyrics/ws-protocol@npm:*, @applemusic-like-lyrics/ws-protocol@workspace:^, @applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol":
   version: 0.0.0-use.local
   resolution: "@applemusic-like-lyrics/ws-protocol@workspace:packages/ws-protocol"
   languageName: unknown
@@ -626,6 +627,15 @@ __metadata:
   dependencies:
     regenerator-runtime: "npm:^0.14.0"
   checksum: 4c4ab16f0361c59fb23956e4d0a29935f1f8a64aa8dd37876ce38355b6f4d8f0e54237aacb89c73b1532def60539ddde2d651523c8fa887b30b19a8cf0c465b0
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.24.8":
+  version: 7.25.4
+  resolution: "@babel/runtime@npm:7.25.4"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 70d2a420c24a3289ea6c4addaf3a1c4186bc3d001c92445faa3cd7601d7d2fbdb32c63b3a26b9771e20ff2f511fa76b726bf256f823cdb95bc37b8eadbd02f70
   languageName: node
   linkType: hard
 
@@ -7199,6 +7209,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"html-parse-stringify@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "html-parse-stringify@npm:3.0.1"
+  dependencies:
+    void-elements: "npm:3.1.0"
+  checksum: 8743b76cc50e46d1956c1ad879d18eb9613b0d2d81e24686d633f9f69bb26b84676f64a926973de793cca479997017a63219278476d617b6c42d68246d7c07fe
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.0, http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -7267,6 +7286,15 @@ __metadata:
   version: 1.0.4
   resolution: "hyphenate-style-name@npm:1.0.4"
   checksum: d37883e6b7e1be62e1ddae29cac83fa59fb93c068bc8eb1561585439adbad91dcf7e264ee2a82c4378fc58049f7bd853544a4a81bf00d4aff717f641052323e7
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^23.14.0":
+  version: 23.14.0
+  resolution: "i18next@npm:23.14.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.23.2"
+  checksum: 661c1b22ae20bf75a616b3a804b96fd55bd04ed880853a05ef93912ed37f65b9546d8f8bbe55dfe2967a5b0f2ce110a7e9f4b7a6a3d90eb097d06c858d2b3e3f
   languageName: node
   linkType: hard
 
@@ -11258,19 +11286,23 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "player@workspace:packages/player"
   dependencies:
-    "@applemusic-like-lyrics/bncm": "npm:*"
-    "@applemusic-like-lyrics/lyric": "npm:*"
-    "@applemusic-like-lyrics/react": "npm:*"
-    "@applemusic-like-lyrics/ws-protocol": "npm:*"
+    "@applemusic-like-lyrics/core": "workspace:^"
+    "@applemusic-like-lyrics/lyric": "workspace:^"
+    "@applemusic-like-lyrics/react": "workspace:^"
+    "@applemusic-like-lyrics/react-full": "workspace:^"
+    "@applemusic-like-lyrics/ws-protocol": "workspace:^"
     "@biomejs/biome": "npm:^1.8.3"
+    "@radix-ui/themes": "npm:^3.1.3"
     "@tauri-apps/api": "npm:^1.4.0"
     "@tauri-apps/cli": "npm:^1.4.0"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
+    i18next: "npm:^23.14.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-error-boundary: "npm:^4.0.11"
+    react-i18next: "npm:^15.0.1"
     sass: "npm:^1.69.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
@@ -11506,6 +11538,24 @@ __metadata:
   peerDependencies:
     react: ">=16.13.1"
   checksum: 12495458ec9f4a809f5eac684e115cc4247aa607c686f8506caf32930c53d4bb6c234428c12d7ab91708f34cfdbc6452be0ef0fb8c857cc11aea165d3e76aa27
+  languageName: node
+  linkType: hard
+
+"react-i18next@npm:^15.0.1":
+  version: 15.0.1
+  resolution: "react-i18next@npm:15.0.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.24.8"
+    html-parse-stringify: "npm:^3.0.1"
+  peerDependencies:
+    i18next: ">= 23.2.3"
+    react: ">= 16.8.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 2998565bdcdc37ba8d2b3531e36441e00c8bb7fb7c1cac35364a81722cb4e5a363288906566c91f3ad835abc5b0b78e14d8511f57b154a8e5c057a8e6096cb07
   languageName: node
   linkType: hard
 
@@ -13881,6 +13931,13 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 5a98b1d30cc8c0263551f417a360102d40b78b9170e9e58a99c1a394ab700c7e604d3c52dafda323c11356a76eba865800d3d8588b33a8febdeaddd5a8981410
+  languageName: node
+  linkType: hard
+
+"void-elements@npm:3.1.0":
+  version: 3.1.0
+  resolution: "void-elements@npm:3.1.0"
+  checksum: 0390f818107fa8fce55bb0a5c3f661056001c1d5a2a48c28d582d4d847347c2ab5b7f8272314cac58acf62345126b6b09bea623a185935f6b1c3bbce0dfd7f7f
   languageName: node
   linkType: hard
 

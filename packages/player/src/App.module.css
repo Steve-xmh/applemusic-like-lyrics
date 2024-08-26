@@ -1,0 +1,12 @@
+#root {
+  width: 100vw;
+  height: 100vh;
+  color: white;
+}
+
+.playBar {
+  margin: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-4);
+  border: solid 1px var(--gray-6);
+}

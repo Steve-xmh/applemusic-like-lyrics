@@ -2,6 +2,7 @@ use std::{
     fmt::Debug,
     future::Future,
     io::ErrorKind,
+    pin::Pin,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -77,11 +78,9 @@ impl Debug for AudioInfo {
     }
 }
 
-pub type CustomSongLoaderFn = fn(
-    String,
-) -> Box<
-    dyn Future<Output = anyhow::Result<Box<dyn MediaSource + 'static>>> + Unpin + Send,
->;
+pub type CustomSongLoaderReturn =
+    Pin<Box<dyn Future<Output = anyhow::Result<Box<dyn MediaSource + 'static>>> + Send + 'static>>;
+pub type CustomSongLoaderFn = fn(String) -> CustomSongLoaderReturn;
 
 pub struct AudioPlayer {
     evt_sender: AudioPlayerEventSender,
@@ -478,9 +477,7 @@ impl AudioPlayer {
                 }
                 SongData::Custom { song_json_data, .. } => {
                     if let Some(loader) = ctx.custom_song_loader.as_ref() {
-                        let source_task = loader(song_json_data);
-                        tokio::pin!(source_task);
-                        let source = (&mut source_task).await?;
+                        let source = loader(song_json_data).await?;
 
                         struct BoxedMediaSource(Box<dyn MediaSource + 'static>);
 
@@ -838,15 +835,6 @@ impl AudioPlayerEventEmitter {
                 data: Some(msg),
             })
             .await?;
-        Ok(())
-    }
-
-    pub async fn ret(
-        &self,
-        req: AudioThreadEventMessage<AudioThreadMessage>,
-        res: AudioThreadEvent,
-    ) -> anyhow::Result<()> {
-        self.evt_sender.send(req.to(res)).await?;
         Ok(())
     }
 

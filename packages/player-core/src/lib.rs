@@ -32,20 +32,7 @@ pub enum SongData {
     },
 }
 
-trait SongSource {
-    fn get_id(&self) -> String;
-    async fn fetch_source(&self) -> std::result::Result<Vec<u8>, String> {
-        Err("未实现".to_string())
-    }
-}
-
-impl SongSource for () {
-    fn get_id(&self) -> String {
-        "".to_string()
-    }
-}
-
-impl SongSource for SongData {
+impl SongData {
     fn get_id(&self) -> String {
         match self {
             SongData::Local { file_path, .. } => format!("local:{:x}", md5::compute(file_path)),
