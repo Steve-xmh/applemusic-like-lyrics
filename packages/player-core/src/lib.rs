@@ -10,6 +10,7 @@ mod fft_player;
 mod output;
 mod player;
 mod resampler;
+mod media_state;
 
 pub use player::*;
 
@@ -67,6 +68,8 @@ pub enum AudioThreadMessage {
     SetVolumeRelative { volume: f64 },
     #[serde(rename_all = "camelCase")]
     SetAudioOutput { name: String },
+    #[serde(rename_all = "camelCase")]
+    SetFFTRange { from_freq: f32, to_freq: f32 },
     #[serde(rename_all = "camelCase")]
     SyncStatus,
     #[serde(rename_all = "camelCase")]

@@ -9,6 +9,7 @@ use std::{
 
 use anyhow::Context;
 
+use media_state::{MediaStateManager, MediaStateManagerBackend, MediaStateMessage};
 use output::create_audio_output_thread;
 use symphonia::core::{errors::Error as DecodeError, units::Time};
 use symphonia::core::{
@@ -47,6 +48,7 @@ struct AudioPlayerTaskContext {
     pub fft_has_data_sx: UnboundedSender<()>,
     pub play_pos_sx: UnboundedSender<Option<(bool, f64)>>,
     pub current_audio_info: Arc<RwLock<AudioInfo>>,
+    pub media_state_manager: Option<Arc<MediaStateManager>>,
 }
 
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -111,6 +113,8 @@ pub struct AudioPlayer {
     play_pos_task: JoinHandle<()>,
 
     custom_song_loader: Option<CustomSongLoaderFn>,
+    media_state_manager: Option<Arc<MediaStateManager>>,
+    media_state_rx: Option<UnboundedReceiver<MediaStateMessage>>,
 }
 
 impl Default for AudioPlayer {
@@ -128,7 +132,19 @@ impl AudioPlayer {
         let fft_player_clone = fft_player.clone();
         let (fft_has_data_sx, mut fft_rx) = tokio::sync::mpsc::unbounded_channel();
         let (play_pos_sx, mut play_pos_rx) = tokio::sync::mpsc::unbounded_channel();
+
         let player = create_audio_output_thread();
+
+        let (media_state_manager, media_state_rx) = match MediaStateManager::new() {
+            Ok((manager, ms_rx)) => {
+                info!("已初始化媒体状态管理器");
+                (Some(Arc::new(manager)), Some(ms_rx))
+            }
+            Err(err) => {
+                warn!("初始化媒体状态管理器时出错：{err:?}");
+                (None, None)
+            }
+        };
 
         // 用于给播放位置插值的任务
         let emt = AudioPlayerEventEmitter::new(evt_sender.clone());
@@ -228,6 +244,8 @@ impl AudioPlayer {
             fft_task,
             play_pos_task,
             custom_song_loader: None,
+            media_state_manager,
+            media_state_rx,
         }
     }
 
@@ -245,27 +263,86 @@ impl AudioPlayer {
 
     pub async fn run(mut self, on_event: impl Fn(AudioThreadEvent) + Send + 'static) {
         loop {
-            tokio::select! {
-                msg = self.msg_receiver.recv() => {
-                    if let Some(msg) = msg {
-                        if let Some(AudioThreadMessage::Close) = msg.data {
-                            break;
-                        }
-                        if let Err(err) = self.process_message(msg).await {
-                            warn!("处理音频线程消息时出错：{err:?}");
-                        }
-                    }
-                }
-                evt = self.evt_receiver.recv() => {
-                    if let Some(evt) = evt {
-                        if let Some(data) = evt.data {
-                            on_event(data);
+            if self.media_state_rx.is_some() {
+                tokio::select! {
+                    msg = self.msg_receiver.recv() => {
+                        if let Some(msg) = msg {
+                            if let Some(AudioThreadMessage::Close) = msg.data {
+                                break;
+                            }
+                            if let Err(err) = self.process_message(msg).await {
+                                warn!("处理音频线程消息时出错：{err:?}");
+                            }
                         }
                     }
+                    msg = self.media_state_rx.as_mut().unwrap().recv() => {
+                        if let Some(msg) = msg {
+                            self.on_media_state_msg(msg).await;
+                        }
+                    }
+                    evt = self.evt_receiver.recv() => {
+                        if let Some(evt) = evt {
+                            if let Some(data) = evt.data {
+                                on_event(data);
+                            }
+                        }
+                    }
+                    else => {
+                        break;
+                    }
                 }
-                else => {
-                    break;
+            } else {
+                tokio::select! {
+                    msg = self.msg_receiver.recv() => {
+                        if let Some(msg) = msg {
+                            if let Some(AudioThreadMessage::Close) = msg.data {
+                                break;
+                            }
+                            if let Err(err) = self.process_message(msg).await {
+                                warn!("处理音频线程消息时出错：{err:?}");
+                            }
+                        }
+                    }
+                    evt = self.evt_receiver.recv() => {
+                        if let Some(evt) = evt {
+                            if let Some(data) = evt.data {
+                                on_event(data);
+                            }
+                        }
+                    }
+                    else => {
+                        break;
+                    }
                 }
+            }
+        }
+    }
+
+    pub async fn on_media_state_msg(&mut self, msg: MediaStateMessage) {
+        match msg {
+            MediaStateMessage::Play => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::ResumeAudio)
+                    .await;
+            }
+            MediaStateMessage::Pause => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::PauseAudio)
+                    .await;
+            }
+            MediaStateMessage::Next => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::NextSong)
+                    .await;
+            }
+            MediaStateMessage::Previous => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::PrevSong)
+                    .await;
             }
         }
     }
@@ -288,6 +365,9 @@ impl AudioPlayer {
                     self.is_playing = true;
                     info!("开始继续播放歌曲！");
                     let _ = self.play_task_sx.send(AudioThreadMessage::ResumeAudio);
+                    if let Some(x) = &self.media_state_manager {
+                        let _ = x.set_playing(true);
+                    }
                     emitter
                         .emit(AudioThreadEvent::PlayStatus { is_playing: true })
                         .await?;
@@ -301,6 +381,9 @@ impl AudioPlayer {
                     //     self.player = super::output::init_audio_player("");
                     // }
                     info!("播放已暂停！");
+                    if let Some(x) = &self.media_state_manager {
+                        let _ = x.set_playing(false);
+                    }
                     let _ = self.play_task_sx.send(AudioThreadMessage::PauseAudio);
                     emitter
                         .emit(AudioThreadEvent::PlayStatus { is_playing: false })
@@ -402,6 +485,17 @@ impl AudioPlayer {
 
                     emitter.ret_none(msg).await?;
                 }
+                AudioThreadMessage::SetFFTRange {
+                    from_freq, to_freq, ..
+                } => {
+                    if *from_freq < *to_freq {
+                        self.fft_player
+                            .lock()
+                            .await
+                            .set_freq_range(*from_freq, *to_freq);
+                    }
+                    emitter.ret_none(msg).await?;
+                }
                 other => {
                     warn!("未知的音频线程消息：{other:?}");
                     emitter.ret_none(msg).await?;
@@ -452,6 +546,7 @@ impl AudioPlayer {
                 fft_has_data_sx: self.fft_has_data_sx.clone(),
                 play_pos_sx: self.play_pos_sx.clone(),
                 current_audio_info: self.current_audio_info.clone(),
+                media_state_manager: self.media_state_manager.clone(),
             };
             let task = tokio::task::spawn(Self::play_audio(ctx, current_song));
             self.current_play_task_handle = Some(task.abort_handle());
@@ -625,10 +720,19 @@ impl AudioPlayer {
         new_audio_info.position = 0.0;
 
         let mut current_audio_info = ctx.current_audio_info.write().await;
-        *current_audio_info = dbg!(new_audio_info.clone());
+        *current_audio_info = new_audio_info.clone();
         drop(current_audio_info);
 
         let audio_quality: AudioQuality = track.into();
+        if let Some(x) = &ctx.media_state_manager {
+            let _ = x.set_title(&new_audio_info.name);
+            let _ = x.set_artist(&new_audio_info.artist);
+            if let Some(cover) = &new_audio_info.cover {
+                let _ = x.set_cover_image(cover);
+            }
+            let _ = x.set_playing(true);
+            let _ = x.update();
+        }
         ctx.emitter
             .emit(AudioThreadEvent::LoadAudio {
                 music_id: music_id.clone(),

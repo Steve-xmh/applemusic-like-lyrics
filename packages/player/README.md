@@ -1,6 +1,6 @@
 # AMLL Player
 
-一个通过 WebSocket Server 获取音频播放信息的独立歌词页面播放器。
+一个通过 本地音乐文件/WebSocket Server 获取音频播放信息的独立歌词页面播放器。
 
 功能/特性列表：
 
@@ -8,6 +8,7 @@
 - 支持读取本地音频文件播放，或加载本地歌词文件
 - 支持加载各种歌词格式
 - 高性能 —— 不会因为某些软件自身问题导致歌词展示效果受到影响
+- 预计支持播放状态传输协议：[SMTC (Windows)](https://learn.microsoft.com/en-us/uwp/api/windows.media.systemmediatransportcontrols?view=winrt-26100) / [MPRIS (Linux/XDG)](https://www.freedesktop.org/wiki/Specifications/mpris-spec/) / [MPNowPlayingInfoCenter (macOS)](https://developer.apple.com/documentation/mediaplayer/mpnowplayinginfocenter)
 
 ## 安装使用
 
