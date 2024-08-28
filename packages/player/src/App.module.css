@@ -9,4 +9,5 @@
   padding: var(--space-3);
   border-radius: var(--radius-4);
   border: solid 1px var(--gray-6);
+  backdrop-filter: blur(20px) brightness(0.8);
 }

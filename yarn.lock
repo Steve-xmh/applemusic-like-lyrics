@@ -3150,6 +3150,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@remix-run/router@npm:1.19.1"
+  checksum: 2800c2f6567a982fe942aacc4cb5b170e7cc89bd455960e3bea2424161ff7dac32d01886322d88dd19b88d1bea711f39566d17f02b73eeb74999affb471f8f52
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-terser@npm:^0.4.3":
   version: 0.4.4
   resolution: "@rollup/plugin-terser@npm:0.4.4"
@@ -3685,7 +3692,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tauri-apps/api@npm:^2.0.0-rc.3":
+"@tauri-apps/api@npm:^2.0.0-rc.0, @tauri-apps/api@npm:^2.0.0-rc.3":
   version: 2.0.0-rc.3
   resolution: "@tauri-apps/api@npm:2.0.0-rc.3"
   checksum: 754b7fbcc148db4a3051e3d722689422a2f3168e9c94b1b50ce18a4dfb20aa258765d23caf80faa0c9c14ae73424ee57b81bf1f4d0d2a013bff9984f4b9ad97e
@@ -3800,6 +3807,15 @@ __metadata:
   bin:
     tauri: tauri.js
   checksum: 7067bedc21442f9833a6fdb3c4371290382f0e3434df423d811ca9d8f6621f395220350d05055206e1415a44add18f218d910b6323dc9bfc7f7742f67b713fb7
+  languageName: node
+  linkType: hard
+
+"@tauri-apps/plugin-dialog@npm:^2.0.0-rc.0":
+  version: 2.0.0-rc.0
+  resolution: "@tauri-apps/plugin-dialog@npm:2.0.0-rc.0"
+  dependencies:
+    "@tauri-apps/api": "npm:^2.0.0-rc.0"
+  checksum: c872fbfcd98fa45670d4df18907b800f85adead84ea8fdd7f8668963cba249a0a7a8f0fba352f0da450562738ba2444981b0dcfd592c1cfac5cb486983facbef
   languageName: node
   linkType: hard
 
@@ -5193,6 +5209,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"charenc@npm:0.0.2":
+  version: 0.0.2
+  resolution: "charenc@npm:0.0.2"
+  checksum: 81dcadbe57e861d527faf6dd3855dc857395a1c4d6781f4847288ab23cffb7b3ee80d57c15bba7252ffe3e5e8019db767757ee7975663ad2ca0939bb8fcaf2e5
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:>=3.0.0 <4.0.0":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
@@ -5624,6 +5647,13 @@ __metadata:
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
   checksum: e1a13869d2f57d974de0d9ef7acbf69dc6937db20b918525a01dacb5032129bd552d290d886d981e99f1b624cb03657084cc87bd40f115c07ecf376821c729ce
+  languageName: node
+  linkType: hard
+
+"crypt@npm:0.0.2":
+  version: 0.0.2
+  resolution: "crypt@npm:0.0.2"
+  checksum: 2c72768de3d28278c7c9ffd81a298b26f87ecdfe94415084f339e6632f089b43fe039f2c93f612bcb5ffe447238373d93b2e8c90894cba6cfb0ac7a74616f8b9
   languageName: node
   linkType: hard
 
@@ -7581,6 +7611,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-buffer@npm:~1.1.6":
+  version: 1.1.6
+  resolution: "is-buffer@npm:1.1.6"
+  checksum: f63da109e74bbe8947036ed529d43e4ae0c5fcd0909921dce4917ad3ea212c6a87c29f525ba1d17c0858c18331cf1046d4fc69ef59ed26896b25c8288a627133
+  languageName: node
+  linkType: hard
+
 "is-ci@npm:3.0.1":
   version: 3.0.1
   resolution: "is-ci@npm:3.0.1"
@@ -8789,6 +8826,17 @@ __metadata:
   version: 1.2.6
   resolution: "material-colors@npm:1.2.6"
   checksum: 7ad6df7ee7de15d8b8f95191c2310db6b99934ce01b592b38d7c6e2ce119fc6d37699356fb148dd3e6ba63a5ec68cc16d466b972d96fc5364ab85238a3fe2429
+  languageName: node
+  linkType: hard
+
+"md5@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "md5@npm:2.3.0"
+  dependencies:
+    charenc: "npm:0.0.2"
+    crypt: "npm:0.0.2"
+    is-buffer: "npm:~1.1.6"
+  checksum: 88dce9fb8df1a084c2385726dcc18c7f54e0b64c261b5def7cdfe4928c4ee1cd68695c34108b4fab7ecceb05838c938aa411c6143df9fdc0026c4ddb4e4e72fa
   languageName: node
   linkType: hard
 
@@ -11323,16 +11371,19 @@ __metadata:
     "@radix-ui/themes": "npm:^3.1.3"
     "@tauri-apps/api": "npm:^2.0.0-rc.3"
     "@tauri-apps/cli": "npm:^2.0.0-rc.7"
+    "@tauri-apps/plugin-dialog": "npm:^2.0.0-rc.0"
     "@types/react": "npm:^18.2.15"
     "@types/react-dom": "npm:^18.2.7"
     "@vitejs/plugin-react": "npm:^4.3.1"
     dexie: "npm:^4.0.8"
     dexie-react-hooks: "npm:^1.1.7"
     i18next: "npm:^23.14.0"
+    md5: "npm:^2.3.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-error-boundary: "npm:^4.0.11"
     react-i18next: "npm:^15.0.1"
+    react-router-dom: "npm:^6.26.1"
     sass: "npm:^1.69.3"
     typescript: "npm:^5.5.4"
     vite: "npm:^5.4.0"
@@ -11693,6 +11744,30 @@ __metadata:
     "@types/react":
       optional: true
   checksum: a1285d118e734855be6a1cf6c83a2ee39d8c5a5c3c336a1e9b80ab571326669bf39a52607f1889337c559c18b9e5fd5a0772fa82f748de3fcfe114ee6f772cc6
+  languageName: node
+  linkType: hard
+
+"react-router-dom@npm:^6.26.1":
+  version: 6.26.1
+  resolution: "react-router-dom@npm:6.26.1"
+  dependencies:
+    "@remix-run/router": "npm:1.19.1"
+    react-router: "npm:6.26.1"
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 1bd255d1ff88f477699c72656e7c07702a907e644388a1bea1c648f2df0c3c86db2e90bea945b1d43eaf84ebab194f3868f3788502965ad5f20c508c6874f1fe
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.26.1":
+  version: 6.26.1
+  resolution: "react-router@npm:6.26.1"
+  dependencies:
+    "@remix-run/router": "npm:1.19.1"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: b3761515c75da65a1678f005d08a6285ceccd9df7237ae6fdd9ab2ab816ef328435b75610f705ecd9ecd41c6878fd22eb9b44c5391cdef2e1ed99ddbc78de8a4
   languageName: node
   linkType: hard
 

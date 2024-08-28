@@ -1,5 +1,11 @@
 use crate::server::AMLLWebSocketServer;
-use std::{net::SocketAddr, sync::Mutex};
+use base64::prelude::*;
+use serde::*;
+use std::{fs::File, net::SocketAddr, sync::Mutex};
+use symphonia::core::{
+    io::{MediaSourceStream, MediaSourceStreamOptions},
+    meta::StandardTagKey,
+};
 use tauri::{Manager, State};
 use tracing::*;
 
@@ -21,6 +27,72 @@ fn ws_get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> 
 fn ws_boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
     let ws = ws.clone();
     tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
+}
+
+#[derive(Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MusicInfo {
+    pub name: String,
+    pub artist: String,
+    pub album: String,
+    pub lyric: String,
+    pub cover: String,
+    pub duration: f64,
+}
+
+#[tauri::command]
+fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, String> {
+    let file = File::open(file_path).map_err(|e| e.to_string())?;
+    let probe = symphonia::default::get_probe();
+    let mut format_result = probe
+        .format(
+            &Default::default(),
+            MediaSourceStream::new(Box::new(file), MediaSourceStreamOptions::default()),
+            &Default::default(),
+            &Default::default(),
+        )
+        .map_err(|e| e.to_string())?;
+
+    let mut new_audio_info = MusicInfo::default();
+    let mut metadata = format_result.format.metadata();
+    metadata.skip_to_latest();
+
+    if let Some(metadata) = metadata.skip_to_latest() {
+        for tag in metadata.tags() {
+            match tag.std_key {
+                Some(StandardTagKey::TrackTitle) => {
+                    new_audio_info.name = tag.value.to_string();
+                }
+                Some(StandardTagKey::Artist) => {
+                    new_audio_info.artist = tag.value.to_string();
+                }
+                Some(StandardTagKey::Album) => {
+                    new_audio_info.album = tag.value.to_string();
+                }
+                Some(StandardTagKey::Lyrics) => {
+                    new_audio_info.lyric = tag.value.to_string();
+                }
+                Some(_) | None => {}
+            }
+        }
+        for visual in metadata.visuals() {
+            if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
+                new_audio_info.cover =
+                    BASE64_STANDARD.encode(&visual.data);
+            }
+        }
+    }
+
+    let track = format_result
+        .format
+        .default_track()
+        .ok_or_else(|| "无法解码正在加载的音频的默认音轨".to_string())?;
+    let timebase = track.codec_params.time_base.unwrap_or_default();
+    let duration = timebase.calc_time(track.codec_params.n_frames.unwrap_or_default());
+    let play_duration = duration.seconds as f64 + duration.frac;
+    new_audio_info.duration = play_duration;
+
+    Ok(new_audio_info)
 }
 
 fn init_logging() {
@@ -61,11 +133,13 @@ pub fn run() {
     init_logging();
     info!("AMLL Player is starting!");
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             ws_reopen_connection,
             ws_get_connections,
             ws_boardcast_message,
             player::local_player_send_msg,
+            read_local_music_metadata,
         ])
         .setup(|app| {
             player::init_local_player(app.handle().clone());

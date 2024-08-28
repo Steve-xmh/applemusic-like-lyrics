@@ -9,14 +9,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%
+  -webkit-text-size-adjust: 100%;
+
+  background-color: var(--background-color);
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
-  cursor: default
+  cursor: default;
+  padding-bottom: 5em;
 }

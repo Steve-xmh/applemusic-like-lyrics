@@ -1,42 +1,42 @@
 {
-  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-  "build": {
-    "beforeDevCommand": "yarn dev --host",
-    "beforeBuildCommand": "yarn build:dev",
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:1420"
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  },
-  "productName": "AMLL Player",
-  "version": "0.0.1",
-  "identifier": "net.stevexmh.amllplayer",
-  "plugins": {},
-  "app": {
-    "withGlobalTauri": true,
-    "windows": [
-      {
-        "label": "main",
-        "fullscreen": false,
-        "resizable": true,
-        "title": "AMLL Player",
-        "width": 800,
-        "height": 600,
-        "theme": "Dark"
-      }
-    ],
-    "security": {
-      "dangerousDisableAssetCspModification": true,
-      "csp": "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: mediastream: blob: filesystem: https://*; connect-src ipc: http://ipc.localhost"
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+	"build": {
+		"beforeDevCommand": "yarn dev --host",
+		"beforeBuildCommand": "yarn build:dev",
+		"frontendDist": "../dist",
+		"devUrl": "http://localhost:1420"
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	},
+	"productName": "AMLL Player",
+	"version": "0.0.1",
+	"identifier": "net.stevexmh.amllplayer",
+	"plugins": {},
+	"app": {
+		"withGlobalTauri": true,
+		"windows": [
+			{
+				"label": "main",
+				"fullscreen": false,
+				"resizable": true,
+				"title": "AMLL Player",
+				"width": 800,
+				"height": 600,
+				"theme": "Dark"
+			}
+		],
+		"security": {
+			"dangerousDisableAssetCspModification": true,
+			"csp": "default-src 'self' 'unsafe-eval' 'unsafe-inline' data: mediastream: blob: filesystem: https://*; connect-src ipc: http://ipc.localhost"
+		}
+	}
 }

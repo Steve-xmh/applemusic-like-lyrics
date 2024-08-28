@@ -1,13 +1,13 @@
 {
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "migrated",
-  "description": "permissions that were migrated from v1",
-  "local": true,
-  "windows": [
-    "main"
-  ],
-  "permissions": [
-    "core:event:default",
-    "core:window:default"
-  ]
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "migrated",
+	"description": "permissions that were migrated from v1",
+	"local": true,
+	"windows": ["main"],
+	"permissions": [
+		"core:event:default",
+		"core:window:default",
+		"core:path:default",
+		"dialog:default"
+	]
 }

@@ -11,27 +11,22 @@ import {
 import "@applemusic-like-lyrics/react-full/style.css";
 import { Provider, useAtomValue } from "jotai";
 import { ErrorBoundary } from "react-error-boundary";
-import { useTranslation } from "react-i18next";
 import "./i18n";
 import {
 	Avatar,
-	Box,
 	Container,
 	Flex,
-	Heading,
 	IconButton,
-	Text,
-	TextField,
 	Theme,
 } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
-import { ListBulletIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { NewPlaylistButton } from "./components/NewPlaylistButton";
-import { SettingsButton } from "./components/SettingsButton";
+import { ListBulletIcon } from "@radix-ui/react-icons";
 import IconPlay from "./assets/icon_play.svg?react";
 import IconPause from "./assets/icon_pause.svg?react";
 import IconForward from "./assets/icon_forward.svg?react";
 import IconRewind from "./assets/icon_rewind.svg?react";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 function ErrorRender({ error, resetErrorBoundary }) {
 	console.error(error);
@@ -49,7 +44,6 @@ function ErrorRender({ error, resetErrorBoundary }) {
 }
 
 function App() {
-	const { t } = useTranslation();
 	const musicName = useAtomValue(musicNameAtom);
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicPlaying = useAtomValue(musicPlayingAtom);
@@ -61,25 +55,7 @@ function App() {
 				<Theme appearance="dark">
 					<>
 						<Container mx="9" mb="9">
-							<Flex direction="row" align="center" wrap="wrap">
-								<Box asChild flexGrow="1">
-									<Heading wrap="nowrap" my="4">
-										AMLL Player
-									</Heading>
-								</Box>
-								<Flex gap="1" wrap="wrap">
-									<TextField.Root placeholder="搜索……">
-										<TextField.Slot>
-											<MagnifyingGlassIcon />
-										</TextField.Slot>
-									</TextField.Root>
-									<NewPlaylistButton />
-									<SettingsButton />
-								</Flex>
-							</Flex>
-							<Text mt="9" as="div" align="center">
-								没有播放列表，快去新建一个吧！
-							</Text>
+							<RouterProvider router={router} />
 						</Container>
 						<Container position="fixed" bottom="0" left="0" right="0">
 							<Flex className={styles.playBar} overflow="hidden">
