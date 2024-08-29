@@ -2,6 +2,8 @@ use std::fmt::Debug;
 
 use tokio::sync::mpsc::UnboundedReceiver;
 
+#[cfg(target_os = "macos")]
+mod macos;
 #[cfg(target_os = "windows")]
 mod windows;
 
@@ -12,12 +14,14 @@ pub enum MediaStateMessage {
     Previous,
 }
 
-pub(super) trait MediaStateManagerBackend: Sized + Debug {
+pub(super) trait MediaStateManagerBackend: Sized + Send + Sync + Debug {
     fn new() -> anyhow::Result<(Self, UnboundedReceiver<MediaStateMessage>)>;
     fn set_playing(&self, playing: bool) -> anyhow::Result<()>;
     fn set_title(&self, title: &str) -> anyhow::Result<()>;
     fn set_artist(&self, artist: &str) -> anyhow::Result<()>;
     fn set_cover_image(&self, cover_data: impl AsRef<[u8]>) -> anyhow::Result<()>;
+    fn set_duration(&self, duration: f64) -> anyhow::Result<()>;
+    fn set_position(&self, position: f64) -> anyhow::Result<()>;
     fn update(&self) -> anyhow::Result<()>;
 }
 
@@ -45,6 +49,14 @@ impl MediaStateManagerBackend for EmptyMediaStateManager {
         Ok(())
     }
 
+    fn set_duration(&self, duration: f64) -> anyhow::Result<()> {
+        Ok(())
+    }
+
+    fn set_position(&self, position: f64) -> anyhow::Result<()> {
+        Ok(())
+    }
+
     fn update(&self) -> anyhow::Result<()> {
         Ok(())
     }
@@ -52,5 +64,7 @@ impl MediaStateManagerBackend for EmptyMediaStateManager {
 
 #[cfg(target_os = "windows")]
 pub type MediaStateManager = windows::MediaStateManagerWindowsBackend;
-#[cfg(not(target_os = "windows"))]
+#[cfg(target_os = "macos")]
+pub type MediaStateManager = macos::MediaStateManagerMacOSBackend;
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
 pub type MediaStateManager = EmptyMediaStateManager;

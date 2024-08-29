@@ -731,6 +731,7 @@ impl AudioPlayer {
                 let _ = x.set_cover_image(cover);
             }
             let _ = x.set_playing(true);
+            let _ = x.set_duration(play_duration);
             let _ = x.update();
         }
         ctx.emitter
@@ -759,6 +760,10 @@ impl AudioPlayer {
         ctx.play_pos_sx.send(Some((false, last_play_pos))).unwrap();
         let play_result = 'play_loop: loop {
             if is_playing {
+                if let Some(x) = &ctx.media_state_manager {
+                    let _ = x.set_position(last_play_pos);
+                    let _ = x.update();
+                }
                 'recv_loop: loop {
                     match ctx.play_rx.try_recv() {
                         Ok(msg) => match msg {

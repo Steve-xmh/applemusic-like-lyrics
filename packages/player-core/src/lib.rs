@@ -7,10 +7,10 @@ use serde::*;
 
 mod audio_quality;
 mod fft_player;
+mod media_state;
 mod output;
 mod player;
 mod resampler;
-mod media_state;
 
 pub use player::*;
 

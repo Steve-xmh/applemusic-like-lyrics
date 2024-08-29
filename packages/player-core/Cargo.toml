@@ -35,6 +35,23 @@ features = [
 mpris-server = "0.8"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-objc2 = "0.2"
+objc2 = "0.5"
+once_cell = "^1.18"
+[target.'cfg(target_os = "macos")'.dependencies.objc2-media-player]
+version = "0.2"
+features = [
+    "MPNowPlayingInfoCenter",
+    "MPMediaItem",
+    "block2",
+    "objc2-app-kit",
+]
+[target.'cfg(target_os = "macos")'.dependencies.objc2-app-kit]
+version = "0.2"
+features = [
+    "NSImage",
+]
+[target.'cfg(target_os = "macos")'.dependencies.objc2-foundation]
+version = "0.2"
+features = ["all"]
 
 [build-dependencies]

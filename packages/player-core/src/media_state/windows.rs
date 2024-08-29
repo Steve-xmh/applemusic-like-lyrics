@@ -96,6 +96,14 @@ impl super::MediaStateManagerBackend for MediaStateManagerWindowsBackend {
         Ok(())
     }
 
+    fn set_duration(&self, duration: f64) -> anyhow::Result<()> {
+        Ok(())
+    }
+
+    fn set_position(&self, position: f64) -> anyhow::Result<()> {
+        Ok(())
+    }
+
     fn set_cover_image(&self, cover_data: impl AsRef<[u8]>) -> anyhow::Result<()> {
         // TODO: 暂时无法显示出来，要确认原因
         let cover_data = cover_data.as_ref();
