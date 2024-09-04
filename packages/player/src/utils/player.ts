@@ -17,16 +17,16 @@ export interface AudioQuality {
 }
 
 export interface AudioInfo {
-    name: string;
-    artist: string;
-    album: string;
-    lyric: string;
-    coverMediaType: string;
-    // 本质是 Uint8Array
-    // TODO: 返回成 Base64？
-    cover?: number[];
-    duration: number;
-    position: number;
+	name: string;
+	artist: string;
+	album: string;
+	lyric: string;
+	coverMediaType: string;
+	// 本质是 Uint8Array
+	// TODO: 返回成 Base64？
+	cover?: number[];
+	duration: number;
+	position: number;
 }
 
 export type SongData =
@@ -115,7 +115,7 @@ export type AudioThreadEvent =
 			type: "syncStatus";
 			data: {
 				musicId: string;
-                musicInfo: AudioInfo;
+				musicInfo: AudioInfo;
 				isPlaying: boolean;
 				duration: number;
 				position: number;
@@ -150,7 +150,7 @@ export type AudioThreadEvent =
 const msgTasks = new Map<string, (value: unknown) => void>();
 
 async function initAudioThread() {
-	console.log("后台线程连接初始化中  [1/2]");
+	console.log("后台线程连接初始化中");
 	await listen<AudioThreadEventMessage<AudioThreadEvent>>(
 		"audio_player_msg",
 		(evt) => {
@@ -161,8 +161,6 @@ async function initAudioThread() {
 			}
 		},
 	);
-	console.log("后台线程连接初始化中 [2/2]");
-	await emitAudioThreadRet("syncStatus");
 	console.log("后台线程连接初始化完成");
 }
 
@@ -174,14 +172,14 @@ export const listenAudioThreadEvent = (
 ) => listen("audio_player_msg", handler);
 
 export async function readLocalMusicMetadata(filePath: string): Promise<{
-    name: string,
-    artist: string,
-    album: string,
-    lyric: string,
-    cover: string,
-    duration: number,
+	name: string;
+	artist: string;
+	album: string;
+	lyric: string;
+	cover: string;
+	duration: number;
 }> {
-    return await invoke("read_local_music_metadata", { filePath });
+	return await invoke("read_local_music_metadata", { filePath });
 }
 
 export async function emitAudioThread<

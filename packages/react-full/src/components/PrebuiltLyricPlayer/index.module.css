@@ -1,40 +1,121 @@
 .horizontalControls {
     padding: 2vh 0 !important;
     width: min(52vh, 38vw);
+    
+    @media screen and (max-height: 768px) {
+        padding: 0.5vh 0 !important;
+    }
 }
 
-.controls, .bigControls {
+.controls,
+.bigControls {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 1em 0;
     padding: 0 2vh;
+    
+    @media screen and (max-height: 768px) {
+        margin: 0 0;
+    }
 }
 
 .bigControls {
     padding: 2vh 4vh;
 }
 
+.songMediaButton {
+    height: 10vh;
+
+    @media screen and (max-height: 768px) {
+        height: 8vh;
+    }
+    &>svg {
+        scale: 3;
+        transition: scale 0.3s;
+        
+        @media screen and (max-height: 1080px) {
+            scale: 2;
+        }
+
+        @media screen and (max-height: 768px) {
+            scale: 1.5;
+        }
+        
+        @media screen and (max-height: 512px) {
+            scale: 0.75;
+        }
+    }
+}
+
+.songMediaPlayButton {
+    height: 10vh;
+
+    @media screen and (max-height: 768px) {
+        height: 8vh;
+    }
+    &>svg {
+        scale: 2;
+        transition: scale 0.3s;
+        
+        @media screen and (max-height: 1080px) {
+            scale: 1.5;
+        }
+
+        @media screen and (max-height: 768px) {
+            scale: 1;
+        }
+        
+        @media screen and (max-height: 512px) {
+            scale: 0.5;
+        }
+    }
+}
+
+.qualityTag {
+    scale: 1.4;
+    transition: scale 0.3s;
+    
+    @media screen and (max-height: 512px) {
+        scale: 0.5;
+    }
+
+    @media screen and (max-height: 768px) {
+        scale: 1;
+    }
+}
+
 .progressBarLabels {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    font-size: max(1.2vh, 1em);
+    margin-top: 0.5em;
+    opacity: 0.5;
     
-    & > * {
+    @media screen and (max-height: 768px) {
+        margin-top: 0;
+    }
+
+    &>* {
         flex: 1;
     }
-    
-    & > *:nth-child(2) {
+
+    &>*:nth-child(2) {
         flex: 0;
     }
-    
-    & > *:last-child {
+
+    &>*:last-child {
         text-align: right;
     }
 }
 
-.bigControls > button {
+.bigControls>button {
     height: 10vh !important;
     width: 10vh !important;
-    & > svg {
+
+    &>svg {
         scale: 1.75;
     }
 }

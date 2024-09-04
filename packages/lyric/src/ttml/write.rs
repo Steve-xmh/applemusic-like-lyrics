@@ -224,7 +224,7 @@ fn ms_to_timestamp(time_ms: u64) -> String {
     let time = time_ms;
     if time == 0 {
         return "00:00.000".to_string();
-    } else if time == std::u64::MAX {
+    } else if time == u64::MAX {
         return "99:99.999".to_string();
     }
     let ms = time % 1000;

@@ -119,8 +119,6 @@ pub enum AudioThreadEvent {
     #[serde(rename_all = "camelCase")]
     PlayStatus { is_playing: bool },
     #[serde(rename_all = "camelCase")]
-    SetDuration { duration: f64 },
-    #[serde(rename_all = "camelCase")]
     LoadError { error: String },
     #[serde(rename_all = "camelCase")]
     VolumeChanged { volume: f64 },
@@ -139,6 +137,14 @@ pub struct AudioThreadEventMessage<T> {
 impl<T> AudioThreadEventMessage<T> {
     pub fn new(callback_id: String, data: Option<T>) -> Self {
         Self { callback_id, data }
+    }
+
+    pub fn data(&self) -> Option<&T> {
+        self.data.as_ref()
+    }
+
+    pub fn callback_id(&self) -> &str {
+        &self.callback_id
     }
 
     pub fn to<D>(self, new_data: D) -> AudioThreadEventMessage<D> {

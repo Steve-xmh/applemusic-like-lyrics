@@ -6,8 +6,25 @@ import * as wsp from "@applemusic-like-lyrics/ws-protocol";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import "./utils/player";
+import { Provider } from "jotai";
+import { ErrorBoundary } from "react-error-boundary";
 
 (window as any).wsp = wsp;
+
+const ErrorRender = (props: FallbackProps) => {
+	console.error(props.error);
+	return (
+		<div>
+			<h2>An unrecoverable error has occured</h2>
+			<code>
+				<pre>
+					{props.error.message}
+					{props.error.stack}
+				</pre>
+			</code>
+		</div>
+	);
+};
 
 invoke("ws_reopen_connection", {
 	addr: "",
@@ -31,6 +48,10 @@ listen("audio-player-msg", (event) => {
 
 createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
-		<App />
+		<ErrorBoundary fallbackRender={ErrorRender}>
+			<Provider>
+				<App />
+			</Provider>
+		</ErrorBoundary>
 	</React.StrictMode>,
 );

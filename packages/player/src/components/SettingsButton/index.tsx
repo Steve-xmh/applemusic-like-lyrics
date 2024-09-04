@@ -22,7 +22,9 @@ export const SettingsButton: React.FC = () => {
 					关于
 				</Text>
 				<Text as="div">Apple Music-like Lyrics Player</Text>
-				<Text as="div" style={{opacity:"0.5"}}>{commit.substring(0, 7)} {branch}</Text>
+				<Text as="div" style={{ opacity: "0.5" }}>
+					{commit.substring(0, 7)} {branch}
+				</Text>
 				<Text as="div">由 SteveXMH 及其所有 Github 协作者共同开发</Text>
 
 				<Flex gap="3" mt="4" justify="end">

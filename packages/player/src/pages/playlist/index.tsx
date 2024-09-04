@@ -15,9 +15,12 @@ import { db } from "../../dexie";
 import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@radix-ui/react-icons";
 import { open } from "@tauri-apps/plugin-dialog";
 import { path } from "@tauri-apps/api";
-import { invoke } from "@tauri-apps/api/core";
 import md5 from "md5";
-import { readLocalMusicMetadata } from "../../utils/player";
+import {
+	emitAudioThread,
+	emitAudioThreadRet,
+	readLocalMusicMetadata,
+} from "../../utils/player";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -71,55 +74,56 @@ export const PlaylistPage: FC = () => {
 		await db.songs.bulkPut(transformed);
 		const shouldAddIds = transformed
 			.map((v) => v.id)
-			.filter((v) => !playlist?.songIds.includes(v));
+			.filter((v) => !playlist?.songIds.includes(v))
+			.reverse();
 		await db.playlists.update(Number(param.id), (obj) => {
-			obj.songIds.push(...shouldAddIds);
+			obj.songIds.unshift(...shouldAddIds);
 		});
 	}, [playlist, param.id]);
 
-	const onPlayAll = useCallback(async () => {
-		if (songs === undefined) return;
-		await invoke("local_player_send_msg", {
-			msg: {
-				callbackId: "",
-				data: {
-					type: "setPlaylist",
-					songs: songs
-						.filter((v) => !!v)
-						.map((v, i) => ({
-							type: "local",
-							filePath: v.filePath,
-							origOrder: i,
-						})),
-				},
-			},
-		});
-		await invoke("local_player_send_msg", {
-			msg: {
-				callbackId: "",
-				data: {
-					type: "jumpToSong",
-					songIndex: 0,
-				},
-			},
-		});
-	}, [songs]);
+	const onPlayList = useCallback(
+		async (songIndex = 0) => {
+			if (songs === undefined) return;
+			await emitAudioThreadRet("setPlaylist", {
+				songs: songs
+					.filter((v) => !!v)
+					.map((v, i) => ({
+						type: "local",
+						filePath: v.filePath,
+						origOrder: i,
+					})),
+			});
+			await emitAudioThread("jumpToSong", {
+				songIndex,
+			});
+		},
+		[songs],
+	);
+
+	const onPlaylistDefault = useCallback(onPlayList.bind(null, 0), [onPlayList]);
 
 	return (
 		<>
-			<Flex align="end" mt="4" mx="8" gap="4">
+			<Flex align="end" mt="4" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
 					返回
 				</Button>
 			</Flex>
-			<Flex align="end" mt="4" mx="8" gap="4">
+			<Flex align="end" mt="4" gap="4">
 				<Avatar size="9" fallback={<div />} />
-				<Flex direction="column" gap="4">
+				<Flex
+					direction="column"
+					gap="4"
+					display={{
+						initial: "none",
+						sm: "flex",
+					}}
+				>
 					<Heading>{playlist?.name}</Heading>
 					<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
 					<Flex gap="2">
-						<Button onClick={onPlayAll}>
+						<Button onClick={onPlaylistDefault}>
 							<PlayIcon />
 							播放全部
 						</Button>
@@ -130,12 +134,31 @@ export const PlaylistPage: FC = () => {
 						</Button>
 					</Flex>
 				</Flex>
+				<Flex
+					direction="column"
+					gap="4"
+					display={{
+						xs: "flex",
+						sm: "none",
+					}}
+				>
+					<Heading>{playlist?.name}</Heading>
+					<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
+					<Flex gap="2">
+						<IconButton onClick={onPlaylistDefault}>
+							<PlayIcon />
+						</IconButton>
+						<IconButton variant="soft" onClick={onAddLocalMusics}>
+							<PlusIcon />
+						</IconButton>
+					</Flex>
+				</Flex>
 			</Flex>
-			<Flex direction="column" mt="4" mx="8" gap="4" overflowY="auto">
+			<Flex direction="column" mt="4" gap="4" overflowY="auto">
 				{songs ? (
 					songs
 						.filter((v) => !!v)
-						.map((song) => (
+						.map((song, index) => (
 							<Card key={song.id}>
 								<Flex p="1" align="center" gap="4">
 									<Avatar
@@ -148,7 +171,12 @@ export const PlaylistPage: FC = () => {
 										<Box>{song.songArtists}</Box>
 									</Flex>
 									<Box>{toDuration(song.duration)}</Box>
-									<IconButton variant="ghost">
+									<IconButton
+										variant="ghost"
+										onClick={() => {
+											onPlayList(index);
+										}}
+									>
 										<PlayIcon />
 									</IconButton>
 								</Flex>

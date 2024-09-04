@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use tokio::sync::mpsc::UnboundedReceiver;
 use windows::{
     core::*,
@@ -14,6 +16,7 @@ use super::MediaStateMessage;
 pub struct MediaStateManagerWindowsBackend {
     mp: windows::Media::Playback::MediaPlayer,
     smtc: SystemMediaTransportControls,
+    smtc_timeline_prop: SystemMediaTransportControlsTimelineProperties,
     smtc_updater: SystemMediaTransportControlsDisplayUpdater,
 }
 
@@ -65,8 +68,17 @@ impl super::MediaStateManagerBackend for MediaStateManagerWindowsBackend {
         let result = Self {
             mp,
             smtc,
+            smtc_timeline_prop: SystemMediaTransportControlsTimelineProperties::new()?,
             smtc_updater,
         };
+        result
+            .smtc_timeline_prop
+            .SetStartTime(TimeSpan::default())?;
+        result
+            .smtc_timeline_prop
+            .SetMinSeekTime(TimeSpan::default())?;
+        result.set_position(0.0)?;
+        result.set_duration(0.0)?;
         result.set_title("未知歌曲")?;
         result.set_artist("未知歌手")?;
         result.update()?;
@@ -97,10 +109,21 @@ impl super::MediaStateManagerBackend for MediaStateManagerWindowsBackend {
     }
 
     fn set_duration(&self, duration: f64) -> anyhow::Result<()> {
+        // TODO: 无法工作
+        let ts = TimeSpan::from(Duration::from_secs_f64(duration));
+        self.smtc_timeline_prop.SetEndTime(ts)?;
+        self.smtc_timeline_prop.SetMaxSeekTime(ts)?;
+        self.smtc
+            .UpdateTimelineProperties(&self.smtc_timeline_prop)?;
         Ok(())
     }
 
     fn set_position(&self, position: f64) -> anyhow::Result<()> {
+        // TODO: 无法工作
+        let ts = TimeSpan::from(Duration::from_secs_f64(position));
+        self.smtc_timeline_prop.SetPosition(ts)?;
+        self.smtc
+            .UpdateTimelineProperties(&self.smtc_timeline_prop)?;
         Ok(())
     }
 

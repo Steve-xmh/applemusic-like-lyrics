@@ -14,6 +14,10 @@ const c = <Args extends any[], Result = void>(
 ): Callback<Args, Result> => ({});
 
 /**
+ * 当点击歌曲专辑图上方的控制横条按钮时触发的回调函数
+ */
+export const onClickControlThumbAtom = atom(c(() => {}));
+/**
  * 当任意企图打开菜单或点击菜单按钮时触发的回调函数
  */
 export const onRequestOpenMenuAtom = atom(c(() => {}));

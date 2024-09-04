@@ -14,8 +14,8 @@
         [buttom-controls] 0fr
         1fr;
     grid-template-columns:
-        [info-side] 0.85fr
-        [player-side] 1fr
+        [info-side] 0.45fr
+        [player-side] 0.55fr
         [side-controls] 0fr;
     gap: 8px;
     transition: 0.5s ease-in-out;

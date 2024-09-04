@@ -45,6 +45,10 @@ export const musicCoverAtom = atom("");
  */
 export const musicCoverIsVideoAtom = atom(false);
 /**
+ * 当前音乐的音乐时长，单位为毫秒
+ */
+export const musicDurationAtom = atom(0);
+/**
  * 当前是否正在播放音乐
  */
 export const musicPlayingAtom = atom(false);
@@ -82,3 +86,8 @@ export const fftDataAtom = atom<number[]>([]);
  * 如需呈现音频可视化频谱图，请设置 fftDataAtom 的值
  */
 export const lowFreqVolumeAtom = atom<number>(1);
+/**
+ * 当前是否正在展示 AMLL 播放页面，设置为 true 时将会让背景和歌词实时展示动画效果
+ * 推荐在页面被隐藏的时候将其设置为 false，这样会减少其对性能的影响（例如暂停背景渲染和歌词行变换等）
+ */
+export const isLyricPageOpenedAtom = atom(false);

@@ -99,7 +99,7 @@ export const globalLyricTimelineOffsetAtom = atomWithStorage(
 
 /**
  * 配置所使用的歌词背景渲染器，默认使用 MeshGradientRenderer
- * 
+ *
  * 由于存储状态特殊，故不使用 atomWithStorage，请另外处理配置存储
  *
  * 性能影响情况：高

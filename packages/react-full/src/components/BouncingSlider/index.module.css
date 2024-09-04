@@ -7,7 +7,7 @@
     justify-content: stretch;
     align-items: center;
 
-    min-height: 25px;
+    min-height: calc(1.16em * 2);
 
     &:active>.thumb {
         opacity: 0.9;

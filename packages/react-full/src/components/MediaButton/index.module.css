@@ -18,8 +18,6 @@
 
 .mediaButton {
     aspect-ratio: 1/1;
-    height: 6vh !important;
-    width: 6vh !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,7 +42,6 @@
     }
 
     &>* {
-        height: 60%;
         transition: transform 0.5s;
         transform-origin: center;
         animation: pressed-animation 0.7s;

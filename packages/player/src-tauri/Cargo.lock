@@ -102,7 +102,11 @@ dependencies = [
  "futures",
  "md5",
  "mpris-server",
- "objc2 0.2.7",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "objc2-media-player",
+ "once_cell",
  "rb",
  "ringbuf",
  "rubato",
@@ -548,7 +552,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2c132eebf10f5cad5289222520a4a058514204aed6d791f1cf4fe8088b82d15f"
 dependencies = [
- "objc2 0.5.2",
+ "objc2",
 ]
 
 [[package]]
@@ -2735,15 +2739,6 @@ checksum = "cdb91bdd390c7ce1a8607f35f3ca7151b65afc0ff5ff3b34fa350f7d7c7e4310"
 
 [[package]]
 name = "objc2"
-version = "0.2.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "612c08b52f6d8b11d8c199d0798bc38ab35c0a95da3be548a60808a4ae56d1f4"
-dependencies = [
- "malloc_buf",
-]
-
-[[package]]
-name = "objc2"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46a785d4eeff09c14c487497c162e92766fbb3e4059a71840cecc03d9a50b804"
@@ -2761,7 +2756,7 @@ dependencies = [
  "bitflags 2.6.0",
  "block2",
  "libc",
- "objc2 0.5.2",
+ "objc2",
  "objc2-core-data",
  "objc2-core-image",
  "objc2-foundation",
@@ -2776,7 +2771,7 @@ checksum = "617fbf49e071c178c0b24c080767db52958f716d9eabdf0890523aeae54773ef"
 dependencies = [
  "bitflags 2.6.0",
  "block2",
- "objc2 0.5.2",
+ "objc2",
  "objc2-foundation",
 ]
 
@@ -2787,7 +2782,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55260963a527c99f1819c4f8e3b47fe04f9650694ef348ffd2227e8196d34c80"
 dependencies = [
  "block2",
- "objc2 0.5.2",
+ "objc2",
  "objc2-foundation",
  "objc2-metal",
 ]
@@ -2808,7 +2803,20 @@ dependencies = [
  "block2",
  "dispatch",
  "libc",
- "objc2 0.5.2",
+ "objc2",
+]
+
+[[package]]
+name = "objc2-media-player"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aeee7e398f352d50d8016c73969878942efb422030884a744180a2d2b8b341de"
+dependencies = [
+ "bitflags 2.6.0",
+ "block2",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
 ]
 
 [[package]]
@@ -2819,7 +2827,7 @@ checksum = "dd0cba1276f6023976a406a14ffa85e1fdd19df6b0f737b063b95f6c8c7aadd6"
 dependencies = [
  "bitflags 2.6.0",
  "block2",
- "objc2 0.5.2",
+ "objc2",
  "objc2-foundation",
 ]
 
@@ -2831,7 +2839,7 @@ checksum = "e42bee7bff906b14b167da2bac5efe6b6a07e6f7c0a21a7308d40c960242dc7a"
 dependencies = [
  "bitflags 2.6.0",
  "block2",
- "objc2 0.5.2",
+ "objc2",
  "objc2-foundation",
  "objc2-metal",
 ]
@@ -4019,7 +4027,7 @@ dependencies = [
  "foreign-types",
  "js-sys",
  "log",
- "objc2 0.5.2",
+ "objc2",
  "objc2-app-kit",
  "objc2-foundation",
  "objc2-quartz-core",
@@ -5026,7 +5034,7 @@ dependencies = [
  "dirs",
  "libappindicator",
  "muda",
- "objc2 0.5.2",
+ "objc2",
  "objc2-app-kit",
  "objc2-foundation",
  "once_cell",

@@ -6,7 +6,7 @@ use symphonia::core::{
     io::{MediaSourceStream, MediaSourceStreamOptions},
     meta::StandardTagKey,
 };
-use tauri::{Manager, State};
+use tauri::{AppHandle, Manager, Runtime, State};
 use tracing::*;
 
 mod player;
@@ -27,6 +27,11 @@ fn ws_get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> 
 fn ws_boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
     let ws = ws.clone();
     tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
+}
+
+#[tauri::command]
+fn restart_app<R: Runtime>(app: AppHandle<R>) {
+    tauri::process::restart(&app.env())
 }
 
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -77,8 +82,7 @@ fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, String> {
         }
         for visual in metadata.visuals() {
             if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
-                new_audio_info.cover =
-                    BASE64_STANDARD.encode(&visual.data);
+                new_audio_info.cover = BASE64_STANDARD.encode(&visual.data);
             }
         }
     }
@@ -140,6 +144,7 @@ pub fn run() {
             ws_boardcast_message,
             player::local_player_send_msg,
             read_local_music_metadata,
+            restart_app,
         ])
         .setup(|app| {
             player::init_local_player(app.handle().clone());

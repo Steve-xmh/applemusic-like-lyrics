@@ -29,24 +29,26 @@ async fn main() -> anyhow::Result<()> {
 
     player
         .run(move |evt| {
-            match evt {
-                AudioThreadEvent::PlayPosition { .. } => {
-                    // 数据量太多就不输出了
-                    // println!("{:?}", play_position);
-                }
-                AudioThreadEvent::FFTData { .. } => {
-                    // 数据量太多就不输出了
-                    // println!("{:?}", fft_data);
-                }
-                AudioThreadEvent::AudioPlayFinished { .. } => {
-                    let handler = handler.clone();
-                    tokio::spawn(async move {
-                        let _ = handler.send_anonymous(AudioThreadMessage::Close).await;
-                        println!("播放完成，结束播放");
-                    });
-                }
-                other => {
-                    println!("{:?}", other);
+            if let Some(evt) = evt.data() {
+                match evt {
+                    AudioThreadEvent::PlayPosition { .. } => {
+                        // 数据量太多就不输出了
+                        // println!("{:?}", play_position);
+                    }
+                    AudioThreadEvent::FFTData { .. } => {
+                        // 数据量太多就不输出了
+                        // println!("{:?}", fft_data);
+                    }
+                    AudioThreadEvent::AudioPlayFinished { .. } => {
+                        let handler = handler.clone();
+                        tokio::spawn(async move {
+                            let _ = handler.send_anonymous(AudioThreadMessage::Close).await;
+                            println!("播放完成，结束播放");
+                        });
+                    }
+                    other => {
+                        println!("{:?}", other);
+                    }
                 }
             }
         })

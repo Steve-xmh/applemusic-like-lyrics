@@ -1,13 +1,30 @@
-#root {
-  width: 100vw;
-  height: 100vh;
-  color: white;
+.body {
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: scale(1);
+    box-sizing: border-box;
+    
+    
+    &.amllOpened {
+        transform: scale(0.95);
+        
+        &::after {
+            opacity: 0.75;
+            
+        transform: scale(1.6);
+        }
+    }
 }
 
-.playBar {
-  margin: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-4);
-  border: solid 1px var(--gray-6);
-  backdrop-filter: blur(20px) brightness(0.8);
+.body::after {
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    content: '';
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    opacity: 0;
+    background-color: #000;
 }

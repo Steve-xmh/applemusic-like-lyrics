@@ -17,11 +17,19 @@ import {
 	musicArtistsAtom,
 	musicCoverAtom,
 	musicCoverIsVideoAtom,
+	musicDurationAtom,
 	musicLyricLinesAtom,
 	musicNameAtom,
 	musicPlayingAtom,
+	musicPlayingPositionAtom,
 } from "../../states/music";
-import { onRequestOpenMenuAtom } from "../../states/callback";
+import {
+	onClickControlThumbAtom,
+	onPlayOrResumeAtom,
+	onRequestNextSongAtom,
+	onRequestOpenMenuAtom,
+	onRequestPrevSongAtom,
+} from "../../states/callback";
 import { useRef, type FC, type HTMLProps } from "react";
 import { MusicInfo } from "../MusicInfo";
 import { BouncingSlider } from "../BouncingSlider";
@@ -42,7 +50,7 @@ const PrebuiltMusicInfo: FC<{
 	const musicName = useAtomValue(musicNameAtom);
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicAlbum = useAtomValue(musicAlbumNameAtom);
-	const onMenuClicked = useAtomValue(onRequestOpenMenuAtom);
+	const onMenuClicked = useAtomValue(onRequestOpenMenuAtom).onEmit;
 	return (
 		<MusicInfo
 			className={className}
@@ -50,42 +58,71 @@ const PrebuiltMusicInfo: FC<{
 			name={musicName}
 			artists={musicArtists.map((v) => v.name)}
 			album={musicAlbum}
-			onMenuButtonClicked={onMenuClicked.onEmit}
+			onMenuButtonClicked={onMenuClicked}
 		/>
 	);
 };
 
 const PrebuiltMediaButtons: FC = () => {
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+	const onRequestPrevSong = useAtomValue(onRequestPrevSongAtom).onEmit;
+	const onRequestNextSong = useAtomValue(onRequestNextSongAtom).onEmit;
+	const onPlayOrResume = useAtomValue(onPlayOrResumeAtom).onEmit;
 	return (
 		<>
-			<MediaButton>
+			<MediaButton
+				className={styles.songMediaButton}
+				onClick={onRequestPrevSong}
+			>
 				<IconRewind color="#FFFFFF" />
 			</MediaButton>
-			<MediaButton>
+			<MediaButton
+				className={styles.songMediaPlayButton}
+				onClick={onPlayOrResume}
+			>
 				{musicIsPlaying ? (
 					<IconPause color="#FFFFFF" />
 				) : (
 					<IconPlay color="#FFFFFF" />
 				)}
 			</MediaButton>
-			<MediaButton>
+			<MediaButton
+				className={styles.songMediaButton}
+				onClick={onRequestNextSong}
+			>
 				<IconForward color="#FFFFFF" />
 			</MediaButton>
 		</>
 	);
 };
 
+function toDuration(duration: number) {
+	const isRemainTime = duration < 0;
+
+	const d = Math.abs(duration | 0);
+	const sec = d % 60;
+	const min = Math.floor((d - sec) / 60);
+	const secText = "0".repeat(2 - sec.toString().length) + sec;
+
+	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
+}
+
 const PrebuiltProgressBar: FC = () => {
+	const musicDuration = useAtomValue(musicDurationAtom);
+	const musicPosition = useAtomValue(musicPlayingPositionAtom);
+
 	return (
 		<>
-			<BouncingSlider value={0.5} min={0} max={1} />
+			<BouncingSlider value={musicPosition / musicDuration} min={0} max={1} />
 			<div className={styles.progressBarLabels}>
-				<div>0:00</div>
+				<div>{toDuration(musicPosition / 1000)}</div>
 				<div>
-					<AudioQualityTag quality={AudioQualityType.HiRes} />
+					<AudioQualityTag
+						className={styles.qualityTag}
+						quality={AudioQualityType.HiRes}
+					/>
 				</div>
-				<div>0:00</div>
+				<div>{toDuration((musicPosition - musicDuration) / 1000)}</div>
 			</div>
 		</>
 	);
@@ -108,6 +145,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+	const onClickControlThumb = useAtomValue(onClickControlThumbAtom).onEmit;
 
 	const coverElRef = useRef<HTMLElement>(null);
 
@@ -120,7 +158,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					musicPaused={!musicIsPlaying}
 				/>
 			}
-			thumbSlot={<ControlThumb />}
+			thumbSlot={<ControlThumb onClick={onClickControlThumb} />}
 			smallControlsSlot={
 				<PrebuiltMusicInfo
 					className={classNames(

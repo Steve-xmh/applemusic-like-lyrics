@@ -49,11 +49,11 @@ impl MediaStateManagerBackend for EmptyMediaStateManager {
         Ok(())
     }
 
-    fn set_duration(&self, duration: f64) -> anyhow::Result<()> {
+    fn set_duration(&self, _duration: f64) -> anyhow::Result<()> {
         Ok(())
     }
 
-    fn set_position(&self, position: f64) -> anyhow::Result<()> {
+    fn set_position(&self, _position: f64) -> anyhow::Result<()> {
         Ok(())
     }
 

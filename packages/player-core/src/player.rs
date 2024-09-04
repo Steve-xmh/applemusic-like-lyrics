@@ -730,6 +730,7 @@ impl AudioPlayer {
             }
             let _ = x.set_playing(true);
             let _ = x.set_duration(play_duration);
+            let _ = x.set_position(0.0);
             let _ = x.update();
         }
         info!("音频文件的信息：{new_audio_info:#?}");
@@ -742,11 +743,6 @@ impl AudioPlayer {
             .await?;
         ctx.emitter
             .emit(AudioThreadEvent::PlayStatus { is_playing: true })
-            .await?;
-        ctx.emitter
-            .emit(AudioThreadEvent::SetDuration {
-                duration: play_duration,
-            })
             .await?;
 
         info!("开始播放音频数据，时长为 {play_duration} 秒，音质为 {audio_quality:?}");
