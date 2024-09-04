@@ -1,6 +1,7 @@
 import { GearIcon } from "@radix-ui/react-icons";
 import { Button, Dialog, Flex, Separator, Text } from "@radix-ui/themes";
 import { Trans } from "react-i18next";
+import { commit, branch } from "virtual:git-metadata-plugin";
 
 export const SettingsButton: React.FC = () => {
 	return (
@@ -21,6 +22,7 @@ export const SettingsButton: React.FC = () => {
 					关于
 				</Text>
 				<Text as="div">Apple Music-like Lyrics Player</Text>
+				<Text as="div" style={{opacity:"0.5"}}>{commit.substring(0, 7)} {branch}</Text>
 				<Text as="div">由 SteveXMH 及其所有 Github 协作者共同开发</Text>
 
 				<Flex gap="3" mt="4" justify="end">

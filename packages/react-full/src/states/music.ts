@@ -51,7 +51,7 @@ export const musicPlayingAtom = atom(false);
 /**
  * 当前音乐的播放进度，单位为毫秒
  */
-export const musicPlayingPositionAtom = atom(false);
+export const musicPlayingPositionAtom = atom(0);
 /**
  * 当前播放的音乐音量大小，范围在 [0.0-1.0] 之间
  *

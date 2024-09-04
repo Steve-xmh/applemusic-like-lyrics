@@ -10,15 +10,9 @@ import {
 } from "@applemusic-like-lyrics/react-full";
 import "@applemusic-like-lyrics/react-full/style.css";
 import { Provider, useAtomValue } from "jotai";
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import "./i18n";
-import {
-	Avatar,
-	Container,
-	Flex,
-	IconButton,
-	Theme,
-} from "@radix-ui/themes";
+import { Avatar, Container, Flex, IconButton, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { ListBulletIcon } from "@radix-ui/react-icons";
 import IconPlay from "./assets/icon_play.svg?react";
@@ -28,20 +22,20 @@ import IconRewind from "./assets/icon_rewind.svg?react";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 
-function ErrorRender({ error, resetErrorBoundary }) {
-	console.error(error);
+const ErrorRender = (props: FallbackProps) => {
+	console.error(props.error);
 	return (
 		<div>
 			<h2>An unrecoverable error has occured</h2>
 			<code>
 				<pre>
-					{error.message}
-					{error.stack}
+					{props.error.message}
+					{props.error.stack}
 				</pre>
 			</code>
 		</div>
 	);
-}
+};
 
 function App() {
 	const musicName = useAtomValue(musicNameAtom);

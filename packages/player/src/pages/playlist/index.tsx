@@ -17,6 +17,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { path } from "@tauri-apps/api";
 import { invoke } from "@tauri-apps/api/core";
 import md5 from "md5";
+import { readLocalMusicMetadata } from "../../utils/player";
 
 function toDuration(duration: number) {
 	const isRemainTime = duration < 0;
@@ -53,9 +54,7 @@ export const PlaylistPage: FC = () => {
 			results.map(async (v) => {
 				const normalized = (await path.normalize(v.path)).replace(/\\/gi, "/");
 				const pathMd5 = md5(normalized);
-				const musicInfo = await invoke("read_local_music_metadata", {
-					filePath: normalized,
-				});
+				const musicInfo = await readLocalMusicMetadata(normalized);
 
 				return {
 					id: pathMd5,

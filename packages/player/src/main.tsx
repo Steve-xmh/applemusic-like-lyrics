@@ -5,6 +5,7 @@ import "./styles.css";
 import * as wsp from "@applemusic-like-lyrics/ws-protocol";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import "./utils/player";
 
 (window as any).wsp = wsp;
 

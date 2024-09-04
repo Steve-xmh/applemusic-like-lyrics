@@ -29,25 +29,33 @@ function getBranchName() {
 	}
 }
 
-const BNCMManifestPlugin = ({ manifestPath = "manifest.json" }): Plugin => {
-	const VIRTUAL_ID = "virtual:bncm-plugin-manifest";
+const GitMetadataPlugin = (): Plugin => {
+	const VIRTUAL_ID = "virtual:git-metadata-plugin";
 	const RESOLVED_VIRTUAL_ID = `\0${VIRTUAL_ID}`;
-	let manifestJson = "{}";
+	let gitCommit = "";
+	let gitBranch = "";
 	return {
-		name: "bncm-manifest-plugin",
+		name: "git-metadata-plugin",
 		async buildStart() {
-			this.addWatchFile(manifestPath);
-			const rawManifest: BNCMManifest = JSON.parse(
-				await readFile(manifestPath, { encoding: "utf8" }),
-			);
-			rawManifest.commit = getCommitHash();
-			rawManifest.branch = getBranchName();
-			manifestJson = JSON.stringify(rawManifest);
+			const metadata = {
+				commit: "",
+				branch: "",
+			};
+			try {
+				gitCommit = getCommitHash();
+			} catch (err) {
+				console.warn("警告：获取 Git Commit Hash 失败", err);
+			}
+			try {
+				gitBranch = getBranchName();
+			} catch (err) {
+				console.warn("警告：获取 Git Branch Name 失败", err);
+			}
 			this.emitFile({
-				fileName: "manifest.json",
-				name: "manifest",
+				fileName: "git-metadata.json",
+				name: "git-metadata",
 				needsCodeReference: false,
-				source: manifestJson,
+				source: JSON.stringify(metadata),
 				type: "asset",
 			});
 		},
@@ -58,7 +66,7 @@ const BNCMManifestPlugin = ({ manifestPath = "manifest.json" }): Plugin => {
 		},
 		load(id) {
 			if (id === RESOLVED_VIRTUAL_ID) {
-				return `export default ${manifestJson};`;
+				return `export const commit = ${JSON.stringify(gitCommit)};\nexport const branch = ${JSON.stringify(gitBranch)};`;
 			}
 		},
 	};
@@ -79,7 +87,7 @@ export default defineConfig(async () => ({
 		lightningcss({
 			browserslist: "safari >= 10.13, chrome >= 91",
 		}),
-		BNCMManifestPlugin({}),
+		GitMetadataPlugin(),
 	],
 	resolve: {
 		dedupe: ["react", "react-dom", "jotai"],

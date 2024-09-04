@@ -1,6 +1,7 @@
 use amll_player_core::*;
 use async_std::sync::RwLock;
 use tauri::{Emitter, Runtime};
+use tracing::info;
 
 static PLAYER_HANDLER: RwLock<Option<AudioPlayerHandle>> = RwLock::new(None);
 
@@ -18,7 +19,7 @@ async fn local_player_main<R: Runtime>(emitter: impl Emitter<R> + Send + 'static
 
     player
         .run(move |evt| {
-            let _ = emitter.emit("audio-player-msg", evt);
+            let _ = emitter.emit("audio_player_msg", evt);
         })
         .await;
 }

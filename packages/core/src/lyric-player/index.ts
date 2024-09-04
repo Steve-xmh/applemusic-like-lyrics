@@ -583,7 +583,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.resetScroll();
 		this.setCurrentTime(0, true);
 		this.calcLayout(true, true);
-		console.log("设置歌词行，触发强制重排", initialTime);
 	}
 	/**
 	 * 重置用户滚动状态
@@ -927,7 +926,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			for (const v of this.hotLines) {
 				this.bufferedLines.add(v);
 			}
-			console.log("强制修改时间，触发强制重排", time);
 			this.calcLayout(true);
 		} else if (removedIds.size > 0 || addedIds.size > 0) {
 			// function debugLog() {

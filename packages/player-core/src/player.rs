@@ -261,7 +261,10 @@ impl AudioPlayer {
         AudioPlayerEventEmitter::new(self.evt_sender.clone())
     }
 
-    pub async fn run(mut self, on_event: impl Fn(AudioThreadEvent) + Send + 'static) {
+    pub async fn run(
+        mut self,
+        on_event: impl Fn(AudioThreadEventMessage<AudioThreadEvent>) + Send + 'static,
+    ) {
         loop {
             if self.media_state_rx.is_some() {
                 tokio::select! {
@@ -282,9 +285,7 @@ impl AudioPlayer {
                     }
                     evt = self.evt_receiver.recv() => {
                         if let Some(evt) = evt {
-                            if let Some(data) = evt.data {
-                                on_event(data);
-                            }
+                            on_event(evt);
                         }
                     }
                     else => {
@@ -305,9 +306,7 @@ impl AudioPlayer {
                     }
                     evt = self.evt_receiver.recv() => {
                         if let Some(evt) = evt {
-                            if let Some(data) = evt.data {
-                                on_event(data);
-                            }
+                            on_event(evt);
                         }
                     }
                     else => {
@@ -460,7 +459,8 @@ impl AudioPlayer {
                     emitter.ret_none(msg).await?;
                 }
                 AudioThreadMessage::SyncStatus => {
-                    self.send_sync_status().await?;
+                    let status = self.get_sync_status().await?;
+                    emitter.ret(msg, status).await?;
                 }
                 AudioThreadMessage::SetVolume { volume, .. } => {
                     self.volume = volume.clamp(0., 1.);
@@ -505,28 +505,26 @@ impl AudioPlayer {
         Ok(())
     }
 
-    async fn send_sync_status(&self) -> anyhow::Result<()> {
+    async fn get_sync_status(&self) -> anyhow::Result<AudioThreadEvent> {
         let play_task_data = self.play_task_data.lock().await.clone();
         let audio_info = self.current_audio_info.read().await.clone();
-        self.emitter()
-            .emit(AudioThreadEvent::SyncStatus {
-                music_id: self
-                    .current_song
-                    .as_ref()
-                    .map(|x| x.get_id())
-                    .unwrap_or_default(),
-                is_playing: self.is_playing,
-                duration: audio_info.duration,
-                position: audio_info.position,
-                music_info: audio_info,
-                volume: self.volume,
-                load_position: 0.,
-                playlist_inited: self.playlist_inited,
-                playlist: self.playlist.to_owned(),
-                quality: play_task_data.audio_quality,
-            })
-            .await?;
-        Ok(())
+
+        Ok(AudioThreadEvent::SyncStatus {
+            music_id: self
+                .current_song
+                .as_ref()
+                .map(|x| x.get_id())
+                .unwrap_or_default(),
+            is_playing: self.is_playing,
+            duration: audio_info.duration,
+            position: audio_info.position,
+            music_info: audio_info,
+            volume: self.volume,
+            load_position: 0.,
+            playlist_inited: self.playlist_inited,
+            playlist: self.playlist.to_owned(),
+            quality: play_task_data.audio_quality,
+        })
     }
 
     pub fn recreate_play_task(&mut self) {
@@ -700,7 +698,7 @@ impl AudioPlayer {
             }
             for visual in metadata.visuals() {
                 if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
-                    new_audio_info.cover_media_type = dbg!(visual.media_type.clone());
+                    new_audio_info.cover_media_type = visual.media_type.clone();
                     new_audio_info.cover = Some(visual.data.to_vec());
                 }
             }
@@ -734,10 +732,10 @@ impl AudioPlayer {
             let _ = x.set_duration(play_duration);
             let _ = x.update();
         }
+        info!("音频文件的信息：{new_audio_info:#?}");
         ctx.emitter
             .emit(AudioThreadEvent::LoadAudio {
                 music_id: music_id.clone(),
-                duration: play_duration,
                 music_info: new_audio_info,
                 quality: audio_quality.to_owned(),
             })
@@ -944,6 +942,15 @@ impl AudioPlayerEventEmitter {
                 data: Some(msg),
             })
             .await?;
+        Ok(())
+    }
+
+    pub async fn ret(
+        &self,
+        req: AudioThreadEventMessage<AudioThreadMessage>,
+        res: AudioThreadEvent,
+    ) -> anyhow::Result<()> {
+        self.evt_sender.send(req.to(res)).await?;
         Ok(())
     }
 

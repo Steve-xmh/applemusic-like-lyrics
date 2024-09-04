@@ -96,7 +96,6 @@ pub enum AudioThreadEvent {
     #[serde(rename_all = "camelCase")]
     LoadAudio {
         music_id: String,
-        duration: f64,
         music_info: AudioInfo,
         quality: AudioQuality,
     },

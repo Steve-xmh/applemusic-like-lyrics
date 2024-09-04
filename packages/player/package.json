@@ -30,6 +30,7 @@
 		"react-i18next": "^15.0.1",
 		"react-router-dom": "^6.26.1",
 		"sass": "^1.69.3",
+		"uid": "^2.0.2",
 		"vite-plugin-lightningcss": "^0.0.5",
 		"vite-plugin-svgr": "^4.2.0",
 		"vite-plugin-top-level-await": "^1.4.4",
