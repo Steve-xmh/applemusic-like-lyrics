@@ -1,5 +1,6 @@
 import {
 	fftDataAtom,
+	lowFreqVolumeAtom,
 	hideLyricViewAtom,
 	isLyricPageOpenedAtom,
 	musicAlbumNameAtom,
@@ -15,6 +16,7 @@ import {
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
 	onRequestPrevSongAtom,
+	onSeekPositionAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { useStore } from "jotai";
 import { useEffect, type FC } from "react";
@@ -25,8 +27,80 @@ import {
 	type AudioInfo,
 } from "../../utils/player";
 
+function useFFTToLowPass() {
+	const store = useStore();
+
+	useEffect(() => {
+		let rafId: number;
+		let curValue = 1;
+		let lt = 0;
+
+		const gradient: number[] = [];
+
+		function amplitudeToLevel(amplitude: number): number {
+			const normalizedAmplitude = amplitude / 255;
+			const level = 0.5 * Math.log10(normalizedAmplitude + 1);
+			return level;
+		}
+
+		function calculateGradient(fftData: number[]): number {
+			const window = 10;
+			const volume =
+				(amplitudeToLevel(fftData[0]) + amplitudeToLevel(fftData[1])) * 0.5;
+			if (gradient.length < window && !gradient.includes(volume)) {
+				gradient.push(volume);
+				return 0;
+			}
+			gradient.shift();
+			gradient.push(volume);
+
+			const maxInInterval = Math.max(...gradient) ** 2;
+			const minInInterval = Math.min(...gradient);
+			const difference = maxInInterval - minInInterval;
+			// console.log(volume, maxInInterval, minInInterval, difference);
+			return difference > 0.35 ? maxInInterval : minInInterval * 0.5 ** 2;
+		}
+
+		const onFrame = (dt: number) => {
+			const fftData = store.get(fftDataAtom);
+
+			const delta = dt - lt;
+			const gradient = calculateGradient(fftData);
+
+			const value = gradient;
+
+			const increasing = curValue < value;
+
+			if (increasing) {
+				curValue = Math.min(
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
+				);
+			} else {
+				curValue = Math.max(
+					value,
+					curValue + (value - curValue) * 0.003 * delta,
+				);
+			}
+
+			if (Number.isNaN(curValue)) curValue = 1;
+
+			store.set(lowFreqVolumeAtom, curValue);
+
+			lt = dt;
+			rafId = requestAnimationFrame(onFrame);
+		};
+		rafId = requestAnimationFrame(onFrame);
+		return () => {
+			cancelAnimationFrame(rafId);
+		};
+	}, [store]);
+}
+
 export const MusicContext: FC = () => {
 	const store = useStore();
+
+	useFFTToLowPass();
 
 	useEffect(() => {
 		const toEmitThread = (type: Parameters<typeof emitAudioThread>[0]) => ({
@@ -44,6 +118,14 @@ export const MusicContext: FC = () => {
 			onClickControlThumbAtom,
 			toEmit(() => {
 				store.set(isLyricPageOpenedAtom, false);
+			}),
+		);
+		store.set(
+			onSeekPositionAtom,
+			toEmit((time: number) => {
+				emitAudioThread("seekAudio", {
+					position: time / 1000,
+				});
 			}),
 		);
 		store.set(hideLyricViewAtom, true); // TODO: 暂无歌词

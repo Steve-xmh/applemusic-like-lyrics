@@ -24,18 +24,17 @@ function App() {
 					isLyricPageOpened && styles.amllOpened,
 				)}
 			>
-				<>
-					<Container
-						mx={{
-							initial: "4",
-							sm: "9",
-						}}
-						mb="9"
-					>
-						<RouterProvider router={router} />
-					</Container>
-					<NowPlayingBar />
-				</>
+				<Container
+					className={styles.container}
+					mx={{
+						initial: "4",
+						sm: "9",
+					}}
+					mb="9"
+				>
+					<RouterProvider router={router} />
+				</Container>
+				<NowPlayingBar />
 			</Theme>
 			<AMLLWrapper />
 		</>

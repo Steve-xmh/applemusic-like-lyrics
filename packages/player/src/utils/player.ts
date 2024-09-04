@@ -182,6 +182,10 @@ export async function readLocalMusicMetadata(filePath: string): Promise<{
 	return await invoke("read_local_music_metadata", { filePath });
 }
 
+export async function restartApp(): Promise<never> {
+	return await invoke("restart_app");
+}
+
 export async function emitAudioThread<
 	D extends AudioThreadMessage,
 	T extends D["type"],

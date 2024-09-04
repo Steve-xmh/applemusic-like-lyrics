@@ -7,12 +7,12 @@
     position: relative;
     display: grid;
     grid-template-rows:
-        [drag-area] minmax(30px, 0.9fr)
+        [drag-area] minmax(30px, 0.45fr)
         [thumb] auto
         [cover] auto
         [music-info] 3fr
         [buttom-controls] 0fr
-        1fr;
+        0.5fr;
     grid-template-columns:
         [info-side] 0.45fr
         [player-side] 0.55fr

@@ -34,6 +34,7 @@ export const BouncingSlider: React.FC<
 	const [curValue, setCurValue] = useState(value);
 	const outerRef = useRef<HTMLDivElement>(null);
 	const innerRef = useRef<HTMLDivElement>(null);
+	const isSeekingRef = useRef(false);
 	useEffect(() => {
 		const outer = outerRef.current;
 		const inner = innerRef.current;
@@ -119,6 +120,7 @@ export const BouncingSlider: React.FC<
 				heightSpring.setTargetPosition(189);
 				lastTime = null;
 				dragging = true;
+				isSeekingRef.current = true;
 				window.addEventListener("mousemove", onMouseMove);
 				window.addEventListener("mouseup", onMouseUp);
 				onBeforeChange?.();
@@ -131,6 +133,7 @@ export const BouncingSlider: React.FC<
 				heightSpring.setTargetPosition(80);
 				lastTime = null;
 				dragging = false;
+				isSeekingRef.current = false;
 				window.removeEventListener("mousemove", onMouseMove);
 				window.removeEventListener("mouseup", onMouseUp);
 				setValue(evt);
@@ -153,7 +156,9 @@ export const BouncingSlider: React.FC<
 		}
 	}, [onChange, onSeeking, onBeforeChange, min, max]);
 	useEffect(() => {
-		setCurValue(value);
+		if (!isSeekingRef.current) {
+			setCurValue(value);
+		}
 	}, [value]);
 	return (
 		<div

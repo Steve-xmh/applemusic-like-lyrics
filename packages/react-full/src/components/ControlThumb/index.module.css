@@ -2,7 +2,6 @@
     justify-self: center;
     width: 100%;
     height: 100%;
-    mix-blend-mode: plus-lighter;
 
     & button {
         display: block;
@@ -18,7 +17,6 @@
         & div {
             position: absolute;
             background-color: black;
-            mix-blend-mode: plus-lighter;
             border-radius: 10px;
         }
     }

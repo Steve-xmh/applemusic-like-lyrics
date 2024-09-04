@@ -10,8 +10,14 @@ import {
 	onRequestPrevSongAtom,
 	isLyricPageOpenedAtom,
 } from "@applemusic-like-lyrics/react-full";
-import { ListBulletIcon } from "@radix-ui/react-icons";
-import { Avatar, Container, Flex, IconButton } from "@radix-ui/themes";
+import {
+	ListBulletIcon,
+	PlayIcon,
+	PauseIcon,
+	TrackPreviousIcon,
+	TrackNextIcon,
+} from "@radix-ui/react-icons";
+import { Container, Flex, IconButton } from "@radix-ui/themes";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { FC } from "react";
 import lyricIcon from "@iconify/icons-ic/round-lyrics";
@@ -79,6 +85,10 @@ export const NowPlayingBar: FC = () => {
 					flexGrow="1"
 					flexBasis="33.3%"
 					gap="5"
+					display={{
+						initial: "none",
+						sm: "flex",
+					}}
 				>
 					<MediaButton
 						style={{
@@ -88,7 +98,7 @@ export const NowPlayingBar: FC = () => {
 					>
 						<IconRewind
 							style={{
-								scale: "1.5",
+								scale: "1.25",
 							}}
 						/>
 					</MediaButton>
@@ -98,7 +108,19 @@ export const NowPlayingBar: FC = () => {
 						}}
 						onClick={onPlayOrResume}
 					>
-						{musicPlaying ? <IconPause /> : <IconPlay />}
+						{musicPlaying ? (
+							<IconPause
+								style={{
+									scale: "0.75",
+								}}
+							/>
+						) : (
+							<IconPlay
+								style={{
+									scale: "0.75",
+								}}
+							/>
+						)}
 					</MediaButton>
 					<MediaButton
 						style={{
@@ -108,7 +130,7 @@ export const NowPlayingBar: FC = () => {
 					>
 						<IconForward
 							style={{
-								scale: "1.5",
+								scale: "1.25",
 							}}
 						/>
 					</MediaButton>
@@ -119,7 +141,17 @@ export const NowPlayingBar: FC = () => {
 					align="center"
 					flexGrow="1"
 					flexBasis="33.3%"
+					gap="1"
 				>
+					<IconButton onClick={onRequestPrevSong} variant="soft">
+						<TrackPreviousIcon />
+					</IconButton>
+					<IconButton onClick={onPlayOrResume} variant="soft">
+						{musicPlaying ? <PauseIcon /> : <PlayIcon />}
+					</IconButton>
+					<IconButton onClick={onRequestNextSong} variant="soft">
+						<TrackNextIcon />
+					</IconButton>
 					<IconButton variant="soft">
 						<ListBulletIcon />
 					</IconButton>

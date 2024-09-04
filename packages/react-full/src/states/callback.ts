@@ -41,7 +41,11 @@ export const onRequestPrevSongAtom = atom(c(() => {}));
  * 当触发下一首歌曲时触发的回调函数
  */
 export const onRequestNextSongAtom = atom(c(() => {}));
-
+/**
+ * 当触发设置歌曲播放位置时触发的回调函数
+ * @param position 播放位置，单位为毫秒
+ */
+export const onSeekPositionAtom = atom(c((position: number) => {}));
 /**
  * 当点击位于控制按钮左侧的按钮时触发的回调函数
  */

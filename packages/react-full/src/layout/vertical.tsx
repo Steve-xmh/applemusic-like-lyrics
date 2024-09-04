@@ -15,6 +15,7 @@ export const VerticalLayout: React.FC<
 		bigControlsSlot?: React.ReactNode;
 		coverSlot?: React.ReactNode;
 		lyricSlot?: React.ReactNode;
+		asChild?: boolean;
 		hideLyric?: boolean;
 	} & HTMLProps<HTMLDivElement>
 > = ({
@@ -24,6 +25,7 @@ export const VerticalLayout: React.FC<
 	bigControlsSlot,
 	lyricSlot,
 	hideLyric,
+	asChild,
 	className,
 	...rest
 }) => {
@@ -34,7 +36,8 @@ export const VerticalLayout: React.FC<
 	const hideLyricRef = useRef(hideLyric ?? false);
 	const updateCoverLayout = useCallback(
 		(hideLyric = hideLyricRef.current, force = false) => {
-			const rootEl = rootRef.current;
+			if (!rootRef.current) return;
+			let rootEl: HTMLElement = rootRef.current;
 			const targetCover = hideLyric
 				? phonyBigCoverRef.current
 				: phonySmallCoverRef.current;
@@ -44,6 +47,9 @@ export const VerticalLayout: React.FC<
 				targetCover.clientWidth,
 				targetCover.clientHeight,
 			);
+			while (getComputedStyle(rootEl).display === "contents") {
+				rootEl = rootEl.parentElement!!;
+			}
 			const rootB = rootEl.getBoundingClientRect();
 			const targetCoverB = targetCover.getBoundingClientRect();
 			const targetCoverLeft =
@@ -85,9 +91,9 @@ export const VerticalLayout: React.FC<
 	return (
 		<div
 			className={classNames(
-				styles.verticalLayout,
-				hideLyric && styles.hideLyric,
 				className,
+				!asChild && styles.verticalLayout,
+				!asChild && hideLyric && styles.hideLyric,
 			)}
 			ref={rootRef}
 			{...rest}

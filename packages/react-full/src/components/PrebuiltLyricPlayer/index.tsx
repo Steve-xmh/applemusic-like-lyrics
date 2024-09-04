@@ -7,12 +7,14 @@ import { LyricPlayer, BackgroundRender } from "@applemusic-like-lyrics/react";
 import { AutoLyricLayout } from "../../layout/auto";
 import { ControlThumb } from "../ControlThumb";
 import { Cover } from "../Cover";
+import "./icon-animations.css";
 import styles from "./index.module.css";
 import "@applemusic-like-lyrics/core/style.css";
 import { useAtomValue } from "jotai";
 import {
 	AudioQualityType,
 	hideLyricViewAtom,
+	lowFreqVolumeAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
@@ -29,6 +31,7 @@ import {
 	onRequestNextSongAtom,
 	onRequestOpenMenuAtom,
 	onRequestPrevSongAtom,
+	onSeekPositionAtom,
 } from "../../states/callback";
 import { useRef, type FC, type HTMLProps } from "react";
 import { MusicInfo } from "../MusicInfo";
@@ -110,10 +113,16 @@ function toDuration(duration: number) {
 const PrebuiltProgressBar: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const musicPosition = useAtomValue(musicPlayingPositionAtom);
+	const onSeekPosition = useAtomValue(onSeekPositionAtom).onEmit;
 
 	return (
 		<>
-			<BouncingSlider value={musicPosition / musicDuration} min={0} max={1} />
+			<BouncingSlider
+				value={musicPosition}
+				min={0}
+				max={musicDuration}
+				onChange={onSeekPosition}
+			/>
 			<div className={styles.progressBarLabels}>
 				<div>{toDuration(musicPosition / 1000)}</div>
 				<div>
@@ -145,6 +154,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
 	const onClickControlThumb = useAtomValue(onClickControlThumbAtom).onEmit;
 
 	const coverElRef = useRef<HTMLElement>(null);
@@ -171,6 +181,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				<BackgroundRender
 					album={musicCover}
 					albumIsVideo={musicCoverIsVideo}
+					lowFreqVolume={lowFreqVolume}
 					renderScale={1}
 					style={{
 						zIndex: -1,

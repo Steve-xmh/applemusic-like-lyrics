@@ -13,7 +13,9 @@ export const HorizontalLayout: React.FC<
 		coverSlot?: React.ReactNode;
 		controlsSlot?: React.ReactNode;
 		lyricSlot?: React.ReactNode;
+		backgroundSlot?: React.ReactNode;
 		hideLyric?: boolean;
+		asChild?: boolean;
 	} & HTMLProps<HTMLDivElement>
 > = ({
 	thumbSlot,
@@ -22,14 +24,15 @@ export const HorizontalLayout: React.FC<
 	lyricSlot,
 	hideLyric,
 	className,
+	asChild,
 	...rest
 }) => {
 	return (
 		<div
 			className={classnames(
-				styles.horizontalLayout,
-				hideLyric && styles.hideLyric,
 				className,
+				!asChild && styles.horizontalLayout,
+				!asChild && hideLyric && styles.hideLyric,
 			)}
 			{...rest}
 		>

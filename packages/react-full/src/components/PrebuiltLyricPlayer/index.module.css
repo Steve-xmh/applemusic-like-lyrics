@@ -1,7 +1,7 @@
 .horizontalControls {
     padding: 2vh 0 !important;
     width: min(52vh, 38vw);
-    
+
     @media screen and (max-height: 768px) {
         padding: 0.5vh 0 !important;
     }
@@ -10,11 +10,11 @@
 .controls,
 .bigControls {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     margin: 1em 0;
     padding: 0 2vh;
-    
+
     @media screen and (max-height: 768px) {
         margin: 0 0;
     }
@@ -30,10 +30,11 @@
     @media screen and (max-height: 768px) {
         height: 8vh;
     }
+
     &>svg {
         scale: 3;
         transition: scale 0.3s;
-        
+
         @media screen and (max-height: 1080px) {
             scale: 2;
         }
@@ -41,7 +42,7 @@
         @media screen and (max-height: 768px) {
             scale: 1.5;
         }
-        
+
         @media screen and (max-height: 512px) {
             scale: 0.75;
         }
@@ -54,10 +55,11 @@
     @media screen and (max-height: 768px) {
         height: 8vh;
     }
+
     &>svg {
         scale: 2;
         transition: scale 0.3s;
-        
+
         @media screen and (max-height: 1080px) {
             scale: 1.5;
         }
@@ -65,7 +67,7 @@
         @media screen and (max-height: 768px) {
             scale: 1;
         }
-        
+
         @media screen and (max-height: 512px) {
             scale: 0.5;
         }
@@ -75,12 +77,12 @@
 .qualityTag {
     scale: 1.4;
     transition: scale 0.3s;
-    
-    @media screen and (max-height: 512px) {
+
+    @media screen and (max-height: 768px) {
         scale: 0.5;
     }
 
-    @media screen and (max-height: 768px) {
+    @media screen and (max-height: 1080px) {
         scale: 1;
     }
 }
@@ -93,7 +95,7 @@
     font-size: max(1.2vh, 1em);
     margin-top: 0.5em;
     opacity: 0.5;
-    
+
     @media screen and (max-height: 768px) {
         margin-top: 0;
     }

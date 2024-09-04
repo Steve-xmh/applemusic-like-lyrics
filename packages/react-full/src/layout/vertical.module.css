@@ -4,7 +4,7 @@
     display: grid;
     grid-template-rows:
         /* 保证可以拖动窗口的区域 */
-        [drag-area] 20px
+        [drag-area] 30px
         /* 控制条的空间 */
         [thumb] 30px
         /* 主视图，包括是否展示歌词的两种布局 */
@@ -49,6 +49,7 @@
         1em [controls] 0fr [lyric-view] 1fr [bottom-controls] 0fr;
     grid-template-columns:
         3em [cover-side] 0fr [info-side] 1fr 3em;
+        mix-blend-mode: plus-lighter;
 }
 
 .noLyricLayout {
@@ -100,6 +101,7 @@
     overflow: hidden;
     height: fit-content;
     z-index: 1;
+    mix-blend-mode: plus-lighter;
 }
 
 .lyric {
@@ -110,6 +112,7 @@
 
     transition: opacity 0.5s 0.5s;
     opacity: 1;
+    mix-blend-mode: plus-lighter;
 }
 
 .bigControls {
@@ -119,6 +122,7 @@
     /* border: 1px solid red; */
     transition: opacity 0.5s;
     opacity: 0;
+    mix-blend-mode: plus-lighter;
 }
 
 .hideLyric {
@@ -141,4 +145,10 @@
     .bigControls {
         opacity: 1;
     }
+}
+
+.background {
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }

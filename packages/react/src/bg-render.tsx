@@ -106,6 +106,7 @@ export const BackgroundRender = forwardRef<
 			lowFreqVolume,
 			hasLyric,
 			renderer,
+			style,
 			...props
 		},
 		ref,
@@ -193,6 +194,15 @@ export const BackgroundRender = forwardRef<
 			[wrapperRef.current, coreBGRenderRef.current],
 		);
 
-		return <div {...props} ref={wrapperRef} />;
+		return (
+			<div
+				style={{
+					display: "contents",
+					...style,
+				}}
+				{...props}
+				ref={wrapperRef}
+			/>
+		);
 	},
 );

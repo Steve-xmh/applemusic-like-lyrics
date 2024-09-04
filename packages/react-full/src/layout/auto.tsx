@@ -30,7 +30,6 @@ export const AutoLyricLayout: React.FC<
 	lyricSlot,
 	backgroundSlot,
 	hideLyric,
-	className,
 	...rest
 }) => {
 	const [isVertical, setIsVertical] = useState(false);
@@ -48,33 +47,36 @@ export const AutoLyricLayout: React.FC<
 		return () => obz.disconnect();
 	}, []);
 
+	// 如果分开使用两个布局，会导致不能衔接背景组件，导致两者间切换有闪屏情况
+	// 如果直接使用背景并各套一个 div，会导致无法应用 plus-lighter 效果
+	// 故借助 display: contents 来融合布局
+
 	return (
 		<div
 			ref={rootRef}
-			className={classNames(styles.autoLyricLayout, className)}
 			{...rest}
 		>
-			<div>{backgroundSlot}</div>
-			<div>
-				{isVertical ? (
-					<VerticalLayout
-						thumbSlot={thumbSlot}
-						smallControlsSlot={smallControlsSlot}
-						bigControlsSlot={bigControlsSlot}
-						coverSlot={coverSlot}
-						lyricSlot={lyricSlot}
-						hideLyric={hideLyric}
-					/>
-				) : (
-					<HorizontalLayout
-						thumbSlot={thumbSlot}
-						controlsSlot={controlsSlot}
-						coverSlot={coverSlot}
-						lyricSlot={lyricSlot}
-						hideLyric={hideLyric}
-					/>
-				)}
-			</div>
+			<div className={styles.background}>{backgroundSlot}</div>
+			{isVertical ? (
+				<VerticalLayout
+					thumbSlot={thumbSlot}
+					smallControlsSlot={smallControlsSlot}
+					bigControlsSlot={bigControlsSlot}
+					coverSlot={coverSlot}
+					lyricSlot={lyricSlot}
+					hideLyric={hideLyric}
+				/>
+			) : (
+				<HorizontalLayout
+					// style={{ display: "contents" }}
+					// asChild
+					thumbSlot={thumbSlot}
+					controlsSlot={controlsSlot}
+					coverSlot={coverSlot}
+					lyricSlot={lyricSlot}
+					hideLyric={hideLyric}
+				/>
+			)}
 		</div>
 	);
 };

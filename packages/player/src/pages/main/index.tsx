@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { GearIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
 	Box,
 	Card,
@@ -7,10 +7,10 @@ import {
 	Spinner,
 	TextField,
 	Text,
+	Button,
 } from "@radix-ui/themes";
 import type { FC } from "react";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
-import { SettingsButton } from "../../components/SettingsButton";
 import { db } from "../../dexie";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link } from "react-router-dom";
@@ -33,7 +33,12 @@ export const MainPage: FC = () => {
 						</TextField.Slot>
 					</TextField.Root>
 					<NewPlaylistButton />
-					<SettingsButton />
+					<Button variant="soft" asChild>
+						<Link to="/settings">
+							<GearIcon />
+							设置
+						</Link>
+					</Button>
 				</Flex>
 			</Flex>
 			{playlists !== undefined ? (

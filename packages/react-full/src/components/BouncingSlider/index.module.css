@@ -1,7 +1,6 @@
 .nowPlayingSlider {
 
     cursor: pointer;
-    mix-blend-mode: plus-lighter;
     transform-origin: center;
     display: flex;
     justify-content: stretch;

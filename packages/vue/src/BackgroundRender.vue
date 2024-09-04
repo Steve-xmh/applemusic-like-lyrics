@@ -1,5 +1,5 @@
 <template>
-    <div ref="wrapperRef"></div>
+    <div style="display: contents;" ref="wrapperRef"></div>
 </template>
 
 <script setup lang="ts">
