@@ -3,11 +3,17 @@
 	"identifier": "migrated",
 	"description": "permissions that were migrated from v1",
 	"local": true,
-	"windows": ["main"],
+	"windows": [
+		"main"
+	],
 	"permissions": [
-		"core:event:default",
 		"core:window:default",
 		"core:path:default",
+		"core:path:allow-normalize",
+		"core:event:allow-emit",
+		"core:event:allow-emit-to",
+		"core:event:allow-listen",
+		"core:event:allow-unlisten",
 		"dialog:default"
 	]
 }
