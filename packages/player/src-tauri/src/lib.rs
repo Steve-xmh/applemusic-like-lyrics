@@ -46,57 +46,65 @@ pub struct MusicInfo {
 }
 
 #[tauri::command]
-fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, String> {
-    let file = File::open(file_path).map_err(|e| e.to_string())?;
-    let probe = symphonia::default::get_probe();
-    let mut format_result = probe
-        .format(
-            &Default::default(),
-            MediaSourceStream::new(Box::new(file), MediaSourceStreamOptions::default()),
-            &Default::default(),
-            &Default::default(),
-        )
-        .map_err(|e| e.to_string())?;
+async fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, String> {
+    let result = tokio::task::spawn_blocking(move || -> Result<MusicInfo, String> {
+        let file = File::open(file_path).map_err(|e| e.to_string())?;
+        let probe = symphonia::default::get_probe();
+        let mut format_result = probe
+            .format(
+                &Default::default(),
+                MediaSourceStream::new(Box::new(file), MediaSourceStreamOptions::default()),
+                &Default::default(),
+                &Default::default(),
+            )
+            .map_err(|e| e.to_string())?;
 
-    let mut new_audio_info = MusicInfo::default();
-    let mut metadata = format_result.format.metadata();
-    metadata.skip_to_latest();
+        let mut new_audio_info = MusicInfo::default();
+        let mut metadata = format_result.format.metadata();
+        metadata.skip_to_latest();
 
-    if let Some(metadata) = metadata.skip_to_latest() {
-        for tag in metadata.tags() {
-            match tag.std_key {
-                Some(StandardTagKey::TrackTitle) => {
-                    new_audio_info.name = tag.value.to_string();
+        if let Some(metadata) = metadata.skip_to_latest() {
+            for tag in metadata.tags() {
+                match tag.std_key {
+                    Some(StandardTagKey::TrackTitle) => {
+                        new_audio_info.name = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Artist) => {
+                        new_audio_info.artist = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Album) => {
+                        new_audio_info.album = tag.value.to_string();
+                    }
+                    Some(StandardTagKey::Lyrics) => {
+                        new_audio_info.lyric = tag.value.to_string();
+                    }
+                    Some(_) | None => {}
                 }
-                Some(StandardTagKey::Artist) => {
-                    new_audio_info.artist = tag.value.to_string();
+            }
+            for visual in metadata.visuals() {
+                if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
+                    new_audio_info.cover = BASE64_STANDARD.encode(&visual.data);
                 }
-                Some(StandardTagKey::Album) => {
-                    new_audio_info.album = tag.value.to_string();
-                }
-                Some(StandardTagKey::Lyrics) => {
-                    new_audio_info.lyric = tag.value.to_string();
-                }
-                Some(_) | None => {}
             }
         }
-        for visual in metadata.visuals() {
-            if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
-                new_audio_info.cover = BASE64_STANDARD.encode(&visual.data);
-            }
-        }
+
+        let track = format_result
+            .format
+            .default_track()
+            .ok_or_else(|| "无法解码正在加载的音频的默认音轨".to_string())?;
+        let timebase = track.codec_params.time_base.unwrap_or_default();
+        let duration = timebase.calc_time(track.codec_params.n_frames.unwrap_or_default());
+        let play_duration = duration.seconds as f64 + duration.frac;
+        new_audio_info.duration = play_duration;
+
+        Ok(new_audio_info)
+    })
+    .await;
+
+    match result {
+        Ok(result) => result,
+        Err(e) => Err(e.to_string()),
     }
-
-    let track = format_result
-        .format
-        .default_track()
-        .ok_or_else(|| "无法解码正在加载的音频的默认音轨".to_string())?;
-    let timebase = track.codec_params.time_base.unwrap_or_default();
-    let duration = timebase.calc_time(track.codec_params.n_frames.unwrap_or_default());
-    let play_duration = duration.seconds as f64 + duration.frac;
-    new_audio_info.duration = play_duration;
-
-    Ok(new_audio_info)
 }
 
 fn init_logging() {

@@ -154,6 +154,7 @@ async function initAudioThread() {
 	await listen<AudioThreadEventMessage<AudioThreadEvent>>(
 		"audio_player_msg",
 		(evt) => {
+			console.trace("收到后台线程消息", evt.payload);
 			const resolve = msgTasks.get(evt.payload.callbackId);
 			if (resolve) {
 				msgTasks.delete(evt.payload.callbackId);

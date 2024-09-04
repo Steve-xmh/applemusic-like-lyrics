@@ -53,23 +53,32 @@ export const PlaylistPage: FC = () => {
 			],
 		});
 		if (!results) return;
-		const transformed = await Promise.all(
-			results.map(async (v) => {
-				const normalized = (await path.normalize(v.path)).replace(/\\/gi, "/");
-				const pathMd5 = md5(normalized);
-				const musicInfo = await readLocalMusicMetadata(normalized);
+		const transformed = (
+			await Promise.all(
+				results.map(async (v) => {
+					try {
+						const normalized = (await path.normalize(v.path)).replace(
+							/\\/gi,
+							"/",
+						);
+						const pathMd5 = md5(normalized);
+						const musicInfo = await readLocalMusicMetadata(normalized);
 
-				return {
-					id: pathMd5,
-					filePath: normalized,
-					songName: musicInfo.name,
-					songArtists: musicInfo.artist,
-					lyric: musicInfo.lyric,
-					cover: musicInfo.cover,
-					duration: musicInfo.duration,
-				};
-			}),
-		);
+						return {
+							id: pathMd5,
+							filePath: normalized,
+							songName: musicInfo.name,
+							songArtists: musicInfo.artist,
+							lyric: musicInfo.lyric,
+							cover: musicInfo.cover,
+							duration: musicInfo.duration,
+						};
+					} catch {
+						return null;
+					}
+				}),
+			)
+		).filter((v) => !!v);
 		console.log(transformed);
 		await db.songs.bulkPut(transformed);
 		const shouldAddIds = transformed
