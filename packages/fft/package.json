@@ -13,7 +13,8 @@
   "scripts": {
     "build": "wasm-pack build --release",
     "build:dev": "wasm-pack build --dev",
-    "fmt": "cargo fmt"
+    "fmt": "cargo fmt",
+    "preinstall": "npx only-allow pnpm"
   },
   "files": [
     "pkg/*.wasm",

@@ -10,7 +10,12 @@ import { BaseRenderer } from "../base";
 import { Mat4, Vec2, Vec3, Vec4 } from "gl-matrix";
 import meshVertShader from "./mesh.vert.glsl?raw";
 import meshFragShader from "./mesh.frag.glsl?raw";
-import { blurImage, brightnessImage, contrastImage, saturateImage } from "../img";
+import {
+	blurImage,
+	brightnessImage,
+	contrastImage,
+	saturateImage,
+} from "../img";
 import {
 	loadResourceFromElement,
 	loadResourceFromUrl,

@@ -34,10 +34,10 @@ import { lyricLinesAtom } from "../../lyric/provider";
 import { playStatusAtom } from "../../music-context/wrapper";
 import { PlayState } from "../../music-context";
 
-type AnyRenderer = { new(canvas: HTMLCanvasElement): BaseRenderer };
+type AnyRenderer = { new (canvas: HTMLCanvasElement): BaseRenderer };
 
 export const forceOverrideBgRendererAtom = atom<{
-	renderer: AnyRenderer
+	renderer: AnyRenderer;
 } | null>(null);
 
 export const Background: FC = () => {
@@ -66,7 +66,8 @@ export const Background: FC = () => {
 	const gradient: number[] = [];
 
 	const targetRenderer = useMemo<AnyRenderer>(() => {
-		if (forceOverrideBgRenderer?.renderer) return forceOverrideBgRenderer?.renderer;
+		if (forceOverrideBgRenderer?.renderer)
+			return forceOverrideBgRenderer?.renderer;
 		switch (backgroundType) {
 			case BackgroundType.LiquidEplor:
 				return MeshGradientRenderer;
@@ -268,8 +269,9 @@ export const Background: FC = () => {
 						lowFreqVolume={lowFreqVolume}
 						renderScale={backgroundRenderScale}
 						hasLyric={
-							forceHasLyricsBackground ? true :
-								lyricLines.state === "hasData" && lyricLines.data.length > 0
+							forceHasLyricsBackground
+								? true
+								: lyricLines.state === "hasData" && lyricLines.data.length > 0
 									? true
 									: lyricLines.state === "loading"
 										? undefined

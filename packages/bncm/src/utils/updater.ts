@@ -252,7 +252,7 @@ export const selectedBranchLatestVersionAtom = atom(async (get) => {
 				manifest.version,
 				manifest?.commit?.slice(0, 8) ?? "",
 				"packages/bncm/dist",
-		  ];
+			];
 });
 export const hasUpdateAtom = atom(async (get) => {
 	const [latestBranch, latestVersion, latestCommit] = await get(

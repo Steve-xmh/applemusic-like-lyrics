@@ -1,6 +1,5 @@
 {
   "name": "@applemusic-like-lyrics/react-full",
-  "packageManager": "yarn@3.6.1",
   "version": "0.1.5",
   "description": "AMLL 组件库的 React 绑定，但是更加完备且高度灵活",
   "repository": {
@@ -35,7 +34,8 @@
     "build": "vite build",
     "build:dev": "vite build",
     "fmt": "biome format --write ./src",
-    "dev": "vite dev"
+    "dev": "vite dev",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@applemusic-like-lyrics/lyric": "workspace:^",

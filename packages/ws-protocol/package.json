@@ -12,7 +12,8 @@
   },
   "scripts": {
     "build": "wasm-pack build --release",
-    "build:dev": "wasm-pack build --dev"
+    "build:dev": "wasm-pack build --dev",
+    "preinstall": "npx only-allow pnpm"
   },
   "files": [
     "pkg/*.wasm",

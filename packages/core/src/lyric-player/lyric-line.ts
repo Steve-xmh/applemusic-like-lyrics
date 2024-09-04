@@ -515,9 +515,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			.getCurrentPosition()
 			.toFixed(1)}px,${this.lineTransforms.posY
 			.getCurrentPosition()
-			.toFixed(1)}px) scale(${(
-			this.lineTransforms.scale.getCurrentPosition() / 100
-		).toFixed(4)});`;
+			.toFixed(
+				1,
+			)}px) scale(${(this.lineTransforms.scale.getCurrentPosition() / 100).toFixed(4)});`;
 		if (!this.lyricPlayer.getEnableSpring() && this.isInSight) {
 			style += `transition-delay:${this.delay}ms;`;
 		}

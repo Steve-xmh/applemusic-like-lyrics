@@ -1,6 +1,5 @@
 {
   "name": "@applemusic-like-lyrics/ttml",
-  "packageManager": "yarn@3.6.1",
   "version": "0.1.1",
   "description": "AMLL 的 TTML 歌词文件序列化和反序列化模块",
   "repository": {
@@ -26,7 +25,8 @@
     "build": "vite build",
     "build:dev": "vite build",
     "fmt": "biome format --write ./src",
-    "dev": "vite dev"
+    "dev": "vite dev",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",

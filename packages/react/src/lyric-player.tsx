@@ -338,9 +338,9 @@ export const LyricPlayer = forwardRef<
 				<div {...props} ref={wrapperRef} />
 				{corePlayerRef.current?.getBottomLineElement() && bottomLine
 					? createPortal(
-						bottomLine,
-						corePlayerRef.current?.getBottomLineElement(),
-					)
+							bottomLine,
+							corePlayerRef.current?.getBottomLineElement(),
+						)
 					: null}
 			</>
 		);

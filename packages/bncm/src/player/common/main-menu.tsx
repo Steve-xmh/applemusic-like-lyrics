@@ -344,7 +344,7 @@ const RightClickLyricMenu: FC = () => {
 											?.map((v) => v.word)
 											?.join("") || rightClickedLyric.originalLyric
 									: rightClickedLyric.originalLyric
-						  }`
+							}`
 						: "未右键选中歌词"
 				}
 				onClick={() => {

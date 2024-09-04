@@ -39,11 +39,11 @@ export const displayMusicArtistsAtom = atom((get) => {
 	if (overrideData.state === "hasData") {
 		return overrideData.data.musicArtists
 			? ([
-				{
-					id: "0",
-					name: overrideData.data.musicArtists,
-				},
-			] as Artist[])
+					{
+						id: "0",
+						name: overrideData.data.musicArtists,
+					},
+				] as Artist[])
 			: get(musicArtistsAtom);
 	}
 	return get(musicArtistsAtom);
@@ -103,8 +103,8 @@ export const currentTimeAtom = atom(
 		update:
 			| number
 			| {
-				raw: number;
-			},
+					raw: number;
+			  },
 	) => {
 		const musicCtx = get(rawMusicContextAtom);
 		if (typeof update === "number") {

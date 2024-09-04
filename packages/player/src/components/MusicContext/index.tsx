@@ -158,7 +158,7 @@ export const MusicContext: FC = () => {
 				store.set(musicCoverAtom, imgUrl);
 				store.set(musicCoverIsVideoAtom, false);
 			} else {
-				store.set(musicCoverAtom, "data:image/gif;base64,R0lGODlhAQABAAAAACw=");
+				store.set(musicCoverAtom, "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
 				store.set(musicCoverIsVideoAtom, false);
 			}
 		};

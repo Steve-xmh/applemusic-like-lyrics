@@ -56,7 +56,7 @@ export function processLyric2(original: LyricLine[]) {
 		if (origLine.words.some((word) => /[\(\)（）]/.test(word.word))) {
 			needNonDynamic = true;
 		}
-		if (origLine.words.some((word) => (word.endTime - word.startTime) >= 6000)) {
+		if (origLine.words.some((word) => word.endTime - word.startTime >= 6000)) {
 			needNonDynamic = true;
 		}
 		if (needNonDynamic) break;
@@ -74,7 +74,10 @@ export function processLyric2(original: LyricLine[]) {
 			});
 			if (newLineStr.length > 0) {
 				if (newLineStr.charAt(0) === "'") {
-					newLineStr = newLineStr.charAt(0) + newLineStr.charAt(1).toUpperCase() + newLineStr.slice(2);
+					newLineStr =
+						newLineStr.charAt(0) +
+						newLineStr.charAt(1).toUpperCase() +
+						newLineStr.slice(2);
 				} else {
 					newLineStr = newLineStr.charAt(0).toUpperCase() + newLineStr.slice(1);
 				}
@@ -118,11 +121,15 @@ export function processLyric2(original: LyricLine[]) {
 			if (newWords.length > 0) {
 				// 处理 newWords 中整句的第一个单词
 				if (newWords[0].word.charAt(0) === "'") {
-					newWords[0].word = newWords[0].word.charAt(0) + newWords[0].word.charAt(1).toUpperCase() + newWords[0].word.slice(2);
+					newWords[0].word =
+						newWords[0].word.charAt(0) +
+						newWords[0].word.charAt(1).toUpperCase() +
+						newWords[0].word.slice(2);
 				} else {
-					newWords[0].word = newWords[0].word.charAt(0).toUpperCase() + newWords[0].word.slice(1);
+					newWords[0].word =
+						newWords[0].word.charAt(0).toUpperCase() +
+						newWords[0].word.slice(1);
 				}
-
 			}
 			origLine.words = newWords;
 		}

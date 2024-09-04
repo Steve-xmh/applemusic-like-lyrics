@@ -1,6 +1,5 @@
 {
   "name": "@applemusic-like-lyrics/bncm",
-  "packageManager": "yarn@3.6.1",
   "version": "0.0.1",
   "private": true,
   "type": "module",

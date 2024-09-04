@@ -2,10 +2,6 @@
   "name": "applemusic-like-lyrics",
   "private": true,
   "license": "GPL-3.0",
-  "workspaces": [
-    "packages/*"
-  ],
-  "packageManager": "yarn@4.0.2",
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
     "lerna": "^7.3.1"

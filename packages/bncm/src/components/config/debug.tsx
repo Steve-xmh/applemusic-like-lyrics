@@ -69,7 +69,7 @@ const TTMLDebugValue: FC = () => {
 									value: musicArtists.map((v) => v.name),
 								},
 							],
-					  })
+						})
 					: null}
 			</div>
 		</>

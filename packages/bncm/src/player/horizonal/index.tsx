@@ -39,7 +39,9 @@ export const LyricPlayerHorizonal: FC = () => {
 	const albumCoverRef = useRef<HTMLDivElement>(null);
 	const loadableMusicOverrideData = useAtomValue(loadableMusicOverrideDataAtom);
 	const lyricLines = useAtomValue(lyricLinesAtom);
-	const hideCursorWhenHoveringCover = useAtomValue(hideCursorWhenHoveringCoverAtom);
+	const hideCursorWhenHoveringCover = useAtomValue(
+		hideCursorWhenHoveringCoverAtom,
+	);
 
 	useEffect(() => {
 		if (showStats) {
@@ -108,7 +110,7 @@ export const LyricPlayerHorizonal: FC = () => {
 			)} */}
 			{showAlbumImage &&
 				(loadableMusicOverrideData.state === "hasData" &&
-					loadableMusicOverrideData.data.musicCoverIsVideo ? (
+				loadableMusicOverrideData.data.musicCoverIsVideo ? (
 					<div
 						className={classNames("amll-cover-image amll-cover-image-video", {
 							"hide-cursor": hideCursorWhenHoveringCover,
@@ -156,7 +158,7 @@ export const LyricPlayerHorizonal: FC = () => {
 				onMouseDown={(evt) => {
 					evt.preventDefault();
 					evt.stopPropagation();
-					channel.call("winhelper.dragWindow", () => { }, []);
+					channel.call("winhelper.dragWindow", () => {}, []);
 				}}
 			/>
 		</div>
