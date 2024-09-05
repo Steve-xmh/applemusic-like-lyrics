@@ -17,6 +17,7 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
       - name: 安装依赖并构建网站
         run: |
+          npm i -g pnpm
           pnpm i
           pnpm workspace -F @applemusic-like-lyrics/docs build
         env:
