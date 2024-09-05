@@ -153,6 +153,7 @@ const PrebuiltVolumeControl: FC<{
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
 export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
+	className,
 	...rest
 }) => {
 	const lyricLines = useAtomValue(musicLyricLinesAtom);
@@ -171,6 +172,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 
 	return (
 		<AutoLyricLayout
+			className={classNames(styles.autoLyricLayout, className)}
 			coverSlot={
 				<Cover
 					coverUrl={musicCover}

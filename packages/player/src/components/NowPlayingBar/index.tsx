@@ -139,19 +139,36 @@ export const NowPlayingBar: FC = () => {
 					direction="row"
 					justify="end"
 					align="center"
-					flexGrow="1"
-					flexBasis="33.3%"
+					flexGrow={{
+						initial: "0",
+						sm: "1",
+					}}
+					flexBasis={{
+						initial: "",
+						sm: "33.3%",
+					}}
 					gap="1"
 				>
-					<IconButton onClick={onRequestPrevSong} variant="soft">
-						<TrackPreviousIcon />
-					</IconButton>
-					<IconButton onClick={onPlayOrResume} variant="soft">
-						{musicPlaying ? <PauseIcon /> : <PlayIcon />}
-					</IconButton>
-					<IconButton onClick={onRequestNextSong} variant="soft">
-						<TrackNextIcon />
-					</IconButton>
+					<Flex
+						direction="row"
+						justify="end"
+						align="center"
+						gap="1"
+						display={{
+							initial: "flex",
+							sm: "none",
+						}}
+					>
+						<IconButton onClick={onRequestPrevSong} variant="soft">
+							<TrackPreviousIcon />
+						</IconButton>
+						<IconButton onClick={onPlayOrResume} variant="soft">
+							{musicPlaying ? <PauseIcon /> : <PlayIcon />}
+						</IconButton>
+						<IconButton onClick={onRequestNextSong} variant="soft">
+							<TrackNextIcon />
+						</IconButton>
+					</Flex>
 					<IconButton variant="soft">
 						<ListBulletIcon />
 					</IconButton>

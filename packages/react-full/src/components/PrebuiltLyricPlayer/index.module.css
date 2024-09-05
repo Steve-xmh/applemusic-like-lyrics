@@ -2,8 +2,8 @@
     padding: 2vh 0 !important;
     width: min(52vh, 38vw);
 
-    @media screen and (max-height: 768px) {
-        padding: 0.5vh 0 !important;
+    @media screen and (max-height: 1000px) {
+        padding: 0vh 0 !important;
     }
 }
 
@@ -122,34 +122,41 @@
     }
 }
 
+.autoLyricLayout {
+    --info-timing-func-in: cubic-bezier(0.5, 0, 0.75, 0);
+    --info-timing-func-out: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 .bigMusicInfo {
     transition:
-        transform 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
-        opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        transform 0.3s var(--info-timing-func-in),
+        opacity 0.3s var(--info-timing-func-in);
     transform: translateY(-25vh);
     opacity: 0;
+    overflow-x: hidden;
+    min-width: 0;
 }
 
 .bigMusicInfo.hideLyric {
     transition:
-        transform 0.3s 0.3s cubic-bezier(0.215, 0.610, 0.355, 1),
-        opacity 0.3s 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+        transform 0.5s 0.3s var(--info-timing-func-out),
+        opacity 0.5s 0.3s var(--info-timing-func-out);
     transform: translateY(0);
     opacity: 1;
 }
 
 .smallMusicInfo {
     transition:
-        transform 0.3s 0.5s cubic-bezier(0.215, 0.610, 0.355, 1),
-        opacity 0.3s 0.5s cubic-bezier(0.215, 0.610, 0.355, 1);
+        transform 0.5s 0.3s var(--info-timing-func-out),
+        opacity 0.3s 0.3s var(--info-timing-func-out);
     transform: translateY(0);
     opacity: 1;
 }
 
 .smallMusicInfo.hideLyric {
     transition:
-        transform 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19),
-        opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        transform 0.3s var(--info-timing-func-in),
+        opacity 0.3s var(--info-timing-func-in);
     transform: translateY(25vh);
     opacity: 0;
 }

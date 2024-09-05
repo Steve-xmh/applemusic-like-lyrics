@@ -124,6 +124,7 @@
     transition: opacity 0.5s;
     opacity: 0;
     mix-blend-mode: plus-lighter;
+    min-width: 0;
 }
 
 .hideLyric {

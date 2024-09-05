@@ -203,6 +203,7 @@ export const MusicContext: FC = () => {
 					break;
 				}
 				case "loadingAudio": {
+					store.set(musicIdAtom, evtData.data.musicId);
 					break;
 				}
 				case "syncStatus": {

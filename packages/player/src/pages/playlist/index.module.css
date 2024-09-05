@@ -1,14 +1,12 @@
 .playlist {
-    height: 100vh;
-    padding-bottom: var(--spacing-8);
+    max-height: 100vh;
+    padding: 0 var(--space-2);
+    padding-bottom: var(--space-8);
+    box-sizing: border-box;
 }
 
 .playlist > * {
     margin: 0 auto;
-    padding: 0 var(--spacing-4);
+    padding: 0 var(--space-4);
     max-width: var(--container-4);
-}
-
-.playlist > *:last-child> *:last-child {
-    margin-bottom: var(--spacing-8);
 }
