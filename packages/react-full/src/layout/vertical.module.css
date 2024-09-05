@@ -49,7 +49,7 @@
         1em [controls] 0fr [lyric-view] 1fr [bottom-controls] 0fr;
     grid-template-columns:
         3em [cover-side] 0fr [info-side] 1fr 3em;
-        mix-blend-mode: plus-lighter;
+    mix-blend-mode: plus-lighter;
 }
 
 .noLyricLayout {
@@ -114,6 +114,9 @@
     transition: opacity 0.5s 0.5s;
     opacity: 1;
     mix-blend-mode: plus-lighter;
+    contain: paint;
+
+    mask-image: linear-gradient(transparent 0%, black 10%, black 100%);
 }
 
 .bigControls {

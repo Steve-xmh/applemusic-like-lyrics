@@ -11,28 +11,18 @@ pub fn read_audio_info(format_result: &mut ProbeResult) -> AudioInfo {
     let metadata = format_result.format.metadata();
 
     if let Some(rev) = metadata.current() {
-        for v in rev.vendor_data() {
-            info!("音频文件的元数据：{} 大小 {}", v.ident, v.data.len());
-        }
         if rev.visuals().len() == 1 {
             let visual = &rev.visuals()[0];
             new_audio_info.cover_media_type = visual.media_type.clone();
             new_audio_info.cover = Some(visual.data.to_vec());
         }
         for visual in rev.visuals() {
-            info!(
-                "音频文件的视觉图数据：{:?} {:?} 大小 {}",
-                visual.usage,
-                visual.tags,
-                visual.data.len()
-            );
             if visual.usage == Some(StandardVisualKey::FrontCover) {
                 new_audio_info.cover_media_type = visual.media_type.clone();
                 new_audio_info.cover = Some(visual.data.to_vec());
             }
         }
         for tag in rev.tags() {
-            info!("音频文件的标签数据：{} {:?}", tag.key, tag.value);
             match tag.std_key {
                 Some(StandardTagKey::TrackTitle) => {
                     new_audio_info.name = tag.value.to_string();

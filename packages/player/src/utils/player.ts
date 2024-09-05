@@ -1,5 +1,5 @@
-import { type EventCallback, listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { type EventCallback, listen } from "@tauri-apps/api/event";
 import { uid } from "uid";
 
 export interface AudioThreadEventMessage<T> {
@@ -166,7 +166,6 @@ async function initAudioThread() {
 
 initAudioThread();
 
-export const invokeSyncStatus = () => invoke("init_audio_thread");
 export const listenAudioThreadEvent = (
 	handler: EventCallback<AudioThreadEventMessage<AudioThreadEvent>>,
 ) => listen("audio_player_msg", handler);

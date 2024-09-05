@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [macos-latest, ubuntu-22.04, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -34,27 +34,15 @@ jobs:
         with:
           node-version: 18
       - name: 安装 Tauri 所需系统依赖（仅 Linux）
-        if: matrix.platform == 'ubuntu-20.04'
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            libappindicator3-dev \
-            patchelf \
-            libwebkit2gtk-4.0-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libssl-dev \
-            libgtk-3-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
+          sudo apt-get install -y libappindicator3-dev libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - name: 构建 AMLL 包
         run: |
-          yarn
-          yarn lerna run build --scope player
+          pnpm i
+          pnpm lerna run build --scope player
         env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true
       - name: 构建 Tauri 程序
         uses: tauri-apps/tauri-action@v0

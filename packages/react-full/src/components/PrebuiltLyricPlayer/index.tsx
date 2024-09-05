@@ -3,17 +3,28 @@
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
 
-import { LyricPlayer, BackgroundRender } from "@applemusic-like-lyrics/react";
-import { AutoLyricLayout } from "../../layout/auto";
-import { ControlThumb } from "../ControlThumb";
-import { Cover } from "../Cover";
-import "./icon-animations.css";
-import styles from "./index.module.css";
 import "@applemusic-like-lyrics/core/style.css";
+import { BackgroundRender, LyricPlayer } from "@applemusic-like-lyrics/react";
 import { useAtomValue } from "jotai";
 import {
-	AudioQualityType,
+	type FC,
+	type HTMLProps,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
+import { AutoLyricLayout } from "../../layout/auto";
+import {
+	onClickControlThumbAtom,
+	onPlayOrResumeAtom,
+	onRequestNextSongAtom,
+	onRequestOpenMenuAtom,
+	onRequestPrevSongAtom,
+	onSeekPositionAtom,
+} from "../../states/callback";
+import {
 	hideLyricViewAtom,
+	isLyricPageOpenedAtom,
 	lowFreqVolumeAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
@@ -26,30 +37,26 @@ import {
 	musicPlayingPositionAtom,
 	musicQualityAtom,
 } from "../../states/music";
-import {
-	onClickControlThumbAtom,
-	onPlayOrResumeAtom,
-	onRequestNextSongAtom,
-	onRequestOpenMenuAtom,
-	onRequestPrevSongAtom,
-	onSeekPositionAtom,
-} from "../../states/callback";
-import { useRef, type FC, type HTMLProps } from "react";
-import { MusicInfo } from "../MusicInfo";
 import { BouncingSlider } from "../BouncingSlider";
+import { ControlThumb } from "../ControlThumb";
+import { Cover } from "../Cover";
+import { MusicInfo } from "../MusicInfo";
 import { VolumeControl } from "../VolumeControlSlider";
+import "./icon-animations.css";
+import styles from "./index.module.css";
 
-import IconRewind from "./icon_rewind.svg?react";
-import IconForward from "./icon_forward.svg?react";
-import IconPause from "./icon_pause.svg?react";
-import IconPlay from "./icon_play.svg?react";
-import { MediaButton } from "../MediaButton";
-import { AudioQualityTag } from "../AudioQualityTag";
 import classNames from "classnames";
 import {
 	lyricBackgroundFPSAtom,
 	lyricBackgroundRenderScaleAtom,
 } from "../../states/config";
+import { toDuration } from "../../utils";
+import { AudioQualityTag } from "../AudioQualityTag";
+import { MediaButton } from "../MediaButton";
+import IconForward from "./icon_forward.svg?react";
+import IconPause from "./icon_pause.svg?react";
+import IconPlay from "./icon_play.svg?react";
+import IconRewind from "./icon_rewind.svg?react";
 
 const PrebuiltMusicInfo: FC<{
 	className?: string;
@@ -104,17 +111,6 @@ const PrebuiltMediaButtons: FC = () => {
 	);
 };
 
-function toDuration(duration: number) {
-	const isRemainTime = duration < 0;
-
-	const d = Math.abs(duration | 0);
-	const sec = d % 60;
-	const min = Math.floor((d - sec) / 60);
-	const secText = "0".repeat(2 - sec.toString().length) + sec;
-
-	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
-}
-
 const PrebuiltProgressBar: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const musicPosition = useAtomValue(musicPlayingPositionAtom);
@@ -156,6 +152,8 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	className,
 	...rest
 }) => {
+	const musicPlayingPosition = useAtomValue(musicPlayingPositionAtom);
+	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const lyricLines = useAtomValue(musicLyricLinesAtom);
 	const hideVerticalLyricView = useAtomValue(hideLyricViewAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
@@ -167,12 +165,40 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 		lyricBackgroundRenderScaleAtom,
 	);
 	const onClickControlThumb = useAtomValue(onClickControlThumbAtom).onEmit;
-
+	const [isVertical, setIsVertical] = useState(false);
+	const [alignPosition, setAlignPosition] = useState(0.25);
+	const [alignAnchor, setAlignAnchor] = useState("top");
 	const coverElRef = useRef<HTMLElement>(null);
+	const layoutRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		// 如果是水平布局，则让歌词对齐到封面的中心
+		if (!isVertical && coverElRef.current && layoutRef.current) {
+			const obz = new ResizeObserver(() => {
+				if (!(coverElRef.current && layoutRef.current)) return;
+				const coverB = coverElRef.current.getBoundingClientRect();
+				const layoutB = layoutRef.current.getBoundingClientRect();
+				setAlignPosition(
+					(coverB.top + coverB.height / 2 - layoutB.top) / layoutB.height,
+				);
+			});
+			obz.observe(coverElRef.current);
+			obz.observe(layoutRef.current);
+			setAlignAnchor("center");
+			return () => obz.disconnect();
+		}
+		// 如果是垂直布局，则把歌词对齐到顶部（歌曲信息下方）
+		if (isVertical && layoutRef.current) {
+			setAlignPosition(0.1);
+			setAlignAnchor("top");
+		}
+	}, [isVertical]);
 
 	return (
 		<AutoLyricLayout
+			ref={layoutRef}
 			className={classNames(styles.autoLyricLayout, className)}
+			onLayoutChange={setIsVertical}
 			coverSlot={
 				<Cover
 					coverUrl={musicCover}
@@ -231,9 +257,16 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 			}
 			lyricSlot={
 				<LyricPlayer
-					style={{ width: "100%", height: "100%" }}
+					style={{
+						width: "100%",
+						height: "100%",
+						fontWeight: "var(--amll-lyric-font-weight, 500)",
+					}}
 					playing={musicIsPlaying}
-					alignPosition={0.25}
+					disabled={!isLyricPageOpened}
+					alignPosition={alignPosition}
+					alignAnchor={alignAnchor}
+					currentTime={musicPlayingPosition}
 					lyricLines={lyricLines}
 				/>
 			}

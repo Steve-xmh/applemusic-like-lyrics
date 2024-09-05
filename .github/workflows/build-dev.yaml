@@ -17,8 +17,8 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
       - name: 构建 BNCM 插件
         run: |
-          yarn
-          yarn lerna run build:dev --scope "@applemusic-like-lyrics/*"
+          pnpm i
+          pnpm lerna run build:dev --scope "@applemusic-like-lyrics/*"
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true

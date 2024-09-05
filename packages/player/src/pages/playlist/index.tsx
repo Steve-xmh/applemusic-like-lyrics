@@ -1,29 +1,34 @@
+import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@radix-ui/react-icons";
 import {
 	Avatar,
 	Box,
 	Button,
 	Card,
+	Container,
+	ContextMenu,
 	Flex,
 	Heading,
 	IconButton,
 	Skeleton,
 	Text,
 } from "@radix-ui/themes";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useCallback, useEffect, useMemo, type FC } from "react";
-import { useParams } from "react-router-dom";
-import { db, type Song } from "../../dexie";
-import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@radix-ui/react-icons";
-import { open } from "@tauri-apps/plugin-dialog";
 import { path } from "@tauri-apps/api";
-import { VirtualList } from "react-base-virtual-list";
+import { open } from "@tauri-apps/plugin-dialog";
+import { useLiveQuery } from "dexie-react-hooks";
 import md5 from "md5";
 import {
-	emitAudioThread,
-	emitAudioThreadRet,
-	readLocalMusicMetadata,
-} from "../../utils/player";
-import styles from "./index.module.css";
+	type CSSProperties,
+	type FC,
+	type HTMLProps,
+	forwardRef,
+	useCallback,
+} from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList } from "react-window";
+import { type Song, db } from "../../dexie";
+import { emitAudioThread, readLocalMusicMetadata } from "../../utils/player";
+import { useSongCover } from "../../utils/use-song-cover";
 
 export type Loadable<Value> =
 	| {
@@ -52,9 +57,10 @@ function toDuration(duration: number) {
 export const SongCard: FC<{
 	songId: string;
 	songIndex: number;
-	isLast: boolean;
 	onPlayList: (songIndex: number) => void;
-}> = ({ songId, songIndex, isLast, onPlayList }) => {
+	onDeleteSong: (songId: string) => void;
+	style?: CSSProperties;
+}> = ({ songId, songIndex, onPlayList, onDeleteSong, style }) => {
 	const song: Loadable<Song> = useLiveQuery(
 		() =>
 			db.songs.get(songId).then((data) => {
@@ -74,58 +80,84 @@ export const SongCard: FC<{
 			state: "loading",
 		},
 	);
-	const songImgUrl = useMemo(
-		() =>
-			song.state === "hasData" && song.data?.cover
-				? URL.createObjectURL(song.data.cover)
-				: "",
-		[song],
+	const songImgUrl = useSongCover(
+		song.state === "hasData" ? song.data : undefined,
 	);
-	useEffect(() => {
-		return () => {
-			if (songImgUrl.length > 0) URL.revokeObjectURL(songImgUrl);
-		};
-	}, [songImgUrl]);
+	const navigate = useNavigate();
 
 	return (
-		<Skeleton loading={song.state === "loading"}>
-			<Card
-				key={songId}
-				style={{
-					marginBottom: isLast ? "150px" : "",
-				}}
-				mt="2"
-			>
-				<Flex p="1" align="center" gap="4">
-					<Avatar size="5" fallback={<div />} src={songImgUrl} />
-					<Flex direction="column" justify="center" flexGrow="1">
-						<Box>
-							{song.state === "hasData" &&
-								(song.data.songName ||
-									song.data.filePath ||
-									`未知歌曲 ID ${songId}`)}
-						</Box>
-						<Box>
-							{song.state === "hasData" && (song.data.songArtists || "")}
-						</Box>
-					</Flex>
-					<Box>
-						{song.state === "hasData" &&
-							(song.data.duration ? toDuration(song.data.duration) : "")}
-					</Box>
-					<IconButton
-						variant="ghost"
-						onClick={() => {
-							onPlayList(songIndex);
-						}}
-					>
-						<PlayIcon />
-					</IconButton>
-				</Flex>
-			</Card>
+		<Skeleton
+			style={style}
+			key={`song-card-${songId}`}
+			loading={song.state === "loading"}
+		>
+			<Box py="4" pr="4" style={style}>
+				<ContextMenu.Root>
+					<ContextMenu.Trigger>
+						<Card>
+							<Flex p="1" align="center" gap="4">
+								<Avatar size="5" fallback={<div />} src={songImgUrl} />
+								<Flex
+									direction="column"
+									justify="center"
+									flexGrow="1"
+									minWidth="0"
+								>
+									<Text wrap="nowrap" truncate>
+										{song.state === "hasData" &&
+											(song.data.songName ||
+												song.data.filePath ||
+												`未知歌曲 ID ${songId}`)}
+									</Text>
+									<Text wrap="nowrap" truncate color="gray">
+										{song.state === "hasData" && (song.data.songArtists || "")}
+									</Text>
+								</Flex>
+								<Text wrap="nowrap">
+									{song.state === "hasData" &&
+										(song.data.duration ? toDuration(song.data.duration) : "")}
+								</Text>
+								<IconButton
+									variant="ghost"
+									onClick={() => onPlayList(songIndex)}
+								>
+									<PlayIcon />
+								</IconButton>
+							</Flex>
+						</Card>
+					</ContextMenu.Trigger>
+					<ContextMenu.Content>
+						<ContextMenu.Item onClick={() => onPlayList(songIndex)}>
+							播放音乐
+						</ContextMenu.Item>
+						<ContextMenu.Item onClick={() => navigate(`/song/${songId}`)}>
+							编辑音乐数据
+						</ContextMenu.Item>
+						<ContextMenu.Separator />
+						<ContextMenu.Item color="red" onClick={() => onDeleteSong(songId)}>
+							从歌单中删除
+						</ContextMenu.Item>
+					</ContextMenu.Content>
+				</ContextMenu.Root>
+			</Box>
 		</Skeleton>
 	);
 };
+
+const BOTTOM_PADDING = 150;
+
+const PlaylistViewInner = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
+	({ style, ...rest }, ref) => (
+		<div
+			ref={ref}
+			style={{
+				...style,
+				height: `${(Number.parseFloat(style?.height?.toString() || "") || 0) + BOTTOM_PADDING}px`,
+			}}
+			{...rest}
+		/>
+	),
+);
 
 export const PlaylistPage: FC = () => {
 	const param = useParams();
@@ -162,10 +194,12 @@ export const PlaylistPage: FC = () => {
 							filePath: normalized,
 							songName: musicInfo.name,
 							songArtists: musicInfo.artist,
+							songAlbum: musicInfo.album,
+							lyricFormat: musicInfo.lyric.length > 0 ? "lrc" : "",
 							lyric: musicInfo.lyric,
 							cover: coverBlob,
 							duration: musicInfo.duration,
-						};
+						} satisfies Song;
 					} catch (err) {
 						console.warn("解析歌曲元数据以添加歌曲失败", normalized, err);
 						return null;
@@ -184,15 +218,24 @@ export const PlaylistPage: FC = () => {
 	}, [playlist, param.id]);
 
 	const onPlayList = useCallback(
-		async (songIndex = 0) => {
+		async (songIndex = 0, shuffle = false) => {
 			if (playlist === undefined) return;
 			const collected = await db.songs
 				.toCollection()
 				.filter((v) => playlist.songIds.includes(v.id))
 				.toArray();
-			collected.sort((a, b) => {
-				return playlist.songIds.indexOf(a.id) - playlist.songIds.indexOf(b.id);
-			});
+			if (shuffle) {
+				for (let i = 0; i < collected.length; i++) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[collected[i], collected[j]] = [collected[j], collected[i]];
+				}
+			} else {
+				collected.sort((a, b) => {
+					return (
+						playlist.songIds.indexOf(a.id) - playlist.songIds.indexOf(b.id)
+					);
+				});
+			}
 			await emitAudioThread("setPlaylist", {
 				songs: collected.map((v, i) => ({
 					type: "local",
@@ -207,24 +250,30 @@ export const PlaylistPage: FC = () => {
 		[playlist],
 	);
 
-	const onPlaylistDefault = useCallback(onPlayList.bind(null, 0), [onPlayList]);
+	const onDeleteSong = useCallback(
+		async (songId: string) => {
+			if (playlist === undefined) return;
+			await db.playlists.update(Number(param.id), (obj) => {
+				obj.songIds = obj.songIds.filter((v) => v !== songId);
+			});
+		},
+		[playlist, param.id],
+	);
 
-	return playlist?.songIds ? (
-		<VirtualList
-			items={playlist.songIds}
-			className={styles.playlist}
-			renderHead={() => (
-				<Flex
-					gap="4"
-					direction="column"
-					position="sticky"
-					top="0"
-					style={{
-						zIndex: "10",
-						paddingBottom: "var(--space-4)",
-						backgroundColor: "var(--color-background)",
-					}}
-				>
+	const onPlaylistDefault = useCallback(onPlayList.bind(null, 0), [onPlayList]);
+	const onPlaylistShuffle = useCallback(onPlayList.bind(null, 0, true), [
+		onPlayList,
+	]);
+
+	return (
+		<Container
+			mx={{
+				initial: "4",
+				sm: "9",
+			}}
+		>
+			<Flex direction="column" maxHeight="100vh" height="100vh">
+				<Flex gap="4" direction="column" flexGrow="0" pb="4">
 					<Flex align="end" pt="4">
 						<Button variant="soft" onClick={() => history.back()}>
 							<ArrowLeftIcon />
@@ -248,7 +297,9 @@ export const PlaylistPage: FC = () => {
 									<PlayIcon />
 									播放全部
 								</Button>
-								<Button variant="soft">随机播放</Button>
+								<Button variant="soft" onClick={onPlaylistShuffle}>
+									随机播放
+								</Button>
 								<Button variant="soft" onClick={onAddLocalMusics}>
 									<PlusIcon />
 									添加本地歌曲
@@ -276,17 +327,32 @@ export const PlaylistPage: FC = () => {
 						</Flex>
 					</Flex>
 				</Flex>
-			)}
-			renderItem={(songId, index) => (
-				<SongCard
-					songId={songId}
-					songIndex={index}
-					isLast={index === playlist.songIds.length - 1}
-					onPlayList={onPlayList}
-				/>
-			)}
-		/>
-	) : (
-		<></>
+				<Box flexGrow="1" overflow="hidden" minHeight="0">
+					{playlist?.songIds && (
+						<AutoSizer>
+							{({ width, height }) => (
+								<FixedSizeList
+									itemCount={playlist.songIds.length}
+									itemSize={96 + 16}
+									innerElementType={PlaylistViewInner}
+									width={width}
+									height={height}
+								>
+									{({ index, style }) => (
+										<SongCard
+											songId={playlist.songIds[index]}
+											songIndex={index}
+											style={style}
+											onPlayList={onPlayList}
+											onDeleteSong={onDeleteSong}
+										/>
+									)}
+								</FixedSizeList>
+							)}
+						</AutoSizer>
+					)}
+				</Box>
+			</Flex>
+		</Container>
 	);
 };

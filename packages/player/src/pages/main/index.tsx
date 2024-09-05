@@ -1,25 +1,31 @@
 import { GearIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
 	Box,
+	Button,
 	Card,
+	Container,
 	Flex,
 	Heading,
 	Spinner,
-	TextField,
 	Text,
-	Button,
+	TextField,
 } from "@radix-ui/themes";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { FC } from "react";
+import { Link } from "react-router-dom";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
 import { db } from "../../dexie";
-import { useLiveQuery } from "dexie-react-hooks";
-import { Link } from "react-router-dom";
 
 export const MainPage: FC = () => {
 	const playlists = useLiveQuery(() => db.playlists.toArray());
 
 	return (
-		<>
+		<Container
+			mx={{
+				initial: "4",
+				sm: "9",
+			}}
+		>
 			<Flex direction="row" align="center" wrap="wrap">
 				<Box asChild flexGrow="1">
 					<Heading wrap="nowrap" my="4">
@@ -49,7 +55,7 @@ export const MainPage: FC = () => {
 				) : (
 					<>
 						{playlists.map((v) => (
-							<Card asChild size="2" key={v.id}>
+							<Card asChild size="2" mb="4" key={v.id}>
 								<Link to={`/playlist/${v.id}`}>{v.name}</Link>
 							</Card>
 						))}
@@ -67,6 +73,6 @@ export const MainPage: FC = () => {
 					加载歌单中
 				</Flex>
 			)}
-		</>
+		</Container>
 	);
 };

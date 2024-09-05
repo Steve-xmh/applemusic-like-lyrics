@@ -20,6 +20,6 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["src"],
+	"include": ["src", "../react-full/src/utils/duration.ts"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

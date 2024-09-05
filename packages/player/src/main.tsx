@@ -1,13 +1,13 @@
+import * as wsp from "@applemusic-like-lyrics/ws-protocol";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { Provider } from "jotai";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { ErrorBoundary } from "react-error-boundary";
 import App from "./App";
 import "./styles.css";
-import * as wsp from "@applemusic-like-lyrics/ws-protocol";
-import { listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/core";
 import "./utils/player";
-import { Provider } from "jotai";
-import { ErrorBoundary } from "react-error-boundary";
 
 (window as any).wsp = wsp;
 

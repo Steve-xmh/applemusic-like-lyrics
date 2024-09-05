@@ -13,3 +13,4 @@ lyrics/
 target/
 .yarn/cache/
 .yarn/install-state.gz
+.nx

@@ -1,37 +1,41 @@
+import { parseTTML } from "@applemusic-like-lyrics/lyric";
 import {
+	AudioQualityType,
 	fftDataAtom,
-	lowFreqVolumeAtom,
 	hideLyricViewAtom,
 	isLyricPageOpenedAtom,
+	lowFreqVolumeAtom,
 	musicAlbumNameAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
 	musicCoverIsVideoAtom,
 	musicDurationAtom,
+	musicLyricLinesAtom,
 	musicNameAtom,
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
+	musicQualityAtom,
 	musicVolumeAtom,
 	onClickControlThumbAtom,
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
 	onRequestPrevSongAtom,
 	onSeekPositionAtom,
-	AudioQualityType,
-	musicQualityAtom,
 } from "@applemusic-like-lyrics/react-full";
-import { useStore } from "jotai";
-import { useEffect, type FC } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useAtomValue, useSetAtom, useStore } from "jotai";
+import { type FC, useEffect } from "react";
+import { db } from "../../dexie";
+import { musicIdAtom } from "../../states";
 import {
-	emitAudioThreadRet,
-	emitAudioThread,
-	listenAudioThreadEvent,
 	type AudioInfo,
 	type AudioQuality,
+	emitAudioThread,
+	emitAudioThreadRet,
+	listenAudioThreadEvent,
 } from "../../utils/player";
-import { musicIdAtom } from "../../states";
 
-function useFFTToLowPass() {
+const FFTToLowPassContext: FC = () => {
 	const store = useStore();
 
 	useEffect(() => {
@@ -99,12 +103,43 @@ function useFFTToLowPass() {
 			cancelAnimationFrame(rafId);
 		};
 	}, [store]);
-}
+
+	return null;
+};
+
+const LyricContext: FC = () => {
+	const musicId = useAtomValue(musicIdAtom);
+	const setLyricLines = useSetAtom(musicLyricLinesAtom);
+	const song = useLiveQuery(() => db.songs.get(musicId), [musicId]);
+
+	useEffect(() => {
+		if (song) {
+			console.log("正在检查歌词", song.id, song.lyricFormat);
+			try {
+				switch (song.lyricFormat) {
+					case "ttml": {
+						const lyric = parseTTML(song.lyric);
+						console.log("解析出 TTML 歌词", lyric);
+						setLyricLines(lyric.lines);
+						break;
+					}
+					default:
+						setLyricLines([]);
+				}
+			} catch (e) {
+				console.warn("解析歌词时出现错误", e);
+				setLyricLines([]);
+			}
+		} else {
+			setLyricLines([]);
+		}
+	}, [song, setLyricLines]);
+
+	return null;
+};
 
 export const MusicContext: FC = () => {
 	const store = useStore();
-
-	useFFTToLowPass();
 
 	useEffect(() => {
 		const toEmitThread = (type: Parameters<typeof emitAudioThread>[0]) => ({
@@ -169,6 +204,13 @@ export const MusicContext: FC = () => {
 				store.set(musicCoverIsVideoAtom, false);
 			}
 		};
+		const syncMusicId = (musicId: string) => {
+			if (musicId.startsWith("local:")) {
+				store.set(musicIdAtom, musicId.substring(6));
+			} else {
+				store.set(musicIdAtom, musicId);
+			}
+		};
 		const syncMusicQuality = (quality: AudioQuality) => {
 			console.log("已设置音乐音质信息", quality);
 			let result = AudioQualityType.None;
@@ -197,18 +239,18 @@ export const MusicContext: FC = () => {
 					break;
 				}
 				case "loadAudio": {
-					store.set(musicIdAtom, evtData.data.musicId);
+					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
 					break;
 				}
 				case "loadingAudio": {
-					store.set(musicIdAtom, evtData.data.musicId);
+					syncMusicId(evtData.data.musicId);
 					break;
 				}
 				case "syncStatus": {
 					store.set(musicPlayingAtom, evtData.data.isPlaying);
-					store.set(musicIdAtom, evtData.data.musicId);
+					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
 					break;
@@ -240,5 +282,10 @@ export const MusicContext: FC = () => {
 		};
 	}, [store]);
 
-	return null;
+	return (
+		<>
+			<LyricContext />
+			<FFTToLowPassContext />
+		</>
+	);
 };

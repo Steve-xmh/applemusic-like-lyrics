@@ -1,16 +1,20 @@
 import {
+	PrebuiltLyricPlayer,
 	hideLyricViewAtom,
 	isLyricPageOpenedAtom,
-	PrebuiltLyricPlayer,
 } from "@applemusic-like-lyrics/react-full";
-import { useAtom, useAtomValue } from "jotai";
-import styles from "./index.module.css";
-import classnames from "classnames";
-import { useLayoutEffect, type FC } from "react";
 import { ContextMenu } from "@radix-ui/themes";
+import classnames from "classnames";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { type FC, useLayoutEffect } from "react";
+import { router } from "../../router";
+import { musicIdAtom } from "../../states";
+import styles from "./index.module.css";
 
 const AMLLContextMenuContent: FC = () => {
 	const [hideLyricView, setHideLyricView] = useAtom(hideLyricViewAtom);
+	const setLyricPageOpened = useSetAtom(isLyricPageOpenedAtom);
+	const musicId = useAtomValue(musicIdAtom);
 
 	return (
 		<ContextMenu.Content>
@@ -20,7 +24,14 @@ const AMLLContextMenuContent: FC = () => {
 			>
 				显示歌词
 			</ContextMenu.CheckboxItem>
-			<ContextMenu.Item>编辑歌曲覆盖信息</ContextMenu.Item>
+			<ContextMenu.Item
+				onClick={() => {
+					setLyricPageOpened(false);
+					router.navigate(`/song/${musicId}`);
+				}}
+			>
+				编辑歌曲覆盖信息
+			</ContextMenu.Item>
 		</ContextMenu.Content>
 	);
 };

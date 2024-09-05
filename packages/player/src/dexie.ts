@@ -1,5 +1,5 @@
-import Dexie from "dexie";
 import type { EntityTable } from "dexie";
+import Dexie from "dexie";
 
 export interface Playlist {
 	id: number;
@@ -15,8 +15,10 @@ export interface Song {
 	filePath: string;
 	songName: string;
 	songArtists: string;
+	songAlbum: string;
 	cover: Blob;
 	duration: number;
+	lyricFormat: string;
 	lyric: string;
 }
 
@@ -37,5 +39,15 @@ db.version(2).upgrade((trans) => {
 		.modify((song) => {
 			const raw = Uint8Array.from(atob(song.cover), (c) => c.charCodeAt(0));
 			song.cover = new Blob([raw], { type: "image" });
+		});
+});
+
+db.version(3).upgrade((trans) => {
+	trans
+		.table("songs")
+		.toCollection()
+		.modify((song) => {
+			song.songAlbum = "";
+			song.lyricFormat = "";
 		});
 });

@@ -3,26 +3,21 @@
     /* --player-size-fract: 1fr; */
     width: 100%;
     height: 100%;
-    
+
     position: relative;
     display: grid;
     grid-template-rows:
-        [drag-area] minmax(30px, 0.45fr)
-        [thumb] auto
-        [cover] auto
-        [music-info] 3fr
-        [buttom-controls] 0fr
-        0.5fr;
+        [drag-area] minmax(30px, 0.45fr) [thumb] auto [cover] auto [music-info] 3fr [buttom-controls] 0fr 0.5fr;
     grid-template-columns:
-        [info-side] 0.45fr
-        [player-side] 0.55fr
-        [side-controls] 0fr;
+        [info-side] 0.45fr [player-side] 0.55fr [side-controls] 0fr;
     gap: 8px;
     transition: 0.5s ease-in-out;
     left: 0%;
+
     &.hideLyric {
         /* percentage(calc((1 - var(--info-size-fract) / (var(--info-size-fract) + var(--player-size-fract))) / 2)) */
         left: 27.02702702702703%;
+
         .lyric {
             transition: opacity 0.5s cubic-bezier(0.5, 0, 0.5, 1), transform 0.5s cubic-bezier(0.5, 0, 0.5, 1);
             opacity: 0;
@@ -35,7 +30,7 @@
     grid-row: thumb;
     justify-self: center;
     margin: 2vh;
-    
+
     mix-blend-mode: plus-lighter;
 }
 
@@ -53,7 +48,7 @@
     grid-column: info-side;
     grid-row: music-info;
     justify-self: center;
-    
+
     mix-blend-mode: plus-lighter;
 }
 
@@ -63,6 +58,7 @@
     width: 100%;
     height: 100%;
     transition: opacity 0.5s 0.5s cubic-bezier(0.5, 0, 0.5, 1);
-    
+
     mix-blend-mode: plus-lighter;
+    contain: paint;
 }

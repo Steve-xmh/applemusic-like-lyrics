@@ -1,8 +1,19 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "rust-analyzer.linkedProjects": [
-        "./packages/player/src-tauri/Cargo.toml",
-        "./packages/skia-player/Cargo.toml",
-        "./packages/lyric/Cargo.toml",
-    ]
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"editor.codeActionsOnSave": {
+		"quickfix.biome": "always",
+		"source.organizeImports.biome": "always",
+		"source.fixAll.ts": "explicit",
+		"source.removeUnused.ts": "explicit",
+		"source.removeUnusedImports": "explicit",
+		"source.sortImports": "always",
+		"source.organizeImports": "always"
+	},
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"rust-analyzer.linkedProjects": [
+		"./packages/player/src-tauri/Cargo.toml",
+		"./packages/skia-player/Cargo.toml",
+		"./packages/lyric/Cargo.toml"
+	]
 }

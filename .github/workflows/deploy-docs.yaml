@@ -17,8 +17,8 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
       - name: 安装依赖并构建网站
         run: |
-          yarn
-          yarn workspace @applemusic-like-lyrics/docs build
+          pnpm i
+          pnpm workspace -F @applemusic-like-lyrics/docs build
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true
