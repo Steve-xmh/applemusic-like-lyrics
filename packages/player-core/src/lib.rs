@@ -11,6 +11,7 @@ mod media_state;
 mod output;
 mod player;
 mod resampler;
+pub mod utils;
 
 pub use player::*;
 

@@ -53,6 +53,10 @@ export const musicDurationAtom = atom(0);
  */
 export const musicPlayingAtom = atom(false);
 /**
+ * 当前音乐的音质水平，如有提供则会显示在进度条下
+ */
+export const musicQualityAtom = atom<AudioQualityType>(AudioQualityType.None);
+/**
  * 当前音乐的播放进度，单位为毫秒
  */
 export const musicPlayingPositionAtom = atom(0);

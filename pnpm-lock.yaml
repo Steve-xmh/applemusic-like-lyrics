@@ -13,7 +13,7 @@ importers:
         version: 1.8.3
       lerna:
         specifier: ^7.3.1
-        version: 7.4.2(@swc/core@1.7.23)(encoding@0.1.13)
+        version: 7.4.2(@swc/core@1.7.23(@swc/helpers@0.5.2))(encoding@0.1.13)
 
   packages/bncm:
     dependencies:
@@ -249,13 +249,13 @@ importers:
     dependencies:
       '@mdx-js/loader':
         specifier: ^3.0.0
-        version: 3.0.1(webpack@5.94.0(@swc/core@1.7.23))
+        version: 3.0.1(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.0.1(@types/react@18.3.5)(react@18.3.1)
       '@next/mdx':
         specifier: ^14.1.0
-        version: 14.2.7(@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23)))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))
+        version: 14.2.7(@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2))))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))
       '@types/mdx':
         specifier: ^2.0.10
         version: 2.0.13
@@ -366,6 +366,9 @@ importers:
       react:
         specifier: ^18.2.0
         version: 18.3.1
+      react-base-virtual-list:
+        specifier: ^1.0.1
+        version: 1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
@@ -485,6 +488,9 @@ importers:
       '@applemusic-like-lyrics/react':
         specifier: workspace:^
         version: link:../react
+      '@types/react':
+        specifier: ^18.3.5
+        version: 18.3.5
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -5139,6 +5145,12 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
+  react-base-virtual-list@1.0.1:
+    resolution: {integrity: sha512-sfAyldFHw/+btqTA2vkrPAGTP/4nqCYr6mgTa7Bw3BtPToaM0UwwRUc+/IU5vRN9zxFbpqo5ibyU51oaCBRRiA==}
+    peerDependencies:
+      react: ^18
+      react-dom: ^18
+
   react-color@2.19.3:
     resolution: {integrity: sha512-LEeGE/ZzNLIsFWa1TMe8y5VYqr7bibneWmvJwm1pCn/eNmrabWDh659JSPn9BuaMpEfU83WTOJfnCcjDZwNQTA==}
     peerDependencies:
@@ -6630,11 +6642,11 @@ snapshots:
       execa: 5.1.1
       strong-log-transformer: 2.1.0
 
-  '@lerna/create@7.4.2(@swc/core@1.7.23)(encoding@0.1.13)(typescript@5.5.4)':
+  '@lerna/create@7.4.2(@swc/core@1.7.23(@swc/helpers@0.5.2))(encoding@0.1.13)(typescript@5.5.4)':
     dependencies:
       '@lerna/child-process': 7.4.2
       '@npmcli/run-script': 6.0.2
-      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23))
+      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       '@octokit/plugin-enterprise-rest': 6.0.1
       '@octokit/rest': 19.0.11(encoding@0.1.13)
       byte-size: 8.1.1
@@ -6671,7 +6683,7 @@ snapshots:
       npm-packlist: 5.1.1
       npm-registry-fetch: 14.0.5
       npmlog: 6.0.2
-      nx: 16.10.0(@swc/core@1.7.23)
+      nx: 16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
       p-map: 4.0.0
       p-map-series: 2.1.0
       p-queue: 6.6.2
@@ -6708,11 +6720,11 @@ snapshots:
 
   '@lukeed/csprng@1.1.0': {}
 
-  '@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23))':
+  '@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))':
     dependencies:
       '@mdx-js/mdx': 3.0.1
       source-map: 0.7.4
-      webpack: 5.94.0(@swc/core@1.7.23)
+      webpack: 5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
     transitivePeerDependencies:
       - supports-color
 
@@ -6815,11 +6827,11 @@ snapshots:
 
   '@next/env@14.1.0': {}
 
-  '@next/mdx@14.2.7(@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23)))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))':
+  '@next/mdx@14.2.7(@mdx-js/loader@3.0.1(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2))))(@mdx-js/react@3.0.1(@types/react@18.3.5)(react@18.3.1))':
     dependencies:
       source-map: 0.7.4
     optionalDependencies:
-      '@mdx-js/loader': 3.0.1(webpack@5.94.0(@swc/core@1.7.23))
+      '@mdx-js/loader': 3.0.1(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       '@mdx-js/react': 3.0.1(@types/react@18.3.5)(react@18.3.1)
 
   '@next/swc-darwin-arm64@14.1.0':
@@ -6910,28 +6922,28 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@nrwl/devkit@16.10.0(nx@16.10.0(@swc/core@1.7.23))':
+  '@nrwl/devkit@16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))':
     dependencies:
-      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23))
+      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
     transitivePeerDependencies:
       - nx
 
-  '@nrwl/tao@16.10.0(@swc/core@1.7.23)':
+  '@nrwl/tao@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))':
     dependencies:
-      nx: 16.10.0(@swc/core@1.7.23)
+      nx: 16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
       tslib: 2.6.3
     transitivePeerDependencies:
       - '@swc-node/register'
       - '@swc/core'
       - debug
 
-  '@nx/devkit@16.10.0(nx@16.10.0(@swc/core@1.7.23))':
+  '@nx/devkit@16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))':
     dependencies:
-      '@nrwl/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23))
+      '@nrwl/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       ejs: 3.1.9
       enquirer: 2.3.6
       ignore: 5.3.0
-      nx: 16.10.0(@swc/core@1.7.23)
+      nx: 16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
       semver: 7.5.3
       tmp: 0.2.1
       tslib: 2.6.3
@@ -9998,12 +10010,12 @@ snapshots:
 
   kolorist@1.8.0: {}
 
-  lerna@7.4.2(@swc/core@1.7.23)(encoding@0.1.13):
+  lerna@7.4.2(@swc/core@1.7.23(@swc/helpers@0.5.2))(encoding@0.1.13):
     dependencies:
       '@lerna/child-process': 7.4.2
-      '@lerna/create': 7.4.2(@swc/core@1.7.23)(encoding@0.1.13)(typescript@5.5.4)
+      '@lerna/create': 7.4.2(@swc/core@1.7.23(@swc/helpers@0.5.2))(encoding@0.1.13)(typescript@5.5.4)
       '@npmcli/run-script': 6.0.2
-      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23))
+      '@nx/devkit': 16.10.0(nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       '@octokit/plugin-enterprise-rest': 6.0.1
       '@octokit/rest': 19.0.11(encoding@0.1.13)
       byte-size: 8.1.1
@@ -10046,7 +10058,7 @@ snapshots:
       npm-packlist: 5.1.1
       npm-registry-fetch: 14.0.5
       npmlog: 6.0.2
-      nx: 16.10.0(@swc/core@1.7.23)
+      nx: 16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
       p-map: 4.0.0
       p-map-series: 2.1.0
       p-pipe: 3.1.0
@@ -11406,9 +11418,9 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nx@16.10.0(@swc/core@1.7.23):
+  nx@16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2)):
     dependencies:
-      '@nrwl/tao': 16.10.0(@swc/core@1.7.23)
+      '@nrwl/tao': 16.10.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
       '@parcel/watcher': 2.0.4
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.0-rc.46
@@ -11712,6 +11724,11 @@ snapshots:
   randombytes@2.1.0:
     dependencies:
       safe-buffer: 5.2.1
+
+  react-base-virtual-list@1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-color@2.19.3(react@18.3.1):
     dependencies:
@@ -12415,14 +12432,14 @@ snapshots:
 
   temp-dir@1.0.0: {}
 
-  terser-webpack-plugin@5.3.10(@swc/core@1.7.23)(webpack@5.94.0(@swc/core@1.7.23)):
+  terser-webpack-plugin@5.3.10(@swc/core@1.7.23(@swc/helpers@0.5.2))(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2))):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.31.6
-      webpack: 5.94.0(@swc/core@1.7.23)
+      webpack: 5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2))
     optionalDependencies:
       '@swc/core': 1.7.23(@swc/helpers@0.5.2)
 
@@ -12845,7 +12862,7 @@ snapshots:
 
   webpack-sources@3.2.3: {}
 
-  webpack@5.94.0(@swc/core@1.7.23):
+  webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2)):
     dependencies:
       '@types/estree': 1.0.5
       '@webassemblyjs/ast': 1.12.1
@@ -12867,7 +12884,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.7.23)(webpack@5.94.0(@swc/core@1.7.23))
+      terser-webpack-plugin: 5.3.10(@swc/core@1.7.23(@swc/helpers@0.5.2))(webpack@5.94.0(@swc/core@1.7.23(@swc/helpers@0.5.2)))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:

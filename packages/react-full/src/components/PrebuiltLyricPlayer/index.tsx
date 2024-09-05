@@ -24,6 +24,7 @@ import {
 	musicNameAtom,
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
+	musicQualityAtom,
 } from "../../states/music";
 import {
 	onClickControlThumbAtom,
@@ -45,6 +46,10 @@ import IconPlay from "./icon_play.svg?react";
 import { MediaButton } from "../MediaButton";
 import { AudioQualityTag } from "../AudioQualityTag";
 import classNames from "classnames";
+import {
+	lyricBackgroundFPSAtom,
+	lyricBackgroundRenderScaleAtom,
+} from "../../states/config";
 
 const PrebuiltMusicInfo: FC<{
 	className?: string;
@@ -113,6 +118,7 @@ function toDuration(duration: number) {
 const PrebuiltProgressBar: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const musicPosition = useAtomValue(musicPlayingPositionAtom);
+	const musicQuality = useAtomValue(musicQualityAtom);
 	const onSeekPosition = useAtomValue(onSeekPositionAtom).onEmit;
 
 	return (
@@ -128,7 +134,7 @@ const PrebuiltProgressBar: FC = () => {
 				<div>
 					<AudioQualityTag
 						className={styles.qualityTag}
-						quality={AudioQualityType.HiRes}
+						quality={musicQuality}
 					/>
 				</div>
 				<div>{toDuration((musicPosition - musicDuration) / 1000)}</div>
@@ -155,6 +161,10 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
 	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
+	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
+	const lyricBackgroundRenderScale = useAtomValue(
+		lyricBackgroundRenderScaleAtom,
+	);
 	const onClickControlThumb = useAtomValue(onClickControlThumbAtom).onEmit;
 
 	const coverElRef = useRef<HTMLElement>(null);
@@ -182,7 +192,8 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					album={musicCover}
 					albumIsVideo={musicCoverIsVideo}
 					lowFreqVolume={lowFreqVolume}
-					renderScale={1}
+					renderScale={lyricBackgroundRenderScale}
+					fps={lyricBackgroundFPS}
 					style={{
 						zIndex: -1,
 					}}

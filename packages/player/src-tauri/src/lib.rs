@@ -1,4 +1,5 @@
 use crate::server::AMLLWebSocketServer;
+use amll_player_core::AudioInfo;
 use base64::prelude::*;
 use serde::*;
 use std::{fs::File, net::SocketAddr, sync::Mutex};
@@ -41,8 +42,21 @@ pub struct MusicInfo {
     pub artist: String,
     pub album: String,
     pub lyric: String,
-    pub cover: String,
+    pub cover: Vec<u8>,
     pub duration: f64,
+}
+
+impl From<AudioInfo> for MusicInfo {
+    fn from(v: AudioInfo) -> Self {
+        Self {
+            name: v.name,
+            artist: v.artist,
+            album: v.album,
+            lyric: v.lyric,
+            cover: v.cover.unwrap_or_default(),
+            duration: v.duration,
+        }
+    }
 }
 
 #[tauri::command]
@@ -59,45 +73,7 @@ async fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, Strin
             )
             .map_err(|e| e.to_string())?;
 
-        let mut new_audio_info = MusicInfo::default();
-        let mut metadata = format_result.format.metadata();
-        metadata.skip_to_latest();
-
-        if let Some(metadata) = metadata.skip_to_latest() {
-            for tag in metadata.tags() {
-                match tag.std_key {
-                    Some(StandardTagKey::TrackTitle) => {
-                        new_audio_info.name = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Artist) => {
-                        new_audio_info.artist = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Album) => {
-                        new_audio_info.album = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Lyrics) => {
-                        new_audio_info.lyric = tag.value.to_string();
-                    }
-                    Some(_) | None => {}
-                }
-            }
-            for visual in metadata.visuals() {
-                if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
-                    new_audio_info.cover = BASE64_STANDARD.encode(&visual.data);
-                }
-            }
-        }
-
-        let track = format_result
-            .format
-            .default_track()
-            .ok_or_else(|| "无法解码正在加载的音频的默认音轨".to_string())?;
-        let timebase = track.codec_params.time_base.unwrap_or_default();
-        let duration = timebase.calc_time(track.codec_params.n_frames.unwrap_or_default());
-        let play_duration = duration.seconds as f64 + duration.frac;
-        new_audio_info.duration = play_duration;
-
-        Ok(new_audio_info)
+        Ok(amll_player_core::utils::read_audio_info(&mut format_result).into())
     })
     .await;
 

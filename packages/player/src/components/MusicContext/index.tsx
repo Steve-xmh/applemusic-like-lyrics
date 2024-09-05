@@ -17,6 +17,8 @@ import {
 	onRequestNextSongAtom,
 	onRequestPrevSongAtom,
 	onSeekPositionAtom,
+	AudioQualityType,
+	musicQualityAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { useStore } from "jotai";
 import { useEffect, type FC } from "react";
@@ -25,7 +27,9 @@ import {
 	emitAudioThread,
 	listenAudioThreadEvent,
 	type AudioInfo,
+	type AudioQuality,
 } from "../../utils/player";
+import { musicIdAtom } from "../../states";
 
 function useFFTToLowPass() {
 	const store = useStore();
@@ -130,7 +134,7 @@ export const MusicContext: FC = () => {
 		);
 		store.set(hideLyricViewAtom, true); // TODO: 暂无歌词
 		const syncMusicInfo = (musicInfo: AudioInfo) => {
-			console.log(musicInfo);
+			console.log("已设置音乐信息", musicInfo);
 			store.set(musicNameAtom, musicInfo.name);
 			store.set(musicAlbumNameAtom, musicInfo.album);
 			store.set(
@@ -158,9 +162,26 @@ export const MusicContext: FC = () => {
 				store.set(musicCoverAtom, imgUrl);
 				store.set(musicCoverIsVideoAtom, false);
 			} else {
-				store.set(musicCoverAtom, "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+				store.set(
+					musicCoverAtom,
+					"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+				);
 				store.set(musicCoverIsVideoAtom, false);
 			}
+		};
+		const syncMusicQuality = (quality: AudioQuality) => {
+			console.log("已设置音乐音质信息", quality);
+			let result = AudioQualityType.None;
+			if (quality.codec === "flac") {
+				result = AudioQualityType.Lossless;
+				if ((quality.sampleRate || 0) > 48000) {
+					result = AudioQualityType.HiRes;
+				}
+				if ((quality.channels || 0) > 2) {
+					result = AudioQualityType.DolbyAtmos;
+				}
+			}
+			store.set(musicQualityAtom, result);
 		};
 		const unlistenPromise = listenAudioThreadEvent((evt) => {
 			const evtData = evt.payload.data;
@@ -176,6 +197,8 @@ export const MusicContext: FC = () => {
 					break;
 				}
 				case "loadAudio": {
+					store.set(musicIdAtom, evtData.data.musicId);
+					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
 					break;
 				}
@@ -184,6 +207,8 @@ export const MusicContext: FC = () => {
 				}
 				case "syncStatus": {
 					store.set(musicPlayingAtom, evtData.data.isPlaying);
+					store.set(musicIdAtom, evtData.data.musicId);
+					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
 					break;
 				}

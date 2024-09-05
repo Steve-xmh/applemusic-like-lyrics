@@ -113,7 +113,7 @@ export const lyricBackgroundRendererAtom =
  * 性能影响情况：高
  */
 export const lyricBackgroundFPSAtom = atomWithStorage<
-	BackgroundRenderProps["fps"]
+	NonNullable<BackgroundRenderProps["fps"]>
 >("amll-react-full.lyricBackgroundFPSAtom", 60);
 
 /**
@@ -122,7 +122,7 @@ export const lyricBackgroundFPSAtom = atomWithStorage<
  * 性能影响情况：高
  */
 export const lyricBackgroundRenderScaleAtom = atomWithStorage<
-	BackgroundRenderProps["renderScale"]
+	NonNullable<BackgroundRenderProps["renderScale"]>
 >("amll-react-full.lyricBackgroundRenderScaleAtom", 1);
 
 /**
@@ -131,5 +131,5 @@ export const lyricBackgroundRenderScaleAtom = atomWithStorage<
  * 性能影响情况：中
  */
 export const lyricBackgroundStaticModeAtom = atomWithStorage<
-	BackgroundRenderProps["staticMode"]
+	NonNullable<BackgroundRenderProps["staticMode"]>
 >("amll-react-full.lyricBackgroundStaticModeAtom", false);

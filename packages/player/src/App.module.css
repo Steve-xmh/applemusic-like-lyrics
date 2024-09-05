@@ -1,7 +1,15 @@
+.body {
+    height: 100vh;
+    overflow: hidden;
+    --default-font-family: var(--amll-font-family);
+}
+
 .container {
     transition: scale 0.5s cubic-bezier(0.25, 1, 0.5, 1);
     scale: 1;
     box-sizing: border-box;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .body.amllOpened {

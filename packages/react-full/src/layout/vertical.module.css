@@ -93,12 +93,13 @@
 .smallControls {
     grid-row: controls;
     grid-column: info-side;
+    align-self: center;
 
     /* border: 1px solid yellow; */
-    transition: opacity 0.5s 0.5s;
+    transition: opacity 0.25s 0.25s;
     padding-left: 1em;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
     height: fit-content;
     z-index: 1;
     mix-blend-mode: plus-lighter;

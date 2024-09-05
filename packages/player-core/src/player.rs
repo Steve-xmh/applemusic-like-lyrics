@@ -24,6 +24,7 @@ use tokio::{
     task::{AbortHandle, JoinHandle},
 };
 use tracing::*;
+use utils::read_audio_info;
 
 use crate::*;
 
@@ -656,53 +657,8 @@ impl AudioPlayer {
             })
             .await?
             .context("无法解码正在加载的音频数据信息")?;
-        if let Some(metadata) = format_result.metadata.get() {
-            if let Some(rev) = metadata.current() {
-                for v in rev.vendor_data() {
-                    info!("音频文件的元数据：{} 大小 {}", v.ident, v.data.len());
-                }
-                for v in rev.visuals() {
-                    info!(
-                        "音频文件的视觉图数据：{:?} {:?} 大小 {}",
-                        v.usage,
-                        v.tags,
-                        v.data.len()
-                    );
-                }
-                for t in rev.tags() {
-                    info!("音频文件的标签数据：{} {:?}", t.key, t.value);
-                }
-            }
-        }
-        let mut new_audio_info = AudioInfo::default();
-        let mut metadata = format_result.format.metadata();
-        metadata.skip_to_latest();
 
-        if let Some(metadata) = metadata.skip_to_latest() {
-            for tag in metadata.tags() {
-                match tag.std_key {
-                    Some(StandardTagKey::TrackTitle) => {
-                        new_audio_info.name = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Artist) => {
-                        new_audio_info.artist = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Album) => {
-                        new_audio_info.album = tag.value.to_string();
-                    }
-                    Some(StandardTagKey::Lyrics) => {
-                        new_audio_info.lyric = tag.value.to_string();
-                    }
-                    Some(_) | None => {}
-                }
-            }
-            for visual in metadata.visuals() {
-                if visual.usage == Some(symphonia::core::meta::StandardVisualKey::FrontCover) {
-                    new_audio_info.cover_media_type = visual.media_type.clone();
-                    new_audio_info.cover = Some(visual.data.to_vec());
-                }
-            }
-        }
+        let mut new_audio_info = read_audio_info(&mut format_result);
 
         let track = format_result
             .format

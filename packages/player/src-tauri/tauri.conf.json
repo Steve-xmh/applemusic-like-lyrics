@@ -1,8 +1,8 @@
 {
 	"$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
 	"build": {
-		"beforeDevCommand": "yarn dev --host",
-		"beforeBuildCommand": "yarn build:dev",
+		"beforeDevCommand": "pnpm dev --host",
+		"beforeBuildCommand": "pnpm build",
 		"frontendDist": "../dist",
 		"devUrl": "http://localhost:1420"
 	},

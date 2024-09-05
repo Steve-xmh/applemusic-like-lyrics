@@ -154,7 +154,6 @@ async function initAudioThread() {
 	await listen<AudioThreadEventMessage<AudioThreadEvent>>(
 		"audio_player_msg",
 		(evt) => {
-			// console.trace("收到后台线程消息", evt.payload);
 			const resolve = msgTasks.get(evt.payload.callbackId);
 			if (resolve) {
 				msgTasks.delete(evt.payload.callbackId);
@@ -177,7 +176,7 @@ export async function readLocalMusicMetadata(filePath: string): Promise<{
 	artist: string;
 	album: string;
 	lyric: string;
-	cover: string;
+	cover: number[];
 	duration: number;
 }> {
 	return await invoke("read_local_music_metadata", { filePath });
@@ -213,7 +212,7 @@ export function emitAudioThreadRet<
 	msgType: T,
 	data: Omit<AudioThreadMessage, "type" | "callbackId"> = {},
 ): Promise<unknown> {
-	const id = uid(32) + Date.now();
+	const id = `${uid(32)}-${Date.now()}`;
 	return new Promise((resolve) => {
 		msgTasks.set(id, resolve);
 		invoke("local_player_send_msg", {

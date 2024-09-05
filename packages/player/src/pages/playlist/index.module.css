@@ -1,0 +1,14 @@
+.playlist {
+    height: 100vh;
+    padding-bottom: var(--spacing-8);
+}
+
+.playlist > * {
+    margin: 0 auto;
+    padding: 0 var(--spacing-4);
+    max-width: var(--container-4);
+}
+
+.playlist > *:last-child> *:last-child {
+    margin-bottom: var(--spacing-8);
+}

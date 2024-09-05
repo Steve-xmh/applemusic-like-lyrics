@@ -7,6 +7,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"build:dev": "vite build --mode dev",
+		"fmt": "biome format --write ./src",
 		"preview": "vite preview",
 		"tauri": "tauri",
     	"preinstall": "npx only-allow pnpm"
@@ -30,6 +31,7 @@
 		"jotai": "^2.9.3",
 		"md5": "^2.3.0",
 		"react": "^18.2.0",
+		"react-base-virtual-list": "^1.0.1",
 		"react-dom": "^18.2.0",
 		"react-error-boundary": "^4.0.11",
 		"react-i18next": "^15.0.1",

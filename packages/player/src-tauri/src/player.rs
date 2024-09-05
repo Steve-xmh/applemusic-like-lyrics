@@ -1,7 +1,6 @@
 use amll_player_core::*;
 use async_std::sync::RwLock;
-use tauri::{Emitter, Runtime};
-use tracing::info;
+use tauri::{Emitter, Manager, Runtime};
 
 static PLAYER_HANDLER: RwLock<Option<AudioPlayerHandle>> = RwLock::new(None);
 
@@ -12,19 +11,21 @@ pub async fn local_player_send_msg(msg: AudioThreadEventMessage<AudioThreadMessa
     }
 }
 
-async fn local_player_main<R: Runtime>(emitter: impl Emitter<R> + Send + 'static) {
+async fn local_player_main<R: Runtime>(emitter: impl Manager<R> + Send + 'static) {
     let player = AudioPlayer::new();
     let handler = player.handler();
     PLAYER_HANDLER.write().await.replace(handler);
 
     player
         .run(move |evt| {
-            let _ = emitter.emit("audio_player_msg", evt);
+            for (_name, win) in emitter.webview_windows() {
+                let _ = win.emit("audio_player_msg", evt.to_owned());
+            }
         })
         .await;
 }
 
-pub fn init_local_player<R: Runtime>(emitter: impl Emitter<R> + Send + 'static) {
+pub fn init_local_player<R: Runtime>(emitter: impl Manager<R> + Send + 'static) {
     std::thread::spawn(|| {
         tokio::runtime::Runtime::new()
             .unwrap()
