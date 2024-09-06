@@ -15,6 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+      - name: 安装 PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
       - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@stable
       - name: 安装 wasm-pack
@@ -29,10 +39,6 @@ jobs:
         if: matrix.platform == 'macos-latest'
         with:
           version: "15"
-      - name: 配置 NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
       - name: 安装 Tauri 所需系统依赖（仅 Linux）
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -40,7 +46,6 @@ jobs:
           sudo apt-get install -y libasound2-dev libappindicator3-dev libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - name: 构建 AMLL 包
         run: |
-          npm i -g pnpm
           pnpm i
           pnpm lerna run build --scope player
         env:
