@@ -23,12 +23,12 @@ jobs:
           version: latest
       - name: 安装 wasm32 目标
         run: rustup target add wasm32-unknown-unknown
-      # # macOS 自带的 Xcode LLVM 不支持 WASM 目标
-      # - name: "macOS: 安装 LLVM 和 Clang"
-      #   uses: KyleMayes/install-llvm-action@v1
-      #   if: matrix.platform == 'macos-latest'
-      #   with:
-      #     version: "14"
+      # macOS 自带的 Xcode LLVM 不支持 WASM 目标
+      - name: "macOS: 安装 LLVM 和 Clang"
+        uses: KyleMayes/install-llvm-action@v2
+        if: matrix.platform == 'macos-latest'
+        with:
+          version: "15"
       - name: 配置 NodeJS
         uses: actions/setup-node@v3
         with:
@@ -37,7 +37,7 @@ jobs:
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libappindicator3-dev libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libasound2-dev libappindicator3-dev libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - name: 构建 AMLL 包
         run: |
           npm i -g pnpm
