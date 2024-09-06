@@ -500,6 +500,9 @@ importers:
       '@applemusic-like-lyrics/react':
         specifier: workspace:^
         version: link:../react
+      '@ungap/structured-clone':
+        specifier: ^1.2.0
+        version: 1.2.0
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -540,6 +543,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.7
         version: 18.3.0
+      '@types/ungap__structured-clone':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.4.3(@types/node@20.16.5)(lightningcss@1.26.0)(sass@1.78.0)(terser@5.31.6))
@@ -2514,6 +2520,9 @@ packages:
 
   '@types/stats.js@0.17.3':
     resolution: {integrity: sha512-pXNfAD3KHOdif9EQXZ9deK82HVNaXP5ZIF5RP2QG6OQFNTaY2YIetfrE9t528vEreGQvEPRDDc8muaoYeK0SxQ==}
+
+  '@types/ungap__structured-clone@1.2.0':
+    resolution: {integrity: sha512-ZoaihZNLeZSxESbk9PUAPZOlSpcKx81I1+4emtULDVmBLkYutTcMlCj2K9VNlf9EWODxdO6gkAqEaLorXwZQVA==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -8346,6 +8355,8 @@ snapshots:
   '@types/sortablejs@1.15.8': {}
 
   '@types/stats.js@0.17.3': {}
+
+  '@types/ungap__structured-clone@1.2.0': {}
 
   '@types/unist@2.0.11': {}
 

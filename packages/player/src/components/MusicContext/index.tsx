@@ -1,4 +1,11 @@
-import { parseTTML } from "@applemusic-like-lyrics/lyric";
+import {
+	parseEslrc,
+	parseLrc,
+	parseLys,
+	parseQrc,
+	parseTTML,
+	parseYrc,
+} from "@applemusic-like-lyrics/lyric";
 import {
 	AudioQualityType,
 	fftDataAtom,
@@ -110,6 +117,7 @@ const FFTToLowPassContext: FC = () => {
 const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
 	const setLyricLines = useSetAtom(musicLyricLinesAtom);
+	const setHideLyricView = useSetAtom(hideLyricViewAtom);
 	const song = useLiveQuery(() => db.songs.get(musicId), [musicId]);
 
 	useEffect(() => {
@@ -117,23 +125,62 @@ const LyricContext: FC = () => {
 			console.log("正在检查歌词", song.id, song.lyricFormat);
 			try {
 				switch (song.lyricFormat) {
+					case "lrc": {
+						const lyric = parseLrc(song.lyric);
+						console.log("解析出 LyRiC 歌词", lyric);
+						setLyricLines(lyric);
+						setHideLyricView(false);
+						break;
+					}
+					case "eslrc": {
+						const lyric = parseEslrc(song.lyric);
+						console.log("解析出 ESLyRiC 歌词", lyric);
+						setLyricLines(lyric);
+						setHideLyricView(false);
+						break;
+					}
+					case "yrc": {
+						const lyric = parseYrc(song.lyric);
+						console.log("解析出 YRC 歌词", lyric);
+						setLyricLines(lyric);
+						setHideLyricView(false);
+						break;
+					}
+					case "qrc": {
+						const lyric = parseQrc(song.lyric);
+						console.log("解析出 QRC 歌词", lyric);
+						setLyricLines(lyric);
+						setHideLyricView(false);
+						break;
+					}
+					case "lys": {
+						const lyric = parseLys(song.lyric);
+						console.log("解析出 Lyricify Syllable 歌词", lyric);
+						setLyricLines(lyric);
+						setHideLyricView(false);
+						break;
+					}
 					case "ttml": {
 						const lyric = parseTTML(song.lyric);
 						console.log("解析出 TTML 歌词", lyric);
 						setLyricLines(lyric.lines);
+						setHideLyricView(false);
 						break;
 					}
 					default:
 						setLyricLines([]);
+						setHideLyricView(true);
 				}
 			} catch (e) {
 				console.warn("解析歌词时出现错误", e);
 				setLyricLines([]);
+				setHideLyricView(true);
 			}
 		} else {
 			setLyricLines([]);
+			setHideLyricView(true);
 		}
-	}, [song, setLyricLines]);
+	}, [song, setLyricLines, setHideLyricView]);
 
 	return null;
 };
@@ -167,8 +214,10 @@ export const MusicContext: FC = () => {
 				});
 			}),
 		);
-		store.set(hideLyricViewAtom, true); // TODO: 暂无歌词
-		const syncMusicInfo = (musicInfo: AudioInfo) => {
+		const syncMusicInfo = (
+			musicInfo: AudioInfo,
+			musicId = store.get(musicIdAtom),
+		) => {
 			console.log("已设置音乐信息", musicInfo);
 			store.set(musicNameAtom, musicInfo.name);
 			store.set(musicAlbumNameAtom, musicInfo.album);
@@ -181,28 +230,43 @@ export const MusicContext: FC = () => {
 			);
 			store.set(musicPlayingPositionAtom, (musicInfo.position * 1000) | 0);
 			store.set(musicDurationAtom, (musicInfo.duration * 1000) | 0);
-			if (musicInfo.cover) {
-				const imgBlob = new Blob([new Uint8Array(musicInfo.cover)], {
-					type: "image",
-				});
-				const imgUrl = URL.createObjectURL(imgBlob);
-				try {
-					const oldUrl = store.get(musicCoverAtom);
-					if (oldUrl.startsWith("blob:")) {
-						URL.revokeObjectURL(oldUrl);
+
+			db.songs.get(musicId).then((song) => {
+				if (song) {
+					const imgUrl = URL.createObjectURL(song.cover);
+					try {
+						const oldUrl = store.get(musicCoverAtom);
+						if (oldUrl.startsWith("blob:")) {
+							URL.revokeObjectURL(oldUrl);
+						}
+					} catch (e) {
+						console.warn(e);
 					}
-				} catch (e) {
-					console.warn(e);
+					store.set(musicCoverAtom, imgUrl);
+					store.set(musicCoverIsVideoAtom, false);
+				} else if (musicInfo.cover) {
+					const imgBlob = new Blob([new Uint8Array(musicInfo.cover)], {
+						type: "image",
+					});
+					const imgUrl = URL.createObjectURL(imgBlob);
+					try {
+						const oldUrl = store.get(musicCoverAtom);
+						if (oldUrl.startsWith("blob:")) {
+							URL.revokeObjectURL(oldUrl);
+						}
+					} catch (e) {
+						console.warn(e);
+					}
+					store.set(musicCoverAtom, imgUrl);
+					store.set(musicCoverIsVideoAtom, false);
+				} else {
+					store.set(
+						musicCoverAtom,
+						"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+					);
+					store.set(musicCoverIsVideoAtom, false);
 				}
-				store.set(musicCoverAtom, imgUrl);
-				store.set(musicCoverIsVideoAtom, false);
-			} else {
-				store.set(
-					musicCoverAtom,
-					"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-				);
-				store.set(musicCoverIsVideoAtom, false);
-			}
+			});
 		};
 		const syncMusicId = (musicId: string) => {
 			if (musicId.startsWith("local:")) {

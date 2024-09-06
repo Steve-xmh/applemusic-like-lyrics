@@ -115,12 +115,12 @@ export interface LyricLine {
 	 * 该行是否为背景歌词行
 	 * 此选项只有作为 Lyricify Syllable 文件格式导入导出时才有意义
 	 */
-	isBG?: boolean;
+	isBG: boolean;
 	/**
 	 * 该行是否为对唱歌词行（即歌词行靠右对齐）
 	 * 此选项只有作为 Lyricify Syllable 文件格式导入导出时才有意义
 	 */
-	isDuet?: boolean;
+	isDuet: boolean;
 	/**
 	 * 该行的开始时间
 	 *

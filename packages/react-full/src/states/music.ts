@@ -3,9 +3,9 @@
  * 所有有关 PrebuiltLyricPlayer 组件中开发者需要在预设歌词组件中根据当前播放内容实时更新的状态都在这里
  */
 
+import type { LyricLine } from "@applemusic-like-lyrics/core";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import type { LyricLine } from "@applemusic-like-lyrics/core";
 
 export interface ArtistStateEntry {
 	name: string;
@@ -76,7 +76,10 @@ export const musicLyricLinesAtom = atom<LyricLine[]>([]);
 /**
  * 是否隐藏歌词视图
  */
-export const hideLyricViewAtom = atom(false);
+export const hideLyricViewAtom = atomWithStorage(
+	"amll-react-full.hideLyricViewAtom",
+	false,
+);
 /**
  * 用于音频可视化频谱图的数据
  * 如需呈现背景跳动效果，请设置 lowFreqVolumeAtom 的值

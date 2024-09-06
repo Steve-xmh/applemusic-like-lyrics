@@ -1,43 +1,24 @@
 import {
+	MeshGradientRenderer,
+	PixiRenderer,
+} from "@applemusic-like-lyrics/core";
+import {
 	PrebuiltLyricPlayer,
-	hideLyricViewAtom,
 	isLyricPageOpenedAtom,
+	lyricBackgroundRendererAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ContextMenu } from "@radix-ui/themes";
 import classnames from "classnames";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { type FC, useLayoutEffect } from "react";
-import { router } from "../../router";
-import { musicIdAtom } from "../../states";
+import { backgroundRendererAtom } from "../../states";
+import { AMLLContextMenuContent } from "../AMLLContextMenu";
 import styles from "./index.module.css";
-
-const AMLLContextMenuContent: FC = () => {
-	const [hideLyricView, setHideLyricView] = useAtom(hideLyricViewAtom);
-	const setLyricPageOpened = useSetAtom(isLyricPageOpenedAtom);
-	const musicId = useAtomValue(musicIdAtom);
-
-	return (
-		<ContextMenu.Content>
-			<ContextMenu.CheckboxItem
-				checked={!hideLyricView}
-				onCheckedChange={(e) => setHideLyricView(!e)}
-			>
-				显示歌词
-			</ContextMenu.CheckboxItem>
-			<ContextMenu.Item
-				onClick={() => {
-					setLyricPageOpened(false);
-					router.navigate(`/song/${musicId}`);
-				}}
-			>
-				编辑歌曲覆盖信息
-			</ContextMenu.Item>
-		</ContextMenu.Content>
-	);
-};
 
 export const AMLLWrapper: FC = () => {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
+	const backgroundRenderer = useAtomValue(backgroundRendererAtom);
+	const setBackgroundRenderer = useSetAtom(lyricBackgroundRendererAtom);
 
 	useLayoutEffect(() => {
 		if (isLyricPageOpened) {
@@ -46,6 +27,21 @@ export const AMLLWrapper: FC = () => {
 			delete document.body.dataset.amllLyricsOpen;
 		}
 	}, [isLyricPageOpened]);
+
+	useLayoutEffect(() => {
+		switch (backgroundRenderer) {
+			case "pixi":
+				setBackgroundRenderer({
+					renderer: PixiRenderer,
+				});
+				break;
+			default:
+				setBackgroundRenderer({
+					renderer: MeshGradientRenderer,
+				});
+				break;
+		}
+	}, [backgroundRenderer, setBackgroundRenderer]);
 
 	return (
 		<ContextMenu.Root>

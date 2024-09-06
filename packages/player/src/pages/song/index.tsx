@@ -25,6 +25,7 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../../dexie";
+import { readLocalMusicMetadata } from "../../utils/player";
 import { useSongCover } from "../../utils/use-song-cover";
 
 const Option: FC<
@@ -87,6 +88,42 @@ export const SongPage: FC = () => {
 			song.lyric = lyricContent;
 		});
 	}, [song, songName, songArtists, songAlbum, lyricFormat, lyricContent]);
+
+	const uploadCover = useCallback(() => {
+		if (song === undefined) return;
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = "image/*";
+		input.onchange = async () => {
+			const file = input.files?.[0];
+			if (file === undefined) return;
+			db.songs.update(song, (song) => {
+				song.cover = file;
+			});
+		};
+		input.click();
+	}, [song]);
+
+	const readMetadataFromFile = useCallback(async () => {
+		if (song === undefined) return;
+		const newInfo = await readLocalMusicMetadata(song.filePath);
+
+		db.songs.update(song.id, (song) => {
+			song.songName = newInfo.name;
+			song.songAlbum = newInfo.album;
+			song.songArtists = newInfo.artist;
+			if (newInfo.lyric) {
+				song.lyricFormat = "lrc";
+				song.lyric = newInfo.lyric;
+			}
+			if (newInfo.cover) {
+				const coverData = new Uint8Array(newInfo.cover);
+				const coverBlob = new Blob([coverData], { type: "image" });
+
+				song.cover = coverBlob;
+			}
+		});
+	}, [song]);
 
 	return (
 		<Container
@@ -167,7 +204,33 @@ export const SongPage: FC = () => {
 								onChange={(v) => setSongAlbum(v.currentTarget.value)}
 							/>
 						</Flex>
-						<Button mt="4" onClick={saveData}>
+						<Button
+							mt="4"
+							style={{
+								display: "block",
+							}}
+							variant="soft"
+							onClick={uploadCover}
+						>
+							更换封面图
+						</Button>
+						<Button
+							mt="4"
+							style={{
+								display: "block",
+							}}
+							variant="soft"
+							onClick={readMetadataFromFile}
+						>
+							重新从文件中读取元数据
+						</Button>
+						<Button
+							mt="4"
+							style={{
+								display: "block",
+							}}
+							onClick={saveData}
+						>
 							保存
 						</Button>
 					</Tabs.Content>
@@ -182,6 +245,7 @@ export const SongPage: FC = () => {
 									<Select.Content>
 										<Select.Item value="none">无歌词</Select.Item>
 										<Select.Item value="lrc">LyRiC 歌词</Select.Item>
+										<Select.Item value="eslrc">ESLyRiC 歌词</Select.Item>
 										<Select.Item value="yrc">YRC 歌词</Select.Item>
 										<Select.Item value="qrc">QRC 歌词</Select.Item>
 										<Select.Item value="lys">

@@ -35,21 +35,6 @@ export class LyricLineMouseEvent extends MouseEvent {
 
 export type LyricLineMouseEventListener = (evt: LyricLineMouseEvent) => void;
 
-const waitFrame = (frameTime = 1) => {
-	return new Promise<void>((resolve) => {
-		let h = 0;
-		let ft = frameTime;
-		const onCB = () => {
-			if (--ft <= 0) {
-				resolve();
-			} else {
-				h = requestAnimationFrame(onCB);
-			}
-		};
-		h = requestAnimationFrame(onCB);
-	});
-};
-
 /**
  * 歌词播放组件，本框架的核心组件
  *
@@ -79,11 +64,14 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private hidePassedLines = false;
 	private debounceCalcLayout = debounceFrame(async () => {
 		this.calcLayout(true, true);
-		for (const hotLine of this.hotLines) {
-			const el = this.lyricLinesEl[hotLine];
-			el.enable(this.currentTime);
-		}
-	}, 2);
+		this.lyricLinesEl.forEach((el, i) => {
+			el.markMaskImageDirty().then(() => {
+				if (this.hotLines.has(i)) {
+					el.enable(this.currentTime);
+				}
+			});
+		});
+	}, 5);
 	private resizeObserver: ResizeObserver = new ResizeObserver(
 		debounceFrame(
 			((e) => {
@@ -102,6 +90,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				this.innerSize[0] = innerWidth;
 				this.innerSize[1] = innerHeight;
 				this.rebuildStyle();
+				this.lyricLinesEl.forEach((el, i) => {
+					el.markMaskImageDirty().then(() => {
+						if (this.hotLines.has(i)) {
+							el.enable(this.currentTime);
+						}
+					});
+				});
 				for (const el of this.lyricLinesEl) {
 					el.markMaskImageDirty();
 				}
@@ -781,7 +776,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				delay,
 				currentAbove,
 			);
-			// console.log(i, el._getDebugTargetPos());
 			if (line.isBG && isActive) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
 			} else if (!line.isBG) {
@@ -874,7 +868,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		// 如果当前所有缓冲行都将被删除且有新热行加入，则删除所有缓冲行并加入新热行作为缓冲行，然后修改当前滚动位置
 		this.initializeSeeking = isSeek;
 		this.currentTime = time;
-		// console.log(Math.abs(this.currentTime - this.lastCurrentTime));
 		if (Math.abs(this.currentTime - this.lastCurrentTime) >= 100) {
 			this.initializeSeeking = true;
 		} else this.initializeSeeking = false;
@@ -960,35 +953,24 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			}
 			this.calcLayout(true);
 		} else if (removedIds.size > 0 || addedIds.size > 0) {
-			// function debugLog() {
-			// 	console.groupCollapsed("setCurrentTime", time);
-			// 	console.log("removedIds", removedIds);
-			// 	console.log("addedIds", addedIds);
-			// 	console.groupEnd();
-			// }
 			if (removedIds.size === 0 && addedIds.size > 0) {
-				// debugLog();
 				for (const v of addedIds) {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable(time);
 				}
 				this.scrollToIndex = Math.min(...this.bufferedLines);
-				console.log("时间更新，触发重排", time);
 				this.calcLayout();
 			} else if (addedIds.size === 0 && removedIds.size > 0) {
 				if (eqSet(removedIds, this.bufferedLines)) {
-					// debugLog();
 					for (const v of this.bufferedLines) {
 						if (!this.hotLines.has(v)) {
 							this.bufferedLines.delete(v);
 							this.lyricLinesEl[v].disable(time);
 						}
 					}
-					console.log("时间更新，触发重排", time);
 					this.calcLayout();
 				}
 			} else {
-				// debugLog();
 				for (const v of addedIds) {
 					this.bufferedLines.add(v);
 					this.lyricLinesEl[v].enable(time);
@@ -999,7 +981,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 				if (this.bufferedLines.size > 0)
 					this.scrollToIndex = Math.min(...this.bufferedLines);
-				console.log("时间更新，触发重排", time);
 				this.calcLayout();
 			}
 		}

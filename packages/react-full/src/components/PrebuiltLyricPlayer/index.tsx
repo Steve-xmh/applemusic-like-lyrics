@@ -5,11 +5,13 @@
 
 import "@applemusic-like-lyrics/core/style.css";
 import { BackgroundRender, LyricPlayer } from "@applemusic-like-lyrics/react";
+import structuredClone from "@ungap/structured-clone";
 import { useAtomValue } from "jotai";
 import {
 	type FC,
 	type HTMLProps,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -47,8 +49,16 @@ import styles from "./index.module.css";
 
 import classNames from "classnames";
 import {
+	enableLyricLineBlurEffectAtom,
+	enableLyricLineScaleEffectAtom,
+	enableLyricLineSpringAnimationAtom,
+	enableLyricRomanLineAtom,
+	enableLyricSwapTransRomanLineAtom,
+	enableLyricTranslationLineAtom,
 	lyricBackgroundFPSAtom,
 	lyricBackgroundRenderScaleAtom,
+	lyricBackgroundRendererAtom,
+	lyricWordFadeWidthAtom,
 } from "../../states/config";
 import { toDuration } from "../../utils";
 import { AudioQualityTag } from "../AudioQualityTag";
@@ -139,6 +149,80 @@ const PrebuiltProgressBar: FC = () => {
 	);
 };
 
+const PrebuiltCoreLyricPlayer: FC<{
+	alignPosition: number;
+	alignAnchor: "center" | "bottom" | "top";
+}> = ({ alignPosition, alignAnchor }) => {
+	const musicIsPlaying = useAtomValue(musicPlayingAtom);
+	const lyricLines = useAtomValue(musicLyricLinesAtom);
+	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
+	const musicPlayingPosition = useAtomValue(musicPlayingPositionAtom);
+
+	const enableLyricLineBlurEffect = useAtomValue(enableLyricLineBlurEffectAtom);
+	const enableLyricLineScaleEffect = useAtomValue(
+		enableLyricLineScaleEffectAtom,
+	);
+	const enableLyricLineSpringAnimation = useAtomValue(
+		enableLyricLineSpringAnimationAtom,
+	);
+	const lyricWordFadeWidth = useAtomValue(lyricWordFadeWidthAtom);
+	const enableLyricTranslationLine = useAtomValue(
+		enableLyricTranslationLineAtom,
+	);
+	const enableLyricRomanLine = useAtomValue(enableLyricRomanLineAtom);
+	const enableLyricSwapTransRomanLine = useAtomValue(
+		enableLyricSwapTransRomanLineAtom,
+	);
+
+	const processedLyricLines = useMemo(() => {
+		const processed = structuredClone(lyricLines);
+		if (!enableLyricTranslationLine) {
+			for (const line of processed) {
+				line.translatedLyric = "";
+			}
+		}
+		if (!enableLyricRomanLine) {
+			for (const line of processed) {
+				line.romanLyric = "";
+			}
+		}
+		if (enableLyricSwapTransRomanLine) {
+			for (const line of processed) {
+				[line.translatedLyric, line.romanLyric] = [
+					line.romanLyric,
+					line.translatedLyric,
+				];
+			}
+		}
+		return processed;
+	}, [
+		lyricLines,
+		enableLyricTranslationLine,
+		enableLyricRomanLine,
+		enableLyricSwapTransRomanLine,
+	]);
+
+	return (
+		<LyricPlayer
+			style={{
+				width: "100%",
+				height: "100%",
+				fontWeight: "var(--amll-lyric-font-weight, 500)",
+			}}
+			playing={musicIsPlaying}
+			disabled={!isLyricPageOpened}
+			alignPosition={alignPosition}
+			alignAnchor={alignAnchor}
+			currentTime={musicPlayingPosition}
+			lyricLines={processedLyricLines}
+			enableBlur={enableLyricLineBlurEffect}
+			enableScale={enableLyricLineScaleEffect}
+			enableSpring={enableLyricLineSpringAnimation}
+			wordFadeWidth={lyricWordFadeWidth}
+		/>
+	);
+};
+
 const PrebuiltVolumeControl: FC<{
 	style?: React.CSSProperties;
 }> = ({ style }) => {
@@ -152,9 +236,6 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	className,
 	...rest
 }) => {
-	const musicPlayingPosition = useAtomValue(musicPlayingPositionAtom);
-	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
-	const lyricLines = useAtomValue(musicLyricLinesAtom);
 	const hideVerticalLyricView = useAtomValue(hideLyricViewAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
@@ -172,6 +253,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	);
 	const coverElRef = useRef<HTMLElement>(null);
 	const layoutRef = useRef<HTMLDivElement>(null);
+	const backgroundRenderer = useAtomValue(lyricBackgroundRendererAtom);
 
 	useLayoutEffect(() => {
 		// 如果是水平布局，则让歌词对齐到封面的中心
@@ -224,6 +306,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					lowFreqVolume={lowFreqVolume}
 					renderScale={lyricBackgroundRenderScale}
 					fps={lyricBackgroundFPS}
+					renderer={backgroundRenderer.renderer}
 					style={{
 						zIndex: -1,
 					}}
@@ -258,18 +341,9 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				</>
 			}
 			lyricSlot={
-				<LyricPlayer
-					style={{
-						width: "100%",
-						height: "100%",
-						fontWeight: "var(--amll-lyric-font-weight, 500)",
-					}}
-					playing={musicIsPlaying}
-					disabled={!isLyricPageOpened}
+				<PrebuiltCoreLyricPlayer
 					alignPosition={alignPosition}
 					alignAnchor={alignAnchor}
-					currentTime={musicPlayingPosition}
-					lyricLines={lyricLines}
 				/>
 			}
 			hideLyric={hideVerticalLyricView}

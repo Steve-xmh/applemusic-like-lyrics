@@ -300,7 +300,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const topDifference = Math.abs(rect1.top - rect2.top);
 
 			// 如果顶部距离相差很小，可以认为它们在同一行上
-			// console.log(word1.word, word2.word, topDifference);
 			return topDifference < 10;
 		}
 
@@ -309,10 +308,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 
 	private isEnabled = false;
 	private hasFaded = false;
-	enable(maskAnimationTime = this.lyricLine.startTime) {
+	async enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
 		this.hasFaded = false;
 		this.element.classList.add(styles.active);
+		await this.waitMaskImageUpdated();
 		const main = this.element.children[0] as HTMLDivElement;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
@@ -840,10 +840,24 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		);
 	}
 	private maskImageDirty = false;
-	markMaskImageDirty() {
+	private markImageDirtyPromises: (() => void)[] = [];
+	markMaskImageDirty(): Promise<void> {
 		this.maskImageDirty = true;
+		return new Promise((resolve) => {
+			this.markImageDirtyPromises.push(resolve);
+		});
+	}
+	waitMaskImageUpdated(): Promise<void> {
+		if (this.maskImageDirty) {
+			return new Promise((resolve) => {
+				this.markImageDirtyPromises.push(resolve);
+			});
+		}
+		return Promise.resolve();
 	}
 	async updateMaskImage() {
+		const resolves = this.markImageDirtyPromises;
+		this.markImageDirtyPromises = [];
 		this.maskImageDirty = false;
 		if (this._hide) {
 			await mutate(() => {
@@ -881,6 +895,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				this.element.style.display = "none";
 				this.element.style.visibility = "";
 			});
+		}
+		for (const resolve of resolves) {
+			resolve();
 		}
 	}
 	private generateCalcBasedMaskImage() {

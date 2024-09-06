@@ -4,10 +4,10 @@
  * 如无特殊注明，此处所有配置均会被存储在 localStorage 中
  */
 
-import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { MeshGradientRenderer } from "@applemusic-like-lyrics/core";
 import type { BackgroundRenderProps } from "@applemusic-like-lyrics/react";
+import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
 // ======================== 歌词效果配置 ========================
 
@@ -78,7 +78,7 @@ export const enableLyricSwapTransRomanLineAtom = atomWithStorage(
  *
  * 性能影响情况：无
  */
-export const lyricWordFadeWidth = atomWithStorage(
+export const lyricWordFadeWidthAtom = atomWithStorage(
 	"amll-react-full.lyricWordFadeWidth",
 	0.5,
 );
@@ -104,8 +104,11 @@ export const globalLyricTimelineOffsetAtom = atomWithStorage(
  *
  * 性能影响情况：高
  */
-export const lyricBackgroundRendererAtom =
-	atom<BackgroundRenderProps["renderer"]>(MeshGradientRenderer);
+export const lyricBackgroundRendererAtom = atom<{
+	renderer: BackgroundRenderProps["renderer"];
+}>({
+	renderer: MeshGradientRenderer,
+});
 
 /**
  * 调节背景的最大帧率，默认 60
