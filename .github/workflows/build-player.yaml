@@ -10,6 +10,17 @@ jobs:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-22.04, windows-latest]
+        include:
+          - platform: macos-latest # arm64 二进制包
+            args: '--target aarch64-apple-darwin'
+          - platform: macos-latest # x86 二进制包
+            args: '--target x86_64-apple-darwin'
+          - platform: macos-latest # 通用二进制包
+            args: '--target universal-apple-darwin'
+          - platform: ubuntu-22.04
+            args: ''
+          - platform: windows-latest
+            args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -27,6 +38,8 @@ jobs:
           cache: pnpm
       - name: 安装 Rust 工具链
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
       - name: 安装 wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
         with:
