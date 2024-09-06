@@ -66,13 +66,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libappindicator3-dev libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: 构建 AMLL 包
+      - name: 构建 AMLL Full React 包
         run: |
           pnpm i
-          pnpm lerna run build --scope player
+          pnpm lerna run build --scope @applemusic-like-lyrics/react-full
         env:
           AMLL_GITHUB_IS_ACTION: true
-      - name: 构建 Tauri 程序
+      - name: 构建 AMLL Player 程序
         uses: tauri-apps/tauri-action@v0
         with:
           projectPath: packages/player
