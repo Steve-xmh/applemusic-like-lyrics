@@ -5,13 +5,14 @@
  */
 
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
-import { eqSet } from "../utils/eq-set";
-import { SpringParams } from "../utils/spring";
-import { BottomLineEl } from "./bottom-line";
-import { InterludeDots } from "./interlude-dots";
-import { LyricLineEl, RawLyricLineMouseEvent } from "./lyric-line";
 import "../styles/index.css";
 import styles from "../styles/lyric-player.module.css";
+import { debounceFrame } from "../utils/debounce";
+import { eqSet } from "../utils/eq-set";
+import type { SpringParams } from "../utils/spring";
+import { BottomLineEl } from "./bottom-line";
+import { InterludeDots } from "./interlude-dots";
+import { LyricLineEl, type RawLyricLineMouseEvent } from "./lyric-line";
 
 /**
  * 歌词行鼠标相关事件，可以获取到歌词行的索引和歌词行元素
@@ -32,9 +33,22 @@ export class LyricLineMouseEvent extends MouseEvent {
 	}
 }
 
-export interface LyricLineMouseEventListener {
-	(evt: LyricLineMouseEvent): void;
-}
+export type LyricLineMouseEventListener = (evt: LyricLineMouseEvent) => void;
+
+const waitFrame = (frameTime = 1) => {
+	return new Promise<void>((resolve) => {
+		let h = 0;
+		let ft = frameTime;
+		const onCB = () => {
+			if (--ft <= 0) {
+				resolve();
+			} else {
+				h = requestAnimationFrame(onCB);
+			}
+		};
+		h = requestAnimationFrame(onCB);
+	});
+};
 
 /**
  * 歌词播放组件，本框架的核心组件
@@ -63,27 +77,39 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	private invokedByScrollEvent = false;
 	private scrollOffset = 0;
 	private hidePassedLines = false;
-	private resizeObserver: ResizeObserver = new ResizeObserver((e) => {
-		const rect = e[0].contentRect;
-		this.size[0] = rect.width;
-		this.size[1] = rect.height;
-		const styles = getComputedStyle(e[0].target);
-		const innerWidth =
-			this.element.clientWidth -
-			parseFloat(styles.paddingLeft) -
-			parseFloat(styles.paddingRight);
-		const innerHeight =
-			this.element.clientHeight -
-			parseFloat(styles.paddingTop) -
-			parseFloat(styles.paddingBottom);
-		this.innerSize[0] = innerWidth;
-		this.innerSize[1] = innerHeight;
-		this.rebuildStyle();
+	private debounceCalcLayout = debounceFrame(async () => {
 		this.calcLayout(true, true);
-		for (const el of this.lyricLinesEl) {
-			el.updateMaskImage();
+		for (const hotLine of this.hotLines) {
+			const el = this.lyricLinesEl[hotLine];
+			el.enable(this.currentTime);
 		}
-	});
+	}, 2);
+	private resizeObserver: ResizeObserver = new ResizeObserver(
+		debounceFrame(
+			((e) => {
+				const rect = e[0].contentRect;
+				this.size[0] = rect.width;
+				this.size[1] = rect.height;
+				const styles = getComputedStyle(e[0].target);
+				const innerWidth =
+					this.element.clientWidth -
+					Number.parseFloat(styles.paddingLeft) -
+					Number.parseFloat(styles.paddingRight);
+				const innerHeight =
+					this.element.clientHeight -
+					Number.parseFloat(styles.paddingTop) -
+					Number.parseFloat(styles.paddingBottom);
+				this.innerSize[0] = innerWidth;
+				this.innerSize[1] = innerHeight;
+				this.rebuildStyle();
+				for (const el of this.lyricLinesEl) {
+					el.markMaskImageDirty();
+				}
+				this.debounceCalcLayout();
+			}) as ResizeObserverCallback,
+			5,
+		),
+	);
 	private posXSpringParams: Partial<SpringParams> = {
 		mass: 1,
 		damping: 10,
@@ -190,7 +216,9 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	getEnableScale() {
 		return this.enableScale;
 	}
-	private _baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
+	private _baseFontSize = Number.parseFloat(
+		getComputedStyle(this.element).fontSize,
+	);
 	public get baseFontSize() {
 		return this._baseFontSize;
 	}
@@ -395,9 +423,13 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 * 重建样式
 	 *
 	 * 这个只允许内部调用
+	 *
+	 * @private
 	 */
 	rebuildStyle() {
-		this._baseFontSize = parseFloat(getComputedStyle(this.element).fontSize);
+		this._baseFontSize = Number.parseFloat(
+			getComputedStyle(this.element).fontSize,
+		);
 		let style = "";
 		style += "--amll-lp-width:";
 		if (window.innerWidth <= 1024) {
@@ -451,7 +483,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	setWordFadeWidth(value = 0.5) {
 		this._wordFadeWidth = Math.max(0.0001, value);
 		for (const el of this.lyricLinesEl) {
-			el.updateMaskImage();
+			el.markMaskImageDirty();
 		}
 	}
 
@@ -572,7 +604,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.lyricLinesEl.forEach((el, i) => {
 			this.element.appendChild(el.getElement());
 			this.lyricLinesIndexes.set(el, i);
-			el.updateMaskImage();
+			el.markMaskImageDirty();
 		});
 		this.interludeDots.setInterlude(undefined);
 		this.hotLines.clear();
@@ -615,7 +647,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
-			this.emUnit = parseFloat(getComputedStyle(this.element).fontSize);
+			this.emUnit = Number.parseFloat(getComputedStyle(this.element).fontSize);
 			for (const el of this.lyricLinesEl) {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);

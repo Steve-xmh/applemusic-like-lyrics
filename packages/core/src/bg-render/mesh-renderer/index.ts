@@ -5,22 +5,22 @@
  * 参考内容 https://movingparts.io/gradient-meshes
  */
 
-import type { Disposable } from "../../interfaces";
-import { BaseRenderer } from "../base";
 import { Mat4, Vec2, Vec3, Vec4 } from "gl-matrix";
-import meshVertShader from "./mesh.vert.glsl?raw";
-import meshFragShader from "./mesh.frag.glsl?raw";
+import type { Disposable } from "../../interfaces";
+import {
+	loadResourceFromElement,
+	loadResourceFromUrl,
+} from "../../utils/resource";
+import { BaseRenderer } from "../base";
 import {
 	blurImage,
 	brightnessImage,
 	contrastImage,
 	saturateImage,
 } from "../img";
-import {
-	loadResourceFromElement,
-	loadResourceFromUrl,
-} from "../../utils/resource";
 import { CONTROL_POINT_PRESETS } from "./cp-presets";
+import meshFragShader from "./mesh.frag.glsl?raw";
+import meshVertShader from "./mesh.vert.glsl?raw";
 
 type RenderingContext = WebGLRenderingContext;
 
@@ -315,7 +315,13 @@ const spV = Vec4.create();
 
 const spxAcc = Mat4.create();
 const spyAcc = Mat4.create();
-function surfacePoint(u: number, v: number, X: Mat4, Y: Mat4) {
+function surfacePoint(
+	u: number,
+	v: number,
+	X: Mat4,
+	Y: Mat4,
+	output = Vec2.create(),
+): Vec2 {
 	spUx[0] = u ** 3;
 	spUx[1] = u ** 2;
 	spUx[2] = u;
@@ -340,7 +346,9 @@ function surfacePoint(u: number, v: number, X: Mat4, Y: Mat4) {
 	Vec4.transformMat4(spUy, spUy, spyAcc);
 	const y = spV.dot(spUy);
 
-	return Vec2.fromValues(x, y);
+	output.x = x;
+	output.y = y;
+	return output;
 }
 
 function meshCoefficients(
@@ -541,6 +549,7 @@ class BHPMesh extends Mesh {
 	private uMR = Mat4.create();
 	private uMG = Mat4.create();
 	private uMB = Mat4.create();
+	private tmpV2 = Vec2.create();
 	/**
 	 * 更新最终呈现的网格数据，此方法应在所有控制点或细分参数的操作完成后调用
 	 */
@@ -570,7 +579,13 @@ class BHPMesh extends Mesh {
 						// 总之能跑就行（雾）
 						const vx = y * this._subDivisions + u;
 						const vy = x * this._subDivisions + v;
-						const [px, py] = surfacePoint(u / subDivM1, v / subDivM1, X, Y);
+						const [px, py] = surfacePoint(
+							u / subDivM1,
+							v / subDivM1,
+							X,
+							Y,
+							this.tmpV2,
+						);
 						this.setVertexPos(vx, vy, px, py);
 						this.setVertexUV(vx, vy, sX + v / tH, 1 - sY - u / tW);
 						const [pr, pg, pb] = colorPoint(
@@ -643,7 +658,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private lastFrameTime = 0;
 	private frameTime = 0;
 	private lastTickTime = 0;
-	private playTime = 0;
 	private volume = 0;
 	private tickHandle = 0;
 	private maxFPS = 60;
@@ -755,9 +769,11 @@ export class MeshGradientRenderer extends BaseRenderer {
 		return false;
 	}
 
+	private onTickBinded = this.onTick.bind(this);
+
 	private requestTick() {
-		if (!this.tickHandle)
-			this.tickHandle = requestAnimationFrame((t) => this.onTick(t));
+		if (this.tickHandle === 0)
+			this.tickHandle = requestAnimationFrame(this.onTickBinded);
 	}
 
 	constructor(canvas: HTMLCanvasElement) {
@@ -841,7 +857,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (!res) return;
 		// resize image
 		const c = this.reduceImageSizeCanvas;
-		const ctx = c.getContext("2d");
+		const ctx = c.getContext("2d", {
+			willReadFrequently: true,
+		});
 		if (!ctx) throw new Error("Failed to create canvas context");
 		ctx.clearRect(0, 0, c.width, c.height);
 		// Safari 不支持 filter
@@ -866,7 +884,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 			this.mainProgram.attrs.a_color,
 			this.mainProgram.attrs.a_uv,
 		);
-		newMesh.resetSubdivition(15);
+		newMesh.resetSubdivition(10);
 
 		if (this.manualControl) {
 			newMesh.resizeControlPoints(5, 5);

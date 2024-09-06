@@ -1,9 +1,15 @@
-import { LyricPlayer } from ".";
-import { Disposable, HasElement, LyricLine, LyricWord } from "../interfaces";
-import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
-import { Spring } from "../utils/spring";
 import bezier from "bezier-easing";
+import type { LyricPlayer } from ".";
+import type {
+	Disposable,
+	HasElement,
+	LyricLine,
+	LyricWord,
+} from "../interfaces";
 import styles from "../styles/lyric-player.module.css";
+import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
+import { measure, mutate } from "../utils/schedule";
+import { Spring } from "../utils/spring";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -32,7 +38,6 @@ const bezOut = bezier(0.3, 0.0, 0.58, 1.0);
 const makeEmpEasing = (mid: number) => {
 	return (x: number) => (x < mid ? bezIn(beginNum(x)) : 1 - bezOut(endNum(x)));
 };
-const defaultEmpEasing = makeEmpEasing(EMP_EASING_MID);
 
 function generateFadeGradient(
 	width: number,
@@ -165,8 +170,8 @@ function getScaleFromTransform(transform: string): number {
 	const match = transform.match(/matrix\(([^)]+)\)/);
 	if (match) {
 		const values = match[1].split(", ");
-		const scaleX = parseFloat(values[0]);
-		const scaleY = parseFloat(values[3]);
+		const scaleX = Number.parseFloat(values[0]);
+		const scaleY = Number.parseFloat(values[3]);
 		return (scaleX + scaleY) / 2; // Average of scaleX and scaleY
 	}
 	return 1; // Default scale value if not found
@@ -552,7 +557,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						a.word += b.word;
 						return a;
 					},
-					{ word: "", startTime: Infinity, endTime: -Infinity },
+					{
+						word: "",
+						startTime: Number.POSITIVE_INFINITY,
+						endTime: Number.NEGATIVE_INFINITY,
+					},
 				);
 				const emp = chunk
 					.map((word) => shouldEmphasize(word))
@@ -830,20 +839,29 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.lyricLine.startTime
 		);
 	}
-	updateMaskImage() {
+	private maskImageDirty = false;
+	markMaskImageDirty() {
+		this.maskImageDirty = true;
+	}
+	async updateMaskImage() {
+		this.maskImageDirty = false;
 		if (this._hide) {
-			if (this._prevParentEl) {
-				this._prevParentEl.appendChild(this.element);
-			}
-			this.element.style.display = "";
-			this.element.style.visibility = "hidden";
+			await mutate(() => {
+				if (this._prevParentEl) {
+					this._prevParentEl.appendChild(this.element);
+				}
+				this.element.style.display = "";
+				this.element.style.visibility = "hidden";
+			});
 		}
 		for (const word of this.splittedWords) {
 			const el = word.mainElement;
 			if (el) {
-				word.padding = parseFloat(getComputedStyle(el).paddingLeft);
-				word.width = el.clientWidth - word.padding * 2;
-				word.height = el.clientHeight - word.padding * 2;
+				await measure(() => {
+					word.padding = Number.parseFloat(getComputedStyle(el).paddingLeft);
+					word.width = el.clientWidth - word.padding * 2;
+					word.height = el.clientHeight - word.padding * 2;
+				});
 			} else {
 				word.width = 0;
 				word.height = 0;
@@ -856,11 +874,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.generateCalcBasedMaskImage();
 		}
 		if (this._hide) {
-			if (this._prevParentEl) {
-				this.element.remove();
-			}
-			this.element.style.display = "none";
-			this.element.style.visibility = "";
+			await mutate(() => {
+				if (this._prevParentEl) {
+					this.element.remove();
+				}
+				this.element.style.display = "none";
+				this.element.style.visibility = "";
+			});
 		}
 	}
 	private generateCalcBasedMaskImage() {
@@ -1084,6 +1104,9 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.lineTransforms.scale.update(delta);
 		if (this.isInSight) {
 			this.show();
+			if (this.maskImageDirty) {
+				this.updateMaskImage();
+			}
 		} else {
 			this.hide();
 		}
@@ -1141,11 +1164,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	get isInSight() {
 		const l = this.lineTransforms.posX.getCurrentPosition();
 		const t = this.lineTransforms.posY.getCurrentPosition();
-		const r = l + this.lineSize[0];
-		const b = t + this.lineSize[1];
+		const w = this.lineSize[0];
+		const h = this.lineSize[1];
+		const r = l + w;
+		const b = t + h;
 		const pr = this.lyricPlayer.size[0];
 		const pb = this.lyricPlayer.size[1];
-		return !(l > pr || r < 0 || t > pb || b < 0);
+		return !(l > pr + w || r < -w || t > pb + h || b < -h);
 	}
 	private disposeElements() {
 		for (const realWord of this.splittedWords) {

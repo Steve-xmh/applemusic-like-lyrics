@@ -167,7 +167,9 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const onClickControlThumb = useAtomValue(onClickControlThumbAtom).onEmit;
 	const [isVertical, setIsVertical] = useState(false);
 	const [alignPosition, setAlignPosition] = useState(0.25);
-	const [alignAnchor, setAlignAnchor] = useState("top");
+	const [alignAnchor, setAlignAnchor] = useState<"center" | "bottom" | "top">(
+		"top",
+	);
 	const coverElRef = useRef<HTMLElement>(null);
 	const layoutRef = useRef<HTMLDivElement>(null);
 

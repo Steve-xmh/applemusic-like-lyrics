@@ -461,6 +461,9 @@ importers:
       '@pixi/sprite':
         specifier: ^7.2.4
         version: 7.4.2(@pixi/core@7.4.2)(@pixi/display@7.4.2(@pixi/core@7.4.2))
+      '@types/react':
+        specifier: ^18.3.5
+        version: 18.3.5
       '@types/react-dom':
         specifier: ^18.2.7
         version: 18.3.0
