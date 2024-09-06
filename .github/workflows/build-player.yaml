@@ -69,7 +69,7 @@ jobs:
       - name: 构建 AMLL Full React 包
         run: |
           pnpm i
-          pnpm lerna run build --scope @applemusic-like-lyrics/react-full
+          pnpm lerna run build --scope @applemusic-like-lyrics/*
         env:
           AMLL_GITHUB_IS_ACTION: true
       - name: 构建 AMLL Player 程序
