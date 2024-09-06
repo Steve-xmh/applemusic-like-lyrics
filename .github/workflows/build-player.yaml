@@ -26,11 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+      - name: 缓存 Cargo 产物
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: 安装 PNPM
         uses: pnpm/action-setup@v4
         with:
           version: latest
-          run_install: true
       - name: 安装 Node.js
         uses: actions/setup-node@v4
         with:
@@ -67,6 +76,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         with:
           projectPath: packages/player
+          args: ${{ matrix.args }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 上传产物到 Action Artifact
