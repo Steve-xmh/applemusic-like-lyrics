@@ -9,18 +9,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-22.04, windows-latest]
         include:
-          - platform: macos-latest # arm64 二进制包
-            args: '--target aarch64-apple-darwin'
-          - platform: macos-latest # x86 二进制包
-            args: '--target x86_64-apple-darwin'
-          - platform: macos-latest # 通用二进制包
-            args: '--target universal-apple-darwin'
           - platform: ubuntu-22.04
             args: ''
+            name: linux
+            arch: x86_64
           - platform: windows-latest
             args: ''
+            name: windows
+            arch: x86_64
+          - platform: macos-latest # arm64 二进制包
+            args: '--target aarch64-apple-darwin'
+            name: macOS
+            arch: aarch64
+          - platform: macos-latest # x86 二进制包
+            args: '--target x86_64-apple-darwin'
+            name: macOS
+            arch: x86_64
+          - platform: macos-latest # 通用二进制包
+            args: '--target universal-apple-darwin'
+            name: macOS
+            arch: universal
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -82,7 +91,7 @@ jobs:
       - name: 上传产物到 Action Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: AMLL Player ${{runner.os}}-${{runner.arch}}
+          name: AMLL Player ${{matrix.name}}-${{matrix.arch}}
           path: |
             packages/player/src-tauri/target/release/bundle/deb/*.deb
             packages/player/src-tauri/target/release/bundle/appimage/*.AppImage
