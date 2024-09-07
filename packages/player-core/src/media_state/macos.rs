@@ -1,4 +1,4 @@
-use std::{cell::Cell, sync::RwLock};
+use std::{cell::Cell, ptr::NonNull, sync::RwLock};
 
 use super::*;
 use anyhow::Context;
@@ -10,12 +10,21 @@ use tokio::sync::mpsc::UnboundedSender;
 
 // static NP_INFO_CTR_LOCK: Mutex<()> = Mutex::new(());
 
-#[derive(Debug)]
 pub struct MediaStateManagerMacOSBackend {
     np_info_ctr: Id<MPNowPlayingInfoCenter>,
     info: RwLock<Id<NSMutableDictionary<NSString, AnyObject>>>,
     playing: Cell<bool>,
     sender: UnboundedSender<MediaStateMessage>,
+}
+
+impl Debug for MediaStateManagerMacOSBackend {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MediaStateManagerMacOSBackend")
+            .field("np_info_ctr", &self.np_info_ctr)
+            .field("info", &self.info)
+            .field("playing", &self.playing)
+            .finish()
+    }
 }
 
 unsafe impl Send for MediaStateManagerMacOSBackend {}
@@ -89,11 +98,18 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
     fn set_cover_image(&self, cover_data: impl AsRef<[u8]>) -> anyhow::Result<()> {
         let cover_data = cover_data.as_ref().to_vec();
         let cover_data = NSData::from_vec(cover_data);
-        let img = NSImage::alloc();
+        let img = dbg!(NSImage::alloc());
         let img = NSImage::initWithData(img, &cover_data).context("initWithData")?;
+        let img_size = unsafe { img.size() };
+        let img = NonNull::new(Id::into_raw(img)).unwrap();
+        let artwork = MPMediaItemArtwork::alloc();
+        let req_handler = block2::RcBlock::new(move |_: CGSize| img);
+        let artwork = unsafe {
+            MPMediaItemArtwork::initWithBoundsSize_requestHandler(artwork, img_size, &req_handler)
+        };
         let mut info = self.info.write().unwrap();
         unsafe {
-            info.setValue_forKey(Some(&img), MPMediaItemPropertyArtwork);
+            info.setValue_forKey(Some(&artwork), MPMediaItemPropertyArtwork);
         }
         Ok(())
     }

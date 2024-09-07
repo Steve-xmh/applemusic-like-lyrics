@@ -97,6 +97,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arrayvec",
+ "block2",
  "concat-string",
  "cpal",
  "futures",

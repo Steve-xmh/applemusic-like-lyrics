@@ -36,6 +36,7 @@ mpris-server = "0.8"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.5"
+block2 = "0.5"
 once_cell = "^1.18"
 [target.'cfg(target_os = "macos")'.dependencies.objc2-media-player]
 version = "0.2"
