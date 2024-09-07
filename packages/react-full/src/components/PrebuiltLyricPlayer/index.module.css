@@ -21,7 +21,7 @@
 }
 
 .bigControls {
-    padding: 2vh 4vh;
+    padding: 2vh min(2vw, 2vh);
 }
 
 .songMediaButton {
@@ -117,8 +117,12 @@
     height: 10vh !important;
     width: 10vh !important;
 
-    &>svg {
+    &:nth-child(2)>svg {
         scale: 1.75;
+    }
+
+    &>svg {
+        scale: 2.5;
     }
 }
 
@@ -151,6 +155,7 @@
         opacity 0.3s 0.3s var(--info-timing-func-out);
     transform: translateY(0);
     opacity: 1;
+    font-size: clamp(1em, 2vh, 1.25em) !important;
 }
 
 .smallMusicInfo.hideLyric {

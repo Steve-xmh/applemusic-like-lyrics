@@ -1,9 +1,9 @@
 import {
-	useRef,
 	type FC,
-	useLayoutEffect,
 	type HTMLProps,
 	useEffect,
+	useLayoutEffect,
+	useRef,
 } from "react";
 
 export const AudioFFTVisualizer: FC<
@@ -27,11 +27,13 @@ export const AudioFFTVisualizer: FC<
 		if (canvas) {
 			const ctx = canvas.getContext("2d");
 			if (ctx) {
+				let targetSize = { width: 0, height: 0 };
 				const obs = new ResizeObserver((sizes) => {
 					for (const size of sizes) {
-						const target = size.target as HTMLCanvasElement;
-						target.width = size.contentRect.width * window.devicePixelRatio;
-						target.height = size.contentRect.height * window.devicePixelRatio;
+						targetSize = {
+							width: size.contentRect.width * window.devicePixelRatio,
+							height: size.contentRect.height * window.devicePixelRatio,
+						};
 					}
 				});
 
@@ -46,6 +48,10 @@ export const AudioFFTVisualizer: FC<
 					if (!(canvas && ctx) || stopped) return;
 					const width = canvas.width;
 					const height = canvas.height;
+					if (targetSize.width !== width || targetSize.height !== height) {
+						canvas.width = targetSize.width;
+						canvas.height = targetSize.height;
+					}
 
 					const processed = fftDataRef.current ?? [];
 					if (buf.length !== processed.length) {

@@ -50,6 +50,9 @@
     justify-self: center;
 
     mix-blend-mode: plus-lighter;
+    min-width: 0;
+    min-height: 0;
+    max-width: min(52vh, 38vw);
 }
 
 .lyric {

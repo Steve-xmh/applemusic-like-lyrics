@@ -14,3 +14,4 @@ target/
 .yarn/cache/
 .yarn/install-state.gz
 .nx
+.idea

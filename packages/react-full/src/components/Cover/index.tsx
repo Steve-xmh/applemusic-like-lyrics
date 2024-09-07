@@ -4,10 +4,8 @@
  */
 
 import classNames from "classnames";
-import { forwardRef, type HTMLProps, type PropsWithRef, useRef } from "react";
+import { type HTMLProps, forwardRef, useEffect, useMemo, useRef } from "react";
 import styles from "./index.module.css";
-import { useMemo } from "react";
-import { useEffect } from "react";
 
 /**
  * 一个专辑图组件
@@ -19,6 +17,7 @@ export const Cover = forwardRef<
 		coverIsVideo?: boolean;
 		coverVideoPaused?: boolean;
 		musicPaused?: boolean;
+		pauseShrinkAspect?: number;
 	} & HTMLProps<HTMLElement>
 >(
 	(
@@ -28,12 +27,14 @@ export const Cover = forwardRef<
 			coverVideoPaused,
 			className,
 			musicPaused,
+			pauseShrinkAspect,
 			...rest
 		},
 		ref,
 	) => {
 		const clsNames = useMemo(
-			() => classNames(styles.cover, musicPaused && styles.paused, className),
+			() =>
+				classNames(styles.cover, musicPaused && styles.musicPaused, className),
 			[className, musicPaused],
 		);
 		const videoRef = useRef<HTMLVideoElement>(null);
@@ -52,6 +53,9 @@ export const Cover = forwardRef<
 				<video
 					className={clsNames}
 					src={coverUrl}
+					style={{
+						"--scale-level": pauseShrinkAspect ?? 0.75,
+					}}
 					autoPlay
 					loop
 					muted
@@ -65,7 +69,10 @@ export const Cover = forwardRef<
 		return (
 			<div
 				className={clsNames}
-				style={{ backgroundImage: `url(${coverUrl})` }}
+				style={{
+					backgroundImage: `url(${coverUrl})`,
+					"--scale-level": pauseShrinkAspect ?? 0.75,
+				}}
 				alt="cover"
 				ref={ref as any}
 				{...rest}

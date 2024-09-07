@@ -23,6 +23,7 @@ import {
 	musicPlayingPositionAtom,
 	musicQualityAtom,
 	musicVolumeAtom,
+	onChangeVolumeAtom,
 	onClickControlThumbAtom,
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
@@ -33,7 +34,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useEffect } from "react";
 import { db } from "../../dexie";
-import { musicIdAtom } from "../../states";
+import { fftDataRangeAtom, musicIdAtom } from "../../states";
 import {
 	type AudioInfo,
 	type AudioQuality,
@@ -44,6 +45,14 @@ import {
 
 const FFTToLowPassContext: FC = () => {
 	const store = useStore();
+	const fftDataRange = useAtomValue(fftDataRangeAtom);
+
+	useEffect(() => {
+		emitAudioThread("setFFTRange", {
+			fromFreq: fftDataRange[0],
+			toFreq: fftDataRange[1],
+		});
+	}, [fftDataRange]);
 
 	useEffect(() => {
 		let rafId: number;
@@ -214,6 +223,14 @@ export const MusicContext: FC = () => {
 				});
 			}),
 		);
+		store.set(
+			onChangeVolumeAtom,
+			toEmit((volume: number) => {
+				emitAudioThread("setVolume", {
+					volume,
+				});
+			}),
+		);
 		const syncMusicInfo = (
 			musicInfo: AudioInfo,
 			musicId = store.get(musicIdAtom),
@@ -314,6 +331,7 @@ export const MusicContext: FC = () => {
 				}
 				case "syncStatus": {
 					store.set(musicPlayingAtom, evtData.data.isPlaying);
+					store.set(musicVolumeAtom, evtData.data.volume);
 					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);

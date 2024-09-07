@@ -18,6 +18,8 @@ import {
 	contrastImage,
 	saturateImage,
 } from "../img";
+import blendFragShader from "./blend.frag.glsl?raw";
+import blendVertShader from "./blend.vert.glsl?raw";
 import { CONTROL_POINT_PRESETS } from "./cp-presets";
 import meshFragShader from "./mesh.frag.glsl?raw";
 import meshVertShader from "./mesh.vert.glsl?raw";
@@ -29,7 +31,7 @@ class GLProgram implements Disposable {
 	program: WebGLProgram;
 	private vertexShader: WebGLShader;
 	private fragmentShader: WebGLShader;
-	readonly attrs: { [name: string]: number };
+	readonly attrs: { [name: string]: number | undefined };
 	constructor(
 		gl: RenderingContext,
 		vertexShaderSource: string,
@@ -135,9 +137,9 @@ class Mesh implements Disposable {
 	private wireFrame = false;
 	constructor(
 		private readonly gl: RenderingContext,
-		private readonly attrPos: number,
-		private readonly attrColor: number,
-		private readonly attrUV: number,
+		private readonly attrPos: number | undefined,
+		private readonly attrColor: number | undefined,
+		private readonly attrUV: number | undefined,
 	) {
 		const vertexBuf = gl.createBuffer();
 		if (!vertexBuf) throw new Error("Failed to create vertex buffer");
@@ -279,12 +281,18 @@ class Mesh implements Disposable {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-		gl.vertexAttribPointer(this.attrPos, 2, gl.FLOAT, false, 4 * 7, 0);
-		gl.enableVertexAttribArray(this.attrPos);
-		gl.vertexAttribPointer(this.attrColor, 3, gl.FLOAT, false, 4 * 7, 4 * 2);
-		gl.enableVertexAttribArray(this.attrColor);
-		gl.vertexAttribPointer(this.attrUV, 2, gl.FLOAT, false, 4 * 7, 4 * 5);
-		gl.enableVertexAttribArray(this.attrUV);
+		if (this.attrPos !== undefined) {
+			gl.vertexAttribPointer(this.attrPos, 2, gl.FLOAT, false, 4 * 7, 0);
+			gl.enableVertexAttribArray(this.attrPos);
+		}
+		if (this.attrColor !== undefined) {
+			gl.vertexAttribPointer(this.attrColor, 3, gl.FLOAT, false, 4 * 7, 4 * 2);
+			gl.enableVertexAttribArray(this.attrColor);
+		}
+		if (this.attrUV !== undefined) {
+			gl.vertexAttribPointer(this.attrUV, 2, gl.FLOAT, false, 4 * 7, 4 * 5);
+			gl.enableVertexAttribArray(this.attrUV);
+		}
 	}
 
 	update() {
@@ -664,6 +672,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private mainProgram: GLProgram;
+	private blendProgram: GLProgram;
 	private manualControl = false;
 	private reduceImageSizeCanvas = createOffscreenCanvas(
 		32,
@@ -671,6 +680,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 	) as HTMLCanvasElement;
 	private targetSize = Vec2.fromValues(0, 0);
 	private currentSize = Vec2.fromValues(0, 0);
+	private fullScreenMesh: Mesh;
+	private drawFrameBuffer: WebGLFramebuffer;
+	private drawFrameBufferTexture: WebGLTexture;
 	private meshStates: MeshState[] = [];
 
 	setManualControl(enable: boolean) {
@@ -678,25 +690,37 @@ export class MeshGradientRenderer extends BaseRenderer {
 	}
 
 	setWireFrame(enable: boolean) {
-		// this.mainMesh.setWireFrame(enable);
+		for (const state of this.meshStates) {
+			state.mesh.setWireFrame(enable);
+		}
 	}
 
-	getControlPoint(x: number, y: number) {
-		// return this.mainMesh.getControlPoint(x, y);
+	getControlPoint(x: number, y: number): ControlPoint | undefined {
+		return this.meshStates[this.meshStates.length - 1]?.mesh?.getControlPoint(
+			x,
+			y,
+		);
 	}
 
 	resizeControlPoints(width: number, height: number) {
-		// this.mainMesh.resizeControlPoints(width, height);
+		return this.meshStates[
+			this.meshStates.length - 1
+		]?.mesh?.resizeControlPoints(width, height);
 	}
 
 	resetSubdivition(subDivisions: number) {
-		// this.mainMesh.resetSubdivition(subDivisions);
+		return this.meshStates[this.meshStates.length - 1]?.mesh?.resetSubdivition(
+			subDivisions,
+		);
 	}
 
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
 
+		if (Number.isNaN(this.lastFrameTime)) {
+			this.lastFrameTime = tickTime;
+		}
 		const delta = tickTime - this.lastTickTime;
 		const frameDelta = tickTime - this.lastFrameTime;
 		this.lastFrameTime = tickTime;
@@ -709,6 +733,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		if (!(this.onRedraw(this.frameTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
+		} else if (this.staticMode) {
+			this.lastFrameTime = Number.NaN;
 		}
 
 		this.lastTickTime = tickTime;
@@ -720,6 +746,21 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (tW !== cW || tH !== cH) {
 			super.onResize(tW, tH);
 			const gl = this.gl;
+			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
+			gl.texImage2D(
+				gl.TEXTURE_2D,
+				0,
+				gl.RGB,
+				Math.ceil(tW),
+				Math.ceil(tH),
+				0,
+				gl.RGB,
+				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
+				null,
+			);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this.drawFrameBuffer);
+			gl.viewport(0, 0, tW, tH);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 			gl.viewport(0, 0, tW, tH);
 			this.currentSize.x = tW;
 			this.currentSize.y = tH;
@@ -728,6 +769,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 	private onRedraw(tickTime: number, delta: number) {
 		const latestMeshState = this.meshStates[this.meshStates.length - 1];
+		let canBeStatic = false;
 		if (latestMeshState) {
 			latestMeshState.mesh.bind();
 			latestMeshState.mesh.updateMesh();
@@ -739,12 +781,15 @@ export class MeshGradientRenderer extends BaseRenderer {
 					state.texture.dispose();
 				}
 			}
+			if (this.meshStates.length === 1 && latestMeshState.alpha >= 1) {
+				canBeStatic = true;
+			}
 		}
 
 		const gl = this.gl;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		gl.clearColor(0, 0, 0, 1);
 		this.checkIfResize();
 
 		this.mainProgram.use();
@@ -752,21 +797,32 @@ export class MeshGradientRenderer extends BaseRenderer {
 		this.mainProgram.setUniform1f("u_time", tickTime / 10000);
 		this.mainProgram.setUniform1f(
 			"u_aspect",
-			this.canvas.width / this.canvas.height,
+			this.manualControl ? 1 : this.canvas.width / this.canvas.height,
 		);
 		this.mainProgram.setUniform1i("u_texture", 0);
 
 		this.mainProgram.setUniform1f("u_volume", this.volume);
 		for (const state of this.meshStates) {
-			this.mainProgram.setUniform1f("u_alpha", state.alpha);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this.drawFrameBuffer);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			this.mainProgram.use();
 			state.texture.bind();
 			state.mesh.bind();
 			state.mesh.draw();
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
+			this.blendProgram.use();
+			this.blendProgram.setUniform1f("u_alpha", state.alpha);
+			this.blendProgram.setUniform1i("u_texture", 0);
+			this.fullScreenMesh.bind();
+			this.fullScreenMesh.draw();
 		}
 
 		gl.flush();
 
-		return false;
+		return canBeStatic;
 	}
 
 	private onTickBinded = this.onTick.bind(this);
@@ -775,6 +831,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (this.tickHandle === 0)
 			this.tickHandle = requestAnimationFrame(this.onTickBinded);
 	}
+
+	private supportTextureFloat = true;
 
 	constructor(canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -787,6 +845,11 @@ export class MeshGradientRenderer extends BaseRenderer {
 			console.warn("EXT_float_blend not supported");
 		if (!gl.getExtension("OES_texture_float_linear"))
 			console.warn("OES_texture_float_linear not supported");
+		if (!gl.getExtension("OES_texture_float")) {
+			this.supportTextureFloat = false;
+			console.warn("OES_texture_float not supported");
+		}
+
 		this.gl = gl;
 		gl.enable(gl.BLEND);
 		gl.enable(gl.DEPTH_TEST);
@@ -799,6 +862,54 @@ export class MeshGradientRenderer extends BaseRenderer {
 			meshVertShader,
 			meshFragShader,
 			"main-program-mg",
+		);
+
+		this.blendProgram = new GLProgram(
+			gl,
+			blendVertShader,
+			blendFragShader,
+			"blend-program-mg",
+		);
+
+		this.fullScreenMesh = new Mesh(
+			gl,
+			this.blendProgram.attrs.a_pos,
+			this.blendProgram.attrs.a_color,
+			this.blendProgram.attrs.a_uv,
+		);
+		this.fullScreenMesh.update();
+
+		const drawFrameBufferTexture = gl.createTexture();
+		if (!drawFrameBufferTexture)
+			throw new Error("Failed to create framebuffer texture");
+		this.drawFrameBufferTexture = drawFrameBufferTexture;
+		gl.bindTexture(gl.TEXTURE_2D, drawFrameBufferTexture);
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGB,
+			canvas.width,
+			canvas.height,
+			0,
+			gl.RGB,
+			this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
+			null,
+		);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		const drawFrameBuffer = gl.createFramebuffer();
+		if (!drawFrameBuffer) throw new Error("Failed to create framebuffer");
+		this.drawFrameBuffer = drawFrameBuffer;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, drawFrameBuffer);
+		gl.enable(gl.DEPTH_BITS);
+		gl.framebufferTexture2D(
+			gl.FRAMEBUFFER,
+			gl.COLOR_ATTACHMENT0,
+			gl.TEXTURE_2D,
+			drawFrameBufferTexture,
+			0,
 		);
 
 		this.requestTick();
@@ -884,7 +995,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 			this.mainProgram.attrs.a_color,
 			this.mainProgram.attrs.a_uv,
 		);
-		newMesh.resetSubdivition(10);
+		newMesh.resetSubdivition(15);
 
 		if (this.manualControl) {
 			newMesh.resizeControlPoints(5, 5);
@@ -909,12 +1020,13 @@ export class MeshGradientRenderer extends BaseRenderer {
 			alpha: 0,
 		};
 		this.meshStates.push(newState);
-		console.log("Updated album texture", newState);
+
+		this.requestTick();
 	}
 	override setLowFreqVolume(volume: number): void {
 		this.volume = volume / 10;
 	}
-	override setHasLyric(hasLyric: boolean): void {
+	override setHasLyric(_hasLyric: boolean): void {
 		// 不再考虑实现
 	}
 }

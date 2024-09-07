@@ -83,6 +83,19 @@ export const lyricWordFadeWidthAtom = atomWithStorage(
 	0.5,
 );
 
+// ====================== 歌曲信息展示配置 ======================
+
+export enum PlayerControlsType {
+	Controls = "controls",
+	FFT = "fft",
+	None = "none",
+}
+
+export const playerControlsTypeAtom = atomWithStorage(
+	"amll-react-full.playerControlsType",
+	PlayerControlsType.Controls,
+);
+
 // ======================== 歌词内容配置 ========================
 
 /**

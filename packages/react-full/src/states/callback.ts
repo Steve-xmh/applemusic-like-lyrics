@@ -10,7 +10,7 @@ export interface Callback<Args extends any[], Result = void> {
 }
 
 const c = <Args extends any[], Result = void>(
-	onEmit: (...args: Args) => Result,
+	_onEmit: (...args: Args) => Result,
 ): Callback<Args, Result> => ({});
 
 /**
@@ -43,9 +43,14 @@ export const onRequestPrevSongAtom = atom(c(() => {}));
 export const onRequestNextSongAtom = atom(c(() => {}));
 /**
  * 当触发设置歌曲播放位置时触发的回调函数
- * @param position 播放位置，单位为毫秒
+ * @param _position 播放位置，单位为毫秒
  */
-export const onSeekPositionAtom = atom(c((position: number) => {}));
+export const onSeekPositionAtom = atom(c((_position: number) => {}));
+/**
+ * 当触发设置音量大小时触发的回调函数
+ * @param _volume 音量大小，取值范围为 [0-1]
+ */
+export const onChangeVolumeAtom = atom(c((_volume: number) => {}));
 /**
  * 当点击位于控制按钮左侧的按钮时触发的回调函数
  */

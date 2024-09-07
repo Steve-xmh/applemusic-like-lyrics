@@ -4,9 +4,9 @@
  *
  * @author SteveXMH
  */
-import Stats from "stats.js";
 import GUI from "lil-gui";
-import { BackgroundRender, MeshGradientRenderer } from "./bg-render";
+import Stats from "stats.js";
+import { MeshGradientRenderer } from "./bg-render";
 
 const debugValues = {
 	controlPointSize: 4,
@@ -14,28 +14,28 @@ const debugValues = {
 	wireFrame: false,
 };
 
-const canvas = document.getElementById("bg")!! as HTMLCanvasElement;
+const canvas = document.getElementById("bg")! as HTMLCanvasElement;
 const mgRenderer = new MeshGradientRenderer(canvas);
 // mgRenderer.setAlbum("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAADUExURf///6fEG8gAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAKSURBVBjTY2AAAAACAAGYY2zXAAAAAElFTkSuQmCC");
-mgRenderer.setAlbum("bigsur.jpg");
 mgRenderer.setManualControl(true);
-mgRenderer.setFPS(Infinity);
+mgRenderer.setFPS(Number.POSITIVE_INFINITY);
 
 function updateControlPointDraggers() {
-	document.querySelectorAll(".dragger").forEach((el) => {
-		const x = parseInt(el.getAttribute("x")!);
-		const y = parseInt(el.getAttribute("y")!);
+	for (const el of document.querySelectorAll(".dragger")) {
+		const x = Number.parseInt(el.getAttribute("x") ?? "");
+		const y = Number.parseInt(el.getAttribute("y") ?? "");
 		const point = mgRenderer.getControlPoint(x, y);
+		if (point === undefined) return;
 		(el as HTMLElement).style.left = `${(point.location.x + 1) * 50}%`;
 		(el as HTMLElement).style.top = `${(1 - point.location.y) * 50}%`;
-	});
+	}
 }
 
 window.addEventListener("resize", updateControlPointDraggers);
 
 const resultTextArea = document.getElementById(
 	"result",
-)!! as HTMLTextAreaElement;
+)! as HTMLTextAreaElement;
 resultTextArea.value = "// 控制点的设置代码将会在这里显示";
 function updateResult() {
 	const result = [
@@ -44,6 +44,7 @@ function updateResult() {
 	for (let y = 0; y < debugValues.controlPointSize; y++) {
 		for (let x = 0; x < debugValues.controlPointSize; x++) {
 			const point = mgRenderer.getControlPoint(x, y);
+			if (point === undefined) continue;
 			result.push(`	p(${x}, ${y}, ${point.location.x}, ${point.location.y}),`);
 			// result.push("");
 			// result.push(`point = this.getControlPoint(${x}, ${y});`);
@@ -66,10 +67,12 @@ function resizeControlPoint() {
 		debugValues.controlPointSize,
 		debugValues.controlPointSize,
 	);
+	mgRenderer.resetSubdivition(debugValues.subdivideDepth);
 
 	for (let y = 0; y < debugValues.controlPointSize; y++) {
 		for (let x = 0; x < debugValues.controlPointSize; x++) {
 			const point = mgRenderer.getControlPoint(x, y);
+			if (point === undefined) continue;
 			const dragger = document.createElement("div");
 			const draggerInput = document.createElement("input");
 			draggerInput.type = "color";
@@ -91,9 +94,9 @@ function resizeControlPoint() {
 				dragger.style.backgroundColor = c;
 				const color = c.match(/#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
 				if (color) {
-					point.color.r = parseInt(color[1], 16) / 255;
-					point.color.g = parseInt(color[2], 16) / 255;
-					point.color.b = parseInt(color[3], 16) / 255;
+					point.color.r = Number.parseInt(color[1], 16) / 255;
+					point.color.g = Number.parseInt(color[2], 16) / 255;
+					point.color.b = Number.parseInt(color[3], 16) / 255;
 					dragger.setAttribute("r", `${point.color.r}`);
 					dragger.setAttribute("g", `${point.color.g}`);
 					dragger.setAttribute("b", `${point.color.b}`);
@@ -112,23 +115,30 @@ function resizeControlPoint() {
 						window.innerHeight,
 						Math.max(0, evt.clientY),
 					)}px`;
-					point.location.x = Math.max(
-						-1,
-						Math.min(1, (evt.clientX / window.innerWidth) * 2 - 1),
-					);
-					point.location.y = Math.max(
-						-1,
-						Math.min(1, -((evt.clientY / window.innerHeight) * 2 - 1)),
-					);
+					if (point) {
+						point.location.x = Math.max(
+							-1,
+							Math.min(1, (evt.clientX / window.innerWidth) * 2 - 1),
+						);
+						point.location.y = Math.max(
+							-1,
+							Math.min(1, -((evt.clientY / window.innerHeight) * 2 - 1)),
+						);
+					}
 					dragging = true;
 					updateResult();
 					evt.stopPropagation();
 				}
-				function onMouseUp() {
+				function onMouseUp(evt: MouseEvent) {
 					if (dragging) {
 						dragging = false;
-					} else {
+					} else if (dragger.classList.contains("active")) {
 						draggerInput.click();
+					} else {
+						for (const el of document.querySelectorAll(".dragger.active")) {
+							el.classList.remove("active");
+						}
+						dragger.classList.add("active");
 					}
 					window.removeEventListener("mousemove", onMouseMove);
 					window.removeEventListener("mouseup", onMouseUp);
@@ -146,8 +156,10 @@ function subdivide() {
 	mgRenderer.resetSubdivition(debugValues.subdivideDepth);
 }
 
-resizeControlPoint();
-subdivide();
+mgRenderer.setAlbum("bigsur.jpg").then(() => {
+	resizeControlPoint();
+	subdivide();
+});
 
 const gui = new GUI();
 gui.close();

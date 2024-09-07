@@ -1,4 +1,5 @@
 import {
+	PlayerControlsType,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -9,6 +10,7 @@ import {
 	lyricBackgroundRenderScaleAtom,
 	lyricBackgroundStaticModeAtom,
 	lyricWordFadeWidthAtom,
+	playerControlsTypeAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import {
@@ -18,16 +20,18 @@ import {
 	Flex,
 	Select,
 	Separator,
+	Slider,
+	type SliderProps,
 	Switch,
 	type SwitchProps,
 	Text,
 	TextField,
 	type TextProps,
 } from "@radix-ui/themes";
-import { type WritableAtom, useAtom } from "jotai";
-import type { ComponentProps, FC, PropsWithChildren } from "react";
+import { type WritableAtom, useAtom, useAtomValue } from "jotai";
+import type { ComponentProps, FC, PropsWithChildren, ReactNode } from "react";
 import { branch, commit } from "virtual:git-metadata-plugin";
-import { backgroundRendererAtom } from "../../states";
+import { backgroundRendererAtom, fftDataRangeAtom } from "../../states";
 import { restartApp } from "../../utils/player";
 import styles from "./index.module.css";
 
@@ -89,15 +93,18 @@ const SwitchSettings: FC<
 	);
 };
 
-const SelectSettings: FC<
-	{
-		configAtom: WritableAtom<string, [string], void>;
-		menu: {
-			label: string;
-			value: string;
-		}[];
-	} & ComponentProps<typeof SettingEntry>
-> = ({ label, description, menu, configAtom }) => {
+function SelectSettings<T extends string>({
+	label,
+	description,
+	menu,
+	configAtom,
+}: {
+	configAtom: WritableAtom<T, [T], void>;
+	menu: {
+		label: string;
+		value: T;
+	}[];
+} & ComponentProps<typeof SettingEntry>): ReactNode {
 	const [value, setValue] = useAtom(configAtom);
 
 	return (
@@ -114,7 +121,34 @@ const SelectSettings: FC<
 			</Select.Root>
 		</SettingEntry>
 	);
-};
+}
+
+function SliderSettings<T extends number | number[]>({
+	label,
+	description,
+	configAtom,
+	children,
+	...rest
+}: PropsWithChildren<{
+	configAtom: WritableAtom<T, [T], void>;
+}> &
+	ComponentProps<typeof SettingEntry> &
+	Omit<SliderProps, "value" | "onValueChange">): ReactNode {
+	const [value, setValue] = useAtom(configAtom);
+
+	return (
+		<SettingEntry label={label} description={description}>
+			<Slider
+				value={typeof value === "number" ? [value] : value}
+				onValueChange={(v: any) =>
+					typeof value === "number" ? setValue(v[0]) : setValue(v)
+				}
+				{...rest}
+			/>
+			{children}
+		</SettingEntry>
+	);
+}
 
 const SubTitle: FC<PropsWithChildren<TextProps>> = ({ children, ...props }) => {
 	return (
@@ -125,6 +159,8 @@ const SubTitle: FC<PropsWithChildren<TextProps>> = ({ children, ...props }) => {
 };
 
 export const SettingsPage: FC = () => {
+	const fftDataRange = useAtomValue(fftDataRangeAtom);
+
 	return (
 		<Container
 			mx={{
@@ -183,6 +219,40 @@ export const SettingsPage: FC = () => {
 				}
 				configAtom={lyricWordFadeWidthAtom}
 			/>
+
+			<SubTitle>歌曲信息样式</SubTitle>
+
+			<SelectSettings
+				label="播放控制组件类型"
+				description="即歌曲信息下方的组件"
+				menu={[
+					{
+						label: "播放控制组件",
+						value: PlayerControlsType.Controls,
+					},
+					{
+						label: "线条音频可视化",
+						value: PlayerControlsType.FFT,
+					},
+					{
+						label: "无",
+						value: PlayerControlsType.None,
+					},
+				]}
+				configAtom={playerControlsTypeAtom}
+			/>
+
+			<SliderSettings
+				label="音频可视化频域范围"
+				description="单位为赫兹（hz），此项会影响音频可视化和背景跳动效果的展示效果"
+				configAtom={fftDataRangeAtom}
+				min={1}
+				max={22050}
+			>
+				<Text wrap="nowrap">
+					{fftDataRange[0]} Hz - {fftDataRange[1]} Hz
+				</Text>
+			</SliderSettings>
 
 			<SubTitle>歌词背景</SubTitle>
 

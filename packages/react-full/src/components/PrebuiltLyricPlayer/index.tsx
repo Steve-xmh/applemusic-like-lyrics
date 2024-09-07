@@ -17,6 +17,7 @@ import {
 } from "react";
 import { AutoLyricLayout } from "../../layout/auto";
 import {
+	onChangeVolumeAtom,
 	onClickControlThumbAtom,
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
@@ -25,6 +26,7 @@ import {
 	onSeekPositionAtom,
 } from "../../states/callback";
 import {
+	fftDataAtom,
 	hideLyricViewAtom,
 	isLyricPageOpenedAtom,
 	lowFreqVolumeAtom,
@@ -38,6 +40,7 @@ import {
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
 	musicQualityAtom,
+	musicVolumeAtom,
 } from "../../states/music";
 import { BouncingSlider } from "../BouncingSlider";
 import { ControlThumb } from "../ControlThumb";
@@ -49,6 +52,7 @@ import styles from "./index.module.css";
 
 import classNames from "classnames";
 import {
+	PlayerControlsType,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -58,9 +62,12 @@ import {
 	lyricBackgroundFPSAtom,
 	lyricBackgroundRenderScaleAtom,
 	lyricBackgroundRendererAtom,
+	lyricBackgroundStaticModeAtom,
 	lyricWordFadeWidthAtom,
+	playerControlsTypeAtom,
 } from "../../states/config";
 import { toDuration } from "../../utils";
+import { AudioFFTVisualizer } from "../AudioFFTVisualizer";
 import { AudioQualityTag } from "../AudioQualityTag";
 import { MediaButton } from "../MediaButton";
 import IconForward from "./icon_forward.svg?react";
@@ -226,7 +233,41 @@ const PrebuiltCoreLyricPlayer: FC<{
 const PrebuiltVolumeControl: FC<{
 	style?: React.CSSProperties;
 }> = ({ style }) => {
-	return <VolumeControl value={0.5} min={0} max={1} style={style} />;
+	const musicVolume = useAtomValue(musicVolumeAtom);
+	const onChangeVolume = useAtomValue(onChangeVolumeAtom).onEmit;
+	return (
+		<VolumeControl
+			value={musicVolume}
+			min={0}
+			max={1}
+			style={style}
+			onChange={onChangeVolume}
+		/>
+	);
+};
+
+const PrebuiltMusicControls: FC<HTMLProps<HTMLDivElement>> = ({
+	className,
+	...props
+}) => {
+	const playerControlsType = useAtomValue(playerControlsTypeAtom);
+	const fftData = useAtomValue(fftDataAtom);
+	return (
+		<div className={classNames(styles.controls, className)} {...props}>
+			{playerControlsType === PlayerControlsType.Controls && (
+				<PrebuiltMediaButtons />
+			)}
+			{playerControlsType === PlayerControlsType.FFT && (
+				<AudioFFTVisualizer
+					style={{
+						width: "100%",
+						height: "8vh",
+					}}
+					fftData={fftData}
+				/>
+			)}
+		</div>
+	);
 };
 
 /**
@@ -242,6 +283,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
 	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
 	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
+	const lyricBackgroundStaticMode = useAtomValue(lyricBackgroundStaticModeAtom);
 	const lyricBackgroundRenderScale = useAtomValue(
 		lyricBackgroundRenderScaleAtom,
 	);
@@ -307,6 +349,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					renderScale={lyricBackgroundRenderScale}
 					fps={lyricBackgroundFPS}
 					renderer={backgroundRenderer.renderer}
+					staticMode={lyricBackgroundStaticMode}
 					style={{
 						zIndex: -1,
 					}}
@@ -324,9 +367,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 						}}
 					/>
 					<PrebuiltProgressBar />
-					<div className={styles.bigControls}>
-						<PrebuiltMediaButtons />
-					</div>
+					<PrebuiltMusicControls className={styles.bigControls} />
 					<PrebuiltVolumeControl style={{ paddingBottom: "4em" }} />
 				</>
 			}
@@ -334,9 +375,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				<>
 					<PrebuiltMusicInfo className={styles.horizontalControls} />
 					<PrebuiltProgressBar />
-					<div className={styles.controls}>
-						<PrebuiltMediaButtons />
-					</div>
+					<PrebuiltMusicControls className={styles.controls} />
 					<PrebuiltVolumeControl />
 				</>
 			}

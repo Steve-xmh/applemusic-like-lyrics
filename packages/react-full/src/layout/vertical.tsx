@@ -3,10 +3,11 @@
  * 一个适用于歌词页面竖向布局的组件
  */
 
-import type { HTMLProps } from "react";
-import { useCallback, useLayoutEffect, useRef } from "react";
-import styles from "./vertical.module.css";
 import classNames from "classnames";
+import { type MotionProps, motion } from "framer-motion";
+import type { HTMLProps } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import styles from "./vertical.module.css";
 
 export const VerticalLayout: React.FC<
 	{
@@ -34,59 +35,54 @@ export const VerticalLayout: React.FC<
 	const phonySmallCoverRef = useRef<HTMLDivElement>(null);
 	const coverFrameRef = useRef<HTMLDivElement>(null);
 	const hideLyricRef = useRef(hideLyric ?? false);
-	const updateCoverLayout = useCallback(
-		(hideLyric = hideLyricRef.current, force = false) => {
-			if (!rootRef.current) return;
-			let rootEl: HTMLElement = rootRef.current;
-			const targetCover = hideLyric
-				? phonyBigCoverRef.current
-				: phonySmallCoverRef.current;
-			const coverFrameEl = coverFrameRef.current;
-			if (!targetCover || !coverFrameEl || !rootEl) return;
-			const targetCoverSize = Math.min(
-				targetCover.clientWidth,
-				targetCover.clientHeight,
-			);
-			while (getComputedStyle(rootEl).display === "contents") {
-				rootEl = rootEl.parentElement!!;
-			}
-			const rootB = rootEl.getBoundingClientRect();
-			const targetCoverB = targetCover.getBoundingClientRect();
-			const targetCoverLeft =
-				targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
-			const targetCoverTop =
-				targetCoverB.y - rootB.y + (targetCoverB.height - targetCoverSize) / 2;
-			const transitionValue = force
-				? "none"
-				: "all 0.5s cubic-bezier(0.4, 0.2, 0.1, 1)";
-			if (transitionValue !== coverFrameEl.style.transition) {
-				coverFrameEl.style.transition = transitionValue;
-			}
-			coverFrameEl.style.width = `${targetCoverSize}px`;
-			coverFrameEl.style.height = `${targetCoverSize}px`;
-			coverFrameEl.style.left = `${targetCoverLeft}px`;
-			coverFrameEl.style.top = `${targetCoverTop}px`;
-		},
-		[],
-	);
+	const [currentCoverStyle, setCurrentCoverStyle] = useState<
+		MotionProps["animate"]
+	>({});
+	const updateCoverLayout = useCallback((hideLyric = hideLyricRef.current) => {
+		if (!rootRef.current) return;
+		let rootEl: HTMLElement = rootRef.current;
+		const targetCover = hideLyric
+			? phonyBigCoverRef.current
+			: phonySmallCoverRef.current;
+		if (!targetCover || !rootEl) return;
+		const targetCoverSize = Math.min(
+			targetCover.clientWidth,
+			targetCover.clientHeight,
+		);
+		while (getComputedStyle(rootEl).display === "contents") {
+			rootEl = rootEl.parentElement!;
+		}
+		const rootB = rootEl.getBoundingClientRect();
+		const targetCoverB = targetCover.getBoundingClientRect();
+		const targetCoverLeft =
+			targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
+		const targetCoverTop =
+			targetCoverB.y - rootB.y + (targetCoverB.height - targetCoverSize) / 2;
+		setCurrentCoverStyle({
+			width: targetCoverSize,
+			height: targetCoverSize,
+			left: targetCoverLeft,
+			top: targetCoverTop,
+		});
+	}, []);
 	useLayoutEffect(() => {
 		const phonyBigCoverEl = phonyBigCoverRef.current;
 		const phonySmallCoverEl = phonySmallCoverRef.current;
-		const coverFrameEl = coverFrameRef.current;
-		if (!phonyBigCoverEl || !phonySmallCoverEl || !coverFrameEl) return;
+		// const coverFrameEl = coverFrameRef.current;
+		if (!phonyBigCoverEl || !phonySmallCoverEl) return;
 		const obz = new ResizeObserver(() => {
-			updateCoverLayout(hideLyricRef.current, true);
+			updateCoverLayout(hideLyricRef.current);
 		});
 		obz.observe(phonyBigCoverEl);
 		obz.observe(phonySmallCoverEl);
-		updateCoverLayout(hideLyricRef.current, true);
+		updateCoverLayout(hideLyricRef.current);
 		return () => {
 			obz.disconnect();
 		};
 	}, [updateCoverLayout]);
 	useLayoutEffect(() => {
 		hideLyricRef.current = hideLyric ?? false;
-		updateCoverLayout(hideLyricRef.current, false);
+		updateCoverLayout(hideLyricRef.current);
 	}, [hideLyric, updateCoverLayout]);
 	return (
 		<div
@@ -110,11 +106,18 @@ export const VerticalLayout: React.FC<
 				<div className={styles.phonyBigCover} ref={phonyBigCoverRef} />
 				<div className={styles.bigControls}>{bigControlsSlot}</div>
 			</div>
-			<div className={styles.coverFrame}>
-				<div className={styles.cover} ref={coverFrameRef}>
-					{coverSlot}
-				</div>
-			</div>
+			<motion.div
+				className={styles.coverFrame}
+				animate={currentCoverStyle}
+				transition={{
+					type: "spring",
+					stiffness: 200,
+					damping: 30,
+				}}
+				ref={coverFrameRef}
+			>
+				{coverSlot}
+			</motion.div>
 		</div>
 	);
 };
