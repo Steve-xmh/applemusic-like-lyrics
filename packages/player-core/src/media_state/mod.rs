@@ -10,6 +10,8 @@ mod windows;
 pub enum MediaStateMessage {
     Play,
     Pause,
+    PlayOrPause,
+    Seek(f64),
     Next,
     Previous,
 }

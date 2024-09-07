@@ -332,6 +332,12 @@ impl AudioPlayer {
                     .send_anonymous(AudioThreadMessage::PauseAudio)
                     .await;
             }
+            MediaStateMessage::PlayOrPause => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::ResumeOrPauseAudio)
+                    .await;
+            }
             MediaStateMessage::Next => {
                 let _ = self
                     .handler()
@@ -342,6 +348,12 @@ impl AudioPlayer {
                 let _ = self
                     .handler()
                     .send_anonymous(AudioThreadMessage::PrevSong)
+                    .await;
+            }
+            MediaStateMessage::Seek(pos) => {
+                let _ = self
+                    .handler()
+                    .send_anonymous(AudioThreadMessage::SeekAudio { position: pos })
                     .await;
             }
         }
@@ -683,6 +695,8 @@ impl AudioPlayer {
             let _ = x.set_artist(&new_audio_info.artist);
             if let Some(cover) = &new_audio_info.cover {
                 let _ = x.set_cover_image(cover);
+            } else {
+                let _ = x.set_cover_image([]);
             }
             let _ = x.set_playing(true);
             let _ = x.set_duration(play_duration);

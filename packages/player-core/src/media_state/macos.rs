@@ -12,6 +12,7 @@ use tokio::sync::mpsc::UnboundedSender;
 
 pub struct MediaStateManagerMacOSBackend {
     np_info_ctr: Id<MPNowPlayingInfoCenter>,
+    cmd_ctr: Id<MPRemoteCommandCenter>,
     info: RwLock<Id<NSMutableDictionary<NSString, AnyObject>>>,
     playing: Cell<bool>,
     sender: UnboundedSender<MediaStateMessage>,
@@ -34,6 +35,7 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
     fn new() -> anyhow::Result<(Self, UnboundedReceiver<MediaStateMessage>)> {
         let (sender, receiver) = tokio::sync::mpsc::unbounded_channel();
         let np_info_ctr = unsafe { MPNowPlayingInfoCenter::defaultCenter() };
+        let cmd_ctr = unsafe { MPRemoteCommandCenter::sharedCommandCenter() };
         let mut dict: Id<NSMutableDictionary<NSString, AnyObject>> = NSMutableDictionary::new();
         unsafe {
             dict.setValue_forKey(
@@ -41,9 +43,96 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
                 MPMediaItemPropertyMediaType,
             );
         }
+        // TODO: 实现 Drop 以回收这些资源
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |_: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    let _ = sender_clone.send(MediaStateMessage::Play);
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr.playCommand().addTargetWithHandler(&req_handler);
+            }
+        }
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |_: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    let _ = sender_clone.send(MediaStateMessage::Pause);
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr.pauseCommand().addTargetWithHandler(&req_handler);
+            }
+        }
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |mut evt: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    if let Some(evt) = unsafe { Id::retain(evt.as_mut()) } {
+                        let evt: Id<MPChangePlaybackPositionCommandEvent> =
+                            unsafe { Id::cast(evt) };
+                        let pos = unsafe { evt.positionTime() };
+                        let _ = sender_clone.send(MediaStateMessage::Seek(pos));
+                    }
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr
+                    .changePlaybackPositionCommand()
+                    .addTargetWithHandler(&req_handler);
+            }
+        }
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |_: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    let _ = sender_clone.send(MediaStateMessage::PlayOrPause);
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr
+                    .togglePlayPauseCommand()
+                    .addTargetWithHandler(&req_handler);
+            }
+        }
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |_: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    let _ = sender_clone.send(MediaStateMessage::Previous);
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr
+                    .previousTrackCommand()
+                    .addTargetWithHandler(&req_handler);
+            }
+        }
+        {
+            let sender_clone = sender.clone();
+            let req_handler = block2::RcBlock::new(
+                move |_: NonNull<MPRemoteCommandEvent>| -> MPRemoteCommandHandlerStatus {
+                    let _ = sender_clone.send(MediaStateMessage::Next);
+                    MPRemoteCommandHandlerStatus::Success
+                },
+            );
+            unsafe {
+                cmd_ctr
+                    .nextTrackCommand()
+                    .addTargetWithHandler(&req_handler);
+            }
+        }
         Ok((
             Self {
                 np_info_ctr,
+                cmd_ctr,
                 info: RwLock::new(dict),
                 playing: Cell::new(false),
                 sender,
@@ -53,7 +142,13 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
     }
 
     fn set_playing(&self, playing: bool) -> anyhow::Result<()> {
-        self.playing.set(dbg!(playing));
+        unsafe {
+            self.np_info_ctr.setPlaybackState(if playing {
+                MPNowPlayingPlaybackState::Playing
+            } else {
+                MPNowPlayingPlaybackState::Paused
+            });
+        }
         Ok(())
     }
 
@@ -96,9 +191,17 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
     }
 
     fn set_cover_image(&self, cover_data: impl AsRef<[u8]>) -> anyhow::Result<()> {
-        let cover_data = cover_data.as_ref().to_vec();
+        let cover_data = cover_data.as_ref();
+        if cover_data.is_empty() {
+            let mut info = self.info.write().unwrap();
+            unsafe {
+                info.setValue_forKey(None, MPMediaItemPropertyArtwork);
+            }
+            return Ok(());
+        }
+        let cover_data = cover_data.to_vec();
         let cover_data = NSData::from_vec(cover_data);
-        let img = dbg!(NSImage::alloc());
+        let img = NSImage::alloc();
         let img = NSImage::initWithData(img, &cover_data).context("initWithData")?;
         let img_size = unsafe { img.size() };
         let img = NonNull::new(Id::into_raw(img)).unwrap();
@@ -119,11 +222,6 @@ impl MediaStateManagerBackend for MediaStateManagerMacOSBackend {
         let np_info = np_info.copy();
         unsafe {
             self.np_info_ctr.setNowPlayingInfo(Some(&np_info));
-            self.np_info_ctr.setPlaybackState(if self.playing.get() {
-                MPNowPlayingPlaybackState::Playing
-            } else {
-                MPNowPlayingPlaybackState::Paused
-            });
         }
         Ok(())
     }
