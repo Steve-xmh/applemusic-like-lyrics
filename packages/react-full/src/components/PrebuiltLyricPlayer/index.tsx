@@ -3,7 +3,6 @@
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
 
-import "@applemusic-like-lyrics/core/style.css";
 import { BackgroundRender, LyricPlayer } from "@applemusic-like-lyrics/react";
 import structuredClone from "@ungap/structured-clone";
 import { useAtomValue } from "jotai";

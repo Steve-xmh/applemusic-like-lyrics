@@ -1,5 +1,4 @@
 import { isLyricPageOpenedAtom } from "@applemusic-like-lyrics/react-full";
-import "@applemusic-like-lyrics/react-full/style.css";
 import { Box, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import classNames from "classnames";

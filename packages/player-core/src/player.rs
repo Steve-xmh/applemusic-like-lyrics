@@ -126,8 +126,8 @@ impl Default for AudioPlayer {
 
 impl AudioPlayer {
     pub fn new() -> Self {
-        let (evt_sender, evt_receiver) = tokio::sync::mpsc::channel(128);
-        let (msg_sender, msg_receiver) = tokio::sync::mpsc::channel(128);
+        let (evt_sender, evt_receiver) = tokio::sync::mpsc::unbounded_channel();
+        let (msg_sender, msg_receiver) = tokio::sync::mpsc::unbounded_channel();
         let playlist = Vec::<SongData>::with_capacity(4096);
         let fft_player = Arc::new(Mutex::new(FFTPlayer::new()));
         let fft_player_clone = fft_player.clone();
@@ -860,7 +860,7 @@ impl AudioPlayerHandle {
         &self,
         msg: AudioThreadEventMessage<AudioThreadMessage>,
     ) -> anyhow::Result<()> {
-        self.msg_sender.send(msg).await?;
+        self.msg_sender.send(msg)?;
         Ok(())
     }
 
@@ -868,22 +868,20 @@ impl AudioPlayerHandle {
         &self,
         msg: AudioThreadEventMessage<AudioThreadMessage>,
     ) -> anyhow::Result<()> {
-        self.msg_sender.blocking_send(msg)?;
+        self.msg_sender.send(msg)?;
         Ok(())
     }
 
     pub async fn send_anonymous(&self, msg: AudioThreadMessage) -> anyhow::Result<()> {
-        self.msg_sender
-            .send(AudioThreadEventMessage {
-                callback_id: "".into(),
-                data: Some(msg),
-            })
-            .await?;
+        self.msg_sender.send(AudioThreadEventMessage {
+            callback_id: "".into(),
+            data: Some(msg),
+        })?;
         Ok(())
     }
 
     pub fn send_anonymous_blocking(&self, msg: AudioThreadMessage) -> anyhow::Result<()> {
-        self.msg_sender.blocking_send(AudioThreadEventMessage {
+        self.msg_sender.send(AudioThreadEventMessage {
             callback_id: "".into(),
             data: Some(msg),
         })?;
@@ -902,12 +900,10 @@ impl AudioPlayerEventEmitter {
     }
 
     pub async fn emit(&self, msg: AudioThreadEvent) -> anyhow::Result<()> {
-        self.evt_sender
-            .send(AudioThreadEventMessage {
-                callback_id: "".into(),
-                data: Some(msg),
-            })
-            .await?;
+        self.evt_sender.send(AudioThreadEventMessage {
+            callback_id: "".into(),
+            data: Some(msg),
+        })?;
         Ok(())
     }
 
@@ -916,7 +912,7 @@ impl AudioPlayerEventEmitter {
         req: AudioThreadEventMessage<AudioThreadMessage>,
         res: AudioThreadEvent,
     ) -> anyhow::Result<()> {
-        self.evt_sender.send(req.to(res)).await?;
+        self.evt_sender.send(req.to(res))?;
         Ok(())
     }
 
@@ -924,7 +920,7 @@ impl AudioPlayerEventEmitter {
         &self,
         req: AudioThreadEventMessage<AudioThreadMessage>,
     ) -> anyhow::Result<()> {
-        self.evt_sender.send(req.to_none()).await?;
+        self.evt_sender.send(req.to_none())?;
         Ok(())
     }
 }

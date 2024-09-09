@@ -1,12 +1,8 @@
 use crate::server::AMLLWebSocketServer;
 use amll_player_core::AudioInfo;
-use base64::prelude::*;
 use serde::*;
 use std::{fs::File, net::SocketAddr, sync::Mutex};
-use symphonia::core::{
-    io::{MediaSourceStream, MediaSourceStreamOptions},
-    meta::StandardTagKey,
-};
+use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
 use tauri::{AppHandle, Manager, Runtime, State};
 use tracing::*;
 

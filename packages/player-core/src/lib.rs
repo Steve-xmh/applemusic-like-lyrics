@@ -78,13 +78,13 @@ pub enum AudioThreadMessage {
 }
 
 pub type AudioPlayerEventSender =
-    tokio::sync::mpsc::Sender<AudioThreadEventMessage<AudioThreadEvent>>;
+    tokio::sync::mpsc::UnboundedSender<AudioThreadEventMessage<AudioThreadEvent>>;
 pub type AudioPlayerMessageSender =
-    tokio::sync::mpsc::Sender<AudioThreadEventMessage<AudioThreadMessage>>;
+    tokio::sync::mpsc::UnboundedSender<AudioThreadEventMessage<AudioThreadMessage>>;
 pub type AudioPlayerEventReceiver =
-    tokio::sync::mpsc::Receiver<AudioThreadEventMessage<AudioThreadEvent>>;
+    tokio::sync::mpsc::UnboundedReceiver<AudioThreadEventMessage<AudioThreadEvent>>;
 pub type AudioPlayerMessageReceiver =
-    tokio::sync::mpsc::Receiver<AudioThreadEventMessage<AudioThreadMessage>>;
+    tokio::sync::mpsc::UnboundedReceiver<AudioThreadEventMessage<AudioThreadMessage>>;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

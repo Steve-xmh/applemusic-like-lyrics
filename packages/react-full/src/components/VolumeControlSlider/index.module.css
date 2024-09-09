@@ -28,7 +28,7 @@
     opacity: 0.5;
 }
 
-.speakerAnimate>.speaker-bounce-1 {
+.speakerAnimate :global(.speaker-bounce-1) {
     animation:
         speaker-bounce-part1 0.2s ease-in-out 0s forwards,
         speaker-bounce-part2 0.2s ease-in-out 0.2s forwards,
@@ -36,7 +36,7 @@
     transform-origin: center;
 }
 
-.speakerAnimate>.speaker-bounce-2 {
+.speakerAnimate :global(.speaker-bounce-2) {
     animation:
         speaker-bounce-part1 0.2s ease-in-out 0.05s forwards,
         speaker-bounce-part2 0.2s ease-in-out 0.25s forwards,
@@ -44,7 +44,7 @@
     transform-origin: center;
 }
 
-.speakerAnimate>.speaker-bounce-3 {
+.speakerAnimate :global(.speaker-bounce-3) {
     animation:
         speaker-bounce-part1 0.2s ease-in-out 0.1s forwards,
         speaker-bounce-part2 0.2s ease-in-out 0.3s forwards,
@@ -52,7 +52,7 @@
     transform-origin: center;
 }
 
-.speakerAnimate>.speaker-bounce-4 {
+.speakerAnimate :global(.speaker-bounce-4) {
     animation:
         speaker-bounce-part1 0.2s ease-in-out 0.15s forwards,
         speaker-bounce-part2 0.2s ease-in-out 0.35s forwards,

@@ -1,11 +1,11 @@
-import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import wasm from "vite-plugin-wasm";
-import topLevelAwait from "vite-plugin-top-level-await";
-import svgr from "vite-plugin-svgr";
-import lightningcss from "vite-plugin-lightningcss";
 import { execSync } from "child_process";
-import { readFile } from "fs/promises";
+import { resolve } from "path";
+import { defineConfig, Plugin } from "vite";
+import lightningcss from "vite-plugin-lightningcss";
+import svgr from "vite-plugin-svgr";
+import topLevelAwait from "vite-plugin-top-level-await";
+import wasm from "vite-plugin-wasm";
 
 function getCommitHash() {
 	try {
@@ -82,7 +82,7 @@ export default defineConfig(async () => ({
 			svgrOptions: {
 				ref: true,
 			},
-			include: ["./src/**/*.svg?react", "../bncm/src/**/*.svg?react"],
+			include: ["./src/**/*.svg?react", "../react-full/src/**/*.svg?react"],
 		}),
 		lightningcss({
 			browserslist: "safari >= 10.13, chrome >= 91",
@@ -91,6 +91,12 @@ export default defineConfig(async () => ({
 	],
 	resolve: {
 		dedupe: ["react", "react-dom", "jotai"],
+		alias: {
+			"@applemusic-like-lyrics/core": resolve(__dirname, "../core/src"),
+			"@applemusic-like-lyrics/react": resolve(__dirname, "../react/src"),
+			"@applemusic-like-lyrics/ttml": resolve(__dirname, "../ttml/src"),
+			"@applemusic-like-lyrics/react-full": resolve(__dirname, "../react-full/src"),
+		}
 	},
 	// Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
 	//
