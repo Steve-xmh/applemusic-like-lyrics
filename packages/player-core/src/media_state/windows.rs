@@ -129,25 +129,27 @@ impl super::MediaStateManagerBackend for MediaStateManagerWindowsBackend {
 
     fn set_cover_image(&self, cover_data: impl AsRef<[u8]>) -> anyhow::Result<()> {
         // TODO: 暂时无法显示出来，要确认原因
-        let cover_data = cover_data.as_ref();
-        let buf = MemoryBuffer::Create(cover_data.len() as _)?;
-        let reference = buf.CreateReference()?;
-        assert_eq!(reference.Capacity()?, cover_data.len() as _);
+        // 而且下面写的在某些电脑上会崩溃
 
-        {
-            let slice = unsafe { as_mut_slice(&reference)? };
-            slice.copy_from_slice(cover_data);
-        }
+        // let cover_data = cover_data.as_ref();
+        // let buf = MemoryBuffer::Create(cover_data.len() as _)?;
+        // let reference = buf.CreateReference()?;
+        // assert_eq!(reference.Capacity()?, cover_data.len() as _);
 
-        let buf = Buffer::CreateCopyFromMemoryBuffer(&buf)?;
+        // {
+        //     let slice = unsafe { as_mut_slice(&reference)? };
+        //     slice.copy_from_slice(cover_data);
+        // }
 
-        let stream = InMemoryRandomAccessStream::new()?;
-        stream
-            .GetOutputStreamAt(0)?
-            .WriteAsync(&buf)?
-            .GetResults()?;
-        self.smtc_updater
-            .SetThumbnail(&RandomAccessStreamReference::CreateFromStream(&stream)?)?;
+        // let buf = Buffer::CreateCopyFromMemoryBuffer(&buf)?;
+
+        // let stream = InMemoryRandomAccessStream::new()?;
+        // stream
+        //     .GetOutputStreamAt(0)?
+        //     .WriteAsync(&buf)?
+        //     .GetResults()?;
+        // self.smtc_updater
+        //     .SetThumbnail(&RandomAccessStreamReference::CreateFromStream(&stream)?)?;
 
         Ok(())
     }

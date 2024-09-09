@@ -1,9 +1,9 @@
 use amll_player_core::*;
-use async_std::sync::RwLock;
 use tauri::{Emitter, Runtime};
+use tokio::sync::RwLock;
 use tracing::warn;
 
-static PLAYER_HANDLER: RwLock<Option<AudioPlayerHandle>> = RwLock::new(None);
+static PLAYER_HANDLER: RwLock<Option<AudioPlayerHandle>> = RwLock::const_new(None);
 
 #[tauri::command]
 pub async fn local_player_send_msg(msg: AudioThreadEventMessage<AudioThreadMessage>) {
