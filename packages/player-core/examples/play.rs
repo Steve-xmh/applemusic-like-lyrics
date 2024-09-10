@@ -13,7 +13,7 @@ async fn main() -> anyhow::Result<()> {
     let file_path = file_path.to_str().unwrap();
     let file_path = file_path.to_string();
 
-    let player = AudioPlayer::new();
+    let player = AudioPlayer::new(AudioPlayerConfig {});
     let handler = player.handler();
 
     handler

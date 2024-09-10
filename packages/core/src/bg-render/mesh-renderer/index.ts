@@ -750,11 +750,11 @@ export class MeshGradientRenderer extends BaseRenderer {
 			gl.texImage2D(
 				gl.TEXTURE_2D,
 				0,
-				gl.RGB,
+				gl.RGBA,
 				Math.ceil(tW),
 				Math.ceil(tH),
 				0,
-				gl.RGB,
+				gl.RGBA,
 				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
 				null,
 			);
@@ -841,8 +841,10 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (!gl) throw new Error("WebGL not supported");
 		if (!gl.getExtension("EXT_color_buffer_float"))
 			console.warn("EXT_color_buffer_float not supported");
-		if (!gl.getExtension("EXT_float_blend"))
+		if (!gl.getExtension("EXT_float_blend")) {
 			console.warn("EXT_float_blend not supported");
+			this.supportTextureFloat = false;
+		}
 		if (!gl.getExtension("OES_texture_float_linear"))
 			console.warn("OES_texture_float_linear not supported");
 		if (!gl.getExtension("OES_texture_float")) {
@@ -887,11 +889,11 @@ export class MeshGradientRenderer extends BaseRenderer {
 		gl.texImage2D(
 			gl.TEXTURE_2D,
 			0,
-			gl.RGB,
+			gl.RGBA,
 			canvas.width,
 			canvas.height,
 			0,
-			gl.RGB,
+			gl.RGBA,
 			this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
 			null,
 		);
@@ -903,7 +905,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (!drawFrameBuffer) throw new Error("Failed to create framebuffer");
 		this.drawFrameBuffer = drawFrameBuffer;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, drawFrameBuffer);
-		gl.enable(gl.DEPTH_BITS);
 		gl.framebufferTexture2D(
 			gl.FRAMEBUFFER,
 			gl.COLOR_ATTACHMENT0,

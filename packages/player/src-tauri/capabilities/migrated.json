@@ -14,6 +14,8 @@
 		"core:event:allow-emit-to",
 		"core:event:allow-listen",
 		"core:event:allow-unlisten",
+		"fs:default",
+		"fs:allow-stat",
 		"dialog:default"
 	]
 }

@@ -1,9 +1,10 @@
 use crate::server::AMLLWebSocketServer;
 use amll_player_core::AudioInfo;
 use serde::*;
-use std::{fs::File, net::SocketAddr, sync::Mutex};
+use std::{net::SocketAddr, path::Path, sync::Mutex};
 use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
 use tauri::{AppHandle, Manager, Runtime, State};
+use tauri_plugin_fs::OpenOptions;
 use tracing::*;
 
 mod player;
@@ -56,9 +57,16 @@ impl From<AudioInfo> for MusicInfo {
 }
 
 #[tauri::command]
-async fn read_local_music_metadata(file_path: String) -> Result<MusicInfo, String> {
+async fn read_local_music_metadata(
+    file_path: String,
+    fs: State<'_, tauri_plugin_fs::Fs<tauri::Wry>>,
+) -> Result<MusicInfo, String> {
+    let mut opt = OpenOptions::new();
+    opt.read(true);
+    let file = fs
+        .open(Path::new(&file_path), opt)
+        .map_err(|e| format!("文件打开失败 {e}"))?;
     let result = tokio::task::spawn_blocking(move || -> Result<MusicInfo, String> {
-        let file = File::open(file_path).map_err(|e| e.to_string())?;
         let probe = symphonia::default::get_probe();
         let mut format_result = probe
             .format(
@@ -100,9 +108,10 @@ fn init_logging() {
     #[cfg(debug_assertions)]
     {
         tracing_subscriber::fmt()
-            .with_env_filter("amll_player=trace")
+            .with_env_filter("amll_player=trace,wry=info")
             .with_thread_names(true)
             .with_timer(tracing_subscriber::fmt::time::uptime())
+            // .with(tracing_android::layer("amll-player").unwrap())
             .init();
     }
     std::panic::set_hook(Box::new(move |info| {
@@ -118,6 +127,8 @@ pub fn run() {
     info!("AMLL Player is starting!");
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
             ws_reopen_connection,
             ws_get_connections,

@@ -1,5 +1,8 @@
+use std::path::Path;
+
 use amll_player_core::*;
-use tauri::{Emitter, Runtime};
+use tauri::{Emitter, Manager, Runtime};
+use tauri_plugin_fs::*;
 use tokio::sync::RwLock;
 use tracing::warn;
 
@@ -14,21 +17,31 @@ pub async fn local_player_send_msg(msg: AudioThreadEventMessage<AudioThreadMessa
     }
 }
 
-async fn local_player_main<R: Runtime>(emitter: impl Emitter<R> + Send + 'static) {
-    let player = AudioPlayer::new();
+async fn local_player_main<R: Runtime>(manager: impl Manager<R> + Clone + Send + Sync + 'static) {
+    let mut player = AudioPlayer::new(AudioPlayerConfig {});
     let handler = player.handler();
     PLAYER_HANDLER.write().await.replace(handler);
 
+    let manager_clone = manager.clone();
+    player.set_custom_local_song_loader(Box::new(move |path| {
+        let fs = manager_clone.fs();
+        let mut opt = OpenOptions::new();
+        opt.read(true);
+        let file = fs.open(Path::new(&path), opt)?;
+        Ok(file)
+    }));
+
     player
         .run(move |evt| {
-            if let Err(err) = emitter.emit("audio_player_msg", evt) {
+            let app = manager.app_handle();
+            if let Err(err) = app.emit("audio_player_msg", evt) {
                 warn!("failed to emit audio_player_msg: {:?}", err);
             }
         })
         .await;
 }
 
-pub fn init_local_player<R: Runtime>(emitter: impl Emitter<R> + Send + 'static) {
+pub fn init_local_player<R: Runtime>(emitter: impl Manager<R> + Clone + Send + Sync + 'static) {
     std::thread::spawn(|| {
         tokio::runtime::Runtime::new()
             .unwrap()

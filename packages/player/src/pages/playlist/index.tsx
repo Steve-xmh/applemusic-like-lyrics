@@ -14,6 +14,7 @@ import {
 } from "@radix-ui/themes";
 import { path } from "@tauri-apps/api";
 import { open } from "@tauri-apps/plugin-dialog";
+import { platform } from "@tauri-apps/plugin-os";
 import { useLiveQuery } from "dexie-react-hooks";
 import md5 from "md5";
 import {
@@ -164,24 +165,29 @@ export const PlaylistPage: FC = () => {
 	const playlist = useLiveQuery(() => db.playlists.get(Number(param.id)));
 
 	const onAddLocalMusics = useCallback(async () => {
+		const filters = [
+			{
+				name: "音频文件",
+				extensions: ["mp3", "flac", "wav", "m4a", "aac", "ogg"],
+			},
+		];
+		if (platform() === "android") {
+			filters.length = 0;
+		}
 		const results = await open({
 			multiple: true,
 			title: "选择本地音乐",
-			filters: [
-				{
-					name: "音频文件",
-					extensions: ["mp3", "flac", "wav", "m4a", "aac", "ogg"],
-				},
-			],
+			filters,
 		});
 		if (!results) return;
+		console.log(results);
 		const transformed = (
 			await Promise.all(
 				results.map(async (v) => {
-					const normalized = (await path.normalize(v.path)).replace(
-						/\\/gi,
-						"/",
-					);
+					let normalized = v;
+					if (platform() !== "android" && platform() !== "ios") {
+						normalized = (await path.normalize(v)).replace(/\\/gi, "/");
+					}
 					try {
 						const pathMd5 = md5(normalized);
 						const musicInfo = await readLocalMusicMetadata(normalized);
