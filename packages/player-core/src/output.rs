@@ -189,7 +189,6 @@ fn init_audio_stream_inner<T: AudioOutputSample + Into<f64>>(
                     let s: f32 = (*x).into_sample();
                     *x = (s * volume).into_sample();
                 });
-                trace!("已从环中读出 {} 个样本", data.len());
             },
             move |err| {
                 warn!("[WARN][AT] {err}");
