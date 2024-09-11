@@ -18,11 +18,10 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin: 1em 0;
+}
 
-    @media screen and (max-height: 1000px) {
-        margin: 0 0;
-    }
+.controls {
+    justify-content: space-between;
 }
 
 .bigControls {

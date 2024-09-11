@@ -152,7 +152,7 @@ const PrebuiltProgressBar: FC = () => {
 	const onSeekPosition = useAtomValue(onSeekPositionAtom).onEmit;
 
 	return (
-		<>
+		<div>
 			<BouncingSlider
 				value={musicPosition}
 				min={0}
@@ -169,7 +169,7 @@ const PrebuiltProgressBar: FC = () => {
 				</div>
 				<div>{toDuration((musicPosition - musicDuration) / 1000)}</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

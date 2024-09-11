@@ -9,7 +9,8 @@
     opacity: 0.45;
     height: 4em;
 
-    @media screen and (max-width: 1200px) {
+    @media screen and (max-width: 1200px),
+    (max-height: 768px) {
         height: 3em;
     }
 }

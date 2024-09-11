@@ -36,7 +36,12 @@
         }
     }
 
-    --horizontal-layout-max-width: min(48vh, 38vw);
+    --horizontal-layout-max-width: min(50vh, 38vw);
+
+
+    @media screen and (max-height: 1000px) {
+        --horizontal-layout-max-width: min(45vh, 38vw);
+    }
 
     @media screen and (max-height: 768px) {
         font-size: 0.8em;
@@ -44,10 +49,6 @@
         --horizontal-layout-max-width: min(40vh, 38vw);
         grid-template-rows:
             [drag-area] minmax(30px, 0.45fr) [thumb] auto [cover] auto [music-info] 3fr [buttom-controls] 0fr 0.2fr;
-    }
-
-    @media screen and (max-height: 1000px) {
-        --horizontal-layout-max-width: min(45vh, 38vw);
     }
 }
 
@@ -82,7 +83,7 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
 .lyric {
