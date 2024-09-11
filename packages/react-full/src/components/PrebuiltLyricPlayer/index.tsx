@@ -5,7 +5,7 @@
 
 import { BackgroundRender, LyricPlayer } from "@applemusic-like-lyrics/react";
 import structuredClone from "@ungap/structured-clone";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import {
 	type FC,
 	type HTMLProps,
@@ -64,11 +64,18 @@ import {
 	lyricBackgroundStaticModeAtom,
 	lyricWordFadeWidthAtom,
 	playerControlsTypeAtom,
+	showBottomControlAtom,
+	showMusicAlbumAtom,
+	showMusicArtistsAtom,
+	showMusicNameAtom,
+	showVolumeControlAtom,
 } from "../../states/config";
 import { toDuration } from "../../utils";
 import { AudioFFTVisualizer } from "../AudioFFTVisualizer";
 import { AudioQualityTag } from "../AudioQualityTag";
 import { MediaButton } from "../MediaButton";
+import { PrebuiltToggleIconButton } from "../ToggleIconButton";
+import { PrebuiltToggleIconButtonType } from "../ToggleIconButton/prebuilt-enum";
 import IconForward from "./icon_forward.svg?react";
 import IconPause from "./icon_pause.svg?react";
 import IconPlay from "./icon_play.svg?react";
@@ -82,25 +89,33 @@ const PrebuiltMusicInfo: FC<{
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicAlbum = useAtomValue(musicAlbumNameAtom);
 	const onMenuClicked = useAtomValue(onRequestOpenMenuAtom).onEmit;
+	const showMusicName = useAtomValue(showMusicNameAtom);
+	const showMusicArtists = useAtomValue(showMusicArtistsAtom);
+	const showMusicAlbum = useAtomValue(showMusicAlbumAtom);
 	return (
 		<MusicInfo
 			className={className}
 			style={style}
-			name={musicName}
-			artists={musicArtists.map((v) => v.name)}
-			album={musicAlbum}
+			name={showMusicName ? musicName : undefined}
+			artists={showMusicArtists ? musicArtists.map((v) => v.name) : undefined}
+			album={showMusicAlbum ? musicAlbum : undefined}
 			onMenuButtonClicked={onMenuClicked}
 		/>
 	);
 };
 
-const PrebuiltMediaButtons: FC = () => {
+const PrebuiltMediaButtons: FC<{
+	showOtherButtons?: boolean;
+}> = ({ showOtherButtons }) => {
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
 	const onRequestPrevSong = useAtomValue(onRequestPrevSongAtom).onEmit;
 	const onRequestNextSong = useAtomValue(onRequestNextSongAtom).onEmit;
 	const onPlayOrResume = useAtomValue(onPlayOrResumeAtom).onEmit;
 	return (
 		<>
+			{showOtherButtons && (
+				<PrebuiltToggleIconButton type={PrebuiltToggleIconButtonType.Shuffle} />
+			)}
 			<MediaButton
 				className={styles.songMediaButton}
 				onClick={onRequestPrevSong}
@@ -123,6 +138,9 @@ const PrebuiltMediaButtons: FC = () => {
 			>
 				<IconForward color="#FFFFFF" />
 			</MediaButton>
+			{showOtherButtons && (
+				<PrebuiltToggleIconButton type={PrebuiltToggleIconButtonType.Repeat} />
+			)}
 		</>
 	);
 };
@@ -231,30 +249,36 @@ const PrebuiltCoreLyricPlayer: FC<{
 
 const PrebuiltVolumeControl: FC<{
 	style?: React.CSSProperties;
-}> = ({ style }) => {
+	className?: string;
+}> = ({ style, className }) => {
 	const musicVolume = useAtomValue(musicVolumeAtom);
 	const onChangeVolume = useAtomValue(onChangeVolumeAtom).onEmit;
-	return (
-		<VolumeControl
-			value={musicVolume}
-			min={0}
-			max={1}
-			style={style}
-			onChange={onChangeVolume}
-		/>
-	);
+	const showVolumeControl = useAtomValue(showVolumeControlAtom);
+	if (showVolumeControl)
+		return (
+			<VolumeControl
+				value={musicVolume}
+				min={0}
+				max={1}
+				style={style}
+				className={className}
+				onChange={onChangeVolume}
+			/>
+		);
+	return null;
 };
 
-const PrebuiltMusicControls: FC<HTMLProps<HTMLDivElement>> = ({
-	className,
-	...props
-}) => {
+const PrebuiltMusicControls: FC<
+	{
+		showOtherButtons?: boolean;
+	} & HTMLProps<HTMLDivElement>
+> = ({ className, showOtherButtons, ...props }) => {
 	const playerControlsType = useAtomValue(playerControlsTypeAtom);
 	const fftData = useAtomValue(fftDataAtom);
 	return (
 		<div className={classNames(styles.controls, className)} {...props}>
 			{playerControlsType === PlayerControlsType.Controls && (
-				<PrebuiltMediaButtons />
+				<PrebuiltMediaButtons showOtherButtons={showOtherButtons} />
 			)}
 			{playerControlsType === PlayerControlsType.FFT && (
 				<AudioFFTVisualizer
@@ -276,7 +300,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	className,
 	...rest
 }) => {
-	const hideVerticalLyricView = useAtomValue(hideLyricViewAtom);
+	const [hideLyricView, setHideLyricView] = useAtom(hideLyricViewAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
@@ -295,6 +319,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const coverElRef = useRef<HTMLElement>(null);
 	const layoutRef = useRef<HTMLDivElement>(null);
 	const backgroundRenderer = useAtomValue(lyricBackgroundRendererAtom);
+	const showBottomControl = useAtomValue(showBottomControlAtom);
 
 	useLayoutEffect(() => {
 		// 如果是水平布局，则让歌词对齐到封面的中心
@@ -336,7 +361,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				<PrebuiltMusicInfo
 					className={classNames(
 						styles.smallMusicInfo,
-						hideVerticalLyricView && styles.hideLyric,
+						hideLyricView && styles.hideLyric,
 					)}
 				/>
 			}
@@ -359,24 +384,52 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					<PrebuiltMusicInfo
 						className={classNames(
 							styles.bigMusicInfo,
-							hideVerticalLyricView && styles.hideLyric,
+							hideLyricView && styles.hideLyric,
 						)}
-						style={{
-							padding: "2em 0",
-						}}
 					/>
 					<PrebuiltProgressBar />
 					<PrebuiltMusicControls className={styles.bigControls} />
-					<PrebuiltVolumeControl style={{ paddingBottom: "4em" }} />
+					{showBottomControl && (
+						<div
+							style={{
+								display: "flex",
+								justifyContent: "space-evenly",
+							}}
+						>
+							<PrebuiltToggleIconButton
+								type={PrebuiltToggleIconButtonType.Lyrics}
+								checked={!hideLyricView}
+								onClick={() => setHideLyricView(!hideLyricView)}
+							/>
+							<PrebuiltToggleIconButton
+								type={PrebuiltToggleIconButtonType.Playlist}
+							/>
+						</div>
+					)}
+					<PrebuiltVolumeControl className={styles.bigVolumeControl} />
 				</>
 			}
 			controlsSlot={
 				<>
 					<PrebuiltMusicInfo className={styles.horizontalControls} />
 					<PrebuiltProgressBar />
-					<PrebuiltMusicControls className={styles.controls} />
+					<PrebuiltMusicControls className={styles.controls} showOtherButtons />
 					<PrebuiltVolumeControl />
 				</>
+			}
+			horizontalBottomControls={
+				showBottomControl && (
+					<>
+						<PrebuiltToggleIconButton
+							type={PrebuiltToggleIconButtonType.Playlist}
+						/>
+						<PrebuiltToggleIconButton
+							type={PrebuiltToggleIconButtonType.Lyrics}
+							checked={!hideLyricView}
+							onClick={() => setHideLyricView(!hideLyricView)}
+						/>
+					</>
+				)
 			}
 			lyricSlot={
 				<PrebuiltCoreLyricPlayer
@@ -384,7 +437,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 					alignAnchor={alignAnchor}
 				/>
 			}
-			hideLyric={hideVerticalLyricView}
+			hideLyric={hideLyricView}
 			{...rest}
 		/>
 	);

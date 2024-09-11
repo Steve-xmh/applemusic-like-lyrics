@@ -751,8 +751,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 				gl.TEXTURE_2D,
 				0,
 				gl.RGBA,
-				Math.ceil(tW),
-				Math.ceil(tH),
+				tW,
+				tH,
 				0,
 				gl.RGBA,
 				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
@@ -917,8 +917,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 	}
 
 	protected override onResize(width: number, height: number): void {
-		this.targetSize.x = width;
-		this.targetSize.y = height;
+		this.targetSize.x = Math.ceil(width);
+		this.targetSize.y = Math.ceil(height);
 	}
 
 	override setStaticMode(enable: boolean): void {

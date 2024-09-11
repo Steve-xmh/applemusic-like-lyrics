@@ -91,9 +91,47 @@ export enum PlayerControlsType {
 	None = "none",
 }
 
+/**
+ * 播放器控制器类型，默认为 `PlayerControlsType.Controls`
+ */
 export const playerControlsTypeAtom = atomWithStorage(
 	"amll-react-full.playerControlsType",
 	PlayerControlsType.Controls,
+);
+/**
+ * 是否显示歌曲名称，默认启用
+ */
+export const showMusicNameAtom = atomWithStorage(
+	"amll-react-full.showMusicName",
+	true,
+);
+/**
+ * 是否显示歌曲作者，默认启用
+ */
+export const showMusicArtistsAtom = atomWithStorage(
+	"amll-react-full.showMusicArtists",
+	true,
+);
+/**
+ * 是否显示歌曲专辑名称，默认启用
+ */
+export const showMusicAlbumAtom = atomWithStorage(
+	"amll-react-full.showMusicAlbum",
+	false,
+);
+/**
+ * 是否显示音量滑块条，默认启用
+ */
+export const showVolumeControlAtom = atomWithStorage(
+	"amll-react-full.showVolumeControl",
+	true,
+);
+/**
+ * 是否显示底部控制按钮组，默认启用
+ */
+export const showBottomControlAtom = atomWithStorage(
+	"amll-react-full.showBottomControl",
+	true,
 );
 
 // ======================== 歌词内容配置 ========================

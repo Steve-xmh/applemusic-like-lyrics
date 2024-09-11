@@ -279,7 +279,7 @@ export const PlaylistPage: FC = () => {
 			}}
 		>
 			<Flex direction="column" maxHeight="100vh" height="100vh">
-				<Flex gap="4" direction="column" flexGrow="0" pb="4">
+				<Flex gap="4" direction="column" flexGrow="0" pb="4" mt="5">
 					<Flex align="end" pt="4">
 						<Button variant="soft" onClick={() => history.back()}>
 							<ArrowLeftIcon />

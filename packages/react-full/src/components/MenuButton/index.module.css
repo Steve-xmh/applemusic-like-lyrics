@@ -4,7 +4,7 @@
     position: relative;
     border: none;
     background: #FFFFFF15 !important;
-    width: 3vh;
+    width: 4vh;
     margin-left: 16px;
     border-radius: 50%;
     align-self: center;
@@ -17,5 +17,9 @@
         width: 72%;
         height: auto;
         color: #FFFFFF;
+    }
+
+    @media screen and (max-width: 1000px) {
+        width: max(2em, min(5vw, 4vh));
     }
 }

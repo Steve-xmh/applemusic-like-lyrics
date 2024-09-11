@@ -1,9 +1,15 @@
 .horizontalControls {
-    padding: 2vh 0 !important;
-    width: min(52vh, 38vw);
+
+    min-width: 0;
+    overflow: hidden;
 
     @media screen and (max-height: 1000px) {
         padding: 0vh 0 !important;
+    }
+
+    @media screen and (min-height: 1000px) {
+        padding-top: 2vh;
+        padding-bottom: 1vh;
     }
 }
 
@@ -13,15 +19,15 @@
     justify-content: space-evenly;
     align-items: center;
     margin: 1em 0;
-    padding: 0 2vh;
 
-    @media screen and (max-height: 768px) {
+    @media screen and (max-height: 1000px) {
         margin: 0 0;
     }
 }
 
 .bigControls {
     padding: 2vh min(2vw, 2vh);
+    padding-bottom: 0;
 }
 
 .songMediaButton {
@@ -44,17 +50,17 @@
         }
 
         @media screen and (max-height: 512px) {
-            scale: 0.75;
+            scale: 1;
+        }
+
+        @media screen and (max-width: 480px) {
+            scale: 0.5;
         }
     }
 }
 
 .songMediaPlayButton {
     height: 10vh;
-
-    @media screen and (max-height: 768px) {
-        height: 8vh;
-    }
 
     &>svg {
         scale: 2;
@@ -69,6 +75,10 @@
         }
 
         @media screen and (max-height: 512px) {
+            scale: 0.5;
+        }
+
+        @media screen and (max-width: 480px) {
             scale: 0.5;
         }
     }
@@ -93,7 +103,6 @@
     align-items: center;
     font-weight: 500;
     font-size: max(1.2vh, 1em);
-    margin-top: 0.5em;
     opacity: 0.5;
 
     @media screen and (max-height: 768px) {
@@ -119,10 +128,18 @@
 
     &:nth-child(2)>svg {
         scale: 1.75;
+
+        @media screen and (max-width: 480px) {
+            scale: 1.25;
+        }
     }
 
     &>svg {
         scale: 2.5;
+
+        @media screen and (max-width: 480px) {
+            scale: 2;
+        }
     }
 }
 
@@ -139,6 +156,15 @@
     opacity: 0;
     overflow-x: hidden;
     min-width: 0;
+    padding: 2em 0;
+
+    @media screen and (max-height: 768px) {
+        padding: 1em 0;
+    }
+
+    @media screen and (max-height: 512px) {
+        padding: 0.25em 0;
+    }
 }
 
 .bigMusicInfo.hideLyric {
@@ -164,4 +190,16 @@
         opacity 0.3s var(--info-timing-func-in);
     transform: translateY(25vh);
     opacity: 0;
+}
+
+.bigVolumeControl {
+    padding-bottom: 4em;
+
+    @media screen and (max-height: 768px) {
+        padding-bottom: 2em;
+    }
+
+    @media screen and (max-height: 512px) {
+        padding-bottom: 1em;
+    }
 }

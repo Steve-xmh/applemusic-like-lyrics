@@ -3,8 +3,8 @@
  * 一个适用于歌词页面横向布局的组件
  */
 
-import type { HTMLProps } from "react";
 import classnames from "classnames";
+import type { HTMLProps } from "react";
 import styles from "./horizontal.module.css";
 
 export const HorizontalLayout: React.FC<
@@ -14,6 +14,7 @@ export const HorizontalLayout: React.FC<
 		controlsSlot?: React.ReactNode;
 		lyricSlot?: React.ReactNode;
 		backgroundSlot?: React.ReactNode;
+		bottomControls?: React.ReactNode;
 		hideLyric?: boolean;
 		asChild?: boolean;
 	} & HTMLProps<HTMLDivElement>
@@ -22,6 +23,7 @@ export const HorizontalLayout: React.FC<
 	coverSlot,
 	controlsSlot,
 	lyricSlot,
+	bottomControls,
 	hideLyric,
 	className,
 	asChild,
@@ -40,6 +42,7 @@ export const HorizontalLayout: React.FC<
 			<div className={styles.cover}>{coverSlot}</div>
 			<div className={styles.controls}>{controlsSlot}</div>
 			<div className={styles.lyric}>{lyricSlot}</div>
+			<div className={styles.bottomControls}>{bottomControls}</div>
 		</div>
 	);
 };

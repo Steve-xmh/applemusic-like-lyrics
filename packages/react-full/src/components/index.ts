@@ -8,4 +8,6 @@ export * from "./MenuButton";
 export * from "./MusicInfo";
 export * from "./PrebuiltLyricPlayer";
 export * from "./TextMarquee";
+export * from "./ToggleIconButton";
+export * from "./ToggleIconButton/prebuilt-enum";
 export * from "./VolumeControlSlider";

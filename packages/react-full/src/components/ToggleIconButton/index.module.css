@@ -1,0 +1,15 @@
+.toggleIconButton {
+    border: none;
+    background-color: transparent;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0.45;
+    height: 4em;
+
+    @media screen and (max-width: 1200px) {
+        height: 3em;
+    }
+}

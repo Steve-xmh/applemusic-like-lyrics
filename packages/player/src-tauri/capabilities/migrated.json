@@ -14,6 +14,13 @@
 		"core:event:allow-emit-to",
 		"core:event:allow-listen",
 		"core:event:allow-unlisten",
+		"core:window:allow-start-dragging",
+		"core:window:allow-start-resize-dragging",
+		"core:window:allow-close",
+		"core:window:allow-maximize",
+		"core:window:allow-is-maximizable",
+		"core:window:allow-unmaximize",
+		"core:window:allow-minimize",
 		"fs:default",
 		"fs:allow-stat",
 		"dialog:default"

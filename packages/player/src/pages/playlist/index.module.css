@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-.playlist > * {
+.playlist>* {
     margin: 0 auto;
     padding: 0 var(--space-4);
     max-width: var(--container-4);

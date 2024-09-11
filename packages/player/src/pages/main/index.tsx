@@ -4,6 +4,7 @@ import {
 	Button,
 	Card,
 	Container,
+	ContextMenu,
 	Flex,
 	Heading,
 	Spinner,
@@ -26,7 +27,7 @@ export const MainPage: FC = () => {
 				sm: "9",
 			}}
 		>
-			<Flex direction="row" align="center" wrap="wrap">
+			<Flex direction="row" align="center" wrap="wrap" mt="5">
 				<Box asChild flexGrow="1">
 					<Heading wrap="nowrap" my="4">
 						AMLL Player
@@ -55,9 +56,21 @@ export const MainPage: FC = () => {
 				) : (
 					<>
 						{playlists.map((v) => (
-							<Card asChild size="2" mb="4" key={v.id}>
-								<Link to={`/playlist/${v.id}`}>{v.name}</Link>
-							</Card>
+							<ContextMenu.Root key={v.id}>
+								<ContextMenu.Trigger>
+									<Card asChild size="2" mb="4" key={v.id}>
+										<Link to={`/playlist/${v.id}`}>{v.name}</Link>
+									</Card>
+								</ContextMenu.Trigger>
+								<ContextMenu.Content>
+									<ContextMenu.Item
+										color="red"
+										onSelect={() => db.playlists.delete(v.id)}
+									>
+										删除
+									</ContextMenu.Item>
+								</ContextMenu.Content>
+							</ContextMenu.Root>
 						))}
 					</>
 				)

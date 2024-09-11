@@ -13,6 +13,7 @@ export const AutoLyricLayout: React.FC<
 	{
 		thumbSlot?: React.ReactNode;
 		controlsSlot?: React.ReactNode;
+		horizontalBottomControls?: React.ReactNode;
 		smallControlsSlot?: React.ReactNode;
 		bigControlsSlot?: React.ReactNode;
 		coverSlot?: React.ReactNode;
@@ -26,6 +27,7 @@ export const AutoLyricLayout: React.FC<
 		{
 			thumbSlot,
 			controlsSlot,
+			horizontalBottomControls,
 			smallControlsSlot,
 			bigControlsSlot,
 			coverSlot,
@@ -82,6 +84,7 @@ export const AutoLyricLayout: React.FC<
 						controlsSlot={controlsSlot}
 						coverSlot={coverSlot}
 						lyricSlot={lyricSlot}
+						bottomControls={horizontalBottomControls}
 						hideLyric={hideLyric}
 					/>
 				)}

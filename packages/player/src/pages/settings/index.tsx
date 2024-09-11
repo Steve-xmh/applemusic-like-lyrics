@@ -11,9 +11,15 @@ import {
 	lyricBackgroundStaticModeAtom,
 	lyricWordFadeWidthAtom,
 	playerControlsTypeAtom,
+	showBottomControlAtom,
+	showMusicAlbumAtom,
+	showMusicArtistsAtom,
+	showMusicNameAtom,
+	showVolumeControlAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import {
+	Box,
 	Button,
 	Card,
 	Container,
@@ -169,7 +175,7 @@ export const SettingsPage: FC = () => {
 			}}
 			mb="150px"
 		>
-			<Flex align="end" mt="4" gap="4">
+			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
 					返回
@@ -221,6 +227,28 @@ export const SettingsPage: FC = () => {
 			/>
 
 			<SubTitle>歌曲信息样式</SubTitle>
+
+			<SwitchSettings label="显示歌曲名称" configAtom={showMusicNameAtom} />
+			<SwitchSettings label="显示歌曲作者" configAtom={showMusicArtistsAtom} />
+			<SwitchSettings
+				label="显示歌曲专辑名称"
+				description="如果同时启用三个，布局上可能不太好看，请酌情调节。"
+				configAtom={showMusicAlbumAtom}
+			/>
+
+			<Box height="1em" />
+
+			<SwitchSettings
+				label="显示音量控制条"
+				configAtom={showVolumeControlAtom}
+			/>
+			<SwitchSettings
+				label="显示底部按钮组"
+				description="在横向布局里是右下角的几个按钮，在竖向布局里是播放按钮下方的几个按钮"
+				configAtom={showBottomControlAtom}
+			/>
+
+			<Box height="1em" />
 
 			<SelectSettings
 				label="播放控制组件类型"

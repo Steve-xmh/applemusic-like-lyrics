@@ -132,7 +132,7 @@ export const SongPage: FC = () => {
 				sm: "9",
 			}}
 		>
-			<Flex align="end" mt="4" gap="4">
+			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
 					返回

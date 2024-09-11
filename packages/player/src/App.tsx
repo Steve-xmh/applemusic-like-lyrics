@@ -16,7 +16,7 @@ function App() {
 	return (
 		<>
 			<MusicContext />
-			<Theme appearance="dark">
+			<Theme appearance="dark" className={styles.radixTheme}>
 				<Box
 					className={classNames(
 						styles.body,

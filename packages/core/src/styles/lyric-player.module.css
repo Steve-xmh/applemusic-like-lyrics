@@ -26,24 +26,14 @@
     }
 }
 
-@media (max-width: 1024px) {
-    .lyricLine {
-        padding: 1vh 20px;
-    }
-
-    .lyricBgLine {
-        padding: 1vh 1.428571em;
-    }
-}
-
 .lyricBgLine {
     opacity: 0;
     font-size: max(70%, 10px);
-    transition: opacity 0.25s, scale 0.5s;
-    padding: 1vh 20px;
+    transition: opacity 0.25s, scale 0.5s, filter 0.2s, background-color 0.25s, box-shadow 0.25s;
+    padding: 1vh 2px;
 
     &.active {
-        transition: opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0, 1, 0, 1) 0.25s;
+        transition: opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0, 1, 0, 1) 0.25s, filter 0.2s, background-color 0.25s, box-shadow 0.25s;
         opacity: 0.4;
     }
 }

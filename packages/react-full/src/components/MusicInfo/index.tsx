@@ -1,8 +1,8 @@
+import classNames from "classnames";
 import type { HTMLProps } from "react";
 import { MenuButton } from "../MenuButton";
 import { TextMarquee } from "../TextMarquee";
 import styles from "./index.module.css";
-import classNames from "classnames";
 
 export const MusicInfo: React.FC<
 	{
@@ -26,9 +26,19 @@ export const MusicInfo: React.FC<
 	return (
 		<div className={classNames(styles.musicInfo, className)} {...rest}>
 			<div className={styles.info}>
-				<TextMarquee className={styles.name}>{name || ""}</TextMarquee>
-				<TextMarquee className={styles.artists}>{artists}</TextMarquee>
-				<TextMarquee className={styles.album}>{album}</TextMarquee>
+				{name !== undefined && (
+					<TextMarquee className={styles.name}>{name}</TextMarquee>
+				)}
+				{artists !== undefined && (
+					<TextMarquee className={styles.artists}>
+						{artists.map((v) => (
+							<a>{v}</a>
+						))}
+					</TextMarquee>
+				)}
+				{album !== undefined && (
+					<TextMarquee className={styles.album}>{album}</TextMarquee>
+				)}
 			</div>
 			<MenuButton onClick={onMenuButtonClicked} />
 		</div>

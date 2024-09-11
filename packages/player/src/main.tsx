@@ -1,6 +1,7 @@
 import * as wsp from "@applemusic-like-lyrics/ws-protocol";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Provider } from "jotai";
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -25,6 +26,42 @@ const ErrorRender = (props: FallbackProps) => {
 		</div>
 	);
 };
+
+addEventListener("on-system-titlebar-click-close", async () => {
+	const win = getCurrentWindow();
+	await win.close();
+});
+
+addEventListener("on-system-titlebar-click-resize", async () => {
+	const win = getCurrentWindow();
+	if (await win.isMaximizable()) {
+		if (await win.isMaximized()) {
+			await win.unmaximize();
+			setSystemTitlebarResizeAppearance(
+				SystemTitlebarResizeAppearance.Maximize,
+			);
+		} else {
+			await win.maximize();
+			setSystemTitlebarResizeAppearance(SystemTitlebarResizeAppearance.Restore);
+		}
+	}
+});
+
+const win = getCurrentWindow();
+async function checkWindow() {
+	if (await win.isMaximized()) {
+		setSystemTitlebarResizeAppearance(SystemTitlebarResizeAppearance.Restore);
+	} else {
+		setSystemTitlebarResizeAppearance(SystemTitlebarResizeAppearance.Maximize);
+	}
+}
+checkWindow();
+win.onResized(checkWindow);
+
+addEventListener("on-system-titlebar-click-minimize", async () => {
+	const win = getCurrentWindow();
+	await win.minimize();
+});
 
 invoke("ws_reopen_connection", {
 	addr: "",

@@ -23,8 +23,10 @@ export const AMLLWrapper: FC = () => {
 	useLayoutEffect(() => {
 		if (isLyricPageOpened) {
 			document.body.dataset.amllLyricsOpen = "";
+			setSystemTitlebarImmersiveMode(true);
 		} else {
 			delete document.body.dataset.amllLyricsOpen;
+			setSystemTitlebarImmersiveMode(false);
 		}
 	}, [isLyricPageOpened]);
 

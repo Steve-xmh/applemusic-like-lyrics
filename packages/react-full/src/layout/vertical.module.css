@@ -50,6 +50,11 @@
     grid-template-columns:
         3em [cover-side] 0fr [info-side] 1fr 3em;
     mix-blend-mode: plus-lighter;
+
+    @media screen and (max-width: 480px) {
+        grid-template-columns:
+            2em [cover-side] 0fr [info-side] 1fr 2em;
+    }
 }
 
 .noLyricLayout {
@@ -63,6 +68,11 @@
     grid-template-columns:
         3em [main-view] 1fr 3em;
     pointer-events: none;
+
+    @media screen and (max-width: 480px) {
+        grid-template-columns:
+            2em [main-view] 1fr 2em;
+    }
 }
 
 /* 辅助定位的小封面图位置 */
@@ -76,6 +86,10 @@
     pointer-events: none;
 
     width: 6em;
+
+    @media screen and (max-width: 480px) {
+        width: 4.5em;
+    }
 
     /* border: 1px solid greenyellow; */
 }
@@ -117,6 +131,12 @@
     contain: paint;
 
     mask-image: linear-gradient(transparent 0%, black 10%, black 100%);
+
+    padding: 0 calc(3em - 24px);
+
+    @media screen and (max-width: 480px) {
+        padding: 0 calc(2em - 24px);
+    }
 }
 
 .bigControls {

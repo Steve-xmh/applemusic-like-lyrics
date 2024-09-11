@@ -2,12 +2,13 @@
     display: flex;
     color: white;
     font-size: max(2.0vh, 1em);
+    min-width: 0;
 }
 
 .info {
     flex: 1;
     min-width: 0;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .name {
