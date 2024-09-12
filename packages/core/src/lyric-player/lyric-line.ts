@@ -575,7 +575,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					// 	merged,
 					// 	mainWordEl,
 					// );
-					if (shouldEmphasize(merged)) {
+					if (emp) {
 						mainWordEl.classList.add(styles.emphasize);
 						const charEls: HTMLSpanElement[] = [];
 						for (const char of word.word.trim().split("")) {
@@ -589,7 +589,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 							...word,
 							mainElement: mainWordEl,
 							subElements: charEls,
-							elementAnimations: [this.initFloatAnimation(merged, mainWordEl)],
+							elementAnimations: [this.initFloatAnimation(word, mainWordEl)],
 							maskAnimations: [],
 							width: 0,
 							height: 0,
@@ -613,7 +613,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					}
 					wrapperWordEl.appendChild(mainWordEl);
 				}
-				if (shouldEmphasize(merged)) {
+				if (emp) {
 					this.splittedWords[
 						this.splittedWords.length - 1
 					].elementAnimations.push(
@@ -693,9 +693,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		let up = 0.05;
 		if (this.lyricLine.isBG) {
 			up *= 2;
-		}
-		if (shouldEmphasize(word)) {
-			up = 0;
 		}
 		const a = wordEl.animate(
 			[

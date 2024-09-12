@@ -4,6 +4,9 @@
 
 /* 给歌词视图元素应用的样式 */
 .amll-lyric-player {
+    --amll-lp-line-width-aspect: 0.9;
+    --amll-lp-line-padding-x: 1em;
+    --amll-lp-bg-line-scale: 70%;
     user-select: none;
     font-size: var(--amll-lp-font-size, max(max(4.7vh, 3.2vw), 12px));
     padding: 1em;
@@ -20,5 +23,12 @@
 
     &:hover .lyric-line {
         filter: unset !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .amll-lyric-player {
+        --amll-lp-line-width-aspect: 1;
+        --amll-lp-line-padding-x: 0;
     }
 }

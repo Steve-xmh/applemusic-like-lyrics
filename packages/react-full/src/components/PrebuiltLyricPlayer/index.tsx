@@ -52,6 +52,7 @@ import styles from "./index.module.css";
 import classNames from "classnames";
 import {
 	PlayerControlsType,
+	advanceLyricDynamicLyricTimeAtom,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -197,6 +198,9 @@ const PrebuiltCoreLyricPlayer: FC<{
 	const enableLyricSwapTransRomanLine = useAtomValue(
 		enableLyricSwapTransRomanLineAtom,
 	);
+	const advanceLyricDynamicLyricTime = useAtomValue(
+		advanceLyricDynamicLyricTimeAtom,
+	);
 
 	const processedLyricLines = useMemo(() => {
 		const processed = structuredClone(lyricLines);
@@ -242,6 +246,7 @@ const PrebuiltCoreLyricPlayer: FC<{
 			enableBlur={enableLyricLineBlurEffect}
 			enableScale={enableLyricLineScaleEffect}
 			enableSpring={enableLyricLineSpringAnimation}
+			enableLyricAdvanceDynamicLyricTime={advanceLyricDynamicLyricTime}
 			wordFadeWidth={lyricWordFadeWidth}
 		/>
 	);

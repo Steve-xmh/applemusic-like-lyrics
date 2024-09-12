@@ -203,7 +203,7 @@ export const MusicContext: FC = () => {
 				emitAudioThread(type);
 			},
 		});
-		const toEmit = (onEmit) => ({
+		const toEmit = <T,>(onEmit: T) => ({
 			onEmit,
 		});
 		store.set(onRequestNextSongAtom, toEmitThread("nextSong"));

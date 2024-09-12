@@ -7,9 +7,9 @@
     position: absolute;
     backface-visibility: hidden;
     transform-origin: left;
-    width: var(--amll-lp-width, 100%);
+    width: calc(var(--amll-lp-line-width-aspect, 1) * (var(--amll-lp-width, 100%) - (var(--amll-lp-line-padding-x, 1em) * 2)));
     height: fit-content;
-    padding: 2vh 1em;
+    padding: 2vh var(--amll-lp-line-padding-x, 1em);
     contain: content;
     will-change: filter, transform, opacity;
     transition: filter 0.2s, background-color 0.25s, box-shadow 0.25s;
@@ -28,10 +28,10 @@
 
 .lyricBgLine {
     opacity: 0;
-    font-size: max(70%, 10px);
+    font-size: max(var(--amll-lp-bg-line-scale, 70%), 10px);
     transition: opacity 0.25s, scale 0.5s, filter 0.2s, background-color 0.25s, box-shadow 0.25s;
     /* 因为字体大小缩小了，故内边距要和主行字体大小统一，行边距计算公式为 100% / font-size 转 em 单位 */
-    padding: 1vh 1.428571em;
+    padding: 1vh calc(var(--amll-lp-line-padding-x, 1em) / var(--amll-lp-bg-line-scale, 70%));
 
     &.active {
         transition: opacity 0.5s 0.25s, scale 1.5s cubic-bezier(0, 1, 0, 1) 0.25s, filter 0.2s, background-color 0.25s, box-shadow 0.25s;

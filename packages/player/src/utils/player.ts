@@ -37,58 +37,53 @@ export type SongData =
 	  }
 	| {
 			type: "custom";
+			id: string;
 			songJsonData: string;
 			origOrder: number;
 	  };
 
+export type AudioThreadMessageMap = {
+	resumeAudio: {};
+	pauseAudio: {};
+	resumeOrPauseAudio: {};
+	seekAudio: {
+		position: number;
+	};
+	jumpToSong: {
+		songIndex: number;
+	};
+	prevSong: {};
+	nextSong: {};
+	setPlaylist: {
+		songs: SongData[];
+	};
+	setVolume: {
+		volume: number;
+	};
+	setVolumeRelative: {
+		volume: number;
+	};
+	setAudioOutput: {
+		name: string;
+	};
+	setFFTRange: {
+		fromFreq: number;
+		toFreq: number;
+	};
+	syncStatus: {};
+	close: {};
+};
+
+export type AudioThreadMessageKeys = keyof AudioThreadMessageMap;
+
+export type AudioThreadMessagePayloadMap = {
+	[T in keyof AudioThreadMessageMap]: {
+		type: T;
+	} & AudioThreadMessageMap[T];
+};
+
 export type AudioThreadMessage =
-	| {
-			type: "resumeAudio";
-	  }
-	| {
-			type: "pauseAudio";
-	  }
-	| {
-			type: "resumeOrPauseAudio";
-	  }
-	| {
-			type: "seekAudio";
-			position: number;
-	  }
-	| {
-			type: "jumpToSong";
-			songIndex: number;
-	  }
-	| {
-			type: "prevSong";
-	  }
-	| {
-			type: "nextSong";
-	  }
-	| {
-			type: "setPlaylist";
-	  }
-	| {
-			type: "setVolume";
-	  }
-	| {
-			type: "setVolumeRelative";
-	  }
-	| {
-			type: "setAudioOutput";
-			name: string;
-	  }
-	| {
-			type: "setFFTRange";
-			fromFreq: number;
-			toFreq: number;
-	  }
-	| {
-			type: "syncStatus";
-	  }
-	| {
-			type: "close";
-	  };
+	AudioThreadMessagePayloadMap[AudioThreadMessageKeys];
 
 export type AudioThreadEvent =
 	| {
@@ -188,10 +183,7 @@ export async function restartApp(): Promise<never> {
 export async function emitAudioThread<
 	D extends AudioThreadMessage,
 	T extends D["type"],
->(
-	msgType: T,
-	data: Omit<AudioThreadMessage, "type" | "callbackId"> = {},
-): Promise<void> {
+>(msgType: T, data: Omit<AudioThreadMessage, "type"> = {}): Promise<void> {
 	const id = uid(32) + Date.now();
 	await invoke("local_player_send_msg", {
 		msg: {
@@ -207,10 +199,7 @@ export async function emitAudioThread<
 export function emitAudioThreadRet<
 	D extends AudioThreadMessage,
 	T extends D["type"],
->(
-	msgType: T,
-	data: Omit<AudioThreadMessage, "type" | "callbackId"> = {},
-): Promise<unknown> {
+>(msgType: T, data: Omit<AudioThreadMessage, "type"> = {}): Promise<unknown> {
 	const id = `${uid(32)}-${Date.now()}`;
 	return new Promise((resolve) => {
 		msgTasks.set(id, resolve);

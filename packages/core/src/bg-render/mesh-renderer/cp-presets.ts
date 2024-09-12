@@ -12,9 +12,9 @@ interface ControlPointPreset {
 }
 
 const p = (cx: number, cy: number, x: number, y: number) =>
-	({ cx, cy, x, y }) as ControlPointConf;
+	Object.freeze({ cx, cy, x, y }) as ControlPointConf;
 const preset = (width: number, height: number, conf: ControlPointConf[]) =>
-	({ width, height, conf }) as ControlPointPreset;
+	Object.freeze({ width, height, conf }) as ControlPointPreset;
 
 export const CONTROL_POINT_PRESETS = [
 	preset(6, 6, [

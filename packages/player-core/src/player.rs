@@ -79,7 +79,7 @@ impl Debug for AudioInfo {
 }
 
 pub type CustomSongLoaderReturn =
-    Box<dyn Future<Output = anyhow::Result<Box<dyn MediaSource + 'static>>> + Send>;
+    Box<dyn Future<Output = anyhow::Result<Box<dyn MediaSource>>> + Send>;
 pub type CustomSongLoaderFn = Box<dyn Fn(String) -> CustomSongLoaderReturn + Send + Sync>;
 
 pub type LocalSongLoaderReturn = Box<dyn Future<Output = anyhow::Result<std::fs::File>> + Send>;

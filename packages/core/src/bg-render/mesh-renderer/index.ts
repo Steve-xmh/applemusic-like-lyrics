@@ -857,8 +857,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.ALWAYS);
 
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
 		this.mainProgram = new GLProgram(
 			gl,
 			meshVertShader,
