@@ -24,11 +24,14 @@ async fn local_player_main<R: Runtime>(manager: impl Manager<R> + Clone + Send +
 
     let manager_clone = manager.clone();
     player.set_custom_local_song_loader(Box::new(move |path| {
-        let fs = manager_clone.fs();
-        let mut opt = OpenOptions::new();
-        opt.read(true);
-        let file = fs.open(Path::new(&path), opt)?;
-        Ok(file)
+        let manager_clone = manager_clone.clone();
+        Box::new(async move {
+            let fs = manager_clone.fs();
+            let mut opt = OpenOptions::new();
+            opt.read(true);
+            let file = fs.open(Path::new(&path), opt)?;
+            Ok(file)
+        })
     }));
 
     player

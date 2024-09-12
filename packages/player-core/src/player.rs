@@ -2,7 +2,6 @@ use std::{
     fmt::Debug,
     future::Future,
     io::ErrorKind,
-    pin::Pin,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -11,11 +10,8 @@ use anyhow::Context;
 
 use media_state::{MediaStateManager, MediaStateManagerBackend, MediaStateMessage};
 use output::create_audio_output_thread;
+use symphonia::core::io::{MediaSource, MediaSourceStream, MediaSourceStreamOptions};
 use symphonia::core::{errors::Error as DecodeError, units::Time};
-use symphonia::core::{
-    io::{MediaSource, MediaSourceStream, MediaSourceStreamOptions},
-    meta::StandardTagKey,
-};
 use tokio::{
     sync::{
         mpsc::{error::TryRecvError, UnboundedReceiver, UnboundedSender},
@@ -49,6 +45,8 @@ struct AudioPlayerTaskContext {
     pub play_pos_sx: UnboundedSender<Option<(bool, f64)>>,
     pub current_audio_info: Arc<RwLock<AudioInfo>>,
     pub media_state_manager: Option<Arc<MediaStateManager>>,
+    pub custom_song_loader: Option<Arc<CustomSongLoaderFn>>,
+    pub custom_local_song_loader: Option<Arc<LocalSongLoaderFn>>,
 }
 
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -80,10 +78,11 @@ impl Debug for AudioInfo {
     }
 }
 
-pub type CustomSongLoaderReturn = anyhow::Result<Box<dyn MediaSource + 'static>>;
+pub type CustomSongLoaderReturn =
+    Box<dyn Future<Output = anyhow::Result<Box<dyn MediaSource + 'static>>> + Send>;
 pub type CustomSongLoaderFn = Box<dyn Fn(String) -> CustomSongLoaderReturn + Send + Sync>;
 
-pub type LocalSongLoaderReturn = anyhow::Result<std::fs::File>;
+pub type LocalSongLoaderReturn = Box<dyn Future<Output = anyhow::Result<std::fs::File>> + Send>;
 pub type LocalSongLoaderFn = Box<dyn Fn(String) -> LocalSongLoaderReturn + Send + Sync>;
 
 pub struct AudioPlayer {
@@ -114,8 +113,8 @@ pub struct AudioPlayer {
     fft_task: JoinHandle<()>,
     play_pos_task: JoinHandle<()>,
 
-    custom_song_loader: Option<CustomSongLoaderFn>,
-    custom_local_song_loader: Option<LocalSongLoaderFn>,
+    custom_song_loader: Option<Arc<CustomSongLoaderFn>>,
+    custom_local_song_loader: Option<Arc<LocalSongLoaderFn>>,
     media_state_manager: Option<Arc<MediaStateManager>>,
     media_state_rx: Option<UnboundedReceiver<MediaStateMessage>>,
 }
@@ -250,11 +249,11 @@ impl AudioPlayer {
     }
 
     pub fn set_custom_song_loader(&mut self, loader: CustomSongLoaderFn) {
-        self.custom_song_loader = Some(loader);
+        self.custom_song_loader = Some(Arc::new(loader));
     }
 
     pub fn set_custom_local_song_loader(&mut self, loader: LocalSongLoaderFn) {
-        self.custom_local_song_loader = Some(loader);
+        self.custom_local_song_loader = Some(Arc::new(loader));
     }
 
     pub fn handler(&self) -> AudioPlayerHandle {
@@ -560,177 +559,88 @@ impl AudioPlayer {
                 play_pos_sx: self.play_pos_sx.clone(),
                 current_audio_info: self.current_audio_info.clone(),
                 media_state_manager: self.media_state_manager.clone(),
+                custom_song_loader: self.custom_song_loader.clone(),
+                custom_local_song_loader: self.custom_local_song_loader.clone(),
             };
-            self.prepare_play_audio(ctx, current_song);
+            let task = tokio::spawn(Self::play_audio(ctx, current_song));
+            self.current_play_task_handle = Some(task.abort_handle());
         } else {
             warn!("当前没有歌曲可以播放！");
         }
     }
 
-    fn prepare_play_audio(&mut self, ctx: AudioPlayerTaskContext, song_data: SongData) {
-        let music_id = song_data.get_id();
-        let handler = ctx.handler.clone();
+    async fn play_audio(ctx: AudioPlayerTaskContext, song_data: SongData) -> anyhow::Result<()> {
         let emitter = ctx.emitter.clone();
-        let task: JoinHandle<anyhow::Result<()>> = match song_data {
-            SongData::Local { file_path, .. } => {
-                if let Some(loader) = self.custom_local_song_loader.as_ref() {
-                    info!("正在通过自定义加载器播放本地音乐文件 {file_path}");
-                    match dbg!(loader(file_path)) {
-                        Ok(file) => tokio::task::spawn(async move {
-                            Self::play_media_stream(ctx, music_id, file).await?;
-                            handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                            Ok(())
-                        }),
-                        Err(err) => tokio::task::spawn(async move {
-                            emitter
-                                .emit(AudioThreadEvent::LoadError {
-                                    error: format!("自定义本地加载器返回了错误：{err}"),
-                                })
-                                .await?;
-                            handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                            Ok(())
-                        }),
+        let handler = ctx.handler.clone();
+        if let Err(err) = {
+            let music_id = song_data.get_id();
+            ctx.emitter
+                .emit(AudioThreadEvent::LoadingAudio {
+                    music_id: music_id.to_owned(),
+                })
+                .await?;
+            match song_data {
+                SongData::Local { file_path, .. } => {
+                    if let Some(loader) = ctx.custom_local_song_loader.as_ref() {
+                        info!("正在通过自定义加载器播放本地音乐文件 {file_path}");
+                        let loader_fut = Box::into_pin(loader(file_path));
+                        let file = loader_fut.await?;
+                        Self::play_media_stream(ctx, music_id, file).await
+                    } else {
+                        info!("正在播放本地音乐文件 {file_path}");
+                        Self::play_audio_from_local(ctx, music_id, file_path).await
                     }
-                } else {
-                    info!("正在播放本地音乐文件 {file_path}");
-                    tokio::task::spawn(async move {
-                        Self::play_audio_from_local(ctx, music_id, file_path).await?;
-                        handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                        Ok(())
-                    })
                 }
-            }
-            SongData::Custom { song_json_data, .. } => {
-                if let Some(loader) = self.custom_song_loader.as_ref() {
-                    match loader(song_json_data) {
-                        Ok(source) => {
-                            struct BoxedMediaSource(Box<dyn MediaSource + 'static>);
+                SongData::Custom { song_json_data, .. } => {
+                    if let Some(loader) = ctx.custom_song_loader.as_ref() {
+                        let source_fut = Box::into_pin(loader(song_json_data));
+                        let source = source_fut.await?;
 
-                            impl std::io::Read for BoxedMediaSource {
-                                fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-                                    self.0.read(buf)
-                                }
+                        struct BoxedMediaSource(Box<dyn MediaSource + 'static>);
+
+                        impl std::io::Read for BoxedMediaSource {
+                            fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+                                self.0.read(buf)
                             }
-
-                            impl std::io::Seek for BoxedMediaSource {
-                                fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
-                                    self.0.seek(pos)
-                                }
-                            }
-
-                            impl MediaSource for BoxedMediaSource {
-                                fn is_seekable(&self) -> bool {
-                                    self.0.is_seekable()
-                                }
-
-                                fn byte_len(&self) -> Option<u64> {
-                                    self.0.byte_len()
-                                }
-                            }
-
-                            tokio::task::spawn(async move {
-                                Self::play_media_stream(ctx, music_id, BoxedMediaSource(source))
-                                    .await?;
-                                handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                                Ok(())
-                            })
                         }
-                        Err(err) => tokio::task::spawn(async move {
-                            emitter
-                                .emit(AudioThreadEvent::LoadError {
-                                    error: format!("自定义歌曲源加载器返回了错误：{err}"),
-                                })
-                                .await?;
-                            handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                            Ok(())
-                        }),
+
+                        impl std::io::Seek for BoxedMediaSource {
+                            fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
+                                self.0.seek(pos)
+                            }
+                        }
+
+                        impl MediaSource for BoxedMediaSource {
+                            fn is_seekable(&self) -> bool {
+                                self.0.is_seekable()
+                            }
+
+                            fn byte_len(&self) -> Option<u64> {
+                                self.0.byte_len()
+                            }
+                        }
+
+                        Self::play_media_stream(ctx, music_id, BoxedMediaSource(source)).await
+                    } else {
+                        Err(anyhow::anyhow!(
+                            "传入了自定义音乐源但未设置自定义音乐加载器"
+                        ))
                     }
-                } else {
-                    tokio::task::spawn(async move {
-                        emitter
-                            .emit(AudioThreadEvent::LoadError {
-                                error: "传入了自定义音乐源但未设置自定义音乐加载器".to_owned(),
-                            })
-                            .await?;
-                        handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-                        Ok(())
-                    })
                 }
             }
-        };
-        self.current_play_task_handle = Some(task.abort_handle());
+        } {
+            error!("播放音频文件时出错：{err:?}");
+            emitter
+                .emit(AudioThreadEvent::LoadError {
+                    error: format!("{err:?}"),
+                })
+                .await?;
+        }
+
+        handler.send_anonymous(AudioThreadMessage::NextSong).await?;
+
+        Ok(())
     }
-
-    // async fn play_audio(ctx: AudioPlayerTaskContext, song_data: SongData) -> anyhow::Result<()> {
-    //     let emitter = ctx.emitter.clone();
-    //     let handler = ctx.handler.clone();
-    //     if let Err(err) = {
-    //         let music_id = song_data.get_id();
-    //         ctx.emitter
-    //             .emit(AudioThreadEvent::LoadingAudio {
-    //                 music_id: music_id.to_owned(),
-    //             })
-    //             .await?;
-    //         match song_data {
-    //             SongData::Local { file_path, .. } => {
-    //                 if let Some(loader) = ctx.custom_local_song_loader.as_ref() {
-    //                     info!("正在通过自定义加载器播放本地音乐文件 {file_path}");
-    //                     let file = loader(file_path).await?;
-    //                     Self::play_media_stream(ctx, music_id, file).await
-    //                 } else {
-    //                     info!("正在播放本地音乐文件 {file_path}");
-    //                     Self::play_audio_from_local(ctx, music_id, file_path).await
-    //                 }
-    //             }
-    //             SongData::Custom { song_json_data, .. } => {
-    //                 if let Some(loader) = ctx.custom_song_loader.as_ref() {
-    //                     let source = loader(song_json_data).await?;
-
-    //                     struct BoxedMediaSource(Box<dyn MediaSource + 'static>);
-
-    //                     impl std::io::Read for BoxedMediaSource {
-    //                         fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-    //                             self.0.read(buf)
-    //                         }
-    //                     }
-
-    //                     impl std::io::Seek for BoxedMediaSource {
-    //                         fn seek(&mut self, pos: std::io::SeekFrom) -> std::io::Result<u64> {
-    //                             self.0.seek(pos)
-    //                         }
-    //                     }
-
-    //                     impl MediaSource for BoxedMediaSource {
-    //                         fn is_seekable(&self) -> bool {
-    //                             self.0.is_seekable()
-    //                         }
-
-    //                         fn byte_len(&self) -> Option<u64> {
-    //                             self.0.byte_len()
-    //                         }
-    //                     }
-
-    //                     Self::play_media_stream(ctx, music_id, BoxedMediaSource(source)).await
-    //                 } else {
-    //                     Err(anyhow::anyhow!(
-    //                         "传入了自定义音乐源但未设置自定义音乐加载器"
-    //                     ))
-    //                 }
-    //             }
-    //         }
-    //     } {
-    //         error!("播放音频文件时出错：{err:?}");
-    //         emitter
-    //             .emit(AudioThreadEvent::LoadError {
-    //                 error: format!("{err:?}"),
-    //             })
-    //             .await?;
-    //     }
-
-    //     handler.send_anonymous(AudioThreadMessage::NextSong).await?;
-
-    //     Ok(())
-    // }
 
     async fn play_audio_from_local(
         ctx: AudioPlayerTaskContext,
