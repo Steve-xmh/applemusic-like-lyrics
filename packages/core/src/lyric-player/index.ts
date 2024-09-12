@@ -427,9 +427,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		);
 		let style = "";
 		style += "--amll-lp-width:";
-		style += `${this.innerSize[0] - this.padding * 2}px;`;
+		const width = this.innerSize[0] - this._baseFontSize * 2;
+		style += `${width.toFixed(4)}px;`;
 		style += "--amll-lp-height:";
-		style += `${this.innerSize[1] - this.padding * 2}px;`;
+		style += `${(this.innerSize[1] - this._baseFontSize * 2).toFixed(4)}px;`;
+		// 原本想用 calc 来计算的，但是发现算式复杂之后无法解析，所以只能用 JS 来计算直接结果了
+		style += "--amll-lp-line-width:";
+		if (this.innerSize[0] < 768) {
+			style += `${width.toFixed(4)}px;`;
+		} else {
+			style += `${(width * 0.8).toFixed(4)}px;`;
+		}
 
 		// style += "--amll-player-time:";
 		// style += this.currentTime;
