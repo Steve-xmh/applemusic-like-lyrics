@@ -9,7 +9,12 @@ import { exit } from 'node:process';
 import { fileURLToPath } from "node:url";
 
 const tauriConfPath = resolve(dirname(fileURLToPath(import.meta.url)), '../src-tauri/tauri.conf.json');
+
+console.log("Reading tauri.conf.json from", tauriConfPath);
+
 const tauriConf = JSON.parse(readFileSync(tauriConfPath, 'utf-8'));
+
+console.log("tauri.conf.json content:", tauriConf);
 
 const baseVersion = tauriConf.version;
 
