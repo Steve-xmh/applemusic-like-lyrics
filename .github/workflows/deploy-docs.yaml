@@ -27,7 +27,7 @@ jobs:
       - name: 安装依赖并构建网站
         run: |
           pnpm i
-          pnpm workspace -F @applemusic-like-lyrics/docs build
+          pnpm -F @applemusic-like-lyrics/docs build
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
           AMLL_GITHUB_IS_ACTION: true

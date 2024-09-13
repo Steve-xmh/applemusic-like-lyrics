@@ -96,7 +96,7 @@ jobs:
             开发版本可能不稳定且可能无法正常工作，请仅用于测试目的。
             
             Latest commits (最新提交): ${{ github.event.head_commit.message }}
-          prerelease: false
+          prerelease: true
           args: ${{ matrix.args }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
