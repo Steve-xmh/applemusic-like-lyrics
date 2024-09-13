@@ -35,6 +35,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         name: 克隆仓库
+        with:
+          fetch-depth: 0 # 为了正确生成开发版本号码
       - name: 缓存 Cargo 产物
         uses: actions/cache@v4
         with:
