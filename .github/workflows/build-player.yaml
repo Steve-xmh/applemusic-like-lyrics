@@ -79,6 +79,7 @@ jobs:
         run: |
           pnpm i
           pnpm lerna run build --scope @applemusic-like-lyrics/*
+          
         env:
           AMLL_GITHUB_IS_ACTION: true
       - name: 构建 AMLL Player 程序并发布自动构建
@@ -89,30 +90,23 @@ jobs:
           includeUpdaterJson: true
           releaseName: AMLL Player ${{ github.ref_name }} branch development build
           releaseBody: |
-            Latest ${{ github.ref_name }} branch development build
-            最新 ${{ github.ref_name }} 分支开发调试构建
+            Latest ${{ github.ref_name }} branch development build.
+            最新 ${{ github.ref_name }} 分支开发调试构建。
             Development version may be unstable and may not work properly, please only for test purpose.
             开发版本可能不稳定且可能无法正常工作，请仅用于测试目的。
-          releaseDraft: true
+            
+            Latest commits (最新提交): ${{ github.event.head_commit.message }}
           prerelease: false
           args: ${{ matrix.args }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: 上传产物到 Action Artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: AMLL Player ${{matrix.name}}-${{matrix.arch}}
-      #     path: |
-      #       packages/player/src-tauri/target/**/release/bundle/deb/*.deb
-      #       packages/player/src-tauri/target/**/release/bundle/appimage/*.AppImage
-      #       packages/player/src-tauri/target/**/release/bundle/appimage/*.AppImage.tar.gz
-      #       packages/player/src-tauri/target/**/release/bundle/msis/*.exe
-      #       packages/player/src-tauri/target/**/release/bundle/msi/*.msi
-      #       packages/player/src-tauri/target/**/release/bundle/dmg/*.dmg
-      #       packages/player/src-tauri/target/**/release/bundle/macos/*.app
-      #       packages/player/src-tauri/target/**/release/bundle/macos/*.app.tar.gz
-      #       packages/player/src-tauri/target/**/release/bundle/dmg/*.dmg
-      #       packages/player/src-tauri/target/**/release/bundle/macos/*.app
-      #       packages/player/src-tauri/target/**/release/bundle/macos/*.app.tar.gz
+      - name: 上传产物到 Action Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: AMLL Player ${{matrix.name}}-${{matrix.arch}}
+          path: |
+            packages/player/src-tauri/target/**/release/bundle/**/*
+            packages/player/src-tauri/target/**/release/amll-player.exe
+            packages/player/src-tauri/target/**/release/amll-player
