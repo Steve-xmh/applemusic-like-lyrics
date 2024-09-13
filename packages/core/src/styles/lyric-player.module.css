@@ -95,7 +95,7 @@
     height: clamp(0.5em, 1vh, 3em);
     transform-origin: center;
     width: fit-content;
-    padding: 2.5% var(--amll-lp-line-padding-x, 1em);
+    padding: 2.5% calc(var(--amll-lp-line-padding-x, 1em) * 0.6);
     position: absolute;
     display: flex;
     gap: 0.25em;

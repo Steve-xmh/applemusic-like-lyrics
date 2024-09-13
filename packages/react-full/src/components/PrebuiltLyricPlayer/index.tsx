@@ -63,6 +63,9 @@ import {
 	lyricBackgroundRenderScaleAtom,
 	lyricBackgroundRendererAtom,
 	lyricBackgroundStaticModeAtom,
+	lyricFontFamilyAtom,
+	lyricFontWeightAtom,
+	lyricLetterSpacingAtom,
 	lyricWordFadeWidthAtom,
 	playerControlsTypeAtom,
 	showBottomControlAtom,
@@ -183,6 +186,10 @@ const PrebuiltCoreLyricPlayer: FC<{
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const musicPlayingPosition = useAtomValue(musicPlayingPositionAtom);
 
+	const lyricFontFamily = useAtomValue(lyricFontFamilyAtom);
+	const lyricFontWeight = useAtomValue(lyricFontWeightAtom);
+	const lyricLetterSpacing = useAtomValue(lyricLetterSpacingAtom);
+
 	const enableLyricLineBlurEffect = useAtomValue(enableLyricLineBlurEffectAtom);
 	const enableLyricLineScaleEffect = useAtomValue(
 		enableLyricLineScaleEffectAtom,
@@ -235,7 +242,9 @@ const PrebuiltCoreLyricPlayer: FC<{
 			style={{
 				width: "100%",
 				height: "100%",
-				fontWeight: "var(--amll-lyric-font-weight, 500)",
+				fontFamily: lyricFontFamily || undefined,
+				fontWeight: lyricFontWeight || undefined,
+				letterSpacing: lyricLetterSpacing || undefined,
 			}}
 			playing={musicIsPlaying}
 			disabled={!isLyricPageOpened}
@@ -247,7 +256,7 @@ const PrebuiltCoreLyricPlayer: FC<{
 			enableScale={enableLyricLineScaleEffect}
 			enableSpring={enableLyricLineSpringAnimation}
 			enableLyricAdvanceDynamicLyricTime={advanceLyricDynamicLyricTime}
-			wordFadeWidth={lyricWordFadeWidth}
+			wordFadeWidth={Math.max(0.01, lyricWordFadeWidth)}
 		/>
 	);
 };

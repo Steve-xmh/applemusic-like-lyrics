@@ -91,6 +91,27 @@ export const lyricWordFadeWidthAtom = atomWithStorage(
 	"amll-react-full.lyricWordFadeWidth",
 	0.5,
 );
+/**
+ * 设置仅歌词组件的字体家族（CSS Font Family 属性），默认为空（即继承自父元素）
+ */
+export const lyricFontFamilyAtom = atomWithStorage(
+	"amll-react-full.lyricFontFamily",
+	"",
+);
+/**
+ * 设置仅歌词组件的字体字重（CSS Font Weight 属性），默认为 0 （即继承自父元素）
+ */
+export const lyricFontWeightAtom = atomWithStorage(
+	"amll-react-full.lyricFontWeight",
+	0,
+);
+/**
+ * 设置仅歌词组件的字符间距（CSS Font Weight 属性），默认为 0 （即继承自父元素）
+ */
+export const lyricLetterSpacingAtom = atomWithStorage(
+	"amll-react-full.lyricLetterSpacing",
+	"normal",
+);
 
 // ====================== 歌曲信息展示配置 ======================
 

@@ -9,6 +9,9 @@ import {
 	lyricBackgroundFPSAtom,
 	lyricBackgroundRenderScaleAtom,
 	lyricBackgroundStaticModeAtom,
+	lyricFontFamilyAtom,
+	lyricFontWeightAtom,
+	lyricLetterSpacingAtom,
 	lyricWordFadeWidthAtom,
 	playerControlsTypeAtom,
 	showBottomControlAtom,
@@ -35,7 +38,13 @@ import {
 	type TextProps,
 } from "@radix-ui/themes";
 import { type WritableAtom, useAtom, useAtomValue } from "jotai";
-import type { ComponentProps, FC, PropsWithChildren, ReactNode } from "react";
+import {
+	type ComponentProps,
+	type FC,
+	type PropsWithChildren,
+	type ReactNode,
+	useState,
+} from "react";
 import { branch, commit } from "virtual:git-metadata-plugin";
 import { backgroundRendererAtom, fftDataRangeAtom } from "../../states";
 import { restartApp } from "../../utils/player";
@@ -77,8 +86,8 @@ const NumberSettings: FC<
 				style={{
 					minWidth: "10em",
 				}}
-				value={value}
-				onChange={(e) => setValue(Number(e.currentTarget.value) || 60)}
+				defaultValue={value}
+				onChange={(e) => setValue(e.currentTarget.valueAsNumber)}
 			/>
 		</SettingEntry>
 	);
@@ -164,6 +173,102 @@ const SubTitle: FC<PropsWithChildren<TextProps>> = ({ children, ...props }) => {
 	);
 };
 
+const LyricFontSetting: FC = () => {
+	const [fontFamily, setFontFamily] = useAtom(lyricFontFamilyAtom);
+	const [fontWeight, setFontWeight] = useAtom(lyricFontWeightAtom);
+	const [letterSpacing, setLetterSpacing] = useAtom(lyricLetterSpacingAtom);
+	const [preview, setPreview] = useState("字体预览 Font Preview");
+
+	return (
+		<Card mt="2">
+			<Flex direction="row" align="center" gap="4">
+				<Flex direction="column" flexGrow="1">
+					<Text as="div">歌词字体设置</Text>
+					<Text as="div" color="gray" size="2" className={styles.desc}>
+						此设置仅设置歌词字体，不包含其他组件的字体
+					</Text>
+				</Flex>
+			</Flex>
+			<Flex direction="row" align="center" gap="4" my="2">
+				<Flex direction="column" flexGrow="1">
+					<Text as="div">字体家族</Text>
+					<Text as="div" color="gray" size="2" className={styles.desc}>
+						以逗号分隔的字体名称组合，等同于 CSS 的 font-family 属性，留空为默认
+					</Text>
+				</Flex>
+				<TextField.Root
+					value={fontFamily}
+					onChange={(e) => setFontFamily(e.currentTarget.value)}
+				/>
+			</Flex>
+			<Flex direction="row" align="center" gap="4" my="2">
+				<Flex direction="column" flexGrow="1">
+					<Text as="div">字体字重</Text>
+					<Text as="div" color="gray" size="2" className={styles.desc}>
+						等同于 CSS 的 font-weight 属性，设置 0 为默认
+					</Text>
+				</Flex>
+				<TextField.Root
+					value={fontWeight}
+					type="number"
+					min={0}
+					max={1000}
+					onChange={(e) => setFontWeight(e.currentTarget.valueAsNumber)}
+				/>
+				<Slider
+					value={[fontWeight]}
+					min={0}
+					max={1000}
+					style={{
+						maxWidth: "10em",
+					}}
+					onValueChange={([value]) => setFontWeight(value)}
+				/>
+			</Flex>
+			<Flex direction="row" align="center" gap="4" my="2">
+				<Flex direction="column" flexGrow="1">
+					<Text as="div">字符间距</Text>
+					<Text as="div" color="gray" size="2" className={styles.desc}>
+						等同于 CSS 的 letter-spacing 属性，留空为默认
+					</Text>
+				</Flex>
+				<TextField.Root
+					value={letterSpacing}
+					onChange={(e) => setLetterSpacing(e.currentTarget.value)}
+				/>
+			</Flex>
+			<Flex direction="row" align="center" gap="4" my="2">
+				<Flex direction="column" flexGrow="1">
+					<Text as="div">字体预览</Text>
+				</Flex>
+				<TextField.Root
+					value={preview}
+					onChange={(e) => setPreview(e.currentTarget.value)}
+				/>
+			</Flex>
+			<Box
+				style={{
+					fontFamily: fontFamily || undefined,
+					fontWeight: fontWeight || undefined,
+					letterSpacing: letterSpacing || undefined,
+					fontSize: "max(max(4.7vh, 3.2vw), 12px)",
+					textAlign: "center",
+				}}
+			>
+				{preview}
+				<Box
+					style={{
+						fontSize: "max(0.5em, 10px)",
+						opacity: "0.3",
+					}}
+				>
+					{preview}
+				</Box>
+			</Box>
+		</Card>
+	);
+};
+
 export const SettingsPage: FC = () => {
 	const fftDataRange = useAtomValue(fftDataRangeAtom);
 
@@ -197,6 +302,8 @@ export const SettingsPage: FC = () => {
 			/>
 
 			<SubTitle>歌词样式</SubTitle>
+			<LyricFontSetting />
+
 			<SwitchSettings
 				label="启用歌词模糊效果"
 				description="对性能影响较高，如果遇到性能问题，可以尝试关闭此项。默认开启。"

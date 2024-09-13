@@ -131,6 +131,7 @@ export const SongPage: FC = () => {
 				initial: "4",
 				sm: "9",
 			}}
+			mb="150px"
 		>
 			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
