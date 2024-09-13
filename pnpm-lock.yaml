@@ -212,7 +212,7 @@ importers:
         specifier: ^1.8.3
         version: 1.8.3
       '@types/stats.js':
-        specifier: ^0.17.0
+        specifier: ^0.17.3
         version: 0.17.3
       lil-gui:
         specifier: ^0.18.2
@@ -402,6 +402,9 @@ importers:
       sass:
         specifier: ^1.69.3
         version: 1.78.0
+      stats.js:
+        specifier: ^0.17.0
+        version: 0.17.0
       uid:
         specifier: ^2.0.2
         version: 2.0.2
@@ -433,6 +436,9 @@ importers:
       '@types/react-window':
         specifier: ^1.8.8
         version: 1.8.8
+      '@types/stats.js':
+        specifier: ^0.17.0
+        version: 0.17.3
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.4.3(@types/node@20.16.5)(lightningcss@1.26.0)(sass@1.78.0)(terser@5.31.6))

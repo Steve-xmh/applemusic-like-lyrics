@@ -43,6 +43,7 @@
 		"react-virtualized-auto-sizer": "^1.0.24",
 		"react-window": "^1.8.10",
 		"sass": "^1.69.3",
+		"stats.js": "^0.17.0",
 		"uid": "^2.0.2",
 		"vite-plugin-lightningcss": "^0.0.5",
 		"vite-plugin-svgr": "^4.2.0",
@@ -55,6 +56,7 @@
 		"@types/react": "^18.2.15",
 		"@types/react-dom": "^18.2.7",
 		"@types/react-window": "^1.8.8",
+		"@types/stats.js": "^0.17.0",
 		"@vitejs/plugin-react": "^4.3.1",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.0"

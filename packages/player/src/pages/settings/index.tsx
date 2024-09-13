@@ -46,7 +46,11 @@ import {
 	useState,
 } from "react";
 import { branch, commit } from "virtual:git-metadata-plugin";
-import { backgroundRendererAtom, fftDataRangeAtom } from "../../states";
+import {
+	backgroundRendererAtom,
+	fftDataRangeAtom,
+	showStatJSFrameAtom,
+} from "../../states";
 import { restartApp } from "../../utils/player";
 import styles from "./index.module.css";
 
@@ -435,7 +439,14 @@ export const SettingsPage: FC = () => {
 			/>
 
 			<SubTitle>杂项</SubTitle>
-			<Button onClick={() => restartApp()}>重启程序</Button>
+			<SwitchSettings
+				label="显示性能统计信息"
+				description="可以看到帧率、帧时间、内存占用（仅 Chromuim 系）等信息，对性能影响较小。"
+				configAtom={showStatJSFrameAtom}
+			/>
+			<Button my="2" onClick={() => restartApp()}>
+				重启程序
+			</Button>
 			<Separator my="3" size="4" />
 			<SubTitle>关于</SubTitle>
 			<Text as="div">Apple Music-like Lyrics Player</Text>

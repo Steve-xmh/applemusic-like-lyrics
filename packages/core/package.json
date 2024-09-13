@@ -41,7 +41,7 @@
     "@applemusic-like-lyrics/lyric": "^0.0.2",
     "@applemusic-like-lyrics/ttml": "workspace:^",
     "@biomejs/biome": "^1.8.3",
-    "@types/stats.js": "^0.17.0",
+    "@types/stats.js": "^0.17.3",
     "lil-gui": "^0.18.2",
     "stats.js": "^0.17.0",
     "typedoc": "^0.26.5",

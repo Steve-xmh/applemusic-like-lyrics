@@ -12,3 +12,8 @@ export const fftDataRangeAtom = atomWithStorage(
 	"amll-player.fftDataRange",
 	[80, 2000],
 );
+
+export const showStatJSFrameAtom = atomWithStorage(
+	"amll-player.showStatJSFrame",
+	false,
+);
