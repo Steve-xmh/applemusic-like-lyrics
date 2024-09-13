@@ -131,7 +131,6 @@ const LyricContext: FC = () => {
 
 	useEffect(() => {
 		if (song) {
-			console.log("正在检查歌词", song.id, song.lyricFormat);
 			try {
 				switch (song.lyricFormat) {
 					case "lrc": {
@@ -171,7 +170,6 @@ const LyricContext: FC = () => {
 					}
 					case "ttml": {
 						const lyric = parseTTML(song.lyric);
-						console.log("解析出 TTML 歌词", lyric);
 						setLyricLines(lyric.lines);
 						setHideLyricView(false);
 						break;
@@ -235,7 +233,6 @@ export const MusicContext: FC = () => {
 			musicInfo: AudioInfo,
 			musicId = store.get(musicIdAtom),
 		) => {
-			console.log("已设置音乐信息", musicInfo);
 			store.set(musicNameAtom, musicInfo.name);
 			store.set(musicAlbumNameAtom, musicInfo.album);
 			store.set(
@@ -293,7 +290,6 @@ export const MusicContext: FC = () => {
 			}
 		};
 		const syncMusicQuality = (quality: AudioQuality) => {
-			console.log("已设置音乐音质信息", quality);
 			let result = AudioQualityType.None;
 			if (quality.codec === "flac") {
 				result = AudioQualityType.Lossless;

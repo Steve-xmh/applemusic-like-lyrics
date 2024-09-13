@@ -32,7 +32,7 @@ export const MusicInfo: React.FC<
 				{artists !== undefined && (
 					<TextMarquee className={styles.artists}>
 						{artists.map((v) => (
-							<a>{v}</a>
+							<a key={`artist-${v}`}>{v}</a>
 						))}
 					</TextMarquee>
 				)}

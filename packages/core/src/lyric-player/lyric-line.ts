@@ -1033,6 +1033,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					a.cancel();
 				}
 				try {
+					// TODO: 如果此处动画帧计算出错，需要一个后备方案
 					const ani = wordEl.animate(frames, {
 						duration: totalDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
