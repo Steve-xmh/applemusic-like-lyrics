@@ -79,7 +79,6 @@ jobs:
         run: |
           pnpm i
           pnpm lerna run build --scope @applemusic-like-lyrics/*
-          node ./packages/player/scripts/gen-dev-version.mjs
         env:
           AMLL_GITHUB_IS_ACTION: true
       - name: 生成开发构建版本号
