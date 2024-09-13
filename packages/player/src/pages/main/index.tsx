@@ -1,5 +1,6 @@
 import { GearIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
+	Badge,
 	Box,
 	Button,
 	Card,
@@ -12,13 +13,17 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useAtomValue } from "jotai";
 import type { FC } from "react";
 import { Link } from "react-router-dom";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
 import { db } from "../../dexie";
+import { router } from "../../router";
+import { updateInfoAtom } from "../../states/updater";
 
 export const MainPage: FC = () => {
 	const playlists = useLiveQuery(() => db.playlists.toArray());
+	const updateInfo = useAtomValue(updateInfoAtom);
 
 	return (
 		<Container
@@ -31,6 +36,19 @@ export const MainPage: FC = () => {
 				<Box asChild flexGrow="1">
 					<Heading wrap="nowrap" my="4">
 						AMLL Player
+						{updateInfo && (
+							<Badge
+								onClick={() => router.navigate("/settings#updater")}
+								radius="full"
+								style={{
+									cursor: "pointer",
+								}}
+								color="indigo"
+								ml="2"
+							>
+								有可用更新
+							</Badge>
+						)}
 					</Heading>
 				</Box>
 				<Flex gap="1" wrap="wrap">

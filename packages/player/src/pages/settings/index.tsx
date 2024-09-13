@@ -37,20 +37,25 @@ import {
 	TextField,
 	type TextProps,
 } from "@radix-ui/themes";
-import { type WritableAtom, useAtom, useAtomValue } from "jotai";
+import { getVersion } from "@tauri-apps/api/app";
+import { type WritableAtom, atom, useAtom, useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
 import {
 	type ComponentProps,
 	type FC,
 	type PropsWithChildren,
 	type ReactNode,
+	Suspense,
 	useState,
 } from "react";
+import { toast } from "react-toastify";
 import { branch, commit } from "virtual:git-metadata-plugin";
 import {
 	backgroundRendererAtom,
 	fftDataRangeAtom,
 	showStatJSFrameAtom,
 } from "../../states";
+import { updateInfoAtom } from "../../states/updater";
 import { restartApp } from "../../utils/player";
 import styles from "./index.module.css";
 
@@ -273,8 +278,13 @@ const LyricFontSetting: FC = () => {
 	);
 };
 
+const appVersionAtom = loadable(atom(() => getVersion()));
+
 export const SettingsPage: FC = () => {
 	const fftDataRange = useAtomValue(fftDataRangeAtom);
+	const updateInfo = useAtomValue(updateInfoAtom);
+	const appVersion = useAtomValue(appVersionAtom);
+	const [updating] = useState(false);
 
 	return (
 		<Container
@@ -451,9 +461,80 @@ export const SettingsPage: FC = () => {
 			<SubTitle>关于</SubTitle>
 			<Text as="div">Apple Music-like Lyrics Player</Text>
 			<Text as="div" style={{ opacity: "0.5" }}>
+				{appVersion.state === "hasData" ? `${appVersion.data} - ` : ""}
 				{commit.substring(0, 7)} - {branch}
 			</Text>
 			<Text as="div">由 SteveXMH 及其所有 Github 协作者共同开发</Text>
+			<Suspense>
+				{/* biome-ignore lint/complexity/useOptionalChain: <explanation> */}
+				{updateInfo && updateInfo.available && (
+					<>
+						<div id="updater">
+							有可用更新从 {updateInfo.currentVersion} 升级至{" "}
+							{updateInfo.version}
+						</div>
+						<div
+							style={{
+								margin: "1em 0",
+								whiteSpace: "pre-wrap",
+							}}
+						>
+							{updateInfo.body}
+						</div>
+						<Button
+							disabled={updating}
+							loading={updating}
+							onClick={() => {
+								const t = toast.loading(
+									"正在更新，完成后将会自动重启，请稍后……",
+								);
+								let contentLength: number | undefined = undefined;
+								let receivedLength = 0;
+
+								function getProgressSizeText() {
+									const rec = `${(receivedLength / 1024 / 1024).toFixed(2)} MiB`;
+									if (contentLength === undefined) {
+										return `(${rec})`;
+									}
+									const total = `${(contentLength / 1024 / 1024).toFixed(2)} MiB`;
+									return `(${rec} / ${total}) (${((receivedLength / contentLength) * 100).toFixed(1)}%)`;
+								}
+
+								updateInfo.downloadAndInstall((evt) => {
+									switch (evt.event) {
+										case "Started": {
+											contentLength = evt.data.contentLength;
+											toast.update(t, {
+												render: `正在下载更新…… ${getProgressSizeText()}`,
+											});
+											break;
+										}
+										case "Progress": {
+											receivedLength += evt.data.chunkLength;
+											toast.update(t, {
+												render: `正在下载更新…… ${getProgressSizeText()}`,
+												progress:
+													contentLength === undefined
+														? null
+														: receivedLength / contentLength,
+											});
+											break;
+										}
+										case "Finished":
+											toast.update(t, {
+												render: "正在安装更新，将会自动重启，请稍后……",
+												progress: null,
+											});
+											break;
+									}
+								});
+							}}
+						>
+							更新并安装
+						</Button>
+					</>
+				)}
+			</Suspense>
 		</Container>
 	);
 };

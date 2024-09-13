@@ -5,11 +5,13 @@ import classNames from "classnames";
 import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
 import styles from "./App.module.css";
 import { AMLLWrapper } from "./components/AMLLWrapper";
 import { MusicContext } from "./components/MusicContext";
 import { NowPlayingBar } from "./components/NowPlayingBar";
+import { UpdateContext } from "./components/UpdateContext";
 import "./i18n";
 import { router } from "./router";
 import { showStatJSFrameAtom } from "./states";
@@ -43,6 +45,7 @@ function App() {
 	return (
 		<>
 			<MusicContext />
+			<UpdateContext />
 			<Theme appearance="dark" className={styles.radixTheme}>
 				<Box
 					className={classNames(
@@ -56,6 +59,13 @@ function App() {
 					<NowPlayingBar />
 				</Box>
 				<AMLLWrapper />
+				<ToastContainer
+					theme="dark"
+					position="bottom-right"
+					style={{
+						marginBottom: "150px",
+					}}
+				/>
 			</Theme>
 		</>
 	);

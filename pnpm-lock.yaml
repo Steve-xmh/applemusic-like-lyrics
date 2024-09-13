@@ -351,6 +351,9 @@ importers:
       '@tauri-apps/plugin-os':
         specifier: 2.0.0-rc.1
         version: 2.0.0-rc.1
+      '@tauri-apps/plugin-updater':
+        specifier: 2.0.0-rc.2
+        version: 2.0.0-rc.2
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -2424,6 +2427,9 @@ packages:
 
   '@tauri-apps/plugin-os@2.0.0-rc.1':
     resolution: {integrity: sha512-PV8zlSTmYfiN2xzILUmlDSEycS7UYbH2yXk/ZqF+qQU6/s+OVQvmSth4EhllFjcpvPbtqELvpzfjw+2qEouchA==}
+
+  '@tauri-apps/plugin-updater@2.0.0-rc.2':
+    resolution: {integrity: sha512-Ngvpa/km/00KASvOsFqRQbVf/6BaAX/gYwQs9eFxjygDpxxlZkZDVP1Fg0urW8s5dY7ELD6UAFB/ZI/g8D0QvQ==}
 
   '@trysound/sax@0.2.0':
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
@@ -8268,6 +8274,10 @@ snapshots:
       '@tauri-apps/api': 2.0.0-rc.4
 
   '@tauri-apps/plugin-os@2.0.0-rc.1':
+    dependencies:
+      '@tauri-apps/api': 2.0.0-rc.4
+
+  '@tauri-apps/plugin-updater@2.0.0-rc.2':
     dependencies:
       '@tauri-apps/api': 2.0.0-rc.4
 

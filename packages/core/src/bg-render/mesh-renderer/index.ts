@@ -312,6 +312,10 @@ class ControlPoint {
 	location = Vec2.fromValues(0, 0);
 	uTangent = Vec2.fromValues(0, 0);
 	vTangent = Vec2.fromValues(0, 0);
+
+	constructor() {
+		Object.seal(this);
+	}
 }
 
 const H = Mat4.fromValues(2, -2, 1, 1, -3, 3, -2, -1, 0, 0, 1, 0, 1, 0, 0, 0);
@@ -465,6 +469,7 @@ class Map2D<T> {
 	private _data: T[] = [];
 	constructor(width: number, height: number) {
 		this.resize(width, height);
+		Object.seal(this);
 	}
 	resize(width: number, height: number) {
 		this._width = width;
@@ -501,6 +506,7 @@ class BHPMesh extends Mesh {
 	) {
 		super(gl, attrPos, attrColor, attrUV);
 		this.resizeControlPoints(3, 3);
+		Object.seal(this);
 	}
 	override setWireFrame(enable: boolean) {
 		super.setWireFrame(enable);

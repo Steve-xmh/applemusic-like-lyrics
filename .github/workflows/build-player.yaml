@@ -79,9 +79,12 @@ jobs:
         run: |
           pnpm i
           pnpm lerna run build --scope @applemusic-like-lyrics/*
-          
+          node ./packages/player/scripts/gen-dev-version.mjs
         env:
           AMLL_GITHUB_IS_ACTION: true
+      - name: 生成开发构建版本号
+        run: |
+          node ./packages/player/scripts/gen-dev-version.mjs
       - name: 构建 AMLL Player 程序并发布自动构建
         uses: tauri-apps/tauri-action@v0
         with:

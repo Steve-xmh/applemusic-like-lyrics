@@ -1,6 +1,7 @@
 use crate::server::AMLLWebSocketServer;
 use amll_player_core::AudioInfo;
 use serde::*;
+use serde_json::Value;
 use std::{net::SocketAddr, path::Path, sync::Mutex};
 use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
 use tauri::{AppHandle, Manager, Runtime, State};
@@ -125,10 +126,25 @@ fn init_logging() {
 pub fn run() {
     init_logging();
     info!("AMLL Player is starting!");
+    let context = tauri::generate_context!();
+
+    let pubkey = {
+        if let Some(Value::Object(updater_config)) = context.config().plugins.0.get("updater") {
+            if let Some(Value::String(pubkey)) = updater_config.get("pubkey") {
+                pubkey.clone()
+            } else {
+                "".into()
+            }
+        } else {
+            "".into()
+        }
+    };
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_updater::Builder::new().pubkey(pubkey).build())
         .invoke_handler(tauri::generate_handler![
             ws_reopen_connection,
             ws_get_connections,
@@ -142,6 +158,6 @@ pub fn run() {
             app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle().clone())));
             Ok(())
         })
-        .run(tauri::generate_context!())
+        .run(context)
         .expect("error while running tauri application");
 }

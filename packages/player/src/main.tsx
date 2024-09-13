@@ -6,6 +6,7 @@ import { Provider } from "jotai";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
+import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
 import "./styles.css";
 import "./utils/player";

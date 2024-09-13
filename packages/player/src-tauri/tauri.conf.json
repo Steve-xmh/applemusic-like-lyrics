@@ -19,7 +19,7 @@
 		"createUpdaterArtifacts": true
 	},
 	"productName": "AMLL Player",
-	"version": "0.0.1",
+	"version": "0.0.0",
 	"identifier": "net.stevexmh.amllplayer",
 	"plugins": {
 		"updater": {

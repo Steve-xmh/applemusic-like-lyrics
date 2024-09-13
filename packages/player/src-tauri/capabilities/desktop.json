@@ -5,6 +5,10 @@
     "windows",
     "linux"
   ],
+  "local": true,
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "updater:default"
   ]
