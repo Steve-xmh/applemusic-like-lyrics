@@ -117,7 +117,7 @@
         padding-right: 1em;
     }
 
-    @media screen and (max-width: 1200px) {
+    @media screen and (max-width: 1600px) {
         gap: 2em;
         padding-right: 2em;
     }

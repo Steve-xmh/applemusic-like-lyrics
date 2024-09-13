@@ -4,7 +4,10 @@ use serde::*;
 use serde_json::Value;
 use std::{net::SocketAddr, path::Path, sync::Mutex};
 use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
-use tauri::{AppHandle, Manager, Runtime, State};
+use tauri::{
+    AppHandle, Manager, PhysicalSize, Runtime, Size, State, Theme, TitleBarStyle,
+    WebviewWindowBuilder,
+};
 use tauri_plugin_fs::OpenOptions;
 use tracing::*;
 
@@ -88,6 +91,67 @@ async fn read_local_music_metadata(
     }
 }
 
+fn recreate_window(app: &AppHandle) {
+    if let Some(win) = app.get_webview_window("main") {
+        #[cfg(desktop)]
+        {
+            let _ = win.show();
+            let _ = win.set_focus();
+        }
+        return;
+    }
+    #[cfg(debug_assertions)]
+    let url = tauri::WebviewUrl::External(app.config().build.dev_url.clone().unwrap());
+    #[cfg(not(debug_assertions))]
+    let url = tauri::WebviewUrl::App("index.html".into());
+    let win: WebviewWindowBuilder<'_, _, _> = WebviewWindowBuilder::new(app, "main", url);
+    #[cfg(not(desktop))]
+    let win = win;
+    #[cfg(all(desktop, not(target_os = "macos")))]
+    let win = win.transparent(true);
+    #[cfg(desktop)]
+    let win = win
+        .center()
+        .inner_size(800.0, 600.0)
+        .title({
+            #[cfg(target_os = "macos")]
+            {
+                ""
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                "AMLL Player"
+            }
+        })
+        .visible(false)
+        .theme(Some(Theme::Dark))
+        .decorations({
+            #[cfg(target_os = "macos")]
+            {
+                true
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                false
+            }
+        });
+
+    #[cfg(target_os = "macos")]
+    let win = win.title_bar_style(TitleBarStyle::Overlay);
+
+    let win = win.build().expect("can't show original window");
+
+    #[cfg(desktop)]
+    {
+        let _ = win.show();
+        let _ = win.set_focus();
+        if let Ok(orig_size) = win.inner_size() {
+            let _ = win.set_size(Size::Physical(PhysicalSize::new(0, 0)));
+            let _ = win.set_size(orig_size);
+        }
+    }
+}
+
 fn init_logging() {
     #[cfg(not(debug_assertions))]
     {
@@ -156,6 +220,7 @@ pub fn run() {
         .setup(|app| {
             player::init_local_player(app.handle().clone());
             app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle().clone())));
+            recreate_window(app.handle());
             Ok(())
         })
         .run(context)

@@ -31,17 +31,6 @@
 	},
 	"app": {
 		"withGlobalTauri": true,
-		"windows": [
-			{
-				"label": "main",
-				"fullscreen": false,
-				"resizable": true,
-				"decorations": false,
-				"title": "AMLL Player",
-				"width": 800,
-				"height": 600,
-				"theme": "Dark"
-			}
-		]
+		"windows": []
 	}
 }
