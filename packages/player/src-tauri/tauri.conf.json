@@ -15,12 +15,20 @@
 			"icons/128x128@2x.png",
 			"icons/icon.icns",
 			"icons/icon.ico"
-		]
+		],
+		"createUpdaterArtifacts": true
 	},
 	"productName": "AMLL Player",
 	"version": "0.0.1",
 	"identifier": "net.stevexmh.amllplayer",
-	"plugins": {},
+	"plugins": {
+		"updater": {
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUwMjJGQ0MyMjkzMzEyQkMKUldTOEVqTXB3dndpNEpLQXIrOG5kK1lZSENwRjk1KzRIcFZGVHhUbjFFSDEyeS9BRG9PalF3U3EK",
+			"endpoints": [
+				"https://github.com/Steve-xmh/applemusic-like-lyrics/releases/download/full-refractor-player-dev/latest.json"
+			]
+		}
+	},
 	"app": {
 		"withGlobalTauri": true,
 		"windows": [
