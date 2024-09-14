@@ -4,8 +4,22 @@ on:
   - workflow_dispatch
 
 jobs:
+  clean-pre-release:
+    name: 删除预发布版本的构建产物
+    runs-on: ubuntu-22.04
+    steps:
+        - name: 删除预发布版本的构建产物
+          uses: mknejp/delete-release-assets@v1
+          with:
+            token: ${{ github.token }}
+            assets: |
+              *.*
+            tag: ${{ github.ref_name }}-player-dev
+            fail-if-no-assets: false
+            fail-if-no-release: false
   build-tauri:
     name: 构建 Tauri 桌面版本
+    needs: clean-pre-release
     strategy:
       fail-fast: false
       matrix:
