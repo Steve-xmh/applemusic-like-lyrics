@@ -4,6 +4,7 @@
  */
 
 import classnames from "classnames";
+import { motion } from "framer-motion";
 import type { HTMLProps } from "react";
 import styles from "./horizontal.module.css";
 
@@ -38,9 +39,19 @@ export const HorizontalLayout: React.FC<
 			)}
 			{...rest}
 		>
-			<div className={styles.thumb}>{thumbSlot}</div>
-			<div className={styles.cover}>{coverSlot}</div>
-			<div className={styles.controls}>{controlsSlot}</div>
+			<motion.div layout layoutId="amll-player-thumb" className={styles.thumb}>
+				{thumbSlot}
+			</motion.div>
+			<motion.div layout layoutId="amll-player-cover" className={styles.cover}>
+				{coverSlot}
+			</motion.div>
+			<motion.div
+				layout
+				layoutId="amll-player-controls"
+				className={styles.controls}
+			>
+				{controlsSlot}
+			</motion.div>
 			<div className={styles.lyric}>{lyricSlot}</div>
 			<div className={styles.bottomControls}>{bottomControls}</div>
 		</div>

@@ -9,11 +9,12 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
+    /* 固定行高，否则文字变化时有可能产生布局抖动 */
+    line-height: 1.25em;
 }
 
 .name {
     white-space: nowrap;
-    line-height: normal;
     cursor: text;
     user-select: text;
     min-width: 0;
@@ -33,7 +34,6 @@
     letter-spacing: 1px;
 
     & a {
-        line-height: normal;
         text-decoration: none;
 
         user-select: text;

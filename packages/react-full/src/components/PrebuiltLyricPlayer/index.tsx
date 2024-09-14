@@ -50,6 +50,7 @@ import "./icon-animations.css";
 import styles from "./index.module.css";
 
 import classNames from "classnames";
+import { LayoutGroup } from "framer-motion";
 import {
 	PlayerControlsType,
 	advanceLyricDynamicLyricTimeAtom,
@@ -359,100 +360,105 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	}, [isVertical]);
 
 	return (
-		<AutoLyricLayout
-			ref={layoutRef}
-			className={classNames(styles.autoLyricLayout, className)}
-			onLayoutChange={setIsVertical}
-			coverSlot={
-				<Cover
-					coverUrl={musicCover}
-					ref={coverElRef}
-					musicPaused={!musicIsPlaying}
-				/>
-			}
-			thumbSlot={<ControlThumb onClick={onClickControlThumb} />}
-			smallControlsSlot={
-				<PrebuiltMusicInfo
-					className={classNames(
-						styles.smallMusicInfo,
-						hideLyricView && styles.hideLyric,
-					)}
-				/>
-			}
-			backgroundSlot={
-				<BackgroundRender
-					album={musicCover}
-					albumIsVideo={musicCoverIsVideo}
-					lowFreqVolume={lowFreqVolume}
-					renderScale={lyricBackgroundRenderScale}
-					fps={lyricBackgroundFPS}
-					renderer={backgroundRenderer.renderer}
-					staticMode={lyricBackgroundStaticMode}
-					style={{
-						zIndex: -1,
-					}}
-				/>
-			}
-			bigControlsSlot={
-				<>
+		<LayoutGroup>
+			<AutoLyricLayout
+				ref={layoutRef}
+				className={classNames(styles.autoLyricLayout, className)}
+				onLayoutChange={setIsVertical}
+				coverSlot={
+					<Cover
+						coverUrl={musicCover}
+						ref={coverElRef}
+						musicPaused={!musicIsPlaying}
+					/>
+				}
+				thumbSlot={<ControlThumb onClick={onClickControlThumb} />}
+				smallControlsSlot={
 					<PrebuiltMusicInfo
 						className={classNames(
-							styles.bigMusicInfo,
+							styles.smallMusicInfo,
 							hideLyricView && styles.hideLyric,
 						)}
 					/>
-					<PrebuiltProgressBar />
-					<PrebuiltMusicControls className={styles.bigControls} />
-					{showBottomControl && (
-						<div
-							style={{
-								display: "flex",
-								justifyContent: "space-evenly",
-							}}
-						>
+				}
+				backgroundSlot={
+					<BackgroundRender
+						album={musicCover}
+						albumIsVideo={musicCoverIsVideo}
+						lowFreqVolume={lowFreqVolume}
+						renderScale={lyricBackgroundRenderScale}
+						fps={lyricBackgroundFPS}
+						renderer={backgroundRenderer.renderer}
+						staticMode={lyricBackgroundStaticMode}
+						style={{
+							zIndex: -1,
+						}}
+					/>
+				}
+				bigControlsSlot={
+					<>
+						<PrebuiltMusicInfo
+							className={classNames(
+								styles.bigMusicInfo,
+								hideLyricView && styles.hideLyric,
+							)}
+						/>
+						<PrebuiltProgressBar />
+						<PrebuiltMusicControls className={styles.bigControls} />
+						{showBottomControl && (
+							<div
+								style={{
+									display: "flex",
+									justifyContent: "space-evenly",
+								}}
+							>
+								<PrebuiltToggleIconButton
+									type={PrebuiltToggleIconButtonType.Lyrics}
+									checked={!hideLyricView}
+									onClick={() => setHideLyricView(!hideLyricView)}
+								/>
+								<PrebuiltToggleIconButton
+									type={PrebuiltToggleIconButtonType.Playlist}
+								/>
+							</div>
+						)}
+						<PrebuiltVolumeControl className={styles.bigVolumeControl} />
+					</>
+				}
+				controlsSlot={
+					<>
+						<PrebuiltMusicInfo className={styles.horizontalControls} />
+						<PrebuiltProgressBar />
+						<PrebuiltMusicControls
+							className={styles.controls}
+							showOtherButtons
+						/>
+						<PrebuiltVolumeControl />
+					</>
+				}
+				horizontalBottomControls={
+					showBottomControl && (
+						<>
+							<PrebuiltToggleIconButton
+								type={PrebuiltToggleIconButtonType.Playlist}
+							/>
 							<PrebuiltToggleIconButton
 								type={PrebuiltToggleIconButtonType.Lyrics}
 								checked={!hideLyricView}
 								onClick={() => setHideLyricView(!hideLyricView)}
 							/>
-							<PrebuiltToggleIconButton
-								type={PrebuiltToggleIconButtonType.Playlist}
-							/>
-						</div>
-					)}
-					<PrebuiltVolumeControl className={styles.bigVolumeControl} />
-				</>
-			}
-			controlsSlot={
-				<>
-					<PrebuiltMusicInfo className={styles.horizontalControls} />
-					<PrebuiltProgressBar />
-					<PrebuiltMusicControls className={styles.controls} showOtherButtons />
-					<PrebuiltVolumeControl />
-				</>
-			}
-			horizontalBottomControls={
-				showBottomControl && (
-					<>
-						<PrebuiltToggleIconButton
-							type={PrebuiltToggleIconButtonType.Playlist}
-						/>
-						<PrebuiltToggleIconButton
-							type={PrebuiltToggleIconButtonType.Lyrics}
-							checked={!hideLyricView}
-							onClick={() => setHideLyricView(!hideLyricView)}
-						/>
-					</>
-				)
-			}
-			lyricSlot={
-				<PrebuiltCoreLyricPlayer
-					alignPosition={alignPosition}
-					alignAnchor={alignAnchor}
-				/>
-			}
-			hideLyric={hideLyricView}
-			{...rest}
-		/>
+						</>
+					)
+				}
+				lyricSlot={
+					<PrebuiltCoreLyricPlayer
+						alignPosition={alignPosition}
+						alignAnchor={alignAnchor}
+					/>
+				}
+				hideLyric={hideLyricView}
+				{...rest}
+			/>
+		</LayoutGroup>
 	);
 };

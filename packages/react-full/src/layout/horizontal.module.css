@@ -14,9 +14,11 @@
     transition: 0.5s ease-in-out;
     left: 0%;
 
+    --hide-lyric-left: 27.02702702702703%;
+
     &.hideLyric {
         /* percentage(calc((1 - var(--info-size-fract) / (var(--info-size-fract) + var(--player-size-fract))) / 2)) */
-        left: 27.02702702702703%;
+        left: var(--hide-lyric-left);
 
         .lyric {
             transition: opacity 0.5s cubic-bezier(0.5, 0, 0.5, 1), transform 0.5s cubic-bezier(0.5, 0, 0.5, 1);
@@ -24,14 +26,14 @@
         }
 
         .bottomControls {
-            padding-right: calc(27.02702702702703% + 4em);
+            padding-right: calc(var(--hide-lyric-left) + 4em);
 
             @media screen and (max-width: 1000px) {
-                padding-right: calc(27.02702702702703% + 3em);
+                padding-right: calc(var(--hide-lyric-left) + 3em);
             }
 
-            @media screen and (max-width: 1200px) {
-                padding-right: calc(27.02702702702703% + 2em);
+            @media screen and (max-width: 1600px) {
+                padding-right: calc(var(--hide-lyric-left) + 2em);
             }
         }
     }

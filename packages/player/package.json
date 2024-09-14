@@ -43,6 +43,7 @@
 		"react-use": "^17.4.0",
 		"react-virtualized-auto-sizer": "^1.0.24",
 		"react-window": "^1.8.10",
+		"react-window-sortable": "^1.4.12",
 		"sass": "^1.69.3",
 		"stats.js": "^0.17.0",
 		"uid": "^2.0.2",

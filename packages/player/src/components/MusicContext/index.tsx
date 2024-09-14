@@ -303,7 +303,6 @@ export const MusicContext: FC = () => {
 			store.set(musicQualityAtom, result);
 		};
 		const unlistenPromise = listenAudioThreadEvent((evt) => {
-			console.log(evt);
 			const evtData = evt.payload.data;
 			switch (evtData.type) {
 				case "playPosition": {

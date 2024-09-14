@@ -1,0 +1,28 @@
+.audioQualityTag {
+    height: 25px;
+    overflow: hidden;
+}
+
+
+@keyframes dolby-glow {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+
+.dolbyLogoGlow {
+    position: absolute;
+    filter: blur(7px);
+    margin-top: 2.5px;
+    opacity: 1;
+    animation-name: dolby-glow;
+    animation-fill-mode: forwards;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 1s;
+}

@@ -15,5 +15,17 @@
 		"./packages/player/src-tauri/Cargo.toml",
 		"./packages/skia-player/Cargo.toml",
 		"./packages/lyric/Cargo.toml"
-	]
+	],
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
 }
