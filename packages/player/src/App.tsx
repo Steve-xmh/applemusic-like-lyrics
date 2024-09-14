@@ -46,7 +46,11 @@ function App() {
 		<>
 			<MusicContext />
 			<UpdateContext />
-			<Theme appearance="dark" className={styles.radixTheme}>
+			<Theme
+				appearance="dark"
+				panelBackground="solid"
+				className={styles.radixTheme}
+			>
 				<Box
 					className={classNames(
 						styles.body,

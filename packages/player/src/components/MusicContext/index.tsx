@@ -49,6 +49,7 @@ import {
 const FFTToLowPassContext: FC = () => {
 	const store = useStore();
 	const fftDataRange = useAtomValue(fftDataRangeAtom);
+	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 
 	useEffect(() => {
 		emitAudioThread("setFFTRange", {
@@ -58,6 +59,7 @@ const FFTToLowPassContext: FC = () => {
 	}, [fftDataRange]);
 
 	useEffect(() => {
+		if (!isLyricPageOpened) return;
 		let rafId: number;
 		let curValue = 1;
 		let lt = 0;
@@ -121,7 +123,7 @@ const FFTToLowPassContext: FC = () => {
 		return () => {
 			cancelAnimationFrame(rafId);
 		};
-	}, [store]);
+	}, [store, isLyricPageOpened]);
 
 	return null;
 };

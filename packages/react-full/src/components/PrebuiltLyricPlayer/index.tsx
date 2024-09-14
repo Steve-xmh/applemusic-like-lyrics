@@ -328,6 +328,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
 	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
+	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
 	const lyricBackgroundStaticMode = useAtomValue(lyricBackgroundStaticModeAtom);
 	const lyricBackgroundRenderScale = useAtomValue(
@@ -398,7 +399,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 						renderScale={lyricBackgroundRenderScale}
 						fps={lyricBackgroundFPS}
 						renderer={backgroundRenderer.renderer}
-						staticMode={lyricBackgroundStaticMode}
+						staticMode={lyricBackgroundStaticMode || !isLyricPageOpened}
 						style={{
 							zIndex: -1,
 						}}
