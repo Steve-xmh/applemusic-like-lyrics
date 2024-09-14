@@ -51,11 +51,15 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: var(--system-titlebar-height, 32px);
+                height: 32px;
                 flex-direction: row;
                 /* 因为有可能是移动设备，默认隐藏标题栏 */
                 display: none;
                 color: white;
+            }
+
+            #system-titlebar.fullscreen {
+                display: none !important;
             }
 
             #system-titlebar-buttons {
@@ -79,6 +83,10 @@
 
             .system-button>svg {
                 display: none;
+            }
+
+            #system-titlebar.windows {
+                height: 32px;
             }
 
             #system-titlebar.windows .system-button {
@@ -256,6 +264,13 @@
                             titlebar.classList.remove("immersive");
                         }
                     };
+                window.setSystemTitlebarFullscreen = function setSystemTitlebarFullscreen(enabled) {
+                    if (enabled) {
+                        titlebar.classList.add("fullscreen");
+                    } else {
+                        titlebar.classList.remove("fullscreen");
+                    }
+                };
                 function initPlatform() {
                     const userAgent = navigator.userAgent;
                     if (

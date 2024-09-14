@@ -94,9 +94,7 @@ export const VerticalLayout: React.FC<
 			ref={rootRef}
 			{...rest}
 		>
-			<motion.div layout layoutId="amll-player-thumb" className={styles.thumb}>
-				{thumbSlot}
-			</motion.div>
+			<div className={styles.thumb}>{thumbSlot}</div>
 			<div className={styles.lyricLayout}>
 				{/** 用于占位，测量布局的大小用 */}
 				<div className={styles.phonySmallCover} ref={phonySmallCoverRef} />
@@ -106,17 +104,9 @@ export const VerticalLayout: React.FC<
 			<div className={styles.noLyricLayout}>
 				{/** 用于占位，测量布局的大小用 */}
 				<div className={styles.phonyBigCover} ref={phonyBigCoverRef} />
-				<motion.div
-					layout
-					layoutId="amll-player-controls"
-					className={styles.bigControls}
-				>
-					{bigControlsSlot}
-				</motion.div>
+				<div className={styles.bigControls}>{bigControlsSlot}</div>
 			</div>
 			<motion.div
-				layout
-				layoutId="amll-player-cover"
 				className={styles.coverFrame}
 				animate={currentCoverStyle}
 				initial={false}

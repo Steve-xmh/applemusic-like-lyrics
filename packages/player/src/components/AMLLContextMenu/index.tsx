@@ -6,6 +6,7 @@ import {
 	onRequestPrevSongAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ContextMenu } from "@radix-ui/themes";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import type { FC } from "react";
 import { router } from "../../router";
@@ -24,6 +25,17 @@ export const AMLLContextMenuContent: FC = () => {
 			<ContextMenu.Item onClick={onRequestPrevSong}>上一首</ContextMenu.Item>
 			<ContextMenu.Item onClick={onPlayOrResume}>暂停/继续</ContextMenu.Item>
 			<ContextMenu.Item onClick={onRequestNextSong}>下一首</ContextMenu.Item>
+			<ContextMenu.Separator />
+			<ContextMenu.Item
+				onClick={async () => {
+					const win = getCurrentWindow();
+					const isFullscreen = await win.isFullscreen();
+					setSystemTitlebarFullscreen(!isFullscreen);
+					await win.setFullscreen(!isFullscreen);
+				}}
+			>
+				全屏/取消全屏
+			</ContextMenu.Item>
 			<ContextMenu.Separator />
 			<ContextMenu.CheckboxItem
 				checked={!hideLyricView}

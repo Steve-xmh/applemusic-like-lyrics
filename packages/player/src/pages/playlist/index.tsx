@@ -1,16 +1,23 @@
-import { ArrowLeftIcon, PlayIcon, PlusIcon } from "@radix-ui/react-icons";
+import {
+	ArrowLeftIcon,
+	HamburgerMenuIcon,
+	Pencil1Icon,
+	PlayIcon,
+	PlusIcon,
+} from "@radix-ui/react-icons";
 import {
 	Avatar,
 	Box,
 	Button,
 	Card,
 	Container,
-	ContextMenu,
+	DropdownMenu,
 	Flex,
 	Heading,
 	IconButton,
 	Skeleton,
 	Text,
+	TextField,
 } from "@radix-ui/themes";
 import { path } from "@tauri-apps/api";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -23,13 +30,17 @@ import {
 	type HTMLProps,
 	forwardRef,
 	useCallback,
+	useState,
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList } from "react-window";
+import { SortableFixedSizeList } from "react-window-sortable";
 import { type Song, db } from "../../dexie";
+import { router } from "../../router";
 import { emitAudioThread, readLocalMusicMetadata } from "../../utils/player";
 import { useSongCover } from "../../utils/use-song-cover";
+import styles from "./index.module.css";
 
 export type Loadable<Value> =
 	| {
@@ -55,13 +66,16 @@ function toDuration(duration: number) {
 	return `${isRemainTime ? "-" : ""}${min}:${secText}`;
 }
 
-export const SongCard: FC<{
-	songId: string;
-	songIndex: number;
-	onPlayList: (songIndex: number) => void;
-	onDeleteSong: (songId: string) => void;
-	style?: CSSProperties;
-}> = ({ songId, songIndex, onPlayList, onDeleteSong, style }) => {
+export const SongCard = forwardRef<
+	HTMLDivElement,
+	{
+		songId: string;
+		songIndex: number;
+		onPlayList: (songIndex: number) => void;
+		onDeleteSong: (songId: string) => void;
+		style?: CSSProperties;
+	}
+>(({ songId, songIndex, onPlayList, onDeleteSong, style }, ref) => {
 	const song: Loadable<Song> = useLiveQuery(
 		() =>
 			db.songs.get(songId).then((data) => {
@@ -91,59 +105,61 @@ export const SongCard: FC<{
 			style={style}
 			key={`song-card-${songId}`}
 			loading={song.state === "loading"}
+			ref={ref}
 		>
 			<Box py="4" pr="4" style={style}>
-				<ContextMenu.Root>
-					<ContextMenu.Trigger>
-						<Card>
-							<Flex p="1" align="center" gap="4">
-								<Avatar size="5" fallback={<div />} src={songImgUrl} />
-								<Flex
-									direction="column"
-									justify="center"
-									flexGrow="1"
-									minWidth="0"
-								>
-									<Text wrap="nowrap" truncate>
-										{song.state === "hasData" &&
-											(song.data.songName ||
-												song.data.filePath ||
-												`未知歌曲 ID ${songId}`)}
-									</Text>
-									<Text wrap="nowrap" truncate color="gray">
-										{song.state === "hasData" && (song.data.songArtists || "")}
-									</Text>
-								</Flex>
-								<Text wrap="nowrap">
-									{song.state === "hasData" &&
-										(song.data.duration ? toDuration(song.data.duration) : "")}
-								</Text>
+				<Card>
+					<Flex p="1" align="center" gap="4">
+						<Avatar size="5" fallback={<div />} src={songImgUrl} />
+						<Flex direction="column" justify="center" flexGrow="1" minWidth="0">
+							<Text wrap="nowrap" truncate>
+								{song.state === "hasData" &&
+									(song.data.songName ||
+										song.data.filePath ||
+										`未知歌曲 ID ${songId}`)}
+							</Text>
+							<Text wrap="nowrap" truncate color="gray">
+								{song.state === "hasData" && (song.data.songArtists || "")}
+							</Text>
+						</Flex>
+						<Text wrap="nowrap">
+							{song.state === "hasData" &&
+								(song.data.duration ? toDuration(song.data.duration) : "")}
+						</Text>
+						<IconButton variant="ghost" onClick={() => onPlayList(songIndex)}>
+							<PlayIcon />
+						</IconButton>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger>
 								<IconButton
 									variant="ghost"
-									onClick={() => onPlayList(songIndex)}
+									onClick={() => router.navigate(`/song/${songId}`)}
 								>
-									<PlayIcon />
+									<HamburgerMenuIcon />
 								</IconButton>
-							</Flex>
-						</Card>
-					</ContextMenu.Trigger>
-					<ContextMenu.Content>
-						<ContextMenu.Item onClick={() => onPlayList(songIndex)}>
-							播放音乐
-						</ContextMenu.Item>
-						<ContextMenu.Item onClick={() => navigate(`/song/${songId}`)}>
-							编辑音乐数据
-						</ContextMenu.Item>
-						<ContextMenu.Separator />
-						<ContextMenu.Item color="red" onClick={() => onDeleteSong(songId)}>
-							从歌单中删除
-						</ContextMenu.Item>
-					</ContextMenu.Content>
-				</ContextMenu.Root>
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Content>
+								<DropdownMenu.Item onClick={() => onPlayList(songIndex)}>
+									播放音乐
+								</DropdownMenu.Item>
+								<DropdownMenu.Item onClick={() => navigate(`/song/${songId}`)}>
+									编辑音乐数据
+								</DropdownMenu.Item>
+								<DropdownMenu.Separator />
+								<DropdownMenu.Item
+									color="red"
+									onClick={() => onDeleteSong(songId)}
+								>
+									从歌单中删除
+								</DropdownMenu.Item>
+							</DropdownMenu.Content>
+						</DropdownMenu.Root>
+					</Flex>
+				</Card>
 			</Box>
 		</Skeleton>
 	);
-};
+});
 
 const BOTTOM_PADDING = 150;
 
@@ -159,6 +175,53 @@ const PlaylistViewInner = forwardRef<HTMLDivElement, HTMLProps<HTMLDivElement>>(
 		/>
 	),
 );
+
+const EditablePlaylistName: FC<{
+	playlistName: string;
+	onPlaylistNameChange: (newName: string) => void;
+}> = ({ playlistName, onPlaylistNameChange }) => {
+	const [editing, setEditing] = useState(false);
+	const [newName, setNewName] = useState(playlistName);
+
+	return (
+		<Heading className={styles.title}>
+			{!editing && playlistName}
+			{!editing && (
+				<IconButton
+					ml="2"
+					style={{
+						verticalAlign: "middle",
+					}}
+					size="1"
+					variant="ghost"
+					onClick={() => {
+						setNewName(playlistName);
+						setEditing(true);
+					}}
+				>
+					<Pencil1Icon />
+				</IconButton>
+			)}
+			{editing && (
+				<TextField.Root
+					value={newName}
+					autoFocus
+					onChange={(e) => setNewName(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							if (newName !== playlistName) onPlaylistNameChange(newName);
+							setEditing(false);
+						}
+					}}
+					onBlur={() => {
+						if (newName !== playlistName) onPlaylistNameChange(newName);
+						setEditing(false);
+					}}
+				/>
+			)}
+		</Heading>
+	);
+};
 
 export const PlaylistPage: FC = () => {
 	const param = useParams();
@@ -181,6 +244,12 @@ export const PlaylistPage: FC = () => {
 		});
 		if (!results) return;
 		console.log(results);
+		const id = toast.loading(
+			`正在解析音乐元数据以添加歌曲 (${0}/${results.length})`,
+		);
+		let current = 0;
+		let success = 0;
+		let errored = 0;
 		const transformed = (
 			await Promise.all(
 				results.map(async (v) => {
@@ -195,20 +264,28 @@ export const PlaylistPage: FC = () => {
 						const coverData = new Uint8Array(musicInfo.cover);
 						const coverBlob = new Blob([coverData], { type: "image" });
 
+						success += 1;
 						return {
 							id: pathMd5,
 							filePath: normalized,
 							songName: musicInfo.name,
 							songArtists: musicInfo.artist,
 							songAlbum: musicInfo.album,
-							lyricFormat: musicInfo.lyric.length > 0 ? "lrc" : "",
+							lyricFormat: musicInfo.lyric.length > 0 ? "lrc" : "none",
 							lyric: musicInfo.lyric,
 							cover: coverBlob,
 							duration: musicInfo.duration,
 						} satisfies Song;
 					} catch (err) {
+						errored += 1;
 						console.warn("解析歌曲元数据以添加歌曲失败", normalized, err);
 						return null;
+					} finally {
+						current += 1;
+						toast.update(id, {
+							render: `正在解析音乐元数据以添加歌曲 (${current}/${results.length})`,
+							progress: current / results.length,
+						});
 					}
 				}),
 			)
@@ -221,6 +298,14 @@ export const PlaylistPage: FC = () => {
 		await db.playlists.update(Number(param.id), (obj) => {
 			obj.songIds.unshift(...shouldAddIds);
 		});
+		toast.done(id);
+		if (errored > 0 && success > 0) {
+			toast.warn(`已添加 ${success} 首歌曲，其中 ${errored} 首歌曲添加失败`);
+		} else if (success === 0) {
+			toast.error(`${errored} 首歌曲添加失败`);
+		} else {
+			toast.success(`已全部添加 ${success} 首歌曲`);
+		}
 	}, [playlist, param.id]);
 
 	const onPlayList = useCallback(
@@ -296,7 +381,14 @@ export const PlaylistPage: FC = () => {
 								sm: "flex",
 							}}
 						>
-							<Heading>{playlist?.name}</Heading>
+							<EditablePlaylistName
+								playlistName={playlist?.name || ""}
+								onPlaylistNameChange={(newName) =>
+									db.playlists.update(Number(param.id), (obj) => {
+										obj.name = newName;
+									})
+								}
+							/>
 							<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
 							<Flex gap="2">
 								<Button onClick={onPlaylistDefault}>
@@ -320,7 +412,14 @@ export const PlaylistPage: FC = () => {
 								sm: "none",
 							}}
 						>
-							<Heading>{playlist?.name}</Heading>
+							<EditablePlaylistName
+								playlistName={playlist?.name || ""}
+								onPlaylistNameChange={(newName) =>
+									db.playlists.update(Number(param.id), (obj) => {
+										obj.name = newName;
+									})
+								}
+							/>
 							<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
 							<Flex gap="2">
 								<IconButton onClick={onPlaylistDefault}>
@@ -337,23 +436,27 @@ export const PlaylistPage: FC = () => {
 					{playlist?.songIds && (
 						<AutoSizer>
 							{({ width, height }) => (
-								<FixedSizeList
+								<SortableFixedSizeList
 									itemCount={playlist.songIds.length}
 									itemSize={96 + 16}
 									innerElementType={PlaylistViewInner}
 									width={width}
 									height={height}
+									onSortOrderChanged={({ originalIndex, newIndex }) => {
+										// TODO
+									}}
 								>
-									{({ index, style }) => (
+									{forwardRef(({ index, style }, ref) => (
 										<SongCard
 											songId={playlist.songIds[index]}
 											songIndex={index}
 											style={style}
 											onPlayList={onPlayList}
 											onDeleteSong={onDeleteSong}
+											ref={ref}
 										/>
-									)}
-								</FixedSizeList>
+									))}
+								</SortableFixedSizeList>
 							)}
 						</AutoSizer>
 					)}

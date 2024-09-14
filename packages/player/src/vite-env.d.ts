@@ -26,6 +26,7 @@ declare enum SystemTitlebarResizeAppearance {
 declare function setSystemTitlebarResizeAppearance(
 	appearance: SystemTitlebarResizeAppearance,
 ): void;
+declare function setSystemTitlebarFullscreen(enable: boolean): void;
 declare function setSystemTitlebarImmersiveMode(enable: boolean): void;
 declare function addEventListener(
 	type: "on-system-titlebar-click-close",

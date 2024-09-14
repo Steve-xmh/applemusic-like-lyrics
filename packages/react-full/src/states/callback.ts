@@ -3,6 +3,8 @@
  * 所有有关 PrebuiltLyricPlayer 组件中开发者需要在预设歌词组件中配置的回调函数状态在这里
  */
 
+import type { LyricLineMouseEvent } from "@applemusic-like-lyrics/core";
+import type { LyricPlayerProps } from "@applemusic-like-lyrics/react";
 import { atom } from "jotai";
 
 export interface Callback<Args extends any[], Result = void> {
@@ -46,6 +48,24 @@ export const onRequestNextSongAtom = atom(c(() => {}));
  * @param _position 播放位置，单位为毫秒
  */
 export const onSeekPositionAtom = atom(c((_position: number) => {}));
+/**
+ * 当点击歌词行时触发的回调函数
+ * @param _evt 对应的歌词行事件对象
+ */
+export const onLyricLineClickAtom = atom(
+	c(((_evt: LyricLineMouseEvent) => {}) as NonNullable<
+		LyricPlayerProps["onLyricLineClick"]
+	>),
+);
+/**
+ * 当试图对歌词行打开上下文菜单（例如右键点击）时触发的回调函数
+ * @param _evt 对应的歌词行事件对象
+ */
+export const onLyricLineContextMenuAtom = atom(
+	c(((_evt: LyricLineMouseEvent) => {}) as NonNullable<
+		LyricPlayerProps["onLyricLineContextMenu"]
+	>),
+);
 /**
  * 当触发设置音量大小时触发的回调函数
  * @param _volume 音量大小，取值范围为 [0-1]

@@ -20,6 +20,8 @@ export interface Song {
 	duration: number;
 	lyricFormat: string;
 	lyric: string;
+	translatedLrc?: string;
+	romanLrc?: string;
 }
 
 export const db = new Dexie("amll-player") as Dexie & {

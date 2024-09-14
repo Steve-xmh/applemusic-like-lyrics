@@ -1,3 +1,11 @@
+.title > button {
+    visibility: hidden;
+}
+
+.title:hover > button {
+    visibility: visible;
+}
+
 .playlist {
     max-height: 100vh;
     padding: 0 var(--space-2);

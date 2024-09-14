@@ -18,6 +18,8 @@ import { AutoLyricLayout } from "../../layout/auto";
 import {
 	onChangeVolumeAtom,
 	onClickControlThumbAtom,
+	onLyricLineClickAtom,
+	onLyricLineContextMenuAtom,
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
 	onRequestOpenMenuAtom,
@@ -209,6 +211,10 @@ const PrebuiltCoreLyricPlayer: FC<{
 	const advanceLyricDynamicLyricTime = useAtomValue(
 		advanceLyricDynamicLyricTimeAtom,
 	);
+	const onLyricLineClick = useAtomValue(onLyricLineClickAtom).onEmit;
+	const onLyricLineContextMenu = useAtomValue(
+		onLyricLineContextMenuAtom,
+	).onEmit;
 
 	const processedLyricLines = useMemo(() => {
 		const processed = structuredClone(lyricLines);
@@ -258,6 +264,8 @@ const PrebuiltCoreLyricPlayer: FC<{
 			enableSpring={enableLyricLineSpringAnimation}
 			enableLyricAdvanceDynamicLyricTime={advanceLyricDynamicLyricTime}
 			wordFadeWidth={Math.max(0.01, lyricWordFadeWidth)}
+			onLyricLineClick={onLyricLineClick}
+			onLyricLineContextMenu={onLyricLineContextMenu}
 		/>
 	);
 };
