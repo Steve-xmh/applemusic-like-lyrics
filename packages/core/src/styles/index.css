@@ -20,6 +20,7 @@
     color: var(--amll-lp-color, white);
     mix-blend-mode: plus-lighter;
     contain: strict;
+    line-height: 1.2em;
 
     &:hover .lyric-line {
         filter: unset !important;
