@@ -4,10 +4,7 @@ use serde::*;
 use serde_json::Value;
 use std::{net::SocketAddr, path::Path, sync::Mutex};
 use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
-use tauri::{
-    AppHandle, Manager, PhysicalSize, Runtime, Size, State, Theme, TitleBarStyle,
-    WebviewWindowBuilder,
-};
+use tauri::{AppHandle, Manager, PhysicalSize, Runtime, Size, State, Theme, WebviewWindowBuilder};
 use tauri_plugin_fs::OpenOptions;
 use tracing::*;
 
@@ -107,8 +104,7 @@ fn recreate_window(app: &AppHandle) {
     let win: WebviewWindowBuilder<'_, _, _> = WebviewWindowBuilder::new(app, "main", url);
     #[cfg(not(desktop))]
     let win = win;
-    #[cfg(all(desktop, not(target_os = "macos")))]
-    let win = win.transparent(true);
+
     #[cfg(desktop)]
     let win = win
         .center()
@@ -137,7 +133,7 @@ fn recreate_window(app: &AppHandle) {
         });
 
     #[cfg(target_os = "macos")]
-    let win = win.title_bar_style(TitleBarStyle::Overlay);
+    let win = win.title_bar_style(tauri::TitleBarStyle::Overlay);
 
     let win = win.build().expect("can't show original window");
 
