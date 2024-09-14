@@ -247,6 +247,16 @@ export const MusicContext: FC = () => {
 
 			db.songs.get(musicId).then((song) => {
 				if (song) {
+					store.set(musicNameAtom, song.songName);
+					store.set(musicAlbumNameAtom, song.songAlbum);
+					store.set(
+						musicArtistsAtom,
+						song.songArtists.split("/").map((v) => ({
+							id: v.trim(),
+							name: v.trim(),
+						})),
+					);
+
 					const imgUrl = URL.createObjectURL(song.cover);
 					try {
 						const oldUrl = store.get(musicCoverAtom);
@@ -257,7 +267,7 @@ export const MusicContext: FC = () => {
 						console.warn(e);
 					}
 					store.set(musicCoverAtom, imgUrl);
-					store.set(musicCoverIsVideoAtom, false);
+					store.set(musicCoverIsVideoAtom, song.cover.type.startsWith("video"));
 				} else if (musicInfo.cover) {
 					const imgBlob = new Blob([new Uint8Array(musicInfo.cover)], {
 						type: "image",

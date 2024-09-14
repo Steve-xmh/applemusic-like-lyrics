@@ -368,6 +368,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 				coverSlot={
 					<Cover
 						coverUrl={musicCover}
+						coverIsVideo={musicCoverIsVideo}
 						ref={coverElRef}
 						musicPaused={!musicIsPlaying}
 					/>

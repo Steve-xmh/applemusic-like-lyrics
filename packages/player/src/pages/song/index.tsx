@@ -89,11 +89,11 @@ export const SongPage: FC = () => {
 		});
 	}, [song, songName, songArtists, songAlbum, lyricFormat, lyricContent]);
 
-	const uploadCover = useCallback(() => {
+	const uploadCoverAsImage = useCallback(() => {
 		if (song === undefined) return;
 		const input = document.createElement("input");
 		input.type = "file";
-		input.accept = "image/*";
+		input.accept = "image/*,video/*";
 		input.onchange = async () => {
 			const file = input.files?.[0];
 			if (file === undefined) return;
@@ -211,9 +211,9 @@ export const SongPage: FC = () => {
 								display: "block",
 							}}
 							variant="soft"
-							onClick={uploadCover}
+							onClick={uploadCoverAsImage}
 						>
-							更换封面图
+							更换封面图为图片/视频
 						</Button>
 						<Button
 							mt="4"
