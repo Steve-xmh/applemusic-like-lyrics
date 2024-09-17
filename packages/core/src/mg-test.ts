@@ -31,6 +31,34 @@ function updateControlPointDraggers() {
 	}
 }
 
+let draggerGui: GUI | undefined = undefined;
+function setActiveDragger(x: number, y: number) {
+	if (draggerGui) {
+		draggerGui.destroy();
+		draggerGui = undefined;
+	}
+	const point = mgRenderer.getControlPoint(x, y);
+	if (point) {
+		draggerGui = gui.addFolder(`控制点 (${x}, ${y})`);
+		draggerGui
+			.add({ angle: 0 }, "angle", -180, 180)
+			.name("横向扭曲角度")
+			.onChange((v: number) => {
+				const uPower = 2 / (debugValues.controlPointSize - 1);
+				point.uTangent.x = Math.cos((v * Math.PI) / 180) * uPower;
+				point.uTangent.y = Math.sin((v * Math.PI) / 180) * uPower;
+			});
+		draggerGui
+			.add({ angle: 0 }, "angle", -180, 180)
+			.name("纵向扭曲角度")
+			.onChange((v: number) => {
+				const vPower = 2 / (debugValues.controlPointSize - 1);
+				point.vTangent.x = -Math.sin((v * Math.PI) / 180) * vPower;
+				point.vTangent.y = Math.cos((v * Math.PI) / 180) * vPower;
+			});
+	}
+}
+
 window.addEventListener("resize", updateControlPointDraggers);
 
 const resultTextArea = document.getElementById(
@@ -139,6 +167,7 @@ function resizeControlPoint() {
 							el.classList.remove("active");
 						}
 						dragger.classList.add("active");
+						setActiveDragger(x, y);
 					}
 					window.removeEventListener("mousemove", onMouseMove);
 					window.removeEventListener("mouseup", onMouseUp);
@@ -156,7 +185,7 @@ function subdivide() {
 	mgRenderer.resetSubdivition(debugValues.subdivideDepth);
 }
 
-mgRenderer.setAlbum("bigsur.jpg").then(() => {
+mgRenderer.setAlbum("bigsur.png").then(() => {
 	resizeControlPoint();
 	subdivide();
 });

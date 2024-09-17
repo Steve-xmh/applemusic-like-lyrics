@@ -3,6 +3,8 @@ interface ControlPointConf {
 	cy: number;
 	x: number;
 	y: number;
+	ur: number;
+	vr: number;
 }
 
 interface ControlPointPreset {
@@ -11,8 +13,8 @@ interface ControlPointPreset {
 	conf: ControlPointConf[];
 }
 
-const p = (cx: number, cy: number, x: number, y: number) =>
-	Object.freeze({ cx, cy, x, y }) as ControlPointConf;
+const p = (cx: number, cy: number, x: number, y: number, ur = 0, vr = 0) =>
+	Object.freeze({ cx, cy, x, y, ur, vr }) as ControlPointConf;
 const preset = (width: number, height: number, conf: ControlPointConf[]) =>
 	Object.freeze({ width, height, conf }) as ControlPointPreset;
 

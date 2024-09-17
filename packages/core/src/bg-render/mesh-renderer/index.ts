@@ -1014,6 +1014,12 @@ export class MeshGradientRenderer extends BaseRenderer {
 				const p = newMesh.getControlPoint(cp.cx, cp.cy);
 				p.location.x = cp.x;
 				p.location.y = cp.y;
+				const uPower = 2 / (chosenPreset.width - 1);
+				const vPower = 2 / (chosenPreset.height - 1);
+				p.uTangent.x = Math.cos((cp.ur * Math.PI) / 180) * uPower;
+				p.uTangent.y = Math.sin((cp.ur * Math.PI) / 180) * uPower;
+				p.vTangent.x = -Math.sin((cp.vr * Math.PI) / 180) * vPower;
+				p.vTangent.y = Math.cos((cp.vr * Math.PI) / 180) * vPower;
 			}
 		}
 		newMesh.updateMesh();

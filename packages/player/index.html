@@ -6,6 +6,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AMLL Player</title>
+    <style>
+        :root {
+            background-color: #222;
+        }
+    </style>
 </head>
 
 <body>
@@ -89,6 +94,15 @@
                 height: 32px;
             }
 
+            #system-titlebar.mac-os {
+                display: flex;
+                height: 32px;
+            }
+
+            #system-titlebar.mac-os>* {
+                display: none;
+            }
+
             #system-titlebar.windows .system-button {
                 transition: background-color 0.25s, color 0.25s;
             }
@@ -136,11 +150,6 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-            }
-
-            #system-titlebar.mac-os {
-                justify-content: flex-start;
-                display: none;
             }
         </style>
         <script>
@@ -264,13 +273,14 @@
                             titlebar.classList.remove("immersive");
                         }
                     };
-                window.setSystemTitlebarFullscreen = function setSystemTitlebarFullscreen(enabled) {
-                    if (enabled) {
-                        titlebar.classList.add("fullscreen");
-                    } else {
-                        titlebar.classList.remove("fullscreen");
-                    }
-                };
+                window.setSystemTitlebarFullscreen =
+                    function setSystemTitlebarFullscreen(enabled) {
+                        if (enabled) {
+                            titlebar.classList.add("fullscreen");
+                        } else {
+                            titlebar.classList.remove("fullscreen");
+                        }
+                    };
                 function initPlatform() {
                     const userAgent = navigator.userAgent;
                     if (

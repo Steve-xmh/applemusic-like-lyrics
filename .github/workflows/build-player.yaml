@@ -3,20 +3,24 @@ on:
   - push
   - workflow_dispatch
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   clean-pre-release:
     name: 删除预发布版本的构建产物
     runs-on: ubuntu-22.04
     steps:
-        - name: 删除预发布版本的构建产物
-          uses: mknejp/delete-release-assets@v1
-          with:
-            token: ${{ github.token }}
-            assets: |
-              *.*
-            tag: ${{ github.ref_name }}-player-dev
-            fail-if-no-assets: false
-            fail-if-no-release: false
+      - name: 删除预发布版本的构建产物
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ github.token }}
+          assets: |
+            *.*
+          tag: ${{ github.ref_name }}-player-dev
+          fail-if-no-assets: false
+          fail-if-no-release: false
   build-tauri:
     name: 构建 Tauri 桌面版本
     needs: clean-pre-release
@@ -25,23 +29,23 @@ jobs:
       matrix:
         include:
           - platform: ubuntu-22.04
-            args: ''
+            args: ""
             name: linux
             arch: x86_64
           - platform: windows-latest
-            args: ''
+            args: ""
             name: windows
             arch: x86_64
           - platform: macos-latest # arm64 二进制包
-            args: '--target aarch64-apple-darwin'
+            args: "--target aarch64-apple-darwin"
             name: macOS
             arch: aarch64
           - platform: macos-latest # x86 二进制包
-            args: '--target x86_64-apple-darwin'
+            args: "--target x86_64-apple-darwin"
             name: macOS
             arch: x86_64
           - platform: macos-latest # 通用二进制包
-            args: '--target universal-apple-darwin'
+            args: "--target universal-apple-darwin"
             name: macOS
             arch: universal
 
@@ -112,7 +116,7 @@ jobs:
             最新 ${{ github.ref_name }} 分支开发调试构建。
             Development version may be unstable and may not work properly, please only for test purpose.
             开发版本可能不稳定且可能无法正常工作，请仅用于测试目的。
-            
+
             Latest commits (最新提交): ${{ github.event.head_commit.message }}
           prerelease: true
           args: ${{ matrix.args }}
