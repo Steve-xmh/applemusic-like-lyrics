@@ -312,9 +312,59 @@ class ControlPoint {
 	location = Vec2.fromValues(0, 0);
 	uTangent = Vec2.fromValues(0, 0);
 	vTangent = Vec2.fromValues(0, 0);
+	private _uRot = 0;
+	private _vRot = 0;
+	private _uScale = 1;
+	private _vScale = 1;
 
 	constructor() {
 		Object.seal(this);
+	}
+
+	get uRot() {
+		return this._uRot;
+	}
+
+	get vRot() {
+		return this._vRot;
+	}
+
+	set uRot(value: number) {
+		this._uRot = value;
+		this.updateUTangent();
+	}
+
+	set vRot(value: number) {
+		this._vRot = value;
+		this.updateVTangent();
+	}
+
+	get uScale() {
+		return this._uScale;
+	}
+
+	get vScale() {
+		return this._vScale;
+	}
+
+	set uScale(value: number) {
+		this._uScale = value;
+		this.updateUTangent();
+	}
+
+	set vScale(value: number) {
+		this._vScale = value;
+		this.updateVTangent();
+	}
+
+	private updateUTangent() {
+		this.uTangent[0] = Math.cos(this._uRot) * this._uScale;
+		this.uTangent[1] = Math.sin(this._uRot) * this._uScale;
+	}
+
+	private updateVTangent() {
+		this.vTangent[0] = -Math.sin(this._vRot) * this._vScale;
+		this.vTangent[1] = Math.cos(this._vRot) * this._vScale;
 	}
 }
 
@@ -1010,16 +1060,16 @@ export class MeshGradientRenderer extends BaseRenderer {
 					Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
 				];
 			newMesh.resizeControlPoints(chosenPreset.width, chosenPreset.height);
+			const uPower = 2 / (chosenPreset.width - 1);
+			const vPower = 2 / (chosenPreset.height - 1);
 			for (const cp of chosenPreset.conf) {
 				const p = newMesh.getControlPoint(cp.cx, cp.cy);
 				p.location.x = cp.x;
 				p.location.y = cp.y;
-				const uPower = 2 / (chosenPreset.width - 1);
-				const vPower = 2 / (chosenPreset.height - 1);
-				p.uTangent.x = Math.cos((cp.ur * Math.PI) / 180) * uPower;
-				p.uTangent.y = Math.sin((cp.ur * Math.PI) / 180) * uPower;
-				p.vTangent.x = -Math.sin((cp.vr * Math.PI) / 180) * vPower;
-				p.vTangent.y = Math.cos((cp.vr * Math.PI) / 180) * vPower;
+				p.uRot = (cp.ur * Math.PI) / 180;
+				p.vRot = (cp.vr * Math.PI) / 180;
+				p.uScale = uPower * cp.up;
+				p.vScale = vPower * cp.vp;
 			}
 		}
 		newMesh.updateMesh();

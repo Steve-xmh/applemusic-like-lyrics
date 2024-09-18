@@ -40,21 +40,39 @@ function setActiveDragger(x: number, y: number) {
 	const point = mgRenderer.getControlPoint(x, y);
 	if (point) {
 		draggerGui = gui.addFolder(`控制点 (${x}, ${y})`);
+		const obj = {
+			uAngle: point.uRot,
+			vAngle: point.vRot,
+			uScale: point.uScale,
+			vScale: point.vScale,
+		};
 		draggerGui
-			.add({ angle: 0 }, "angle", -180, 180)
+			.add(obj, "uAngle", -180, 180)
 			.name("横向扭曲角度")
 			.onChange((v: number) => {
-				const uPower = 2 / (debugValues.controlPointSize - 1);
-				point.uTangent.x = Math.cos((v * Math.PI) / 180) * uPower;
-				point.uTangent.y = Math.sin((v * Math.PI) / 180) * uPower;
+				point.uRot = (v * Math.PI) / 180;
+				updateResult();
 			});
 		draggerGui
-			.add({ angle: 0 }, "angle", -180, 180)
+			.add(obj, "vAngle", -180, 180)
 			.name("纵向扭曲角度")
 			.onChange((v: number) => {
-				const vPower = 2 / (debugValues.controlPointSize - 1);
-				point.vTangent.x = -Math.sin((v * Math.PI) / 180) * vPower;
-				point.vTangent.y = Math.cos((v * Math.PI) / 180) * vPower;
+				point.vRot = (v * Math.PI) / 180;
+				updateResult();
+			});
+		draggerGui
+			.add(obj, "uScale", 0.1, 10)
+			.name("横向缩放")
+			.onChange((v: number) => {
+				point.uScale = v;
+				updateResult();
+			});
+		draggerGui
+			.add(obj, "vScale", 0.1, 10)
+			.name("纵向缩放")
+			.onChange((v: number) => {
+				point.vScale = v;
+				updateResult();
 			});
 	}
 }
@@ -73,14 +91,9 @@ function updateResult() {
 		for (let x = 0; x < debugValues.controlPointSize; x++) {
 			const point = mgRenderer.getControlPoint(x, y);
 			if (point === undefined) continue;
-			result.push(`	p(${x}, ${y}, ${point.location.x}, ${point.location.y}),`);
-			// result.push("");
-			// result.push(`point = this.getControlPoint(${x}, ${y});`);
-			// result.push(`point.color.r = ${point.color.r};`);
-			// result.push(`point.color.g = ${point.color.g};`);
-			// result.push(`point.color.b = ${point.color.b};`);
-			// result.push(`point.location.x = ${point.location.x};`);
-			// result.push(`point.location.y = ${point.location.y};`);
+			result.push(
+				`	p(${x}, ${y}, ${point.location.x}, ${point.location.y}, ${point.uRot}, ${point.vRot}, ${point.uScale}, ${point.vScale}),`,
+			);
 		}
 	}
 	result.push("]),");
@@ -210,10 +223,8 @@ const stats = new Stats();
 stats.showPanel(0);
 stats.dom.style.left = "50px";
 document.body.appendChild(stats.dom);
-let lastTime = -1;
 const frame = (time: number) => {
 	stats.end();
-	lastTime = time;
 	stats.begin();
 	requestAnimationFrame(frame);
 };
