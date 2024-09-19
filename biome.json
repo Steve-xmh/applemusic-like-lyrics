@@ -5,6 +5,11 @@
         "indentStyle": "tab",
         "lineWidth": 80
     },
+    "css": {
+        "parser": {
+            "cssModules": true
+        }
+    },
     "linter": {
         "enabled": true,
         "rules": {
