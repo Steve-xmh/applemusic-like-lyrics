@@ -31,7 +31,7 @@ class GLProgram implements Disposable {
 	program: WebGLProgram;
 	private vertexShader: WebGLShader;
 	private fragmentShader: WebGLShader;
-	readonly attrs: { [name: string]: number | undefined };
+	readonly attrs: { [name: string]: number };
 	constructor(
 		gl: RenderingContext,
 		vertexShaderSource: string,
@@ -740,6 +740,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private drawFrameBuffer: WebGLFramebuffer;
 	private drawFrameBufferTexture: WebGLTexture;
 	private meshStates: MeshState[] = [];
+	private _disposed = false;
 
 	setManualControl(enable: boolean) {
 		this.manualControl = enable;
@@ -773,6 +774,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private onTick(tickTime: number) {
 		this.tickHandle = 0;
 		if (this.paused) return;
+		if (this._disposed) return;
 
 		if (Number.isNaN(this.lastFrameTime)) {
 			this.lastFrameTime = tickTime;
@@ -884,6 +886,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private onTickBinded = this.onTick.bind(this);
 
 	private requestTick() {
+		if (this._disposed) return;
 		if (this.tickHandle === 0)
 			this.tickHandle = requestAnimationFrame(this.onTickBinded);
 	}
@@ -1044,17 +1047,18 @@ export class MeshGradientRenderer extends BaseRenderer {
 		brightnessImage(imageData, 0.75);
 		blurImage(imageData, 2, 4);
 
-		const newMesh = new BHPMesh(
-			this.gl,
-			this.mainProgram.attrs.a_pos,
-			this.mainProgram.attrs.a_color,
-			this.mainProgram.attrs.a_uv,
-		);
-		newMesh.resetSubdivition(15);
-
-		if (this.manualControl) {
-			newMesh.resizeControlPoints(5, 5);
+		if (this.manualControl && this.meshStates.length > 0) {
+			this.meshStates[0].texture.dispose();
+			this.meshStates[0].texture = new GLTexture(this.gl, imageData);
 		} else {
+			const newMesh = new BHPMesh(
+				this.gl,
+				this.mainProgram.attrs.a_pos,
+				this.mainProgram.attrs.a_color,
+				this.mainProgram.attrs.a_uv,
+			);
+			newMesh.resetSubdivition(15);
+
 			const chosenPreset =
 				CONTROL_POINT_PRESETS[
 					Math.floor(Math.random() * CONTROL_POINT_PRESETS.length)
@@ -1071,16 +1075,17 @@ export class MeshGradientRenderer extends BaseRenderer {
 				p.uScale = uPower * cp.up;
 				p.vScale = vPower * cp.vp;
 			}
-		}
-		newMesh.updateMesh();
 
-		const albumTexture = new GLTexture(this.gl, imageData);
-		const newState: MeshState = {
-			mesh: newMesh,
-			texture: albumTexture,
-			alpha: 0,
-		};
-		this.meshStates.push(newState);
+			newMesh.updateMesh();
+
+			const albumTexture = new GLTexture(this.gl, imageData);
+			const newState: MeshState = {
+				mesh: newMesh,
+				texture: albumTexture,
+				alpha: 0,
+			};
+			this.meshStates.push(newState);
+		}
 
 		this.requestTick();
 	}
@@ -1089,5 +1094,23 @@ export class MeshGradientRenderer extends BaseRenderer {
 	}
 	override setHasLyric(_hasLyric: boolean): void {
 		// 不再考虑实现
+	}
+
+	override dispose(): void {
+		super.dispose();
+		if (this.tickHandle) {
+			cancelAnimationFrame(this.tickHandle);
+			this.tickHandle = 0;
+		}
+		this._disposed = true;
+		this.mainProgram.dispose();
+		this.blendProgram.dispose();
+		this.fullScreenMesh.dispose();
+		this.gl.deleteFramebuffer(this.drawFrameBuffer);
+		this.gl.deleteTexture(this.drawFrameBufferTexture);
+		for (const state of this.meshStates) {
+			state.mesh.dispose();
+			state.texture.dispose();
+		}
 	}
 }

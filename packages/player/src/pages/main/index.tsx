@@ -1,13 +1,14 @@
-import { GearIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
 	Badge,
 	Box,
-	Button,
 	Card,
 	Container,
 	ContextMenu,
+	DropdownMenu,
 	Flex,
 	Heading,
+	IconButton,
 	Spinner,
 	Text,
 	TextField,
@@ -58,12 +59,18 @@ export const MainPage: FC = () => {
 						</TextField.Slot>
 					</TextField.Root>
 					<NewPlaylistButton />
-					<Button variant="soft" asChild>
-						<Link to="/settings">
-							<GearIcon />
-							设置
-						</Link>
-					</Button>
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger>
+							<IconButton variant="soft">
+								<HamburgerMenuIcon />
+							</IconButton>
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content>
+							<DropdownMenu.Item asChild>
+								<Link to="/settings">设置</Link>
+							</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 				</Flex>
 			</Flex>
 			{playlists !== undefined ? (

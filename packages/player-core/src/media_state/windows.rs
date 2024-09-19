@@ -233,7 +233,7 @@ impl super::MediaStateManagerBackend for MediaStateManagerWindowsBackend {
 
         let mut new_cover_file = NamedTempFile::new()?;
         new_cover_file.write_all(cover_data)?;
-        let temp_file_path = dbg!(new_cover_file.path());
+        let temp_file_path = new_cover_file.path();
         let temp_file_path = HSTRING::from(temp_file_path.to_str().unwrap());
         let storage_file = StorageFile::GetFileFromPathAsync(&temp_file_path)?.get()?;
         self.smtc_updater

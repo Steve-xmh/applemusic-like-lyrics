@@ -1,6 +1,7 @@
 import {
-	TextMarquee,
 	MediaButton,
+	TextMarquee,
+	isLyricPageOpenedAtom,
 	musicArtistsAtom,
 	musicCoverAtom,
 	musicNameAtom,
@@ -8,27 +9,29 @@ import {
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
 	onRequestPrevSongAtom,
-	isLyricPageOpenedAtom,
 } from "@applemusic-like-lyrics/react-full";
-import {
-	ListBulletIcon,
-	PlayIcon,
-	PauseIcon,
-	TrackPreviousIcon,
-	TrackNextIcon,
-} from "@radix-ui/react-icons";
-import { Container, Flex, IconButton } from "@radix-ui/themes";
-import { useAtomValue, useSetAtom } from "jotai";
-import type { FC } from "react";
 import lyricIcon from "@iconify/icons-ic/round-lyrics";
 import { Icon } from "@iconify/react";
-import IconPlay from "../../assets/icon_play.svg?react";
-import IconPause from "../../assets/icon_pause.svg?react";
+import {
+	ListBulletIcon,
+	PauseIcon,
+	PlayIcon,
+	TrackNextIcon,
+	TrackPreviousIcon,
+} from "@radix-ui/react-icons";
+import { Container, Flex, IconButton } from "@radix-ui/themes";
+import classNames from "classnames";
+import { useAtomValue, useSetAtom } from "jotai";
+import type { FC } from "react";
 import IconForward from "../../assets/icon_forward.svg?react";
+import IconPause from "../../assets/icon_pause.svg?react";
+import IconPlay from "../../assets/icon_play.svg?react";
 import IconRewind from "../../assets/icon_rewind.svg?react";
+import { hideNowPlayingBarAtom } from "../../states";
 import styles from "./index.module.css";
 
 export const NowPlayingBar: FC = () => {
+	const hideNowPlayingBar = useAtomValue(hideNowPlayingBarAtom);
 	const musicName = useAtomValue(musicNameAtom);
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicPlaying = useAtomValue(musicPlayingAtom);
@@ -40,8 +43,20 @@ export const NowPlayingBar: FC = () => {
 	const onRequestNextSong = useAtomValue(onRequestNextSongAtom).onEmit;
 
 	return (
-		<Container position="fixed" bottom="0" left="0" right="0">
-			<Flex className={styles.playBar} overflow="hidden">
+		<Container
+			className={classNames(
+				styles.nowPlayingBar,
+				hideNowPlayingBar && styles.hide,
+			)}
+			position="fixed"
+			bottom="0"
+			left="0"
+			right="0"
+		>
+			<Flex
+				className={classNames(styles.playBar, hideNowPlayingBar && styles.hide)}
+				overflow="hidden"
+			>
 				<Flex
 					direction="row"
 					justify="center"

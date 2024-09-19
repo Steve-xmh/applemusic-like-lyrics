@@ -27,17 +27,25 @@ import {
 	musicVolumeAtom,
 	onChangeVolumeAtom,
 	onClickControlThumbAtom,
+	onClickLeftFunctionButtonAtom,
+	onClickRightFunctionButtonAtom,
 	onLyricLineClickAtom,
 	onPlayOrResumeAtom,
 	onRequestNextSongAtom,
+	onRequestOpenMenuAtom,
 	onRequestPrevSongAtom,
 	onSeekPositionAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useEffect } from "react";
+import { toast } from "react-toastify";
 import { db } from "../../dexie";
-import { fftDataRangeAtom, musicIdAtom } from "../../states";
+import {
+	advanceLyricDynamicLyricTimeAtom,
+	fftDataRangeAtom,
+	musicIdAtom,
+} from "../../states";
 import {
 	type AudioInfo,
 	type AudioQuality,
@@ -183,6 +191,9 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 
 const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
+	const advanceLyricDynamicLyricTime = useAtomValue(
+		advanceLyricDynamicLyricTimeAtom,
+	);
 	const setLyricLines = useSetAtom(musicLyricLinesAtom);
 	const setHideLyricView = useSetAtom(hideLyricViewAtom);
 	const song = useLiveQuery(() => db.songs.get(musicId), [musicId]);
@@ -250,6 +261,12 @@ const LyricContext: FC = () => {
 						console.warn("解析音译歌词时出现错误", err);
 					}
 				}
+				if (advanceLyricDynamicLyricTime) {
+					for (const line of parsedLyricLines) {
+						line.startTime = Math.max(0, line.startTime - 400);
+						line.endTime = Math.max(0, line.endTime - 400);
+					}
+				}
 				setLyricLines(parsedLyricLines);
 				setHideLyricView(parsedLyricLines.length === 0);
 			} catch (e) {
@@ -261,7 +278,7 @@ const LyricContext: FC = () => {
 			setLyricLines([]);
 			setHideLyricView(true);
 		}
-	}, [song, setLyricLines, setHideLyricView]);
+	}, [song, advanceLyricDynamicLyricTime, setLyricLines, setHideLyricView]);
 
 	return null;
 };
@@ -309,6 +326,24 @@ export const MusicContext: FC = () => {
 				emitAudioThread("setVolume", {
 					volume,
 				});
+			}),
+		);
+		store.set(
+			onRequestOpenMenuAtom,
+			toEmit(() => {
+				toast.info("请右键歌词页任意位置来打开菜单哦！");
+			}),
+		);
+		store.set(
+			onClickLeftFunctionButtonAtom,
+			toEmit(() => {
+				toast.info("此按钮仅供展示用途，暂无实际功能");
+			}),
+		);
+		store.set(
+			onClickRightFunctionButtonAtom,
+			toEmit(() => {
+				toast.info("此按钮仅供展示用途，暂无实际功能");
 			}),
 		);
 		const syncMusicInfo = (
@@ -434,6 +469,7 @@ export const MusicContext: FC = () => {
 					break;
 				}
 				case "loadError": {
+					toast.error(`播放后端加载音频失败\n${evtData.data.error}`, {});
 					break;
 				}
 				case "volumeChanged": {

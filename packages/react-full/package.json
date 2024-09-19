@@ -67,6 +67,7 @@
     "@applemusic-like-lyrics/react": "workspace:^",
     "@ungap/structured-clone": "^1.2.0",
     "classnames": "^2.5.1",
+    "corner-smoothing": "^0.1.5",
     "framer-motion": "^11.3.27"
   },
   "peerDependencies": {

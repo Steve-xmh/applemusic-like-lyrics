@@ -1,16 +1,16 @@
 import {
 	LyricPlayer as CoreLyricPlayer,
-	type LyricLineMouseEvent,
 	type LyricLine,
+	type LyricLineMouseEvent,
 	type spring,
 } from "@applemusic-like-lyrics/core";
 import {
-	useRef,
-	useEffect,
-	forwardRef,
-	useImperativeHandle,
 	type HTMLProps,
 	type ReactNode,
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -77,10 +77,6 @@ export interface LyricPlayerProps {
 	 */
 	currentTime?: number;
 	isSeeking?: boolean;
-	/**
-	 * 设置是否应用提前歌词行时序，默认为 `true`
-	 */
-	enableLyricAdvanceDynamicLyricTime?: boolean;
 	/**
 	 * 设置文字动画的渐变宽度，单位以歌词行的主文字字体大小的倍数为单位，默认为 0.5，即一个全角字符的一半宽度
 	 *
@@ -163,7 +159,6 @@ export const LyricPlayer = forwardRef<
 			lyricLines,
 			currentTime,
 			isSeeking,
-			enableLyricAdvanceDynamicLyricTime,
 			wordFadeWidth,
 			linePosXSpringParams,
 			linePosYSpringParams,
@@ -219,7 +214,7 @@ export const LyricPlayer = forwardRef<
 		useEffect(() => {
 			if (corePlayerRef.current)
 				wrapperRef.current?.appendChild(corePlayerRef.current.getElement());
-		}, [wrapperRef.current]);
+		}, []);
 
 		useEffect(() => {
 			if (alignAnchor !== undefined)
@@ -258,12 +253,6 @@ export const LyricPlayer = forwardRef<
 				currentTimeRef.current = currentTime;
 			} else corePlayerRef.current?.setCurrentTime(0);
 		}, [currentTime]);
-
-		useEffect(() => {
-			corePlayerRef.current?.setLyricAdvanceDynamicLyricTime(
-				enableLyricAdvanceDynamicLyricTime ?? true,
-			);
-		}, [enableLyricAdvanceDynamicLyricTime]);
 
 		useEffect(() => {
 			if (lyricLines !== undefined) {
@@ -330,7 +319,7 @@ export const LyricPlayer = forwardRef<
 				wrapperEl: wrapperRef.current,
 				lyricPlayer: corePlayerRef.current,
 			}),
-			[wrapperRef.current, corePlayerRef.current],
+			[],
 		);
 
 		return (

@@ -51,6 +51,14 @@ export const AMLLContextMenuContent: FC = () => {
 			>
 				编辑歌曲覆盖信息
 			</ContextMenu.Item>
+			<ContextMenu.Separator />
+			<ContextMenu.Item
+				onClick={() => {
+					setLyricPageOpened(false);
+				}}
+			>
+				退出歌词页面
+			</ContextMenu.Item>
 		</ContextMenu.Content>
 	);
 };

@@ -130,8 +130,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		damping: 20,
 		stiffness: 50,
 	};
-	private emUnit = Math.max(Math.min(innerHeight * 0.05, innerWidth * 0.1), 12);
-	private padding = this.emUnit;
 	private enableBlur = true;
 	private enableScale = true;
 	private interludeDots: InterludeDots;
@@ -371,18 +369,17 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 						-2,
 						this.processedLines[0].isDuet,
 					];
-				} else {
-					if (
-						this.processedLines[1].startTime > currentTime &&
-						this.processedLines[0].endTime < currentTime
-					) {
-						return [
-							Math.max(this.processedLines[0].endTime, currentTime),
-							this.processedLines[1].startTime,
-							0,
-							this.processedLines[1].isDuet,
-						];
-					}
+				}
+				if (
+					this.processedLines[1].startTime > currentTime &&
+					this.processedLines[0].endTime < currentTime
+				) {
+					return [
+						Math.max(this.processedLines[0].endTime, currentTime),
+						this.processedLines[1].startTime,
+						0,
+						this.processedLines[1].isDuet,
+					];
 				}
 			}
 		} else if (
@@ -399,7 +396,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 					i,
 					this.processedLines[i + 1].isDuet,
 				];
-			} else if (
+			}
+			if (
 				this.processedLines[i + 2]?.startTime &&
 				this.processedLines[i + 2].startTime > currentTime &&
 				this.processedLines[i + 1].endTime < currentTime
@@ -495,6 +493,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				word.word = word.word.replace(/\s+/g, " ");
 			}
 		}
+		this.lastCurrentTime = initialTime;
+		this.currentTime = initialTime;
 		this.lyricLines = lines;
 		const timeOffset = 750;
 		this.processedLines = lines
@@ -541,17 +541,19 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			});
 
 		this.isNonDynamic = true;
-		this.processedLines.forEach((line) => {
+		this.isNonDuet = true;
+		for (const line of this.processedLines) {
 			if (line.words.length > 1) {
 				this.isNonDynamic = false;
+				break;
 			}
-		});
-		this.isNonDuet = true;
-		this.processedLines.forEach((line) => {
+		}
+		for (const line of this.processedLines) {
 			if (line.isDuet) {
 				this.isNonDuet = false;
+				break;
 			}
-		});
+		}
 		this.rebuildStyle();
 
 		this.processedLines.forEach((line, i, lines) => {
@@ -674,7 +676,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			.slice(0, targetAlignIndex)
 			.reduce(
 				(acc, el) =>
-					acc + (el.getLine().isBG ? 0 : this.lyricLinesSize.get(el)?.[1] ?? 0),
+					acc +
+					(el.getLine().isBG ? 0 : (this.lyricLinesSize.get(el)?.[1] ?? 0)),
 				0,
 			);
 		this.scrollBoundary[0] = -scrollOffset;
@@ -1021,11 +1024,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			line.update(deltaS);
 		}
 	}
-	setLyricAdvanceDynamicLyricTime(enable: boolean) {
-		for (const line of this.lyricLinesEl) {
-			line.setLyricAdvanceDynamicLyricTime(enable);
-		}
-	}
+
 	/**
 	 * 设置所有歌词行在横坐标上的弹簧属性，包括重量、弹力和阻力。
 	 *

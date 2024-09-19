@@ -50,15 +50,6 @@ export const enableLyricTranslationLineAtom = atomWithStorage(
 	true,
 );
 /**
- * 是否对逐字歌词提前歌词行，默认启用
- *
- * 对开发者的提示：此处应只用于对核心歌词组件的参数调节，不应对传入的歌词行内容本身进行修改
- */
-export const advanceLyricDynamicLyricTimeAtom = atomWithStorage(
-	"amll-react-full.advanceLyricDynamicLyricTimeAtom",
-	false,
-);
-/**
  * 是否显示音译歌词行，默认启用
  *
  * 性能影响情况：低

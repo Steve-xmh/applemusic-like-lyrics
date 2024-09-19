@@ -683,6 +683,13 @@ impl AudioPlayer {
 
         let mut new_audio_info = read_audio_info(&mut format_result);
 
+        if format_result.format.tracks().len() > 1 {
+            warn!(
+                "音频文件包含 {} 个音轨，选择默认音轨进行播放",
+                format_result.format.tracks().len()
+            );
+        }
+
         let track = format_result
             .format
             .default_track()
@@ -728,6 +735,13 @@ impl AudioPlayer {
 
         info!("开始播放音频数据，时长为 {play_duration} 秒，音质为 {audio_quality:?}");
 
+        format_result.format.seek(
+            symphonia::core::formats::SeekMode::Accurate,
+            symphonia::core::formats::SeekTo::Time {
+                time: Default::default(),
+                track_id: None,
+            },
+        )?;
         let format_result = Arc::new(tokio::sync::Mutex::new(format_result));
 
         let mut is_playing = true;
@@ -779,7 +793,8 @@ impl AudioPlayer {
                     Ok(packet) => packet,
                     Err(DecodeError::IoError(err)) => match err.kind() {
                         ErrorKind::UnexpectedEof if err.to_string() == "end of stream" => {
-                            break 'play_loop Ok(())
+                            info!("音频流已播放完毕");
+                            break 'play_loop Ok(());
                         }
                         ErrorKind::WouldBlock => continue,
                         _ => {
@@ -837,6 +852,11 @@ impl AudioPlayer {
 
         if let Err(err) = play_result {
             error!("播放音频出错: {err:?}");
+            ctx.emitter
+                .emit(AudioThreadEvent::PlayError {
+                    error: err.to_string(),
+                })
+                .await?;
         }
 
         ctx.emitter

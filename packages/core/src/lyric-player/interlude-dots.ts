@@ -1,4 +1,4 @@
-import { LyricPlayer } from ".";
+import type { LyricPlayer } from ".";
 import type { Disposable, HasElement } from "../interfaces";
 import styles from "../styles/lyric-player.module.css";
 
@@ -9,6 +9,10 @@ function easeInOutBack(x: number): number {
 	return x < 0.5
 		? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
 		: (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+}
+
+function easeOutExpo(x: number): number {
+	return x === 1 ? 1 : 1 - 2 ** (-10 * x);
 }
 
 const clamp = (min: number, cur: number, max: number) =>
@@ -79,8 +83,8 @@ export class InterludeDots implements HasElement, Disposable {
 						20 +
 					1;
 
-				if (currentDuration < 1000) {
-					scale *= 1 - ((1000 - currentDuration) / 1000) ** 2;
+				if (currentDuration < 2000) {
+					scale *= easeOutExpo(currentDuration / 2000);
 				}
 
 				if (currentDuration < 500) {

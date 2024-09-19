@@ -4,21 +4,31 @@
  */
 
 import classNames from "classnames";
-import { type HTMLProps, forwardRef, useEffect, useMemo, useRef } from "react";
+import { Squircle } from "corner-smoothing";
+import {
+	type HTMLProps,
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import styles from "./index.module.css";
 
 /**
  * 一个专辑图组件
  */
 export const Cover = forwardRef<
-	HTMLElement,
+	HTMLDivElement | null,
 	{
 		coverUrl?: string;
 		coverIsVideo?: boolean;
 		coverVideoPaused?: boolean;
 		musicPaused?: boolean;
 		pauseShrinkAspect?: number;
-	} & HTMLProps<HTMLElement>
+	} & HTMLProps<HTMLDivElement>
 >(
 	(
 		{
@@ -32,6 +42,7 @@ export const Cover = forwardRef<
 		},
 		ref,
 	) => {
+		const frameRef = useRef<HTMLDivElement>(null);
 		const clsNames = useMemo(
 			() =>
 				classNames(styles.cover, musicPaused && styles.musicPaused, className),
@@ -48,35 +59,66 @@ export const Cover = forwardRef<
 				}
 			}
 		}, [coverVideoPaused]);
-		if (coverIsVideo) {
-			return (
-				<video
-					className={clsNames}
-					src={coverUrl}
-					style={{
-						"--scale-level": pauseShrinkAspect ?? 0.75,
-					}}
-					autoPlay
-					loop
-					muted
-					playsInline
-					crossOrigin="anonymous"
-					ref={videoRef as any}
-					{...rest}
-				/>
-			);
-		}
+		const [cornerRadius, setCornerRadius] = useState(20);
+
+		useLayoutEffect(() => {
+			const frameEl = frameRef.current;
+			if (frameEl) {
+				const onResize = () => {
+					const size = Math.min(frameEl.clientWidth, frameEl.clientHeight);
+					setCornerRadius(Math.max(size * 0.02, window.innerHeight * 0.007));
+				};
+				const obz = new ResizeObserver(onResize);
+				onResize();
+				obz.observe(frameEl);
+				return () => {
+					obz.disconnect();
+				};
+			}
+		}, []);
+
+		useImperativeHandle(ref, () => frameRef.current!, []);
+
 		return (
 			<div
 				className={clsNames}
 				style={{
-					backgroundImage: `url(${coverUrl})`,
 					"--scale-level": pauseShrinkAspect ?? 0.75,
 				}}
-				alt="cover"
-				ref={ref as any}
+				ref={frameRef}
 				{...rest}
-			/>
+			>
+				<Squircle
+					cornerRadius={cornerRadius}
+					cornerSmoothing={0.7}
+					alt="cover"
+					className={styles.coverInner}
+				>
+					{coverIsVideo ? (
+						<video
+							className={styles.coverInner}
+							src={coverUrl}
+							autoPlay
+							loop
+							muted
+							playsInline
+							crossOrigin="anonymous"
+							ref={videoRef}
+							{...rest}
+						/>
+					) : (
+						<div
+							className={styles.coverInner}
+							alt="cover"
+							style={{
+								backgroundImage: `url(${coverUrl})`,
+								"--scale-level": pauseShrinkAspect ?? 0.75,
+							}}
+							{...rest}
+						/>
+					)}
+				</Squircle>
+			</div>
 		);
 	},
 );

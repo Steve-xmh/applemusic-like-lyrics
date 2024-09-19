@@ -1,20 +1,20 @@
 import {
+	type AbstractBaseRenderer,
+	type BaseRenderer,
 	BackgroundRender as CoreBackgroundRender,
-	AbstractBaseRenderer,
-	BaseRenderer,
 	MeshGradientRenderer,
 } from "@applemusic-like-lyrics/core";
 import {
-	useRef,
-	useEffect,
-	forwardRef,
-	useImperativeHandle,
 	type HTMLProps,
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
 } from "react";
 export {
 	BaseRenderer,
-	PixiRenderer,
 	MeshGradientRenderer,
+	PixiRenderer,
 } from "@applemusic-like-lyrics/core";
 
 /**

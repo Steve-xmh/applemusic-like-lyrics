@@ -189,7 +189,6 @@ type MouseEventListener = (
 ) => void;
 
 export class LyricLineEl extends EventTarget implements HasElement, Disposable {
-	private lyricAdvanceDynamicLyricTime = true;
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -204,13 +203,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		posY: new Spring(0),
 		scale: new Spring(100),
 	};
-
-	/**
-	 * 设置是否应用提前歌词行时序，默认为 `true`
-	 */
-	setLyricAdvanceDynamicLyricTime(enable: boolean) {
-		this.lyricAdvanceDynamicLyricTime = enable;
-	}
 
 	constructor(
 		private lyricPlayer: LyricPlayer,
@@ -345,45 +337,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				) {
 					a.playbackRate = -1;
 					a.play();
-				}
-			}
-			for (const a of word.maskAnimations) {
-				if (this.lyricAdvanceDynamicLyricTime) {
-					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
-						this.hasFaded = false;
-					}
-					const start = word.startTime - this.lyricLine.startTime;
-					const current = maskAnimationTime - this.lyricLine.startTime;
-					a.finished.then(() => {
-						// a.currentTime = 0;
-						a.pause();
-					});
-					if (maskAnimationTime - this.lyricLine.startTime <= 0) {
-						a.currentTime = 0;
-						a.pause();
-					} else if (
-						i === this.splittedWords.length - 1 &&
-						!this.areWordsOnSameLine(
-							this.splittedWords[i - 1],
-							this.splittedWords[i],
-						) &&
-						current < start
-					) {
-						a.currentTime = start;
-						a.playbackRate = 1;
-					} else {
-						a.currentTime = Math.min(
-							this.totalDuration,
-							Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-						);
-						a.playbackRate = 1;
-					}
-				} else {
-					a.currentTime = Math.min(
-						this.totalDuration,
-						Math.max(0, maskAnimationTime - this.lyricLine.startTime),
-					);
-					a.pause();
 				}
 			}
 			i++;
@@ -830,11 +783,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private get totalDuration() {
-		return (
-			this.lyricLine.endTime +
-			(this.lyricAdvanceDynamicLyricTime ? 400 : 0) -
-			this.lyricLine.startTime
-		);
+		return this.lyricLine.endTime - this.lyricLine.startTime;
 	}
 	private maskImageDirty = false;
 	private markImageDirtyPromises: (() => void)[] = [];
@@ -931,7 +880,13 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 	}
 	private generateWebAnimationBasedMaskImage() {
-		const totalDuration = this.totalDuration;
+		// 因为歌词行有可能比行内单词的结束时间早，有可能导致过渡动画提早停止出现瑕疵
+		// 所以要以单词的结束时间为准
+		const totalFadeDuration =
+			Math.max(
+				this.splittedWords.reduce((pv, w) => Math.max(w.endTime, pv), 0),
+				this.lyricLine.endTime,
+			) - this.lyricLine.startTime;
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
@@ -965,9 +920,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastTime = 0;
 				const pushFrame = () => {
 					const easing = "cubic-bezier(.33,.12,.83,.9)";
-					// const easing = "cubic-bezier(.41,.07,.79,.94)";
-					// const easing = "ease-in-out";
-					// const easing = "linear";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;
@@ -1010,14 +962,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					{
 						const curTimeStamp = otherWord.startTime - this.lyricLine.startTime;
 						const staticDuration = curTimeStamp - lastTimeStamp;
-						timeOffset += staticDuration / totalDuration;
+						timeOffset += staticDuration / totalFadeDuration;
 						if (staticDuration > 0) pushFrame();
 						lastTimeStamp = curTimeStamp;
 					}
 					// 移动
 					{
 						const fadeDuration = otherWord.endTime - otherWord.startTime;
-						timeOffset += fadeDuration / totalDuration;
+						timeOffset += fadeDuration / totalFadeDuration;
 						curPos += otherWord.width;
 						if (j === 0) {
 							curPos += fadeWidth * 1.5;
@@ -1035,7 +987,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				try {
 					// TODO: 如果此处动画帧计算出错，需要一个后备方案
 					const ani = wordEl.animate(frames, {
-						duration: totalDuration || 1,
+						duration: totalFadeDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
 						fill: "both",
 						easing: "cubic-bezier(1,1,.66,.99)",
@@ -1043,7 +995,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					ani.pause();
 					word.maskAnimations = [ani];
 				} catch (err) {
-					console.warn("应用渐变动画发生错误", frames, totalDuration, err);
+					console.warn("应用渐变动画发生错误", frames, totalFadeDuration, err);
 				}
 			}
 		});
@@ -1060,7 +1012,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		blur = 0,
 		force = false,
 		delay = 0,
-		currentAbove = true,
 	) {
 		const beforeInSight = this.isInSight;
 		const enableSpring = this.lyricPlayer.getEnableSpring();

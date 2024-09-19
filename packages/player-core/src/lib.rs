@@ -124,6 +124,8 @@ pub enum AudioThreadEvent {
     #[serde(rename_all = "camelCase")]
     LoadError { error: String },
     #[serde(rename_all = "camelCase")]
+    PlayError { error: String },
+    #[serde(rename_all = "camelCase")]
     VolumeChanged { volume: f64 },
     #[serde(rename = "fftData")]
     #[serde(rename_all = "camelCase")]

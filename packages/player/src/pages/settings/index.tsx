@@ -50,7 +50,9 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 import { branch, commit } from "virtual:git-metadata-plugin";
+import { router } from "../../router";
 import {
+	advanceLyricDynamicLyricTimeAtom,
 	backgroundRendererAtom,
 	fftDataRangeAtom,
 	showStatJSFrameAtom,
@@ -333,6 +335,11 @@ export const SettingsPage: FC = () => {
 				description="对性能影响较高，如果遇到性能问题，可以尝试关闭此项。默认开启。"
 				configAtom={enableLyricLineSpringAnimationAtom}
 			/>
+			<SwitchSettings
+				label="提前歌词行时序"
+				description="即将原歌词行的初始时间时序提前，以便在歌词滚动结束后刚好开始播放（逐词）歌词效果。这个行为更加接近 Apple Music 的效果，但是大部分情况下会导致歌词行末尾的歌词尚未播放完成便被切换到下一行。"
+				configAtom={advanceLyricDynamicLyricTimeAtom}
+			/>
 
 			<NumberSettings
 				placeholder="0.5"
@@ -456,6 +463,15 @@ export const SettingsPage: FC = () => {
 			/>
 			<Button my="2" onClick={() => restartApp()}>
 				重启程序
+			</Button>
+			<Button
+				m="2"
+				variant="soft"
+				onClick={() => {
+					router.navigate("/amll-dev");
+				}}
+			>
+				歌词页面开发用工具
 			</Button>
 			<Separator my="3" size="4" />
 			<SubTitle>关于</SubTitle>

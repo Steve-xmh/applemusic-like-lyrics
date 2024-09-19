@@ -60,6 +60,10 @@
 
 .songMediaPlayButton {
     height: 10vh;
+    
+    @media screen and (max-height: 768px) {
+        height: 8vh;
+    }
 
     &>svg {
         scale: 2;

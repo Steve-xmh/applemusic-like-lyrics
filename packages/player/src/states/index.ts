@@ -17,3 +17,17 @@ export const showStatJSFrameAtom = atomWithStorage(
 	"amll-player.showStatJSFrame",
 	false,
 );
+
+/**
+ * 是否对逐字歌词提前歌词行，默认禁用（考虑到大部分人工打轴的 TTML 歌词会主观引入提前的歌词行时序）
+ *
+ * 对开发者的提示：此处应只用于对核心歌词组件的参数调节，不应对传入的歌词行内容本身进行修改
+ */
+export const advanceLyricDynamicLyricTimeAtom = atomWithStorage(
+	"amll-player.advanceLyricDynamicLyricTimeAtom",
+	false,
+);
+
+export const amllMenuOpenedAtom = atom(false);
+
+export const hideNowPlayingBarAtom = atom(false);

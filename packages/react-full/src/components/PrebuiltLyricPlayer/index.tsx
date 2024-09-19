@@ -55,7 +55,6 @@ import classNames from "classnames";
 import { LayoutGroup } from "framer-motion";
 import {
 	PlayerControlsType,
-	advanceLyricDynamicLyricTimeAtom,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -208,9 +207,6 @@ const PrebuiltCoreLyricPlayer: FC<{
 	const enableLyricSwapTransRomanLine = useAtomValue(
 		enableLyricSwapTransRomanLineAtom,
 	);
-	const advanceLyricDynamicLyricTime = useAtomValue(
-		advanceLyricDynamicLyricTimeAtom,
-	);
 	const onLyricLineClick = useAtomValue(onLyricLineClickAtom).onEmit;
 	const onLyricLineContextMenu = useAtomValue(
 		onLyricLineContextMenuAtom,
@@ -262,7 +258,6 @@ const PrebuiltCoreLyricPlayer: FC<{
 			enableBlur={enableLyricLineBlurEffect}
 			enableScale={enableLyricLineScaleEffect}
 			enableSpring={enableLyricLineSpringAnimation}
-			enableLyricAdvanceDynamicLyricTime={advanceLyricDynamicLyricTime}
 			wordFadeWidth={Math.max(0.01, lyricWordFadeWidth)}
 			onLyricLineClick={onLyricLineClick}
 			onLyricLineContextMenu={onLyricLineContextMenu}

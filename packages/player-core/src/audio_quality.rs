@@ -42,7 +42,13 @@ impl From<&Track> for AudioQuality {
                 Some(SampleFormat::S32) => "i32",
                 Some(SampleFormat::F32) => "f32",
                 Some(SampleFormat::F64) => "f64",
-                _ => "unknown",
+                _ => match track.codec_params.bits_per_sample {
+                    Some(8) => "u8",
+                    Some(16) => "i16",
+                    Some(24) => "i24",
+                    Some(32) => "i32",
+                    _ => "unknown",
+                },
             }
             .to_string(),
         }
