@@ -2,6 +2,7 @@ use std::io::Cursor;
 
 use binrw::prelude::*;
 use serde::{Deserialize, Serialize};
+#[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
 use strings::NullString;
@@ -10,7 +11,7 @@ mod strings;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
-#[cfg(feature = "wee_alloc")]
+#[cfg(all(target_arch = "wasm32", feature = "wee_alloc"))]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
@@ -136,6 +137,7 @@ pub fn parse_body(body: &[u8]) -> anyhow::Result<Body> {
     Ok(Body::read(&mut Cursor::new(body))?)
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "parseBody")]
 pub fn parse_body_js(body: &[u8]) -> Result<JsValue, String> {
     match parse_body(body) {
@@ -153,6 +155,7 @@ pub fn to_body(body: &Body) -> anyhow::Result<Vec<u8>> {
     Ok(cursor.into_inner())
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(js_name = "toBody")]
 pub fn to_body_js(body: JsValue) -> Result<Box<[u8]>, String> {
     match serde_wasm_bindgen::from_value(body) {
@@ -164,6 +167,7 @@ pub fn to_body_js(body: JsValue) -> Result<Box<[u8]>, String> {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 /// When the `console_error_panic_hook` feature is enabled, we can call the
 /// `set_panic_hook` function at least once during initialization, and then

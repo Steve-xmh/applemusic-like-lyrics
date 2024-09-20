@@ -186,8 +186,12 @@ fn init_logging() {
 pub fn run() {
     init_logging();
     info!("AMLL Player is starting!");
-    let context = tauri::generate_context!();
+    #[allow(unused_mut)]
+    let mut context = tauri::generate_context!();
 
+    let builder = tauri::Builder::default();
+
+    #[cfg(not(mobile))]
     let pubkey = {
         if let Some(Value::Object(updater_config)) = context.config().plugins.0.get("updater") {
             if let Some(Value::String(pubkey)) = updater_config.get("pubkey") {
@@ -199,12 +203,24 @@ pub fn run() {
             "".into()
         }
     };
+    #[cfg(not(mobile))]
+    let builder = builder.plugin(tauri_plugin_updater::Builder::new().pubkey(pubkey).build());
 
-    tauri::Builder::default()
+    #[cfg(mobile)]
+    {
+        context
+            .config_mut()
+            .app
+            .windows
+            .push(tauri::utils::config::WindowConfig {
+                ..Default::default()
+            })
+    }
+
+    builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_updater::Builder::new().pubkey(pubkey).build())
         .invoke_handler(tauri::generate_handler![
             ws_reopen_connection,
             ws_get_connections,
@@ -216,6 +232,7 @@ pub fn run() {
         .setup(|app| {
             player::init_local_player(app.handle().clone());
             app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle().clone())));
+            #[cfg(not(mobile))]
             recreate_window(app.handle());
             Ok(())
         })
