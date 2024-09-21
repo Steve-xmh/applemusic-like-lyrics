@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { type FC, type HTMLProps, type ReactNode, memo } from "react";
+import airplayIcon from "../IconButton/airplay.svg?react";
 import styles from "./index.module.css";
 import lyricsOffIcon from "./lyrics_off.svg?react";
 import lyricsOnIcon from "./lyrics_on.svg?react";
@@ -37,6 +38,7 @@ const PREBUILT_ICONS_MAP: Record<PrebuiltToggleIconButtonType, [FC, FC]> = {
 	[PrebuiltToggleIconButtonType.Repeat]: [repeatOffIcon, repeatOnNormalIcon],
 	[PrebuiltToggleIconButtonType.Shuffle]: [shuffleOffIcon, shuffleOnIcon],
 	[PrebuiltToggleIconButtonType.Star]: [starIcon, starFilledIcon],
+	[PrebuiltToggleIconButtonType.AirPlay]: [airplayIcon, airplayIcon],
 };
 
 export const PrebuiltToggleIconButton: FC<

@@ -7,7 +7,7 @@
 	position: relative;
 	display: grid;
 	grid-template-rows: [drag-area] minmax(30px, 0.45fr) [thumb] auto [cover] auto [music-info] 3fr [buttom-controls] 0fr 0.3fr;
-	grid-template-columns: [info-side] 0.45fr [player-side] 0.55fr [side-controls] 0.07fr;
+	grid-template-columns: [info-side] 0.45fr [player-side] 0.55fr [side-controls] 0fr;
 	gap: 8px;
 	transition: 0.5s ease-in-out;
 	left: 0%;
@@ -25,14 +25,14 @@
 		}
 
 		.bottomControls {
-			padding-right: calc(var(--hide-lyric-left) + 4em);
+			transform: translateX(calc((var(--hide-lyric-left)) * -1));
 
 			@media screen and (max-width: 1000px) {
-				padding-right: calc(var(--hide-lyric-left) + 3em);
+				transform: translateX(calc((var(--hide-lyric-left)) * -1));
 			}
 
 			@media screen and (max-width: 1600px) {
-				padding-right: calc(var(--hide-lyric-left) + 2em);
+				transform: translateX(calc((var(--hide-lyric-left)) * -1));
 			}
 		}
 	}
@@ -87,11 +87,13 @@
 }
 
 .lyric {
+	box-sizing: border-box;
 	grid-column: player-side;
 	grid-row: 2 / 5;
 	width: 100%;
 	height: 100%;
 	transition: opacity 0.5s 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+	padding-right: 10%;
 
 	mask-image: linear-gradient(transparent, black 10%, black 90%, transparent);
 
@@ -108,16 +110,20 @@
 	flex-direction: row-reverse;
 	gap: 4em;
 	padding-right: 4em;
+	padding-left: 4em;
+	position: relative;
 
-	transition: padding-right 0.5s ease-in-out;
+	transition: padding-right 0.5s ease-in-out, transform 0.5s ease-in-out;
 
 	@media screen and (max-width: 1000px) {
 		gap: 1em;
 		padding-right: 1em;
+		padding-left: 1em;
 	}
 
 	@media screen and (max-width: 1600px) {
 		gap: 2em;
 		padding-right: 2em;
+		padding-left: 2em;
 	}
 }

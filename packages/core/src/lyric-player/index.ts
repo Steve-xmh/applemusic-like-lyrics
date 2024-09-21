@@ -708,7 +708,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			const line = el.getLine();
 			let left = 24;
 			if (line.isDuet) {
-				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0) - 24;
+				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0);
 			}
 			if (
 				!setDots &&

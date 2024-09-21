@@ -4,4 +4,5 @@ export enum PrebuiltToggleIconButtonType {
 	Repeat = "repeat",
 	Shuffle = "shuffle",
 	Star = "star",
+	AirPlay = "airplay",
 }

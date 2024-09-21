@@ -423,6 +423,9 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 									onClick={() => setHideLyricView(!hideLyricView)}
 								/>
 								<PrebuiltToggleIconButton
+									type={PrebuiltToggleIconButtonType.AirPlay}
+								/>
+								<PrebuiltToggleIconButton
 									type={PrebuiltToggleIconButtonType.Playlist}
 								/>
 							</div>
@@ -451,6 +454,10 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 								type={PrebuiltToggleIconButtonType.Lyrics}
 								checked={!hideLyricView}
 								onClick={() => setHideLyricView(!hideLyricView)}
+							/>
+							<div style={{ flex: "1" }} />
+							<PrebuiltToggleIconButton
+								type={PrebuiltToggleIconButtonType.AirPlay}
 							/>
 						</>
 					)

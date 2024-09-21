@@ -31,7 +31,7 @@
 .songMediaButton {
 	height: 10vh;
 
-	@media screen and (max-height: 768px) {
+	@media screen and (max-height: 768px), (max-width: 1200px) {
 		height: 8vh;
 	}
 
@@ -60,7 +60,7 @@
 .songMediaPlayButton {
 	height: 10vh;
 
-	@media screen and (max-height: 768px) {
+	@media screen and (max-height: 768px), (max-width: 1200px) {
 		height: 8vh;
 	}
 
