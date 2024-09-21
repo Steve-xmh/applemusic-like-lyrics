@@ -34,6 +34,10 @@ async fn local_player_main<R: Runtime>(manager: impl Manager<R> + Clone + Send +
         })
     }));
 
+    // async_std::net::TcpStream::connect(addrs)
+
+    // async_tungstenite::client_async(request, stream)
+
     player
         .run(move |evt| {
             let app = manager.app_handle();

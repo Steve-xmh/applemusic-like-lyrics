@@ -1,31 +1,30 @@
 .nowPlayingSlider {
+	cursor: pointer;
+	transform-origin: center;
+	display: flex;
+	justify-content: stretch;
+	align-items: center;
 
-    cursor: pointer;
-    transform-origin: center;
-    display: flex;
-    justify-content: stretch;
-    align-items: center;
+	min-height: calc(1.16em * 2);
 
-    min-height: calc(1.16em * 2);
+	&:active > .thumb {
+		opacity: 0.9;
+	}
 
-    &:active>.thumb {
-        opacity: 0.9;
-    }
+	& > .inner {
+		flex: 1;
+		width: 100%;
+		height: 8px;
+		transition: height 0.3s cubic-bezier(0.38, 1.625, 0.62, 0.995);
+		border-radius: 100px;
+		background-color: #ffffff26;
+		overflow: hidden;
 
-    &>.inner {
-        flex: 1;
-        width: 100%;
-        height: 8px;
-        transition: height 0.3s cubic-bezier(0.38, 1.625, 0.62, 0.995);
-        border-radius: 100px;
-        background-color: #FFFFFF26;
-        overflow: hidden;
-
-        &>.thumb {
-            transition: opacity 0.2s cubic-bezier(0.2, 0.2, 0, 1);
-            height: 100%;
-            background-color: white;
-            opacity: 0.4;
-        }
-    }
+		& > .thumb {
+			transition: opacity 0.2s cubic-bezier(0.2, 0.2, 0, 1);
+			height: 100%;
+			background-color: white;
+			opacity: 0.4;
+		}
+	}
 }

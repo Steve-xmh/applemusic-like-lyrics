@@ -1,25 +1,25 @@
 .menuButton {
-    aspect-ratio: 1 / 1;
-    padding: 0;
-    position: relative;
-    border: none;
-    background: #FFFFFF15 !important;
-    width: 4vh;
-    margin-left: 16px;
-    border-radius: 50%;
-    align-self: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+	aspect-ratio: 1 / 1;
+	padding: 0;
+	position: relative;
+	border: none;
+	background: #ffffff15 !important;
+	width: 4vh;
+	margin-left: 16px;
+	border-radius: 50%;
+	align-self: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
 
-    & svg {
-        width: 72%;
-        height: auto;
-        color: #FFFFFF;
-    }
+	& svg {
+		width: 72%;
+		height: auto;
+		color: #ffffff;
+	}
 
-    @media screen and (max-width: 1000px) {
-        width: max(2em, min(5vw, 4vh));
-    }
+	@media screen and (max-width: 1000px) {
+		width: max(2em, min(5vw, 4vh));
+	}
 }

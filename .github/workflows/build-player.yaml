@@ -21,7 +21,7 @@ jobs:
           tag: ${{ github.ref_name }}-player-dev
           fail-if-no-assets: false
           fail-if-no-release: false
-  build-tauri:
+  build-tauri-desktop:
     name: 构建 Tauri 桌面版本
     needs: clean-pre-release
     strategy:
@@ -98,7 +98,7 @@ jobs:
       - name: 构建 AMLL Full React 包
         run: |
           pnpm i
-          pnpm lerna run build --scope @applemusic-like-lyrics/*
+          pnpm lerna run build --scope player
         env:
           AMLL_GITHUB_IS_ACTION: true
       - name: 生成开发构建版本号

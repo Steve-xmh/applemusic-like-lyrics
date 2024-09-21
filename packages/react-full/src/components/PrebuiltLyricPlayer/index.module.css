@@ -1,208 +1,203 @@
 .horizontalControls {
+	min-width: 0;
+	overflow: hidden;
 
-    min-width: 0;
-    overflow: hidden;
+	@media screen and (max-height: 1000px) {
+		padding: 0vh 0 !important;
+	}
 
-    @media screen and (max-height: 1000px) {
-        padding: 0vh 0 !important;
-    }
-
-    @media screen and (min-height: 1000px) {
-        padding-top: 2vh;
-        padding-bottom: 1vh;
-    }
+	@media screen and (min-height: 1000px) {
+		padding-top: 2vh;
+		padding-bottom: 1vh;
+	}
 }
 
 .controls,
 .bigControls {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
 }
 
 .controls {
-    justify-content: space-between;
+	justify-content: space-between;
 }
 
 .bigControls {
-    padding: 2vh min(2vw, 2vh);
-    padding-bottom: 0;
+	padding: 2vh min(2vw, 2vh);
+	padding-bottom: 0;
 }
 
 .songMediaButton {
-    height: 10vh;
+	height: 10vh;
 
-    @media screen and (max-height: 768px) {
-        height: 8vh;
-    }
+	@media screen and (max-height: 768px) {
+		height: 8vh;
+	}
 
-    &>svg {
-        scale: 3;
-        transition: scale 0.3s;
+	& > svg {
+		scale: 3;
+		transition: scale 0.3s;
 
-        @media screen and (max-height: 1080px) {
-            scale: 2;
-        }
+		@media screen and (max-height: 1080px) {
+			scale: 2;
+		}
 
-        @media screen and (max-height: 768px) {
-            scale: 1.5;
-        }
+		@media screen and (max-height: 768px) {
+			scale: 1.5;
+		}
 
-        @media screen and (max-height: 512px) {
-            scale: 1;
-        }
+		@media screen and (max-height: 512px) {
+			scale: 1;
+		}
 
-        @media screen and (max-width: 480px) {
-            scale: 0.5;
-        }
-    }
+		@media screen and (max-width: 480px) {
+			scale: 0.5;
+		}
+	}
 }
 
 .songMediaPlayButton {
-    height: 10vh;
-    
-    @media screen and (max-height: 768px) {
-        height: 8vh;
-    }
+	height: 10vh;
 
-    &>svg {
-        scale: 2;
-        transition: scale 0.3s;
+	@media screen and (max-height: 768px) {
+		height: 8vh;
+	}
 
-        @media screen and (max-height: 1080px) {
-            scale: 1.5;
-        }
+	& > svg {
+		scale: 2;
+		transition: scale 0.3s;
 
-        @media screen and (max-height: 768px) {
-            scale: 1;
-        }
+		@media screen and (max-height: 1080px) {
+			scale: 1.5;
+		}
 
-        @media screen and (max-height: 512px) {
-            scale: 0.5;
-        }
+		@media screen and (max-height: 768px) {
+			scale: 1;
+		}
 
-        @media screen and (max-width: 480px) {
-            scale: 0.5;
-        }
-    }
+		@media screen and (max-height: 512px) {
+			scale: 0.5;
+		}
+
+		@media screen and (max-width: 480px) {
+			scale: 0.5;
+		}
+	}
 }
 
 .qualityTag {
-    scale: 1.4;
-    transition: scale 0.3s;
+	scale: 1.4;
+	transition: scale 0.3s;
 
-    @media screen and (max-height: 768px) {
-        scale: 0.5;
-    }
+	@media screen and (max-height: 768px) {
+		scale: 0.5;
+	}
 
-    @media screen and (max-height: 1080px) {
-        scale: 1;
-    }
+	@media screen and (max-height: 1080px) {
+		scale: 1;
+	}
 }
 
 .progressBarLabels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 500;
-    font-size: max(1.2vh, 1em);
-    opacity: 0.5;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 500;
+	font-size: max(1.2vh, 1em);
+	opacity: 0.5;
 
-    @media screen and (max-height: 768px) {
-        margin-top: 0;
-    }
+	@media screen and (max-height: 768px) {
+		margin-top: 0;
+	}
 
-    &>* {
-        flex: 1;
-    }
+	& > * {
+		flex: 1;
+	}
 
-    &>*:nth-child(2) {
-        flex: 0;
-    }
+	& > *:nth-child(2) {
+		flex: 0;
+	}
 
-    &>*:last-child {
-        text-align: right;
-    }
+	& > *:last-child {
+		text-align: right;
+	}
 }
 
-.bigControls>button {
-    height: 10vh !important;
-    width: 10vh !important;
+.bigControls > button {
+	height: 10vh !important;
+	width: 10vh !important;
 
-    &:nth-child(2)>svg {
-        scale: 1.75;
+	&:nth-child(2) > svg {
+		scale: 1.75;
 
-        @media screen and (max-width: 480px) {
-            scale: 1.25;
-        }
-    }
+		@media screen and (max-width: 480px) {
+			scale: 1.25;
+		}
+	}
 
-    &>svg {
-        scale: 2.5;
+	& > svg {
+		scale: 2.5;
 
-        @media screen and (max-width: 480px) {
-            scale: 2;
-        }
-    }
+		@media screen and (max-width: 480px) {
+			scale: 2;
+		}
+	}
 }
 
 .autoLyricLayout {
-    --info-timing-func-in: cubic-bezier(0.5, 0, 0.75, 0);
-    --info-timing-func-out: cubic-bezier(0.25, 1, 0.5, 1);
+	--info-timing-func-in: cubic-bezier(0.5, 0, 0.75, 0);
+	--info-timing-func-out: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .bigMusicInfo {
-    transition:
-        transform 0.3s var(--info-timing-func-in),
-        opacity 0.3s var(--info-timing-func-in);
-    transform: translateY(-25vh);
-    opacity: 0;
-    overflow-x: hidden;
-    min-width: 0;
-    padding: 2em 0;
+	transition: transform 0.3s var(--info-timing-func-in), opacity 0.3s
+		var(--info-timing-func-in);
+	transform: translateY(-25vh);
+	opacity: 0;
+	overflow-x: hidden;
+	min-width: 0;
+	padding: 2em 0;
 
-    @media screen and (max-height: 768px) {
-        padding: 1em 0;
-    }
+	@media screen and (max-height: 768px) {
+		padding: 1em 0;
+	}
 
-    @media screen and (max-height: 512px) {
-        padding: 0.25em 0;
-    }
+	@media screen and (max-height: 512px) {
+		padding: 0.25em 0;
+	}
 }
 
 .bigMusicInfo.hideLyric {
-    transition:
-        transform 0.5s 0.3s var(--info-timing-func-out),
-        opacity 0.5s 0.3s var(--info-timing-func-out);
-    transform: translateY(0);
-    opacity: 1;
+	transition: transform 0.5s 0.3s var(--info-timing-func-out), opacity 0.5s 0.3s
+		var(--info-timing-func-out);
+	transform: translateY(0);
+	opacity: 1;
 }
 
 .smallMusicInfo {
-    transition:
-        transform 0.5s 0.3s var(--info-timing-func-out),
-        opacity 0.3s 0.3s var(--info-timing-func-out);
-    transform: translateY(0);
-    opacity: 1;
-    font-size: clamp(1em, 2vh, 1.25em) !important;
+	transition: transform 0.5s 0.3s var(--info-timing-func-out), opacity 0.3s 0.3s
+		var(--info-timing-func-out);
+	transform: translateY(0);
+	opacity: 1;
+	font-size: clamp(1em, 2vh, 1.25em) !important;
 }
 
 .smallMusicInfo.hideLyric {
-    transition:
-        transform 0.3s var(--info-timing-func-in),
-        opacity 0.3s var(--info-timing-func-in);
-    transform: translateY(25vh);
-    opacity: 0;
+	transition: transform 0.3s var(--info-timing-func-in), opacity 0.3s
+		var(--info-timing-func-in);
+	transform: translateY(25vh);
+	opacity: 0;
 }
 
 .bigVolumeControl {
-    padding-bottom: 4em;
+	padding-bottom: 4em;
 
-    @media screen and (max-height: 768px) {
-        padding-bottom: 2em;
-    }
+	@media screen and (max-height: 768px) {
+		padding-bottom: 2em;
+	}
 
-    @media screen and (max-height: 512px) {
-        padding-bottom: 1em;
-    }
+	@media screen and (max-height: 512px) {
+		padding-bottom: 1em;
+	}
 }

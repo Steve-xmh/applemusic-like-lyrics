@@ -283,7 +283,7 @@ const LyricContext: FC = () => {
 	return null;
 };
 
-export const MusicContext: FC = () => {
+export const LocalMusicContext: FC = () => {
 	const store = useStore();
 
 	useEffect(() => {

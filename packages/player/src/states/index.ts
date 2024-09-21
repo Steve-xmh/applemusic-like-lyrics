@@ -31,3 +31,20 @@ export const advanceLyricDynamicLyricTimeAtom = atomWithStorage(
 export const amllMenuOpenedAtom = atom(false);
 
 export const hideNowPlayingBarAtom = atom(false);
+
+export const wsProtocolListenAddrAtom = atomWithStorage(
+	"amll-player.wsProtocolListenAddr",
+	"localhost:11444",
+);
+
+export const wsProtocolConnectedAddrsAtom = atom(new Set<string>());
+
+export enum MusicContextMode {
+	Local = "local",
+	WSProtocol = "ws-protocol",
+}
+
+export const musicContextModeAtom = atomWithStorage(
+	"amll-player.musicContextMode",
+	MusicContextMode.Local,
+);

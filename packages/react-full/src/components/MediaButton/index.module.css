@@ -1,50 +1,50 @@
 @keyframes pressed-animation {
-    0% {
-        transform: scale(1)
-    }
+	0% {
+		transform: scale(1);
+	}
 
-    20% {
-        transform: scale(0.85)
-    }
+	20% {
+		transform: scale(0.85);
+	}
 
-    50% {
-        transform: scale(1.1)
-    }
+	50% {
+		transform: scale(1.1);
+	}
 
-    100% {
-        transform: scale(1)
-    }
+	100% {
+		transform: scale(1);
+	}
 }
 
 .mediaButton {
-    aspect-ratio: 1/1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    position: relative;
-    background-color: #FFF0;
-    padding: 0;
-    border: none;
+	aspect-ratio: 1 / 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	position: relative;
+	background-color: #fff0;
+	padding: 0;
+	border: none;
 
-    transition: background-color 0.5s;
+	transition: background-color 0.5s;
 
-    &:hover {
-        background-color: #FFF2;
-    }
+	&:hover {
+		background-color: #fff2;
+	}
 
-    &:active {
-        background-color: #FFF4;
+	&:active {
+		background-color: #fff4;
 
-        * {
-            animation-name: none !important
-        }
-    }
+		* {
+			animation-name: none !important;
+		}
+	}
 
-    &>* {
-        transition: transform 0.5s;
-        transform-origin: center;
-        animation: pressed-animation 0.7s;
-        animation-composition: accumulate;
-    }
+	& > * {
+		transition: transform 0.5s;
+		transform-origin: center;
+		animation: pressed-animation 0.7s;
+		animation-composition: accumulate;
+	}
 }

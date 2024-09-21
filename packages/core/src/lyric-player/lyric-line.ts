@@ -751,7 +751,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				.map((_, j) => {
 					const x = (j + 1) / ANIMATION_FRAME_QUANTITY;
 					let y = Math.sin(x * Math.PI);
-					y = x < 0.5 ? y : Math.max(y, 1.0);
+					// y = x < 0.5 ? y : Math.max(y, 1.0);
 					if (this.lyricLine.isBG) {
 						y *= 2;
 					}
@@ -764,10 +764,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			const float = el.animate(floatFrame, {
 				duration: animateDu * 1.4,
 				delay: Number.isFinite(wordDe) ? wordDe - 400 : 0,
-				id: "float-word",
+				id: "emphasize-word-float",
 				iterations: 1,
 				composite: "add",
-				easing: "ease-in-out",
+				easing: "linear",
 				fill: "both",
 			});
 			float.onfinish = () => {

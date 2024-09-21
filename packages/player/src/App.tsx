@@ -9,16 +9,22 @@ import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
 import styles from "./App.module.css";
 import { AMLLWrapper } from "./components/AMLLWrapper";
-import { MusicContext } from "./components/MusicContext";
+import { LocalMusicContext } from "./components/LocalMusicContext";
 import { NowPlayingBar } from "./components/NowPlayingBar";
 import { UpdateContext } from "./components/UpdateContext";
+import { WSProtocolMusicContext } from "./components/WSProtocolMusicContext";
 import "./i18n";
 import { router } from "./router";
-import { showStatJSFrameAtom } from "./states";
+import {
+	MusicContextMode,
+	musicContextModeAtom,
+	showStatJSFrameAtom,
+} from "./states";
 
 function App() {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const showStatJSFrame = useAtomValue(showStatJSFrameAtom);
+	const musicContextMode = useAtomValue(musicContextModeAtom);
 
 	useEffect(() => {
 		if (showStatJSFrame) {
@@ -44,7 +50,10 @@ function App() {
 
 	return (
 		<>
-			<MusicContext />
+			{musicContextMode === MusicContextMode.Local && <LocalMusicContext />}
+			{musicContextMode === MusicContextMode.WSProtocol && (
+				<WSProtocolMusicContext />
+			)}
 			<UpdateContext />
 			<Theme
 				appearance="dark"

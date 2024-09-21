@@ -1,179 +1,173 @@
 .verticalLayout {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-rows:
-        /* 保证可以拖动窗口的区域 */
-        [drag-area] 30px
-        /* 控制条的空间 */
-        [thumb] 30px
-        /* 主视图，包括是否展示歌词的两种布局 */
-        [main-view] 1fr
-        /* 主要控制栏的区域 */
-        [control] 0fr;
-    gap: 2px;
+	width: 100%;
+	height: 100%;
+	display: grid;
+	/* 保证可以拖动窗口的区域 */
+	grid-template-rows:
+		[drag-area] 30px
+		/* 控制条的空间 */
+		[thumb] 30px
+		/* 主视图，包括是否展示歌词的两种布局 */
+		[main-view] 1fr
+		/* 主要控制栏的区域 */
+		[control] 0fr;
+	gap: 2px;
 }
 
 .thumb {
-    grid-row: thumb;
-    justify-self: center;
+	grid-row: thumb;
+	justify-self: center;
 
-    /* border: 1px solid aqua; */
+	/* border: 1px solid aqua; */
 
-    @media screen and (max-width: 768px) {
-        margin: 4px
-    }
+	@media screen and (max-width: 768px) {
+		margin: 4px;
+	}
 }
 
 .coverFrame {
-    position: absolute;
-    width: 0px;
-    height: 0px;
+	position: absolute;
+	width: 0px;
+	height: 0px;
 }
 
 /* 封面的位置由 JS 设定 */
 .cover {
-    aspect-ratio: 1 / 1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
+	aspect-ratio: 1 / 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
 }
 
 .lyricLayout {
-    grid-row: main-view;
-    /* 强制和 .noLyricLayout 占用同一区域 */
-    grid-column: 1 / 2;
-    display: grid;
-    grid-template-rows:
-        1em [controls] 0fr [lyric-view] 1fr [bottom-controls] 0fr;
-    grid-template-columns:
-        3em [cover-side] 0fr [info-side] 1fr 3em;
-    mix-blend-mode: plus-lighter;
+	grid-row: main-view;
+	/* 强制和 .noLyricLayout 占用同一区域 */
+	grid-column: 1 / 2;
+	display: grid;
+	grid-template-rows: 1em [controls] 0fr [lyric-view] 1fr [bottom-controls] 0fr;
+	grid-template-columns: 3em [cover-side] 0fr [info-side] 1fr 3em;
+	mix-blend-mode: plus-lighter;
 
-    @media screen and (max-width: 480px) {
-        grid-template-columns:
-            2em [cover-side] 0fr [info-side] 1fr 2em;
-    }
+	@media screen and (max-width: 480px) {
+		grid-template-columns: 2em [cover-side] 0fr [info-side] 1fr 2em;
+	}
 }
 
 .noLyricLayout {
-    grid-row: main-view;
-    /* 强制和 .lyricLayout 占用同一区域 */
-    grid-column: 1 / 2;
-    overflow-y: hidden;
-    display: grid;
-    grid-template-rows:
-        1em [cover-view] 1fr [lyric-view] 0fr;
-    grid-template-columns:
-        3em [main-view] 1fr 3em;
-    pointer-events: none;
+	grid-row: main-view;
+	/* 强制和 .lyricLayout 占用同一区域 */
+	grid-column: 1 / 2;
+	overflow-y: hidden;
+	display: grid;
+	grid-template-rows: 1em [cover-view] 1fr [lyric-view] 0fr;
+	grid-template-columns: 3em [main-view] 1fr 3em;
+	pointer-events: none;
 
-    @media screen and (max-width: 480px) {
-        grid-template-columns:
-            2em [main-view] 1fr 2em;
-    }
+	@media screen and (max-width: 480px) {
+		grid-template-columns: 2em [main-view] 1fr 2em;
+	}
 }
 
 /* 辅助定位的小封面图位置 */
 .phonySmallCover {
-    grid-row: controls;
-    grid-column: cover-side;
-    justify-self: center;
-    align-self: center;
-    aspect-ratio: 1 / 1;
-    opacity: 0;
-    pointer-events: none;
+	grid-row: controls;
+	grid-column: cover-side;
+	justify-self: center;
+	align-self: center;
+	aspect-ratio: 1 / 1;
+	opacity: 0;
+	pointer-events: none;
 
-    width: 6em;
+	width: 6em;
 
-    @media screen and (max-width: 480px) {
-        width: 4.5em;
-    }
+	@media screen and (max-width: 480px) {
+		width: 4.5em;
+	}
 
-    /* border: 1px solid greenyellow; */
+	/* border: 1px solid greenyellow; */
 }
 
 /* 辅助定位的大封面图位置 */
 .phonyBigCover {
-    grid-row: cover-view;
-    grid-column: 2 / 3;
-    opacity: 0;
-    pointer-events: none;
+	grid-row: cover-view;
+	grid-column: 2 / 3;
+	opacity: 0;
+	pointer-events: none;
 
-    /* border: 1px solid pink; */
+	/* border: 1px solid pink; */
 }
 
 .smallControls {
-    grid-row: controls;
-    grid-column: info-side;
-    align-self: center;
+	grid-row: controls;
+	grid-column: info-side;
+	align-self: center;
 
-    /* border: 1px solid yellow; */
-    transition: opacity 0.25s 0.25s;
-    padding-left: 1em;
-    min-width: 0;
-    overflow: visible;
-    height: fit-content;
-    z-index: 1;
-    mix-blend-mode: plus-lighter;
+	/* border: 1px solid yellow; */
+	transition: opacity 0.25s 0.25s;
+	padding-left: 1em;
+	min-width: 0;
+	overflow: visible;
+	height: fit-content;
+	z-index: 1;
+	mix-blend-mode: plus-lighter;
 }
 
 .lyric {
-    grid-row: lyric-view;
-    grid-column: 1 / 5;
+	grid-row: lyric-view;
+	grid-column: 1 / 5;
 
-    /* border: 1px solid blue; */
+	/* border: 1px solid blue; */
 
-    transition: opacity 0.5s 0.5s;
-    opacity: 1;
-    mix-blend-mode: plus-lighter;
-    contain: paint;
+	transition: opacity 0.5s 0.5s;
+	opacity: 1;
+	mix-blend-mode: plus-lighter;
+	contain: paint;
 
-    mask-image: linear-gradient(transparent 0%, black 10%, black 100%);
+	mask-image: linear-gradient(transparent 0%, black 10%, black 100%);
 
-    padding: 0 calc(3em - 24px);
+	padding: 0 calc(3em - 24px);
 
-    @media screen and (max-width: 480px) {
-        padding: 0 calc(2em - 24px);
-    }
+	@media screen and (max-width: 480px) {
+		padding: 0 calc(2em - 24px);
+	}
 }
 
 .bigControls {
-    grid-row: lyric-view;
-    grid-column: 2 / 3;
+	grid-row: lyric-view;
+	grid-column: 2 / 3;
 
-    /* border: 1px solid red; */
-    transition: opacity 0.5s;
-    opacity: 0;
-    mix-blend-mode: plus-lighter;
-    min-width: 0;
+	/* border: 1px solid red; */
+	transition: opacity 0.5s;
+	opacity: 0;
+	mix-blend-mode: plus-lighter;
+	min-width: 0;
 }
 
 .hideLyric {
-    .smallControls {
-        opacity: 0;
-        transition: opacity 0.5s;
-        pointer-events: none;
-    }
+	.smallControls {
+		opacity: 0;
+		transition: opacity 0.5s;
+		pointer-events: none;
+	}
 
-    .noLyricLayout {
-        pointer-events: auto;
-    }
+	.noLyricLayout {
+		pointer-events: auto;
+	}
 
-    .lyric {
-        opacity: 0;
-        transition: opacity 0.5s;
-        pointer-events: none;
-    }
+	.lyric {
+		opacity: 0;
+		transition: opacity 0.5s;
+		pointer-events: none;
+	}
 
-    .bigControls {
-        opacity: 1;
-    }
+	.bigControls {
+		opacity: 1;
+	}
 }
 
 .background {
-    position: absolute;
-    height: 100%;
-    width: 100%;
+	position: absolute;
+	height: 100%;
+	width: 100%;
 }

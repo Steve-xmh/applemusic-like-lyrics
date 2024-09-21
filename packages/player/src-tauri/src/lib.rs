@@ -2,30 +2,35 @@ use crate::server::AMLLWebSocketServer;
 use amll_player_core::AudioInfo;
 use serde::*;
 use serde_json::Value;
-use std::{net::SocketAddr, path::Path, sync::Mutex};
+use std::sync::RwLock;
+use std::{net::SocketAddr, path::Path};
 use symphonia::core::io::{MediaSourceStream, MediaSourceStreamOptions};
 use tauri::{AppHandle, Manager, PhysicalSize, Runtime, Size, State, Theme, WebviewWindowBuilder};
 use tauri_plugin_fs::OpenOptions;
 use tracing::*;
 
+mod client;
 mod player;
 mod server;
 
+pub type AMLLWebSocketServerWrapper = RwLock<AMLLWebSocketServer>;
+pub type AMLLWebSocketServerState<'r> = State<'r, AMLLWebSocketServerWrapper>;
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn ws_reopen_connection(addr: &str, ws: State<Mutex<AMLLWebSocketServer>>) {
-    ws.lock().unwrap().reopen(addr.to_string());
+fn ws_reopen_connection(addr: &str, ws: AMLLWebSocketServerState) {
+    ws.write().unwrap().reopen(addr.to_string());
 }
 
 #[tauri::command]
-fn ws_get_connections(ws: State<Mutex<AMLLWebSocketServer>>) -> Vec<SocketAddr> {
-    ws.lock().unwrap().get_connections()
+fn ws_get_connections(ws: AMLLWebSocketServerState) -> Vec<SocketAddr> {
+    ws.read().unwrap().get_connections()
 }
 
 #[tauri::command]
-fn ws_boardcast_message(ws: State<'_, Mutex<AMLLWebSocketServer>>, data: ws_protocol::Body) {
+fn ws_boardcast_message(ws: AMLLWebSocketServerState, data: ws_protocol::Body) {
     let ws = ws.clone();
-    tauri::async_runtime::block_on(ws.lock().unwrap().boardcast_message(data));
+    tauri::async_runtime::block_on(ws.write().unwrap().boardcast_message(data));
 }
 
 #[tauri::command]
@@ -231,7 +236,9 @@ pub fn run() {
         ])
         .setup(|app| {
             player::init_local_player(app.handle().clone());
-            app.manage(Mutex::new(AMLLWebSocketServer::new(app.handle().clone())));
+            app.manage::<AMLLWebSocketServerWrapper>(RwLock::new(AMLLWebSocketServer::new(
+                app.handle().clone(),
+            )));
             #[cfg(not(mobile))]
             recreate_window(app.handle());
             Ok(())

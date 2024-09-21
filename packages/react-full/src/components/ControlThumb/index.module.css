@@ -1,23 +1,23 @@
 .controlThumb {
-    justify-self: center;
-    width: 100%;
-    height: 100%;
+	justify-self: center;
+	width: 100%;
+	height: 100%;
 
-    & button {
-        display: block;
-        touch-action: none;
-        position: absolute;
-        border: none;
-        padding: 0;
-        border-radius: 4px;
-        background-color: #FFFFFF2D;
-        mix-blend-mode: plus-lighter;
-        cursor: none;
+	& button {
+		display: block;
+		touch-action: none;
+		position: absolute;
+		border: none;
+		padding: 0;
+		border-radius: 4px;
+		background-color: #ffffff2d;
+		mix-blend-mode: plus-lighter;
+		cursor: none;
 
-        & div {
-            position: absolute;
-            background-color: black;
-            border-radius: 10px;
-        }
-    }
+		& div {
+			position: absolute;
+			background-color: black;
+			border-radius: 10px;
+		}
+	}
 }

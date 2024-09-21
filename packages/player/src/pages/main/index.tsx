@@ -66,6 +66,20 @@ export const MainPage: FC = () => {
 							</IconButton>
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content>
+							<DropdownMenu.Sub>
+								<DropdownMenu.SubTrigger>
+									进入 WS Protocol 模式
+								</DropdownMenu.SubTrigger>
+								<DropdownMenu.SubContent>
+									<DropdownMenu.Item asChild>
+										<Link to="/ws/recv">作为状态接收者</Link>
+									</DropdownMenu.Item>
+									<DropdownMenu.Item disabled>
+										{/* <Link to="/ws/send">作为状态发送者（施工中）</Link> */}
+										作为状态发送者（施工中）
+									</DropdownMenu.Item>
+								</DropdownMenu.SubContent>
+							</DropdownMenu.Sub>
 							<DropdownMenu.Item asChild>
 								<Link to="/settings">设置</Link>
 							</DropdownMenu.Item>

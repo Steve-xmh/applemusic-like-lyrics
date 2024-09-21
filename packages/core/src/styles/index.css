@@ -4,32 +4,32 @@
 
 /* 给歌词视图元素应用的样式 */
 .amll-lyric-player {
-    --amll-lp-line-width-aspect: 0.8;
-    --amll-lp-line-padding-x: 1em;
-    --amll-lp-bg-line-scale: 0.7;
-    user-select: none;
-    font-size: var(--amll-lp-font-size, max(max(4.7vh, 3.2vw), 12px));
-    padding: 1em;
-    margin: -1em;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    box-sizing: content-box;
-    max-width: 100%;
-    z-index: 1;
-    color: var(--amll-lp-color, white);
-    mix-blend-mode: plus-lighter;
-    contain: strict;
-    line-height: 1.2em;
+	--amll-lp-line-width-aspect: 0.8;
+	--amll-lp-line-padding-x: 1em;
+	--amll-lp-bg-line-scale: 0.7;
+	user-select: none;
+	font-size: var(--amll-lp-font-size, max(max(4.7vh, 3.2vw), 12px));
+	padding: 1em;
+	margin: -1em;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	box-sizing: content-box;
+	max-width: 100%;
+	z-index: 1;
+	color: var(--amll-lp-color, white);
+	mix-blend-mode: plus-lighter;
+	contain: strict;
+	line-height: 1.2em;
 
-    &:hover .lyric-line {
-        filter: unset !important;
-    }
+	&:hover .lyric-line {
+		filter: unset !important;
+	}
 }
 
 @media screen and (max-width: 768px) {
-    .amll-lyric-player {
-        --amll-lp-line-width-aspect: 1;
-        --amll-lp-line-padding-x: 0;
-    }
+	.amll-lyric-player {
+		--amll-lp-line-width-aspect: 1;
+		--amll-lp-line-padding-x: 0;
+	}
 }
