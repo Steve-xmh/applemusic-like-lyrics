@@ -44,7 +44,4 @@ export enum MusicContextMode {
 	WSProtocol = "ws-protocol",
 }
 
-export const musicContextModeAtom = atomWithStorage(
-	"amll-player.musicContextMode",
-	MusicContextMode.Local,
-);
+export const musicContextModeAtom = atom(MusicContextMode.Local);

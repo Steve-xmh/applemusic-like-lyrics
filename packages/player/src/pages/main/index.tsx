@@ -53,11 +53,18 @@ export const MainPage: FC = () => {
 					</Heading>
 				</Box>
 				<Flex gap="1" wrap="wrap">
-					<TextField.Root placeholder="搜索……">
-						<TextField.Slot>
-							<MagnifyingGlassIcon />
-						</TextField.Slot>
-					</TextField.Root>
+					<Box
+						display={{
+							initial: "none",
+							sm: "block",
+						}}
+					>
+						<TextField.Root placeholder="搜索……">
+							<TextField.Slot>
+								<MagnifyingGlassIcon />
+							</TextField.Slot>
+						</TextField.Root>
+					</Box>
 					<NewPlaylistButton />
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger>

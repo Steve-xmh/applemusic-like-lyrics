@@ -300,7 +300,9 @@
                         );
                     }
                 }
-                if (currentAppearance) {
+                if (navigator.userAgent.includes("Android")) {
+                    setSystemTitlebarAppearance(SystemTitlebarAppearance.Hidden);
+                } else if (currentAppearance) {
                     setSystemTitlebarAppearance(currentAppearance);
                 } else {
                     initPlatform();

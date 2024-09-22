@@ -10,6 +10,9 @@
 .playBar {
 	margin: var(--space-3);
 	padding: var(--space-3);
+	margin-left: calc(var(--space-3) + env(safe-area-inset-left));
+	margin-right: calc(var(--space-3) + env(safe-area-inset-right));
+	margin-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
 	border-radius: var(--radius-4);
 	border: solid 1px var(--gray-6);
 	backdrop-filter: blur(5vh) brightness(0.5);
