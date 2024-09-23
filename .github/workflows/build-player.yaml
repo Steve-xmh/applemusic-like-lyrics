@@ -184,6 +184,7 @@ jobs:
           node ./packages/player/scripts/gen-dev-version.mjs
       - name: 构建 AMLL Player 安卓移动版程序
         run: |
+          export NDK_HOME=$ANDROID_NDK_HOME
           pnpm -F player tauri android build --split-per-abi
       - name: 上传产物到 Action Artifact
         uses: actions/upload-artifact@v3
