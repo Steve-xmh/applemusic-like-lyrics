@@ -44,7 +44,9 @@ pub struct MusicInfo {
     pub name: String,
     pub artist: String,
     pub album: String,
+    pub lyric_format: String,
     pub lyric: String,
+    pub comment: String,
     pub cover: Vec<u8>,
     pub duration: f64,
 }
@@ -55,7 +57,13 @@ impl From<AudioInfo> for MusicInfo {
             name: v.name,
             artist: v.artist,
             album: v.album,
+            lyric_format: if v.lyric.is_empty() {
+                "".into()
+            } else {
+                "lrc".into()
+            },
             lyric: v.lyric,
+            comment: v.comment,
             cover: v.cover.unwrap_or_default(),
             duration: v.duration,
         }
@@ -67,10 +75,11 @@ async fn read_local_music_metadata(
     file_path: String,
     fs: State<'_, tauri_plugin_fs::Fs<tauri::Wry>>,
 ) -> Result<MusicInfo, String> {
+    let file_path = Path::new(&file_path);
     let mut opt = OpenOptions::new();
     opt.read(true);
     let file = fs
-        .open(Path::new(&file_path), opt)
+        .open(file_path, opt)
         .map_err(|e| format!("文件打开失败 {e}"))?;
     let result = tokio::task::spawn_blocking(move || -> Result<MusicInfo, String> {
         let probe = symphonia::default::get_probe();
@@ -87,8 +96,28 @@ async fn read_local_music_metadata(
     })
     .await;
 
+    const LYRIC_FILE_EXTENSIONS: &[&str] = &["ttml", "lys", "yrc", "qrc", "eslrc", "lrc"];
+
     match result {
-        Ok(result) => result,
+        Ok(Ok(mut result)) => {
+            if !result.lyric.is_empty() {
+                result.lyric_format = "lrc".into();
+            }
+            for ext in LYRIC_FILE_EXTENSIONS {
+                let lyric_file_path = file_path.with_extension(ext);
+                if lyric_file_path.exists() {
+                    if let Ok(lyric) = fs.read_to_string(&lyric_file_path) {
+                        result.lyric_format = ext.to_string();
+                        result.lyric = lyric;
+                        break;
+                    } else {
+                        warn!("歌词文件存在但读取失败: {}", lyric_file_path.display());
+                    }
+                }
+            }
+            Ok(result)
+        }
+        Ok(Err(e)) => Err(e),
         Err(e) => Err(e.to_string()),
     }
 }

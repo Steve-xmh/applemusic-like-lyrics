@@ -42,6 +42,9 @@ pub fn read_audio_info(format_result: &mut ProbeResult) -> AudioInfo {
                 Some(StandardTagKey::Lyrics) => {
                     new_audio_info.lyric = tag.value.to_string();
                 }
+                Some(StandardTagKey::Comment) => {
+                    new_audio_info.comment = tag.value.to_string();
+                }
                 Some(_) | None => {}
             }
         }

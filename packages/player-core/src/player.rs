@@ -58,6 +58,7 @@ pub struct AudioInfo {
     pub lyric: String,
     pub cover_media_type: String,
     pub cover: Option<Vec<u8>>,
+    pub comment: String,
 
     pub duration: f64,
     pub position: f64,
@@ -72,6 +73,7 @@ impl Debug for AudioInfo {
             .field("lyric", &self.lyric)
             .field("cover_media_type", &self.cover_media_type)
             .field("cover", &self.cover.as_ref().map(|x| x.len()))
+            .field("comment", &self.comment)
             .field("duration", &self.duration)
             .field("position", &self.position)
             .finish()

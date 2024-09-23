@@ -169,6 +169,7 @@ export async function readLocalMusicMetadata(filePath: string): Promise<{
 	name: string;
 	artist: string;
 	album: string;
+	lyricFormat: string;
 	lyric: string;
 	cover: number[];
 	duration: number;

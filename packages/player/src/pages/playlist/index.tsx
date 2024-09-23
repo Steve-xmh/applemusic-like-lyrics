@@ -271,7 +271,7 @@ export const PlaylistPage: FC = () => {
 							songName: musicInfo.name,
 							songArtists: musicInfo.artist,
 							songAlbum: musicInfo.album,
-							lyricFormat: musicInfo.lyric.length > 0 ? "lrc" : "none",
+							lyricFormat: musicInfo.lyricFormat || "none",
 							lyric: musicInfo.lyric,
 							cover: coverBlob,
 							duration: musicInfo.duration,

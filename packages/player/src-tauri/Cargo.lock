@@ -70,9 +70,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "amll-lyric"
+version = "0.2.2"
+dependencies = [
+ "cc",
+ "miniz_oxide 0.7.4",
+ "nom",
+ "quick-xml 0.31.0",
+ "serde",
+ "serde-wasm-bindgen",
+ "thiserror",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "amll-player"
 version = "0.0.0"
 dependencies = [
+ "amll-lyric",
  "amll-player-core",
  "anyhow",
  "async-std",
@@ -3299,6 +3314,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e719e8df665df0d1c8fbfd238015744736151d4445ec0836b8e628aae103b77"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1004a344b30a54e2ee58d66a71b32d2db2feb0a31f9a2d302bf0536f15de2a33"
+dependencies = [
+ "memchr",
 ]
 
 [[package]]
