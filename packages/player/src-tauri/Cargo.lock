@@ -71,7 +71,7 @@ dependencies = [
 
 [[package]]
 name = "amll-lyric"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "cc",
  "miniz_oxide 0.7.4",

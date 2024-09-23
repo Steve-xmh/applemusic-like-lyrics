@@ -15,7 +15,7 @@ pub fn parse_time(src: &str) -> IResult<&str, u64> {
 
     let (src, min) = take_until1(":")(src)?;
 
-    let min = match u32::from_str(min) {
+    let min = match u64::from_str(min) {
         Ok(v) => v,
         Err(_) => {
             return IResult::Err(nom::Err::Error(nom::error::Error::new(
@@ -54,7 +54,7 @@ pub fn parse_time(src: &str) -> IResult<&str, u64> {
         _ => unreachable!(),
     }
 
-    let time = min as u64 * 60 * 1000 + sec * 1000 + ms;
+    let time = min * 60 * 1000 + sec * 1000 + ms;
 
     let (src, _) = tag("]")(src)?;
     Ok((src, time))
@@ -194,7 +194,7 @@ fn lyric_line_test() {
 pub fn parse_lrc(src: &str) -> Vec<LyricLine> {
     let lines = src.lines();
     let mut result = Vec::with_capacity(lines.size_hint().1.unwrap_or(1024).min(1024));
-    let mut last_end_time = u32::MAX as _;
+    let mut last_end_time = u64::MAX as _;
     for line in lines {
         if let Ok((_, line)) = parse_line(line) {
             result.extend_from_slice(&line);
