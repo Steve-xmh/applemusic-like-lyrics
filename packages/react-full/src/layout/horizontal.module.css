@@ -113,13 +113,7 @@
 	padding-right: 4em;
 	padding-left: 4em;
 
-	@media screen and (max-width: 1000px) {
-		gap: 1em;
-		padding-right: 1em;
-		padding-left: 1em;
-	}
-
-	@media screen and (max-width: 1600px) {
+	@media screen and (max-width: 1600px), (max-height: 1000px) {
 		gap: 2em;
 		padding-right: 2em;
 		padding-left: 2em;

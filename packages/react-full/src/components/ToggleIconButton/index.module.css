@@ -7,16 +7,21 @@
 	align-items: center;
 
 	opacity: 0.45;
+	width: 4em;
 	height: 4em;
 
 	& svg {
+		width: 4em;
 		height: 4em;
+		aspect-ratio: 1 / 1;
 	}
 
 	@media screen and (max-width: 1600px), (max-height: 1000px) {
+		width: 3em;
 		height: 3em;
 
 		& svg {
+			width: 3em;
 			height: 3em;
 		}
 	}

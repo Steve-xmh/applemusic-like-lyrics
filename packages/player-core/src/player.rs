@@ -151,6 +151,7 @@ impl AudioPlayer {
             let mut last_is_playing = false;
             let mut start_base_time = 0.0;
             let mut inst = Instant::now();
+            let mut time_it = tokio::time::interval(Duration::from_secs_f64(1. / 10.));
             loop {
                 let mut should_wait = false;
                 match play_pos_rx.try_recv() {
@@ -196,7 +197,7 @@ impl AudioPlayer {
                         .await;
                 }
                 if should_wait {
-                    tokio::time::sleep(Duration::from_millis(16)).await;
+                    time_it.tick().await;
                 }
             }
         });
@@ -205,16 +206,15 @@ impl AudioPlayer {
         let emt = AudioPlayerEventEmitter::new(evt_sender.clone());
         let fft_task = tokio::task::spawn(async move {
             let mut buf = [0.0; 64];
+            let mut time_it = tokio::time::interval(Duration::from_secs_f64(1. / 30.));
             while fft_rx.recv().await.is_some() {
                 while fft_player_clone.lock().await.has_data() {
-                    let start_it = tokio::time::Instant::now();
-                    let it = start_it + Duration::from_millis(10);
                     if fft_player_clone.lock().await.read(&mut buf) {
                         let _ = emt
                             .emit(AudioThreadEvent::FFTData { data: buf.to_vec() })
                             .await;
                     }
-                    tokio::time::sleep_until(it).await;
+                    time_it.tick().await;
                     let _ = fft_rx.try_recv();
                 }
             }

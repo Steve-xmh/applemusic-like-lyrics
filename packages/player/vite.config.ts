@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { execSync } from "child_process";
 import { resolve } from "path";
-import { defineConfig, Plugin } from "vite";
+import { type Plugin, defineConfig } from "vite";
 import lightningcss from "vite-plugin-lightningcss";
 import svgr from "vite-plugin-svgr";
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -74,6 +74,9 @@ const GitMetadataPlugin = (): Plugin => {
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
+	build: {
+		sourcemap: true,
+	},
 	plugins: [
 		react(),
 		wasm(),
@@ -95,8 +98,11 @@ export default defineConfig(async () => ({
 			"@applemusic-like-lyrics/core": resolve(__dirname, "../core/src"),
 			"@applemusic-like-lyrics/react": resolve(__dirname, "../react/src"),
 			"@applemusic-like-lyrics/ttml": resolve(__dirname, "../ttml/src"),
-			"@applemusic-like-lyrics/react-full": resolve(__dirname, "../react-full/src"),
-		}
+			"@applemusic-like-lyrics/react-full": resolve(
+				__dirname,
+				"../react-full/src",
+			),
+		},
 	},
 	// Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
 	//

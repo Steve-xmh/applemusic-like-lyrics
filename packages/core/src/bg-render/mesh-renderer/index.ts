@@ -830,7 +830,8 @@ export class MeshGradientRenderer extends BaseRenderer {
 		let canBeStatic = false;
 		if (latestMeshState) {
 			latestMeshState.mesh.bind();
-			latestMeshState.mesh.updateMesh();
+			// 考虑到我们并不逐帧更新网格控制点，因此也不需要重复调用 updateMesh
+			if (this.manualControl) latestMeshState.mesh.updateMesh();
 			latestMeshState.alpha = Math.min(1, latestMeshState.alpha + delta / 500);
 			if (latestMeshState.alpha >= 1) {
 				const deleted = this.meshStates.splice(0, this.meshStates.length - 1);
