@@ -266,6 +266,11 @@ pub fn stringify_lrc_js(lrc: JsValue) -> String {
 }
 
 #[test]
+fn lrc_max_num() {
+    dbg!(parse_line("[999:99.999]Test"));
+}
+
+#[test]
 fn lrc_bench_test() {
     let mut times = Vec::with_capacity(1024);
     for _ in 0..1024 {

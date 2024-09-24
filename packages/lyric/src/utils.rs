@@ -22,8 +22,23 @@ pub fn process_lyrics(lines: &mut [LyricLine]) {
             .map(|x| x.start_time)
             .cmp(&b.words.first().map(|x| x.start_time))
     });
+    const MAX_TIME: u64 = 60039999; // 999:99.999
     for line in lines.iter_mut() {
-        line.start_time = line.words.first().map(|x| x.start_time).unwrap_or(0);
-        line.end_time = line.words.last().map(|x| x.end_time).unwrap_or(0);
+        line.start_time = line
+            .words
+            .first()
+            .map(|x| x.start_time)
+            .unwrap_or(0)
+            .clamp(0, MAX_TIME);
+        line.end_time = line
+            .words
+            .last()
+            .map(|x| x.end_time)
+            .unwrap_or(0)
+            .clamp(0, MAX_TIME);
+        for word in line.words.iter_mut() {
+            word.start_time = word.start_time.clamp(0, MAX_TIME);
+            word.end_time = word.end_time.clamp(0, MAX_TIME);
+        }
     }
 }
