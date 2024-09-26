@@ -1,14 +1,13 @@
-import type { LyricPlayer } from ".";
-import type { Disposable, HasElement } from "../interfaces";
-import styles from "../styles/lyric-player.module.css";
+import type { Disposable, HasElement } from "../../interfaces";
+import styles from "../../styles/lyric-player.module.css";
 
 function easeInOutBack(x: number): number {
 	const c1 = 1.70158;
 	const c2 = c1 * 1.525;
 
 	return x < 0.5
-		? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
-		: (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
+		? ((2 * x) ** 2 * ((c2 + 1) * 2 * x - c2)) / 2
+		: ((2 * x - 2) ** 2 * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2;
 }
 
 function easeOutExpo(x: number): number {
@@ -25,14 +24,12 @@ export class InterludeDots implements HasElement, Disposable {
 	private dot2: HTMLElement = document.createElement("span");
 	private left = 0;
 	private top = 0;
-	private scale = 1;
 	private playing = true;
 	private lastStyle = "";
 	private currentInterlude?: [number, number];
 	private currentTime = 0;
-	private interludeTime = 0;
 	private targetBreatheDuration = 1500;
-	constructor(private readonly lyricPlayer: LyricPlayer) {
+	constructor() {
 		this.element.className = styles.interludeDots;
 		this.element.appendChild(this.dot0);
 		this.element.appendChild(this.dot1);

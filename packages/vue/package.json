@@ -1,6 +1,6 @@
 {
   "name": "@applemusic-like-lyrics/vue",
-  "version": "0.2.0-alpha.2",
+  "version": "0.2.0-alpha.3",
   "description": "AMLL 组件库的 Vue 绑定",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",

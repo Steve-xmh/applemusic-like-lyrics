@@ -5,11 +5,11 @@ import type {
 	HasElement,
 	LyricLine,
 	LyricWord,
-} from "../interfaces";
-import styles from "../styles/lyric-player.module.css";
-import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../utils/matrix";
-import { measure, mutate } from "../utils/schedule";
-import { Spring } from "../utils/spring";
+} from "../../interfaces";
+import styles from "../../styles/lyric-player.module.css";
+import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../../utils/matrix";
+import { measure, mutate } from "../../utils/schedule";
+import { Spring } from "../../utils/spring";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -737,7 +737,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				id: `emphasize-word-${el.innerText}-${i}`,
 				iterations: 1,
 				composite: "replace",
-				easing: "linear",
 				fill: "both",
 			});
 			glow.onfinish = () => {
@@ -767,7 +766,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				id: "emphasize-word-float",
 				iterations: 1,
 				composite: "add",
-				easing: "linear",
 				fill: "both",
 			});
 			float.onfinish = () => {
@@ -919,7 +917,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				let lastPos = curPos;
 				let lastTime = 0;
 				const pushFrame = () => {
-					const easing = "cubic-bezier(.33,.12,.83,.9)";
+					// 此处如果添加过渡函数，会导致单词时序不准确，所以不添加
+					// const easing = "cubic-bezier(.33,.12,.83,.9)";
 					const moveOffset = curPos - lastPos;
 					const time = Math.max(0, Math.min(1, timeOffset));
 					const duration = time - lastTime;
@@ -931,7 +930,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
 							maskPosition: value,
-							easing: easing,
 						};
 						frames.push(frame);
 					}
@@ -941,7 +939,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 						const frame: Keyframe = {
 							offset: lastTime + staticTime,
 							maskPosition: value,
-							easing: easing,
 						};
 						frames.push(frame);
 					}
@@ -949,7 +946,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					const frame: Keyframe = {
 						offset: time,
 						maskPosition: value,
-						easing: easing,
 					};
 					frames.push(frame);
 					lastPos = curPos;
@@ -986,11 +982,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 				}
 				try {
 					// TODO: 如果此处动画帧计算出错，需要一个后备方案
+					// 此处如果添加过渡函数，会导致单词时序不准确，所以不添加
 					const ani = wordEl.animate(frames, {
 						duration: totalFadeDuration || 1,
 						id: `fade-word-${word.word}-${i}`,
 						fill: "both",
-						easing: "cubic-bezier(1,1,.66,.99)",
 					});
 					ani.pause();
 					word.maskAnimations = [ani];
