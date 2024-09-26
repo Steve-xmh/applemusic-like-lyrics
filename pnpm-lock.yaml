@@ -195,6 +195,9 @@ importers:
       '@pixi/sprite':
         specifier: '*'
         version: 7.4.2(@pixi/core@7.4.2)(@pixi/display@7.4.2(@pixi/core@7.4.2))
+      '@ungap/structured-clone':
+        specifier: ^1.2.0
+        version: 1.2.0
       bezier-easing:
         specifier: ^2.1.0
         version: 2.1.0
@@ -220,6 +223,9 @@ importers:
       '@types/stats.js':
         specifier: ^0.17.3
         version: 0.17.3
+      '@types/ungap__structured-clone':
+        specifier: ^1.2.0
+        version: 1.2.0
       lil-gui:
         specifier: ^0.18.2
         version: 0.18.2

@@ -4,6 +4,7 @@
  * @author SteveXMH
  */
 
+import structuredClone from "@ungap/structured-clone";
 import type { Disposable, HasElement, LyricLine } from "../interfaces";
 import "../styles/index.css";
 import styles from "../styles/lyric-player.module.css";
@@ -496,49 +497,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		this.lastCurrentTime = initialTime;
 		this.currentTime = initialTime;
 		this.lyricLines = lines;
-		const timeOffset = 750;
-		this.processedLines = lines
-			.filter(
-				(line) =>
-					line.words.reduce((pv, cv) => pv + cv.word.trim().length, 0) > 0,
-			)
-			.map((line, i, lines) => {
-				if (line.isBG)
-					return {
-						...line,
-					};
-
-				if (i === 0) {
-					return {
-						...line,
-						startTime: Math.max(line.startTime - timeOffset, 0),
-					};
-				}
-				const lastLine = lines[i - 1];
-				const pastLine = lines[i - 2];
-				if (lastLine?.isBG && pastLine) {
-					if (pastLine.endTime < line.startTime) {
-						return {
-							...line,
-							startTime:
-								Math.max(pastLine.endTime, line.startTime - timeOffset) ||
-								line.startTime,
-						};
-					}
-				} else if (lastLine?.endTime) {
-					if (lastLine.endTime < line.startTime) {
-						return {
-							...line,
-							startTime:
-								Math.max(lastLine?.endTime, line.startTime - timeOffset) ||
-								line.startTime,
-						};
-					}
-				}
-				return {
-					...line,
-				};
-			});
+		this.processedLines = structuredClone(lines) as LyricLine[];
 
 		this.isNonDynamic = true;
 		this.isNonDuet = true;
@@ -556,6 +515,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 		}
 		this.rebuildStyle();
 
+		// 将行间有较短空隙的两个歌词行的结束时间拉长，与下一行歌词行的开始时间一致，以便于更好的显示
 		this.processedLines.forEach((line, i, lines) => {
 			const nextLine = lines[i + 1];
 			const lastWord = line.words[line.words.length - 1];
@@ -569,6 +529,8 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				}
 			}
 		});
+
+		// 让背景歌词和上一行歌词一同出现
 		this.processedLines.forEach((line, i, lines) => {
 			if (line.isBG) return;
 			const nextLine = lines[i + 1];
@@ -581,25 +543,15 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 			line.removeMouseEventListener("contextmenu", this.onLineClickedHandler);
 			line.dispose();
 		}
-		// const prevLinesEl = this.lyricLinesEl;
+
+		// 创建新的歌词行元素
 		this.lyricLinesEl = this.processedLines.map((line) => {
-			// if (this.lyricLinesEl[i]) {
-			// 	this.lyricLinesEl[i].setLine(line);
-			// 	return this.lyricLinesEl[i];
-			// } else {
 			const lineEl = new LyricLineEl(this, line);
 			lineEl.addMouseEventListener("click", this.onLineClickedHandler);
 			lineEl.addMouseEventListener("contextmenu", this.onLineClickedHandler);
 			return lineEl;
-			// }
 		});
 
-		// while (prevLinesEl.length > this.processedLines.length) {
-		// 	const rest = prevLinesEl.pop();
-		// 	rest?.removeEventListener("click", this.onLineClickedHandler);
-		// 	rest?.removeEventListener("contextmenu", this.onLineClickedHandler);
-		// 	rest?.dispose();
-		// }
 		this.lyricLinesEl.forEach((el, i) => {
 			this.element.appendChild(el.getElement());
 			this.lyricLinesIndexes.set(el, i);
@@ -646,7 +598,7 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 	 */
 	calcLayout(force = false, reflow = false) {
 		if (reflow) {
-			this.emUnit = Number.parseFloat(getComputedStyle(this.element).fontSize);
+			// this.emUnit = Number.parseFloat(getComputedStyle(this.element).fontSize);
 			for (const el of this.lyricLinesEl) {
 				const size: [number, number] = el.measureSize();
 				this.lyricLinesSize.set(el, size);
@@ -766,8 +718,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				blurLevel = 0;
 			}
 
-			const currentAbove =
-				i < (interlude ? interlude[2] + 1 : this.scrollToIndex);
 			const SCALE_ASPECT = this.enableScale ? 97 : 100;
 
 			el.setTransform(
@@ -779,7 +729,6 @@ export class LyricPlayer extends EventTarget implements HasElement, Disposable {
 				window.innerWidth <= 1024 ? blurLevel * 0.8 : blurLevel,
 				force,
 				delay,
-				currentAbove,
 			);
 			if (line.isBG && isActive) {
 				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
