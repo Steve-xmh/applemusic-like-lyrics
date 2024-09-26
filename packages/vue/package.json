@@ -1,6 +1,6 @@
 {
   "name": "@applemusic-like-lyrics/vue",
-  "version": "0.1.5",
+  "version": "0.2.0-alpha.0",
   "description": "AMLL 组件库的 Vue 绑定",
   "repository": {
     "url": "https://github.com/Steve-xmh/applemusic-like-lyrics.git",
@@ -36,6 +36,7 @@
     "vue": "*"
   },
   "devDependencies": {
+    "@applemusic-like-lyrics/lyric": "workspace:^",
     "@biomejs/biome": "^1.8.3",
     "@pixi/app": "^7.2.4",
     "@pixi/core": "^7.2.4",
@@ -44,12 +45,15 @@
     "@pixi/filter-color-matrix": "^7.2.4",
     "@pixi/sprite": "^7.2.4",
     "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue-jsx": "^4.0.1",
     "@vue/tsconfig": "^0.4.0",
     "typedoc": "^0.26.5",
     "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.0.3",
-    "vue": "^3.3.4"
+    "vite-plugin-top-level-await": "^1.4.4",
+    "vite-plugin-wasm": "^3.3.0",
+    "vue": "^3.5.8"
   }
 }
