@@ -21,7 +21,11 @@ import {
 	MeshGradientRenderer,
 	PixiRenderer,
 } from "./bg-render";
-import { DomLyricPlayer, type LyricLineMouseEvent } from "./lyric-player";
+import {
+	CanvasLyricPlayer,
+	type DomLyricPlayer,
+	type LyricLineMouseEvent,
+} from "./lyric-player";
 import type { SpringParams } from "./utils/spring";
 
 const audio = document.createElement("audio");
@@ -228,7 +232,7 @@ const progress = playerGui
 playerGui.add(debugValues, "play").name("加载/播放");
 playerGui.add(debugValues, "pause").name("暂停/继续");
 
-const lyricPlayer = new DomLyricPlayer();
+const lyricPlayer = new CanvasLyricPlayer();
 
 lyricPlayer.addEventListener("line-click", (evt) => {
 	const e = evt as LyricLineMouseEvent;
@@ -319,7 +323,7 @@ async function loadLyric() {
 		lyricPlayer.setEnableSpring(false);
 	}
 	await loadLyric();
-	debugValues.play();
+	// debugValues.play();
 	// debugValues.currentTime = 34;
 	// debugValues.mockPlay();
 })();

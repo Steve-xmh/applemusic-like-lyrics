@@ -2,11 +2,10 @@ import bezier from "bezier-easing";
 import type { DomLyricPlayer } from ".";
 import type { LyricLine, LyricWord } from "../../interfaces";
 import styles from "../../styles/lyric-player.module.css";
+import { chunkAndSplitLyricWords } from "../../utils/lyric-split-words";
 import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../../utils/matrix";
 import { measure, mutate } from "../../utils/schedule";
 import { LyricLineBase } from "../base";
-
-const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
 interface RealWord extends LyricWord {
 	mainElement: HTMLSpanElement;
@@ -51,107 +50,6 @@ function generateFadeGradient(
 	];
 }
 
-// 将输入的单词重新分组，之间没有空格的单词将会组合成一个单词数组
-// 例如输入：["Life", " ", "is", " a", " su", "gar so", "sweet"]
-// 应该返回：["Life", " ", "is", " a", [" su", "gar"], "so", "sweet"]
-function chunkAndSplitLyricWords(
-	words: LyricWord[],
-): (LyricWord | LyricWord[])[] {
-	const resplitedWords: LyricWord[] = [];
-
-	for (const w of words) {
-		const realLength = w.word.replace(/\s/g, "").length;
-		const splited = w.word.split(" ").filter((v) => v.trim().length > 0);
-		if (splited.length > 1) {
-			if (w.word.startsWith(" ")) {
-				resplitedWords.push({
-					word: " ",
-					startTime: 0,
-					endTime: 0,
-				});
-			}
-			let charPos = 0;
-			for (const s of splited) {
-				const word: LyricWord = {
-					word: s,
-					startTime:
-						w.startTime + (charPos / realLength) * (w.endTime - w.startTime),
-					endTime:
-						w.startTime +
-						((charPos + s.length) / realLength) * (w.endTime - w.startTime),
-				};
-				resplitedWords.push(word);
-				resplitedWords.push({
-					word: " ",
-					startTime: 0,
-					endTime: 0,
-				});
-				charPos += s.length;
-			}
-			if (!w.word.endsWith(" ")) {
-				resplitedWords.pop();
-			}
-		} else {
-			resplitedWords.push({
-				...w,
-			});
-		}
-	}
-
-	let wordChunk: string[] = [];
-	let wChunk: LyricWord[] = [];
-	const result: (LyricWord | LyricWord[])[] = [];
-
-	for (const w of resplitedWords) {
-		const word = w.word;
-		wordChunk.push(word);
-		wChunk.push(w);
-		if (word.length > 0 && word.trim().length === 0) {
-			wordChunk.pop();
-			wChunk.pop();
-			if (wChunk.length === 1) {
-				result.push(wChunk[0]);
-			} else if (wChunk.length > 1) {
-				result.push(wChunk);
-			}
-			result.push(w);
-			wordChunk = [];
-			wChunk = [];
-		} else if (
-			!/^\s*[^\s]*\s*$/.test(wordChunk.join("")) ||
-			CJKEXP.test(word)
-		) {
-			wordChunk.pop();
-			wChunk.pop();
-			if (wChunk.length === 1) {
-				result.push(wChunk[0]);
-			} else if (wChunk.length > 1) {
-				result.push(wChunk);
-			}
-			wordChunk = [word];
-			wChunk = [w];
-		}
-	}
-
-	if (wChunk.length === 1) {
-		result.push(wChunk[0]);
-	} else {
-		result.push(wChunk);
-	}
-
-	return result;
-}
-
-// 果子在对辉光效果的解释是一种强调（emphasized）效果
-// 条件是一个单词时长大于等于 1s 且长度小于等于 7
-export function shouldEmphasize(word: LyricWord): boolean {
-	return (
-		word.endTime - word.startTime >= 1000 &&
-		word.word.trim().length <= 7 &&
-		word.word.trim().length > 1
-	);
-}
-
 export class RawLyricLineMouseEvent extends MouseEvent {
 	constructor(
 		public readonly line: LyricLineEl,
@@ -185,11 +83,6 @@ type MouseEventListener = (
 
 export class LyricLineEl extends LyricLineBase {
 	private element: HTMLElement = document.createElement("div");
-	private left = 0;
-	private top = 0;
-	private scale = 1;
-	private blur = 0;
-	private delay = 0;
 	private splittedWords: RealWord[] = [];
 	// 由 LyricPlayer 来设置
 	lineSize: number[] = [0, 0];
@@ -396,21 +289,6 @@ export class LyricLineEl extends LyricLineBase {
 		this.lineSize = size;
 		return size;
 	}
-	setLine(line: LyricLine) {
-		this.lyricLine = line;
-		if (this.lyricLine.isBG) {
-			this.element.classList.add(styles.lyricBgLine);
-		} else {
-			this.element.classList.remove(styles.lyricBgLine);
-		}
-		if (this.lyricLine.isDuet) {
-			this.element.classList.add(styles.lyricDuetLine);
-		} else {
-			this.element.classList.remove(styles.lyricDuetLine);
-		}
-		this.rebuildElement();
-		this.rebuildStyle();
-	}
 	getLine() {
 		return this.lyricLine;
 	}
@@ -494,8 +372,8 @@ export class LyricLineEl extends LyricLineBase {
 					},
 				);
 				const emp = chunk
-					.map((word) => shouldEmphasize(word))
-					.reduce((a, b) => a || b, shouldEmphasize(merged));
+					.map((word) => LyricLineBase.shouldEmphasize(word))
+					.reduce((a, b) => a || b, LyricLineBase.shouldEmphasize(merged));
 				const wrapperWordEl = document.createElement("span");
 				wrapperWordEl.classList.add(styles.emphasizeWrapper);
 				const characterElements: HTMLElement[] = [];
@@ -560,7 +438,10 @@ export class LyricLineEl extends LyricLineBase {
 					main.appendChild(document.createTextNode(" "));
 				}
 				main.appendChild(wrapperWordEl);
-				if (merged.word.trimEnd() !== merged.word && shouldEmphasize(merged)) {
+				if (
+					merged.word.trimEnd() !== merged.word &&
+					LyricLineBase.shouldEmphasize(merged)
+				) {
 					main.appendChild(document.createTextNode(" "));
 				}
 			} else if (chunk.word.trim().length === 0) {
@@ -568,7 +449,7 @@ export class LyricLineEl extends LyricLineBase {
 				main.appendChild(document.createTextNode(" "));
 			} else {
 				// 单个单词
-				const emp = shouldEmphasize(chunk);
+				const emp = LyricLineBase.shouldEmphasize(chunk);
 				const mainWordEl = document.createElement("span");
 				const realWord: RealWord = {
 					...chunk,
@@ -581,7 +462,7 @@ export class LyricLineEl extends LyricLineBase {
 					padding: 0,
 					shouldEmphasize: emp,
 				};
-				if (shouldEmphasize(chunk)) {
+				if (LyricLineBase.shouldEmphasize(chunk)) {
 					mainWordEl.classList.add(styles.emphasize);
 					const charEls: HTMLSpanElement[] = [];
 					for (const char of chunk.word.trim().split("")) {
@@ -976,7 +857,7 @@ export class LyricLineEl extends LyricLineBase {
 	getElement() {
 		return this.element;
 	}
-	setTransform(
+	override setTransform(
 		left: number = this.left,
 		top: number = this.top,
 		scale: number = this.scale,
@@ -985,6 +866,7 @@ export class LyricLineEl extends LyricLineBase {
 		force = false,
 		delay = 0,
 	) {
+		super.setTransform(left, top, scale, opacity, blur, force, delay);
 		const beforeInSight = this.isInSight;
 		const enableSpring = this.lyricPlayer.getEnableSpring();
 		this.left = left;

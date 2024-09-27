@@ -9,8 +9,6 @@ import "../../styles/index.css";
 import styles from "../../styles/lyric-player.module.css";
 import { debounceFrame } from "../../utils/debounce";
 import { LyricPlayerBase } from "../base";
-import { BottomLineEl } from "../bottom-line";
-import { InterludeDots } from "./interlude-dots";
 import { LyricLineEl, type RawLyricLineMouseEvent } from "./lyric-line";
 
 /**
@@ -111,8 +109,6 @@ export class DomLyricPlayer
 	}
 	constructor() {
 		super();
-		this.interludeDots = new InterludeDots();
-		this.bottomLine = new BottomLineEl(this);
 		this.rebuildStyle();
 		this.element.classList.add("amll-lyric-player", "dom");
 		if (this.disableSpring) {

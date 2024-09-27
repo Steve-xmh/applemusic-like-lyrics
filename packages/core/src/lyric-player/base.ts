@@ -1,5 +1,10 @@
 import structuredClone from "@ungap/structured-clone";
-import type { Disposable, HasElement, LyricLine } from "../interfaces";
+import type {
+	Disposable,
+	HasElement,
+	LyricLine,
+	LyricWord,
+} from "../interfaces";
 import styles from "../styles/lyric-player.module.css";
 import { debounceFrame } from "../utils/debounce";
 import { eqSet } from "../utils/eq-set";
@@ -75,7 +80,7 @@ export abstract class LyricPlayerBase
 	private scrolledHandler = 0;
 	protected isScrolled = false;
 
-	private resizeObserver: ResizeObserver = new ResizeObserver(
+	resizeObserver: ResizeObserver = new ResizeObserver(
 		debounceFrame(
 			((e) => {
 				const rect = e[0].contentRect;
@@ -642,14 +647,14 @@ export abstract class LyricPlayerBase
 		let delay = 0;
 		let baseDelay = 0.05;
 		let setDots = false;
-		this.currentLyricLineObjects.forEach((el, i) => {
+		this.currentLyricLineObjects.forEach((lineObj, i) => {
 			const hasBuffered = this.bufferedLines.has(i);
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);
-			const line = el.getLine();
+			const line = lineObj.getLine();
 			let left = 24;
 			if (line.isDuet) {
-				left = this.size[0] - (this.lyricLinesSize.get(el)?.[0] ?? 0);
+				left = this.size[0] - (this.lyricLinesSize.get(lineObj)?.[0] ?? 0);
 			}
 			if (
 				!setDots &&
@@ -700,7 +705,7 @@ export abstract class LyricPlayerBase
 
 			const SCALE_ASPECT = this.enableScale ? 97 : 100;
 
-			el.setTransform(
+			lineObj.setTransform(
 				left,
 				curPos,
 				isActive ? 100 : line.isBG ? 75 : SCALE_ASPECT,
@@ -710,9 +715,9 @@ export abstract class LyricPlayerBase
 				delay,
 			);
 			if (line.isBG && isActive) {
-				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
+				curPos += this.lyricLinesSize.get(lineObj)?.[1] ?? 0;
 			} else if (!line.isBG) {
-				curPos += this.lyricLinesSize.get(el)?.[1] ?? 0;
+				curPos += this.lyricLinesSize.get(lineObj)?.[1] ?? 0;
 			}
 			if (curPos >= 0 && !this.isSeeking) {
 				if (!line.isBG) delay += baseDelay;
@@ -787,11 +792,15 @@ export abstract class LyricPlayerBase
 	/**
 	 * 暂停部分效果演出，目前会暂停播放间奏点的动画
 	 */
-	pause() {}
+	pause() {
+		this.interludeDots.pause();
+	}
 	/**
 	 * 恢复部分效果演出，目前会恢复播放间奏点的动画
 	 */
-	resume() {}
+	resume() {
+		this.interludeDots.resume();
+	}
 	/**
 	 * 更新动画，这个函数应该被逐帧调用或者在以下情况下调用一次：
 	 *
@@ -799,7 +808,10 @@ export abstract class LyricPlayerBase
 	 * @param delta 距离上一次被调用到现在的时长，单位为毫秒（可为浮点数）
 	 */
 
-	update(_delta = 0) {}
+	update(delta = 0) {
+		this.bottomLine.update(delta / 1000);
+		this.interludeDots.update(delta / 1000);
+	}
 
 	protected onResize() {}
 
@@ -860,27 +872,57 @@ export abstract class LyricPlayerBase
  * @internal
  */
 export abstract class LyricLineBase extends EventTarget implements Disposable {
+	protected left = 0;
+	protected top = 0;
+	protected scale = 1;
+	protected blur = 0;
+	protected opacity = 1;
+	protected delay = 0;
 	readonly lineTransforms = {
 		posX: new Spring(0),
 		posY: new Spring(0),
 		scale: new Spring(100),
 	};
 	abstract measureSize(): [number, number];
-	abstract setLine(line: LyricLine): void;
 	abstract getLine(): LyricLine;
 	abstract enable(): void;
 	abstract disable(): void;
 	abstract resume(): void;
 	abstract pause(): void;
-	abstract setTransform(
-		left?: number,
-		top?: number,
-		scale?: number,
-		opacity?: number,
-		blur?: number,
-		force?: boolean,
-		delay?: number,
-	): void;
+	setTransform(
+		left: number = this.left,
+		top: number = this.top,
+		scale: number = this.scale,
+		opacity: number = this.opacity,
+		blur: number = this.blur,
+		_force = false,
+		delay = 0,
+	) {
+		this.left = left;
+		this.top = top;
+		this.scale = scale;
+		this.opacity = opacity;
+		this.blur = blur;
+		this.delay = delay;
+	}
+
+	/**
+	 * 判定歌词是否可以应用强调辉光效果
+	 *
+	 * 果子在对辉光效果的解释是一种强调（emphasized）效果
+	 *
+	 * 条件是一个单词时长大于等于 1s 且长度小于等于 7
+	 *
+	 * @param word 单词
+	 * @returns 是否可以应用强调辉光效果
+	 */
+	static shouldEmphasize(word: LyricWord): boolean {
+		return (
+			word.endTime - word.startTime >= 1000 &&
+			word.word.trim().length <= 7 &&
+			word.word.trim().length > 1
+		);
+	}
 	abstract update(delta?: number): void;
 	dispose() {}
 }

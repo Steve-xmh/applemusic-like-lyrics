@@ -1,6 +1,5 @@
 const WHITE_SPACE = /^\s+/;
 const LATIN = /^[\p{L}0-9!"#$%&’()*+,-./:;<=>?@\[\]^_`\{|\}~]+/iu;
-const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+/u;
 
 export interface TextLayoutResult {
 	text: string;
@@ -21,6 +20,11 @@ export interface TextLayoutConfig {
 	uniformSpace: boolean;
 }
 
+export interface TextLayoutFinalState {
+	x: number;
+	lineIndex: number;
+}
+
 /**
  * 对指定文本进行布局，返回每个字符的位置信息
  * 目前仅可支持普通拉丁字符和 CJK 字符
@@ -34,7 +38,7 @@ export function* layoutWord(
 	text: string,
 	config: TextLayoutConfig,
 	initialX = 0,
-): Generator<TextLayoutResult, void, void> {
+): Generator<TextLayoutResult, TextLayoutFinalState, void> {
 	if (import.meta.env.DEV) {
 		if (!ctx) throw new Error("ctx is null");
 		if (!(config.fontSize > 0)) throw new Error("fontSize is invalid");
@@ -139,4 +143,44 @@ export function* layoutWord(
 
 		curLayoutIndex++;
 	}
+
+	return { x, lineIndex };
+}
+
+/**
+ * 对指定文本进行布局，返回每段文字的位置信息
+ * 目前仅可支持普通拉丁字符和 CJK 字符
+ * @param ctx 2D 画板上下文
+ * @param text 文本
+ * @param config 字体大小
+ * @param initialX 初始 X 坐标，对于需要布局多段文本的情况下有所帮助
+ */
+export function* layoutLine(
+	ctx: CanvasRenderingContext2D,
+	text: string,
+	config: TextLayoutConfig,
+	initialX = 0,
+): Generator<TextLayoutResult, void, void> {
+	let currentLine: TextLayoutResult = {
+		text: "",
+		index: 0,
+		lineIndex: 0,
+		width: 0,
+		height: 0,
+		x: 0,
+	};
+
+	for (const word of layoutWord(ctx, text, config, initialX)) {
+		if (word.lineIndex !== currentLine.lineIndex) {
+			if (currentLine.text.length) yield currentLine;
+			currentLine = {
+				...word,
+			};
+		} else {
+			currentLine.text += word.text;
+			currentLine.width = word.x + word.width;
+		}
+	}
+
+	if (currentLine.text.length) yield currentLine;
 }

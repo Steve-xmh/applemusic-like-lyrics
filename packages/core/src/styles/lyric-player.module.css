@@ -105,6 +105,7 @@
 	left: 1em;
 
 	& > * {
+		width: clamp(0.5em, 1vh, 3em);
 		height: clamp(0.5em, 1vh, 3em);
 		display: inline-block;
 		border-radius: 50%;
