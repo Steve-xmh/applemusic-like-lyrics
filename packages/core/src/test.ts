@@ -5,24 +5,24 @@
  * @author SteveXMH
  */
 
-import GUI from "lil-gui";
-import {
-	BackgroundRender,
-	PixiRenderer,
-	MeshGradientRenderer,
-} from "./bg-render";
-import Stats from "stats.js";
-import { LyricLineMouseEvent, LyricPlayer } from "./lyric-player";
-import { parseTTML } from "@applemusic-like-lyrics/ttml";
-import { SpringParams } from "./utils/spring";
 import {
 	type LyricLine as RawLyricLine,
 	parseLrc,
-	parseYrc,
 	parseLys,
 	parseQrc,
+	parseYrc,
 } from "@applemusic-like-lyrics/lyric";
-import { LyricLine } from ".";
+import { parseTTML } from "@applemusic-like-lyrics/ttml";
+import GUI from "lil-gui";
+import Stats from "stats.js";
+import type { LyricLine } from ".";
+import {
+	BackgroundRender,
+	MeshGradientRenderer,
+	PixiRenderer,
+} from "./bg-render";
+import { DomLyricPlayer, type LyricLineMouseEvent } from "./lyric-player";
+import type { SpringParams } from "./utils/spring";
 
 const audio = document.createElement("audio");
 audio.volume = 0.5;
@@ -228,7 +228,7 @@ const progress = playerGui
 playerGui.add(debugValues, "play").name("加载/播放");
 playerGui.add(debugValues, "pause").name("暂停/继续");
 
-const lyricPlayer = new LyricPlayer();
+const lyricPlayer = new DomLyricPlayer();
 
 lyricPlayer.addEventListener("line-click", (evt) => {
 	const e = evt as LyricLineMouseEvent;
@@ -263,7 +263,7 @@ requestAnimationFrame(frame);
 
 declare global {
 	interface Window {
-		globalLyricPlayer: LyricPlayer;
+		globalLyricPlayer: DomLyricPlayer;
 		globalBackground:
 			| BackgroundRender<PixiRenderer>
 			| BackgroundRender<MeshGradientRenderer>;
@@ -276,12 +276,13 @@ const waitFrame = (): Promise<void> =>
 	new Promise((resolve) => requestAnimationFrame(resolve));
 const mapLyric = (
 	line: RawLyricLine,
-	i: number,
-	lines: RawLyricLine[],
+	_i: number,
+	_lines: RawLyricLine[],
 ): LyricLine => ({
 	words: line.words,
 	startTime: line.words[0]?.startTime ?? 0,
-	endTime: line.words[line.words.length - 1]?.endTime ?? Infinity,
+	endTime:
+		line.words[line.words.length - 1]?.endTime ?? Number.POSITIVE_INFINITY,
 	translatedLyric: "",
 	romanLyric: "",
 	isBG: false,

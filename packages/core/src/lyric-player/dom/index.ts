@@ -11,7 +11,7 @@ import styles from "../../styles/lyric-player.module.css";
 import { debounceFrame } from "../../utils/debounce";
 import { eqSet } from "../../utils/eq-set";
 import type { SpringParams } from "../../utils/spring";
-import { BottomLineEl } from "./bottom-line";
+import { BottomLineEl } from "../bottom-line";
 import { InterludeDots } from "./interlude-dots";
 import { LyricLineEl, type RawLyricLineMouseEvent } from "./lyric-line";
 
@@ -41,7 +41,10 @@ export type LyricLineMouseEventListener = (evt: LyricLineMouseEvent) => void;
  *
  * 尽可能贴切 Apple Music for iPad 的歌词效果设计，且做了力所能及的优化措施
  */
-export class LyricPlayer extends EventTarget implements HasElement, Disposable {
+export class DomLyricPlayer
+	extends EventTarget
+	implements HasElement, Disposable
+{
 	private element: HTMLElement = document.createElement("div");
 	private currentTime = 0;
 	private lastCurrentTime = 0;

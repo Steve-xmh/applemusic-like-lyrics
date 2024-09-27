@@ -1,5 +1,5 @@
 import bezier from "bezier-easing";
-import type { LyricPlayer } from ".";
+import type { DomLyricPlayer } from ".";
 import type {
 	Disposable,
 	HasElement,
@@ -205,7 +205,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	};
 
 	constructor(
-		private lyricPlayer: LyricPlayer,
+		private lyricPlayer: DomLyricPlayer,
 		private lyricLine: LyricLine = {
 			words: [],
 			translatedLyric: "",

@@ -9,9 +9,11 @@
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"strictNullChecks": true,
+		"downlevelIteration": true,
 		"allowSyntheticDefaultImports": true,
 		"allowJs": false,
 		"stripInternal": true,
+		"noImplicitOverride": true,
 		"skipLibCheck": true
 	}
 }

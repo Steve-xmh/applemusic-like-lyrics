@@ -1,7 +1,7 @@
-import type { Disposable, HasElement } from "../../interfaces";
-import styles from "../../styles/lyric-player.module.css";
-import { Spring } from "../../utils/spring";
-import type { LyricPlayer } from "./";
+import type { Disposable, HasElement } from "../interfaces";
+import styles from "../styles/lyric-player.module.css";
+import { Spring } from "../utils/spring";
+import type { LyricPlayerBase } from "./";
 
 export class BottomLineEl implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
@@ -14,7 +14,7 @@ export class BottomLineEl implements HasElement, Disposable {
 		posX: new Spring(0),
 		posY: new Spring(0),
 	};
-	constructor(private lyricPlayer: LyricPlayer) {
+	constructor(private lyricPlayer: LyricPlayerBase) {
 		this.element.setAttribute("class", styles.lyricLine);
 		this.rebuildStyle();
 	}
