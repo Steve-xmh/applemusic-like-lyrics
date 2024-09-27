@@ -1,7 +1,7 @@
 import type { Disposable, HasElement } from "../interfaces";
 import styles from "../styles/lyric-player.module.css";
 import { Spring } from "../utils/spring";
-import type { LyricPlayerBase } from "./";
+import type { LyricPlayerBase } from "./base";
 
 export class BottomLineEl implements HasElement, Disposable {
 	private element: HTMLElement = document.createElement("div");
@@ -32,7 +32,7 @@ export class BottomLineEl implements HasElement, Disposable {
 	hide() {
 		this.rebuildStyle();
 	}
-	rebuildStyle() {
+	private rebuildStyle() {
 		let style = `transform:translate(${this.lineTransforms.posX
 			.getCurrentPosition()
 			.toFixed(2)}px,${this.lineTransforms.posY

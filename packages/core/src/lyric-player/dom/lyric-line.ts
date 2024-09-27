@@ -1,15 +1,10 @@
 import bezier from "bezier-easing";
 import type { DomLyricPlayer } from ".";
-import type {
-	Disposable,
-	HasElement,
-	LyricLine,
-	LyricWord,
-} from "../../interfaces";
+import type { LyricLine, LyricWord } from "../../interfaces";
 import styles from "../../styles/lyric-player.module.css";
 import { createMatrix4, matrix4ToCSS, scaleMatrix4 } from "../../utils/matrix";
 import { measure, mutate } from "../../utils/schedule";
-import { Spring } from "../../utils/spring";
+import { LyricLineBase } from "../base";
 
 const CJKEXP = /^[\p{Unified_Ideograph}\u0800-\u9FFC]+$/u;
 
@@ -188,7 +183,7 @@ type MouseEventListener = (
 	ev: RawLyricLineMouseEvent,
 ) => void;
 
-export class LyricLineEl extends EventTarget implements HasElement, Disposable {
+export class LyricLineEl extends LyricLineBase {
 	private element: HTMLElement = document.createElement("div");
 	private left = 0;
 	private top = 0;
@@ -198,11 +193,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	private splittedWords: RealWord[] = [];
 	// 由 LyricPlayer 来设置
 	lineSize: number[] = [0, 0];
-	readonly lineTransforms = {
-		posX: new Spring(0),
-		posY: new Spring(0),
-		scale: new Spring(100),
-	};
 
 	constructor(
 		private lyricPlayer: DomLyricPlayer,
@@ -299,10 +289,8 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 	}
 
 	private isEnabled = false;
-	private hasFaded = false;
 	async enable(maskAnimationTime = this.lyricLine.startTime) {
 		this.isEnabled = true;
-		this.hasFaded = false;
 		this.element.classList.add(styles.active);
 		await this.waitMaskImageUpdated();
 		const main = this.element.children[0] as HTMLDivElement;
@@ -323,12 +311,10 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		main.classList.add(styles.active);
 	}
-	disable(maskAnimationTime = 0) {
+	disable() {
 		this.isEnabled = false;
-		this.hasFaded = true;
 		this.element.classList.remove(styles.active);
 		const main = this.element.children[0] as HTMLDivElement;
-		let i = 0;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
 				if (
@@ -339,12 +325,11 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 					a.play();
 				}
 			}
-			i++;
 		}
 		main.classList.remove(styles.active);
 	}
 	private lastWord?: RealWord;
-	resume(currentTime = 0) {
+	resume() {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
@@ -367,22 +352,14 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			}
 		}
 	}
-	pause(currentTime = 0) {
+	pause() {
 		if (!this.isEnabled) return;
 		for (const word of this.splittedWords) {
 			for (const a of word.elementAnimations) {
-				if (word.startTime >= currentTime) {
-					a.pause();
-				} else {
-					this.lastWord = word;
-				}
+				a.pause();
 			}
 			for (const a of word.maskAnimations) {
-				if (word.startTime >= currentTime) {
-					a.pause();
-				} else {
-					this.lastWord = word;
-				}
+				a.pause();
 			}
 		}
 	}
@@ -398,7 +375,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 	}
 	measureSize(): [number, number] {
-		this.hasFaded = false;
 		if (this._hide) {
 			if (this._prevParentEl) {
 				this._prevParentEl.appendChild(this.element);
@@ -417,6 +393,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			this.element.style.display = "none";
 			this.element.style.visibility = "";
 		}
+		this.lineSize = size;
 		return size;
 	}
 	setLine(line: LyricLine) {
@@ -456,7 +433,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		this.rebuildStyle();
 	}
-	rebuildStyle() {
+	private rebuildStyle() {
 		if (this._hide) {
 			if (this.lastStyle !== "display:none;transform:translate(0,-10000px);") {
 				this.lastStyle = "display:none;transform:translate(0,-10000px);";
@@ -850,7 +827,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 			if (wordEl) {
 				word.width = wordEl.clientWidth;
 				word.height = wordEl.clientHeight;
-				const fadeWidth = word.height * this.lyricPlayer.wordFadeWidth;
+				const fadeWidth = word.height * this.lyricPlayer.getWordFadeWidth();
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / word.width,
 				);
@@ -888,7 +865,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.splittedWords.forEach((word, i) => {
 			const wordEl = word.mainElement;
 			if (wordEl) {
-				const fadeWidth = word.height * this.lyricPlayer.wordFadeWidth;
+				const fadeWidth = word.height * this.lyricPlayer.getWordFadeWidth();
 				const [maskImage, totalAspect] = generateFadeGradient(
 					fadeWidth / (word.width + word.padding * 2),
 				);
@@ -1004,7 +981,6 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		top: number = this.top,
 		scale: number = this.scale,
 		opacity = 1,
-		subopacity = 0.4,
 		blur = 0,
 		force = false,
 		delay = 0,
@@ -1016,14 +992,12 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		this.scale = scale;
 		this.delay = (delay * 1000) | 0;
 		const main = this.element.children[0] as HTMLDivElement;
-		const trans = this.element.children[1] as HTMLDivElement;
-		const roman = this.element.children[2] as HTMLDivElement;
 		// main.style.opacity = `${opacity *
 		// 	(!this.hasFaded ? 1 : this.lyricPlayer._getIsNonDynamic() ? 1 : 0.3)
 		// 	}`;
 		main.style.opacity = `${opacity}`;
-		trans.style.opacity = `${subopacity}`;
-		roman.style.opacity = `${subopacity}`;
+		// trans.style.opacity = `${subopacity}`;
+		// roman.style.opacity = `${subopacity}`;
 		if (force || !enableSpring) {
 			this.blur = Math.min(32, blur);
 			if (force) this.element.classList.add(styles.tmpDisableTransition);
@@ -1154,7 +1128,7 @@ export class LyricLineEl extends EventTarget implements HasElement, Disposable {
 		}
 		this.splittedWords = [];
 	}
-	dispose(): void {
+	override dispose(): void {
 		this.disposeElements();
 		this.element.remove();
 	}
