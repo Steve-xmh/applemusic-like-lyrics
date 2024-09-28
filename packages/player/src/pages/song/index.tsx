@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/themes";
 import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useContext } from "react";
+import { Trans } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { db } from "../../dexie";
 import { useSongCover } from "../../utils/use-song-cover";
@@ -27,7 +28,7 @@ const SongPageHeader: FC = () => {
 			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
-					返回
+					<Trans i18nKey="common.page.back">返回</Trans>
 				</Button>
 			</Flex>
 			<Flex align="center" my="4" gap="4">
@@ -61,9 +62,15 @@ export const SongPage: FC = () => {
 				<SongPageHeader />
 				<Tabs.Root defaultValue="basic">
 					<Tabs.List>
-						<Tabs.Trigger value="basic">基本</Tabs.Trigger>
-						<Tabs.Trigger value="metadata">元数据</Tabs.Trigger>
-						<Tabs.Trigger value="lyric">歌词</Tabs.Trigger>
+						<Tabs.Trigger value="basic">
+							<Trans i18nKey="page.song.basic.tabs.basic">基本</Trans>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="metadata">
+							<Trans i18nKey="page.song.basic.tabs.metadata">元数据</Trans>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="lyric">
+							<Trans i18nKey="page.song.basic.tabs.lyric">歌词</Trans>
+						</Tabs.Trigger>
 					</Tabs.List>
 					<Box pt="3">
 						<Tabs.Content value="basic">

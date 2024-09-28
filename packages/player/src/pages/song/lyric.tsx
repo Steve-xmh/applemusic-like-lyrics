@@ -6,6 +6,7 @@ import {
 	useLayoutEffect,
 	useState,
 } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { db } from "../../dexie";
 import { Option } from "./common";
 import { SongContext } from "./song-ctx";
@@ -16,6 +17,7 @@ export const LyricTabContent: FC = () => {
 	const [lyricContent, setLyricContent] = useState("");
 	const [translatedLyricContent, setTranslatedLyricContent] = useState("");
 	const [romanLyricContent, setRomanLyricContent] = useState("");
+	const { t } = useTranslation();
 
 	useLayoutEffect(() => {
 		if (song) {
@@ -61,26 +63,52 @@ export const LyricTabContent: FC = () => {
 	return (
 		<>
 			<Flex direction="column" gap="4">
-				<Option label="歌词格式">
+				<Option label={t("page.song.lyric.lyricFormatLabel", "歌词格式")}>
 					<Select.Root
 						defaultValue="none"
 						onValueChange={(v) => setLyricFormat(v)}
 					>
 						<Select.Trigger />
 						<Select.Content>
-							<Select.Item value="none">无歌词</Select.Item>
-							<Select.Item value="lrc">LyRiC 歌词</Select.Item>
-							<Select.Item value="eslrc">ESLyRiC 歌词</Select.Item>
-							<Select.Item value="yrc">YRC 歌词</Select.Item>
-							<Select.Item value="qrc">QRC 歌词</Select.Item>
-							<Select.Item value="lys">Lyricify Syllable 歌词</Select.Item>
-							<Select.Item value="ttml">TTML 歌词</Select.Item>
+							<Select.Item value="none">
+								<Trans i18nKey="page.song.lyric.lyricFormat.none">无歌词</Trans>
+							</Select.Item>
+							<Select.Item value="lrc">
+								<Trans i18nKey="page.song.lyric.lyricFormat.lrc">
+									LyRiC 歌词
+								</Trans>
+							</Select.Item>
+							<Select.Item value="eslrc">
+								<Trans i18nKey="page.song.lyric.lyricFormat.eslrc">
+									ESLyRiC 歌词
+								</Trans>
+							</Select.Item>
+							<Select.Item value="yrc">
+								<Trans i18nKey="page.song.lyric.lyricFormat.yrc">
+									YRC 歌词
+								</Trans>
+							</Select.Item>
+							<Select.Item value="qrc">
+								<Trans i18nKey="page.song.lyric.lyricFormat.qrc">
+									QRC 歌词
+								</Trans>
+							</Select.Item>
+							<Select.Item value="lys">
+								<Trans i18nKey="page.song.lyric.lyricFormat.lys">
+									Lyricify Syllable 歌词
+								</Trans>
+							</Select.Item>
+							<Select.Item value="ttml">
+								<Trans i18nKey="page.song.lyric.lyricFormat.ttml">
+									TTML 歌词
+								</Trans>
+							</Select.Item>
 						</Select.Content>
 					</Select.Root>
 				</Option>
 				{lyricFormat !== "none" && lyricFormat.length > 0 && (
 					<>
-						<Option label="歌词数据">
+						<Option label={t("page.song.lyric.lyricData", "歌词数据")}>
 							<TextArea
 								value={lyricContent}
 								style={{
@@ -92,15 +120,26 @@ export const LyricTabContent: FC = () => {
 
 						{lyricFormat === "ttml" ? (
 							<Callout.Root>
-								<Callout.Text>TTML 歌词可同时包含翻译与音译数据。</Callout.Text>
+								<Callout.Text>
+									<Trans i18nKey="page.song.lyric.ttmlLyricTip">
+										TTML 歌词可同时包含翻译与音译数据。
+									</Trans>
+								</Callout.Text>
 							</Callout.Root>
 						) : (
 							<>
-								<Option label="翻译歌词数据">
+								<Option
+									label={t(
+										"page.song.lyric.translationLyricData",
+										"翻译歌词数据",
+									)}
+								>
 									<Callout.Root>
 										<Callout.Text>
-											请提供 LyRiC
-											格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为译文
+											<Trans i18nKey="page.song.lyric.translationLyricDataTip">
+												请提供 LyRiC
+												格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为译文
+											</Trans>
 										</Callout.Text>
 									</Callout.Root>
 									<TextArea
@@ -117,8 +156,10 @@ export const LyricTabContent: FC = () => {
 								<Option label="音译歌词数据">
 									<Callout.Root>
 										<Callout.Text>
-											请提供 LyRiC
-											格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为音译
+											<Trans i18nKey="page.song.lyric.romanLyricDataTip">
+												请提供 LyRiC
+												格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为音译
+											</Trans>
 										</Callout.Text>
 									</Callout.Root>
 									<TextArea

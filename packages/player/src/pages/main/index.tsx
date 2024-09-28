@@ -1,4 +1,4 @@
-import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import {
 	Badge,
 	Box,
@@ -11,11 +11,11 @@ import {
 	IconButton,
 	Spinner,
 	Text,
-	TextField,
 } from "@radix-ui/themes";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue } from "jotai";
 import type { FC } from "react";
+import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
 import { db } from "../../dexie";
@@ -47,24 +47,12 @@ export const MainPage: FC = () => {
 								color="indigo"
 								ml="2"
 							>
-								有可用更新
+								<Trans i18nKey="page.main.updateAvailableTag">有可用更新</Trans>
 							</Badge>
 						)}
 					</Heading>
 				</Box>
 				<Flex gap="1" wrap="wrap">
-					<Box
-						display={{
-							initial: "none",
-							sm: "block",
-						}}
-					>
-						<TextField.Root placeholder="搜索……">
-							<TextField.Slot>
-								<MagnifyingGlassIcon />
-							</TextField.Slot>
-						</TextField.Root>
-					</Box>
 					<NewPlaylistButton />
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger>
@@ -75,20 +63,29 @@ export const MainPage: FC = () => {
 						<DropdownMenu.Content>
 							<DropdownMenu.Sub>
 								<DropdownMenu.SubTrigger>
-									进入 WS Protocol 模式
+									<Trans i18nKey="page.main.menu.enterWSProtocolMode">
+										进入 WS Protocol 模式
+									</Trans>
 								</DropdownMenu.SubTrigger>
 								<DropdownMenu.SubContent>
 									<DropdownMenu.Item asChild>
-										<Link to="/ws/recv">作为状态接收者</Link>
+										<Link to="/ws/recv">
+											<Trans i18nKey="page.main.menu.asWSProtocolReceiver">
+												作为状态接收者
+											</Trans>
+										</Link>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item disabled>
-										{/* <Link to="/ws/send">作为状态发送者（施工中）</Link> */}
-										作为状态发送者（施工中）
+										<Trans i18nKey="page.main.menu.asWSProtocolSenderWIP">
+											作为状态发送者（施工中）
+										</Trans>
 									</DropdownMenu.Item>
 								</DropdownMenu.SubContent>
 							</DropdownMenu.Sub>
 							<DropdownMenu.Item asChild>
-								<Link to="/settings">设置</Link>
+								<Link to="/settings">
+									<Trans i18nKey="page.main.menu.settings">设置</Trans>
+								</Link>
 							</DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
@@ -97,7 +94,9 @@ export const MainPage: FC = () => {
 			{playlists !== undefined ? (
 				playlists.length === 0 ? (
 					<Text mt="9" as="div" align="center">
-						没有播放列表，快去新建一个吧！
+						<Trans i18nKey="page.main.noPlaylistTip">
+							没有播放列表，快去新建一个吧！
+						</Trans>
 					</Text>
 				) : (
 					<>
@@ -113,7 +112,7 @@ export const MainPage: FC = () => {
 										color="red"
 										onSelect={() => db.playlists.delete(v.id)}
 									>
-										删除
+										<Trans i18nKey="page.main.playlistMenu.delete">删除</Trans>
 									</ContextMenu.Item>
 								</ContextMenu.Content>
 							</ContextMenu.Root>
@@ -129,7 +128,7 @@ export const MainPage: FC = () => {
 					height="70vh"
 				>
 					<Spinner size="3" />
-					加载歌单中
+					<Trans i18nKey="page.main.loadingPlaylist">加载歌单中</Trans>
 				</Flex>
 			)}
 		</Container>

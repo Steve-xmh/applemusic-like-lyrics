@@ -3,7 +3,8 @@ import { Box, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
@@ -17,6 +18,7 @@ import "./i18n";
 import { router } from "./router";
 import {
 	MusicContextMode,
+	displayLanguageAtom,
 	musicContextModeAtom,
 	showStatJSFrameAtom,
 } from "./states";
@@ -25,6 +27,13 @@ function App() {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const showStatJSFrame = useAtomValue(showStatJSFrameAtom);
 	const musicContextMode = useAtomValue(musicContextModeAtom);
+	const displayLanguage = useAtomValue(displayLanguageAtom);
+	const { i18n } = useTranslation();
+
+	useLayoutEffect(() => {
+		console.log("displayLanguage", displayLanguage, i18n);
+		i18n.changeLanguage(displayLanguage);
+	}, [i18n, displayLanguage]);
 
 	useEffect(() => {
 		if (showStatJSFrame) {

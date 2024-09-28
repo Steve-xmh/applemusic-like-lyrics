@@ -17,7 +17,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { type Event, listen } from "@tauri-apps/api/event";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useTransition } from "react";
 import { toast } from "react-toastify";
 import {
 	musicIdAtom,
@@ -30,6 +30,7 @@ export const WSProtocolMusicContext: FC = () => {
 	const wsProtocolListenAddr = useAtomValue(wsProtocolListenAddrAtom);
 	const setConnectedAddrs = useSetAtom(wsProtocolConnectedAddrsAtom);
 	const store = useStore();
+	const { t } = useTransition();
 
 	useEffect(() => {
 		emitAudioThread("pauseAudio");
@@ -48,33 +49,59 @@ export const WSProtocolMusicContext: FC = () => {
 		store.set(
 			onRequestNextSongAtom,
 			toEmit(() => {
-				toast("WS Protocol 模式下无法切换歌曲");
+				toast(
+					t(
+						"ws-protocol.toast.switchSongNotSupported",
+						"WS Protocol 模式下无法切换歌曲",
+					),
+				);
 			}),
 		);
 		store.set(
 			onRequestPrevSongAtom,
 			toEmit(() => {
-				toast("WS Protocol 模式下无法切换歌曲");
+				toast(
+					t(
+						"ws-protocol.toast.switchSongNotSupported",
+						"WS Protocol 模式下无法切换歌曲",
+					),
+				);
 			}),
 		);
 		store.set(
 			onPlayOrResumeAtom,
 			toEmit(() => {
-				toast("WS Protocol 模式下无法暂停/继续播放音乐");
+				toast(
+					t(
+						"ws-protocol.toast.pauseOrPlaySongNotSupported",
+						"WS Protocol 模式下无法暂停/继续播放音乐",
+					),
+				);
 			}),
 		);
 		store.set(
 			onSeekPositionAtom,
 			toEmit(() => {
-				toast("WS Protocol 模式下无法修改播放进度");
+				toast(
+					t(
+						"ws-protocol.toast.seekNotSupported",
+						"WS Protocol 模式下无法修改播放进度",
+					),
+				);
 			}),
 		);
 		store.set(
 			onChangeVolumeAtom,
 			toEmit(() => {
-				toast("WS Protocol 模式下无法修改音量", {
-					toastId: "ws-protocol-change-volume",
-				});
+				toast(
+					t(
+						"ws-protocol.toast.changeVolumeNotSupported",
+						"WS Protocol 模式下无法修改音量",
+					),
+					{
+						toastId: "ws-protocol-change-volume",
+					},
+				);
 			}),
 		);
 

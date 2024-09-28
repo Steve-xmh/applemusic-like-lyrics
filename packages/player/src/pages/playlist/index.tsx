@@ -32,6 +32,7 @@ import {
 	useCallback,
 	useState,
 } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -98,6 +99,7 @@ export const SongCard = forwardRef<
 	const songImgUrl = useSongCover(
 		song.state === "hasData" ? song.data : undefined,
 	);
+	const { t } = useTranslation();
 	const navigate = useNavigate();
 
 	return (
@@ -116,7 +118,13 @@ export const SongCard = forwardRef<
 								{song.state === "hasData" &&
 									(song.data.songName ||
 										song.data.filePath ||
-										`未知歌曲 ID ${songId}`)}
+										t(
+											"page.playlist.music.unknownSongName",
+											"未知歌曲 ID {{id}}",
+											{
+												id: songId,
+											},
+										))}
 							</Text>
 							<Text wrap="nowrap" truncate color="gray">
 								{song.state === "hasData" && (song.data.songArtists || "")}
@@ -140,17 +148,23 @@ export const SongCard = forwardRef<
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content>
 								<DropdownMenu.Item onClick={() => onPlayList(songIndex)}>
-									播放音乐
+									<Trans i18nKey="page.playlist.music.dropdown.playMusic">
+										播放音乐
+									</Trans>
 								</DropdownMenu.Item>
 								<DropdownMenu.Item onClick={() => navigate(`/song/${songId}`)}>
-									编辑音乐数据
+									<Trans i18nKey="page.playlist.music.dropdown.editMusicOverrideData">
+										编辑歌曲覆盖信息
+									</Trans>
 								</DropdownMenu.Item>
 								<DropdownMenu.Separator />
 								<DropdownMenu.Item
 									color="red"
 									onClick={() => onDeleteSong(songId)}
 								>
-									从歌单中删除
+									<Trans i18nKey="page.playlist.music.dropdown.removeFromPlaylist">
+										从歌单中删除
+									</Trans>
 								</DropdownMenu.Item>
 							</DropdownMenu.Content>
 						</DropdownMenu.Root>
@@ -226,11 +240,12 @@ const EditablePlaylistName: FC<{
 export const PlaylistPage: FC = () => {
 	const param = useParams();
 	const playlist = useLiveQuery(() => db.playlists.get(Number(param.id)));
+	const { t } = useTranslation();
 
 	const onAddLocalMusics = useCallback(async () => {
 		const filters = [
 			{
-				name: "音频文件",
+				name: t("page.playlist.addLocalMusic.filterName", "音频文件"),
 				extensions: ["mp3", "flac", "wav", "m4a", "aac", "ogg"],
 			},
 		];
@@ -245,7 +260,14 @@ export const PlaylistPage: FC = () => {
 		if (!results) return;
 		console.log(results);
 		const id = toast.loading(
-			`正在解析音乐元数据以添加歌曲 (${0}/${results.length})`,
+			t(
+				"page.playlist.addLocalMusic.toast.parsingMusicMetadata",
+				"正在解析音乐元数据以添加歌曲 ({{current}}/{{total}})",
+				{
+					current: 0,
+					total: results.length,
+				},
+			),
 		);
 		let current = 0;
 		let success = 0;
@@ -283,7 +305,14 @@ export const PlaylistPage: FC = () => {
 					} finally {
 						current += 1;
 						toast.update(id, {
-							render: `正在解析音乐元数据以添加歌曲 (${current}/${results.length})`,
+							render: t(
+								"page.playlist.addLocalMusic.toast.parsingMusicMetadata",
+								"正在解析音乐元数据以添加歌曲 ({{current}}/{{total}})",
+								{
+									current: 0,
+									total: results.length,
+								},
+							),
 							progress: current / results.length,
 						});
 					}
@@ -300,13 +329,38 @@ export const PlaylistPage: FC = () => {
 		});
 		toast.done(id);
 		if (errored > 0 && success > 0) {
-			toast.warn(`已添加 ${success} 首歌曲，其中 ${errored} 首歌曲添加失败`);
+			toast.warn(
+				t(
+					"page.playlist.addLocalMusic.toast.partiallyFailed",
+					"已添加 {{succeed}} 首歌曲，其中 {{errored}} 首歌曲添加失败",
+					{
+						succeed: success,
+						errored,
+					},
+				),
+			);
 		} else if (success === 0) {
-			toast.error(`${errored} 首歌曲添加失败`);
+			toast.error(
+				t(
+					"page.playlist.addLocalMusic.toast.allFailed",
+					"{{errored}} 首歌曲添加失败",
+					{
+						errored,
+					},
+				),
+			);
 		} else {
-			toast.success(`已全部添加 ${success} 首歌曲`);
+			toast.success(
+				t(
+					"page.playlist.addLocalMusic.toast.success",
+					"已全部添加 {{count}} 首歋曲",
+					{
+						count: success,
+					},
+				),
+			);
 		}
-	}, [playlist, param.id]);
+	}, [playlist, param.id, t]);
 
 	const onPlayList = useCallback(
 		async (songIndex = 0, shuffle = false) => {
@@ -368,7 +422,7 @@ export const PlaylistPage: FC = () => {
 					<Flex align="end" pt="4">
 						<Button variant="soft" onClick={() => history.back()}>
 							<ArrowLeftIcon />
-							返回
+							<Trans i18nKey="common.page.back">返回</Trans>
 						</Button>
 					</Flex>
 					<Flex align="end" gap="4">
@@ -389,18 +443,24 @@ export const PlaylistPage: FC = () => {
 									})
 								}
 							/>
-							<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
+							<Text>
+								{t("page.playlist.totalMusicLabel", "{{count}} 首歌曲", {
+									count: playlist?.songIds?.length || 0,
+								})}
+							</Text>
 							<Flex gap="2">
 								<Button onClick={onPlaylistDefault}>
 									<PlayIcon />
-									播放全部
+									<Trans i18nKey="page.playlist.playAll">播放全部</Trans>
 								</Button>
 								<Button variant="soft" onClick={onPlaylistShuffle}>
-									随机播放
+									<Trans i18nKey="page.playlist.shufflePlayAll">随机播放</Trans>
 								</Button>
 								<Button variant="soft" onClick={onAddLocalMusics}>
 									<PlusIcon />
-									添加本地歌曲
+									<Trans i18nKey="page.playlist.addLocalMusic.label">
+										添加本地歌曲
+									</Trans>
 								</Button>
 							</Flex>
 						</Flex>
@@ -420,7 +480,11 @@ export const PlaylistPage: FC = () => {
 									})
 								}
 							/>
-							<Text>{playlist?.songIds?.length || 0} 首歌曲</Text>
+							<Text>
+								{t("page.playlist.totalMusicLabel", "{{count}} 首歌曲", {
+									count: playlist?.songIds?.length || 0,
+								})}
+							</Text>
 							<Flex gap="2">
 								<IconButton onClick={onPlaylistDefault}>
 									<PlayIcon />

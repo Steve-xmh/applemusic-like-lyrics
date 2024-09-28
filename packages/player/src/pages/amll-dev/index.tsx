@@ -1,6 +1,7 @@
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Button, Card, Container, Flex, Text } from "@radix-ui/themes";
 import type { FC } from "react";
+import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useHideNowPlayingBar } from "../../utils/uses";
 
@@ -17,14 +18,18 @@ export const AMLLDevPage: FC = () => {
 			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
-					返回
+					<Trans i18nKey="common.page.back">返回</Trans>
 				</Button>
 			</Flex>
 			<Text weight="bold" size="4" my="4" as="div">
-				Apple Music Like Lyrics 开发者页面
+				<Trans i18nKey="page.amll-dev.title">
+					Apple Music Like Lyrics 开发者页面
+				</Trans>
 			</Text>
 			<Text>
-				此处的东西用于开发调试用途，仅供作者方便之用，随便使用可能有意想不到的情况出现！
+				<Trans i18nKey="page.amll-dev.warning">
+					此处的东西用于开发调试用途，仅供作者方便之用，随便使用可能有意想不到的情况出现！（页面内容仅中文）
+				</Trans>
 			</Text>
 			<Card asChild>
 				<Link

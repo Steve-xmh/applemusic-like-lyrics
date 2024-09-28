@@ -3,6 +3,11 @@ import { atomWithStorage } from "jotai/utils";
 
 export const musicIdAtom = atom("");
 
+export const displayLanguageAtom = atomWithStorage(
+	"amll-player.displayLanguage",
+	"zh-CN",
+);
+
 export const backgroundRendererAtom = atomWithStorage(
 	"amll-player.backgroundRenderer",
 	"mesh",

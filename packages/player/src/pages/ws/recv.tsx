@@ -11,6 +11,7 @@ import {
 } from "@radix-ui/themes";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { type FC, useEffect, useMemo } from "react";
+import { Trans } from "react-i18next";
 import {
 	MusicContextMode,
 	musicContextModeAtom,
@@ -48,17 +49,21 @@ export const WSProtocolRecvPage: FC = () => {
 			<Flex align="end" mt="7" gap="4">
 				<Button variant="soft" onClick={() => history.back()}>
 					<ArrowLeftIcon />
-					返回
+					<Trans i18nKey="common.page.back">返回</Trans>
 				</Button>
 			</Flex>
 			<Card mt="2">
 				<Flex align="center">
 					<Box flexGrow="1">
-						<Text>开放网络地址</Text>
+						<Text>
+							<Trans i18nKey="page.ws.recv.openNetworkAddress">
+								开放网络地址
+							</Trans>
+						</Text>
 					</Box>
 					<TextField.Root
 						type="url"
-						placeholder="localhost:11444"
+						placeholder="0.0.0.0:11444"
 						value={wsProtocolListenAddr}
 						onChange={(e) => setWsProtocolListenAddr(e.target.value)}
 					/>
@@ -69,11 +74,16 @@ export const WSProtocolRecvPage: FC = () => {
 					<InfoCircledIcon />
 				</Callout.Icon>
 				<Callout.Text>
-					连接到客户端后，可能需要切换一次歌曲方可同步歌曲信息状态
+					<Trans i18nKey="page.ws.recv.tip">
+						连接到客户端后，可能需要切换一次歌曲方可同步歌曲信息状态。如需对外部网络开放，请将
+						Host 设置成 0.0.0.0。
+					</Trans>
 				</Callout.Text>
 			</Callout.Root>
 			<Card mt="2">
-				<Text weight="bold">已连接的客户端</Text>
+				<Text weight="bold">
+					<Trans i18nKey="page.ws.recv.connectedClients">已连接的客户端</Trans>
+				</Text>
 				{connectedAddrsArray.map((addr) => (
 					<Box key={`connected-addr-${addr}`}>
 						<Text color="gray">{addr}</Text>
@@ -81,7 +91,9 @@ export const WSProtocolRecvPage: FC = () => {
 				))}
 				{connectedAddrsArray.length === 0 && (
 					<Box>
-						<Text color="gray">无</Text>
+						<Text color="gray">
+							<Trans i18nKey="page.ws.recv.noClients">无</Trans>
+						</Text>
 					</Box>
 				)}
 			</Card>

@@ -9,16 +9,15 @@ import {
 } from "@applemusic-like-lyrics/react-full";
 import { ContextMenu } from "@radix-ui/themes";
 import classnames from "classnames";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { type FC, useLayoutEffect } from "react";
-import { amllMenuOpenedAtom, backgroundRendererAtom } from "../../states";
+import { backgroundRendererAtom } from "../../states";
 import { AMLLContextMenuContent } from "../AMLLContextMenu";
 import styles from "./index.module.css";
 
 export const AMLLWrapper: FC = () => {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const backgroundRenderer = useAtomValue(backgroundRendererAtom);
-	const [amllMenuOpened, setAmllMenuOpened] = useAtom(amllMenuOpenedAtom);
 	const setBackgroundRenderer = useSetAtom(lyricBackgroundRendererAtom);
 
 	useLayoutEffect(() => {

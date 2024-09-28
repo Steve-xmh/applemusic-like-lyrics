@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react";
 import { execSync } from "child_process";
 import { resolve } from "path";
 import { type Plugin, defineConfig } from "vite";
+import i18nextLoader from "vite-plugin-i18next-loader";
 import lightningcss from "vite-plugin-lightningcss";
 import svgr from "vite-plugin-svgr";
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -91,6 +92,10 @@ export default defineConfig(async () => ({
 			browserslist: "safari >= 10.13, chrome >= 91",
 		}),
 		GitMetadataPlugin(),
+		i18nextLoader({
+			paths: ["./locales"],
+			namespaceResolution: "basename",
+		}),
 	],
 	resolve: {
 		dedupe: ["react", "react-dom", "jotai"],

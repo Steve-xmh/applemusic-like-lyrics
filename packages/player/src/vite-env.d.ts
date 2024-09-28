@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
+/// <reference types="vite-plugin-i18next-loader/vite" />
 
 declare module "md5" {
 	export default function md5(input: string): string;
@@ -8,6 +9,11 @@ declare module "md5" {
 declare module "virtual:git-metadata-plugin" {
 	export const commit: string;
 	export const branch: string;
+}
+
+declare module "virtual:i18next-loader" {
+	const resources: typeof import("../locales/zh-CN/translation.json");
+	export default resources;
 }
 
 declare enum SystemTitlebarAppearance {
