@@ -2,16 +2,16 @@
   "amll": {
     "contextMenu": {
       "rewindSong": "Previous Song",
-      "pauseOrResume": "Pause / Resume",
+      "pauseOrResume": null,
       "forwardSong": "Next Song",
-      "toggleFullscreen": "Enter / Exit full screen",
+      "toggleFullscreen": null,
       "toggleLyrics": "Show lyrics",
       "editMusicOverrideMessage": "Edit track's replacement settings",
       "exitLyricPage": "Exit lyrics page"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "Player backend loading audio file has an error: {{error}}"
+    "loadAudioError": null
   },
   "newPlaylist": {
     "buttonLabel": "New playlist",
@@ -33,7 +33,7 @@
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "Unable to switch tracks under WS Protocol mode.",
-      "pauseOrPlaySongNotSupported": "Unable to pause / resume in WS Protocol mode.",
+      "pauseOrPlaySongNotSupported": null,
       "seekNotSupported": "Unable to modify playing progress under WS Protocol mode.",
       "changeVolumeNotSupported": "Unable to modify volume under WS Protocol mode."
     }
@@ -41,7 +41,7 @@
   "page": {
     "amll-dev": {
       "title": "Apple Music Like Lyrics Developer Page",
-      "warning": "This page is develop only, use it at your own risk!"
+      "warning": null
     },
     "main": {
       "updateAvailableTag": "Available update",
@@ -59,7 +59,7 @@
     },
     "playlist": {
       "music": {
-        "unknownSongName": "Unknown track ID: {{id}}",
+        "unknownSongName": null,
         "dropdown": {
           "playMusic": "Play",
           "editMusicOverrideData": "Edit music override data",
@@ -69,9 +69,9 @@
       "addLocalMusic": {
         "filterName": "Audio file name",
         "toast": {
-          "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({{current}} / {{total}})",
-          "partiallyFailed": "Successfully add {{succeed}} songs, {{errored}} songs failed to be added.",
-          "allFailed": "{{errored}} track(s) add failure.",
+          "parsingMusicMetadata": null,
+          "partiallyFailed": null,
+          "allFailed": null,
           "success": null
         },
         "label": "Add local music"
@@ -218,9 +218,9 @@
     "about": {
       "subtitle": "About",
       "credits": "Made by SteveXMH and all Contributors from GitHub",
-      "newVersion": "Available update from {{currentVersion}} to {{nextVersion}}",
+      "newVersion": null,
       "updating": "Player will restart after update, hold on a second....",
-      "downloading": "Downloading update... {{progressText}}",
+      "downloading": null,
       "installing": "Installing update, player will restart, wait a minute...",
       "installUpdate": "Install this update"
     },
@@ -257,7 +257,7 @@
         "songName": "Track name",
         "songArtists": "Artists",
         "songAlbum": "Album",
-        "changeCoverToImageOrVideo": "Change cover to image or video",
+        "changeCoverToImageOrVideo": null,
         "reloadMetadataFromFile": "Reload metadata from file"
       }
     },
