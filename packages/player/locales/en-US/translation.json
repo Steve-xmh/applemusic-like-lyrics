@@ -1,23 +1,23 @@
 {
   "amll": {
     "contextMenu": {
-      "rewindSong": "Prev",
-      "pauseOrResume": "Pause/Resume",
-      "forwardSong": "Next",
-      "toggleFullscreen": "Full screen / Exit full screen",
+      "rewindSong": "Previous Song",
+      "pauseOrResume": "Pause / Resume",
+      "forwardSong": "Next Song",
+      "toggleFullscreen": "Enter / Exit full screen",
       "toggleLyrics": "Show lyrics",
-      "editMusicOverrideMessage": "Edit track's replacement settings",
+      "editMusicOverrideMessage": null,
       "exitLyricPage": "Exit lyrics page"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
-    "buttonForDisplayOnly": "This function is under contributing",
+    "buttonForDisplayOnly": null,
     "loadAudioError": "Player backend loading audio file has an error: {{error}}"
   },
   "newPlaylist": {
     "buttonLabel": "New playlist",
     "dialog": {
-      "title": "New track list",
-      "namePlaceholder": "Name"
+      "title": null,
+      "namePlaceholder": null
     }
   },
   "common": {
@@ -33,7 +33,7 @@
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "Unable to switch tracks under WS Protocol mode.",
-      "pauseOrPlaySongNotSupported": "Unable to pause/resume in WS Protocol mode.",
+      "pauseOrPlaySongNotSupported": null,
       "seekNotSupported": "Unable to modify playing progress under WS Protocol mode.",
       "changeVolumeNotSupported": "Unable to modify volume under WS Protocol mode."
     }
@@ -69,204 +69,204 @@
       "addLocalMusic": {
         "filterName": "Audio file name",
         "toast": {
-          "parsingMusicMetadata": "We are parsing metadata to add your track into playlist: {{current}} / {{total}}",
+          "parsingMusicMetadata": null,
           "partiallyFailed": "Successfully add {{succeed}} songs, {{errored}} songs failed to be added.",
           "allFailed": "{{errored}} track(s) add failure.",
           "success_other": "Successfully add {{count}} song(s)."
         },
         "label": "Add local music"
       },
-      "totalMusicLabel_other": "{{count}} song(s)",
-      "playAll": "Play all",
-      "shufflePlayAll": "Random play"
+      "totalMusicLabel_other": null,
+      "playAll": null,
+      "shufflePlayAll": null
     },
     "settings": {
       "lyricFont": {
         "fontPreview": {
-          "defaultText": "Font Preview",
-          "label": "Font preview"
+          "defaultText": null,
+          "label": null
         },
-        "subtitle": "Font settings of lyrics page",
-        "tip": "This option only affect LYRIC's font but other parts.",
+        "subtitle": null,
+        "tip": null,
         "fontFamily": {
-          "label": "Font family",
-          "description": "Font name separated by comma, equals to font-family property in CSS. Empty is default."
+          "label": null,
+          "description": null
         },
         "fontWeight": {
-          "label": "Font weight",
-          "description": "Equals to font-weight property in CSS, keep blank will follow default."
+          "label": null,
+          "description": null
         },
         "letterSpacing": {
-          "label": "Letter space",
-          "description": "Equals to letter-spacing in CSS, keep blank fill follow default."
+          "label": null,
+          "description": null
         }
       },
       "general": {
         "displayLanguage": {
-          "cimode": "Localization ID",
-          "label": "Displaying language"
+          "cimode": null,
+          "label": null
         },
-        "subtitle": "General"
+        "subtitle": null
       },
       "musicInfoAppearance": {
         "playerControlsType": {
           "menu": {
-            "controls": "Playing controls",
-            "fft": "Line-shaped audio visualization",
-            "none": "None"
+            "controls": null,
+            "fft": null,
+            "none": null
           },
-          "label": "Type of play controls",
-          "description": "The components under track information."
+          "label": null,
+          "description": null
         },
-        "subtitle": "Music information appearance",
+        "subtitle": null,
         "showMusicName": {
-          "label": "Show music title"
+          "label": null
         },
         "showMusicArtists": {
-          "label": "Show artist"
+          "label": null
         },
         "showMusicAlbum": {
-          "label": "Show album name",
-          "description": "Enabling all three options simultaneously may not be aesthetically pleasing."
+          "label": null,
+          "description": null
         },
         "showVolumeControl": {
-          "label": "Show volume bar"
+          "label": null
         },
         "showBottomControl": {
-          "label": "Show buttons on the bottom",
-          "description": "This is the buttons at right-bottom in horizontal view, or buttons under \"play\" button in vertical view."
+          "label": null,
+          "description": null
         },
         "fftDataRange": {
-          "label": "Audio visualization frequency range",
-          "description": "The unit is Hertz (Hz), which will affect the display effect of audio visualization and background jumping effect."
+          "label": null,
+          "description": null
         }
       },
       "lyricAppearance": {
         "lyricPlayerImplementation": {
           "menu": {
-            "dom": "DOM",
-            "canvas": "Canvas"
+            "dom": null,
+            "canvas": null
           },
-          "label": "歌词播放器实现",
-          "description": "目前有两个歌词播放实现\n- DOM：使用 DOM 元素实现，目前效果最全，但性能开销大\n- Canvas：使用 Canvas 实现，仍在开发中，性能优异，但是部分细节效果不足"
+          "label": null,
+          "description": null
         },
-        "subtitle": "Lyric appearance",
+        "subtitle": null,
         "enableLyricLineBlurEffect": {
-          "label": "Enable text blur",
-          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+          "label": null,
+          "description": null
         },
         "enableLyricLineScaleEffect": {
-          "label": "Enable text zooming effect",
-          "description": "Less influence to performance. Non currently playing lyrics will be slightly reduced in size. Enabled by default."
+          "label": null,
+          "description": null
         },
         "enableLyricLineSpringAnimation": {
-          "label": "启用歌词行弹簧动画效果",
-          "description": "对性能影响较高，如果遇到性能问题，可以尝试关闭此项。默认开启。"
+          "label": null,
+          "description": null
         },
         "advanceLyricDynamicLyricTime": {
-          "label": "提前歌词行时序",
-          "description": "即将原歌词行的初始时间时序提前，以便在歌词滚动结束后刚好开始播放（逐词）歌词效果。这个行为更加接近 Apple Music 的效果，但是大部分情况下会导致歌词行末尾的歌词尚未播放完成便被切换到下一行。"
+          "label": null,
+          "description": null
         },
         "lyricWordFadeWidth": {
-          "label": "逐词渐变宽度",
-          "description": "调节逐词歌词时单词的渐变过渡宽度，单位为一个全角字的宽度，默认为 0.5。\n如果要模拟 Apple Music for Android 的效果，可以设置为 1。\n如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5。\n如需关闭逐词歌词时单词的渐变过渡效果，可以设置为 0。"
+          "label": null,
+          "description": null
         }
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Mesh gradient renderer",
-          "pixiRenderer": "Pixi renderer"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
-        "subtitle": "Lyric page background",
+        "subtitle": null,
         "backgroundRenderer": {
-          "label": "Pixi renderer"
+          "label": null
         },
         "lyricBackgroundFPS": {
-          "label": "Background maximum FPS",
-          "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 60."
+          "label": null,
+          "description": null
         },
         "lyricBackgroundRenderScale": {
-          "label": "Background render scale",
-          "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 1 which means rendering pixel by pixel."
+          "label": null,
+          "description": null
         },
         "lyricBackgroundStaticMode": {
-          "label": "Static background",
-          "description": "Keep the background static except when switching song. If you encounter performance issues, consider enabling this option.\nNote: Enabling this option will disable the background bouncing effect."
+          "label": null,
+          "description": null
         }
       },
       "lyricContent": {
-        "subtitle": "Lyric content",
-        "enableLyricTranslationLine": "Show translation",
+        "subtitle": null,
+        "enableLyricTranslationLine": null,
         "enableLyricRomanLine": {
-          "label": "Show Romanized translation"
+          "label": null
         },
         "enableLyricSwapTransRomanLine": {
-          "label": "Swap translation and Romanized translation",
-          "description": "Only valid when the above two are enabled"
+          "label": null,
+          "description": null
         }
       },
       "others": {
-        "subtitle": "Others",
+        "subtitle": null,
         "showStatJSFrame": {
-          "label": "Show performance statics",
-          "description": "[Chromium only] Show FPS, frame time, memory. Less impact of performance."
+          "label": null,
+          "description": null
         },
-        "restartProgram": "Restart player",
-        "enterAmllDevPage": "Development tools"
+        "restartProgram": null,
+        "enterAmllDevPage": null
       }
     },
     "about": {
-      "subtitle": "About",
-      "credits": "Available update from {{currentVersion}} to {{nextVersion}}",
-      "newVersion": "Available update from {{currentVersion}} to {{nextVersion}}",
-      "updating": "Player will restart after update, hold on a second....",
-      "downloading": "Downloading update {{progressText}}% ...",
-      "installing": "Installing update, player will restart, wait a minute...",
-      "installUpdate": "Install this update"
+      "subtitle": null,
+      "credits": null,
+      "newVersion": null,
+      "updating": null,
+      "downloading": null,
+      "installing": null,
+      "installUpdate": null
     },
     "song": {
       "basic": {
-        "musicId": "Music ID",
-        "musicFilePath": "File path",
-        "musicDuration": "Duration",
+        "musicId": null,
+        "musicFilePath": null,
+        "musicDuration": null,
         "tabs": {
-          "basic": "Basics",
-          "metadata": "Metadata",
-          "lyric": "Lyrics"
+          "basic": null,
+          "metadata": null,
+          "lyric": null
         }
       },
       "lyric": {
-        "lyricFormatLabel": "Lyric format",
+        "lyricFormatLabel": null,
         "lyricFormat": {
-          "none": "No lyrics",
-          "lrc": "LyRiC format (LRC)",
-          "eslrc": "LyRiC format used by ESLyric (LRC)",
-          "yrc": "YRC lyrics",
-          "qrc": "QRC lyrics",
-          "lys": "Lyricify Syllable lyrics",
-          "ttml": "TTML lyrics"
+          "none": null,
+          "lrc": null,
+          "eslrc": null,
+          "yrc": null,
+          "qrc": null,
+          "lys": null,
+          "ttml": null
         },
-        "lyricData": "Lyric data",
-        "ttmlLyricTip": "TTML lyric will contain translation and Romanized translation.",
-        "translationLyricData": "Translated lyrics",
-        "translationLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar.",
-        "romanLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar."
+        "lyricData": null,
+        "ttmlLyricTip": null,
+        "translationLyricData": null,
+        "translationLyricDataTip": null,
+        "romanLyricDataTip": null
       },
       "metadata": {
-        "overrideSafeTip": "Properties in this page will not override into source file.",
-        "songName": "Track name",
-        "songArtists": "Artist",
-        "songAlbum": "Album",
-        "changeCoverToImageOrVideo": "Change cover to image or video",
-        "reloadMetadataFromFile": "Reload metadata from file"
+        "overrideSafeTip": null,
+        "songName": null,
+        "songArtists": null,
+        "songAlbum": null,
+        "changeCoverToImageOrVideo": null,
+        "reloadMetadataFromFile": null
       }
     },
     "ws": {
       "recv": {
-        "openNetworkAddress": "Open network address",
-        "tip": "When connect to client, you may switch track once to synchronous data. If you want to open to external network, please set host to \"0.0.0.0\".",
-        "connectedClients": "Connected client(s)",
-        "noClients": "No clients connected"
+        "openNetworkAddress": null,
+        "tip": null,
+        "connectedClients": null,
+        "noClients": null
       }
     }
   }
