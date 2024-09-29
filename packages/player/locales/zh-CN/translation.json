@@ -2,16 +2,16 @@
   "amll": {
     "contextMenu": {
       "rewindSong": "上一首",
-      "pauseOrResume": "暂停 / 继续",
+      "pauseOrResume": null,
       "forwardSong": "下一首",
-      "toggleFullscreen": "全屏 / 取消全屏",
+      "toggleFullscreen": null,
       "toggleLyrics": "显示歌词",
       "editMusicOverrideMessage": "编辑歌曲覆盖信息",
       "exitLyricPage": "退出歌词页面"
     },
     "openMenuViaRightClick": "请右键歌词页任意位置来打开菜单哦！",
     "buttonForDisplayOnly": "此按钮仅供展示用途，暂无实际功能",
-    "loadAudioError": "播放后端加载音频失败\n{error}"
+    "loadAudioError": null
   },
   "newPlaylist": {
     "buttonLabel": "新建播放列表",
@@ -33,7 +33,7 @@
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "WS Protocol 模式下无法切换歌曲",
-      "pauseOrPlaySongNotSupported": "WS Protocol 模式下无法暂停 / 继续播放音乐",
+      "pauseOrPlaySongNotSupported": null,
       "seekNotSupported": "WS Protocol 模式下无法修改播放进度",
       "changeVolumeNotSupported": "WS Protocol 模式下无法修改音量"
     }
@@ -41,7 +41,7 @@
   "page": {
     "amll-dev": {
       "title": "Apple Music Like Lyrics 开发者页面",
-      "warning": "此处的东西用于开发调试用途，仅供作者方便之用，随便使用可能有意想不到的情况出现！（页面内容仅中文）"
+      "warning": null
     },
     "main": {
       "updateAvailableTag": "有可用更新",
@@ -59,7 +59,7 @@
     },
     "playlist": {
       "music": {
-        "unknownSongName": "未知歌曲 ID {id}",
+        "unknownSongName": null,
         "dropdown": {
           "playMusic": "播放音乐",
           "editMusicOverrideData": "编辑歌曲覆盖信息",
@@ -69,14 +69,14 @@
       "addLocalMusic": {
         "filterName": "音频文件",
         "toast": {
-          "parsingMusicMetadata": "正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
-          "partiallyFailed": "已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失败",
-          "allFailed": "{errored, plural, other {#}} 首歌曲添加失败",
-          "success": "已全部添加 {count, plural, other {#}} 首歌曲"
+          "parsingMusicMetadata": null,
+          "partiallyFailed": null,
+          "allFailed": null,
+          "success": null
         },
         "label": "添加本地歌曲"
       },
-      "totalMusicLabel": "{count, plural, other {#}} 首歌曲",
+      "totalMusicLabel": null,
       "playAll": "播放全部",
       "shufflePlayAll": "随机播放"
     },
@@ -217,10 +217,10 @@
     },
     "about": {
       "subtitle": "关于",
-      "credits": "由 SteveXMH 及其所有 Github 协作者共同开发",
-      "newVersion": "有可用更新从 {currentVersion} 升级至 {nextVersion}",
+      "credits": "有可用更新从 {{currentVersion}} 升级至 {{nextVersion}}",
+      "newVersion": null,
       "updating": "正在更新，完成后将会自动重启，请稍后……",
-      "downloading": "正在下载更新…… {progressText}",
+      "downloading": null,
       "installing": "正在安装更新，将会自动重启，请稍后……",
       "installUpdate": "更新并安装"
     },
@@ -257,7 +257,7 @@
         "songName": "音乐名称",
         "songArtists": "音乐作者",
         "songAlbum": "音乐专辑名",
-        "changeCoverToImageOrVideo": "更换封面图为图片 / 视频",
+        "changeCoverToImageOrVideo": null,
         "reloadMetadataFromFile": "重新从文件中读取元数据"
       }
     },
