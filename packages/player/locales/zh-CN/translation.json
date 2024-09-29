@@ -217,7 +217,7 @@
     },
     "about": {
       "subtitle": "关于",
-      "credits": "有可用更新从 {{currentVersion}} 升级至 {{nextVersion}}",
+      "credits": "由 SteveXMH 及其所有 Github 协作者共同开发",
       "newVersion": "有可用更新从 {currentVersion} 升级至 {nextVersion}",
       "updating": "正在更新，完成后将会自动重启，请稍后……",
       "downloading": "正在下载更新…… {progressText}",
