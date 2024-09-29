@@ -2,7 +2,7 @@
   "amll": {
     "contextMenu": {
       "rewindSong": "上一首",
-      "pauseOrResume": "暂停/继续",
+      "pauseOrResume": "暂停 / 继续",
       "forwardSong": "下一首",
       "toggleFullscreen": "全屏/取消全屏",
       "toggleLyrics": "显示歌词",

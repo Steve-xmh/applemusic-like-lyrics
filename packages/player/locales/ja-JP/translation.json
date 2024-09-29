@@ -1,0 +1,273 @@
+{
+  "amll": {
+    "contextMenu": {
+      "rewindSong": "前の曲",
+      "pauseOrResume": null,
+      "forwardSong": "次の曲",
+      "toggleFullscreen": "全画面 / 全画面解除",
+      "toggleLyrics": "歌詞を表示",
+      "editMusicOverrideMessage": "曲のカバレッジ情報を編集する",
+      "exitLyricPage": "歌詞ページを出る"
+    },
+    "openMenuViaRightClick": "歌詞ページの任意の場所を右クリックしてメニューを開きます。",
+    "buttonForDisplayOnly": "このボタンは表示のみを目的としており、現時点では実際の機能はありません。",
+    "loadAudioError": "再生バックエンドでオーディオのロードに失敗しました\n{{error}}"
+  },
+  "newPlaylist": {
+    "buttonLabel": "新プレイリストを作成する",
+    "dialog": {
+      "title": "新プレイリストを作成する",
+      "namePlaceholder": "プレイリスト名"
+    }
+  },
+  "common": {
+    "dialog": {
+      "cancel": "キャンセル",
+      "confirm": "確認",
+      "save": "セーブ"
+    },
+    "page": {
+      "back": "戻る"
+    }
+  },
+  "ws-protocol": {
+    "toast": {
+      "switchSongNotSupported": "WS プロトコル・モードで曲の切り替えができない",
+      "pauseOrPlaySongNotSupported": "WS プロトコル・モードでは、音楽の一時停止 / 継続はできません",
+      "seekNotSupported": "WS プロトコル・モードでは、再生の進行状況を変更することはできません。",
+      "changeVolumeNotSupported": "WS プロトコル・モードでは音量を変更できない"
+    }
+  },
+  "page": {
+    "amll-dev": {
+      "title": "Apple Music Like Lyrics 開発者ページ",
+      "warning": "ここでの内容は、開発およびデバッグを目的としたものであり、作者の便宜を図るためのものである！"
+    },
+    "main": {
+      "updateAvailableTag": "アップデートが可能",
+      "menu": {
+        "enterWSProtocolMode": "WS プロトコル・モードに入る",
+        "asWSProtocolReceiver": "ステータス受信機として",
+        "asWSProtocolSenderWIP": "ステータス送信者として（準備中）",
+        "settings": "設定"
+      },
+      "noPlaylistTip": "プレイリストがない！",
+      "playlistMenu": {
+        "delete": "削除"
+      },
+      "loadingPlaylist": "プレイリストを読み込んでいます"
+    },
+    "playlist": {
+      "music": {
+        "unknownSongName": "不明な曲 ID {{id}}",
+        "dropdown": {
+          "playMusic": "曲を再生する",
+          "editMusicOverrideData": "曲のカバレッジ情報を編集する",
+          "removeFromPlaylist": "プレイリストから削除"
+        }
+      },
+      "addLocalMusic": {
+        "filterName": null,
+        "toast": {
+          "parsingMusicMetadata": null,
+          "partiallyFailed": null,
+          "allFailed": null,
+          "success": null
+        },
+        "label": null
+      },
+      "totalMusicLabel": null,
+      "playAll": null,
+      "shufflePlayAll": null
+    },
+    "settings": {
+      "lyricFont": {
+        "fontPreview": {
+          "defaultText": null,
+          "label": null
+        },
+        "subtitle": null,
+        "tip": null,
+        "fontFamily": {
+          "label": null,
+          "description": null
+        },
+        "fontWeight": {
+          "label": null,
+          "description": null
+        },
+        "letterSpacing": {
+          "label": null,
+          "description": null
+        }
+      },
+      "general": {
+        "displayLanguage": {
+          "cimode": null,
+          "label": null
+        },
+        "subtitle": null
+      },
+      "musicInfoAppearance": {
+        "playerControlsType": {
+          "menu": {
+            "controls": null,
+            "fft": null,
+            "none": null
+          },
+          "label": null,
+          "description": null
+        },
+        "subtitle": null,
+        "showMusicName": {
+          "label": null
+        },
+        "showMusicArtists": {
+          "label": null
+        },
+        "showMusicAlbum": {
+          "label": null,
+          "description": null
+        },
+        "showVolumeControl": {
+          "label": null
+        },
+        "showBottomControl": {
+          "label": null,
+          "description": null
+        },
+        "fftDataRange": {
+          "label": null,
+          "description": null
+        }
+      },
+      "lyricAppearance": {
+        "lyricPlayerImplementation": {
+          "menu": {
+            "dom": null,
+            "canvas": null
+          },
+          "label": null,
+          "description": null
+        },
+        "subtitle": null,
+        "enableLyricLineBlurEffect": {
+          "label": null,
+          "description": null
+        },
+        "enableLyricLineScaleEffect": {
+          "label": null,
+          "description": null
+        },
+        "enableLyricLineSpringAnimation": {
+          "label": null,
+          "description": null
+        },
+        "advanceLyricDynamicLyricTime": {
+          "label": null,
+          "description": null
+        },
+        "lyricWordFadeWidth": {
+          "label": null,
+          "description": null
+        }
+      },
+      "lyricBackground": {
+        "menu": {
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
+        },
+        "subtitle": null,
+        "backgroundRenderer": {
+          "label": null
+        },
+        "lyricBackgroundFPS": {
+          "label": null,
+          "description": null
+        },
+        "lyricBackgroundRenderScale": {
+          "label": null,
+          "description": null
+        },
+        "lyricBackgroundStaticMode": {
+          "label": null,
+          "description": null
+        }
+      },
+      "lyricContent": {
+        "subtitle": null,
+        "enableLyricTranslationLine": null,
+        "enableLyricRomanLine": {
+          "label": null
+        },
+        "enableLyricSwapTransRomanLine": {
+          "label": null,
+          "description": null
+        }
+      },
+      "others": {
+        "subtitle": null,
+        "showStatJSFrame": {
+          "label": null,
+          "description": null
+        },
+        "restartProgram": null,
+        "enterAmllDevPage": null
+      }
+    },
+    "about": {
+      "subtitle": null,
+      "credits": null,
+      "newVersion": null,
+      "updating": null,
+      "downloading": null,
+      "installing": null,
+      "installUpdate": null
+    },
+    "song": {
+      "basic": {
+        "musicId": null,
+        "musicFilePath": null,
+        "musicDuration": null,
+        "tabs": {
+          "basic": null,
+          "metadata": null,
+          "lyric": null
+        }
+      },
+      "lyric": {
+        "lyricFormatLabel": null,
+        "lyricFormat": {
+          "none": null,
+          "lrc": null,
+          "eslrc": null,
+          "yrc": null,
+          "qrc": null,
+          "lys": null,
+          "ttml": null
+        },
+        "lyricData": null,
+        "ttmlLyricTip": null,
+        "translationLyricData": null,
+        "translationLyricDataTip": null,
+        "romanLyricDataTip": null
+      },
+      "metadata": {
+        "overrideSafeTip": null,
+        "songName": null,
+        "songArtists": null,
+        "songAlbum": null,
+        "changeCoverToImageOrVideo": null,
+        "reloadMetadataFromFile": null
+      }
+    },
+    "ws": {
+      "recv": {
+        "openNetworkAddress": null,
+        "tip": null,
+        "connectedClients": null,
+        "noClients": null
+      }
+    }
+  }
+}
