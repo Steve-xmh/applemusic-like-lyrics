@@ -1,1146 +1,273 @@
-[
-    {
-        "identifier": "amll.contextMenu.rewindSong",
-        "source_string": "上一首",
-        "translation": "Previous Song",
-        "context": "amll -> contextMenu -> rewindSong",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.pauseOrResume",
-        "source_string": "暂停/继续",
-        "translation": null,
-        "context": "amll -> contextMenu -> pauseOrResume",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.forwardSong",
-        "source_string": "下一首",
-        "translation": "Next Song",
-        "context": "amll -> contextMenu -> forwardSong",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.toggleFullscreen",
-        "source_string": "全屏/取消全屏",
-        "translation": "Enter / Exit full screen",
-        "context": "amll -> contextMenu -> toggleFullscreen",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.toggleLyrics",
-        "source_string": "显示歌词",
-        "translation": "Show lyrics",
-        "context": "amll -> contextMenu -> toggleLyrics",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.editMusicOverrideMessage",
-        "source_string": "编辑歌曲覆盖信息",
-        "translation": "Edit track's replacement settings",
-        "context": "amll -> contextMenu -> editMusicOverrideMessage",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.contextMenu.exitLyricPage",
-        "source_string": "退出歌词页面",
-        "translation": "Exit lyrics page",
-        "context": "amll -> contextMenu -> exitLyricPage",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.openMenuViaRightClick",
-        "source_string": "请右键歌词页任意位置来打开菜单哦！",
-        "translation": "Please right-click anywhere to open menu",
-        "context": "amll -> openMenuViaRightClick",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.buttonForDisplayOnly",
-        "source_string": "此按钮仅供展示用途，暂无实际功能",
-        "translation": null,
-        "context": "amll -> buttonForDisplayOnly",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "amll.loadAudioError",
-        "source_string": "播放后端加载音频失败\n{{error}}",
-        "translation": "Player backend loading audio file has an error: {{error}}",
-        "context": "amll -> loadAudioError",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "newPlaylist.buttonLabel",
-        "source_string": "新建播放列表",
-        "translation": "New playlist",
-        "context": "newPlaylist -> buttonLabel",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "newPlaylist.dialog.title",
-        "source_string": "新建歌单",
-        "translation": "New Playlist",
-        "context": "newPlaylist -> dialog -> title",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "newPlaylist.dialog.namePlaceholder",
-        "source_string": "歌单名称",
-        "translation": "Playlist Name",
-        "context": "newPlaylist -> dialog -> namePlaceholder",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "common.dialog.cancel",
-        "source_string": "取消",
-        "translation": "Cancel",
-        "context": "common -> dialog -> cancel",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "common.dialog.confirm",
-        "source_string": "确认",
-        "translation": "Confirm",
-        "context": "common -> dialog -> confirm",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "common.dialog.save",
-        "source_string": "保存",
-        "translation": "Save",
-        "context": "common -> dialog -> save",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "common.page.back",
-        "source_string": "返回",
-        "translation": "Back",
-        "context": "common -> page -> back",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "ws-protocol.toast.switchSongNotSupported",
-        "source_string": "WS Protocol 模式下无法切换歌曲",
-        "translation": "Unable to switch tracks under WS Protocol mode.",
-        "context": "ws-protocol -> toast -> switchSongNotSupported",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "ws-protocol.toast.pauseOrPlaySongNotSupported",
-        "source_string": "WS Protocol 模式下无法暂停/继续播放音乐",
-        "translation": null,
-        "context": "ws-protocol -> toast -> pauseOrPlaySongNotSupported",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "ws-protocol.toast.seekNotSupported",
-        "source_string": "WS Protocol 模式下无法修改播放进度",
-        "translation": "Unable to modify playing progress under WS Protocol mode.",
-        "context": "ws-protocol -> toast -> seekNotSupported",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "ws-protocol.toast.changeVolumeNotSupported",
-        "source_string": "WS Protocol 模式下无法修改音量",
-        "translation": "Unable to modify volume under WS Protocol mode.",
-        "context": "ws-protocol -> toast -> changeVolumeNotSupported",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.amll-dev.title",
-        "source_string": "Apple Music Like Lyrics 开发者页面",
-        "translation": "Apple Music Like Lyrics Developer Page",
-        "context": "page -> amll-dev -> title",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.amll-dev.warning",
-        "source_string": "此处的东西用于开发调试用途，仅供作者方便之用，随便使用可能有意想不到的情况出现！",
-        "translation": "This page is develop only, use it at your own risk!",
-        "context": "page -> amll-dev -> warning",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.updateAvailableTag",
-        "source_string": "有可用更新",
-        "translation": "Available update",
-        "context": "page -> main -> updateAvailableTag",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.menu.enterWSProtocolMode",
-        "source_string": "进入 WS Protocol 模式",
-        "translation": "Start WS Protocol mode",
-        "context": "page -> main -> menu -> enterWSProtocolMode",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.menu.asWSProtocolReceiver",
-        "source_string": "作为状态接收者",
-        "translation": "As WS Protocol Receiver",
-        "context": "page -> main -> menu -> asWSProtocolReceiver",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.menu.asWSProtocolSenderWIP",
-        "source_string": "作为状态发送者（施工中）",
-        "translation": "As WS Protocol Sender (On development)",
-        "context": "page -> main -> menu -> asWSProtocolSenderWIP",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.menu.settings",
-        "source_string": "设置",
-        "translation": "Settings",
-        "context": "page -> main -> menu -> settings",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.noPlaylistTip",
-        "source_string": "没有播放列表，快去新建一个吧！",
-        "translation": "Nothing is here, try to create something?",
-        "context": "page -> main -> noPlaylistTip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.playlistMenu.delete",
-        "source_string": "删除",
-        "translation": "Delete",
-        "context": "page -> main -> playlistMenu -> delete",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.main.loadingPlaylist",
-        "source_string": "加载歌单中",
-        "translation": "Loading playlist",
-        "context": "page -> main -> loadingPlaylist",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.music.unknownSongName",
-        "source_string": "未知歌曲 ID {{id}}",
-        "translation": "Unknown track ID: {{id}}",
-        "context": "page -> playlist -> music -> unknownSongName",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.music.dropdown.playMusic",
-        "source_string": "播放音乐",
-        "translation": "Play",
-        "context": "page -> playlist -> music -> dropdown -> playMusic",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.music.dropdown.editMusicOverrideData",
-        "source_string": "编辑歌曲覆盖信息",
-        "translation": "Edit music override data",
-        "context": "page -> playlist -> music -> dropdown -> editMusicOverrideData",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.music.dropdown.removeFromPlaylist",
-        "source_string": "从歌单中删除",
-        "translation": "Remove from playlist",
-        "context": "page -> playlist -> music -> dropdown -> removeFromPlaylist",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.filterName",
-        "source_string": "音频文件",
-        "translation": "Audio file name",
-        "context": "page -> playlist -> addLocalMusic -> filterName",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.toast.parsingMusicMetadata",
-        "source_string": "正在解析音乐元数据以添加歌曲 ({{current}}/{{total}})",
-        "translation": null,
-        "context": "page -> playlist -> addLocalMusic -> toast -> parsingMusicMetadata",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.toast.partiallyFailed",
-        "source_string": "已添加 {{succeed}} 首歌曲，其中 {{errored}} 首歌曲添加失败",
-        "translation": "Successfully add {{succeed}} songs, {{errored}} songs failed to be added.",
-        "context": "page -> playlist -> addLocalMusic -> toast -> partiallyFailed",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.toast.allFailed",
-        "source_string": "{{errored}} 首歌曲添加失败",
-        "translation": "{{errored}} track(s) add failure.",
-        "context": "page -> playlist -> addLocalMusic -> toast -> allFailed",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.toast.success_other",
-        "source_string": "已全部添加 {{count}} 首歋曲",
-        "translation": "Successfully add {{count}} song(s).",
-        "context": "page -> playlist -> addLocalMusic -> toast -> success_other",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.addLocalMusic.label",
-        "source_string": "添加本地歌曲",
-        "translation": "Add local music",
-        "context": "page -> playlist -> addLocalMusic -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.totalMusicLabel_other",
-        "source_string": "{{count}} 首歌曲",
-        "translation": null,
-        "context": "page -> playlist -> totalMusicLabel_other",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.playAll",
-        "source_string": "播放全部",
-        "translation": null,
-        "context": "page -> playlist -> playAll",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.playlist.shufflePlayAll",
-        "source_string": "随机播放",
-        "translation": null,
-        "context": "page -> playlist -> shufflePlayAll",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontPreview.defaultText",
-        "source_string": "字体预览 Font Preview",
-        "translation": null,
-        "context": "page -> settings -> lyricFont -> fontPreview -> defaultText",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontPreview.label",
-        "source_string": "字体预览",
-        "translation": null,
-        "context": "page -> settings -> lyricFont -> fontPreview -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.subtitle",
-        "source_string": "歌词字体设置",
-        "translation": null,
-        "context": "page -> settings -> lyricFont -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.tip",
-        "source_string": "此设置仅设置歌词字体，不包含其他组件的字体",
-        "translation": "This option only affect LYRIC's font but other parts.",
-        "context": "page -> settings -> lyricFont -> tip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontFamily.label",
-        "source_string": "字体家族",
-        "translation": "Font family",
-        "context": "page -> settings -> lyricFont -> fontFamily -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontFamily.description",
-        "source_string": "以逗号分隔的字体名称组合，等同于 CSS 的 font-family 属性，留空为默认",
-        "translation": "Font name separated by comma, equals to font-family property in CSS. Empty is default.",
-        "context": "page -> settings -> lyricFont -> fontFamily -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontWeight.label",
-        "source_string": "字体字重",
-        "translation": "Font weight",
-        "context": "page -> settings -> lyricFont -> fontWeight -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.fontWeight.description",
-        "source_string": "等同于 CSS 的 font-weight 属性，设置 0 为默认",
-        "translation": "Equals to font-weight property in CSS, keep blank will follow default.",
-        "context": "page -> settings -> lyricFont -> fontWeight -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.letterSpacing.label",
-        "source_string": "字符间距",
-        "translation": "Letter space",
-        "context": "page -> settings -> lyricFont -> letterSpacing -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricFont.letterSpacing.description",
-        "source_string": "等同于 CSS 的 letter-spacing 属性，留空为默认",
-        "translation": "Equals to letter-spacing in CSS, keep blank fill follow default.",
-        "context": "page -> settings -> lyricFont -> letterSpacing -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.general.displayLanguage.cimode",
-        "source_string": "本地化 ID",
-        "translation": "Localization ID",
-        "context": "page -> settings -> general -> displayLanguage -> cimode",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.general.displayLanguage.label",
-        "source_string": "显示语言",
-        "translation": null,
-        "context": "page -> settings -> general -> displayLanguage -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.general.subtitle",
-        "source_string": "常规",
-        "translation": "General",
-        "context": "page -> settings -> general -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.playerControlsType.menu.controls",
-        "source_string": "播放控制组件",
-        "translation": "Playing controls",
-        "context": "page -> settings -> musicInfoAppearance -> playerControlsType -> menu -> controls",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.playerControlsType.menu.fft",
-        "source_string": "线条音频可视化",
-        "translation": "Line-shaped audio visualization",
-        "context": "page -> settings -> musicInfoAppearance -> playerControlsType -> menu -> fft",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.playerControlsType.menu.none",
-        "source_string": "无",
-        "translation": "None",
-        "context": "page -> settings -> musicInfoAppearance -> playerControlsType -> menu -> none",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.playerControlsType.label",
-        "source_string": "播放控制组件类型",
-        "translation": "Type of play controls",
-        "context": "page -> settings -> musicInfoAppearance -> playerControlsType -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.playerControlsType.description",
-        "source_string": "即歌曲信息下方的组件",
-        "translation": "The components under track information.",
-        "context": "page -> settings -> musicInfoAppearance -> playerControlsType -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.subtitle",
-        "source_string": "歌曲信息样式",
-        "translation": "Music information appearance",
-        "context": "page -> settings -> musicInfoAppearance -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showMusicName.label",
-        "source_string": "显示歌曲名称",
-        "translation": "Show music title",
-        "context": "page -> settings -> musicInfoAppearance -> showMusicName -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showMusicArtists.label",
-        "source_string": "显示歌曲作者",
-        "translation": null,
-        "context": "page -> settings -> musicInfoAppearance -> showMusicArtists -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showMusicAlbum.label",
-        "source_string": "显示歌曲专辑名称",
-        "translation": "Show album name",
-        "context": "page -> settings -> musicInfoAppearance -> showMusicAlbum -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showMusicAlbum.description",
-        "source_string": "如果同时启用三个，布局上可能不太好看，请酌情调节。",
-        "translation": "Enabling all three options simultaneously may not be aesthetically pleasing.",
-        "context": "page -> settings -> musicInfoAppearance -> showMusicAlbum -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showVolumeControl.label",
-        "source_string": "显示音量控制条",
-        "translation": "Show volume bar",
-        "context": "page -> settings -> musicInfoAppearance -> showVolumeControl -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showBottomControl.label",
-        "source_string": "显示底部按钮组",
-        "translation": "Show buttons on the bottom",
-        "context": "page -> settings -> musicInfoAppearance -> showBottomControl -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.showBottomControl.description",
-        "source_string": "在横向布局里是右下角的几个按钮，在竖向布局里是播放按钮下方的几个按钮",
-        "translation": "This is the buttons at right-bottom in horizontal view, or buttons under \"play\" button in vertical view.",
-        "context": "page -> settings -> musicInfoAppearance -> showBottomControl -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.fftDataRange.label",
-        "source_string": "音频可视化频域范围",
-        "translation": "Audio visualization frequency range",
-        "context": "page -> settings -> musicInfoAppearance -> fftDataRange -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.musicInfoAppearance.fftDataRange.description",
-        "source_string": "单位为赫兹（hz），此项会影响音频可视化和背景跳动效果的展示效果",
-        "translation": null,
-        "context": "page -> settings -> musicInfoAppearance -> fftDataRange -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricPlayerImplementation.menu.dom",
-        "source_string": "DOM",
-        "translation": "DOM",
-        "context": "page -> settings -> lyricAppearance -> lyricPlayerImplementation -> menu -> dom",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricPlayerImplementation.menu.canvas",
-        "source_string": "Canvas",
-        "translation": "Canvas",
-        "context": "page -> settings -> lyricAppearance -> lyricPlayerImplementation -> menu -> canvas",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricPlayerImplementation.label",
-        "source_string": "歌词播放器实现",
-        "translation": "Implementation of lyric player",
-        "context": "page -> settings -> lyricAppearance -> lyricPlayerImplementation -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricPlayerImplementation.description",
-        "source_string": "目前有两个歌词播放实现\n- DOM：使用 DOM 元素实现，目前效果最全，但性能开销大\n- Canvas：使用 Canvas 实现，仍在开发中，性能优异，但是部分细节效果不足",
-        "translation": null,
-        "context": "page -> settings -> lyricAppearance -> lyricPlayerImplementation -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.subtitle",
-        "source_string": "歌词样式",
-        "translation": "Lyric appearance",
-        "context": "page -> settings -> lyricAppearance -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineBlurEffect.label",
-        "source_string": "启用歌词模糊效果",
-        "translation": "Enable text blur",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineBlurEffect -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineBlurEffect.description",
-        "source_string": "对性能影响较高，如果遇到性能问题，可以尝试关闭此项。默认开启。",
-        "translation": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default.",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineBlurEffect -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineScaleEffect.label",
-        "source_string": "启用歌词缩放效果",
-        "translation": "Enable text zooming effect",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineScaleEffect -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineScaleEffect.description",
-        "source_string": "对性能无影响，非当前播放歌词行会略微缩小。默认开启",
-        "translation": "Less influence to performance. Non currently playing lyrics will be slightly reduced in size. Enabled by default.",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineScaleEffect -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineSpringAnimation.label",
-        "source_string": "启用歌词行弹簧动画效果",
-        "translation": "Enable text spring animation",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineSpringAnimation -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.enableLyricLineSpringAnimation.description",
-        "source_string": "对性能影响较高，如果遇到性能问题，可以尝试关闭此项。默认开启。",
-        "translation": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default.",
-        "context": "page -> settings -> lyricAppearance -> enableLyricLineSpringAnimation -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.advanceLyricDynamicLyricTime.label",
-        "source_string": "提前歌词行时序",
-        "translation": "Advance lyric timing",
-        "context": "page -> settings -> lyricAppearance -> advanceLyricDynamicLyricTime -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.advanceLyricDynamicLyricTime.description",
-        "source_string": "即将原歌词行的初始时间时序提前，以便在歌词滚动结束后刚好开始播放（逐词）歌词效果。这个行为更加接近 Apple Music 的效果，但是大部分情况下会导致歌词行末尾的歌词尚未播放完成便被切换到下一行。",
-        "translation": "Advance the initial time sequence of the original lyrics line, so that the lyrics effect starts playing (word by word) just after the lyrics scroll ends. This behavior is closer to the effect of Apple Music, but in most cases, it will cause the lyrics at the end of the line to be switched to the next line before they have been played completely.",
-        "context": "page -> settings -> lyricAppearance -> advanceLyricDynamicLyricTime -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricWordFadeWidth.label",
-        "source_string": "逐词渐变宽度",
-        "translation": null,
-        "context": "page -> settings -> lyricAppearance -> lyricWordFadeWidth -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricAppearance.lyricWordFadeWidth.description",
-        "source_string": "调节逐词歌词时单词的渐变过渡宽度，单位为一个全角字的宽度，默认为 0.5。\n如果要模拟 Apple Music for Android 的效果，可以设置为 1。\n如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5。\n如需关闭逐词歌词时单词的渐变过渡效果，可以设置为 0。",
-        "translation": null,
-        "context": "page -> settings -> lyricAppearance -> lyricWordFadeWidth -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.menu.meshGradientRenderer",
-        "source_string": "网格渐变渲染器（MeshGradientRenderer）",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> menu -> meshGradientRenderer",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.menu.pixiRenderer",
-        "source_string": "PixiJS 渲染器（PixiRenderer）",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> menu -> pixiRenderer",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.subtitle",
-        "source_string": "歌词背景",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.backgroundRenderer.label",
-        "source_string": "背景渲染器",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> backgroundRenderer -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundFPS.label",
-        "source_string": "背景最高帧数",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundFPS -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundFPS.description",
-        "source_string": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 60。",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundFPS -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundRenderScale.label",
-        "source_string": "背景渲染倍率",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundRenderScale -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundRenderScale.description",
-        "source_string": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 1 即每像素点渲染。",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundRenderScale -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundStaticMode.label",
-        "source_string": "背景静态模式",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundStaticMode -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricBackground.lyricBackgroundStaticMode.description",
-        "source_string": "让背景会在除了切换歌曲变换封面的情况下保持静止，如果遇到了性能问题，可以考虑开启此项。\n注意：启用此项会导致背景跳动效果失效。",
-        "translation": null,
-        "context": "page -> settings -> lyricBackground -> lyricBackgroundStaticMode -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricContent.subtitle",
-        "source_string": "歌词内容",
-        "translation": null,
-        "context": "page -> settings -> lyricContent -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricContent.enableLyricTranslationLine",
-        "source_string": "显示翻译歌词",
-        "translation": null,
-        "context": "page -> settings -> lyricContent -> enableLyricTranslationLine",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricContent.enableLyricRomanLine.label",
-        "source_string": "显示音译歌词",
-        "translation": null,
-        "context": "page -> settings -> lyricContent -> enableLyricRomanLine -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricContent.enableLyricSwapTransRomanLine.label",
-        "source_string": "启用音译歌词与翻译歌词互换",
-        "translation": "Swap translation and Romanized translation",
-        "context": "page -> settings -> lyricContent -> enableLyricSwapTransRomanLine -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.lyricContent.enableLyricSwapTransRomanLine.description",
-        "source_string": "仅上面两者启用后有效",
-        "translation": "Only valid when the above two are enabled",
-        "context": "page -> settings -> lyricContent -> enableLyricSwapTransRomanLine -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.others.subtitle",
-        "source_string": "杂项",
-        "translation": "Others",
-        "context": "page -> settings -> others -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.others.showStatJSFrame.label",
-        "source_string": "显示性能统计信息",
-        "translation": "Show performance statics",
-        "context": "page -> settings -> others -> showStatJSFrame -> label",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.others.showStatJSFrame.description",
-        "source_string": "可以看到帧率、帧时间、内存占用（仅 Chromuim 系）等信息，对性能影响较小。",
-        "translation": null,
-        "context": "page -> settings -> others -> showStatJSFrame -> description",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.others.restartProgram",
-        "source_string": "重启程序",
-        "translation": "Restart player",
-        "context": "page -> settings -> others -> restartProgram",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.settings.others.enterAmllDevPage",
-        "source_string": "歌词页面开发用工具",
-        "translation": "Development tools",
-        "context": "page -> settings -> others -> enterAmllDevPage",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.subtitle",
-        "source_string": "关于",
-        "translation": "About",
-        "context": "page -> about -> subtitle",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.credits",
-        "source_string": "由 SteveXMH 及其所有 Github 协作者共同开发",
-        "translation": "Made by SteveXMH and all Contributors from GitHub",
-        "context": "page -> about -> credits",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.newVersion",
-        "source_string": "有可用更新从 {{currentVersion}} 升级至 {{nextVersion}}",
-        "translation": "Available update from {{currentVersion}} to {{nextVersion}}",
-        "context": "page -> about -> newVersion",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.updating",
-        "source_string": "正在更新，完成后将会自动重启，请稍后……",
-        "translation": "Player will restart after update, hold on a second....",
-        "context": "page -> about -> updating",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.downloading",
-        "source_string": "正在下载更新…… {{progressText}}",
-        "translation": null,
-        "context": "page -> about -> downloading, the progressText is like \"(10.0MiB / 20.0MiB)\" format",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.installing",
-        "source_string": "正在安装更新，将会自动重启，请稍后……",
-        "translation": "Installing update, player will restart, wait a minute...",
-        "context": "page -> about -> installing",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.about.installUpdate",
-        "source_string": "更新并安装",
-        "translation": "Install this update",
-        "context": "page -> about -> installUpdate",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.musicId",
-        "source_string": "音乐 ID",
-        "translation": "Music ID",
-        "context": "page -> song -> basic -> musicId",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.musicFilePath",
-        "source_string": "音乐文件路径",
-        "translation": "File path",
-        "context": "page -> song -> basic -> musicFilePath",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.musicDuration",
-        "source_string": "音乐时长",
-        "translation": "Duration",
-        "context": "page -> song -> basic -> musicDuration",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.tabs.basic",
-        "source_string": "基本",
-        "translation": "Basics",
-        "context": "page -> song -> basic -> tabs -> basic",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.tabs.metadata",
-        "source_string": "元数据",
-        "translation": "Metadata",
-        "context": "page -> song -> basic -> tabs -> metadata",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.basic.tabs.lyric",
-        "source_string": "歌词",
-        "translation": "Lyrics",
-        "context": "page -> song -> basic -> tabs -> lyric",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormatLabel",
-        "source_string": "歌词格式",
-        "translation": "Lyric format",
-        "context": "page -> song -> lyric -> lyricFormatLabel",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.none",
-        "source_string": "无歌词",
-        "translation": "No lyrics",
-        "context": "page -> song -> lyric -> lyricFormat -> none",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.lrc",
-        "source_string": "LyRiC 歌词",
-        "translation": "LyRiC format (LRC)",
-        "context": "page -> song -> lyric -> lyricFormat -> lrc",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.eslrc",
-        "source_string": "ESLyRiC 歌词",
-        "translation": "LyRiC format used by ESLyric (LRC)",
-        "context": "page -> song -> lyric -> lyricFormat -> eslrc",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.yrc",
-        "source_string": "YRC 歌词",
-        "translation": "YRC lyrics",
-        "context": "page -> song -> lyric -> lyricFormat -> yrc",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.qrc",
-        "source_string": "QRC 歌词",
-        "translation": "QRC lyrics",
-        "context": "page -> song -> lyric -> lyricFormat -> qrc",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.lys",
-        "source_string": "Lyricify Syllable 歌词",
-        "translation": "Lyricify Syllable lyrics",
-        "context": "page -> song -> lyric -> lyricFormat -> lys",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricFormat.ttml",
-        "source_string": "TTML 歌词",
-        "translation": "TTML lyrics",
-        "context": "page -> song -> lyric -> lyricFormat -> ttml",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.lyricData",
-        "source_string": "歌词数据",
-        "translation": "Lyric data",
-        "context": "page -> song -> lyric -> lyricData",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.ttmlLyricTip",
-        "source_string": "TTML 歌词可同时包含翻译与音译数据。",
-        "translation": "TTML lyric will contain translation and Romanized translation.",
-        "context": "page -> song -> lyric -> ttmlLyricTip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.translationLyricData",
-        "source_string": "翻译歌词数据",
-        "translation": "Translated lyrics",
-        "context": "page -> song -> lyric -> translationLyricData",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.translationLyricDataTip",
-        "source_string": "请提供 LyRiC 格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为译文",
-        "translation": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar.",
-        "context": "page -> song -> lyric -> translationLyricDataTip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.lyric.romanLyricDataTip",
-        "source_string": "请提供 LyRiC 格式的歌词数据，将会根据时间戳与一致或靠近的原文歌词配对成为音译",
-        "translation": null,
-        "context": "page -> song -> lyric -> romanLyricDataTip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.overrideSafeTip",
-        "source_string": "本页面的设置不会写入到原始音乐文件中",
-        "translation": "Properties in this page will not override into source file.",
-        "context": "page -> song -> metadata -> overrideSafeTip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.songName",
-        "source_string": "音乐名称",
-        "translation": "Track name",
-        "context": "page -> song -> metadata -> songName",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.songArtists",
-        "source_string": "音乐作者",
-        "translation": null,
-        "context": "page -> song -> metadata -> songArtists",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.songAlbum",
-        "source_string": "音乐专辑名",
-        "translation": "Album",
-        "context": "page -> song -> metadata -> songAlbum",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.changeCoverToImageOrVideo",
-        "source_string": "更换封面图为图片/视频",
-        "translation": "Change cover to image or video",
-        "context": "page -> song -> metadata -> changeCoverToImageOrVideo",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.song.metadata.reloadMetadataFromFile",
-        "source_string": "重新从文件中读取元数据",
-        "translation": "Reload metadata from file",
-        "context": "page -> song -> metadata -> reloadMetadataFromFile",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.ws.recv.openNetworkAddress",
-        "source_string": "开放网络地址",
-        "translation": "Open network address",
-        "context": "page -> ws -> recv -> openNetworkAddress",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.ws.recv.tip",
-        "source_string": "连接到客户端后，可能需要切换一次歌曲方可同步歌曲信息状态。如需对外部网络开放，请将 Host 设置成 0.0.0.0。",
-        "translation": "When connect to client, you may switch track once to synchronous data. If you want to open to external network, please set host to \"0.0.0.0\".",
-        "context": "page -> ws -> recv -> tip",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.ws.recv.connectedClients",
-        "source_string": "已连接的客户端",
-        "translation": "Connected client(s)",
-        "context": "page -> ws -> recv -> connectedClients",
-        "labels": null,
-        "max_length": null
-    },
-    {
-        "identifier": "page.ws.recv.noClients",
-        "source_string": "无",
-        "translation": "No clients connected",
-        "context": "page -> ws -> recv -> noClients",
-        "labels": null,
-        "max_length": null
+{
+  "amll": {
+    "contextMenu": {
+      "rewindSong": "Previous Song",
+      "pauseOrResume": "Pause / Resume",
+      "forwardSong": "Next Song",
+      "toggleFullscreen": "Enter / Exit full screen",
+      "toggleLyrics": "Show lyrics",
+      "editMusicOverrideMessage": "Edit track's replacement settings",
+      "exitLyricPage": "Exit lyrics page"
+    },
+    "openMenuViaRightClick": "Please right-click anywhere to open menu",
+    "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
+    "loadAudioError": "Player backend loading audio file has an error: {{error}}"
+  },
+  "newPlaylist": {
+    "buttonLabel": "New playlist",
+    "dialog": {
+      "title": "New Playlist",
+      "namePlaceholder": "Playlist Name"
     }
-]
+  },
+  "common": {
+    "dialog": {
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "save": "Save"
+    },
+    "page": {
+      "back": "Back"
+    }
+  },
+  "ws-protocol": {
+    "toast": {
+      "switchSongNotSupported": "Unable to switch tracks under WS Protocol mode.",
+      "pauseOrPlaySongNotSupported": "Unable to pause / resume in WS Protocol mode.",
+      "seekNotSupported": "Unable to modify playing progress under WS Protocol mode.",
+      "changeVolumeNotSupported": "Unable to modify volume under WS Protocol mode."
+    }
+  },
+  "page": {
+    "amll-dev": {
+      "title": "Apple Music Like Lyrics Developer Page",
+      "warning": "This page is develop only, use it at your own risk!"
+    },
+    "main": {
+      "updateAvailableTag": "Available update",
+      "menu": {
+        "enterWSProtocolMode": "Start WS Protocol mode",
+        "asWSProtocolReceiver": "As WS Protocol Receiver",
+        "asWSProtocolSenderWIP": "As WS Protocol Sender (On development)",
+        "settings": "Settings"
+      },
+      "noPlaylistTip": "Nothing is here, try to create something?",
+      "playlistMenu": {
+        "delete": "Delete"
+      },
+      "loadingPlaylist": "Loading playlist"
+    },
+    "playlist": {
+      "music": {
+        "unknownSongName": "Unknown track ID: {{id}}",
+        "dropdown": {
+          "playMusic": "Play",
+          "editMusicOverrideData": "Edit music override data",
+          "removeFromPlaylist": "Remove from playlist"
+        }
+      },
+      "addLocalMusic": {
+        "filterName": "Audio file name",
+        "toast": {
+          "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({{current}} / {{total}})",
+          "partiallyFailed": "Successfully add {{succeed}} songs, {{errored}} songs failed to be added.",
+          "allFailed": "{{errored}} track(s) add failure.",
+          "success": null
+        },
+        "label": "Add local music"
+      },
+      "totalMusicLabel": null,
+      "playAll": "Play all",
+      "shufflePlayAll": "Random play"
+    },
+    "settings": {
+      "lyricFont": {
+        "fontPreview": {
+          "defaultText": "Font Preview",
+          "label": "Font preview"
+        },
+        "subtitle": "Lyric Font Settings",
+        "tip": "This option only affect LYRIC's font but other parts.",
+        "fontFamily": {
+          "label": "Font family",
+          "description": "Font name separated by comma, equals to font-family property in CSS. Empty is default."
+        },
+        "fontWeight": {
+          "label": "Font weight",
+          "description": "Equals to font-weight property in CSS, keep blank will follow default."
+        },
+        "letterSpacing": {
+          "label": "Letter space",
+          "description": "Equals to letter-spacing in CSS, keep blank fill follow default."
+        }
+      },
+      "general": {
+        "displayLanguage": {
+          "cimode": "Localization ID",
+          "label": "Display language"
+        },
+        "subtitle": "General"
+      },
+      "musicInfoAppearance": {
+        "playerControlsType": {
+          "menu": {
+            "controls": "Playing controls",
+            "fft": "Line-shaped audio visualization",
+            "none": "None"
+          },
+          "label": "Type of play controls",
+          "description": "The components under track information."
+        },
+        "subtitle": "Music information appearance",
+        "showMusicName": {
+          "label": "Show music title"
+        },
+        "showMusicArtists": {
+          "label": "Show artists"
+        },
+        "showMusicAlbum": {
+          "label": "Show album name",
+          "description": "Enabling all three options simultaneously may not be aesthetically pleasing."
+        },
+        "showVolumeControl": {
+          "label": "Show volume bar"
+        },
+        "showBottomControl": {
+          "label": "Show buttons on the bottom",
+          "description": "This is the buttons at right-bottom in horizontal view, or buttons under \"play\" button in vertical view."
+        },
+        "fftDataRange": {
+          "label": "Audio visualization frequency range",
+          "description": "The unit is Hertz, which will affect the display effect of audio visualization and background jumping rhythm effect."
+        }
+      },
+      "lyricAppearance": {
+        "lyricPlayerImplementation": {
+          "menu": {
+            "dom": "DOM",
+            "canvas": "Canvas"
+          },
+          "label": "Implementation of lyric player",
+          "description": "Currently, there are two lyrics playback implementations\n- DOM: Implemented using DOM elements, currently the most comprehensive, but with high performance overhead\n- Canvas: Implemented using Canvas, still under development, with excellent performance, but some details have insufficient effects"
+        },
+        "subtitle": "Lyric appearance",
+        "enableLyricLineBlurEffect": {
+          "label": "Enable text blur",
+          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+        },
+        "enableLyricLineScaleEffect": {
+          "label": "Enable text zooming effect",
+          "description": "Less influence to performance. Non currently playing lyrics will be slightly reduced in size. Enabled by default."
+        },
+        "enableLyricLineSpringAnimation": {
+          "label": "Enable text spring animation",
+          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+        },
+        "advanceLyricDynamicLyricTime": {
+          "label": "Advance lyric timing",
+          "description": "Advance the initial time sequence of the original lyrics line, so that the lyrics effect starts playing (word by word) just after the lyrics scroll ends. This behavior is closer to the effect of Apple Music, but in most cases, it will cause the lyrics at the end of the line to be switched to the next line before they have been played completely."
+        },
+        "lyricWordFadeWidth": {
+          "label": "Gradient transition width of each word",
+          "description": "Adjust the gradient transition width of each word in lyrics, measured in the width of a full width character, with a default value of 0.5.\nIf you want to simulate the effect of Apple Music for Android, you can set it to 1.\nIf you want to simulate the effect of Apple Music for iPad, you can set it to 0.5.\nTo turn off the gradient transition effect of each word in lyrics, you can set it to 0."
+        }
+      },
+      "lyricBackground": {
+        "menu": {
+          "meshGradientRenderer": "Mesh gradient renderer",
+          "pixiRenderer": "Pixi renderer"
+        },
+        "subtitle": "Lyric page background",
+        "backgroundRenderer": {
+          "label": "Pixi renderer"
+        },
+        "lyricBackgroundFPS": {
+          "label": "Background maximum FPS",
+          "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 60."
+        },
+        "lyricBackgroundRenderScale": {
+          "label": "Background render scale",
+          "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 1 which means rendering pixel by pixel."
+        },
+        "lyricBackgroundStaticMode": {
+          "label": "Static background",
+          "description": "Keep the background static except when switching song. If you encounter performance issues, consider enabling this option.\nNote: Enabling this option will disable the background bouncing effect."
+        }
+      },
+      "lyricContent": {
+        "subtitle": "Lyric content",
+        "enableLyricTranslationLine": "Show translation",
+        "enableLyricRomanLine": {
+          "label": "Show Romanized translation"
+        },
+        "enableLyricSwapTransRomanLine": {
+          "label": "Swap translation and Romanized translation",
+          "description": "Only valid when the above two are enabled"
+        }
+      },
+      "others": {
+        "subtitle": "Others",
+        "showStatJSFrame": {
+          "label": "Show performance statics",
+          "description": "Show fps, frame time, memory [Chromium only]. Less impact of performance."
+        },
+        "restartProgram": "Restart player",
+        "enterAmllDevPage": "Development tools"
+      }
+    },
+    "about": {
+      "subtitle": "About",
+      "credits": "Made by SteveXMH and all Contributors from GitHub",
+      "newVersion": "Available update from {{currentVersion}} to {{nextVersion}}",
+      "updating": "Player will restart after update, hold on a second....",
+      "downloading": "Downloading update... {{progressText}}",
+      "installing": "Installing update, player will restart, wait a minute...",
+      "installUpdate": "Install this update"
+    },
+    "song": {
+      "basic": {
+        "musicId": "Music ID",
+        "musicFilePath": "File path",
+        "musicDuration": "Duration",
+        "tabs": {
+          "basic": "Basics",
+          "metadata": "Metadata",
+          "lyric": "Lyrics"
+        }
+      },
+      "lyric": {
+        "lyricFormatLabel": "Lyric format",
+        "lyricFormat": {
+          "none": "No lyrics",
+          "lrc": "LyRiC format (LRC)",
+          "eslrc": "LyRiC format used by ESLyric (LRC)",
+          "yrc": "YRC lyrics",
+          "qrc": "QRC lyrics",
+          "lys": "Lyricify Syllable lyrics",
+          "ttml": "TTML lyrics"
+        },
+        "lyricData": "Lyric data",
+        "ttmlLyricTip": "TTML lyric will contain translation and Romanized translation.",
+        "translationLyricData": "Translated lyrics",
+        "translationLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar.",
+        "romanLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as Romanized by timestamp if they are the same or similar."
+      },
+      "metadata": {
+        "overrideSafeTip": "Properties in this page will not override into source file.",
+        "songName": "Track name",
+        "songArtists": "Artists",
+        "songAlbum": "Album",
+        "changeCoverToImageOrVideo": "Change cover to image or video",
+        "reloadMetadataFromFile": "Reload metadata from file"
+      }
+    },
+    "ws": {
+      "recv": {
+        "openNetworkAddress": "Open network address",
+        "tip": "When connect to client, you may switch track once to synchronous data. If you want to open to external network, please set host to \"0.0.0.0\".",
+        "connectedClients": "Connected client(s)",
+        "noClients": "No clients connected"
+      }
+    }
+  }
+}
