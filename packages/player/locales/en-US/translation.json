@@ -7,7 +7,7 @@
       "toggleFullscreen": "Enter / Exit full screen",
       "toggleLyrics": "Show lyrics",
       "editMusicOverrideMessage": "Edit Track Override Data",
-      "exitLyricPage": "Exit lyrics page"
+      "exitLyricPage": "Exit Lyrics Page"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
@@ -67,34 +67,34 @@
         }
       },
       "addLocalMusic": {
-        "filterName": "Audio file name",
+        "filterName": "Audio File",
         "toast": {
           "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "{succeed, plural, =0 {No song is} one {A song is} other {# songs}} added, but {errored, plural, =0 {no song is} one {a song is} other {# songs are}} failed to be added",
           "allFailed": "{errored, plural, other {#}} songs failed to be added",
           "success": "{count, plural, other {#}} song(s) added"
         },
-        "label": "Add local music"
+        "label": "Add Music From Disk"
       },
       "totalMusicLabel": "{count, plural, other {#}} song(s)",
-      "playAll": "Play all",
+      "playAll": "Play All",
       "shufflePlayAll": "Random play"
     },
     "settings": {
       "lyricFont": {
         "fontPreview": {
           "defaultText": "Font Preview",
-          "label": "Font preview"
+          "label": "Font Preview"
         },
         "subtitle": "Lyric Font Settings",
         "tip": "This option only affect LYRIC's font but other parts.",
         "fontFamily": {
           "label": "Font family",
-          "description": "Font name separated by comma, equals to font-family property in CSS. Empty is default."
+          "description": "Font name separated by comma, equals to font-family property in CSS. Leave blank to use default settings."
         },
         "fontWeight": {
           "label": "Font weight",
-          "description": "Equals to font-weight property in CSS, keep blank will follow default."
+          "description": "Equals to the font-weight property in CSS, set to 0 to use default value."
         },
         "letterSpacing": {
           "label": "Letter space",
@@ -111,22 +111,22 @@
       "musicInfoAppearance": {
         "playerControlsType": {
           "menu": {
-            "controls": "Playing controls",
-            "fft": "Line-shaped audio visualization",
+            "controls": "Playback Controls",
+            "fft": "Line-shaped Audio Visualizer",
             "none": "None"
           },
-          "label": "Type of play controls",
-          "description": "The components under track information."
+          "label": "Playback Controls Type",
+          "description": "The components under the track informations."
         },
         "subtitle": "Music information appearance",
         "showMusicName": {
-          "label": "Show music title"
+          "label": "Show Song Title"
         },
         "showMusicArtists": {
           "label": "Show artists"
         },
         "showMusicAlbum": {
-          "label": "Show album name",
+          "label": "Show Album Title",
           "description": "Enabling all three options simultaneously may not be aesthetically pleasing."
         },
         "showVolumeControl": {
@@ -134,7 +134,7 @@
         },
         "showBottomControl": {
           "label": "Show buttons on the bottom",
-          "description": "This is the buttons at right-bottom in horizontal view, or buttons under \"play\" button in vertical view."
+          "description": "This is the buttons at bottom in horizontal view, or buttons under playback buttons in vertical view."
         },
         "fftDataRange": {
           "label": "Audio visualization frequency range",
