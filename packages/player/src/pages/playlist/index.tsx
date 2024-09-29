@@ -307,7 +307,7 @@ export const PlaylistPage: FC = () => {
 						toast.update(id, {
 							render: t(
 								"page.playlist.addLocalMusic.toast.parsingMusicMetadata",
-								"正在解析音乐元数据以添加歌曲 ({current} / {total})",
+								"正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
 								{
 									current: 0,
 									total: results.length,
@@ -332,7 +332,7 @@ export const PlaylistPage: FC = () => {
 			toast.warn(
 				t(
 					"page.playlist.addLocalMusic.toast.partiallyFailed",
-					"已添加 {succeed} 首歌曲，其中 {errored} 首歌曲添加失败",
+					"已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失败",
 					{
 						succeed: success,
 						errored,
@@ -343,7 +343,7 @@ export const PlaylistPage: FC = () => {
 			toast.error(
 				t(
 					"page.playlist.addLocalMusic.toast.allFailed",
-					"{errored} 首歌曲添加失败",
+					"{errored, plural, other {#}} 首歌曲添加失败",
 					{
 						errored,
 					},
@@ -353,7 +353,7 @@ export const PlaylistPage: FC = () => {
 			toast.success(
 				t(
 					"page.playlist.addLocalMusic.toast.success",
-					"已全部添加 {count} 首歌曲",
+					"已全部添加 {count, plural, other {#}} 首歌曲",
 					{
 						count: success,
 					},
@@ -444,9 +444,13 @@ export const PlaylistPage: FC = () => {
 								}
 							/>
 							<Text>
-								{t("page.playlist.totalMusicLabel", "{count} 首歌曲", {
-									count: playlist?.songIds?.length || 0,
-								})}
+								{t(
+									"page.playlist.totalMusicLabel",
+									"{count, plural, other {#}} 首歌曲",
+									{
+										count: playlist?.songIds?.length || 0,
+									},
+								)}
 							</Text>
 							<Flex gap="2">
 								<Button onClick={onPlaylistDefault}>

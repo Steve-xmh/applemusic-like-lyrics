@@ -69,14 +69,14 @@
       "addLocalMusic": {
         "filterName": "音频文件",
         "toast": {
-          "parsingMusicMetadata": "正在解析音乐元数据以添加歌曲 ({current} / {total})",
-          "partiallyFailed": "已添加 {succeed} 首歌曲，其中 {errored} 首歌曲添加失败",
-          "allFailed": "{errored} 首歌曲添加失败",
-          "success": "已全部添加 {count} 首歌曲"
+          "parsingMusicMetadata": "正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
+          "partiallyFailed": "已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失败",
+          "allFailed": "{errored, plural, other {#}} 首歌曲添加失败",
+          "success": "已全部添加 {count, plural, other {#}} 首歌曲"
         },
         "label": "添加本地歌曲"
       },
-      "totalMusicLabel": "{count} 首歌曲",
+      "totalMusicLabel": "{count, plural, other {#}} 首歌曲",
       "playAll": "播放全部",
       "shufflePlayAll": "随机播放"
     },
