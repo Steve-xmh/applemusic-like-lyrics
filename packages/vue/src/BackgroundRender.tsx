@@ -99,12 +99,12 @@ const backgroundRenderProps = {
 		required: false,
 	},
 	/**
-	 * 设置渲染器，如果为 `undefined` 则默认为 `PixiRenderer`
+	 * 设置渲染器，如果为 `undefined` 则默认为 `MeshGradientRenderer`
 	 * 默认渲染器有可能会随着版本更新而更换
 	 */
 	renderer: {
 		type: Object as PropType<{
-			new (canvas: HTMLCanvasElement): BaseRenderer;
+			new (...args: ConstructorParameters<typeof BaseRenderer>): BaseRenderer;
 		}>,
 		required: false,
 	},

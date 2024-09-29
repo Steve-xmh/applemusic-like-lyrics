@@ -4,13 +4,33 @@
  * 如无特殊注明，此处所有配置均会被存储在 localStorage 中
  */
 
-import { MeshGradientRenderer } from "@applemusic-like-lyrics/core";
+import {
+	LyricPlayer as DefaultLyricPlayer,
+	type LyricPlayerBase,
+	MeshGradientRenderer,
+} from "@applemusic-like-lyrics/core";
 import type { BackgroundRenderProps } from "@applemusic-like-lyrics/react";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 // ======================== 歌词效果配置 ========================
 
+/**
+ * 歌词播放组件的实现类型，默认为 `DefaultLyricPlayer`
+ *
+ * 由于存储状态特殊，故不使用 atomWithStorage，请另外处理配置存储
+ *
+ * 性能影响情况：高
+ */
+export const lyricPlayerImplementationAtom = atom<{
+	lyricPlayer: {
+		new (
+			...args: ConstructorParameters<typeof LyricPlayerBase>
+		): LyricPlayerBase;
+	};
+}>({
+	lyricPlayer: DefaultLyricPlayer,
+});
 /**
  * 是否启用歌词行模糊效果，默认启用
  *

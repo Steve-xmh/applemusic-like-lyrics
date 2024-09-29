@@ -56,10 +56,12 @@ import { branch, commit } from "virtual:git-metadata-plugin";
 import resources from "virtual:i18next-loader";
 import { router } from "../../router";
 import {
+	LyricPlayerImplementation,
 	advanceLyricDynamicLyricTimeAtom,
 	backgroundRendererAtom,
 	displayLanguageAtom,
 	fftDataRangeAtom,
+	lyricPlayerImplementationAtom,
 	showStatJSFrameAtom,
 } from "../../states";
 import { updateInfoAtom } from "../../states/updater";
@@ -382,6 +384,26 @@ export const SettingsPage: FC = () => {
 		[t],
 	);
 
+	const lyricPlayerImplementationMenu = useMemo(
+		() => [
+			{
+				label: t(
+					"page.settings.lyricAppearance.lyricPlayerImplementation.menu.dom",
+					"DOM",
+				),
+				value: LyricPlayerImplementation.Dom,
+			},
+			{
+				label: t(
+					"page.settings.lyricAppearance.lyricPlayerImplementation.menu.canvas",
+					"Canvas",
+				),
+				value: LyricPlayerImplementation.Canvas,
+			},
+		],
+		[t],
+	);
+
 	const backgroundRendererMenu = useMemo(
 		() => [
 			{
@@ -420,7 +442,7 @@ export const SettingsPage: FC = () => {
 				<Trans i18nKey="page.settings.general.subtitle">常规</Trans>
 			</SubTitle>
 			<SelectSettings
-				label={t("page.settings.general.displayLanguage", "显示语言")}
+				label={t("page.settings.general.displayLanguage.label", "显示语言")}
 				menu={supportedLanguagesMenu}
 				configAtom={displayLanguageAtom}
 			/>
@@ -456,6 +478,20 @@ export const SettingsPage: FC = () => {
 			<SubTitle>
 				<Trans i18nKey="page.settings.lyricAppearance.subtitle">歌词样式</Trans>
 			</SubTitle>
+
+			<SelectSettings
+				label={t(
+					"page.settings.lyricAppearance.lyricPlayerImplementation.label",
+					"歌词播放器实现",
+				)}
+				description={t(
+					"page.settings.lyricAppearance.lyricPlayerImplementation.description",
+					"目前有两个歌词播放实现\n- DOM：使用 DOM 元素实现，目前效果最全，但性能开销大\n- Canvas：使用 Canvas 实现，仍在开发中，性能优异，但是部分细节效果不足",
+				)}
+				menu={lyricPlayerImplementationMenu}
+				configAtom={lyricPlayerImplementationAtom}
+			/>
+
 			<LyricFontSetting />
 
 			<SwitchSettings

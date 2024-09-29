@@ -434,6 +434,7 @@ export abstract class LyricPlayerBase
 			line.dispose();
 		}
 
+		this.interludeDots.setInterlude(undefined);
 		this.hotLines.clear();
 		this.bufferedLines.clear();
 		this.setCurrentTime(0, true);
@@ -652,10 +653,10 @@ export abstract class LyricPlayerBase
 			const isActive =
 				hasBuffered || (i >= this.scrollToIndex && i < latestIndex);
 			const line = lineObj.getLine();
-			let left = 24;
-			if (line.isDuet) {
-				left = this.size[0] - (this.lyricLinesSize.get(lineObj)?.[0] ?? 0);
-			}
+			const left = 0;
+			// if (line.isDuet) {
+			// 	left = this.size[0] - (this.lyricLinesSize.get(lineObj)?.[0] ?? 0);
+			// }
 			if (
 				!setDots &&
 				interludeDuration >= 4000 &&
@@ -663,7 +664,7 @@ export abstract class LyricPlayerBase
 					i === this.scrollToIndex + 1)
 			) {
 				setDots = true;
-				this.interludeDots.setTransform(24, curPos + 10);
+				this.interludeDots.setTransform(0, curPos + 10);
 				if (interlude) {
 					this.interludeDots.setInterlude([interlude[0], interlude[1]]);
 				}
@@ -734,7 +735,7 @@ export abstract class LyricPlayerBase
 		});
 		this.scrollBoundary[1] = curPos + this.scrollOffset - this.size[1] / 2;
 		// console.groupEnd();
-		this.bottomLine.setTransform(24, curPos, force, delay);
+		this.bottomLine.setTransform(0, curPos, force, delay);
 	}
 
 	/**

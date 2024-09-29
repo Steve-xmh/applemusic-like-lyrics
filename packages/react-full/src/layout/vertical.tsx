@@ -106,19 +106,21 @@ export const VerticalLayout: React.FC<
 				<div className={styles.phonyBigCover} ref={phonyBigCoverRef} />
 				<div className={styles.bigControls}>{bigControlsSlot}</div>
 			</div>
-			<motion.div
-				className={styles.coverFrame}
-				animate={currentCoverStyle}
-				initial={false}
-				transition={{
-					type: "spring",
-					stiffness: 200,
-					damping: 30,
-				}}
-				ref={coverFrameRef}
-			>
-				{coverSlot}
-			</motion.div>
+			{currentCoverStyle && (
+				<motion.div
+					className={styles.coverFrame}
+					animate={currentCoverStyle}
+					initial={false}
+					transition={{
+						type: "spring",
+						stiffness: 200,
+						damping: 30,
+					}}
+					ref={coverFrameRef}
+				>
+					{coverSlot}
+				</motion.div>
+			)}
 		</div>
 	);
 };

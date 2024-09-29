@@ -68,6 +68,7 @@ import {
 	lyricFontFamilyAtom,
 	lyricFontWeightAtom,
 	lyricLetterSpacingAtom,
+	lyricPlayerImplementationAtom,
 	lyricWordFadeWidthAtom,
 	playerControlsTypeAtom,
 	showBottomControlAtom,
@@ -192,6 +193,10 @@ const PrebuiltCoreLyricPlayer: FC<{
 	const lyricFontWeight = useAtomValue(lyricFontWeightAtom);
 	const lyricLetterSpacing = useAtomValue(lyricLetterSpacingAtom);
 
+	const lyricPlayerImplementation = useAtomValue(
+		lyricPlayerImplementationAtom,
+	).lyricPlayer;
+
 	const enableLyricLineBlurEffect = useAtomValue(enableLyricLineBlurEffectAtom);
 	const enableLyricLineScaleEffect = useAtomValue(
 		enableLyricLineScaleEffectAtom,
@@ -259,6 +264,7 @@ const PrebuiltCoreLyricPlayer: FC<{
 			enableScale={enableLyricLineScaleEffect}
 			enableSpring={enableLyricLineSpringAnimation}
 			wordFadeWidth={Math.max(0.01, lyricWordFadeWidth)}
+			lyricPlayer={lyricPlayerImplementation}
 			onLyricLineClick={onLyricLineClick}
 			onLyricLineContextMenu={onLyricLineContextMenu}
 		/>

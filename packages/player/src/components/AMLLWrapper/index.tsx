@@ -1,4 +1,7 @@
 import {
+	CanvasLyricPlayer,
+	DomLyricPlayer,
+	LyricPlayer,
 	MeshGradientRenderer,
 	PixiRenderer,
 } from "@applemusic-like-lyrics/core";
@@ -6,19 +9,28 @@ import {
 	PrebuiltLyricPlayer,
 	isLyricPageOpenedAtom,
 	lyricBackgroundRendererAtom,
+	lyricPlayerImplementationAtom as lyricPlayerImplementationConstructorAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ContextMenu } from "@radix-ui/themes";
 import classnames from "classnames";
 import { useAtomValue, useSetAtom } from "jotai";
 import { type FC, useLayoutEffect } from "react";
-import { backgroundRendererAtom } from "../../states";
+import {
+	LyricPlayerImplementation,
+	backgroundRendererAtom,
+	lyricPlayerImplementationAtom,
+} from "../../states";
 import { AMLLContextMenuContent } from "../AMLLContextMenu";
 import styles from "./index.module.css";
 
 export const AMLLWrapper: FC = () => {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const backgroundRenderer = useAtomValue(backgroundRendererAtom);
+	const lyricPlayerImplementation = useAtomValue(lyricPlayerImplementationAtom);
 	const setBackgroundRenderer = useSetAtom(lyricBackgroundRendererAtom);
+	const setLyricPlayerImplementation = useSetAtom(
+		lyricPlayerImplementationConstructorAtom,
+	);
 
 	useLayoutEffect(() => {
 		if (isLyricPageOpened) {
@@ -44,6 +56,26 @@ export const AMLLWrapper: FC = () => {
 				break;
 		}
 	}, [backgroundRenderer, setBackgroundRenderer]);
+
+	useLayoutEffect(() => {
+		switch (lyricPlayerImplementation) {
+			case LyricPlayerImplementation.Dom:
+				setLyricPlayerImplementation({
+					lyricPlayer: DomLyricPlayer,
+				});
+				break;
+			case LyricPlayerImplementation.Canvas:
+				setLyricPlayerImplementation({
+					lyricPlayer: CanvasLyricPlayer,
+				});
+				break;
+			default:
+				setLyricPlayerImplementation({
+					lyricPlayer: LyricPlayer,
+				});
+				break;
+		}
+	}, [lyricPlayerImplementation, setLyricPlayerImplementation]);
 
 	return (
 		<ContextMenu.Root>

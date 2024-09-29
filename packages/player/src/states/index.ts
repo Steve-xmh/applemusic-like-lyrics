@@ -44,6 +44,16 @@ export const wsProtocolListenAddrAtom = atomWithStorage(
 
 export const wsProtocolConnectedAddrsAtom = atom(new Set<string>());
 
+export enum LyricPlayerImplementation {
+	Dom = "dom",
+	Canvas = "canvas",
+}
+
+export const lyricPlayerImplementationAtom = atomWithStorage(
+	"amll-player.lyricPlayerImplementation",
+	LyricPlayerImplementation.Dom,
+);
+
 export enum MusicContextMode {
 	Local = "local",
 	WSProtocol = "ws-protocol",

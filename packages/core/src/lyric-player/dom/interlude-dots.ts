@@ -46,12 +46,19 @@ export class InterludeDots implements HasElement, Disposable {
 	setInterlude(interlude?: [number, number]) {
 		this.currentInterlude = interlude;
 		this.currentTime = interlude?.[0] ?? 0;
+		if (interlude) {
+			this.element.classList.add(styles.enabled);
+		} else {
+			this.element.classList.remove(styles.enabled);
+		}
 	}
 	pause() {
 		this.playing = false;
+		this.element.classList.remove(styles.playing);
 	}
 	resume() {
 		this.playing = true;
+		this.element.classList.add(styles.playing);
 	}
 	update(delta = 0) {
 		if (!this.playing) return;
@@ -149,18 +156,13 @@ export class InterludeDots implements HasElement, Disposable {
 				this.dot1.style.opacity = "0";
 				this.dot2.style.opacity = "0";
 			}
-		} else {
-			curStyle += " scale(0)";
-			this.dot0.style.opacity = "0";
-			this.dot1.style.opacity = "0";
-			this.dot2.style.opacity = "0";
-		}
 
-		curStyle += ";";
+			curStyle += ";";
 
-		if (this.lastStyle !== curStyle) {
-			this.element.setAttribute("style", curStyle);
-			this.lastStyle = curStyle;
+			if (this.lastStyle !== curStyle) {
+				this.element.setAttribute("style", curStyle);
+				this.lastStyle = curStyle;
+			}
 		}
 	}
 	dispose() {

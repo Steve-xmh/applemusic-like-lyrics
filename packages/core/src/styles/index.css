@@ -17,11 +17,8 @@
 		--amll-lp-line-padding-x: 1em;
 		--amll-lp-bg-line-scale: 0.7;
 		user-select: none;
-		padding: 1em;
-		margin: -1em;
 		box-sizing: content-box;
 		z-index: 1;
-		contain: strict;
 		line-height: 1.2em;
 
 		&:hover .lyric-line {

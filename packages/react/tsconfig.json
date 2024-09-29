@@ -1,22 +1,18 @@
 {
-    "include": ["./src/**/*.ts", "./src/**/*.tsx"],
-    "exclude": ["./src/test-app.tsx"],
-    "compilerOptions": {
-        "target": "ESNext",
-        "lib": [
-            "ESNext",
-            "DOM",
-            "DOM.Iterable"
-        ],
-        "module": "ESNext",
-        "jsx": "react-jsx",
-        "types": [],
-        "strict": true,
-        "moduleResolution": "bundler",
-        "resolveJsonModule": true,
-        "strictNullChecks": true,
-        "allowSyntheticDefaultImports": true,
-        "allowJs": false,
-        "skipLibCheck": true
-    }
+	"include": ["./src/**/*.ts", "./src/**/*.tsx"],
+	"exclude": ["./src/test-app.tsx"],
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"module": "ESNext",
+		"jsx": "react-jsx",
+		"types": [],
+		"strict": true,
+		"moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"strictNullChecks": true,
+		"allowSyntheticDefaultImports": true,
+		"allowJs": false,
+		"skipLibCheck": true
+	}
 }

@@ -1,16 +1,19 @@
-import {
-	LyricPlayer as CoreLyricPlayer,
-	type LyricLine,
-	type LyricLineMouseEvent,
-	type spring,
+import type {
+	LyricLine,
+	LyricLineMouseEvent,
+	LyricPlayerBase,
+	spring,
 } from "@applemusic-like-lyrics/core";
+import { LyricPlayer as DefaultLyricPlayer } from "@applemusic-like-lyrics/core";
 import {
 	type HTMLProps,
 	type ReactNode,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
+	useLayoutEffect,
 	useRef,
+	useState,
 } from "react";
 import { createPortal } from "react-dom";
 
@@ -112,6 +115,14 @@ export interface LyricPlayerProps {
 	 */
 	bottomLine?: ReactNode;
 	/**
+	 * 需要用于创建歌词播放组件的类实例
+	 */
+	lyricPlayer?: {
+		new (
+			...args: ConstructorParameters<typeof LyricPlayerBase>
+		): LyricPlayerBase;
+	};
+	/**
 	 * 当某个歌词行被左键点击时触发的事件
 	 * @param line 歌词行的事件对象，可以访问到对应的歌词行信息和歌词行索引
 	 */
@@ -130,7 +141,7 @@ export interface LyricPlayerRef {
 	/**
 	 * 歌词播放实例
 	 */
-	lyricPlayer?: CoreLyricPlayer;
+	lyricPlayer?: LyricPlayerBase;
 	/**
 	 * 将歌词播放实例的元素包裹起来的 DIV 元素实例
 	 */
@@ -164,22 +175,37 @@ export const LyricPlayer = forwardRef<
 			linePosYSpringParams,
 			lineScaleSpringParams,
 			bottomLine,
+			lyricPlayer,
 			onLyricLineClick,
 			onLyricLineContextMenu,
 			...props
 		},
 		ref,
 	) => {
-		const corePlayerRef = useRef<CoreLyricPlayer>();
+		// const corePlayerRef = useRef<LyricPlayerBase>();
+		const [corePlayer, setCorePlayer] = useState<LyricPlayerBase>();
 		const wrapperRef = useRef<HTMLDivElement>(null);
 		const currentTimeRef = useRef(currentTime);
 
-		useEffect(() => {
-			corePlayerRef.current = new CoreLyricPlayer();
+		useLayoutEffect(() => {
+			const newPlayer = new (lyricPlayer ?? DefaultLyricPlayer)();
+			setCorePlayer(newPlayer);
+			wrapperRef.current?.appendChild(newPlayer.getElement());
 			return () => {
-				corePlayerRef.current?.dispose();
+				newPlayer?.dispose();
+				setCorePlayer(undefined);
 			};
-		}, []);
+		}, [lyricPlayer]);
+
+		useLayoutEffect(() => {
+			if (lyricLines !== undefined) {
+				corePlayer?.setLyricLines(lyricLines, currentTimeRef.current);
+				corePlayer?.update();
+			} else {
+				corePlayer?.setLyricLines([]);
+				corePlayer?.update();
+			}
+		}, [corePlayer, lyricLines]);
 
 		useEffect(() => {
 			if (!disabled) {
@@ -190,146 +216,119 @@ export const LyricPlayer = forwardRef<
 					if (lastTime === -1) {
 						lastTime = time;
 					}
-					corePlayerRef.current?.update(time - lastTime);
+					corePlayer?.update(time - lastTime);
 					lastTime = time;
 					requestAnimationFrame(onFrame);
 				};
+				corePlayer?.calcLayout();
 				requestAnimationFrame(onFrame);
 				return () => {
 					canceled = true;
 				};
 			}
-		}, [disabled]);
+		}, [corePlayer, disabled]);
 
 		useEffect(() => {
 			if (playing !== undefined) {
 				if (playing) {
-					corePlayerRef.current?.resume();
+					corePlayer?.resume();
 				} else {
-					corePlayerRef.current?.pause();
+					corePlayer?.pause();
 				}
-			} else corePlayerRef.current?.resume();
-		}, [playing]);
+			} else corePlayer?.resume();
+		}, [corePlayer, playing]);
 
 		useEffect(() => {
-			if (corePlayerRef.current)
-				wrapperRef.current?.appendChild(corePlayerRef.current.getElement());
-		}, []);
-
-		useEffect(() => {
-			if (alignAnchor !== undefined)
-				corePlayerRef.current?.setAlignAnchor(alignAnchor);
-		}, [alignAnchor]);
+			if (alignAnchor !== undefined) corePlayer?.setAlignAnchor(alignAnchor);
+		}, [corePlayer, alignAnchor]);
 
 		useEffect(() => {
 			if (hidePassedLines !== undefined)
-				corePlayerRef.current?.setHidePassedLines(hidePassedLines);
-		}, [hidePassedLines]);
+				corePlayer?.setHidePassedLines(hidePassedLines);
+		}, [corePlayer, hidePassedLines]);
 
 		useEffect(() => {
 			if (alignPosition !== undefined)
-				corePlayerRef.current?.setAlignPosition(alignPosition);
-		}, [alignPosition]);
+				corePlayer?.setAlignPosition(alignPosition);
+		}, [corePlayer, alignPosition]);
 
 		useEffect(() => {
-			if (enableSpring !== undefined)
-				corePlayerRef.current?.setEnableSpring(enableSpring);
-			else corePlayerRef.current?.setEnableSpring(true);
-		}, [enableSpring]);
+			if (enableSpring !== undefined) corePlayer?.setEnableSpring(enableSpring);
+			else corePlayer?.setEnableSpring(true);
+		}, [corePlayer, enableSpring]);
 
 		useEffect(() => {
-			if (enableScale !== undefined)
-				corePlayerRef.current?.setEnableScale(enableScale);
-			else corePlayerRef.current?.setEnableScale(true);
-		}, [enableScale]);
+			if (enableScale !== undefined) corePlayer?.setEnableScale(enableScale);
+			else corePlayer?.setEnableScale(true);
+		}, [corePlayer, enableScale]);
 
 		useEffect(() => {
-			corePlayerRef.current?.setEnableBlur(enableBlur ?? true);
-		}, [enableBlur]);
+			corePlayer?.setEnableBlur(enableBlur ?? true);
+		}, [corePlayer, enableBlur]);
 
 		useEffect(() => {
 			if (currentTime !== undefined) {
-				corePlayerRef.current?.setCurrentTime(currentTime);
+				corePlayer?.setCurrentTime(currentTime);
 				currentTimeRef.current = currentTime;
-			} else corePlayerRef.current?.setCurrentTime(0);
-		}, [currentTime]);
+			} else corePlayer?.setCurrentTime(0);
+		}, [corePlayer, currentTime]);
 
 		useEffect(() => {
-			if (lyricLines !== undefined) {
-				corePlayerRef.current?.setLyricLines(
-					lyricLines,
-					currentTimeRef.current,
-				);
-				corePlayerRef.current?.update();
-			} else {
-				corePlayerRef.current?.setLyricLines([]);
-				corePlayerRef.current?.update();
-			}
-		}, [lyricLines]);
+			corePlayer?.setIsSeeking(!!isSeeking);
+		}, [corePlayer, isSeeking]);
 
 		useEffect(() => {
-			corePlayerRef.current?.setIsSeeking(!!isSeeking);
-		}, [isSeeking]);
-
-		useEffect(() => {
-			corePlayerRef.current?.setWordFadeWidth(wordFadeWidth);
-		}, [wordFadeWidth]);
+			corePlayer?.setWordFadeWidth(wordFadeWidth);
+		}, [corePlayer, wordFadeWidth]);
 
 		useEffect(() => {
 			if (linePosXSpringParams !== undefined)
-				corePlayerRef.current?.setLinePosXSpringParams(linePosXSpringParams);
-		}, [linePosXSpringParams]);
+				corePlayer?.setLinePosXSpringParams(linePosXSpringParams);
+		}, [corePlayer, linePosXSpringParams]);
 
 		useEffect(() => {
 			if (linePosYSpringParams !== undefined)
-				corePlayerRef.current?.setLinePosYSpringParams(linePosYSpringParams);
-		}, [linePosYSpringParams]);
+				corePlayer?.setLinePosYSpringParams(linePosYSpringParams);
+		}, [corePlayer, linePosYSpringParams]);
 
 		useEffect(() => {
 			if (lineScaleSpringParams !== undefined)
-				corePlayerRef.current?.setLineScaleSpringParams(lineScaleSpringParams);
-		}, [lineScaleSpringParams]);
+				corePlayer?.setLineScaleSpringParams(lineScaleSpringParams);
+		}, [corePlayer, lineScaleSpringParams]);
 
 		useEffect(() => {
 			if (onLyricLineClick) {
 				const handler = (e: Event) =>
 					onLyricLineClick(e as LyricLineMouseEvent);
-				corePlayerRef.current?.addEventListener("line-click", handler);
-				return () =>
-					corePlayerRef.current?.removeEventListener("line-click", handler);
+				corePlayer?.addEventListener("line-click", handler);
+				return () => corePlayer?.removeEventListener("line-click", handler);
 			}
-		}, [onLyricLineClick]);
+		}, [corePlayer, onLyricLineClick]);
 
 		useEffect(() => {
 			if (onLyricLineContextMenu) {
 				const handler = (e: Event) =>
 					onLyricLineContextMenu(e as LyricLineMouseEvent);
-				corePlayerRef.current?.addEventListener("line-contextmenu", handler);
+				corePlayer?.addEventListener("line-contextmenu", handler);
 				return () =>
-					corePlayerRef.current?.removeEventListener(
-						"line-contextmenu",
-						handler,
-					);
+					corePlayer?.removeEventListener("line-contextmenu", handler);
 			}
-		}, [onLyricLineContextMenu]);
+		}, [corePlayer, onLyricLineContextMenu]);
 
 		useImperativeHandle(
 			ref,
 			() => ({
 				wrapperEl: wrapperRef.current,
-				lyricPlayer: corePlayerRef.current,
+				lyricPlayer: corePlayer,
 			}),
-			[],
+			[corePlayer],
 		);
 
 		return (
 			<>
 				<div {...props} ref={wrapperRef} />
-				{corePlayerRef.current?.getBottomLineElement() && bottomLine
-					? createPortal(
-							bottomLine,
-							corePlayerRef.current?.getBottomLineElement(),
-						)
+				{corePlayer?.getBottomLineElement() && bottomLine
+					? createPortal(bottomLine, corePlayer?.getBottomLineElement())
 					: null}
 			</>
 		);

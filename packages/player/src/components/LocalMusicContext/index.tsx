@@ -39,6 +39,7 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { db } from "../../dexie";
 import {
@@ -285,6 +286,7 @@ const LyricContext: FC = () => {
 
 export const LocalMusicContext: FC = () => {
 	const store = useStore();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		const toEmitThread = (type: Parameters<typeof emitAudioThread>[0]) => ({
@@ -331,19 +333,25 @@ export const LocalMusicContext: FC = () => {
 		store.set(
 			onRequestOpenMenuAtom,
 			toEmit(() => {
-				toast.info("请右键歌词页任意位置来打开菜单哦！");
+				toast.info(
+					t("amll.openMenuViaRightClick", "请右键歌词页任意位置来打开菜单哦！"),
+				);
 			}),
 		);
 		store.set(
 			onClickLeftFunctionButtonAtom,
 			toEmit(() => {
-				toast.info("此按钮仅供展示用途，暂无实际功能");
+				toast.info(
+					t("amll.buttonForDisplayOnly", "此按钮仅供展示用途，暂无实际功能"),
+				);
 			}),
 		);
 		store.set(
 			onClickRightFunctionButtonAtom,
 			toEmit(() => {
-				toast.info("此按钮仅供展示用途，暂无实际功能");
+				toast.info(
+					t("amll.buttonForDisplayOnly", "此按钮仅供展示用途，暂无实际功能"),
+				);
 			}),
 		);
 		const syncMusicInfo = (
@@ -469,7 +477,13 @@ export const LocalMusicContext: FC = () => {
 					break;
 				}
 				case "loadError": {
-					toast.error(`播放后端加载音频失败\n${evtData.data.error}`, {});
+					// toast.error(`播放后端加载音频失败\n${evtData.data.error}`, {});
+					toast.error(
+						t("amll.loadAudioError", "播放后端加载音频失败\n{{error}}", {
+							error: evtData.data.error,
+						}),
+						{},
+					);
 					break;
 				}
 				case "volumeChanged": {
@@ -486,7 +500,7 @@ export const LocalMusicContext: FC = () => {
 		return () => {
 			unlistenPromise.then((unlisten) => unlisten());
 		};
-	}, [store]);
+	}, [store, t]);
 
 	return (
 		<>

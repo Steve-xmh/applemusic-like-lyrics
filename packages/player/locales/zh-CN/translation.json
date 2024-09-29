@@ -8,7 +8,10 @@
       "toggleLyrics": "显示歌词",
       "editMusicOverrideMessage": "编辑歌曲覆盖信息",
       "exitLyricPage": "退出歌词页面"
-    }
+    },
+    "openMenuViaRightClick": "请右键歌词页任意位置来打开菜单哦！",
+    "buttonForDisplayOnly": "此按钮仅供展示用途，暂无实际功能",
+    "loadAudioError": "播放后端加载音频失败\n{{error}}"
   },
   "newPlaylist": {
     "buttonLabel": "新建播放列表",
@@ -78,6 +81,33 @@
       "shufflePlayAll": "随机播放"
     },
     "settings": {
+      "lyricFont": {
+        "fontPreview": {
+          "defaultText": "字体预览 Font Preview",
+          "label": "字体预览"
+        },
+        "subtitle": "歌词字体设置",
+        "tip": "此设置仅设置歌词字体，不包含其他组件的字体",
+        "fontFamily": {
+          "label": "字体家族",
+          "description": "以逗号分隔的字体名称组合，等同于 CSS 的 font-family 属性，留空为默认"
+        },
+        "fontWeight": {
+          "label": "字体字重",
+          "description": "等同于 CSS 的 font-weight 属性，设置 0 为默认"
+        },
+        "letterSpacing": {
+          "label": "字符间距",
+          "description": "等同于 CSS 的 letter-spacing 属性，留空为默认"
+        }
+      },
+      "general": {
+        "displayLanguage": {
+          "cimode": "本地化 ID",
+          "label": "显示语言"
+        },
+        "subtitle": "常规"
+      },
       "musicInfoAppearance": {
         "playerControlsType": {
           "menu": {
@@ -111,43 +141,15 @@
           "description": "单位为赫兹（hz），此项会影响音频可视化和背景跳动效果的展示效果"
         }
       },
-      "lyricBackground": {
-        "menu": {
-          "meshGradientRenderer": "网格渐变渲染器（MeshGradientRenderer）",
-          "pixiRenderer": "PixiJS 渲染器（PixiRenderer）"
-        },
-        "backgroundRenderer": {
-          "label": "背景渲染器"
-        },
-        "lyricBackgroundFPS": {
-          "label": "背景最高帧数",
-          "description": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 60。"
-        },
-        "lyricBackgroundRenderScale": {
-          "label": "背景渲染倍率",
-          "description": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 1 即每像素点渲染。"
-        },
-        "lyricBackgroundStaticMode": {
-          "label": "背景静态模式",
-          "description": "让背景会在除了切换歌曲变换封面的情况下保持静止，如果遇到了性能问题，可以考虑开启此项。\n注意：启用此项会导致背景跳动效果失效。"
-        }
-      },
-      "general": {
-        "subtitle": "常规",
-        "displayLanguage": "显示语言"
-      },
-      "lyricContent": {
-        "subtitle": "歌词内容",
-        "enableLyricTranslationLine": "显示翻译歌词",
-        "enableLyricRomanLine": {
-          "label": "显示音译歌词"
-        },
-        "enableLyricSwapTransRomanLine": {
-          "label": "启用音译歌词与翻译歌词互换",
-          "description": "仅上面两者启用后有效"
-        }
-      },
       "lyricAppearance": {
+        "lyricPlayerImplementation": {
+          "menu": {
+            "dom": "DOM",
+            "canvas": "Canvas"
+          },
+          "label": "歌词播放器实现",
+          "description": "目前有两个歌词播放实现\n- DOM：使用 DOM 元素实现，目前效果最全，但性能开销大\n- Canvas：使用 Canvas 实现，仍在开发中，性能优异，但是部分细节效果不足"
+        },
         "subtitle": "歌词样式",
         "enableLyricLineBlurEffect": {
           "label": "启用歌词模糊效果",
@@ -168,6 +170,39 @@
         "lyricWordFadeWidth": {
           "label": "逐词渐变宽度",
           "description": "调节逐词歌词时单词的渐变过渡宽度，单位为一个全角字的宽度，默认为 0.5。\n如果要模拟 Apple Music for Android 的效果，可以设置为 1。\n如果要模拟 Apple Music for iPad 的效果，可以设置为 0.5。\n如需关闭逐词歌词时单词的渐变过渡效果，可以设置为 0。"
+        }
+      },
+      "lyricBackground": {
+        "menu": {
+          "meshGradientRenderer": "网格渐变渲染器（MeshGradientRenderer）",
+          "pixiRenderer": "PixiJS 渲染器（PixiRenderer）"
+        },
+        "subtitle": "歌词背景",
+        "backgroundRenderer": {
+          "label": "背景渲染器"
+        },
+        "lyricBackgroundFPS": {
+          "label": "背景最高帧数",
+          "description": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 60。"
+        },
+        "lyricBackgroundRenderScale": {
+          "label": "背景渲染倍率",
+          "description": "对性能影响较高，但是实际开销不大，如果遇到性能问题，可以尝试降低此值。默认值为 1 即每像素点渲染。"
+        },
+        "lyricBackgroundStaticMode": {
+          "label": "背景静态模式",
+          "description": "让背景会在除了切换歌曲变换封面的情况下保持静止，如果遇到了性能问题，可以考虑开启此项。\n注意：启用此项会导致背景跳动效果失效。"
+        }
+      },
+      "lyricContent": {
+        "subtitle": "歌词内容",
+        "enableLyricTranslationLine": "显示翻译歌词",
+        "enableLyricRomanLine": {
+          "label": "显示音译歌词"
+        },
+        "enableLyricSwapTransRomanLine": {
+          "label": "启用音译歌词与翻译歌词互换",
+          "description": "仅上面两者启用后有效"
         }
       },
       "others": {

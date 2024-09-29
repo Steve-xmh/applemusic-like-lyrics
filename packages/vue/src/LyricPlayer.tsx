@@ -149,6 +149,16 @@ const lyricPlayerProps = {
 		type: Object as PropType<Partial<spring.SpringParams>>,
 		required: false,
 	},
+	/**
+	 * 设置渲染器，如果为 `undefined` 则默认为 `MeshGradientRenderer`
+	 * 默认渲染器有可能会随着版本更新而更换
+	 */
+	lyricPlayer: {
+		type: Object as PropType<{
+			new (...args: ConstructorParameters<typeof BaseRenderer>): BaseRenderer;
+		}>,
+		required: false,
+	},
 } as const;
 
 /**

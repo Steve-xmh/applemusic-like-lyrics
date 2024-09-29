@@ -50,13 +50,15 @@ export class CanvasLyricPlayer extends LyricPlayerBase {
 		this.calcLayout(true, true);
 	}
 	override onResize(): void {
-		this.size[0] = this.element.clientWidth;
-		this.size[1] = this.element.clientHeight;
 		const computedStyle = getComputedStyle(this.element);
 		this.baseFontSize = Number.parseFloat(computedStyle.fontSize) || 30;
 		this.baseFontFamily = computedStyle.fontFamily;
-		this.canvasElement.width = this.size[0] * devicePixelRatio;
-		this.canvasElement.height = this.size[1] * devicePixelRatio;
+		const realWidth = this.canvasElement.clientWidth;
+		const realHeight = this.canvasElement.clientHeight;
+		this.size[0] = realWidth - this.baseFontSize * 2;
+		this.size[1] = realHeight;
+		this.canvasElement.width = realWidth * devicePixelRatio;
+		this.canvasElement.height = realHeight * devicePixelRatio;
 		for (const line of this.currentLyricLineObjects) {
 			line.relayout();
 		}
@@ -85,6 +87,7 @@ export class CanvasLyricPlayer extends LyricPlayerBase {
 		ctx.textAlign = "left";
 
 		ctx.save();
+		ctx.translate(this.baseFontSize, 0);
 
 		for (const line of this.currentLyricLineObjects) {
 			line.update(delta / 1000);

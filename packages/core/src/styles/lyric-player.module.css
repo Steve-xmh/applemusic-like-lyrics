@@ -7,24 +7,27 @@
 	position: absolute;
 	backface-visibility: hidden;
 	transform-origin: left;
-	width: var(--amll-lp-line-width, 100%);
-	min-width: var(--amll-lp-line-width, 100%);
-	max-width: var(--amll-lp-line-width, 100%);
+	width: var(--amll-lp-width, 100%);
+	min-width: var(--amll-lp-width, 100%);
+	max-width: var(--amll-lp-width, 100%);
+	width: 100%;
 	height: fit-content;
-	padding: 2vh var(--amll-lp-line-padding-x, 1em);
+	padding: 2vh 1em;
+	padding-right: 20%;
 	contain: content;
 	will-change: transform;
 	transition: filter 0.2s, background-color 0.25s, box-shadow 0.25s;
-	box-sizing: content-box;
-	border-radius: 16px;
+	box-sizing: border-box;
+	border-radius: 0.25em;
 
 	&:has(> *):hover {
 		background-color: var(--amll-lp-hover-bg-color, #fff1);
-		box-shadow: 0 0 0 4px var(--amll-lp-hover-bg-color, #fff1);
+		/* box-shadow: 0 0 0 4px var(--amll-lp-hover-bg-color, #fff1); */
 	}
 
 	&:has(> *):active {
-		box-shadow: 0 0 0 var(--amll-lp-hover-bg-color, #fff1);
+		background-color: var(--amll-lp-hover-bg-color, #ffffff05);
+		/* box-shadow: 0 0 0 var(--amll-lp-hover-bg-color, #fff1); */
 	}
 }
 
@@ -47,6 +50,8 @@
 .lyricDuetLine {
 	text-align: right;
 	transform-origin: right;
+	padding-left: 20%;
+	padding-right: 1em;
 }
 
 .lyricMainLine {
@@ -96,13 +101,19 @@
 
 .interludeDots {
 	height: clamp(0.5em, 1vh, 3em);
+	transition: opacity 0.25s;
 	transform-origin: center;
 	width: fit-content;
-	padding: 2.5% calc(var(--amll-lp-line-padding-x, 1em) * 0.6);
+	padding: 2.5% 0.75em;
 	position: absolute;
 	display: flex;
 	gap: 0.25em;
-	left: 1em;
+	left: 0;
+	opacity: 0;
+
+	&.enabled {
+		opacity: 1;
+	}
 
 	& > * {
 		width: clamp(0.5em, 1vh, 3em);
@@ -115,7 +126,7 @@
 	}
 
 	&.duet {
-		right: 1em;
+		right: 0;
 		transform-origin: center;
 	}
 }

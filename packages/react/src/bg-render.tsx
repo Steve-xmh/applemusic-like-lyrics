@@ -70,7 +70,9 @@ export interface BackgroundRenderProps {
 	 * 设置渲染器，如果为 `undefined` 则默认为 `PixiRenderer`
 	 * 默认渲染器有可能会随着版本更新而更换
 	 */
-	renderer?: { new (canvas: HTMLCanvasElement): BaseRenderer };
+	renderer?: {
+		new (...args: ConstructorParameters<typeof BaseRenderer>): BaseRenderer;
+	};
 }
 
 /**

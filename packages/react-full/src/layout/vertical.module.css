@@ -122,15 +122,13 @@
 	transition: opacity 0.5s 0.5s;
 	opacity: 1;
 	mix-blend-mode: plus-lighter;
-	contain: paint;
+	/* contain: paint; */
 
 	mask-image: linear-gradient(transparent 0%, black 10%, black 100%);
-
-	padding-left: calc(3em - 24px);
-	padding-right: 3em;
-	box-sizing: border-box;
+	/* margin-left: calc(-24px - 1em); */
+	/* width: calc(100% + 24px + 1em); */
+	box-sizing: content-box;
 	min-height: 0;
-	width: 100%;
 }
 
 .bigControls {

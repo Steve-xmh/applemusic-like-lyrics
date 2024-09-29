@@ -1,5 +1,6 @@
 import { DomLyricPlayer } from "./dom";
 
+export { LyricPlayerBase } from "./base";
 export * from "./canvas";
 export * from "./dom";
 

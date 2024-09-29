@@ -4,7 +4,7 @@
  * @author SteveXMH
  */
 
-import type { Disposable, HasElement, LyricLine } from "../../interfaces";
+import type { LyricLine } from "../../interfaces";
 import "../../styles/index.css";
 import styles from "../../styles/lyric-player.module.css";
 import { debounceFrame } from "../../utils/debounce";
@@ -37,10 +37,7 @@ export type LyricLineMouseEventListener = (evt: LyricLineMouseEvent) => void;
  *
  * 尽可能贴切 Apple Music for iPad 的歌词效果设计，且做了力所能及的优化措施
  */
-export class DomLyricPlayer
-	extends LyricPlayerBase
-	implements HasElement, Disposable
-{
+export class DomLyricPlayer extends LyricPlayerBase {
 	override currentLyricLineObjects: LyricLineEl[] = [];
 	private debounceCalcLayout = debounceFrame(async () => {
 		this.calcLayout(true, true);
@@ -55,6 +52,7 @@ export class DomLyricPlayer
 
 	override onResize(): void {
 		const styles = getComputedStyle(this.element);
+		this._baseFontSize = Number.parseFloat(styles.fontSize);
 		const innerWidth =
 			this.element.clientWidth -
 			Number.parseFloat(styles.paddingLeft) -
@@ -109,7 +107,7 @@ export class DomLyricPlayer
 	}
 	constructor() {
 		super();
-		this.rebuildStyle();
+		this.onResize();
 		this.element.classList.add("amll-lyric-player", "dom");
 		if (this.disableSpring) {
 			this.element.classList.add(styles.disableSpring);
@@ -117,24 +115,13 @@ export class DomLyricPlayer
 	}
 
 	private rebuildStyle() {
-		this._baseFontSize = Number.parseFloat(
-			getComputedStyle(this.element).fontSize,
+		const width = this.innerSize[0];
+		const height = this.innerSize[1];
+		this.element.style.setProperty("--amll-lp-width", `${width.toFixed(4)}px`);
+		this.element.style.setProperty(
+			"--amll-lp-height",
+			`${height.toFixed(4)}px`,
 		);
-		let style = "";
-		style += "--amll-lp-width:";
-		const width = this.innerSize[0] - this._baseFontSize * 2;
-		style += `${width.toFixed(4)}px;`;
-		style += "--amll-lp-height:";
-		style += `${(this.innerSize[1] - this._baseFontSize * 2).toFixed(4)}px;`;
-		// 原本想用 calc 来计算的，但是发现算式复杂之后无法解析，所以只能用 JS 来计算直接结果了
-		style += "--amll-lp-line-width:";
-		if (this.innerSize[0] < 768) {
-			style += `${width.toFixed(4)}px;`;
-		} else {
-			style += `${(width * 0.8).toFixed(4)}px;`;
-		}
-
-		this.element.setAttribute("style", style);
 	}
 
 	override setWordFadeWidth(value = 0.5) {
