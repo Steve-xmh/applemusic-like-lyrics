@@ -177,7 +177,7 @@
           "meshGradientRenderer": "Mesh gradient renderer",
           "pixiRenderer": "Pixi renderer"
         },
-        "subtitle": "Lyric page background",
+        "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
           "label": "Pixi renderer"
         },
@@ -198,11 +198,11 @@
         "subtitle": "Lyric content",
         "enableLyricTranslationLine": "Show translation",
         "enableLyricRomanLine": {
-          "label": "Show Romanized translation"
+          "label": "Show Romanized Translation"
         },
         "enableLyricSwapTransRomanLine": {
-          "label": "Swap translation and Romanized translation",
-          "description": "Only valid when the above two are enabled"
+          "label": "Swap Translation and Romanized Translation",
+          "description": "Only valid when the above two are enabled."
         }
       },
       "others": {
@@ -227,7 +227,7 @@
     "song": {
       "basic": {
         "musicId": "Music ID",
-        "musicFilePath": "File path",
+        "musicFilePath": "File Path",
         "musicDuration": "Duration",
         "tabs": {
           "basic": "Basics",
@@ -238,27 +238,27 @@
       "lyric": {
         "lyricFormatLabel": "Lyric format",
         "lyricFormat": {
-          "none": "No lyrics",
+          "none": "No Lyrics",
           "lrc": "LyRiC format (LRC)",
           "eslrc": "LyRiC format used by ESLyric (LRC)",
-          "yrc": "YRC lyrics",
+          "yrc": "YRC Lyrics",
           "qrc": "QRC lyrics",
           "lys": "Lyricify Syllable lyrics",
           "ttml": "TTML lyrics"
         },
-        "lyricData": "Lyric data",
-        "ttmlLyricTip": "TTML lyric will contain translation and Romanized translation.",
-        "translationLyricData": "Translated lyrics",
+        "lyricData": "Lyrics Data",
+        "ttmlLyricTip": "TTML lyric could contain translation and Romanized translation in a single file.",
+        "translationLyricData": "Translated Lyrics",
         "translationLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar.",
         "romanLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as Romanized by timestamp if they are the same or similar."
       },
       "metadata": {
         "overrideSafeTip": "Properties in this page will not override into source file.",
-        "songName": "Track name",
+        "songName": "Title",
         "songArtists": "Artists",
         "songAlbum": "Album",
         "changeCoverToImageOrVideo": "Change cover image as image / video",
-        "reloadMetadataFromFile": "Reload metadata from file"
+        "reloadMetadataFromFile": "Reload Metadata from Audio File"
       }
     },
     "ws": {
