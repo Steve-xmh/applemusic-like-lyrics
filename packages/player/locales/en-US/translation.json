@@ -6,7 +6,7 @@
       "forwardSong": "Next Song",
       "toggleFullscreen": "Enter / Exit full screen",
       "toggleLyrics": "Show lyrics",
-      "editMusicOverrideMessage": "Edit track's replacement settings",
+      "editMusicOverrideMessage": "Edit Track Override Data",
       "exitLyricPage": "Exit lyrics page"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
