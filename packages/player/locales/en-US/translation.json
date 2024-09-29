@@ -11,7 +11,7 @@
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "Player backend loading audio file has an error: {{error}}"
+    "loadAudioError": "Player backend loading audio file has an error:\n{error}"
   },
   "newPlaylist": {
     "buttonLabel": "New playlist",
@@ -41,7 +41,7 @@
   "page": {
     "amll-dev": {
       "title": "Apple Music Like Lyrics Developer Page",
-      "warning": "This page is develop only, use it at your own risk!"
+      "warning": "This page is for develop usage only, use it at your own risk! (Chinese only)"
     },
     "main": {
       "updateAvailableTag": "Available update",
@@ -59,7 +59,7 @@
     },
     "playlist": {
       "music": {
-        "unknownSongName": "Unknown track ID: {{id}}",
+        "unknownSongName": "Unknown Music ID {id}",
         "dropdown": {
           "playMusic": "Play",
           "editMusicOverrideData": "Edit music override data",
@@ -69,14 +69,14 @@
       "addLocalMusic": {
         "filterName": "Audio file name",
         "toast": {
-          "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({{current}} / {{total}})",
-          "partiallyFailed": "Successfully add {{succeed}} songs, {{errored}} songs failed to be added.",
-          "allFailed": "{{errored}} track(s) add failure.",
-          "success": null
+          "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({current, plural, other {#}} / {total, plural, other {#}})",
+          "partiallyFailed": "{succeed, plural, =0 {No song is} one {A song is} other {# songs}} added, but {errored, plural, =0 {no song is} one {a song is} other {# songs are}} failed to be added",
+          "allFailed": "{errored, plural, other {#}} songs failed to be added",
+          "success": "{count, plural, other {#}} song(s) added"
         },
         "label": "Add local music"
       },
-      "totalMusicLabel": null,
+      "totalMusicLabel": "{count, plural, other {#}} song(s)",
       "playAll": "Play all",
       "shufflePlayAll": "Random play"
     },
@@ -218,9 +218,9 @@
     "about": {
       "subtitle": "About",
       "credits": "Made by SteveXMH and all Contributors from GitHub",
-      "newVersion": "Available update from {{currentVersion}} to {{nextVersion}}",
+      "newVersion": "Available update from {currentVersion} to {nextVersion}",
       "updating": "Player will restart after update, hold on a second....",
-      "downloading": "Downloading update... {{progressText}}",
+      "downloading": "Downloading updates…… {progressText}",
       "installing": "Installing update, player will restart, wait a minute...",
       "installUpdate": "Install this update"
     },
@@ -257,7 +257,7 @@
         "songName": "Track name",
         "songArtists": "Artists",
         "songAlbum": "Album",
-        "changeCoverToImageOrVideo": "Change cover to image or video",
+        "changeCoverToImageOrVideo": "Change cover image as image / video",
         "reloadMetadataFromFile": "Reload metadata from file"
       }
     },

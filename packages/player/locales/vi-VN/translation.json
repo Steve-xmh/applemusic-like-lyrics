@@ -1,272 +1,272 @@
 {
   "amll": {
     "contextMenu": {
-      "rewindSong": null,
-      "pauseOrResume": null,
-      "forwardSong": null,
-      "toggleFullscreen": null,
-      "toggleLyrics": null,
-      "editMusicOverrideMessage": null,
-      "exitLyricPage": null
+      "rewindSong": "Bài trước đó",
+      "pauseOrResume": "Tạm dừng / Tiếp tục",
+      "forwardSong": "Bài tiếp theo",
+      "toggleFullscreen": "Toàn màn hình / Thoát toàn màn hình",
+      "toggleLyrics": "Hiển thị lời bài hát",
+      "editMusicOverrideMessage": "Chỉnh sửa thông tin bài hát",
+      "exitLyricPage": "Thoát lời bài hát"
     },
-    "openMenuViaRightClick": null,
-    "buttonForDisplayOnly": null,
-    "loadAudioError": null
+    "openMenuViaRightClick": "Hãy nhấp chuột phải vào bất kỳ chỗ nào trên trang lời bài hát để mở Menu!",
+    "buttonForDisplayOnly": "Nút này chỉ dùng để hiển thị, hiện tại không có chức năng thực tế ",
+    "loadAudioError": "Lỗi tải âm thanh từ tệp {error}"
   },
   "newPlaylist": {
-    "buttonLabel": null,
+    "buttonLabel": "Tạo danh sách phát mới.",
     "dialog": {
-      "title": null,
-      "namePlaceholder": null
+      "title": "Tạo playlist mới",
+      "namePlaceholder": "Tên playlist"
     }
   },
   "common": {
     "dialog": {
-      "cancel": null,
-      "confirm": null,
-      "save": null
+      "cancel": "Hủy bỏ",
+      "confirm": "Xác nhận",
+      "save": "Lưu"
     },
     "page": {
-      "back": null
+      "back": "Quay lại"
     }
   },
   "ws-protocol": {
     "toast": {
-      "switchSongNotSupported": null,
-      "pauseOrPlaySongNotSupported": null,
-      "seekNotSupported": null,
-      "changeVolumeNotSupported": null
+      "switchSongNotSupported": "Không thể chuyển bài hát trong chế độ WS Protocol",
+      "pauseOrPlaySongNotSupported": "Không thể tạm dừng/tiếp tục phát nhạc trong chế độ WS Protocol",
+      "seekNotSupported": "Không thể thay đổi tiến độ phát trong chế độ WS Protocol",
+      "changeVolumeNotSupported": "Không thể thay đổi âm lượng trong chế độ WS Protocol"
     }
   },
   "page": {
     "amll-dev": {
-      "title": null,
-      "warning": null
+      "title": "Trang phát triển Apple Music Like Lyrics",
+      "warning": "Nội dung này chỉ dùng cho mục đích phát triển và thử nghiệm, chỉ dành cho tác giả sử dụng, việc sử dụng tùy tiện có thể gây ra những tình huống không lường trước được!"
     },
     "main": {
-      "updateAvailableTag": null,
+      "updateAvailableTag": "Có bản cập nhật khả dụng",
       "menu": {
-        "enterWSProtocolMode": null,
-        "asWSProtocolReceiver": null,
-        "asWSProtocolSenderWIP": null,
-        "settings": null
+        "enterWSProtocolMode": "Vào chế độ WS Protocol",
+        "asWSProtocolReceiver": "Trạng thái nhận WS Protocol",
+        "asWSProtocolSenderWIP": "Gửi trạng thái WS Protocol (đang triển khai)",
+        "settings": "Cài đặt"
       },
-      "noPlaylistTip": null,
+      "noPlaylistTip": "Không có danh sách phát, hãy tạo một danh sách mới!",
       "playlistMenu": {
-        "delete": null
+        "delete": "Xóa danh sách phát"
       },
-      "loadingPlaylist": null
+      "loadingPlaylist": "Đang tải danh sách bài hát"
     },
     "playlist": {
       "music": {
-        "unknownSongName": null,
+        "unknownSongName": "ID bài hát không xác định {id}",
         "dropdown": {
-          "playMusic": null,
-          "editMusicOverrideData": null,
-          "removeFromPlaylist": null
+          "playMusic": "Phát nhạc",
+          "editMusicOverrideData": "Chỉnh sửa thông tin bài hát",
+          "removeFromPlaylist": "Xóa khỏi danh sách phát"
         }
       },
       "addLocalMusic": {
-        "filterName": null,
+        "filterName": "Tệp âm thanh",
         "toast": {
-          "parsingMusicMetadata": null,
-          "partiallyFailed": null,
-          "allFailed": null,
-          "success": null
+          "parsingMusicMetadata": "Đang phân tích siêu dữ liệu âm nhạc để thêm bài hát ({current, plural, other {#}} / {total, plural, other {#}})",
+          "partiallyFailed": "Đã thêm {succeed, plural, other {#}} bài hát, trong đó {errored, plural, other {#}} bài hát thất bại khi thêm",
+          "allFailed": "Thêm {errored, plural, other {#}} bài hát thất bại",
+          "success": "Đã thêm tất cả {count, plural, other {#}} bài hát"
         },
-        "label": null
+        "label": "Thêm bài hát từ bộ nhớ"
       },
-      "totalMusicLabel": null,
-      "playAll": null,
-      "shufflePlayAll": null
+      "totalMusicLabel": "{count, plural, other {#}} bài hát",
+      "playAll": "Phát tất cả",
+      "shufflePlayAll": "Phát ngẫu nhiên"
     },
     "settings": {
       "lyricFont": {
         "fontPreview": {
-          "defaultText": null,
-          "label": null
+          "defaultText": "Xem trước phông chữ",
+          "label": "Xem trước phông chữ"
         },
-        "subtitle": null,
-        "tip": null,
+        "subtitle": "Cài đặt phông chữ lời bài hát",
+        "tip": "Cài đặt này chỉ thay đổi phông chữ của lời bài hát, không bao gồm các phông chữ của thành phần khác",
         "fontFamily": {
-          "label": null,
-          "description": null
+          "label": "Họ phông chữ",
+          "description": "Tên phông chữ được phân tách bằng dấu phẩy, tương đương với thuộc tính font-family của CSS, để trống sẽ sử dụng giá trị mặc định"
         },
         "fontWeight": {
-          "label": null,
-          "description": null
+          "label": "Độ dày của phông chữ",
+          "description": "Giá trị 0 sẽ được sử dụng như là giá trị mặc định cho thuộc tính này, giống như cách hoạt động của thuộc tính font-weight trong CSS"
         },
         "letterSpacing": {
-          "label": null,
-          "description": null
+          "label": "Khoảng cách giữa các ký tự",
+          "description": "Tương đương với thuộc tính letter-spacing của CSS, để trống sẽ sử dụng giá trị mặc định"
         }
       },
       "general": {
         "displayLanguage": {
-          "cimode": null,
-          "label": null
+          "cimode": "ID ngôn ngữ địa phương",
+          "label": "Ngôn ngữ hiển thị"
         },
-        "subtitle": null
+        "subtitle": "Chung"
       },
       "musicInfoAppearance": {
         "playerControlsType": {
           "menu": {
-            "controls": null,
-            "fft": null,
-            "none": null
+            "controls": "Thành phần điều khiển phát nhạc",
+            "fft": "Hình ảnh hóa âm thanh bằng dạng sóng",
+            "none": "Không"
           },
-          "label": null,
-          "description": null
+          "label": "Loại thành phần điều khiển phát",
+          "description": "Thông tin bài hát"
         },
-        "subtitle": null,
+        "subtitle": "Kiểu thông tin bài hát",
         "showMusicName": {
-          "label": null
+          "label": "Hiển thị tên bài hát"
         },
         "showMusicArtists": {
-          "label": null
+          "label": "Hiển thị tác giả bài hát"
         },
         "showMusicAlbum": {
-          "label": null,
-          "description": null
+          "label": "Hiển thị tên album",
+          "description": " Nếu kích hoạt cả ba mục, bố cục có thể không đẹp, vui lòng điều chỉnh tùy tình huống."
         },
         "showVolumeControl": {
-          "label": null
+          "label": "Hiển thị thanh điều chỉnh âm lượng"
         },
         "showBottomControl": {
-          "label": null,
-          "description": null
+          "label": "Hiển thị nhóm nút ở dưới cùng",
+          "description": "Trong bố cục ngang, các nút sẽ ở góc dưới bên phải; trong bố cục dọc, chúng nằm dưới nút phát."
         },
         "fftDataRange": {
-          "label": null,
-          "description": null
+          "label": "Phạm vi tần số hiển thị âm thanh",
+          "description": "Đơn vị là Hertz (hz), tùy chọn này sẽ ảnh hưởng đến việc hiển thị âm thanh và hiệu ứng nhảy nền."
         }
       },
       "lyricAppearance": {
         "lyricPlayerImplementation": {
           "menu": {
-            "dom": null,
-            "canvas": null
+            "dom": "DOM",
+            "canvas": "Canvas"
           },
-          "label": null,
-          "description": null
+          "label": "Triển khai trình phát lời bài hát",
+          "description": "Hiện tại có hai phương pháp phát lời bài hát:\n    DOM: Sử dụng phần tử DOM, hiệu ứng hiện tại là tốt nhất, nhưng hiệu năng tiêu thụ cao.\n    Canvas: Sử dụng Canvas, vẫn đang trong quá trình phát triển, tối ưu hóa hiệu năng, nhưng một số hiệu ứng chi tiết chưa hoàn thiện."
         },
-        "subtitle": null,
+        "subtitle": "Kiểu lời bài hát",
         "enableLyricLineBlurEffect": {
-          "label": null,
-          "description": null
+          "label": "Bật hiệu ứng làm mờ lời bài hát",
+          "description": "Ảnh hưởng đến hiệu năng, nếu gặp vấn đề về hiệu suất, có thể thử tắt tùy chọn này. Mặc định được bật."
         },
         "enableLyricLineScaleEffect": {
-          "label": null,
-          "description": null
+          "label": "Bật hiệu ứng phóng to/thu nhỏ lời bài hát",
+          "description": "Không ảnh hưởng đến hiệu năng, khi phát lời bài hát phía trước sẽ thu nhỏ một chút. Mặc định bật."
         },
         "enableLyricLineSpringAnimation": {
-          "label": null,
-          "description": null
+          "label": "Bật hiệu ứng hoạt hình co giãn dòng lời bài hát",
+          "description": "Ảnh hưởng đến hiệu năng, nếu gặp vấn đề về hiệu suất, có thể thử tắt tùy chọn này. Mặc định được bật."
         },
         "advanceLyricDynamicLyricTime": {
-          "label": null,
-          "description": null
+          "label": "Thời gian bắt đầu phát lời bài hát sớm hơn",
+          "description": "Điều chỉnh thời gian ban đầu của lời bài hát để bắt đầu sớm hơn, giúp cho việc phát bài hát kịp thời (dần dần). Hành vi này tương tự như hiệu ứng được nâng cao trong Apple Music, nhưng trong một số trường hợp sẽ không ảnh hưởng đến việc chuyển đổi lời bài hát ở cuối."
         },
         "lyricWordFadeWidth": {
-          "label": null,
-          "description": null
+          "label": "Điều chỉnh độ rộng của hiệu ứng làm mờ dần cho từng từ trong lời bài hát",
+          "description": "Điều chỉnh độ rộng chuyển đổi dần dần cho từng từ trong lời bài hát, đơn vị là chiều rộng của một ký tự, mặc định là 0.5.\nNếu muốn mô phỏng hiệu ứng của Apple Music cho Android, có thể đặt là 1.\nNếu muốn mô phỏng hiệu ứng của Apple Music cho iPad, có thể đặt là 0.5.\nNếu muốn vô hiệu hóa độ rộng chuyển đổi dần dần cho lời bài hát, có thể đặt là 0."
         }
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": null,
-          "pixiRenderer": null
+          "meshGradientRenderer": "Trình tạo hiệu ứng mờ dần bằng lưới",
+          "pixiRenderer": "Trình tạo hình ảnh PixiJS"
         },
-        "subtitle": null,
+        "subtitle": "Nền của lời bài hát",
         "backgroundRenderer": {
-          "label": null
+          "label": " Nền mờ dần"
         },
         "lyricBackgroundFPS": {
-          "label": null,
-          "description": null
+          "label": "Tần suất khung hình cao nhất",
+          "description": "Có ảnh hưởng đến hiệu suất, nhưng thực tế không lớn. Nếu gặp vấn đề về hiệu suất, có thể cân nhắc giảm giá trị này. Mặc định là 60."
         },
         "lyricBackgroundRenderScale": {
-          "label": null,
-          "description": null
+          "label": "Tỷ lệ hiển thị nền",
+          "description": "Có ảnh hưởng đến hiệu suất, nhưng thực tế không lớn. Nếu gặp vấn đề về hiệu suất, có thể cân nhắc giảm giá trị này. Mặc định là 1, tức là hiển thị mỗi khung hình một lần."
         },
         "lyricBackgroundStaticMode": {
-          "label": null,
-          "description": null
+          "label": "Chế độ nền tĩnh",
+          "description": "Giúp nền giữ nguyên khi chuyển đổi bài hát. Nếu gặp vấn đề về hiệu suất, có thể cân nhắc bật tùy chọn này.\nLưu ý: Bật tùy chọn này có thể làm mất hiệu ứng nền."
         }
       },
       "lyricContent": {
-        "subtitle": null,
-        "enableLyricTranslationLine": null,
+        "subtitle": "Nội dung lời bài hát",
+        "enableLyricTranslationLine": "Hiển thị lời bài hát dịch",
         "enableLyricRomanLine": {
-          "label": null
+          "label": "Hiển thị lời bài hát phiên âm"
         },
         "enableLyricSwapTransRomanLine": {
-          "label": null,
-          "description": null
+          "label": "Bật chức năng hoán đổi giữa lời bài hát và lời dịch",
+          "description": "Chỉ có hai tùy chọn trên mới có hiệu lực khi được bật"
         }
       },
       "others": {
-        "subtitle": null,
+        "subtitle": "Các tùy chọn khác",
         "showStatJSFrame": {
-          "label": null,
-          "description": null
+          "label": "Hiển thị thông tin thống kê hiệu suất",
+          "description": "Có thể xem thông tin chiếm dụng bộ nhớ (chỉ dành cho các hệ thống Chromium) và các thông tin khác, ảnh hưởng đến hiệu suất khá nhỏ."
         },
-        "restartProgram": null,
-        "enterAmllDevPage": null
+        "restartProgram": "Khởi động lại chương trình",
+        "enterAmllDevPage": "Công cụ phát triển trang lời bài hát"
       }
     },
     "about": {
-      "subtitle": null,
-      "credits": null,
-      "newVersion": null,
-      "updating": null,
-      "downloading": null,
-      "installing": null,
-      "installUpdate": null
+      "subtitle": "Về",
+      "credits": "Được phát triển bởi SteveXMH và các cộng tác viên khác trên Github\nhttps://github.com/Steve-xmh/applemusic-like-lyrics",
+      "newVersion": " Có bản cập nhật khả dụng từ {currentVersion} lên {nextVersion}",
+      "updating": "Đang cập nhật, khi hoàn tất sẽ tự động khởi động lại, vui lòng chờ...",
+      "downloading": "Đang tải xuống bản cập nhật {progressText}",
+      "installing": "Đang cài đặt cập nhật, sẽ tự động khởi động lại, vui lòng chờ...",
+      "installUpdate": "Cập nhật và cài đặt"
     },
     "song": {
       "basic": {
-        "musicId": null,
-        "musicFilePath": null,
-        "musicDuration": null,
+        "musicId": "ID bài hát",
+        "musicFilePath": "Đường dẫn tệp âm thanh",
+        "musicDuration": "Thời gian bài hát",
         "tabs": {
-          "basic": null,
-          "metadata": null,
-          "lyric": null
+          "basic": "Cơ bản",
+          "metadata": "Siêu dữ liệu bài hát",
+          "lyric": "Lời bài hát"
         }
       },
       "lyric": {
-        "lyricFormatLabel": null,
+        "lyricFormatLabel": "Định dạng lời bài hát",
         "lyricFormat": {
-          "none": null,
-          "lrc": null,
-          "eslrc": null,
-          "yrc": null,
-          "qrc": null,
-          "lys": null,
-          "ttml": null
+          "none": "Không có lời bài hát",
+          "lrc": "Lời bài hát định dạng LyRiC (lrc)",
+          "eslrc": "Lời bài hát định dạng ESLyRiC (eslrc)",
+          "yrc": "Lời bài hát định dạng YRC",
+          "qrc": "Lời bài hát định dạng QRC",
+          "lys": "Lời bài hát định dạng Lyricify Syllable (lys)",
+          "ttml": "Lời bài hát định dạng TTML"
         },
-        "lyricData": null,
-        "ttmlLyricTip": null,
-        "translationLyricData": null,
-        "translationLyricDataTip": null,
-        "romanLyricDataTip": null
+        "lyricData": "Dữ liệu lời bài hát",
+        "ttmlLyricTip": "Lời bài hát TTML có thể đồng thời chứa dữ liệu dịch và phiên âm",
+        "translationLyricData": "Dữ liệu lời bài hát dịch",
+        "translationLyricDataTip": "Vui lòng cung cấp dữ liệu lời bài hát định dạng LyRiC (lrc), sẽ được ghép với các văn bản gốc gần giống theo dấu thời gian",
+        "romanLyricDataTip": "Vui lòng cung cấp dữ liệu lời bài hát định dạng LyRiC (lrc), sẽ được ghép với các văn bản gốc gần giống theo dấu thời gian để thành bản dịch."
       },
       "metadata": {
-        "overrideSafeTip": null,
-        "songName": null,
-        "songArtists": null,
-        "songAlbum": null,
-        "changeCoverToImageOrVideo": null,
-        "reloadMetadataFromFile": null
+        "overrideSafeTip": "Cài đặt trên trang này sẽ không ảnh hưởng đến tệp âm thanh gốc",
+        "songName": "Tên bài hát",
+        "songArtists": "Tác giả bài hát",
+        "songAlbum": "Tên album",
+        "changeCoverToImageOrVideo": "Thay đổi bìa thành bìa hình ảnh/ bìa video",
+        "reloadMetadataFromFile": "Tải lại siêu dữ liệu từ tệp"
       }
     },
     "ws": {
       "recv": {
-        "openNetworkAddress": null,
-        "tip": null,
-        "connectedClients": null,
-        "noClients": null
+        "openNetworkAddress": "Mở địa chỉ mạng",
+        "tip": "Sau khi kết nối với máy khách , có thể cần thay đổi hướng bài hát hoặc trạng thái thông tin bài hát. Nếu cần mở kết mạng bên ngoài, hãy đặt Host thành 0.0.0.0",
+        "connectedClients": "Các máy khách đã kết nối",
+        "noClients": "Không có kết nối máy khách nào"
       }
     }
   }

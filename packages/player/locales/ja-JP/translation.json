@@ -4,14 +4,14 @@
       "rewindSong": "前の曲",
       "pauseOrResume": null,
       "forwardSong": "次の曲",
-      "toggleFullscreen": "全画面 / 全画面解除",
+      "toggleFullscreen": null,
       "toggleLyrics": "歌詞を表示",
       "editMusicOverrideMessage": "曲のカバレッジ情報を編集する",
       "exitLyricPage": "歌詞ページを出る"
     },
     "openMenuViaRightClick": "歌詞ページの任意の場所を右クリックしてメニューを開きます。",
     "buttonForDisplayOnly": "このボタンは表示のみを目的としており、現時点では実際の機能はありません。",
-    "loadAudioError": "再生バックエンドでオーディオのロードに失敗しました\n{{error}}"
+    "loadAudioError": null
   },
   "newPlaylist": {
     "buttonLabel": "新プレイリストを作成する",
@@ -33,7 +33,7 @@
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "WS プロトコル・モードで曲の切り替えができない",
-      "pauseOrPlaySongNotSupported": "WS プロトコル・モードでは、音楽の一時停止 / 継続はできません",
+      "pauseOrPlaySongNotSupported": null,
       "seekNotSupported": "WS プロトコル・モードでは、再生の進行状況を変更することはできません。",
       "changeVolumeNotSupported": "WS プロトコル・モードでは音量を変更できない"
     }
@@ -41,7 +41,7 @@
   "page": {
     "amll-dev": {
       "title": "Apple Music Like Lyrics 開発者ページ",
-      "warning": "ここでの内容は、開発およびデバッグを目的としたものであり、作者の便宜を図るためのものである！"
+      "warning": null
     },
     "main": {
       "updateAvailableTag": "アップデートが可能",
@@ -59,7 +59,7 @@
     },
     "playlist": {
       "music": {
-        "unknownSongName": "不明な曲 ID {{id}}",
+        "unknownSongName": null,
         "dropdown": {
           "playMusic": "曲を再生する",
           "editMusicOverrideData": "曲のカバレッジ情報を編集する",
