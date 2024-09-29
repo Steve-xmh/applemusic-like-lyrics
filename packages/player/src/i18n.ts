@@ -1,8 +1,7 @@
 import i18n from "i18next";
+import ICU from "i18next-icu";
 import { initReactI18next } from "react-i18next";
 import resources from "virtual:i18next-loader";
-
-console.log(resources);
 
 declare module "i18next" {
 	// Extend CustomTypeOptions
@@ -15,6 +14,7 @@ declare module "i18next" {
 
 i18n
 	.use(initReactI18next) // passes i18n down to react-i18next
+	.use(ICU)
 	.init({
 		resources,
 		debug: import.meta.env.DEV,
