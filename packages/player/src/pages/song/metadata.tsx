@@ -121,7 +121,7 @@ export const MetadataTabContent: FC = () => {
 				onClick={uploadCoverAsImage}
 			>
 				<Trans i18nKey="page.song.metadata.changeCoverToImageOrVideo">
-					更换封面图为图片/视频
+					更换封面图为图片 / 视频
 				</Trans>
 			</Button>
 			<Button

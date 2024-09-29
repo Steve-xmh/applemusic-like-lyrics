@@ -27,7 +27,7 @@ export const AMLLContextMenuContent: FC = () => {
 				<Trans i18nKey="amll.contextMenu.rewindSong">上一首</Trans>
 			</ContextMenu.Item>
 			<ContextMenu.Item onClick={onPlayOrResume}>
-				<Trans i18nKey="amll.contextMenu.pauseOrResume">暂停/继续</Trans>
+				<Trans i18nKey="amll.contextMenu.pauseOrResume">暂停 / 继续</Trans>
 			</ContextMenu.Item>
 			<ContextMenu.Item onClick={onRequestNextSong}>
 				<Trans i18nKey="amll.contextMenu.forwardSong">下一首</Trans>
@@ -41,7 +41,9 @@ export const AMLLContextMenuContent: FC = () => {
 					await win.setFullscreen(!isFullscreen);
 				}}
 			>
-				<Trans i18nKey="amll.contextMenu.toggleFullscreen">全屏/取消全屏</Trans>
+				<Trans i18nKey="amll.contextMenu.toggleFullscreen">
+					全屏 / 取消全屏
+				</Trans>
 			</ContextMenu.Item>
 			<ContextMenu.Separator />
 			<ContextMenu.CheckboxItem

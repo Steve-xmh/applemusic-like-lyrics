@@ -74,7 +74,7 @@ export const WSProtocolMusicContext: FC = () => {
 				toast(
 					t(
 						"ws-protocol.toast.pauseOrPlaySongNotSupported",
-						"WS Protocol 模式下无法暂停/继续播放音乐",
+						"WS Protocol 模式下无法暂停 / 继续播放音乐",
 					),
 				);
 			}),

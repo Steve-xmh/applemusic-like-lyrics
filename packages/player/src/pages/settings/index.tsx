@@ -748,7 +748,7 @@ export const SettingsPage: FC = () => {
 						<div id="updater">
 							{t(
 								"page.about.newVersion",
-								"有可用更新从 {{currentVersion}} 升级至 {{nextVersion}}",
+								"有可用更新从 {currentVersion} 升级至 {nextVersion}",
 								{
 									currentVersion: updateInfo.currentVersion,
 									nextVersion: updateInfo.version,
@@ -786,11 +786,9 @@ export const SettingsPage: FC = () => {
 								}
 
 								const getDownloadMessage = (progressText) =>
-									t(
-										"page.about.downloading",
-										"正在下载更新…… {{progressText}}",
-										{ progressText },
-									);
+									t("page.about.downloading", "正在下载更新…… {progressText}", {
+										progressText,
+									});
 
 								updateInfo.downloadAndInstall((evt) => {
 									switch (evt.event) {

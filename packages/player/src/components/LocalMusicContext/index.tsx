@@ -479,7 +479,7 @@ export const LocalMusicContext: FC = () => {
 				case "loadError": {
 					// toast.error(`播放后端加载音频失败\n${evtData.data.error}`, {});
 					toast.error(
-						t("amll.loadAudioError", "播放后端加载音频失败\n{{error}}", {
+						t("amll.loadAudioError", "播放后端加载音频失败\n{error}", {
 							error: evtData.data.error,
 						}),
 						{},
