@@ -1,0 +1,12 @@
+{
+  "page": {
+    "playlist": {
+      "addLocalMusic": {
+        "toast": {
+          "success_other": "已全部添加 {{count}} 首歋曲"
+        }
+      },
+      "totalMusicLabel_other": "{{count}} 首歌曲"
+    }
+  }
+}

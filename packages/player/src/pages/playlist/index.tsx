@@ -353,7 +353,7 @@ export const PlaylistPage: FC = () => {
 			toast.success(
 				t(
 					"page.playlist.addLocalMusic.toast.success",
-					"已全部添加 {{count}} 首歋曲",
+					"已全部添加 {{count}} 首歌曲",
 					{
 						count: success,
 					},

@@ -1,5 +1,5 @@
 project_id: "710461"
 files:
-    - source: /packages/player/locales/zh-CN/*.json
+    - source: /packages/player/locales/zh-CN/translation.json
       translation: /packages/player/locales/%locale%/%file_name%.json
       type: i18next_json
