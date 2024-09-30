@@ -16,7 +16,6 @@ export class CanvasLyricPlayer extends LyricPlayerBase {
 	constructor() {
 		super();
 		this.element.classList.add("amll-lyric-player", "dom");
-		this.resizeObserver.observe(this.element);
 		this.canvasElement.style.width = "100%";
 		this.canvasElement.style.height = "100%";
 		this.canvasElement.style.display = "block";
