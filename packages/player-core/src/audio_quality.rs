@@ -12,23 +12,18 @@ pub struct AudioQuality {
     pub codec: String,
 }
 
-impl From<&Track> for AudioQuality {
-    fn from(track: &Track) -> Self {
+impl AudioQuality {
+    pub fn from_codec_and_track(registry: &CodecRegistry, track: &Track) -> Self {
+        let desc = registry.get_codec(track.codec_params.codec);
         Self {
             sample_rate: track.codec_params.sample_rate as _,
             bits_per_coded_sample: track.codec_params.bits_per_coded_sample,
             bits_per_sample: track.codec_params.bits_per_sample,
             channels: track.codec_params.channels.map(|x| x.count() as _),
-            codec: match track.codec_params.codec {
-                CODEC_TYPE_VORBIS => "vorbis",
-                CODEC_TYPE_MP1 => "mp1",
-                CODEC_TYPE_MP2 => "mp2",
-                CODEC_TYPE_MP3 => "mp3",
-                CODEC_TYPE_AAC => "aac",
-                CODEC_TYPE_OPUS => "opus",
-                CODEC_TYPE_FLAC => "flac",
-                CODEC_TYPE_ALAC => "alac",
-                _ => "unknown",
+            codec: if let Some(desc) = desc {
+                desc.short_name
+            } else {
+                "unknown"
             }
             .to_string(),
             sample_format: match track.codec_params.sample_format {

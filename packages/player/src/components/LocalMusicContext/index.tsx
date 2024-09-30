@@ -426,14 +426,16 @@ export const LocalMusicContext: FC = () => {
 		};
 		const syncMusicQuality = (quality: AudioQuality) => {
 			let result = AudioQualityType.None;
-			if (quality.codec === "flac") {
+			const LOSSLESS_CODECS = new Set(["flac", "alac"]);
+			const codec = quality.codec ?? "unknown";
+			if (LOSSLESS_CODECS.has(codec) || codec.startsWith("pcm_")) {
 				result = AudioQualityType.Lossless;
 				if ((quality.sampleRate || 0) > 48000) {
 					result = AudioQualityType.HiRes;
 				}
-				if ((quality.channels || 0) > 2) {
-					result = AudioQualityType.DolbyAtmos;
-				}
+			}
+			if ((quality.channels || 0) > 2) {
+				result = AudioQualityType.DolbyAtmos;
 			}
 			store.set(musicQualityAtom, result);
 		};

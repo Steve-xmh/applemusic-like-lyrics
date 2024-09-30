@@ -133,8 +133,6 @@ impl AudioPlayer {
         let (fft_has_data_sx, mut fft_rx) = tokio::sync::mpsc::unbounded_channel();
         let (play_pos_sx, mut play_pos_rx) = tokio::sync::mpsc::unbounded_channel();
 
-        let player = create_audio_output_thread();
-
         let (media_state_manager, media_state_rx) = match MediaStateManager::new() {
             Ok((manager, ms_rx)) => {
                 info!("已初始化媒体状态管理器");
@@ -709,7 +707,7 @@ impl AudioPlayer {
         *current_audio_info = new_audio_info.clone();
         drop(current_audio_info);
 
-        let audio_quality: AudioQuality = track.into();
+        let audio_quality = AudioQuality::from_codec_and_track(codecs, track);
         if let Some(x) = &ctx.media_state_manager {
             let _ = x.set_title(&new_audio_info.name);
             let _ = x.set_artist(&new_audio_info.artist);
