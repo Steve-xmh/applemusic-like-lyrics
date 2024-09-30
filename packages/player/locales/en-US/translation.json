@@ -86,25 +86,25 @@
           "defaultText": "Font Preview",
           "label": "Font Preview"
         },
-        "subtitle": "Lyric Font Settings",
+        "subtitle": "Lyrics Font Settings",
         "tip": "This option only affect LYRIC's font but other parts.",
         "fontFamily": {
-          "label": "Font family",
+          "label": "Font Family",
           "description": "Font name separated by comma, equals to font-family property in CSS. Leave blank to use default settings."
         },
         "fontWeight": {
-          "label": "Font weight",
+          "label": "Font Weight",
           "description": "Equals to the font-weight property in CSS, set to 0 to use default value."
         },
         "letterSpacing": {
-          "label": "Letter space",
-          "description": "Equals to letter-spacing in CSS, keep blank fill follow default."
+          "label": "Letter Spacing",
+          "description": "Equals to the letter-spacing in CSS, leave blank to use the default value."
         }
       },
       "general": {
         "displayLanguage": {
           "cimode": "Localization ID",
-          "label": "Display language"
+          "label": "Display Language"
         },
         "subtitle": "General"
       },
@@ -116,24 +116,24 @@
             "none": "None"
           },
           "label": "Playback Controls Type",
-          "description": "The components under the track informations."
+          "description": null
         },
         "subtitle": "Music information appearance",
         "showMusicName": {
           "label": "Show Song Title"
         },
         "showMusicArtists": {
-          "label": "Show artists"
+          "label": "Show Artists"
         },
         "showMusicAlbum": {
           "label": "Show Album Title",
           "description": "Enabling all three options simultaneously may not be aesthetically pleasing."
         },
         "showVolumeControl": {
-          "label": "Show volume bar"
+          "label": "Show Volume Control"
         },
         "showBottomControl": {
-          "label": "Show buttons on the bottom",
+          "label": "Show Buttons at the Bottom",
           "description": "This is the buttons at bottom in horizontal view, or buttons under playback buttons in vertical view."
         },
         "fftDataRange": {
@@ -147,56 +147,56 @@
             "dom": "DOM",
             "canvas": "Canvas"
           },
-          "label": "Implementation of lyric player",
-          "description": "Currently, there are two lyrics playback implementations\n- DOM: Implemented using DOM elements, currently the most comprehensive, but with high performance overhead\n- Canvas: Implemented using Canvas, still under development, with excellent performance, but some details have insufficient effects"
+          "label": "Implementation of the Lyrics Player",
+          "description": "Currently, there are two lyrics rendering implementations:\n- DOM: Implemented using DOM elements, currently the most comprehensive, but with high performance overhead\n- Canvas: Implemented using Canvas, still under development, with excellent performance, but some details still need to be improved"
         },
-        "subtitle": "Lyric appearance",
+        "subtitle": "Lyrics Appearance",
         "enableLyricLineBlurEffect": {
-          "label": "Enable text blur",
-          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+          "label": "Enable Text Blur Effect",
+          "description": "Significantly impacts performance. If you encounter performance issues, try to disable this option. Enabled by default."
         },
         "enableLyricLineScaleEffect": {
-          "label": "Enable text zooming effect",
-          "description": "Less influence to performance. Non currently playing lyrics will be slightly reduced in size. Enabled by default."
+          "label": "Enable Text Zooming Effect",
+          "description": "Does not impact performance. Non-playing lyrics lines will be slightly reduced in size. Enabled by default"
         },
         "enableLyricLineSpringAnimation": {
-          "label": "Enable text spring animation",
-          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+          "label": "Enable Text Spring Animation Effect",
+          "description": "Significantly impacts performance. If you encounter any performance issues, try to disable this option. Enabled by default."
         },
         "advanceLyricDynamicLyricTime": {
-          "label": "Advance lyric timing",
+          "label": "Advance Lyric Timing",
           "description": "Advance the initial time sequence of the original lyrics line, so that the lyrics effect starts playing (word by word) just after the lyrics scroll ends. This behavior is closer to the effect of Apple Music, but in most cases, it will cause the lyrics at the end of the line to be switched to the next line before they have been played completely."
         },
         "lyricWordFadeWidth": {
-          "label": "Gradient transition width of each word",
+          "label": "Gradient Transition Width of Each Word",
           "description": "Adjust the gradient transition width of each word in lyrics, measured in the width of a full width character, with a default value of 0.5.\nIf you want to simulate the effect of Apple Music for Android, you can set it to 1.\nIf you want to simulate the effect of Apple Music for iPad, you can set it to 0.5.\nTo turn off the gradient transition effect of each word in lyrics, you can set it to 0."
         }
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Mesh gradient renderer",
-          "pixiRenderer": "Pixi renderer"
+          "meshGradientRenderer": "Mesh Gradient Renderer",
+          "pixiRenderer": "PixiJS Renderer"
         },
-        "subtitle": "Lyrics Page Background Type",
+        "subtitle": null,
         "backgroundRenderer": {
-          "label": "Pixi renderer"
+          "label": "PixiJS Renderer"
         },
         "lyricBackgroundFPS": {
-          "label": "Background maximum FPS",
+          "label": "Maximum FPS for Background Renderer",
           "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 60."
         },
         "lyricBackgroundRenderScale": {
-          "label": "Background render scale",
+          "label": "Background Resolution",
           "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 1 which means rendering pixel by pixel."
         },
         "lyricBackgroundStaticMode": {
-          "label": "Static background",
+          "label": "Static Mode",
           "description": "Keep the background static except when switching song. If you encounter performance issues, consider enabling this option.\nNote: Enabling this option will disable the background bouncing effect."
         }
       },
       "lyricContent": {
-        "subtitle": "Lyric content",
-        "enableLyricTranslationLine": "Show translation",
+        "subtitle": "Lyrics",
+        "enableLyricTranslationLine": "Show Translation",
         "enableLyricRomanLine": {
           "label": "Show Romanized Translation"
         },
