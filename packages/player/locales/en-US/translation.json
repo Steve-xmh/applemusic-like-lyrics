@@ -5,19 +5,19 @@
       "pauseOrResume": "Pause / Resume",
       "forwardSong": "Next Song",
       "toggleFullscreen": "Enter / Exit full screen",
-      "toggleLyrics": "Show lyrics",
+      "toggleLyrics": "Lyrics",
       "editMusicOverrideMessage": "Edit Track Override Data",
       "exitLyricPage": "Exit Lyrics Page"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "Player backend loading audio file has an error:\n{error}"
+    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}"
   },
   "newPlaylist": {
-    "buttonLabel": "New playlist",
+    "buttonLabel": "New Playlist",
     "dialog": {
       "title": "New Playlist",
-      "namePlaceholder": "Playlist Name"
+      "namePlaceholder": "Playlist Title"
     }
   },
   "common": {
@@ -44,7 +44,7 @@
       "warning": "This page is for develop usage only, use it at your own risk! (Chinese only)"
     },
     "main": {
-      "updateAvailableTag": "Available update",
+      "updateAvailableTag": "Update available",
       "menu": {
         "enterWSProtocolMode": "Start WS Protocol mode",
         "asWSProtocolReceiver": "As WS Protocol Receiver",
@@ -62,8 +62,8 @@
         "unknownSongName": "Unknown Music ID {id}",
         "dropdown": {
           "playMusic": "Play",
-          "editMusicOverrideData": "Edit music override data",
-          "removeFromPlaylist": "Remove from playlist"
+          "editMusicOverrideData": "Edit Track Override Data",
+          "removeFromPlaylist": "Delete from Playlist"
         }
       },
       "addLocalMusic": {
