@@ -78,7 +78,7 @@
       },
       "totalMusicLabel": "{count, plural, other {#}} song(s)",
       "playAll": "Play All",
-      "shufflePlayAll": "Random play"
+      "shufflePlayAll": "Shuffle"
     },
     "settings": {
       "lyricFont": {
@@ -177,7 +177,7 @@
           "meshGradientRenderer": "Mesh Gradient Renderer",
           "pixiRenderer": "PixiJS Renderer"
         },
-        "subtitle": null,
+        "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
           "label": "PixiJS Renderer"
         },
