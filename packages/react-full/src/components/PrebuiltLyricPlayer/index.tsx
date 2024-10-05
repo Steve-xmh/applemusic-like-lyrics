@@ -17,6 +17,7 @@ import {
 import { AutoLyricLayout } from "../../layout/auto";
 import {
 	onChangeVolumeAtom,
+	onClickAudioQualityTagAtom,
 	onClickControlThumbAtom,
 	onLyricLineClickAtom,
 	onLyricLineContextMenuAtom,
@@ -40,7 +41,7 @@ import {
 	musicNameAtom,
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
-	musicQualityAtom,
+	musicQualityTagAtom,
 	musicVolumeAtom,
 } from "../../states/music";
 import { BouncingSlider } from "../BouncingSlider";
@@ -155,7 +156,10 @@ const PrebuiltMediaButtons: FC<{
 const PrebuiltProgressBar: FC = () => {
 	const musicDuration = useAtomValue(musicDurationAtom);
 	const musicPosition = useAtomValue(musicPlayingPositionAtom);
-	const musicQuality = useAtomValue(musicQualityAtom);
+	const musicQualityTag = useAtomValue(musicQualityTagAtom);
+	const onClickAudioQualityTag = useAtomValue(
+		onClickAudioQualityTagAtom,
+	).onEmit;
 	const onSeekPosition = useAtomValue(onSeekPositionAtom).onEmit;
 
 	return (
@@ -169,10 +173,15 @@ const PrebuiltProgressBar: FC = () => {
 			<div className={styles.progressBarLabels}>
 				<div>{toDuration(musicPosition / 1000)}</div>
 				<div>
-					<AudioQualityTag
-						className={styles.qualityTag}
-						quality={musicQuality}
-					/>
+					{musicQualityTag && (
+						<AudioQualityTag
+							className={styles.qualityTag}
+							isDolbyAtmos={musicQualityTag.isDolbyAtmos}
+							tagText={musicQualityTag.tagText}
+							tagIcon={musicQualityTag.tagIcon}
+							onClick={onClickAudioQualityTag}
+						/>
+					)}
 				</div>
 				<div>{toDuration((musicPosition - musicDuration) / 1000)}</div>
 			</div>

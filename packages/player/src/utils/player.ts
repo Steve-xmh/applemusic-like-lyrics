@@ -100,11 +100,12 @@ export type AudioThreadEvent =
 				musicId: string;
 				musicInfo: AudioInfo;
 				quality: AudioQuality;
+				currentPlayIndex: number;
 			};
 	  }
 	| {
 			type: "loadingAudio";
-			data: { musicId: string };
+			data: { musicId: string; currentPlayIndex: number };
 	  }
 	| {
 			type: "syncStatus";
@@ -117,6 +118,7 @@ export type AudioThreadEvent =
 				volume: number;
 				loadPosition: number;
 				playlist: SongData[];
+				currentPlayIndex: number;
 				playlistInited: boolean;
 				quality: AudioQuality;
 			};

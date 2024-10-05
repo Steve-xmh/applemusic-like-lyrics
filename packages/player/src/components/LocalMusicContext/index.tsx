@@ -23,7 +23,7 @@ import {
 	musicNameAtom,
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
-	musicQualityAtom,
+	musicQualityTagAtom,
 	musicVolumeAtom,
 	onChangeVolumeAtom,
 	onClickControlThumbAtom,
@@ -38,14 +38,17 @@ import {
 } from "@applemusic-like-lyrics/react-full";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { db } from "../../dexie";
 import {
 	advanceLyricDynamicLyricTimeAtom,
+	currentPlaylistAtom,
+	currentPlaylistMusicIndexAtom,
 	fftDataRangeAtom,
 	musicIdAtom,
+	musicQualityAtom,
 } from "../../states";
 import {
 	type AudioInfo,
@@ -189,6 +192,39 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 		else nearestLine.original[key] = joined;
 	}
 }
+
+const MusicQualityTagText: FC = () => {
+	const { t } = useTranslation();
+	const musicQuality = useAtomValue(musicQualityAtom);
+	const setMusicQualityTag = useSetAtom(musicQualityTagAtom);
+
+	useLayoutEffect(() => {
+		switch (musicQuality) {
+			case AudioQualityType.None:
+				return setMusicQualityTag(null);
+			case AudioQualityType.Lossless:
+				return setMusicQualityTag({
+					tagIcon: true,
+					tagText: t("amll.qualityTag.lossless", "无损"),
+					isDolbyAtmos: false,
+				});
+			case AudioQualityType.HiRes:
+				return setMusicQualityTag({
+					tagIcon: true,
+					tagText: t("amll.qualityTag.hires", "高解析度无损"),
+					isDolbyAtmos: false,
+				});
+			case AudioQualityType.DolbyAtmos:
+				return setMusicQualityTag({
+					tagIcon: false,
+					tagText: "",
+					isDolbyAtmos: true,
+				});
+		}
+	}, [t, musicQuality, setMusicQualityTag]);
+
+	return null;
+};
 
 const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -441,7 +477,7 @@ export const LocalMusicContext: FC = () => {
 		};
 		const unlistenPromise = listenAudioThreadEvent((evt) => {
 			const evtData = evt.payload.data;
-			switch (evtData.type) {
+			switch (evtData?.type) {
 				case "playPosition": {
 					store.set(
 						musicPlayingPositionAtom,
@@ -468,6 +504,11 @@ export const LocalMusicContext: FC = () => {
 					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
+					store.set(currentPlaylistAtom, evtData.data.playlist);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "playStatus": {
@@ -508,6 +549,7 @@ export const LocalMusicContext: FC = () => {
 		<>
 			<LyricContext />
 			<FFTToLowPassContext />
+			<MusicQualityTagText />
 		</>
 	);
 };

@@ -3,6 +3,7 @@ use amll_player_core::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt().init();
     let file_name = std::env::args().nth(1).expect("Usage: play <file>");
     let file_path = std::path::Path::new(&file_name);
     let file_path = if file_path.is_absolute() {

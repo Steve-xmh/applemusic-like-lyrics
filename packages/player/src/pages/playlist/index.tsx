@@ -248,6 +248,10 @@ export const PlaylistPage: FC = () => {
 				name: t("page.playlist.addLocalMusic.filterName", "音频文件"),
 				extensions: ["mp3", "flac", "wav", "m4a", "aac", "ogg"],
 			},
+			{
+				name: t("page.playlist.addLocalMusic.allFiles", "所有文件"),
+				extensions: ["*"],
+			},
 		];
 		if (platform() === "android") {
 			filters.length = 0;

@@ -24,3 +24,48 @@
 	animation-timing-function: ease-in-out;
 	animation-delay: 1s;
 }
+
+.clickable {
+	transition: all 0.25s;
+
+	&:hover {
+		scale: 1.1;
+	}
+
+	&:active {
+		scale: 0.99;
+	}
+}
+
+.commonTag {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 2px 5px;
+	padding-left: 0.1em;
+	padding-right: 0.52em;
+	color: white;
+	box-sizing: border-box;
+
+	&::before {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		content: "";
+
+		border-image-source: url(audio_quality_tag.svg);
+		border-image-slice: 15 fill;
+		border-image-width: 10px;
+		opacity: 0.2;
+	}
+}
+
+.commonTagText {
+	font-family: "SF Pro Display", "Pingfang SC";
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.01809em;
+	white-space: nowrap;
+}

@@ -53,9 +53,13 @@ export const musicDurationAtom = atom(0);
  */
 export const musicPlayingAtom = atom(false);
 /**
- * 当前音乐的音质水平，如有提供则会显示在进度条下
+ * 当前音乐的音质水平标签信息，如有提供则会显示在进度条下
  */
-export const musicQualityAtom = atom<AudioQualityType>(AudioQualityType.None);
+export const musicQualityTagAtom = atom<{
+	tagIcon: boolean;
+	tagText: string;
+	isDolbyAtmos: boolean;
+} | null>(null);
 /**
  * 当前音乐的播放进度，单位为毫秒
  */

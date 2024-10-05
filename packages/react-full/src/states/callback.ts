@@ -20,6 +20,10 @@ const c = <Args extends any[], Result = void>(
  */
 export const onClickControlThumbAtom = atom(c(() => {}));
 /**
+ * 当点击音质标签时触发
+ */
+export const onClickAudioQualityTagAtom = atom(c(() => {}));
+/**
  * 当任意企图打开菜单或点击菜单按钮时触发的回调函数
  */
 export const onRequestOpenMenuAtom = atom(c(() => {}));
