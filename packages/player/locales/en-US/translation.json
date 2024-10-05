@@ -9,6 +9,10 @@
       "editMusicOverrideMessage": "Edit Track Override Data",
       "exitLyricPage": "Exit Lyrics Page"
     },
+    "qualityTag": {
+      "lossless": null,
+      "hires": null
+    },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
     "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}"
@@ -68,6 +72,7 @@
       },
       "addLocalMusic": {
         "filterName": "Audio File",
+        "allFiles": null,
         "toast": {
           "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "{succeed, plural, =0 {No song is} one {A song is} other {# songs}} added, but {errored, plural, =0 {no song is} one {a song is} other {# songs are}} failed to be added",
