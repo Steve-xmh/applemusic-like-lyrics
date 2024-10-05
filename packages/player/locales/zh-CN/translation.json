@@ -34,6 +34,11 @@
       "back": "返回"
     }
   },
+  "playbar": {
+    "playlist": {
+      "title": "当前播放列表"
+    }
+  },
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "WS Protocol 模式下无法切换歌曲",
@@ -72,7 +77,7 @@
       },
       "addLocalMusic": {
         "filterName": "音频文件",
-        "allFiles": null,
+        "allFiles": "所有文件",
         "toast": {
           "parsingMusicMetadata": "正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失败",

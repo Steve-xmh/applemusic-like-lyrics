@@ -23,7 +23,7 @@ import {
 	musicNameAtom,
 	musicPlayingAtom,
 	musicPlayingPositionAtom,
-	musicQualityAtom,
+	musicQualityTagAtom,
 	musicVolumeAtom,
 	onChangeVolumeAtom,
 	onClickControlThumbAtom,
@@ -38,14 +38,17 @@ import {
 } from "@applemusic-like-lyrics/react-full";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { db } from "../../dexie";
 import {
 	advanceLyricDynamicLyricTimeAtom,
+	currentPlaylistAtom,
+	currentPlaylistMusicIndexAtom,
 	fftDataRangeAtom,
 	musicIdAtom,
+	musicQualityAtom,
 } from "../../states";
 import {
 	type AudioInfo,
@@ -189,6 +192,39 @@ function pairLyric(line: LyricLine, lines: CoreLyricLine[], key: TransLine) {
 		else nearestLine.original[key] = joined;
 	}
 }
+
+const MusicQualityTagText: FC = () => {
+	const { t } = useTranslation();
+	const musicQuality = useAtomValue(musicQualityAtom);
+	const setMusicQualityTag = useSetAtom(musicQualityTagAtom);
+
+	useLayoutEffect(() => {
+		switch (musicQuality) {
+			case AudioQualityType.None:
+				return setMusicQualityTag(null);
+			case AudioQualityType.Lossless:
+				return setMusicQualityTag({
+					tagIcon: true,
+					tagText: t("amll.qualityTag.lossless", "无损"),
+					isDolbyAtmos: false,
+				});
+			case AudioQualityType.HiRes:
+				return setMusicQualityTag({
+					tagIcon: true,
+					tagText: t("amll.qualityTag.hires", "高解析度无损"),
+					isDolbyAtmos: false,
+				});
+			case AudioQualityType.DolbyAtmos:
+				return setMusicQualityTag({
+					tagIcon: false,
+					tagText: "",
+					isDolbyAtmos: true,
+				});
+		}
+	}, [t, musicQuality, setMusicQualityTag]);
+
+	return null;
+};
 
 const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -426,20 +462,22 @@ export const LocalMusicContext: FC = () => {
 		};
 		const syncMusicQuality = (quality: AudioQuality) => {
 			let result = AudioQualityType.None;
-			if (quality.codec === "flac") {
+			const LOSSLESS_CODECS = new Set(["flac", "alac"]);
+			const codec = quality.codec ?? "unknown";
+			if (LOSSLESS_CODECS.has(codec) || codec.startsWith("pcm_")) {
 				result = AudioQualityType.Lossless;
 				if ((quality.sampleRate || 0) > 48000) {
 					result = AudioQualityType.HiRes;
 				}
-				if ((quality.channels || 0) > 2) {
-					result = AudioQualityType.DolbyAtmos;
-				}
+			}
+			if ((quality.channels || 0) > 2) {
+				result = AudioQualityType.DolbyAtmos;
 			}
 			store.set(musicQualityAtom, result);
 		};
 		const unlistenPromise = listenAudioThreadEvent((evt) => {
 			const evtData = evt.payload.data;
-			switch (evtData.type) {
+			switch (evtData?.type) {
 				case "playPosition": {
 					store.set(
 						musicPlayingPositionAtom,
@@ -454,10 +492,18 @@ export const LocalMusicContext: FC = () => {
 					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "loadingAudio": {
 					syncMusicId(evtData.data.musicId);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "syncStatus": {
@@ -466,6 +512,11 @@ export const LocalMusicContext: FC = () => {
 					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
+					store.set(currentPlaylistAtom, evtData.data.playlist);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "playStatus": {
@@ -506,6 +557,7 @@ export const LocalMusicContext: FC = () => {
 		<>
 			<LyricContext />
 			<FFTToLowPassContext />
+			<MusicQualityTagText />
 		</>
 	);
 };

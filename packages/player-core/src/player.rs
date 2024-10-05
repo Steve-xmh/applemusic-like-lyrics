@@ -125,6 +125,24 @@ pub struct AudioPlayerConfig {}
 
 impl AudioPlayer {
     pub fn new(_config: AudioPlayerConfig) -> Self {
+        #[cfg(feature = "ffmpeg-next")]
+        {
+            if let Err(err) = ffmpeg_next::init() {
+                warn!("FFMPEG 初始化失败！");
+                warn!("{err}");
+            }
+            init!("FFMPEG 初始化成功！");
+
+            unsafe {
+                info!("支持编解码器：");
+                let mut ptr = core::ptr::null_mut();
+                while let Some(codec) = ffmpeg_next::sys::av_codec_iterate(&mut ptr).as_ref() {
+                    let name = core::ffi::CStr::from_ptr(codec.name);
+                    info!(" - {}", name.to_string_lossy());
+                }
+            }
+        }
+
         let (evt_sender, evt_receiver) = tokio::sync::mpsc::unbounded_channel();
         let (msg_sender, msg_receiver) = tokio::sync::mpsc::unbounded_channel();
         let playlist = Vec::<SongData>::with_capacity(4096);
@@ -540,6 +558,7 @@ impl AudioPlayer {
             load_position: 0.,
             playlist_inited: self.playlist_inited,
             playlist: self.playlist.to_owned(),
+            current_play_index: self.current_play_index,
             quality: play_task_data.audio_quality,
         })
     }
@@ -564,14 +583,18 @@ impl AudioPlayer {
                 custom_song_loader: self.custom_song_loader.clone(),
                 custom_local_song_loader: self.custom_local_song_loader.clone(),
             };
-            let task = tokio::spawn(Self::play_audio(ctx, current_song));
+            let task = tokio::spawn(Self::play_audio(ctx, current_song, self.current_play_index));
             self.current_play_task_handle = Some(task.abort_handle());
         } else {
             warn!("当前没有歌曲可以播放！");
         }
     }
 
-    async fn play_audio(ctx: AudioPlayerTaskContext, song_data: SongData) -> anyhow::Result<()> {
+    async fn play_audio(
+        ctx: AudioPlayerTaskContext,
+        song_data: SongData,
+        current_play_index: usize,
+    ) -> anyhow::Result<()> {
         let emitter = ctx.emitter.clone();
         let handler = ctx.handler.clone();
         if let Err(err) = {
@@ -579,6 +602,7 @@ impl AudioPlayer {
             ctx.emitter
                 .emit(AudioThreadEvent::LoadingAudio {
                     music_id: music_id.to_owned(),
+                    current_play_index,
                 })
                 .await?;
             match song_data {
@@ -587,10 +611,11 @@ impl AudioPlayer {
                         info!("正在通过自定义加载器播放本地音乐文件 {file_path}");
                         let loader_fut = Box::into_pin(loader(file_path));
                         let file = loader_fut.await?;
-                        Self::play_media_stream(ctx, music_id, file).await
+                        Self::play_media_stream(ctx, music_id, current_play_index, file).await
                     } else {
                         info!("正在播放本地音乐文件 {file_path}");
-                        Self::play_audio_from_local(ctx, music_id, file_path).await
+                        Self::play_audio_from_local(ctx, music_id, current_play_index, file_path)
+                            .await
                     }
                 }
                 SongData::Custom { song_json_data, .. } => {
@@ -622,7 +647,13 @@ impl AudioPlayer {
                             }
                         }
 
-                        Self::play_media_stream(ctx, music_id, BoxedMediaSource(source)).await
+                        Self::play_media_stream(
+                            ctx,
+                            music_id,
+                            current_play_index,
+                            BoxedMediaSource(source),
+                        )
+                        .await
                     } else {
                         Err(anyhow::anyhow!(
                             "传入了自定义音乐源但未设置自定义音乐加载器"
@@ -647,12 +678,13 @@ impl AudioPlayer {
     async fn play_audio_from_local(
         ctx: AudioPlayerTaskContext,
         music_id: String,
+        current_play_index: usize,
         file_path: impl AsRef<std::path::Path> + std::fmt::Debug,
     ) -> anyhow::Result<()> {
         info!("正在打开本地音频文件：{file_path:?}");
         let source = std::fs::File::open(file_path.as_ref()).context("无法打开本地音频文件")?;
 
-        Self::play_media_stream(ctx, music_id, source).await?;
+        Self::play_media_stream(ctx, music_id, current_play_index, source).await?;
 
         Ok(())
     }
@@ -661,6 +693,7 @@ impl AudioPlayer {
     async fn play_media_stream(
         mut ctx: AudioPlayerTaskContext,
         music_id: String,
+        current_play_index: usize,
         source: impl MediaSource + 'static,
     ) -> anyhow::Result<()> {
         let handle = tokio::runtime::Handle::current();
@@ -709,7 +742,7 @@ impl AudioPlayer {
         *current_audio_info = new_audio_info.clone();
         drop(current_audio_info);
 
-        let audio_quality: AudioQuality = track.into();
+        let audio_quality = AudioQuality::from_codec_and_track(codecs, track);
         if let Some(x) = &ctx.media_state_manager {
             let _ = x.set_title(&new_audio_info.name);
             let _ = x.set_artist(&new_audio_info.artist);
@@ -729,6 +762,7 @@ impl AudioPlayer {
                 music_id: music_id.clone(),
                 music_info: new_audio_info,
                 quality: audio_quality.to_owned(),
+                current_play_index,
             })
             .await?;
         ctx.emitter

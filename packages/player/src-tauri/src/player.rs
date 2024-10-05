@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, str::FromStr};
 
 use amll_player_core::*;
 use tauri::{Emitter, Manager, Runtime};
@@ -29,7 +29,8 @@ async fn local_player_main<R: Runtime>(manager: impl Manager<R> + Clone + Send +
             let fs = manager_clone.fs();
             let mut opt = OpenOptions::new();
             opt.read(true);
-            let file = fs.open(Path::new(&path), opt)?;
+            let file_path = tauri_plugin_fs::FilePath::from_str(&path)?;
+            let file = fs.open(file_path, opt)?;
             Ok(file)
         })
     }));

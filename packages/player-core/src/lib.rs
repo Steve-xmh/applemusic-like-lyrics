@@ -101,9 +101,13 @@ pub enum AudioThreadEvent {
         music_id: String,
         music_info: AudioInfo,
         quality: AudioQuality,
+        current_play_index: usize,
     },
     #[serde(rename_all = "camelCase")]
-    LoadingAudio { music_id: String },
+    LoadingAudio {
+        music_id: String,
+        current_play_index: usize,
+    },
     #[serde(rename_all = "camelCase")]
     AudioPlayFinished { music_id: String },
     #[serde(rename_all = "camelCase")]
@@ -116,6 +120,7 @@ pub enum AudioThreadEvent {
         volume: f64,
         load_position: f64,
         playlist: Vec<SongData>,
+        current_play_index: usize,
         playlist_inited: bool,
         quality: AudioQuality,
     },

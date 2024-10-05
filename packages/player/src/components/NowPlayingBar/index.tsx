@@ -21,13 +21,14 @@ import {
 } from "@radix-ui/react-icons";
 import { Container, Flex, IconButton } from "@radix-ui/themes";
 import classNames from "classnames";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import type { FC } from "react";
 import IconForward from "../../assets/icon_forward.svg?react";
 import IconPause from "../../assets/icon_pause.svg?react";
 import IconPlay from "../../assets/icon_play.svg?react";
 import IconRewind from "../../assets/icon_rewind.svg?react";
-import { hideNowPlayingBarAtom } from "../../states";
+import { hideNowPlayingBarAtom, playlistCardOpenedAtom } from "../../states";
+import { PlaylistCard } from "../PlaylistCard";
 import styles from "./index.module.css";
 
 export const NowPlayingBar: FC = () => {
@@ -36,6 +37,7 @@ export const NowPlayingBar: FC = () => {
 	const musicArtists = useAtomValue(musicArtistsAtom);
 	const musicPlaying = useAtomValue(musicPlayingAtom);
 	const musicCover = useAtomValue(musicCoverAtom);
+	const [playlistOpened, setPlaylistOpened] = useAtom(playlistCardOpenedAtom);
 	const setLyricPageOpened = useSetAtom(isLyricPageOpenedAtom);
 
 	const onPlayOrResume = useAtomValue(onPlayOrResumeAtom).onEmit;
@@ -53,6 +55,11 @@ export const NowPlayingBar: FC = () => {
 			left="0"
 			right="0"
 		>
+			{playlistOpened && (
+				<Flex direction="row-reverse" mx="3">
+					<PlaylistCard className={classNames(styles.playlistCard)} />
+				</Flex>
+			)}
 			<Flex
 				className={classNames(styles.playBar, hideNowPlayingBar && styles.hide)}
 				overflow="hidden"
@@ -184,7 +191,10 @@ export const NowPlayingBar: FC = () => {
 							<TrackNextIcon />
 						</IconButton>
 					</Flex>
-					<IconButton variant="soft">
+					<IconButton
+						variant="soft"
+						onClick={() => setPlaylistOpened((v) => !v)}
+					>
 						<ListBulletIcon />
 					</IconButton>
 				</Flex>

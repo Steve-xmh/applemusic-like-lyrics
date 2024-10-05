@@ -1,11 +1,9 @@
 import classNames from "classnames";
 import { AnimatePresence, type Variants, motion } from "framer-motion";
 import { type FC, type HTMLProps, memo } from "react";
-import { AudioQualityType } from "../../states/music";
 import IconDolbyAtmos from "./icon_dolby_atmos.svg?react";
+import LoselessIcon from "./icon_loseless.svg?react";
 import styles from "./index.module.css";
-import TagHiresLossless from "./tag_hires_lossless.svg?react";
-import TagLossless from "./tag_lossless.svg?react";
 
 const COMMON_VARIENTS: Variants = {
 	hide: {
@@ -47,33 +45,23 @@ const DOLBY_VARIENTS: Variants = {
 
 export const AudioQualityTag: FC<
 	{
-		quality: AudioQualityType;
+		isDolbyAtmos?: boolean;
+		tagText?: string;
+		tagIcon?: boolean;
 	} & HTMLProps<HTMLDivElement>
-> = memo(({ quality, className, ...rest }) => {
+> = memo(({ tagText, tagIcon, isDolbyAtmos, className, onClick, ...rest }) => {
 	return (
-		<div className={classNames(className, styles.audioQualityTag)} {...rest}>
+		<div
+			className={classNames(
+				className,
+				styles.audioQualityTag,
+				onClick && styles.clickable,
+			)}
+			onClick={onClick}
+			{...rest}
+		>
 			<AnimatePresence mode="wait">
-				{quality === AudioQualityType.Lossless && (
-					<motion.div
-						initial="hide"
-						animate="show"
-						exit="hide"
-						variants={COMMON_VARIENTS}
-					>
-						<TagLossless />
-					</motion.div>
-				)}
-				{quality === AudioQualityType.HiRes && (
-					<motion.div
-						initial="hide"
-						animate="show"
-						exit="hide"
-						variants={COMMON_VARIENTS}
-					>
-						<TagHiresLossless />
-					</motion.div>
-				)}
-				{quality === AudioQualityType.DolbyAtmos && (
+				{isDolbyAtmos ? (
 					<motion.div
 						initial="hide"
 						animate="show"
@@ -83,6 +71,18 @@ export const AudioQualityTag: FC<
 					>
 						<IconDolbyAtmos className={styles.dolbyLogoGlow} />
 						<IconDolbyAtmos />
+					</motion.div>
+				) : (
+					<motion.div
+						initial="hide"
+						animate="show"
+						exit="hide"
+						variants={COMMON_VARIENTS}
+					>
+						<div className={styles.commonTag}>
+							{tagIcon && <LoselessIcon height="11px" />}
+							{tagText && <div className={styles.commonTagText}>{tagText}</div>}
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>

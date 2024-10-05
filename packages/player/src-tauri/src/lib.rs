@@ -72,14 +72,13 @@ impl From<AudioInfo> for MusicInfo {
 
 #[tauri::command]
 async fn read_local_music_metadata(
-    file_path: String,
+    file_path: tauri_plugin_fs::FilePath,
     fs: State<'_, tauri_plugin_fs::Fs<tauri::Wry>>,
 ) -> Result<MusicInfo, String> {
-    let file_path = Path::new(&file_path);
     let mut opt = OpenOptions::new();
     opt.read(true);
     let file = fs
-        .open(file_path, opt)
+        .open(file_path.clone(), opt)
         .map_err(|e| format!("文件打开失败 {e}"))?;
     let result = tokio::task::spawn_blocking(move || -> Result<MusicInfo, String> {
         let probe = symphonia::default::get_probe();
@@ -103,15 +102,17 @@ async fn read_local_music_metadata(
             if !result.lyric.is_empty() {
                 result.lyric_format = "lrc".into();
             }
-            for ext in LYRIC_FILE_EXTENSIONS {
-                let lyric_file_path = file_path.with_extension(ext);
-                if lyric_file_path.exists() {
-                    if let Ok(lyric) = fs.read_to_string(&lyric_file_path) {
-                        result.lyric_format = ext.to_string();
-                        result.lyric = lyric;
-                        break;
-                    } else {
-                        warn!("歌词文件存在但读取失败: {}", lyric_file_path.display());
+            if let Some(file_path) = file_path.as_path() {
+                for ext in LYRIC_FILE_EXTENSIONS {
+                    let lyric_file_path = file_path.with_extension(ext);
+                    if lyric_file_path.exists() {
+                        if let Ok(lyric) = fs.read_to_string(&lyric_file_path) {
+                            result.lyric_format = ext.to_string();
+                            result.lyric = lyric;
+                            break;
+                        } else {
+                            warn!("歌词文件存在但读取失败: {}", lyric_file_path.display());
+                        }
                     }
                 }
             }

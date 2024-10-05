@@ -1,7 +1,13 @@
+import { AudioQualityType } from "@applemusic-like-lyrics/react-full";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import type { SongData } from "../utils/player";
 
 export const musicIdAtom = atom("");
+export const playlistCardOpenedAtom = atom(false);
+export const currentPlaylistAtom = atom<SongData[]>([]);
+export const currentPlaylistMusicIndexAtom = atom(0);
+export const musicQualityAtom = atom(AudioQualityType.None);
 
 export const displayLanguageAtom = atomWithStorage(
 	"amll-player.displayLanguage",

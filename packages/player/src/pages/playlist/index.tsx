@@ -30,6 +30,7 @@ import {
 	type HTMLProps,
 	forwardRef,
 	useCallback,
+	useMemo,
 	useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -108,6 +109,7 @@ export const SongCard = forwardRef<
 			key={`song-card-${songId}`}
 			loading={song.state === "loading"}
 			ref={ref}
+			onDoubleClick={() => onPlayList(songIndex)}
 		>
 			<Box py="4" pr="4" style={style}>
 				<Card>
@@ -248,6 +250,10 @@ export const PlaylistPage: FC = () => {
 				name: t("page.playlist.addLocalMusic.filterName", "音频文件"),
 				extensions: ["mp3", "flac", "wav", "m4a", "aac", "ogg"],
 			},
+			{
+				name: t("page.playlist.addLocalMusic.allFiles", "所有文件"),
+				extensions: ["*"],
+			},
 		];
 		if (platform() === "android") {
 			filters.length = 0;
@@ -262,7 +268,7 @@ export const PlaylistPage: FC = () => {
 		const id = toast.loading(
 			t(
 				"page.playlist.addLocalMusic.toast.parsingMusicMetadata",
-				"正在解析音乐元数据以添加歌曲 ({current} / {total})",
+				"正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
 				{
 					current: 0,
 					total: results.length,
@@ -406,9 +412,10 @@ export const PlaylistPage: FC = () => {
 	);
 
 	const onPlaylistDefault = useCallback(onPlayList.bind(null, 0), [onPlayList]);
-	const onPlaylistShuffle = useCallback(onPlayList.bind(null, 0, true), [
-		onPlayList,
-	]);
+	const onPlaylistShuffle = useMemo(
+		() => onPlayList.bind(null, 0, true),
+		[onPlayList],
+	);
 
 	return (
 		<Container
@@ -485,9 +492,13 @@ export const PlaylistPage: FC = () => {
 								}
 							/>
 							<Text>
-								{t("page.playlist.totalMusicLabel", "{count} 首歌曲", {
-									count: playlist?.songIds?.length || 0,
-								})}
+								{t(
+									"page.playlist.totalMusicLabel",
+									"{count, plural, other {#}} 首歌曲",
+									{
+										count: playlist?.songIds?.length || 0,
+									},
+								)}
 							</Text>
 							<Flex gap="2">
 								<IconButton onClick={onPlaylistDefault}>

@@ -178,7 +178,7 @@ export const LyricTabContent: FC = () => {
 				)}
 			</Flex>
 			<Button mt="4" onClick={saveData}>
-				保存
+				<Trans i18nKey="common.dialog.save">保存</Trans>
 			</Button>
 		</>
 	);
