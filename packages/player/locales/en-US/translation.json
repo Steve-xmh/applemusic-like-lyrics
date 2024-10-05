@@ -10,8 +10,8 @@
       "exitLyricPage": "Exit Lyrics Page"
     },
     "qualityTag": {
-      "lossless": null,
-      "hires": null
+      "lossless": "Lossless",
+      "hires": "Hi-Res Lossless"
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
@@ -72,7 +72,7 @@
       },
       "addLocalMusic": {
         "filterName": "Audio File",
-        "allFiles": null,
+        "allFiles": "All Files",
         "toast": {
           "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "{succeed, plural, =0 {No song is} one {A song is} other {# songs}} added, but {errored, plural, =0 {no song is} one {a song is} other {# songs are}} failed to be added",
