@@ -34,6 +34,11 @@
       "back": "Quay lại"
     }
   },
+  "playbar": {
+    "playlist": {
+      "title": null
+    }
+  },
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "Không thể chuyển bài hát trong chế độ WS Protocol",
