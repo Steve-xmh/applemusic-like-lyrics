@@ -9,6 +9,10 @@
       "editMusicOverrideMessage": "Chỉnh sửa thông tin bài hát",
       "exitLyricPage": "Thoát lời bài hát"
     },
+    "qualityTag": {
+      "lossless": null,
+      "hires": null
+    },
     "openMenuViaRightClick": "Hãy nhấp chuột phải vào bất kỳ chỗ nào trên trang lời bài hát để mở Menu!",
     "buttonForDisplayOnly": "Nút này chỉ dùng để hiển thị, hiện tại không có chức năng thực tế ",
     "loadAudioError": "Lỗi tải âm thanh từ tệp {error}"
@@ -28,6 +32,11 @@
     },
     "page": {
       "back": "Quay lại"
+    }
+  },
+  "playbar": {
+    "playlist": {
+      "title": null
     }
   },
   "ws-protocol": {
@@ -68,6 +77,7 @@
       },
       "addLocalMusic": {
         "filterName": "Tệp âm thanh",
+        "allFiles": null,
         "toast": {
           "parsingMusicMetadata": "Đang phân tích siêu dữ liệu âm nhạc để thêm bài hát ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "Đã thêm {succeed, plural, other {#}} bài hát, trong đó {errored, plural, other {#}} bài hát thất bại khi thêm",

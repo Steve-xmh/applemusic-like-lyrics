@@ -5,19 +5,23 @@
       "pauseOrResume": "Pause / Resume",
       "forwardSong": "Next Song",
       "toggleFullscreen": "Enter / Exit full screen",
-      "toggleLyrics": "Show lyrics",
+      "toggleLyrics": "Lyrics",
       "editMusicOverrideMessage": "Edit Track Override Data",
       "exitLyricPage": "Exit Lyrics Page"
     },
+    "qualityTag": {
+      "lossless": "Lossless",
+      "hires": "Hi-Res Lossless"
+    },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "Player backend loading audio file has an error:\n{error}"
+    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}"
   },
   "newPlaylist": {
-    "buttonLabel": "New playlist",
+    "buttonLabel": "New Playlist",
     "dialog": {
       "title": "New Playlist",
-      "namePlaceholder": "Playlist Name"
+      "namePlaceholder": "Playlist Title"
     }
   },
   "common": {
@@ -28,6 +32,11 @@
     },
     "page": {
       "back": "Back"
+    }
+  },
+  "playbar": {
+    "playlist": {
+      "title": "Current Playlist"
     }
   },
   "ws-protocol": {
@@ -44,7 +53,7 @@
       "warning": "This page is for develop usage only, use it at your own risk! (Chinese only)"
     },
     "main": {
-      "updateAvailableTag": "Available update",
+      "updateAvailableTag": "Update available",
       "menu": {
         "enterWSProtocolMode": "Start WS Protocol mode",
         "asWSProtocolReceiver": "As WS Protocol Receiver",
@@ -62,12 +71,13 @@
         "unknownSongName": "Unknown Music ID {id}",
         "dropdown": {
           "playMusic": "Play",
-          "editMusicOverrideData": "Edit music override data",
-          "removeFromPlaylist": "Remove from playlist"
+          "editMusicOverrideData": "Edit Track Override Data",
+          "removeFromPlaylist": "Delete from Playlist"
         }
       },
       "addLocalMusic": {
         "filterName": "Audio File",
+        "allFiles": "All Files",
         "toast": {
           "parsingMusicMetadata": "Parsing metadata to add your track into playlist ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "{succeed, plural, =0 {No song is} one {A song is} other {# songs}} added, but {errored, plural, =0 {no song is} one {a song is} other {# songs are}} failed to be added",
@@ -78,7 +88,7 @@
       },
       "totalMusicLabel": "{count, plural, other {#}} song(s)",
       "playAll": "Play All",
-      "shufflePlayAll": "Random play"
+      "shufflePlayAll": "Shuffle"
     },
     "settings": {
       "lyricFont": {
@@ -86,25 +96,25 @@
           "defaultText": "Font Preview",
           "label": "Font Preview"
         },
-        "subtitle": "Lyric Font Settings",
+        "subtitle": "Lyrics Font Settings",
         "tip": "This option only affect LYRIC's font but other parts.",
         "fontFamily": {
-          "label": "Font family",
+          "label": "Font Family",
           "description": "Font name separated by comma, equals to font-family property in CSS. Leave blank to use default settings."
         },
         "fontWeight": {
-          "label": "Font weight",
+          "label": "Font Weight",
           "description": "Equals to the font-weight property in CSS, set to 0 to use default value."
         },
         "letterSpacing": {
-          "label": "Letter space",
-          "description": "Equals to letter-spacing in CSS, keep blank fill follow default."
+          "label": "Letter Spacing",
+          "description": "Equals to the letter-spacing in CSS, leave blank to use the default value."
         }
       },
       "general": {
         "displayLanguage": {
           "cimode": "Localization ID",
-          "label": "Display language"
+          "label": "Display Language"
         },
         "subtitle": "General"
       },
@@ -116,24 +126,24 @@
             "none": "None"
           },
           "label": "Playback Controls Type",
-          "description": "The components under the track informations."
+          "description": null
         },
         "subtitle": "Music information appearance",
         "showMusicName": {
           "label": "Show Song Title"
         },
         "showMusicArtists": {
-          "label": "Show artists"
+          "label": "Show Artists"
         },
         "showMusicAlbum": {
           "label": "Show Album Title",
           "description": "Enabling all three options simultaneously may not be aesthetically pleasing."
         },
         "showVolumeControl": {
-          "label": "Show volume bar"
+          "label": "Show Volume Control"
         },
         "showBottomControl": {
-          "label": "Show buttons on the bottom",
+          "label": "Show Buttons at the Bottom",
           "description": "This is the buttons at bottom in horizontal view, or buttons under playback buttons in vertical view."
         },
         "fftDataRange": {
@@ -147,62 +157,62 @@
             "dom": "DOM",
             "canvas": "Canvas"
           },
-          "label": "Implementation of lyric player",
-          "description": "Currently, there are two lyrics playback implementations\n- DOM: Implemented using DOM elements, currently the most comprehensive, but with high performance overhead\n- Canvas: Implemented using Canvas, still under development, with excellent performance, but some details have insufficient effects"
+          "label": "Implementation of the Lyrics Player",
+          "description": "Currently, there are two lyrics rendering implementations:\n- DOM: Implemented using DOM elements, currently the most comprehensive, but with high performance overhead\n- Canvas: Implemented using Canvas, still under development, with excellent performance, but some details still need to be improved"
         },
-        "subtitle": "Lyric appearance",
+        "subtitle": "Lyrics Appearance",
         "enableLyricLineBlurEffect": {
-          "label": "Enable text blur",
-          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+          "label": "Enable Text Blur Effect",
+          "description": "Significantly impacts performance. If you encounter performance issues, try to disable this option. Enabled by default."
         },
         "enableLyricLineScaleEffect": {
-          "label": "Enable text zooming effect",
-          "description": "Less influence to performance. Non currently playing lyrics will be slightly reduced in size. Enabled by default."
+          "label": "Enable Text Zooming Effect",
+          "description": "Does not impact performance. Non-playing lyrics lines will be slightly reduced in size. Enabled by default"
         },
         "enableLyricLineSpringAnimation": {
-          "label": "Enable text spring animation",
-          "description": "Highly influence to performance. If you encounter performance issues, try to disable this option. Enabled by default."
+          "label": "Enable Text Spring Animation Effect",
+          "description": "Significantly impacts performance. If you encounter any performance issues, try to disable this option. Enabled by default."
         },
         "advanceLyricDynamicLyricTime": {
-          "label": "Advance lyric timing",
+          "label": "Advance Lyric Timing",
           "description": "Advance the initial time sequence of the original lyrics line, so that the lyrics effect starts playing (word by word) just after the lyrics scroll ends. This behavior is closer to the effect of Apple Music, but in most cases, it will cause the lyrics at the end of the line to be switched to the next line before they have been played completely."
         },
         "lyricWordFadeWidth": {
-          "label": "Gradient transition width of each word",
+          "label": "Gradient Transition Width of Each Word",
           "description": "Adjust the gradient transition width of each word in lyrics, measured in the width of a full width character, with a default value of 0.5.\nIf you want to simulate the effect of Apple Music for Android, you can set it to 1.\nIf you want to simulate the effect of Apple Music for iPad, you can set it to 0.5.\nTo turn off the gradient transition effect of each word in lyrics, you can set it to 0."
         }
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Mesh gradient renderer",
-          "pixiRenderer": "Pixi renderer"
+          "meshGradientRenderer": "Mesh Gradient Renderer",
+          "pixiRenderer": "PixiJS Renderer"
         },
-        "subtitle": "Lyric page background",
+        "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
-          "label": "Pixi renderer"
+          "label": "PixiJS Renderer"
         },
         "lyricBackgroundFPS": {
-          "label": "Background maximum FPS",
+          "label": "Maximum FPS for Background Renderer",
           "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 60."
         },
         "lyricBackgroundRenderScale": {
-          "label": "Background render scale",
+          "label": "Background Resolution",
           "description": "High impact on performance, but the actual cost is not significant. If you encounter performance issues, try to reduce this value. The default value is 1 which means rendering pixel by pixel."
         },
         "lyricBackgroundStaticMode": {
-          "label": "Static background",
+          "label": "Static Mode",
           "description": "Keep the background static except when switching song. If you encounter performance issues, consider enabling this option.\nNote: Enabling this option will disable the background bouncing effect."
         }
       },
       "lyricContent": {
-        "subtitle": "Lyric content",
-        "enableLyricTranslationLine": "Show translation",
+        "subtitle": "Lyrics",
+        "enableLyricTranslationLine": "Show Translation",
         "enableLyricRomanLine": {
-          "label": "Show Romanized translation"
+          "label": "Show Romanized Translation"
         },
         "enableLyricSwapTransRomanLine": {
-          "label": "Swap translation and Romanized translation",
-          "description": "Only valid when the above two are enabled"
+          "label": "Swap Translation and Romanized Translation",
+          "description": "Only valid when the above two are enabled."
         }
       },
       "others": {
@@ -227,7 +237,7 @@
     "song": {
       "basic": {
         "musicId": "Music ID",
-        "musicFilePath": "File path",
+        "musicFilePath": "File Path",
         "musicDuration": "Duration",
         "tabs": {
           "basic": "Basics",
@@ -238,27 +248,27 @@
       "lyric": {
         "lyricFormatLabel": "Lyric format",
         "lyricFormat": {
-          "none": "No lyrics",
+          "none": "No Lyrics",
           "lrc": "LyRiC format (LRC)",
           "eslrc": "LyRiC format used by ESLyric (LRC)",
-          "yrc": "YRC lyrics",
+          "yrc": "YRC Lyrics",
           "qrc": "QRC lyrics",
           "lys": "Lyricify Syllable lyrics",
           "ttml": "TTML lyrics"
         },
-        "lyricData": "Lyric data",
-        "ttmlLyricTip": "TTML lyric will contain translation and Romanized translation.",
-        "translationLyricData": "Translated lyrics",
+        "lyricData": "Lyrics Data",
+        "ttmlLyricTip": "TTML lyric could contain translation and Romanized translation in a single file.",
+        "translationLyricData": "Translated Lyrics",
         "translationLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as translation by timestamp if they are the same or similar.",
         "romanLyricDataTip": "Paste LyRiC type of lyric content here, we will pair as Romanized by timestamp if they are the same or similar."
       },
       "metadata": {
         "overrideSafeTip": "Properties in this page will not override into source file.",
-        "songName": "Track name",
+        "songName": "Title",
         "songArtists": "Artists",
         "songAlbum": "Album",
         "changeCoverToImageOrVideo": "Change cover image as image / video",
-        "reloadMetadataFromFile": "Reload metadata from file"
+        "reloadMetadataFromFile": "Reload Metadata from Audio File"
       }
     },
     "ws": {

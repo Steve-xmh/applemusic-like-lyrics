@@ -9,6 +9,10 @@
       "editMusicOverrideMessage": null,
       "exitLyricPage": null
     },
+    "qualityTag": {
+      "lossless": null,
+      "hires": null
+    },
     "openMenuViaRightClick": null,
     "buttonForDisplayOnly": null,
     "loadAudioError": null
@@ -28,6 +32,11 @@
     },
     "page": {
       "back": null
+    }
+  },
+  "playbar": {
+    "playlist": {
+      "title": null
     }
   },
   "ws-protocol": {
@@ -68,6 +77,7 @@
       },
       "addLocalMusic": {
         "filterName": null,
+        "allFiles": null,
         "toast": {
           "parsingMusicMetadata": null,
           "partiallyFailed": null,
