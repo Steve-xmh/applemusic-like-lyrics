@@ -30,6 +30,7 @@ import {
 	type HTMLProps,
 	forwardRef,
 	useCallback,
+	useMemo,
 	useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -108,6 +109,7 @@ export const SongCard = forwardRef<
 			key={`song-card-${songId}`}
 			loading={song.state === "loading"}
 			ref={ref}
+			onDoubleClick={() => onPlayList(songIndex)}
 		>
 			<Box py="4" pr="4" style={style}>
 				<Card>
@@ -410,9 +412,10 @@ export const PlaylistPage: FC = () => {
 	);
 
 	const onPlaylistDefault = useCallback(onPlayList.bind(null, 0), [onPlayList]);
-	const onPlaylistShuffle = useCallback(onPlayList.bind(null, 0, true), [
-		onPlayList,
-	]);
+	const onPlaylistShuffle = useMemo(
+		() => onPlayList.bind(null, 0, true),
+		[onPlayList],
+	);
 
 	return (
 		<Container

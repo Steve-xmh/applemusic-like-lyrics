@@ -492,10 +492,18 @@ export const LocalMusicContext: FC = () => {
 					syncMusicId(evtData.data.musicId);
 					syncMusicQuality(evtData.data.quality);
 					syncMusicInfo(evtData.data.musicInfo);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "loadingAudio": {
 					syncMusicId(evtData.data.musicId);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
 					break;
 				}
 				case "syncStatus": {

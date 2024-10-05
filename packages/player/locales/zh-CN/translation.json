@@ -34,6 +34,11 @@
       "back": "返回"
     }
   },
+  "playbar": {
+    "playlist": {
+      "title": "当前播放列表"
+    }
+  },
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "WS Protocol 模式下无法切换歌曲",
