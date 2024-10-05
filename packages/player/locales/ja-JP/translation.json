@@ -9,6 +9,10 @@
       "editMusicOverrideMessage": "曲のカバレッジ情報を編集する",
       "exitLyricPage": "歌詞ページを出る"
     },
+    "qualityTag": {
+      "lossless": null,
+      "hires": null
+    },
     "openMenuViaRightClick": "歌詞ページの任意の場所を右クリックしてメニューを開きます。",
     "buttonForDisplayOnly": "このボタンは表示のみを目的としており、現時点では実際の機能はありません。",
     "loadAudioError": null
@@ -68,6 +72,7 @@
       },
       "addLocalMusic": {
         "filterName": null,
+        "allFiles": null,
         "toast": {
           "parsingMusicMetadata": null,
           "partiallyFailed": null,
