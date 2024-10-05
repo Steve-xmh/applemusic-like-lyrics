@@ -34,6 +34,11 @@
       "back": "Back"
     }
   },
+  "playbar": {
+    "playlist": {
+      "title": null
+    }
+  },
   "ws-protocol": {
     "toast": {
       "switchSongNotSupported": "Unable to switch tracks under WS Protocol mode.",
