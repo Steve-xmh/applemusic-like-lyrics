@@ -266,7 +266,7 @@ export const PlaylistPage: FC = () => {
 		const id = toast.loading(
 			t(
 				"page.playlist.addLocalMusic.toast.parsingMusicMetadata",
-				"正在解析音乐元数据以添加歌曲 ({current} / {total})",
+				"正在解析音乐元数据以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
 				{
 					current: 0,
 					total: results.length,
@@ -489,9 +489,13 @@ export const PlaylistPage: FC = () => {
 								}
 							/>
 							<Text>
-								{t("page.playlist.totalMusicLabel", "{count} 首歌曲", {
-									count: playlist?.songIds?.length || 0,
-								})}
+								{t(
+									"page.playlist.totalMusicLabel",
+									"{count, plural, other {#}} 首歌曲",
+									{
+										count: playlist?.songIds?.length || 0,
+									},
+								)}
 							</Text>
 							<Flex gap="2">
 								<IconButton onClick={onPlaylistDefault}>
