@@ -9,6 +9,10 @@
       "editMusicOverrideMessage": "編輯歌曲覆蓋訊息",
       "exitLyricPage": "退出歌詞介面"
     },
+    "qualityTag": {
+      "lossless": null,
+      "hires": null
+    },
     "openMenuViaRightClick": "請右鍵歌詞介面任意位置打開目錄哦！",
     "buttonForDisplayOnly": "此按鈕僅供展示用途，暫無實際功能",
     "loadAudioError": "播放後端加載音頻失敗\n{error}"
@@ -68,6 +72,7 @@
       },
       "addLocalMusic": {
         "filterName": "音頻文檔",
+        "allFiles": null,
         "toast": {
           "parsingMusicMetadata": "正在解析音樂元數據以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失敗",
