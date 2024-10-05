@@ -36,7 +36,7 @@
   },
   "playbar": {
     "playlist": {
-      "title": null
+      "title": "當前播放列表"
     }
   },
   "ws-protocol": {
