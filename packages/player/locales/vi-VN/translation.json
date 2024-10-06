@@ -128,6 +128,15 @@
           "label": "Loại thành phần điều khiển phát",
           "description": "Thông tin bài hát"
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": null,
+            "forceNormal": null,
+            "forceImmersive": null
+          },
+          "label": null,
+          "description": null
+        },
         "subtitle": "Kiểu thông tin bài hát",
         "showMusicName": {
           "label": "Hiển thị tên bài hát"
