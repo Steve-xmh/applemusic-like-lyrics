@@ -128,6 +128,15 @@
           "label": "播放控制組件類型",
           "description": "即歌曲訊息下方的組件"
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": null,
+            "forceNormal": null,
+            "forceImmersive": null
+          },
+          "label": null,
+          "description": null
+        },
         "subtitle": "歌曲資訊樣式",
         "showMusicName": {
           "label": "顯示歌曲名稱"
