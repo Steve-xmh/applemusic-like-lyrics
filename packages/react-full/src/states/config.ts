@@ -146,6 +146,21 @@ export const showMusicNameAtom = atomWithStorage(
 	"amll-react-full.showMusicName",
 	true,
 );
+export enum VerticalCoverLayout {
+	Auto = "auto",
+	ForceNormal = "force-normal",
+	ForceImmersive = "force-immersive",
+}
+/**
+ * 垂直布局下隐藏歌词时的专辑图布局模式
+ * - Auto: 根据专辑图是否为视频切换沉浸布局
+ * - ForceNormal: 强制使用默认布局
+ * - ForceImmersive: 强制使用沉浸布局
+ */
+export const verticalCoverLayoutAtom = atomWithStorage(
+	"amll-react-full.verticalCoverLayoutAtom",
+	VerticalCoverLayout.Auto,
+);
 /**
  * 是否显示歌曲作者，默认启用
  */

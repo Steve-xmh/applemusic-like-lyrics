@@ -1,5 +1,6 @@
 import {
 	PlayerControlsType,
+	VerticalCoverLayout,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -19,6 +20,7 @@ import {
 	showMusicArtistsAtom,
 	showMusicNameAtom,
 	showVolumeControlAtom,
+	verticalCoverLayoutAtom,
 } from "@applemusic-like-lyrics/react-full";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import {
@@ -383,6 +385,33 @@ export const SettingsPage: FC = () => {
 		],
 		[t],
 	);
+	
+	const verticalCoverLayoutMenu = useMemo(
+		() => [
+			{
+				label: t(
+					"page.settings.musicInfoAppearance.verticalCoverLayout.menu.auto",
+					"自动",
+				),
+				value: VerticalCoverLayout.Auto,
+			},
+			{
+				label: t(
+					"page.settings.musicInfoAppearance.verticalCoverLayout.menu.forceNormal",
+					"强制默认布局",
+				),
+				value: VerticalCoverLayout.ForceNormal,
+			},
+			{
+				label: t(
+					"page.settings.musicInfoAppearance.verticalCoverLayout.menu.forceImmersive",
+					"强制沉浸布局",
+				),
+				value: VerticalCoverLayout.ForceImmersive,
+			},
+		],
+		[t],
+	);
 
 	const lyricPlayerImplementationMenu = useMemo(
 		() => [
@@ -624,6 +653,21 @@ export const SettingsPage: FC = () => {
 				configAtom={playerControlsTypeAtom}
 			/>
 
+			<Box height="1em" />
+
+			<SelectSettings
+				label={t(
+					"page.settings.musicInfoAppearance.verticalCoverLayout.label",
+					"垂直布局专辑图布局模式",
+				)}
+				description={t(
+					"page.settings.musicInfoAppearance.verticalCoverLayout.description",
+					"在隐藏歌词的情况下专辑图的布局方式：\n- 自动：根据专辑图是否为视频以使用沉浸布局\n- 强制默认布局：强制使用默认的专辑图布局\n- 强制沉浸布局：强制使用沉浸式的专辑图布局",
+				)}
+				menu={verticalCoverLayoutMenu}
+				configAtom={verticalCoverLayoutAtom}
+			/>
+
 			<SliderSettings
 				label={t(
 					"page.settings.musicInfoAppearance.fftDataRange.label",
@@ -785,7 +829,7 @@ export const SettingsPage: FC = () => {
 									return `(${rec} / ${total}) (${((receivedLength / contentLength) * 100).toFixed(1)}%)`;
 								}
 
-								const getDownloadMessage = (progressText) =>
+								const getDownloadMessage = (progressText: string) =>
 									t("page.about.downloading", "正在下载更新…… {progressText}", {
 										progressText,
 									});

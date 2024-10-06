@@ -18,6 +18,7 @@ export const VerticalLayout: React.FC<
 		lyricSlot?: React.ReactNode;
 		asChild?: boolean;
 		hideLyric?: boolean;
+		immerseCover?: boolean;
 	} & HTMLProps<HTMLDivElement>
 > = ({
 	thumbSlot,
@@ -28,6 +29,7 @@ export const VerticalLayout: React.FC<
 	hideLyric,
 	asChild,
 	className,
+	immerseCover,
 	...rest
 }) => {
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -35,35 +37,66 @@ export const VerticalLayout: React.FC<
 	const phonySmallCoverRef = useRef<HTMLDivElement>(null);
 	const coverFrameRef = useRef<HTMLDivElement>(null);
 	const hideLyricRef = useRef(hideLyric ?? false);
+	const immerseCoverRef = useRef(immerseCover ?? false);
 	const [currentCoverStyle, setCurrentCoverStyle] =
 		useState<MotionProps["animate"]>(undefined);
-	const calcCoverLayout = useCallback((hideLyric = hideLyricRef.current) => {
-		if (!rootRef.current) return;
-		let rootEl: HTMLElement = rootRef.current;
-		const targetCover = hideLyric
-			? phonyBigCoverRef.current
-			: phonySmallCoverRef.current;
-		if (!targetCover || !rootEl) return;
-		const targetCoverSize = Math.min(
-			targetCover.clientWidth,
-			targetCover.clientHeight,
-		);
-		while (getComputedStyle(rootEl).display === "contents") {
-			rootEl = rootEl.parentElement!;
-		}
-		const rootB = rootEl.getBoundingClientRect();
-		const targetCoverB = targetCover.getBoundingClientRect();
-		const targetCoverLeft =
-			targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
-		const targetCoverTop =
-			targetCoverB.y - rootB.y + (targetCoverB.height - targetCoverSize) / 2;
-		return {
-			width: targetCoverSize,
-			height: targetCoverSize,
-			left: targetCoverLeft,
-			top: targetCoverTop,
-		} as Target;
-	}, []);
+	const calcCoverLayout = useCallback(
+		(hideLyric = hideLyricRef.current): Target | undefined => {
+			if (!rootRef.current) return;
+			let rootEl: HTMLElement = rootRef.current;
+			const targetCover = hideLyric
+				? phonyBigCoverRef.current
+				: phonySmallCoverRef.current;
+			if (!targetCover || !rootEl) return;
+			const immerseCover = immerseCoverRef.current;
+			while (getComputedStyle(rootEl).display === "contents") {
+				rootEl = rootEl.parentElement!;
+			}
+			const rootB = rootEl.getBoundingClientRect();
+			const targetCoverB = targetCover.getBoundingClientRect();
+			if (immerseCover) {
+				const halfHeight =
+					targetCoverB.top - rootB.top + targetCoverB.height / 2;
+				const targetCoverSize = Math.max(
+					halfHeight * 2.4,
+					rootB.width * 1.2,
+					Math.min(targetCover.clientWidth, targetCover.clientHeight),
+				);
+				const targetCoverLeft =
+					targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
+				const targetCoverTop =
+					targetCoverB.y -
+					rootB.y +
+					(targetCoverB.height - targetCoverSize) / 2;
+				return {
+					width: targetCoverSize,
+					height: targetCoverSize,
+					left: targetCoverLeft,
+					top: targetCoverTop,
+				};
+			}
+			const targetCoverSize = Math.min(
+				targetCover.clientWidth,
+				targetCover.clientHeight,
+			);
+			const targetCoverLeft =
+				targetCoverB.x - rootB.x + (targetCoverB.width - targetCoverSize) / 2;
+			const targetCoverTop =
+				targetCoverB.y - rootB.y + (targetCoverB.height - targetCoverSize) / 2;
+			return {
+				width: targetCoverSize,
+				height: targetCoverSize,
+				left: targetCoverLeft,
+				top: targetCoverTop,
+			};
+		},
+		[],
+	);
+	useLayoutEffect(() => {
+		hideLyricRef.current = hideLyric ?? false;
+		immerseCoverRef.current = immerseCover ?? false;
+		setCurrentCoverStyle(calcCoverLayout(hideLyricRef.current));
+	}, [hideLyric, immerseCover, calcCoverLayout]);
 	useLayoutEffect(() => {
 		const phonyBigCoverEl = phonyBigCoverRef.current;
 		const phonySmallCoverEl = phonySmallCoverRef.current;
@@ -80,10 +113,6 @@ export const VerticalLayout: React.FC<
 			obz.disconnect();
 		};
 	}, [calcCoverLayout]);
-	useLayoutEffect(() => {
-		hideLyricRef.current = hideLyric ?? false;
-		setCurrentCoverStyle(calcCoverLayout(hideLyricRef.current));
-	}, [hideLyric, calcCoverLayout]);
 	return (
 		<div
 			className={classNames(
@@ -108,7 +137,10 @@ export const VerticalLayout: React.FC<
 			</div>
 			{currentCoverStyle && (
 				<motion.div
-					className={styles.coverFrame}
+					className={classNames(
+						styles.coverFrame,
+						immerseCover && styles.immerseCover,
+					)}
 					animate={currentCoverStyle}
 					initial={false}
 					transition={{

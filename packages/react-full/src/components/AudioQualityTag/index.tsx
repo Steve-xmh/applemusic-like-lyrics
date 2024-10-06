@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { AnimatePresence, type Variants, motion } from "framer-motion";
+import { type Variants, motion } from "framer-motion";
 import { type FC, type HTMLProps, memo } from "react";
 import IconDolbyAtmos from "./icon_dolby_atmos.svg?react";
 import LoselessIcon from "./icon_loseless.svg?react";
@@ -60,32 +60,32 @@ export const AudioQualityTag: FC<
 			onClick={onClick}
 			{...rest}
 		>
-			<AnimatePresence mode="wait">
-				{isDolbyAtmos ? (
-					<motion.div
-						initial="hide"
-						animate="show"
-						exit="hide"
-						className={styles.dolbyLogo}
-						variants={DOLBY_VARIENTS}
-					>
-						<IconDolbyAtmos className={styles.dolbyLogoGlow} />
-						<IconDolbyAtmos />
-					</motion.div>
-				) : (
-					<motion.div
-						initial="hide"
-						animate="show"
-						exit="hide"
-						variants={COMMON_VARIENTS}
-					>
-						<div className={styles.commonTag}>
-							{tagIcon && <LoselessIcon height="11px" />}
-							{tagText && <div className={styles.commonTagText}>{tagText}</div>}
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
+			{isDolbyAtmos ? (
+				<motion.div
+					key="dolby-atmos"
+					initial="hide"
+					animate="show"
+					exit="hide"
+					className={styles.dolbyLogo}
+					variants={DOLBY_VARIENTS}
+				>
+					<IconDolbyAtmos className={styles.dolbyLogoGlow} />
+					<IconDolbyAtmos />
+				</motion.div>
+			) : (
+				<motion.div
+					key={`common-tag-${tagIcon}-${tagText}`}
+					initial="hide"
+					animate="show"
+					exit="hide"
+					variants={COMMON_VARIENTS}
+				>
+					<div className={styles.commonTag}>
+						{tagIcon && <LoselessIcon height="11px" />}
+						{tagText && <div className={styles.commonTagText}>{tagText}</div>}
+					</div>
+				</motion.div>
+			)}
 		</div>
 	);
 });

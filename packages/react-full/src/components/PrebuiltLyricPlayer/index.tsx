@@ -53,9 +53,10 @@ import "./icon-animations.css";
 import styles from "./index.module.css";
 
 import classNames from "classnames";
-import { LayoutGroup } from "framer-motion";
+import { AnimatePresence, LayoutGroup } from "framer-motion";
 import {
 	PlayerControlsType,
+	VerticalCoverLayout,
 	enableLyricLineBlurEffectAtom,
 	enableLyricLineScaleEffectAtom,
 	enableLyricLineSpringAnimationAtom,
@@ -77,6 +78,7 @@ import {
 	showMusicArtistsAtom,
 	showMusicNameAtom,
 	showVolumeControlAtom,
+	verticalCoverLayoutAtom,
 } from "../../states/config";
 import { toDuration } from "../../utils";
 import { AudioFFTVisualizer } from "../AudioFFTVisualizer";
@@ -173,15 +175,17 @@ const PrebuiltProgressBar: FC = () => {
 			<div className={styles.progressBarLabels}>
 				<div>{toDuration(musicPosition / 1000)}</div>
 				<div>
-					{musicQualityTag && (
-						<AudioQualityTag
-							className={styles.qualityTag}
-							isDolbyAtmos={musicQualityTag.isDolbyAtmos}
-							tagText={musicQualityTag.tagText}
-							tagIcon={musicQualityTag.tagIcon}
-							onClick={onClickAudioQualityTag}
-						/>
-					)}
+					<AnimatePresence mode="popLayout">
+						{musicQualityTag && (
+							<AudioQualityTag
+								className={styles.qualityTag}
+								isDolbyAtmos={musicQualityTag.isDolbyAtmos}
+								tagText={musicQualityTag.tagText}
+								tagIcon={musicQualityTag.tagIcon}
+								onClick={onClickAudioQualityTag}
+							/>
+						)}
+					</AnimatePresence>
 				</div>
 				<div>{toDuration((musicPosition - musicDuration) / 1000)}</div>
 			</div>
@@ -340,6 +344,7 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
+	const verticalCoverLayout = useAtomValue(verticalCoverLayoutAtom);
 	const lyricBackgroundStaticMode = useAtomValue(lyricBackgroundStaticModeAtom);
 	const lyricBackgroundRenderScale = useAtomValue(
 		lyricBackgroundRenderScaleAtom,
@@ -378,18 +383,26 @@ export const PrebuiltLyricPlayer: FC<HTMLProps<HTMLDivElement>> = ({
 		}
 	}, [isVertical]);
 
+	const verticalImmerseCover =  hideLyricView && (
+		verticalCoverLayout === VerticalCoverLayout.Auto
+			? musicCoverIsVideo && isVertical
+			: verticalCoverLayout === VerticalCoverLayout.ForceImmersive);
+
 	return (
 		<LayoutGroup>
 			<AutoLyricLayout
 				ref={layoutRef}
 				className={classNames(styles.autoLyricLayout, className)}
 				onLayoutChange={setIsVertical}
+				verticalImmerseCover={verticalImmerseCover}
 				coverSlot={
 					<Cover
 						coverUrl={musicCover}
 						coverIsVideo={musicCoverIsVideo}
 						ref={coverElRef}
-						musicPaused={!musicIsPlaying}
+						musicPaused={
+							!musicIsPlaying && !musicCoverIsVideo && verticalImmerseCover
+						}
 					/>
 				}
 				thumbSlot={<ControlThumb onClick={onClickControlThumb} />}

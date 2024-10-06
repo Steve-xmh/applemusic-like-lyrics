@@ -20,6 +20,7 @@ export const AutoLyricLayout: React.FC<
 		lyricSlot?: React.ReactNode;
 		backgroundSlot?: React.ReactNode;
 		hideLyric?: boolean;
+		verticalImmerseCover?: boolean;
 		onLayoutChange?: (isVertical: boolean) => void;
 	} & HTMLProps<HTMLDivElement>
 > = forwardRef(
@@ -34,6 +35,7 @@ export const AutoLyricLayout: React.FC<
 			lyricSlot,
 			backgroundSlot,
 			hideLyric,
+			verticalImmerseCover,
 			onLayoutChange,
 			...rest
 		},
@@ -75,6 +77,7 @@ export const AutoLyricLayout: React.FC<
 						coverSlot={coverSlot}
 						lyricSlot={lyricSlot}
 						hideLyric={hideLyric}
+						immerseCover={verticalImmerseCover}
 					/>
 				) : (
 					<HorizontalLayout

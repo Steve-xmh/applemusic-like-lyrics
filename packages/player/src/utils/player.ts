@@ -124,6 +124,13 @@ export type AudioThreadEvent =
 			};
 	  }
 	| {
+			type: "playListChanged";
+			data: {
+				playlist: SongData[];
+				currentPlayIndex: number;
+			};
+	  }
+	| {
 			type: "playStatus";
 			data: { isPlaying: boolean };
 	  }

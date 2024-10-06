@@ -17,6 +17,7 @@
 .thumb {
 	grid-row: thumb;
 	justify-self: center;
+	z-index: 1;
 
 	/* border: 1px solid aqua; */
 
@@ -29,6 +30,10 @@
 	position: absolute;
 	width: 0px;
 	height: 0px;
+
+	&.immerseCover {
+		mask-image: linear-gradient(to bottom, #000 0%, #000 70%, #0000 100%);
+	}
 }
 
 /* 封面的位置由 JS 设定 */
@@ -140,6 +145,7 @@
 	opacity: 0;
 	mix-blend-mode: plus-lighter;
 	min-width: 0;
+	z-index: 2;
 }
 
 .hideLyric {

@@ -10,6 +10,7 @@
 		cubic-bezier(0.25, 1, 0.5, 1);
 	transform: translateY(100%);
 	border-radius: 1em 1em 0 0;
+	overflow: hidden;
 
 	&.opened {
 		pointer-events: auto;

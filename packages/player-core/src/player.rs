@@ -488,10 +488,34 @@ impl AudioPlayer {
                 }
                 AudioThreadMessage::SetPlaylist { songs, .. } => {
                     self.playlist_inited = true;
+                    let last_playing_song = self.playlist.get(self.current_play_index).cloned();
                     songs.clone_into(&mut self.playlist);
                     info!("已设置播放列表，歌曲数量为 {}", songs.len());
 
+                    let old_play_index = self.current_play_index;
+                    if let Some(last_playing_song) = last_playing_song {
+                        self.current_play_index = self
+                            .playlist
+                            .iter()
+                            .enumerate()
+                            .find(|x| x.1.get_id() == last_playing_song.get_id())
+                            .map(|x| x.0)
+                            .unwrap_or(0);
+                    } else {
+                        self.current_play_index = 0;
+                    }
+                    info!(
+                        "已重定向当前播放位置 {old_play_index} 到 {}",
+                        self.current_play_index
+                    );
+
                     emitter.ret_none(msg).await?;
+                    emitter
+                        .emit(AudioThreadEvent::PlayListChanged {
+                            playlist: self.playlist.clone(),
+                            current_play_index: self.current_play_index,
+                        })
+                        .await?;
                 }
                 AudioThreadMessage::SyncStatus => {
                     let status = self.get_sync_status().await?;

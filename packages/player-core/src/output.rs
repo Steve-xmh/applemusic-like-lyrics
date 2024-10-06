@@ -6,6 +6,7 @@ use std::sync::{
 };
 
 use super::resampler::SincFixedOutResampler;
+use anyhow::Context;
 use cpal::{traits::*, *};
 use rb::*;
 use symphonia::core::{
@@ -91,11 +92,11 @@ impl<T: AudioOutputSample> AudioOutput for AudioStreamPlayer<T> {
     fn set_volume(&mut self, volume: f64) {
         let volume = (volume * 255.).clamp(0., 255.) as u8;
         self.volume
-            .store(volume, std::sync::atomic::Ordering::SeqCst);
+            .store(volume, std::sync::atomic::Ordering::Relaxed);
     }
 
     fn volume(&self) -> f64 {
-        self.volume.load(std::sync::atomic::Ordering::SeqCst) as f64 / 255.
+        self.volume.load(std::sync::atomic::Ordering::Relaxed) as f64 / 255.
     }
 
     fn write(&mut self, decoded: symphonia::core::audio::AudioBufferRef<'_>) {
@@ -164,7 +165,7 @@ fn init_audio_stream_inner<T: AudioOutputSample + Into<f64>>(
     selected_config: StreamConfig,
 ) -> Box<dyn AudioOutput> {
     let channels = selected_config.channels;
-    const RING_BUF_SIZE_MS: usize = 128;
+    const RING_BUF_SIZE_MS: usize = 256;
     let ring_len =
         ((RING_BUF_SIZE_MS * selected_config.sample_rate.0 as usize) / 1000) * channels as usize;
     info!(
@@ -175,7 +176,7 @@ fn init_audio_stream_inner<T: AudioOutputSample + Into<f64>>(
     let prod = ring.producer();
     let cons = ring.consumer();
     let is_dead = Arc::new(AtomicBool::new(false));
-    let is_dead_c = is_dead.clone();
+    let is_dead_c = Arc::clone(&is_dead);
     let volume: Arc<_> = Arc::new(AtomicU8::new(u8::MAX >> 1));
     let volume_c = volume.clone();
     let stream = output
@@ -184,7 +185,7 @@ fn init_audio_stream_inner<T: AudioOutputSample + Into<f64>>(
             move |data, _info| {
                 let written = cons.read(data).unwrap_or(0);
                 data[written..].fill(T::MID);
-                let volume = volume_c.load(std::sync::atomic::Ordering::SeqCst) as f32 / 255.;
+                let volume = volume_c.load(std::sync::atomic::Ordering::Relaxed) as f32 / 255.;
                 data.iter_mut().for_each(|x| {
                     let s: f32 = (*x).into_sample();
                     *x = (s * volume).into_sample();
@@ -228,15 +229,15 @@ fn get_sample_format_quality_level(sample_format: SampleFormat) -> u8 {
 }
 
 #[instrument]
-pub fn init_audio_player(output_device_name: &str) -> Box<dyn AudioOutput> {
+pub fn init_audio_player(output_device_name: &str) -> anyhow::Result<Box<dyn AudioOutput>> {
     let host = cpal::default_host();
     let output = if output_device_name.is_empty() {
-        host.default_output_device().unwrap()
+        host.default_output_device().context("找不到默认输出设备")?
     } else {
         host.output_devices()
             .unwrap()
             .find(|d| d.name().unwrap_or_default() == output_device_name)
-            .unwrap_or_else(|| host.default_output_device().unwrap())
+            .context("找不到指定的输出设备")?
     };
     info!(
         "已初始化输出音频设备为 {}",
@@ -275,7 +276,7 @@ pub fn init_audio_player(output_device_name: &str) -> Box<dyn AudioOutput> {
         selected_config.sample_rate.0, selected_config.channels, selected_sample_format,
     );
 
-    (match selected_sample_format {
+    Ok((match selected_sample_format {
         SampleFormat::I8 => init_audio_stream_inner::<i8>(output, selected_config),
         SampleFormat::I16 => init_audio_stream_inner::<i16>(output, selected_config),
         SampleFormat::I32 => init_audio_stream_inner::<i32>(output, selected_config),
@@ -287,7 +288,7 @@ pub fn init_audio_player(output_device_name: &str) -> Box<dyn AudioOutput> {
         SampleFormat::F32 => init_audio_stream_inner::<f32>(output, selected_config),
         SampleFormat::F64 => init_audio_stream_inner::<f64>(output, selected_config),
         _ => unreachable!(),
-    }) as _
+    }) as _)
 }
 
 pub enum OwnedAudioBuffer {
@@ -322,6 +323,7 @@ impl AsAudioBufferRef for OwnedAudioBuffer {
 
 enum AudioOutputMessage {
     Write(usize, OwnedAudioBuffer),
+    ChangeOutput(String),
     SetVolume(f64),
 }
 
@@ -366,9 +368,12 @@ impl AudioOutputSender {
 pub fn create_audio_output_thread() -> AudioOutputSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(1);
     tokio::runtime::Handle::current().spawn_blocking(move || {
-        let mut output = init_audio_player("");
-        output.set_volume(0.5);
-        output.stream().play().unwrap();
+        let mut output = init_audio_player("").ok();
+        let mut current_volume = 0.5;
+        if let Some(output) = &mut output {
+            output.set_volume(current_volume);
+            output.stream().play().unwrap();
+        }
         let mut current_id = 0;
         info!("音频线程正在开始工作！");
         while let Some(msg) = rx.blocking_recv() {
@@ -376,16 +381,41 @@ pub fn create_audio_output_thread() -> AudioOutputSender {
                 AudioOutputMessage::Write(id, decoded) => {
                     if id >= current_id || id == 0 {
                         current_id = id;
-                        if output.is_dead() {
-                            info!("现有输出设备已断开，正在重新初始化播放器");
-                            output = init_audio_player("");
+                        let mut should_recrate = false;
+                        if let Some(output) = &mut output {
+                            if output.is_dead() {
+                                should_recrate = true;
+                                info!("现有输出设备已断开，正在重新初始化播放器");
+                            }
+                            output.write(decoded.as_audio_buffer_ref());
+                        }
+                        if should_recrate {
+                            output = init_audio_player("").ok();
+                            if let Some(output) = &mut output {
+                                output.set_volume(current_volume);
+                                output.stream().play().unwrap();
+                            }
                             continue;
                         }
-                        output.write(decoded.as_audio_buffer_ref());
+                    }
+                }
+                AudioOutputMessage::ChangeOutput(output_name) => {
+                    match init_audio_player(&output_name) {
+                        Ok(mut new_output) => {
+                            new_output.set_volume(current_volume);
+                            new_output.stream().play().unwrap();
+                            output = Some(new_output);
+                        }
+                        Err(err) => {
+                            warn!("无法切换到输出设备 {output_name}: {err}");
+                            output = None;
+                        }
                     }
                 }
                 AudioOutputMessage::SetVolume(volume) => {
-                    output.set_volume(volume);
+                    if let Some(output) = &mut output {
+                        output.set_volume(volume);
+                    }
                 }
             }
         }

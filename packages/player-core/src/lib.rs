@@ -125,6 +125,11 @@ pub enum AudioThreadEvent {
         quality: AudioQuality,
     },
     #[serde(rename_all = "camelCase")]
+    PlayListChanged {
+        playlist: Vec<SongData>,
+        current_play_index: usize,
+    },
+    #[serde(rename_all = "camelCase")]
     PlayStatus { is_playing: bool },
     #[serde(rename_all = "camelCase")]
     LoadError { error: String },

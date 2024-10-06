@@ -519,6 +519,15 @@ export const LocalMusicContext: FC = () => {
 					);
 					break;
 				}
+				case "playListChanged": {
+					console.log("已更新播放列表");
+					store.set(currentPlaylistAtom, evtData.data.playlist);
+					store.set(
+						currentPlaylistMusicIndexAtom,
+						evtData.data.currentPlayIndex,
+					);
+					break;
+				}
 				case "playStatus": {
 					store.set(musicPlayingAtom, evtData.data.isPlaying);
 					break;
