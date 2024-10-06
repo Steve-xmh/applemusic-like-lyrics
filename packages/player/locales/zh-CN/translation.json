@@ -128,6 +128,15 @@
           "label": "播放控制组件类型",
           "description": "即歌曲信息下方的组件"
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": "自动",
+            "forceNormal": "强制默认布局",
+            "forceImmersive": "强制沉浸布局"
+          },
+          "label": "垂直布局专辑图布局模式",
+          "description": "在隐藏歌词的情况下专辑图的布局方式：\n- 自动：根据专辑图是否为视频以使用沉浸布局\n- 强制默认布局：强制使用默认的专辑图布局\n- 强制沉浸布局：强制使用沉浸式的专辑图布局"
+        },
         "subtitle": "歌曲信息样式",
         "showMusicName": {
           "label": "显示歌曲名称"
