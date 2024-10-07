@@ -1,6 +1,9 @@
 name: "构建并部署开发文档"
 
-on: push
+on:
+  push:
+    branches-ignore:
+      - i10n_*
 
 jobs:
   deploy-docs:

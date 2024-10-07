@@ -1,6 +1,9 @@
 name: "同步仓库至 GitCode"
 
-on: push
+on:
+  push:
+    branches-ignore:
+      - i10n_*
 
 jobs:
   pre-release:

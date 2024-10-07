@@ -1,7 +1,9 @@
 name: 构建 AMLL Player Tauri 桌面版本
 on:
-  - push
-  - workflow_dispatch
+  push:
+    branches-ignore:
+      - i10n_*
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
