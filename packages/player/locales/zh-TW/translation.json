@@ -128,6 +128,15 @@
           "label": "播放控制組件類型",
           "description": "即歌曲訊息下方的組件"
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": "自動",
+            "forceNormal": "強制預設佈局",
+            "forceImmersive": "強制沉浸佈局"
+          },
+          "label": "垂直佈局專輯圖佈局模式",
+          "description": "在隱藏歌詞的情況下專輯圖的佈局方式：\n- 自動：根據專輯圖是否為影片以使用沉浸佈局\n- 強制預設佈局：強制使用預設的專輯圖佈局\n- 強制沉浸佈局：強制使用沉浸式的專輯圖佈局"
+        },
         "subtitle": "歌曲資訊樣式",
         "showMusicName": {
           "label": "顯示歌曲名稱"

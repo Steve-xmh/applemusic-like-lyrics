@@ -128,6 +128,15 @@
           "label": null,
           "description": null
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": null,
+            "forceNormal": null,
+            "forceImmersive": null
+          },
+          "label": null,
+          "description": null
+        },
         "subtitle": null,
         "showMusicName": {
           "label": null

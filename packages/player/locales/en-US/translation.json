@@ -128,6 +128,15 @@
           "label": "Playback Controls Type",
           "description": null
         },
+        "verticalCoverLayout": {
+          "menu": {
+            "auto": "Automatic",
+            "forceNormal": "Force Normal Layout",
+            "forceImmersive": "Force Immersive Layout"
+          },
+          "label": null,
+          "description": null
+        },
         "subtitle": "Music information appearance",
         "showMusicName": {
           "label": "Show Song Title"
