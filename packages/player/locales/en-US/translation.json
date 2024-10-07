@@ -130,9 +130,9 @@
         },
         "verticalCoverLayout": {
           "menu": {
-            "auto": null,
-            "forceNormal": null,
-            "forceImmersive": null
+            "auto": "Automatic",
+            "forceNormal": "Force Normal Layout",
+            "forceImmersive": "Force Immersive Layout"
           },
           "label": null,
           "description": null
