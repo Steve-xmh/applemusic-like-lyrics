@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": "請右鍵歌詞介面任意位置打開目錄哦！",
     "buttonForDisplayOnly": "此按鈕僅供展示用途，暫無實際功能",
-    "loadAudioError": "播放後端加載音頻失敗\n{error}"
+    "loadAudioError": "播放後端加載音頻失敗\n{error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "新建播放清單",
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": "取消",
       "confirm": "確認",
+      "close": null,
       "save": "儲存"
     },
     "page": {
