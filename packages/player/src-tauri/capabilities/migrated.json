@@ -22,6 +22,7 @@
 		"core:window:allow-unmaximize",
 		"core:window:allow-minimize",
 		"core:window:allow-set-fullscreen",
+		"shell:default",
 		"fs:default",
 		"fs:allow-stat",
 		"dialog:default"

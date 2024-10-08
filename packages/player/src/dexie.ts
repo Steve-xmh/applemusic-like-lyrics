@@ -1,3 +1,4 @@
+import type { TTMLLyric } from "@applemusic-like-lyrics/lyric";
 import type { EntityTable } from "dexie";
 import Dexie from "dexie";
 
@@ -24,14 +25,22 @@ export interface Song {
 	romanLrc?: string;
 }
 
+export interface TTMLDBLyricEntry {
+	name: string;
+	content: TTMLLyric;
+	raw: string;
+}
+
 export const db = new Dexie("amll-player") as Dexie & {
 	playlists: EntityTable<Playlist, "id">;
 	songs: EntityTable<Song, "id">;
+	ttmlDB: EntityTable<TTMLDBLyricEntry, "name">;
 };
 
 db.version(1).stores({
 	playlists: "++id,name,createTime,updateTime,playTime",
 	songs: "&id,filePath,songName,songArtists",
+	ttmlDB: "&name",
 });
 
 db.version(2).upgrade((trans) => {

@@ -38,6 +38,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { SortableFixedSizeList } from "react-window-sortable";
+import { PlaylistCover } from "../../components/PlaylistCover";
 import { type Song, db } from "../../dexie";
 import { router } from "../../router";
 import { emitAudioThread, readLocalMusicMetadata } from "../../utils/player";
@@ -433,7 +434,12 @@ export const PlaylistPage: FC = () => {
 						</Button>
 					</Flex>
 					<Flex align="end" gap="4">
-						<Avatar size="9" fallback={<div />} />
+						<PlaylistCover
+							playlistId={Number(param.id)}
+							style={{
+								width: "12em",
+							}}
+						/>
 						<Flex
 							direction="column"
 							gap="4"

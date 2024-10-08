@@ -236,6 +236,99 @@ const LyricContext: FC = () => {
 	const song = useLiveQuery(() => db.songs.get(musicId), [musicId]);
 
 	useEffect(() => {
+		const sig = new AbortController();
+
+		console.log("同步 TTML DB 歌词库中");
+
+		(async () => {
+			const fileListRes = await fetch(
+				"https://api.github.com/repos/Steve-xmh/amll-ttml-db/contents/raw-lyrics",
+				{
+					signal: sig.signal,
+					redirect: "follow",
+				},
+			);
+
+			if (fileListRes.status < 200 || fileListRes.status > 399) {
+				console.warn(
+					"TTML DB 歌词库同步失败",
+					fileListRes.status,
+					fileListRes.statusText,
+				);
+				return;
+			}
+
+			const fileList = await fileListRes.json();
+			const fileMap = Object.fromEntries(fileList.map((v) => [v.name, v]));
+
+			const localFileList = new Set<string>();
+			const remoteFileList = new Set<string>(fileList.map((v) => v.name));
+
+			await db.ttmlDB.each((obj) => {
+				localFileList.add(obj.name);
+			});
+
+			console.log("本地已同步歌词数量", localFileList.size);
+			console.log("远程仓库歌词数量", remoteFileList.size);
+
+			const shouldFetchList = remoteFileList.difference(localFileList);
+
+			console.log("需要下载的歌词数量", shouldFetchList.size);
+
+			let synced = 0;
+			let errored = 0;
+
+			await Promise.all(
+				shouldFetchList.keys().map(async (fileName: string) => {
+					const lyricRes = await fetch(fileMap[fileName].download_url, {
+						signal: sig.signal,
+						redirect: "follow",
+					});
+
+					if (fileListRes.status < 200 || fileListRes.status > 399) {
+						console.warn(
+							"同步歌词文件",
+							fileName,
+							"失败",
+							fileListRes.status,
+							fileListRes.statusText,
+						);
+						errored++;
+						return;
+					}
+
+					const lyricContent = await lyricRes.text();
+
+					try {
+						const ttml = parseTTML(lyricContent);
+						db.ttmlDB.add({
+							name: fileName,
+							content: ttml,
+							raw: lyricContent,
+						});
+						synced++;
+					} catch (err) {
+						console.warn("下载并解析歌词文件", fileName, "失败", err);
+						errored++;
+					}
+				}),
+			);
+
+			console.log(
+				"歌词同步完成，已同步 ",
+				synced,
+				" 首歌曲，有 ",
+				errored,
+				" 首歌词导入失败",
+			);
+		})();
+
+		return () => {
+			sig.abort("useEffect Cleared");
+		};
+	}, []);
+
+	useEffect(() => {
 		if (song) {
 			try {
 				let parsedLyricLines: LyricLine[] = [];

@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { TTMLImportDialog } from "../../components/TTMLImportDialog";
 import { db } from "../../dexie";
 import { Option } from "./common";
 import { SongContext } from "./song-ctx";
@@ -29,36 +30,56 @@ export const LyricTabContent: FC = () => {
 		}
 	}, [song]);
 
-	const saveData = useCallback(() => {
-		if (song === undefined) return;
-		db.songs.update(song, (song) => {
-			song.lyric = lyricFormat;
-			if (lyricFormat === "none") {
-				song.lyricFormat = "none";
-				song.lyric = "";
-				song.translatedLrc = "";
-				song.romanLrc = "";
-				return;
-			}
-			if (lyricFormat === "ttml") {
-				song.lyricFormat = "ttml";
-				song.lyric = lyricContent;
-				song.translatedLrc = "";
-				song.romanLrc = "";
-				return;
-			}
-			song.lyricFormat = lyricFormat;
-			song.lyric = lyricContent;
-			song.translatedLrc = translatedLyricContent;
-			song.romanLrc = romanLyricContent;
-		});
-	}, [
-		song,
-		lyricFormat,
-		lyricContent,
-		translatedLyricContent,
-		romanLyricContent,
-	]);
+	const saveData = useCallback(
+		(
+			saveLyricFormat = lyricFormat,
+			saveLyricContent = lyricContent,
+			saveTranslatedLyricContent = translatedLyricContent,
+			saveRomanLyricContent = romanLyricContent,
+		) => {
+			if (song === undefined) return;
+			db.songs.update(song, (song) => {
+				song.lyric = saveLyricFormat;
+				if (saveLyricFormat === "none") {
+					song.lyricFormat = "none";
+					song.lyric = "";
+					song.translatedLrc = "";
+					song.romanLrc = "";
+					setLyricFormat("none");
+					setLyricContent("");
+					setTranslatedLyricContent("");
+					setRomanLyricContent("");
+					return;
+				}
+				if (saveLyricFormat === "ttml") {
+					song.lyricFormat = "ttml";
+					song.lyric = saveLyricContent;
+					song.translatedLrc = "";
+					song.romanLrc = "";
+					setLyricFormat("ttml");
+					setLyricContent(saveLyricContent);
+					setTranslatedLyricContent("");
+					setRomanLyricContent("");
+					return;
+				}
+				song.lyricFormat = saveLyricFormat;
+				song.lyric = saveLyricContent;
+				song.translatedLrc = saveTranslatedLyricContent;
+				song.romanLrc = saveRomanLyricContent;
+				setLyricFormat(saveLyricFormat);
+				setLyricContent(saveLyricFormat);
+				setTranslatedLyricContent(saveLyricFormat);
+				setRomanLyricContent(saveLyricFormat);
+			});
+		},
+		[
+			song,
+			lyricFormat,
+			lyricContent,
+			translatedLyricContent,
+			romanLyricContent,
+		],
+	);
 
 	return (
 		<>
@@ -176,6 +197,11 @@ export const LyricTabContent: FC = () => {
 						)}
 					</>
 				)}
+				<TTMLImportDialog
+					onSelectedLyric={(ttmlContent) => {
+						saveData("ttml", ttmlContent);
+					}}
+				/>
 			</Flex>
 			<Button mt="4" onClick={saveData}>
 				<Trans i18nKey="common.dialog.save">保存</Trans>

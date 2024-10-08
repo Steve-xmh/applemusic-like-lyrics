@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": "请右键歌词页任意位置来打开菜单哦！",
     "buttonForDisplayOnly": "此按钮仅供展示用途，暂无实际功能",
-    "loadAudioError": "播放后端加载音频失败\n{error}"
+    "loadAudioError": "播放后端加载音频失败\n{error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": "从 AMLL TTML DB 搜索 / 导入歌词",
+      "title": "从 AMLL TTML DB 搜索 / 导入歌词",
+      "searchInput": {
+        "placeholder": "搜索歌曲、歌词内容、歌手等……"
+      },
+      "tip": "在上方输入搜索关键词，点击候选项即可将歌词内容直接导入到歌词数据中。",
+      "supportText": "AMLL TTML DB 是由 AMLL 社区爱好者们一同建设的开源无版权歌词数据库，想为 AMLL TTML DB 贡献歌词吗？前往<1>GitHub 仓库</1>即可知晓提交歌词流程！",
+      "noResults": "无结果"
+    }
   },
   "newPlaylist": {
     "buttonLabel": "新建播放列表",
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": "取消",
       "confirm": "确认",
+      "close": "关闭",
       "save": "保存"
     },
     "page": {

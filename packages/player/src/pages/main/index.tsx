@@ -18,6 +18,7 @@ import type { FC } from "react";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
+import { PlaylistCover } from "../../components/PlaylistCover";
 import { db } from "../../dexie";
 import { router } from "../../router";
 import { updateInfoAtom } from "../../states/updater";
@@ -104,7 +105,12 @@ export const MainPage: FC = () => {
 							<ContextMenu.Root key={v.id}>
 								<ContextMenu.Trigger>
 									<Card asChild size="2" mb="4" key={v.id}>
-										<Link to={`/playlist/${v.id}`}>{v.name}</Link>
+										<Link to={`/playlist/${v.id}`}>
+											<Flex align="center" gap="2">
+												<PlaylistCover playlistId={v.id} />
+												{v.name}
+											</Flex>
+										</Link>
 									</Card>
 								</ContextMenu.Trigger>
 								<ContextMenu.Content>

@@ -1,8 +1,11 @@
 #![allow(unused)]
 
-use std::sync::{
-    atomic::{AtomicBool, AtomicU8},
-    Arc,
+use std::{
+    sync::{
+        atomic::{AtomicBool, AtomicU8},
+        Arc,
+    },
+    time::Duration,
 };
 
 use super::resampler::SincFixedOutResampler;
@@ -135,7 +138,10 @@ impl<T: AudioOutputSample> AudioOutput for AudioStreamPlayer<T> {
         rsp.resample(&decoded);
 
         while let Some(mut buf) = rsp.flush() {
-            while let Some(written) = self.prod.write_blocking(buf) {
+            while let Ok(Some(written)) = self
+                .prod
+                .write_blocking_timeout(buf, Duration::from_secs(1))
+            {
                 buf = &buf[written..];
             }
         }
@@ -365,9 +371,34 @@ impl AudioOutputSender {
     }
 }
 
+// TODO: 允许指定需要的输出设备
 pub fn create_audio_output_thread() -> AudioOutputSender {
     let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(1);
-    tokio::runtime::Handle::current().spawn_blocking(move || {
+    let handle = tokio::runtime::Handle::current();
+    let poll_default_tx = tx.clone();
+    // 通过轮询检测是否需要重新创建音频输出设备流
+    // TODO: 如果 CPAL 支持依照系统默认输出自动更新输出流，那么这段代码就可以删掉了（https://github.com/RustAudio/cpal/issues/740）
+    handle.spawn(async move {
+        let host = cpal::default_host();
+        let get_device_name = || {
+            host.default_output_device()
+                .map(|x| x.name().unwrap_or_default())
+                .unwrap_or_default()
+        };
+        let mut cur_device_name = get_device_name();
+        loop {
+            tokio::time::sleep(Duration::from_secs(1)).await;
+            let mut def_device_name = get_device_name();
+            if cur_device_name != def_device_name {
+                cur_device_name = def_device_name;
+                info!("默认输出设备发生改变，正在尝试重新创建输出设备");
+                poll_default_tx
+                    .send(AudioOutputMessage::ChangeOutput("".into()))
+                    .await;
+            }
+        }
+    });
+    handle.spawn_blocking(move || {
         let mut output = init_audio_player("").ok();
         let mut current_volume = 0.5;
         if let Some(output) = &mut output {
@@ -386,8 +417,9 @@ pub fn create_audio_output_thread() -> AudioOutputSender {
                             if output.is_dead() {
                                 should_recrate = true;
                                 info!("现有输出设备已断开，正在重新初始化播放器");
+                            } else {
+                                output.write(decoded.as_audio_buffer_ref());
                             }
-                            output.write(decoded.as_audio_buffer_ref());
                         }
                         if should_recrate {
                             output = init_audio_player("").ok();
@@ -405,6 +437,7 @@ pub fn create_audio_output_thread() -> AudioOutputSender {
                             new_output.set_volume(current_volume);
                             new_output.stream().play().unwrap();
                             output = Some(new_output);
+                            info!("已切换输出设备")
                         }
                         Err(err) => {
                             warn!("无法切换到输出设备 {output_name}: {err}");

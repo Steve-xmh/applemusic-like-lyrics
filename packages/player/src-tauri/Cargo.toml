@@ -24,6 +24,7 @@ tauri = { version = "^2.0", features = [ "devtools" ] }
 tauri-plugin-os = { version = "^2.0" }
 tauri-plugin-fs = { version = "^2.0" }
 tauri-plugin-dialog = { version = "^2.0" }
+tauri-plugin-shell = { version = "^2.0" }
 
 base64 = "^0.22"
 serde = { version = "1.0", features = ["derive"] }

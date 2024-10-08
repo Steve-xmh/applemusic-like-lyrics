@@ -37,3 +37,7 @@ body {
 		margin-right: 17px !important;
 	}
 }
+
+.img-border {
+	box-shadow: 0 0 0 1px var(--base-card-classic-border-color);
+}
