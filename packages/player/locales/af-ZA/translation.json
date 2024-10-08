@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": null,
     "buttonForDisplayOnly": null,
-    "loadAudioError": null
+    "loadAudioError": null,
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": null,
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": null,
       "confirm": null,
+      "close": null,
       "save": null
     },
     "page": {
