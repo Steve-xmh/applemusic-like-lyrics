@@ -259,6 +259,9 @@ export const PlaylistPage: FC = () => {
 		if (platform() === "android") {
 			filters.length = 0;
 		}
+		if (platform() === "ios") {
+			filters.length = 0;
+		}
 		const results = await open({
 			multiple: true,
 			title: "选择本地音乐",

@@ -241,7 +241,7 @@ pub fn init_audio_player(output_device_name: &str) -> anyhow::Result<Box<dyn Aud
         host.default_output_device().context("找不到默认输出设备")?
     } else {
         host.output_devices()
-            .unwrap()
+            .context("无法枚举输出设备")?
             .find(|d| d.name().unwrap_or_default() == output_device_name)
             .context("找不到指定的输出设备")?
     };
@@ -251,7 +251,7 @@ pub fn init_audio_player(output_device_name: &str) -> anyhow::Result<Box<dyn Aud
     );
     let configs = output
         .supported_output_configs()
-        .unwrap()
+        .context("无法获取输出配置")?
         .collect::<Vec<_>>();
     let mut selected_config = StreamConfig {
         channels: 2,
