@@ -185,17 +185,26 @@ fn init_audio_stream_inner<T: AudioOutputSample + Into<f64>>(
     let is_dead_c = Arc::clone(&is_dead);
     let volume: Arc<_> = Arc::new(AtomicU8::new(u8::MAX >> 1));
     let volume_c = volume.clone();
+    let mut is_drained = false;
     let stream = output
         .build_output_stream::<T, _, _>(
             &selected_config,
             move |data, _info| {
-                let written = cons.read(data).unwrap_or(0);
-                data[written..].fill(T::MID);
-                let volume = volume_c.load(std::sync::atomic::Ordering::Relaxed) as f32 / 255.;
-                data.iter_mut().for_each(|x| {
-                    let s: f32 = (*x).into_sample();
-                    *x = (s * volume).into_sample();
-                });
+                if let Ok(written) = cons.read(data) {
+                    is_drained = false;
+                    data[written..].fill(T::MID);
+                    let volume = volume_c.load(std::sync::atomic::Ordering::Relaxed) as f32 / 255.;
+                    data.iter_mut().for_each(|x| {
+                        let s: f32 = (*x).into_sample();
+                        *x = (s * volume).into_sample();
+                    });
+                } else {
+                    data.fill(T::MID);
+                    if !is_drained {
+                        is_drained = true;
+                        warn!("音频输出流环缓冲区已耗尽（有可能是音频已暂停或音频流因卡顿受阻），正在等待数据填充");
+                    }
+                }
             },
             move |err| {
                 warn!("[WARN][AT] {err}");
@@ -356,6 +365,10 @@ impl AudioOutputSender {
         Ok(())
     }
 
+    pub async fn wait_empty(&self) {
+        self.sender.reserve_many(self.sender.max_capacity()).await;
+    }
+
     pub async fn write(&self, id: usize, decoded: OwnedAudioBuffer) -> anyhow::Result<()> {
         self.sender
             .send(AudioOutputMessage::Write(id, decoded))
@@ -373,7 +386,7 @@ impl AudioOutputSender {
 
 // TODO: 允许指定需要的输出设备
 pub fn create_audio_output_thread() -> AudioOutputSender {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(1);
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(16);
     let handle = tokio::runtime::Handle::current();
     let poll_default_tx = tx.clone();
     // 通过轮询检测是否需要重新创建音频输出设备流

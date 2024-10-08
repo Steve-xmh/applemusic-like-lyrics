@@ -11,6 +11,12 @@ exclude = [
     "./packages/skia-player",
 ]
 
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = 3
