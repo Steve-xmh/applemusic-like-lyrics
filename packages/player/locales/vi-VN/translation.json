@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": "Hãy nhấp chuột phải vào bất kỳ chỗ nào trên trang lời bài hát để mở Menu!",
     "buttonForDisplayOnly": "Nút này chỉ dùng để hiển thị, hiện tại không có chức năng thực tế ",
-    "loadAudioError": "Lỗi tải âm thanh từ tệp {error}"
+    "loadAudioError": "Lỗi tải âm thanh từ tệp {error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "Tạo danh sách phát mới.",
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": "Hủy bỏ",
       "confirm": "Xác nhận",
+      "close": null,
       "save": "Lưu"
     },
     "page": {
