@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}"
+    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "New Playlist",
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": "Cancel",
       "confirm": "Confirm",
+      "close": null,
       "save": "Save"
     },
     "page": {
