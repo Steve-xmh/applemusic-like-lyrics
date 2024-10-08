@@ -15,7 +15,17 @@
     },
     "openMenuViaRightClick": "歌詞ページの任意の場所を右クリックしてメニューを開きます。",
     "buttonForDisplayOnly": "このボタンは表示のみを目的としており、現時点では実際の機能はありません。",
-    "loadAudioError": null
+    "loadAudioError": null,
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "新プレイリストを作成する",
@@ -28,6 +38,7 @@
     "dialog": {
       "cancel": "キャンセル",
       "confirm": "確認",
+      "close": null,
       "save": "セーブ"
     },
     "page": {
