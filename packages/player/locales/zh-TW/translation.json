@@ -17,28 +17,28 @@
     "buttonForDisplayOnly": "此按鈕僅供展示用途，暫無實際功能",
     "loadAudioError": "播放後端加載音頻失敗\n{error}",
     "ttmlImportDialog": {
-      "openButtonLabel": null,
-      "title": null,
+      "openButtonLabel": "從 AMLL TTML DB 搜尋 / 導入歌詞",
+      "title": "從 AMLL TTML DB 搜尋 / 導入歌詞",
       "searchInput": {
-        "placeholder": null
+        "placeholder": "搜尋歌曲、歌詞內容、歌手等……"
       },
-      "tip": null,
-      "supportText": null,
-      "noResults": null
+      "tip": "在上方輸入搜尋關鍵字，點選候選項即可將歌詞內容直接匯入歌詞資料。",
+      "supportText": "AMLL TTML DB 是由 AMLL 社群愛好者們一同建立的開源無版權歌詞資料庫，想為 AMLL TTML DB 貢獻歌詞嗎？前往<1>GitHub 倉庫</1>即可了解提交歌詞流程！",
+      "noResults": "無結果"
     }
   },
   "newPlaylist": {
     "buttonLabel": "新建播放清單",
     "dialog": {
-      "title": "新建清單",
-      "namePlaceholder": "清單名稱"
+      "title": "新建歌單",
+      "namePlaceholder": "歌單名稱"
     }
   },
   "common": {
     "dialog": {
       "cancel": "取消",
       "confirm": "確認",
-      "close": null,
+      "close": "關閉",
       "save": "儲存"
     },
     "page": {
@@ -75,7 +75,7 @@
       "playlistMenu": {
         "delete": "刪除"
       },
-      "loadingPlaylist": "載入清單中"
+      "loadingPlaylist": "載入歌單中"
     },
     "playlist": {
       "music": {
