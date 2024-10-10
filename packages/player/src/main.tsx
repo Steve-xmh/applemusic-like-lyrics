@@ -4,6 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Provider } from "jotai";
 import React from "react";
+import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +14,8 @@ import "./styles.css";
 import "./utils/player";
 
 (window as any).wsp = wsp;
+(window as any).React = React;
+(window as any).ReactDOM = ReactDOM;
 
 const ErrorRender = (props: FallbackProps) => {
 	console.error(props.error);

@@ -386,7 +386,7 @@ impl AudioOutputSender {
 
 // TODO: 允许指定需要的输出设备
 pub fn create_audio_output_thread() -> AudioOutputSender {
-    let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(16);
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<AudioOutputMessage>(1);
     let handle = tokio::runtime::Handle::current();
     let poll_default_tx = tx.clone();
     // 通过轮询检测是否需要重新创建音频输出设备流
