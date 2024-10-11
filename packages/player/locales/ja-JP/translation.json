@@ -39,6 +39,10 @@
       "cancel": "キャンセル",
       "confirm": "確認",
       "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "セーブ"
     },
     "page": {
@@ -298,6 +302,30 @@
         "connectedClients": null,
         "noClients": null
       }
+    }
+  },
+  "settings": {
+    "player": {
+      "tab": null
+    },
+    "plugin": {
+      "tab": null,
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null
+    }
+  },
+  "name": null,
+  "plugin": {
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
     }
   }
 }
