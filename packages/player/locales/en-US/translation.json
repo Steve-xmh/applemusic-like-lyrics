@@ -39,6 +39,10 @@
       "cancel": "Cancel",
       "confirm": "Confirm",
       "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "Save"
     },
     "page": {
@@ -204,8 +208,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Mesh Gradient Renderer",
-          "pixiRenderer": "PixiJS Renderer"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
         "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
@@ -298,6 +302,30 @@
         "connectedClients": "Connected client(s)",
         "noClients": "No clients connected"
       }
+    }
+  },
+  "settings": {
+    "player": {
+      "tab": null
+    },
+    "plugin": {
+      "tab": null,
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null
+    }
+  },
+  "name": null,
+  "plugin": {
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
     }
   }
 }
