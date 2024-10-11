@@ -13,7 +13,7 @@ import {
 import { path } from "@tauri-apps/api";
 import { BaseDirectory } from "@tauri-apps/api/path";
 import { open as dialogOpen } from "@tauri-apps/plugin-dialog";
-import { copyFile, mkdir, rename } from "@tauri-apps/plugin-fs";
+import { copyFile, mkdir, remove, rename } from "@tauri-apps/plugin-fs";
 import { open as shellOpen } from "@tauri-apps/plugin-shell";
 import { atom, useAtomValue, useStore } from "jotai";
 import type { FC } from "react";
@@ -219,7 +219,16 @@ export const PluginTab: FC = () => {
 								store.set(requireRestartAtom, true);
 							}}
 						/>
-						<IconButton variant="soft">
+						<IconButton
+							variant="soft"
+							onClick={async () => {
+								const pluginDir = await store.get(pluginDirAtom);
+								const pluginPath = await path.join(pluginDir, meta.fileName);
+								await remove(pluginPath);
+								store.set(pluginMetaAtom);
+								store.set(requireRestartAtom, true);
+							}}
+						>
 							<TrashIcon />
 						</IconButton>
 					</Flex>

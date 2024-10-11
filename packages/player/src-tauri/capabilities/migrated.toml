@@ -41,6 +41,8 @@ identifier = "fs:default"
 [[permissions]]
 identifier = "fs:allow-rename"
 [[permissions]]
+identifier = "fs:allow-remove"
+[[permissions]]
 identifier = "fs:scope"
 allow = ["$APPDATA/**"]
 [[permissions]]
