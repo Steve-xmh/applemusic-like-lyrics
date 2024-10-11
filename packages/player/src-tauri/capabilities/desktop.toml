@@ -1,0 +1,9 @@
+
+"$schema" = "../gen/schemas/desktop-schema.json"
+
+identifier = "desktop-capability"
+local = true
+windows = ["main"]
+platforms = ["macOS", "windows", "linux"]
+
+permissions = ["updater:default"]

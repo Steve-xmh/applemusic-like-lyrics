@@ -1,0 +1,53 @@
+"$schema" = "../gen/schemas/desktop-schema.json"
+
+identifier = "migrated"
+local = true
+windows = ["main"]
+
+[[permissions]]
+identifier = "core:window:default"
+[[permissions]]
+identifier = "core:path:default"
+[[permissions]]
+identifier = "core:path:allow-normalize"
+[[permissions]]
+identifier = "core:event:allow-emit"
+[[permissions]]
+identifier = "core:event:allow-emit-to"
+[[permissions]]
+identifier = "core:event:allow-listen"
+[[permissions]]
+identifier = "core:event:allow-unlisten"
+[[permissions]]
+identifier = "core:window:allow-start-dragging"
+[[permissions]]
+identifier = "core:window:allow-start-resize-dragging"
+[[permissions]]
+identifier = "core:window:allow-close"
+[[permissions]]
+identifier = "core:window:allow-maximize"
+[[permissions]]
+identifier = "core:window:allow-is-maximizable"
+[[permissions]]
+identifier = "core:window:allow-unmaximize"
+[[permissions]]
+identifier = "core:window:allow-minimize"
+[[permissions]]
+identifier = "core:window:allow-set-fullscreen"
+[[permissions]]
+identifier = "shell:default"
+[[permissions]]
+identifier = "fs:default"
+[[permissions]]
+identifier = "fs:allow-rename"
+[[permissions]]
+identifier = "fs:scope"
+allow = ["$APPDATA/**"]
+[[permissions]]
+identifier = "fs:allow-stat"
+[[permissions]]
+identifier = "fs:read-app-specific-dirs-recursive"
+[[permissions]]
+identifier = "fs:create-app-specific-dirs"
+[[permissions]]
+identifier = "dialog:default"

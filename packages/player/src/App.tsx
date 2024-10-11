@@ -3,7 +3,7 @@ import { Box, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { useEffect, useLayoutEffect } from "react";
+import { StrictMode, Suspense, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -12,6 +12,7 @@ import styles from "./App.module.css";
 import { AMLLWrapper } from "./components/AMLLWrapper";
 import { LocalMusicContext } from "./components/LocalMusicContext";
 import { NowPlayingBar } from "./components/NowPlayingBar";
+import { PluginContext } from "./components/PluginContext";
 import { UpdateContext } from "./components/UpdateContext";
 import { WSProtocolMusicContext } from "./components/WSProtocolMusicContext";
 import "./i18n";
@@ -59,36 +60,42 @@ function App() {
 
 	return (
 		<>
+			{/* 上下文组件均不建议被 StrictMode 包含，以免重复加载插件发生问题  */}
 			{musicContextMode === MusicContextMode.Local && <LocalMusicContext />}
 			{musicContextMode === MusicContextMode.WSProtocol && (
 				<WSProtocolMusicContext />
 			)}
 			<UpdateContext />
-			<Theme
-				appearance="dark"
-				panelBackground="solid"
-				className={styles.radixTheme}
-			>
-				<Box
-					className={classNames(
-						styles.body,
-						isLyricPageOpened && styles.amllOpened,
-					)}
+			<Suspense>
+				<PluginContext />
+			</Suspense>
+			<StrictMode>
+				<Theme
+					appearance="dark"
+					panelBackground="solid"
+					className={styles.radixTheme}
 				>
-					<Box className={styles.container}>
-						<RouterProvider router={router} />
+					<Box
+						className={classNames(
+							styles.body,
+							isLyricPageOpened && styles.amllOpened,
+						)}
+					>
+						<Box className={styles.container}>
+							<RouterProvider router={router} />
+						</Box>
+						<NowPlayingBar />
 					</Box>
-					<NowPlayingBar />
-				</Box>
-				<AMLLWrapper />
-				<ToastContainer
-					theme="dark"
-					position="bottom-right"
-					style={{
-						marginBottom: "150px",
-					}}
-				/>
-			</Theme>
+					<AMLLWrapper />
+					<ToastContainer
+						theme="dark"
+						position="bottom-right"
+						style={{
+							marginBottom: "150px",
+						}}
+					/>
+				</Theme>
+			</StrictMode>
 		</>
 	);
 }

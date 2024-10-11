@@ -1,13 +1,14 @@
 import * as wsp from "@applemusic-like-lyrics/ws-protocol";
-import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
+import * as RadixTheme from "@radix-ui/themes";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import * as Jotai from "jotai";
 import { Provider } from "jotai";
 import React from "react";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import "react-toastify/dist/ReactToastify.css";
+import JSXRuntime from "react/jsx-runtime";
 import App from "./App";
 import "./i18n";
 import "./styles.css";
@@ -16,6 +17,9 @@ import "./utils/player";
 (window as any).wsp = wsp;
 (window as any).React = React;
 (window as any).ReactDOM = ReactDOM;
+(window as any).Jotai = Jotai;
+(window as any).RadixTheme = RadixTheme;
+(window as any).JSXRuntime = JSXRuntime;
 
 const ErrorRender = (props: FallbackProps) => {
 	console.error(props.error);
@@ -68,32 +72,10 @@ addEventListener("on-system-titlebar-click-minimize", async () => {
 	await win.minimize();
 });
 
-invoke("ws_reopen_connection", {
-	addr: "",
-});
-
-invoke("ws_get_connections").then((v) => {
-	console.log("当前已连接", v);
-});
-
-listen("on-client-connected", (event) => {
-	console.log("已连接新播放状态源", event);
-});
-
-listen("on-client-disconnected", (event) => {
-	console.log("已断开播放状态源", event);
-});
-
-listen("audio-player-msg", (event) => {
-	console.log("接收到播放后端信息", event);
-});
-
 createRoot(document.getElementById("root") as HTMLElement).render(
-	<React.StrictMode>
-		<ErrorBoundary fallbackRender={ErrorRender}>
-			<Provider>
-				<App />
-			</Provider>
-		</ErrorBoundary>
-	</React.StrictMode>,
+	<ErrorBoundary fallbackRender={ErrorRender}>
+		<Provider>
+			<App />
+		</Provider>
+	</ErrorBoundary>,
 );

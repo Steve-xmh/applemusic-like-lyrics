@@ -39,6 +39,10 @@
       "cancel": "取消",
       "confirm": "确认",
       "close": "关闭",
+      "filter": {
+        "js": "JavaScript 文件 (*.js)",
+        "all": "全部文件 (*.*)"
+      },
       "save": "保存"
     },
     "page": {
@@ -204,8 +208,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "网格渐变渲染器（MeshGradientRenderer）",
-          "pixiRenderer": "PixiJS 渲染器（PixiRenderer）"
+          "meshGradientRenderer": "网格渐变渲染器",
+          "pixiRenderer": "PixiJS 渲染器"
         },
         "subtitle": "歌词背景",
         "backgroundRenderer": {
@@ -298,6 +302,30 @@
         "connectedClients": "已连接的客户端",
         "noClients": "无"
       }
+    }
+  },
+  "settings": {
+    "player": {
+      "tab": "AMLL Player 设置"
+    },
+    "plugin": {
+      "tab": "插件管理",
+      "safetyWarning": "插件将可以访问并操作你的所有数据，包括你的歌单、播放信息等数据，请务必确保插件来源可靠安全，并只安装你信任的插件！作者不承担使用任何插件后产生的一切后果！",
+      "wipWarning": "插件接口功能仍在开发中，其插件接口有可能随时变更，敬请留意！",
+      "install": {
+        "title": "请选择需要载入的 JavaScript 插件文件"
+      },
+      "installPlugins": "安装插件",
+      "openPluginDirectory": "打开插件文件夹"
+    }
+  },
+  "name": "",
+  "plugin": {
+    "error": {
+      "invaildPluginFile": "无效插件文件",
+      "missingDependency": "缺失依赖项",
+      "missingMetadata": "缺失必需元数据",
+      "pluginIdConflict": "插件 ID 冲突"
     }
   }
 }

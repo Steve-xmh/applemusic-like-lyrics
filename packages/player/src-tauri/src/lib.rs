@@ -212,7 +212,7 @@ fn init_logging() {
     }
     std::panic::set_hook(Box::new(move |info| {
         error!("Fatal error occurred! AMLL Player will exit now.");
-        error!("Error:");
+        error!("Error: {info}");
         error!("{info:#?}");
     }));
 }
