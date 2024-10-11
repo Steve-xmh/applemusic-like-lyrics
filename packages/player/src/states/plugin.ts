@@ -1,5 +1,5 @@
 import { appDataDir, join } from "@tauri-apps/api/path";
-import { readDir, readTextFile } from "@tauri-apps/plugin-fs";
+import { mkdir, readDir, readTextFile } from "@tauri-apps/plugin-fs";
 import { atom } from "jotai";
 import type { PlayerPluginContext } from "../components/PluginContext";
 import i18n from "../i18n";
@@ -42,6 +42,7 @@ export const pluginMetaAtom = atom(
 	async (get) => {
 		get(reloadPluginMetaAtom);
 		const pluginDir = await get(pluginDirAtom);
+		await mkdir(pluginDir, { recursive: true });
 		const plugins = await readDir(pluginDir);
 		const META_REGEX = /^\/\/\s*@(\S+)\s*(.+)$/;
 		const pluginMetas = await Promise.all(
