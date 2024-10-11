@@ -39,6 +39,10 @@
       "cancel": "Hủy bỏ",
       "confirm": "Xác nhận",
       "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "Lưu"
     },
     "page": {
@@ -204,8 +208,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Trình tạo hiệu ứng mờ dần bằng lưới",
-          "pixiRenderer": "Trình tạo hình ảnh PixiJS"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
         "subtitle": "Nền của lời bài hát",
         "backgroundRenderer": {
@@ -298,6 +302,30 @@
         "connectedClients": "Các máy khách đã kết nối",
         "noClients": "Không có kết nối máy khách nào"
       }
+    }
+  },
+  "settings": {
+    "player": {
+      "tab": null
+    },
+    "plugin": {
+      "tab": null,
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null
+    }
+  },
+  "name": null,
+  "plugin": {
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
     }
   }
 }
