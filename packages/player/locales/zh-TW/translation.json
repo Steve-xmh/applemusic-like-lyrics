@@ -39,6 +39,10 @@
       "cancel": "取消",
       "confirm": "確認",
       "close": "關閉",
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "儲存"
     },
     "page": {
@@ -204,8 +208,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "網格漸層渲染器（MeshGradientRenderer）",
-          "pixiRenderer": "PixiJS 渲染器（PixiRenderer）"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
         "subtitle": "歌詞背景",
         "backgroundRenderer": {
@@ -298,6 +302,30 @@
         "connectedClients": "已連線的客戶端",
         "noClients": "無"
       }
+    }
+  },
+  "settings": {
+    "player": {
+      "tab": null
+    },
+    "plugin": {
+      "tab": null,
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null
+    }
+  },
+  "name": null,
+  "plugin": {
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
     }
   }
 }
