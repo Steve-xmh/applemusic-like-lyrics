@@ -27,6 +27,20 @@
       "noResults": null
     }
   },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
+  },
   "newPlaylist": {
     "buttonLabel": "New Playlist",
     "dialog": {
@@ -106,6 +120,15 @@
       "shufflePlayAll": "Shuffle"
     },
     "settings": {
+      "others": {
+        "restartProgram": "Restart player",
+        "subtitle": "Others",
+        "showStatJSFrame": {
+          "label": "Show performance statics",
+          "description": "Show fps, frame time, memory [Chromium only]. Less impact of performance."
+        },
+        "enterAmllDevPage": "Development tools"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "Font Preview",
@@ -238,15 +261,6 @@
           "label": "Swap Translation and Romanized Translation",
           "description": "Only valid when the above two are enabled."
         }
-      },
-      "others": {
-        "subtitle": "Others",
-        "showStatJSFrame": {
-          "label": "Show performance statics",
-          "description": "Show fps, frame time, memory [Chromium only]. Less impact of performance."
-        },
-        "restartProgram": "Restart player",
-        "enterAmllDevPage": "Development tools"
       }
     },
     "about": {
@@ -305,27 +319,19 @@
     }
   },
   "settings": {
-    "player": {
-      "tab": null
-    },
-    "plugin": {
-      "tab": null,
+    "extension": {
       "safetyWarning": null,
       "wipWarning": null,
       "install": {
         "title": null
       },
       "installPlugins": null,
-      "openPluginDirectory": null
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
     }
   },
-  "name": null,
-  "plugin": {
-    "error": {
-      "invaildPluginFile": null,
-      "missingDependency": null,
-      "missingMetadata": null,
-      "pluginIdConflict": null
-    }
-  }
+  "name": null
 }
