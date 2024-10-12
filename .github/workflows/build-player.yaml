@@ -1,8 +1,8 @@
 name: 构建 AMLL Player Tauri 桌面版本
 on:
   push:
-    branches-ignore:
-      - i10n_*
+    branches:
+      - full-refractor
   workflow_dispatch:
 
 concurrency:

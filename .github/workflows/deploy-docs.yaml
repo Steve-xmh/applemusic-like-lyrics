@@ -2,8 +2,8 @@ name: "构建并部署开发文档"
 
 on:
   push:
-    branches-ignore:
-      - i10n_*
+    branches:
+      - full-refractor
 
 jobs:
   deploy-docs:
