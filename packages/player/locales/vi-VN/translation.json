@@ -15,7 +15,31 @@
     },
     "openMenuViaRightClick": "Hãy nhấp chuột phải vào bất kỳ chỗ nào trên trang lời bài hát để mở Menu!",
     "buttonForDisplayOnly": "Nút này chỉ dùng để hiển thị, hiện tại không có chức năng thực tế ",
-    "loadAudioError": "Lỗi tải âm thanh từ tệp {error}"
+    "loadAudioError": "Lỗi tải âm thanh từ tệp {error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
+  },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "Tạo danh sách phát mới.",
@@ -28,6 +52,11 @@
     "dialog": {
       "cancel": "Hủy bỏ",
       "confirm": "Xác nhận",
+      "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "Lưu"
     },
     "page": {
@@ -91,6 +120,15 @@
       "shufflePlayAll": "Phát ngẫu nhiên"
     },
     "settings": {
+      "others": {
+        "restartProgram": "Khởi động lại chương trình",
+        "subtitle": "Các tùy chọn khác",
+        "showStatJSFrame": {
+          "label": "Hiển thị thông tin thống kê hiệu suất",
+          "description": "Có thể xem thông tin chiếm dụng bộ nhớ (chỉ dành cho các hệ thống Chromium) và các thông tin khác, ảnh hưởng đến hiệu suất khá nhỏ."
+        },
+        "enterAmllDevPage": "Công cụ phát triển trang lời bài hát"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "Xem trước phông chữ",
@@ -193,8 +231,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Trình tạo hiệu ứng mờ dần bằng lưới",
-          "pixiRenderer": "Trình tạo hình ảnh PixiJS"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
         "subtitle": "Nền của lời bài hát",
         "backgroundRenderer": {
@@ -223,15 +261,6 @@
           "label": "Bật chức năng hoán đổi giữa lời bài hát và lời dịch",
           "description": "Chỉ có hai tùy chọn trên mới có hiệu lực khi được bật"
         }
-      },
-      "others": {
-        "subtitle": "Các tùy chọn khác",
-        "showStatJSFrame": {
-          "label": "Hiển thị thông tin thống kê hiệu suất",
-          "description": "Có thể xem thông tin chiếm dụng bộ nhớ (chỉ dành cho các hệ thống Chromium) và các thông tin khác, ảnh hưởng đến hiệu suất khá nhỏ."
-        },
-        "restartProgram": "Khởi động lại chương trình",
-        "enterAmllDevPage": "Công cụ phát triển trang lời bài hát"
       }
     },
     "about": {
@@ -288,5 +317,21 @@
         "noClients": "Không có kết nối máy khách nào"
       }
     }
-  }
+  },
+  "settings": {
+    "extension": {
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
+    }
+  },
+  "name": null
 }

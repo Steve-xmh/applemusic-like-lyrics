@@ -15,7 +15,31 @@
     },
     "openMenuViaRightClick": "Please right-click anywhere to open menu",
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
-    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}"
+    "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
+  },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "New Playlist",
@@ -28,6 +52,11 @@
     "dialog": {
       "cancel": "Cancel",
       "confirm": "Confirm",
+      "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": "Save"
     },
     "page": {
@@ -91,6 +120,15 @@
       "shufflePlayAll": "Shuffle"
     },
     "settings": {
+      "others": {
+        "restartProgram": "Restart player",
+        "subtitle": "Others",
+        "showStatJSFrame": {
+          "label": "Show performance statics",
+          "description": "Show fps, frame time, memory [Chromium only]. Less impact of performance."
+        },
+        "enterAmllDevPage": "Development tools"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "Font Preview",
@@ -193,8 +231,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "Mesh Gradient Renderer",
-          "pixiRenderer": "PixiJS Renderer"
+          "meshGradientRenderer": null,
+          "pixiRenderer": null
         },
         "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
@@ -223,15 +261,6 @@
           "label": "Swap Translation and Romanized Translation",
           "description": "Only valid when the above two are enabled."
         }
-      },
-      "others": {
-        "subtitle": "Others",
-        "showStatJSFrame": {
-          "label": "Show performance statics",
-          "description": "Show fps, frame time, memory [Chromium only]. Less impact of performance."
-        },
-        "restartProgram": "Restart player",
-        "enterAmllDevPage": "Development tools"
       }
     },
     "about": {
@@ -288,5 +317,21 @@
         "noClients": "No clients connected"
       }
     }
-  }
+  },
+  "settings": {
+    "extension": {
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
+    }
+  },
+  "name": null
 }

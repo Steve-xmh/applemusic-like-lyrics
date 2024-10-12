@@ -15,7 +15,31 @@
     },
     "openMenuViaRightClick": null,
     "buttonForDisplayOnly": null,
-    "loadAudioError": null
+    "loadAudioError": null,
+    "ttmlImportDialog": {
+      "openButtonLabel": null,
+      "title": null,
+      "searchInput": {
+        "placeholder": null
+      },
+      "tip": null,
+      "supportText": null,
+      "noResults": null
+    }
+  },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": null,
@@ -28,6 +52,11 @@
     "dialog": {
       "cancel": null,
       "confirm": null,
+      "close": null,
+      "filter": {
+        "js": null,
+        "all": null
+      },
       "save": null
     },
     "page": {
@@ -91,6 +120,15 @@
       "shufflePlayAll": null
     },
     "settings": {
+      "others": {
+        "restartProgram": null,
+        "subtitle": null,
+        "showStatJSFrame": {
+          "label": null,
+          "description": null
+        },
+        "enterAmllDevPage": null
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": null,
@@ -223,15 +261,6 @@
           "label": null,
           "description": null
         }
-      },
-      "others": {
-        "subtitle": null,
-        "showStatJSFrame": {
-          "label": null,
-          "description": null
-        },
-        "restartProgram": null,
-        "enterAmllDevPage": null
       }
     },
     "about": {
@@ -288,5 +317,21 @@
         "noClients": null
       }
     }
-  }
+  },
+  "settings": {
+    "extension": {
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
+    }
+  },
+  "name": null
 }

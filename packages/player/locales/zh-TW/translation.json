@@ -15,19 +15,48 @@
     },
     "openMenuViaRightClick": "請右鍵歌詞介面任意位置打開目錄哦！",
     "buttonForDisplayOnly": "此按鈕僅供展示用途，暫無實際功能",
-    "loadAudioError": "播放後端加載音頻失敗\n{error}"
+    "loadAudioError": "播放後端加載音頻失敗\n{error}",
+    "ttmlImportDialog": {
+      "openButtonLabel": "從 AMLL TTML DB 搜尋 / 導入歌詞",
+      "title": "從 AMLL TTML DB 搜尋 / 導入歌詞",
+      "searchInput": {
+        "placeholder": "搜尋歌曲、歌詞內容、歌手等……"
+      },
+      "tip": "在上方輸入搜尋關鍵字，點選候選項即可將歌詞內容直接匯入歌詞資料。",
+      "supportText": "AMLL TTML DB 是由 AMLL 社群愛好者們一同建立的開源無版權歌詞資料庫，想為 AMLL TTML DB 貢獻歌詞嗎？前往<1>GitHub 倉庫</1>即可了解提交歌詞流程！",
+      "noResults": "無結果"
+    }
+  },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
   },
   "newPlaylist": {
     "buttonLabel": "新建播放清單",
     "dialog": {
-      "title": "新建清單",
-      "namePlaceholder": "清單名稱"
+      "title": "新建歌單",
+      "namePlaceholder": "歌單名稱"
     }
   },
   "common": {
     "dialog": {
       "cancel": "取消",
       "confirm": "確認",
+      "close": "關閉",
+      "filter": {
+        "js": "JavaScript 檔案 (*.js)",
+        "all": "全部檔案 (*.*)"
+      },
       "save": "儲存"
     },
     "page": {
@@ -64,7 +93,7 @@
       "playlistMenu": {
         "delete": "刪除"
       },
-      "loadingPlaylist": "載入清單中"
+      "loadingPlaylist": "載入歌單中"
     },
     "playlist": {
       "music": {
@@ -76,10 +105,10 @@
         }
       },
       "addLocalMusic": {
-        "filterName": "音頻文檔",
+        "filterName": "音頻檔案",
         "allFiles": "所有檔案",
         "toast": {
-          "parsingMusicMetadata": "正在解析音樂元數據以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
+          "parsingMusicMetadata": "正在解析音樂後設資料以添加歌曲 ({current, plural, other {#}} / {total, plural, other {#}})",
           "partiallyFailed": "已添加 {succeed, plural, other {#}} 首歌曲，其中 {errored, plural, other {#}} 首歌曲添加失敗",
           "allFailed": "{errored, plural, other {#}} 首歌曲添加失敗",
           "success": "已全部添加 {count, plural, other {#}} 首歌曲"
@@ -91,6 +120,15 @@
       "shufflePlayAll": "隨機播放"
     },
     "settings": {
+      "others": {
+        "restartProgram": "重啟程序",
+        "subtitle": "雜項",
+        "showStatJSFrame": {
+          "label": "顯示效能統計訊息",
+          "description": "可以看到幀率、幀生成時間、內存佔用（僅Chromium系）等訊息，對效能影響較小。"
+        },
+        "enterAmllDevPage": "歌詞介面開發用工具"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "字體預覽 Font Preview",
@@ -193,8 +231,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "網格漸層渲染器（MeshGradientRenderer）",
-          "pixiRenderer": "PixiJS 渲染器（PixiRenderer）"
+          "meshGradientRenderer": "網格漸變渲染器",
+          "pixiRenderer": "PixiJS 渲染器"
         },
         "subtitle": "歌詞背景",
         "backgroundRenderer": {
@@ -223,15 +261,6 @@
           "label": "啟用音譯歌詞与翻譯歌詞互換",
           "description": "僅上面二者啟用后有效"
         }
-      },
-      "others": {
-        "subtitle": "雜項",
-        "showStatJSFrame": {
-          "label": "顯示效能統計訊息",
-          "description": "可以看到幀率、幀生成時間、內存佔用（僅Chromium系）等訊息，對效能影響較小。"
-        },
-        "restartProgram": "重啟程序",
-        "enterAmllDevPage": "歌詞介面開發用工具"
       }
     },
     "about": {
@@ -250,7 +279,7 @@
         "musicDuration": "音樂時長",
         "tabs": {
           "basic": "基本",
-          "metadata": "數據元",
+          "metadata": "後設資料",
           "lyric": "歌詞"
         }
       },
@@ -277,7 +306,7 @@
         "songArtists": "音樂作者",
         "songAlbum": "音樂專輯名",
         "changeCoverToImageOrVideo": "更換封面圖為圖片 / 影片",
-        "reloadMetadataFromFile": "重新從檔案讀取元數據"
+        "reloadMetadataFromFile": "重新從檔案讀取後設資料"
       }
     },
     "ws": {
@@ -288,5 +317,21 @@
         "noClients": "無"
       }
     }
-  }
+  },
+  "settings": {
+    "extension": {
+      "safetyWarning": null,
+      "wipWarning": null,
+      "install": {
+        "title": null
+      },
+      "installPlugins": null,
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
+    }
+  },
+  "name": null
 }
