@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { type EventCallback, listen } from "@tauri-apps/api/event";
+import chalk from "chalk";
 import { uid } from "uid";
 
 export interface AudioThreadEventMessage<T> {
@@ -154,7 +155,10 @@ export type AudioThreadEvent =
 const msgTasks = new Map<string, (value: unknown) => void>();
 
 async function initAudioThread() {
-	console.log("后台线程连接初始化中");
+	console.log(
+		chalk.bgHex("#FF7700").hex("#FFFFFF")(" BACKEND  "),
+		"后台线程连接初始化中",
+	);
 	await listen<AudioThreadEventMessage<AudioThreadEvent>>(
 		"audio_player_msg",
 		(evt) => {
@@ -165,7 +169,10 @@ async function initAudioThread() {
 			}
 		},
 	);
-	console.log("后台线程连接初始化完成");
+	console.log(
+		chalk.bgHex("#FF7700").hex("#FFFFFF")(" BACKEND "),
+		"后台线程连接初始化完成",
+	);
 }
 
 initAudioThread();

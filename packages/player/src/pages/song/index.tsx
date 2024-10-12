@@ -12,6 +12,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useContext } from "react";
 import { Trans } from "react-i18next";
 import { useParams } from "react-router-dom";
+import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint";
 import { db } from "../../dexie";
 import { useSongCover } from "../../utils/use-song-cover";
 import { BasicTabContent } from "./basic";
@@ -62,6 +63,7 @@ export const SongPage: FC = () => {
 				<SongPageHeader />
 				<Tabs.Root defaultValue="basic">
 					<Tabs.List>
+						<ExtensionInjectPoint injectPointName="page.song.tab.list.before" />
 						<Tabs.Trigger value="basic">
 							<Trans i18nKey="page.song.basic.tabs.basic">基本</Trans>
 						</Tabs.Trigger>
@@ -71,8 +73,10 @@ export const SongPage: FC = () => {
 						<Tabs.Trigger value="lyric">
 							<Trans i18nKey="page.song.basic.tabs.lyric">歌词</Trans>
 						</Tabs.Trigger>
+						<ExtensionInjectPoint injectPointName="page.song.tab.list.after" />
 					</Tabs.List>
 					<Box pt="3">
+						<ExtensionInjectPoint injectPointName="page.song.tab.content.before" />
 						<Tabs.Content value="basic">
 							<BasicTabContent />
 						</Tabs.Content>
@@ -82,6 +86,7 @@ export const SongPage: FC = () => {
 						<Tabs.Content value="lyric">
 							<LyricTabContent />
 						</Tabs.Content>
+						<ExtensionInjectPoint injectPointName="page.song.tab.content.after" />
 					</Box>
 				</Tabs.Root>
 			</SongContext.Provider>

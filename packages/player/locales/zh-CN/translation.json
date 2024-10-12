@@ -27,6 +27,20 @@
       "noResults": "无结果"
     }
   },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": "扩展程序 {id} 在注入组件 / 功能到 {injectPointName} 槽位时发生错误：",
+        "toastText": "扩展程序 {id} 在注入组件 / 功能到 {injectPointName} 槽位时发生错误：\n{error}"
+      }
+    },
+    "error": {
+      "invaildPluginFile": "无效插件文件",
+      "missingDependency": "缺失依赖项",
+      "missingMetadata": "缺失必需元数据",
+      "pluginIdConflict": "插件 ID 冲突"
+    }
+  },
   "newPlaylist": {
     "buttonLabel": "新建播放列表",
     "dialog": {
@@ -106,6 +120,15 @@
       "shufflePlayAll": "随机播放"
     },
     "settings": {
+      "others": {
+        "restartProgram": "重启程序",
+        "subtitle": "杂项",
+        "showStatJSFrame": {
+          "label": "显示性能统计信息",
+          "description": "可以看到帧率、帧时间、内存占用（仅 Chromuim 系）等信息，对性能影响较小。"
+        },
+        "enterAmllDevPage": "歌词页面开发用工具"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "字体预览 Font Preview",
@@ -238,15 +261,6 @@
           "label": "启用音译歌词与翻译歌词互换",
           "description": "仅上面两者启用后有效"
         }
-      },
-      "others": {
-        "subtitle": "杂项",
-        "showStatJSFrame": {
-          "label": "显示性能统计信息",
-          "description": "可以看到帧率、帧时间、内存占用（仅 Chromuim 系）等信息，对性能影响较小。"
-        },
-        "restartProgram": "重启程序",
-        "enterAmllDevPage": "歌词页面开发用工具"
       }
     },
     "about": {
@@ -305,27 +319,19 @@
     }
   },
   "settings": {
-    "player": {
-      "tab": "AMLL Player 设置"
-    },
-    "plugin": {
-      "tab": "插件管理",
+    "extension": {
       "safetyWarning": "插件将可以访问并操作你的所有数据，包括你的歌单、播放信息等数据，请务必确保插件来源可靠安全，并只安装你信任的插件！作者不承担使用任何插件后产生的一切后果！",
       "wipWarning": "插件接口功能仍在开发中，其插件接口有可能随时变更，敬请留意！",
       "install": {
         "title": "请选择需要载入的 JavaScript 插件文件"
       },
       "installPlugins": "安装插件",
-      "openPluginDirectory": "打开插件文件夹"
+      "openPluginDirectory": "打开插件文件夹",
+      "tab": "扩展程序管理"
+    },
+    "player": {
+      "tab": "AMLL Player 设置"
     }
   },
-  "name": "",
-  "plugin": {
-    "error": {
-      "invaildPluginFile": "无效插件文件",
-      "missingDependency": "缺失依赖项",
-      "missingMetadata": "缺失必需元数据",
-      "pluginIdConflict": "插件 ID 冲突"
-    }
-  }
+  "name": ""
 }

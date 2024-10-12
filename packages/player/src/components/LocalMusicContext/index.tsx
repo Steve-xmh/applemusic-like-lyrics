@@ -36,6 +36,7 @@ import {
 	onRequestPrevSongAtom,
 	onSeekPositionAtom,
 } from "@applemusic-like-lyrics/react-full";
+import chalk from "chalk";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useEffect, useLayoutEffect } from "react";
@@ -225,6 +226,8 @@ const MusicQualityTagText: FC = () => {
 
 	return null;
 };
+const TTML_LOG_TAG = chalk.bgHex("#FF5577").hex("#FFFFFF")(" TTML DB ");
+const LYRIC_LOG_TAG = chalk.bgHex("#FF4444").hex("#FFFFFF")(" LYRIC ");
 
 const LyricContext: FC = () => {
 	const musicId = useAtomValue(musicIdAtom);
@@ -238,7 +241,7 @@ const LyricContext: FC = () => {
 	useEffect(() => {
 		const sig = new AbortController();
 
-		console.log("同步 TTML DB 歌词库中");
+		console.log(TTML_LOG_TAG, "同步 TTML DB 歌词库中");
 
 		(async () => {
 			const fileListRes = await fetch(
@@ -251,6 +254,7 @@ const LyricContext: FC = () => {
 
 			if (fileListRes.status < 200 || fileListRes.status > 399) {
 				console.warn(
+					TTML_LOG_TAG,
 					"TTML DB 歌词库同步失败",
 					fileListRes.status,
 					fileListRes.statusText,
@@ -268,12 +272,12 @@ const LyricContext: FC = () => {
 				localFileList.add(obj.name);
 			});
 
-			console.log("本地已同步歌词数量", localFileList.size);
-			console.log("远程仓库歌词数量", remoteFileList.size);
+			console.log(TTML_LOG_TAG, "本地已同步歌词数量", localFileList.size);
+			console.log(TTML_LOG_TAG, "远程仓库歌词数量", remoteFileList.size);
 
 			const shouldFetchList = remoteFileList.difference(localFileList);
 
-			console.log("需要下载的歌词数量", shouldFetchList.size);
+			console.log(TTML_LOG_TAG, "需要下载的歌词数量", shouldFetchList.size);
 
 			let synced = 0;
 			let errored = 0;
@@ -315,6 +319,7 @@ const LyricContext: FC = () => {
 			);
 
 			console.log(
+				TTML_LOG_TAG,
 				"歌词同步完成，已同步 ",
 				synced,
 				" 首歌曲，有 ",
@@ -335,32 +340,36 @@ const LyricContext: FC = () => {
 				switch (song.lyricFormat) {
 					case "lrc": {
 						parsedLyricLines = parseLrc(song.lyric);
-						console.log("解析出 LyRiC 歌词", parsedLyricLines);
+						console.log(LYRIC_LOG_TAG, "解析出 LyRiC 歌词", parsedLyricLines);
 						break;
 					}
 					case "eslrc": {
 						parsedLyricLines = parseEslrc(song.lyric);
-						console.log("解析出 ESLyRiC 歌词", parsedLyricLines);
+						console.log(LYRIC_LOG_TAG, "解析出 ESLyRiC 歌词", parsedLyricLines);
 						break;
 					}
 					case "yrc": {
 						parsedLyricLines = parseYrc(song.lyric);
-						console.log("解析出 YRC 歌词", parsedLyricLines);
+						console.log(LYRIC_LOG_TAG, "解析出 YRC 歌词", parsedLyricLines);
 						break;
 					}
 					case "qrc": {
 						parsedLyricLines = parseQrc(song.lyric);
-						console.log("解析出 QRC 歌词", parsedLyricLines);
+						console.log(LYRIC_LOG_TAG, "解析出 QRC 歌词", parsedLyricLines);
 						break;
 					}
 					case "lys": {
 						parsedLyricLines = parseLys(song.lyric);
-						console.log("解析出 Lyricify Syllable 歌词", parsedLyricLines);
+						console.log(
+							LYRIC_LOG_TAG,
+							"解析出 Lyricify Syllable 歌词",
+							parsedLyricLines,
+						);
 						break;
 					}
 					case "ttml": {
 						parsedLyricLines = parseTTML(song.lyric).lines;
-						console.log("解析出 TTML 歌词", parsedLyricLines);
+						console.log(LYRIC_LOG_TAG, "解析出 TTML 歌词", parsedLyricLines);
 						break;
 					}
 					default: {
@@ -375,9 +384,9 @@ const LyricContext: FC = () => {
 						for (const line of translatedLyricLines) {
 							pairLyric(line, parsedLyricLines, "translatedLyric");
 						}
-						console.log("已匹配翻译歌词");
+						console.log(LYRIC_LOG_TAG, "已匹配翻译歌词");
 					} catch (err) {
-						console.warn("解析翻译歌词时出现错误", err);
+						console.warn(LYRIC_LOG_TAG, "解析翻译歌词时出现错误", err);
 					}
 				}
 				if (song.romanLrc) {
@@ -386,9 +395,9 @@ const LyricContext: FC = () => {
 						for (const line of romanLyricLines) {
 							pairLyric(line, parsedLyricLines, "romanLyric");
 						}
-						console.log("已匹配音译歌词");
+						console.log(LYRIC_LOG_TAG, "已匹配音译歌词");
 					} catch (err) {
-						console.warn("解析音译歌词时出现错误", err);
+						console.warn(LYRIC_LOG_TAG, "解析音译歌词时出现错误", err);
 					}
 				}
 				if (advanceLyricDynamicLyricTime) {
@@ -613,7 +622,6 @@ export const LocalMusicContext: FC = () => {
 					break;
 				}
 				case "playListChanged": {
-					console.log("已更新播放列表");
 					store.set(currentPlaylistAtom, evtData.data.playlist);
 					store.set(
 						currentPlaylistMusicIndexAtom,

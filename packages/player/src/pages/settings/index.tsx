@@ -11,12 +11,12 @@ import {
 import { atom, useAtom, useAtomValue } from "jotai";
 import { type FC, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { loadedPluginsAtom } from "../../states/plugin";
+import { loadedExtensionAtom } from "../../states/extension";
 import AMLLPlayerSettingIcon from "./amll-player-setting.svg?react";
+import { ExtensionTab } from "./extension";
+import ExtensionManageIcon from "./extension-manage.svg?react";
 import styles from "./index.module.css";
 import { PlayerSettingsTab } from "./player";
-import { PluginTab } from "./plugin";
-import PluginManageIcon from "./plugin-manage.svg?react";
 
 const currentPageAtom = atom("amll-player");
 
@@ -30,14 +30,16 @@ const TabButton: FC<ButtonProps> = ({ children, content, ...props }) => {
 	);
 };
 
-const loadedPluginsWithSettingsAtom = atom((get) => {
-	const loadedPlugins = get(loadedPluginsAtom);
-	return loadedPlugins.filter((v) => v.context.settingComponent);
+const loadedExtensionsWithSettingsAtom = atom((get) => {
+	const loadedExtensions = get(loadedExtensionAtom);
+	return loadedExtensions.filter(
+		(v) => v.context.registeredInjectPointComponent.settings,
+	);
 });
 
 export const SettingsPage: FC = () => {
 	const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
-	const loadedPlugins = useAtomValue(loadedPluginsWithSettingsAtom);
+	const loadedExtensions = useAtomValue(loadedExtensionsWithSettingsAtom);
 	const { t } = useTranslation();
 
 	return (
@@ -66,39 +68,41 @@ export const SettingsPage: FC = () => {
 							<AMLLPlayerSettingIcon />
 						</TabButton>
 						<TabButton
-							content={t("settings.plugin.tab", "插件管理")}
-							color={currentPage === "plugins" ? "indigo" : "gray"}
-							onClick={() => setCurrentPage("plugins")}
+							content={t("settings.extension.tab", "扩展程序管理")}
+							color={currentPage === "extension" ? "indigo" : "gray"}
+							onClick={() => setCurrentPage("extension")}
 						>
-							<PluginManageIcon />
+							<ExtensionManageIcon />
 						</TabButton>
 						<Separator size="4" my="2" />
-						{loadedPlugins.map((plugin) => {
-							const id = plugin.pluginMeta.id;
+						{loadedExtensions.map((extension) => {
+							const id = extension.extensionMeta.id;
 							return (
 								<TabButton
 									content={t("name", id, { ns: id })}
 									key={id}
-									color={currentPage === `plugin.${id}` ? "indigo" : "gray"}
-									onClick={() => setCurrentPage(`plugin.${id}`)}
+									color={currentPage === `extension.${id}` ? "indigo" : "gray"}
+									onClick={() => setCurrentPage(`extension.${id}`)}
 								>
-									<img src={String(plugin.context.pluginMeta.icon)} />
+									<img src={String(extension.context.extensionMeta.icon)} />
 								</TabButton>
 							);
 						})}
 					</Box>
 					<Box flexGrow="1" minWidth="0">
 						{currentPage === "amll-player" && <PlayerSettingsTab />}
-						{currentPage === "plugins" && (
+						{currentPage === "extension" && (
 							<Suspense>
-								<PluginTab />
+								<ExtensionTab />
 							</Suspense>
 						)}
-						{loadedPlugins.map((plugin) => {
-							const id = plugin.pluginMeta.id;
-							const SettingComponent = plugin.context.settingComponent!;
+						{loadedExtensions.map((extension) => {
+							const id = extension.extensionMeta.id;
+							const ExtensionComponent =
+								extension.context.registeredInjectPointComponent.settings;
 							return (
-								currentPage === `plugin.${id}` && <SettingComponent key={id} />
+								currentPage === `extension.${id}` &&
+								ExtensionComponent && <ExtensionComponent key={id} />
 							);
 						})}
 					</Box>

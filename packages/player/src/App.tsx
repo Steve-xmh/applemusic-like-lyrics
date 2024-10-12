@@ -10,9 +10,10 @@ import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
 import styles from "./App.module.css";
 import { AMLLWrapper } from "./components/AMLLWrapper";
+import { ExtensionContext } from "./components/ExtensionContext";
+import { ExtensionInjectPoint } from "./components/ExtensionInjectPoint";
 import { LocalMusicContext } from "./components/LocalMusicContext";
 import { NowPlayingBar } from "./components/NowPlayingBar";
-import { PluginContext } from "./components/PluginContext";
 import { UpdateContext } from "./components/UpdateContext";
 import { WSProtocolMusicContext } from "./components/WSProtocolMusicContext";
 import "./i18n";
@@ -60,15 +61,16 @@ function App() {
 
 	return (
 		<>
-			{/* 上下文组件均不建议被 StrictMode 包含，以免重复加载插件发生问题  */}
+			{/* 上下文组件均不建议被 StrictMode 包含，以免重复加载扩展程序发生问题  */}
 			{musicContextMode === MusicContextMode.Local && <LocalMusicContext />}
 			{musicContextMode === MusicContextMode.WSProtocol && (
 				<WSProtocolMusicContext />
 			)}
 			<UpdateContext />
 			<Suspense>
-				<PluginContext />
+				<ExtensionContext />
 			</Suspense>
+			<ExtensionInjectPoint injectPointName="context" hideErrorCallout />
 			<StrictMode>
 				<Theme
 					appearance="dark"

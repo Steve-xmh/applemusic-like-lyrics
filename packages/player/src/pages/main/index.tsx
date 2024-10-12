@@ -17,6 +17,7 @@ import { useAtomValue } from "jotai";
 import type { FC } from "react";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
+import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint";
 import { NewPlaylistButton } from "../../components/NewPlaylistButton";
 import { PlaylistCover } from "../../components/PlaylistCover";
 import { db } from "../../dexie";
@@ -54,6 +55,7 @@ export const MainPage: FC = () => {
 					</Heading>
 				</Box>
 				<Flex gap="1" wrap="wrap">
+					<ExtensionInjectPoint injectPointName="page.main.sidebar.before" />
 					<NewPlaylistButton />
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger>
@@ -62,6 +64,7 @@ export const MainPage: FC = () => {
 							</IconButton>
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content>
+							<ExtensionInjectPoint injectPointName="page.main.menu.top" />
 							<DropdownMenu.Sub>
 								<DropdownMenu.SubTrigger>
 									<Trans i18nKey="page.main.menu.enterWSProtocolMode">
@@ -87,11 +90,14 @@ export const MainPage: FC = () => {
 								<Link to="/settings">
 									<Trans i18nKey="page.main.menu.settings">设置</Trans>
 								</Link>
+								<ExtensionInjectPoint injectPointName="page.main.menu.bottom" />
 							</DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
+					<ExtensionInjectPoint injectPointName="page.main.sidebar.after" />
 				</Flex>
 			</Flex>
+			<ExtensionInjectPoint injectPointName="page.main.top" />
 			{playlists !== undefined ? (
 				playlists.length === 0 ? (
 					<Text mt="9" as="div" align="center">
@@ -137,6 +143,7 @@ export const MainPage: FC = () => {
 					<Trans i18nKey="page.main.loadingPlaylist">加载歌单中</Trans>
 				</Flex>
 			)}
+			<ExtensionInjectPoint injectPointName="page.main.bottom" />
 		</Container>
 	);
 };
