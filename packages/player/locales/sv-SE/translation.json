@@ -27,6 +27,20 @@
       "noResults": null
     }
   },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
+  },
   "newPlaylist": {
     "buttonLabel": null,
     "dialog": {
@@ -106,6 +120,15 @@
       "shufflePlayAll": null
     },
     "settings": {
+      "others": {
+        "restartProgram": null,
+        "subtitle": null,
+        "showStatJSFrame": {
+          "label": null,
+          "description": null
+        },
+        "enterAmllDevPage": null
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": null,
@@ -238,15 +261,6 @@
           "label": null,
           "description": null
         }
-      },
-      "others": {
-        "subtitle": null,
-        "showStatJSFrame": {
-          "label": null,
-          "description": null
-        },
-        "restartProgram": null,
-        "enterAmllDevPage": null
       }
     },
     "about": {
@@ -305,27 +319,19 @@
     }
   },
   "settings": {
-    "player": {
-      "tab": null
-    },
-    "plugin": {
-      "tab": null,
+    "extension": {
       "safetyWarning": null,
       "wipWarning": null,
       "install": {
         "title": null
       },
       "installPlugins": null,
-      "openPluginDirectory": null
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
     }
   },
-  "name": null,
-  "plugin": {
-    "error": {
-      "invaildPluginFile": null,
-      "missingDependency": null,
-      "missingMetadata": null,
-      "pluginIdConflict": null
-    }
-  }
+  "name": null
 }
