@@ -90,8 +90,8 @@ export const MainPage: FC = () => {
 								<Link to="/settings">
 									<Trans i18nKey="page.main.menu.settings">设置</Trans>
 								</Link>
-								<ExtensionInjectPoint injectPointName="page.main.menu.bottom" />
 							</DropdownMenu.Item>
+							<ExtensionInjectPoint injectPointName="page.main.menu.bottom" />
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 					<ExtensionInjectPoint injectPointName="page.main.sidebar.after" />
