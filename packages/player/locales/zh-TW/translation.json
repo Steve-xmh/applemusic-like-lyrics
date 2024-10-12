@@ -231,7 +231,7 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": "網格漸變渲染器",
+          "meshGradientRenderer": "網格漸變渲染器 （Mesh Gradient Renderer）",
           "pixiRenderer": "PixiJS 渲染器"
         },
         "subtitle": "歌詞背景",
