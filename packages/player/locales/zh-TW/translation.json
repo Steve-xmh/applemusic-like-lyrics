@@ -27,6 +27,20 @@
       "noResults": "無結果"
     }
   },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
+  },
   "newPlaylist": {
     "buttonLabel": "新建播放清單",
     "dialog": {
@@ -106,6 +120,15 @@
       "shufflePlayAll": "隨機播放"
     },
     "settings": {
+      "others": {
+        "restartProgram": "重啟程序",
+        "subtitle": "雜項",
+        "showStatJSFrame": {
+          "label": "顯示效能統計訊息",
+          "description": "可以看到幀率、幀生成時間、內存佔用（僅Chromium系）等訊息，對效能影響較小。"
+        },
+        "enterAmllDevPage": "歌詞介面開發用工具"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "字體預覽 Font Preview",
@@ -238,15 +261,6 @@
           "label": "啟用音譯歌詞与翻譯歌詞互換",
           "description": "僅上面二者啟用后有效"
         }
-      },
-      "others": {
-        "subtitle": "雜項",
-        "showStatJSFrame": {
-          "label": "顯示效能統計訊息",
-          "description": "可以看到幀率、幀生成時間、內存佔用（僅Chromium系）等訊息，對效能影響較小。"
-        },
-        "restartProgram": "重啟程序",
-        "enterAmllDevPage": "歌詞介面開發用工具"
       }
     },
     "about": {
@@ -305,27 +319,19 @@
     }
   },
   "settings": {
-    "player": {
-      "tab": null
-    },
-    "plugin": {
-      "tab": null,
+    "extension": {
       "safetyWarning": null,
       "wipWarning": null,
       "install": {
         "title": null
       },
       "installPlugins": null,
-      "openPluginDirectory": null
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
     }
   },
-  "name": null,
-  "plugin": {
-    "error": {
-      "invaildPluginFile": null,
-      "missingDependency": "缺失依賴項",
-      "missingMetadata": "缺失必需後設資料",
-      "pluginIdConflict": null
-    }
-  }
+  "name": null
 }
