@@ -27,6 +27,20 @@
       "noResults": null
     }
   },
+  "extension": {
+    "inject": {
+      "error": {
+        "calloutText": null,
+        "toastText": null
+      }
+    },
+    "error": {
+      "invaildPluginFile": null,
+      "missingDependency": null,
+      "missingMetadata": null,
+      "pluginIdConflict": null
+    }
+  },
   "newPlaylist": {
     "buttonLabel": "Tạo danh sách phát mới.",
     "dialog": {
@@ -106,6 +120,15 @@
       "shufflePlayAll": "Phát ngẫu nhiên"
     },
     "settings": {
+      "others": {
+        "restartProgram": "Khởi động lại chương trình",
+        "subtitle": "Các tùy chọn khác",
+        "showStatJSFrame": {
+          "label": "Hiển thị thông tin thống kê hiệu suất",
+          "description": "Có thể xem thông tin chiếm dụng bộ nhớ (chỉ dành cho các hệ thống Chromium) và các thông tin khác, ảnh hưởng đến hiệu suất khá nhỏ."
+        },
+        "enterAmllDevPage": "Công cụ phát triển trang lời bài hát"
+      },
       "lyricFont": {
         "fontPreview": {
           "defaultText": "Xem trước phông chữ",
@@ -238,15 +261,6 @@
           "label": "Bật chức năng hoán đổi giữa lời bài hát và lời dịch",
           "description": "Chỉ có hai tùy chọn trên mới có hiệu lực khi được bật"
         }
-      },
-      "others": {
-        "subtitle": "Các tùy chọn khác",
-        "showStatJSFrame": {
-          "label": "Hiển thị thông tin thống kê hiệu suất",
-          "description": "Có thể xem thông tin chiếm dụng bộ nhớ (chỉ dành cho các hệ thống Chromium) và các thông tin khác, ảnh hưởng đến hiệu suất khá nhỏ."
-        },
-        "restartProgram": "Khởi động lại chương trình",
-        "enterAmllDevPage": "Công cụ phát triển trang lời bài hát"
       }
     },
     "about": {
@@ -305,27 +319,19 @@
     }
   },
   "settings": {
-    "player": {
-      "tab": null
-    },
-    "plugin": {
-      "tab": null,
+    "extension": {
       "safetyWarning": null,
       "wipWarning": null,
       "install": {
         "title": null
       },
       "installPlugins": null,
-      "openPluginDirectory": null
+      "openPluginDirectory": null,
+      "tab": null
+    },
+    "player": {
+      "tab": null
     }
   },
-  "name": null,
-  "plugin": {
-    "error": {
-      "invaildPluginFile": null,
-      "missingDependency": null,
-      "missingMetadata": null,
-      "pluginIdConflict": null
-    }
-  }
+  "name": null
 }
