@@ -18,8 +18,6 @@ import {
 	contrastImage,
 	saturateImage,
 } from "../img";
-import blendFragShader from "./blend.frag.glsl?raw";
-import blendVertShader from "./blend.vert.glsl?raw";
 import { CONTROL_POINT_PRESETS } from "./cp-presets";
 import meshFragShader from "./mesh.frag.glsl?raw";
 import meshVertShader from "./mesh.vert.glsl?raw";
@@ -728,7 +726,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private paused = false;
 	private staticMode = false;
 	private mainProgram: GLProgram;
-	private blendProgram: GLProgram;
 	private manualControl = false;
 	private reduceImageSizeCanvas = createOffscreenCanvas(
 		32,
@@ -736,9 +733,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 	) as HTMLCanvasElement;
 	private targetSize = Vec2.fromValues(0, 0);
 	private currentSize = Vec2.fromValues(0, 0);
-	private fullScreenMesh: Mesh;
-	private drawFrameBuffer: WebGLFramebuffer;
-	private drawFrameBufferTexture: WebGLTexture;
 	private meshStates: MeshState[] = [];
 	private _disposed = false;
 
@@ -804,20 +798,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 		if (tW !== cW || tH !== cH) {
 			super.onResize(tW, tH);
 			const gl = this.gl;
-			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
-			gl.texImage2D(
-				gl.TEXTURE_2D,
-				0,
-				gl.RGBA,
-				tW,
-				tH,
-				0,
-				gl.RGBA,
-				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
-				null,
-			);
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this.drawFrameBuffer);
-			gl.viewport(0, 0, tW, tH);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 			gl.viewport(0, 0, tW, tH);
 			this.currentSize.x = tW;
@@ -862,21 +842,10 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		this.mainProgram.setUniform1f("u_volume", this.volume);
 		for (const state of this.meshStates) {
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this.drawFrameBuffer);
-			gl.clear(gl.COLOR_BUFFER_BIT);
-			this.mainProgram.use();
+			this.mainProgram.setUniform1f("u_alpha", state.alpha);
 			state.texture.bind();
 			state.mesh.bind();
 			state.mesh.draw();
-
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
-			this.blendProgram.use();
-			this.blendProgram.setUniform1f("u_alpha", state.alpha);
-			this.blendProgram.setUniform1i("u_texture", 0);
-			this.fullScreenMesh.bind();
-			this.fullScreenMesh.draw();
 		}
 
 		gl.flush();
@@ -924,59 +893,13 @@ export class MeshGradientRenderer extends BaseRenderer {
 			"main-program-mg",
 		);
 
-		this.blendProgram = new GLProgram(
-			gl,
-			blendVertShader,
-			blendFragShader,
-			"blend-program-mg",
-		);
-
-		this.fullScreenMesh = new Mesh(
-			gl,
-			this.blendProgram.attrs.a_pos,
-			this.blendProgram.attrs.a_color,
-			this.blendProgram.attrs.a_uv,
-		);
-		this.fullScreenMesh.update();
-
-		const drawFrameBufferTexture = gl.createTexture();
-		if (!drawFrameBufferTexture)
-			throw new Error("Failed to create framebuffer texture");
-		this.drawFrameBufferTexture = drawFrameBufferTexture;
-		gl.bindTexture(gl.TEXTURE_2D, drawFrameBufferTexture);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			canvas.width,
-			canvas.height,
-			0,
-			gl.RGBA,
-			this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
-			null,
-		);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		const drawFrameBuffer = gl.createFramebuffer();
-		if (!drawFrameBuffer) throw new Error("Failed to create framebuffer");
-		this.drawFrameBuffer = drawFrameBuffer;
-		gl.bindFramebuffer(gl.FRAMEBUFFER, drawFrameBuffer);
-		gl.framebufferTexture2D(
-			gl.FRAMEBUFFER,
-			gl.COLOR_ATTACHMENT0,
-			gl.TEXTURE_2D,
-			drawFrameBufferTexture,
-			0,
-		);
-
 		this.requestTick();
 	}
 
 	protected override onResize(width: number, height: number): void {
 		this.targetSize.x = Math.ceil(width);
 		this.targetSize.y = Math.ceil(height);
+		this.requestTick();
 	}
 
 	override setStaticMode(enable: boolean): void {
@@ -1105,10 +1028,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 		}
 		this._disposed = true;
 		this.mainProgram.dispose();
-		this.blendProgram.dispose();
-		this.fullScreenMesh.dispose();
-		this.gl.deleteFramebuffer(this.drawFrameBuffer);
-		this.gl.deleteTexture(this.drawFrameBufferTexture);
 		for (const state of this.meshStates) {
 			state.mesh.dispose();
 			state.texture.dispose();
