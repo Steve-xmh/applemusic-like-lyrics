@@ -20,8 +20,6 @@ import {
 } from "../img";
 import blendFragShader from "./blend.frag.glsl?raw";
 import blendVertShader from "./blend.vert.glsl?raw";
-import blurFragShader from "./blur.frag.glsl?raw";
-import blurVertShader from "./blur.vert.glsl?raw";
 import { CONTROL_POINT_PRESETS } from "./cp-presets";
 import meshFragShader from "./mesh.frag.glsl?raw";
 import meshVertShader from "./mesh.vert.glsl?raw";
@@ -731,8 +729,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private staticMode = false;
 	private mainProgram: GLProgram;
 	private blendProgram: GLProgram;
-	private blurProgram: GLProgram;
-
 	private manualControl = false;
 	private reduceImageSizeCanvas = createOffscreenCanvas(
 		32,
@@ -743,10 +739,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 	private fullScreenMesh: Mesh;
 	private drawFrameBuffer: WebGLFramebuffer;
 	private drawFrameBufferTexture: WebGLTexture;
-	private finalFrameBuffer: WebGLFramebuffer;
-	private finalFrameBufferTexture: WebGLTexture;
 	private meshStates: MeshState[] = [];
 	private _disposed = false;
+
 	setManualControl(enable: boolean) {
 		this.manualControl = enable;
 	}
@@ -804,14 +799,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 	}
 
 	private checkIfResize() {
-		let [tW, tH] = [
-			this.targetSize.x / window.devicePixelRatio,
-			this.targetSize.y / window.devicePixelRatio,
-		];
+		const [tW, tH] = [this.targetSize.x, this.targetSize.y];
 		const [cW, cH] = [this.currentSize.x, this.currentSize.y];
 		if (tW !== cW || tH !== cH) {
-			tW /= 5;
-			tH /= 5;
 			super.onResize(tW, tH);
 			const gl = this.gl;
 			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
@@ -826,21 +816,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
 				null,
 			);
-			gl.bindTexture(gl.TEXTURE_2D, this.finalFrameBufferTexture);
-			gl.texImage2D(
-				gl.TEXTURE_2D,
-				0,
-				gl.RGBA,
-				tW,
-				tH,
-				0,
-				gl.RGBA,
-				this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
-				null,
-			);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this.drawFrameBuffer);
-			gl.viewport(0, 0, tW, tH);
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this.finalFrameBuffer);
 			gl.viewport(0, 0, tW, tH);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 			gl.viewport(0, 0, tW, tH);
@@ -873,11 +849,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, this.finalFrameBuffer);
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-		gl.clear(gl.COLOR_BUFFER_BIT);
-
 		this.checkIfResize();
 
 		this.mainProgram.use();
@@ -898,7 +869,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 			state.mesh.bind();
 			state.mesh.draw();
 
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this.finalFrameBuffer);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, this.drawFrameBufferTexture);
 			this.blendProgram.use();
@@ -907,19 +878,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 			this.fullScreenMesh.bind();
 			this.fullScreenMesh.draw();
 		}
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, this.finalFrameBufferTexture);
-		this.blurProgram.use();
-		this.blurProgram.setUniform1i("u_texture", 0);
-		this.blurProgram.setUniform2f(
-			"u_texture_res",
-			this.currentSize.x,
-			this.currentSize.y,
-		);
-		this.fullScreenMesh.bind();
-		this.fullScreenMesh.draw();
 
 		gl.flush();
 
@@ -973,13 +931,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 			"blend-program-mg",
 		);
 
-		this.blurProgram = new GLProgram(
-			gl,
-			blurVertShader,
-			blurFragShader,
-			"blur-program-mg",
-		);
-
 		this.fullScreenMesh = new Mesh(
 			gl,
 			this.blendProgram.attrs.a_pos,
@@ -990,7 +941,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 		const drawFrameBufferTexture = gl.createTexture();
 		if (!drawFrameBufferTexture)
-			throw new Error("Failed to create drawFrameBufferTexture texture");
+			throw new Error("Failed to create framebuffer texture");
 		this.drawFrameBufferTexture = drawFrameBufferTexture;
 		gl.bindTexture(gl.TEXTURE_2D, drawFrameBufferTexture);
 		gl.texImage2D(
@@ -1009,7 +960,7 @@ export class MeshGradientRenderer extends BaseRenderer {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		const drawFrameBuffer = gl.createFramebuffer();
-		if (!drawFrameBuffer) throw new Error("Failed to create drawFrameBuffer");
+		if (!drawFrameBuffer) throw new Error("Failed to create framebuffer");
 		this.drawFrameBuffer = drawFrameBuffer;
 		gl.bindFramebuffer(gl.FRAMEBUFFER, drawFrameBuffer);
 		gl.framebufferTexture2D(
@@ -1017,38 +968,6 @@ export class MeshGradientRenderer extends BaseRenderer {
 			gl.COLOR_ATTACHMENT0,
 			gl.TEXTURE_2D,
 			drawFrameBufferTexture,
-			0,
-		);
-
-		const finalFrameBufferTexture = gl.createTexture();
-		if (!finalFrameBufferTexture)
-			throw new Error("Failed to create finalFrameBufferTexture texture");
-		this.finalFrameBufferTexture = finalFrameBufferTexture;
-		gl.bindTexture(gl.TEXTURE_2D, finalFrameBufferTexture);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			canvas.width,
-			canvas.height,
-			0,
-			gl.RGBA,
-			this.supportTextureFloat ? gl.FLOAT : gl.UNSIGNED_BYTE,
-			null,
-		);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		const finalFrameBuffer = gl.createFramebuffer();
-		if (!finalFrameBuffer) throw new Error("Failed to create finalFrameBuffer");
-		this.finalFrameBuffer = finalFrameBuffer;
-		gl.bindFramebuffer(gl.FRAMEBUFFER, finalFrameBuffer);
-		gl.framebufferTexture2D(
-			gl.FRAMEBUFFER,
-			gl.COLOR_ATTACHMENT0,
-			gl.TEXTURE_2D,
-			finalFrameBufferTexture,
 			0,
 		);
 

@@ -33,10 +33,10 @@ export const LyricTabContent: FC = () => {
 
 	const saveData = useCallback(
 		(
-			saveLyricFormat = lyricFormat,
-			saveLyricContent = lyricContent,
-			saveTranslatedLyricContent = translatedLyricContent,
-			saveRomanLyricContent = romanLyricContent,
+			saveLyricFormat: string,
+			saveLyricContent: string,
+			saveTranslatedLyricContent: string,
+			saveRomanLyricContent: string,
 		) => {
 			if (song === undefined) return;
 			db.songs.update(song, (song) => {
@@ -73,13 +73,7 @@ export const LyricTabContent: FC = () => {
 				setRomanLyricContent(saveLyricFormat);
 			});
 		},
-		[
-			song,
-			lyricFormat,
-			lyricContent,
-			translatedLyricContent,
-			romanLyricContent,
-		],
+		[song],
 	);
 
 	return (
@@ -89,6 +83,7 @@ export const LyricTabContent: FC = () => {
 				<Option label={t("page.song.lyric.lyricFormatLabel", "歌词格式")}>
 					<Select.Root
 						defaultValue="none"
+						value={lyricFormat}
 						onValueChange={(v) => setLyricFormat(v)}
 					>
 						<Select.Trigger />
@@ -201,11 +196,21 @@ export const LyricTabContent: FC = () => {
 				)}
 				<TTMLImportDialog
 					onSelectedLyric={(ttmlContent) => {
-						saveData("ttml", ttmlContent);
+						saveData("ttml", ttmlContent, "", "");
 					}}
 				/>
 			</Flex>
-			<Button mt="4" onClick={saveData}>
+			<Button
+				mt="4"
+				onClick={() =>
+					saveData(
+						lyricFormat,
+						lyricContent,
+						translatedLyricContent,
+						romanLyricContent,
+					)
+				}
+			>
 				<Trans i18nKey="common.dialog.save">保存</Trans>
 			</Button>
 			<ExtensionInjectPoint injectPointName="page.song.tab.lyric.after" />
