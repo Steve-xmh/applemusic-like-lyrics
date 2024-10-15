@@ -23,6 +23,7 @@ async fn local_player_main<R: Runtime>(manager: impl Manager<R> + Clone + Send +
     PLAYER_HANDLER.write().await.replace(handler);
 
     let manager_clone = manager.clone();
+    #[cfg(mobile)]
     player.set_custom_local_song_loader(Box::new(move |path| {
         let manager_clone = manager_clone.clone();
         Box::new(async move {

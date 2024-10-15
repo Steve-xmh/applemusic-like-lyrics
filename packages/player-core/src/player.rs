@@ -131,7 +131,11 @@ impl AudioPlayer {
                 warn!("FFMPEG 初始化失败！");
                 warn!("{err}");
             }
-            init!("FFMPEG 初始化成功！");
+            info!("FFMPEG 初始化成功！");
+            info!("AVCodec 版本：{}", ffmpeg_next::codec::version());
+            info!("AVCodec 许可证：{}", ffmpeg_next::codec::license());
+            info!("AVFormat 版本：{}", ffmpeg_next::format::version());
+            info!("AVFormat 许可证：{}", ffmpeg_next::format::license());
 
             unsafe {
                 info!("支持编解码器：");
@@ -703,12 +707,146 @@ impl AudioPlayer {
         ctx: AudioPlayerTaskContext,
         music_id: String,
         current_play_index: usize,
-        file_path: impl AsRef<std::path::Path> + std::fmt::Debug,
+        file_path: impl AsRef<std::path::Path> + std::fmt::Debug + Send + Sync + 'static,
     ) -> anyhow::Result<()> {
         info!("正在打开本地音频文件：{file_path:?}");
-        let source = std::fs::File::open(file_path.as_ref()).context("无法打开本地音频文件")?;
 
-        Self::play_media_stream(ctx, music_id, current_play_index, source).await?;
+        #[cfg(feature = "ffmpeg-next")]
+        {
+            Self::play_media_stream_ffmpeg(ctx, music_id, current_play_index, file_path).await?;
+        }
+
+        #[cfg(not(feature = "ffmpeg-next"))]
+        {
+            let source = std::fs::File::open(file_path.as_ref()).context("无法打开本地音频文件")?;
+            Self::play_media_stream(ctx, music_id, current_play_index, source).await?;
+        }
+
+        Ok(())
+    }
+
+    #[cfg(feature = "ffmpeg-next")]
+    #[allow(clippy::too_many_arguments)]
+    async fn play_media_stream_ffmpeg(
+        mut ctx: AudioPlayerTaskContext,
+        music_id: String,
+        current_play_index: usize,
+        file_path: impl AsRef<std::path::Path> + std::fmt::Debug + Send + Sync + 'static,
+    ) -> anyhow::Result<()> {
+        use symphonia::core::audio::{AsAudioBufferRef, AudioBuffer, Channels, Signal, SignalSpec};
+
+        let info = crate::utils::read_audio_info_ffmpeg(&file_path);
+
+        info!("音频元数据信息：{info:#?}");
+
+        tokio::runtime::Handle::current()
+            .spawn_blocking(move || -> anyhow::Result<()> {
+                let handle = tokio::runtime::Handle::current();
+                let mut ictx =
+                    ffmpeg_next::format::input(&file_path).context("无法通过 FFMPEG 打开音频流")?;
+
+                let audio_stream = ictx
+                    .streams()
+                    .best(ffmpeg_next::media::Type::Audio)
+                    .context("无法在媒体文件中找到合适的音频流")?;
+                let audio_stream_index = audio_stream.index();
+                let codec = ffmpeg_next::codec::Context::from_parameters(audio_stream.parameters())
+                    .context("从参数创建音频解码器失败")?;
+                let mut dec = codec.decoder().audio().context("创建音频解码器失败")?;
+
+                dec.set_packet_time_base(audio_stream.time_base());
+                let mut frame = ffmpeg_next::frame::Audio::empty();
+
+                for (st, p) in ictx.packets() {
+                    if st.index() == audio_stream_index {
+                        use ffmpeg_next::util::format::Sample;
+                        if let Err(err) = dec.send_packet(&p) {
+                            warn!("解码音频数据包失败，正在尝试跳过：{err}");
+                            continue;
+                        }
+                        if let Err(err) = dec.receive_frame(&mut frame) {
+                            warn!("接收音频数据包失败: {err}");
+                            continue;
+                        }
+
+                        // AudioBuffer::new(10, SignalSpec::new(rate, channels));
+                        let format = frame.format();
+                        fn make_audio_buf<
+                            T: symphonia::core::sample::Sample + ffmpeg_next::frame::audio::Sample,
+                        >(
+                            frame: &ffmpeg_next::frame::Audio,
+                        ) -> anyhow::Result<AudioBuffer<T>> {
+                            let channel_layout = {
+                                let channel_layout = dbg!(frame.channel_layout());
+                                if channel_layout == ffmpeg_next::ChannelLayout::MONO {
+                                    symphonia::core::audio::Layout::Mono
+                                } else if channel_layout == ffmpeg_next::ChannelLayout::STEREO {
+                                    symphonia::core::audio::Layout::Stereo
+                                } else if channel_layout == ffmpeg_next::ChannelLayout::_2POINT1 {
+                                    symphonia::core::audio::Layout::TwoPointOne
+                                } else if channel_layout == ffmpeg_next::ChannelLayout::_5POINT1 {
+                                    symphonia::core::audio::Layout::FivePointOne
+                                } else {
+                                    anyhow::bail!("不支持的声道数据包")
+                                }
+                            };
+                            let mut abuf = AudioBuffer::<T>::new(
+                                frame.samples() as u64,
+                                SignalSpec::new_with_layout(frame.rate(), channel_layout),
+                            );
+                            abuf.render_reserved(Some(frame.samples()));
+                            assert_eq!(abuf.capacity(), frame.samples());
+                            let nb_chan = frame.planes();
+                            for i in 0..nb_chan {
+                                let chan = abuf.chan_mut(i);
+                                chan.copy_from_slice(frame.plane(i));
+                            }
+                            Ok(abuf)
+                        }
+
+                        match format {
+                            Sample::U8(_) => {
+                                let abuf = make_audio_buf::<u8>(&frame)?;
+                                handle
+                                    .block_on(ctx.audio_tx.write_ref(0, abuf.as_audio_buffer_ref()))
+                            }
+                            Sample::I16(_) => {
+                                let abuf = make_audio_buf::<i16>(&frame)?;
+                                handle
+                                    .block_on(ctx.audio_tx.write_ref(0, abuf.as_audio_buffer_ref()))
+                            }
+                            Sample::I32(_) => {
+                                let abuf = make_audio_buf::<i32>(&frame)?;
+                                handle
+                                    .block_on(ctx.audio_tx.write_ref(0, abuf.as_audio_buffer_ref()))
+                            }
+                            Sample::I64(_) => {
+                                warn!("不支持 I64 采样类型");
+                                Ok(())
+                            }
+                            Sample::F32(_) => {
+                                let abuf = make_audio_buf::<f32>(&frame)?;
+                                handle
+                                    .block_on(ctx.audio_tx.write_ref(0, abuf.as_audio_buffer_ref()))
+                            }
+                            Sample::F64(_) => {
+                                let abuf = make_audio_buf::<f64>(&frame)?;
+                                handle
+                                    .block_on(ctx.audio_tx.write_ref(0, abuf.as_audio_buffer_ref()))
+                            }
+                            _ => Ok(()),
+                        }
+                        .context("将音频包写入音频输出时发生错误")?;
+                    }
+                }
+
+                Ok(())
+            })
+            .await??;
+
+        ctx.emitter
+            .emit(AudioThreadEvent::AudioPlayFinished { music_id })
+            .await?;
 
         Ok(())
     }
