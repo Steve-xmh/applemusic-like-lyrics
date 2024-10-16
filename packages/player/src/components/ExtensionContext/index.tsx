@@ -79,6 +79,20 @@ const SingleExtensionContext: FC<{
 		};
 
 		(async () => {
+			const [React, ReactDOM, Jotai, RadixTheme, JSXRuntime] =
+				await Promise.all([
+					import("react"),
+					import("react-dom"),
+					import("jotai"),
+					import("@radix-ui/themes"),
+					import("react/jsx-runtime"),
+				]);
+			const globalWindow = window as any;
+			globalWindow.React = React;
+			globalWindow.ReactDOM = ReactDOM;
+			globalWindow.Jotai = Jotai;
+			globalWindow.RadixTheme = RadixTheme;
+			globalWindow.JSXRuntime = JSXRuntime;
 			const cancelNotify = cancelRef.current;
 			if (cancelNotify) {
 				await cancelNotify.wait();
@@ -225,3 +239,5 @@ export const ExtensionContext: FC = () => {
 		);
 	});
 };
+
+export default ExtensionContext;

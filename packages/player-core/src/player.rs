@@ -696,6 +696,7 @@ impl AudioPlayer {
                     error: format!("{err:?}"),
                 })
                 .await?;
+            tokio::time::sleep(Duration::from_secs(1)).await;
         }
 
         handler.send_anonymous(AudioThreadMessage::NextSong).await?;

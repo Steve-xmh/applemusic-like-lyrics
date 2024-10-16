@@ -240,7 +240,7 @@ const EditablePlaylistName: FC<{
 	);
 };
 
-export const PlaylistPage: FC = () => {
+export const Component: FC = () => {
 	const param = useParams();
 	const playlist = useLiveQuery(() => db.playlists.get(Number(param.id)));
 	const { t } = useTranslation();
@@ -553,3 +553,7 @@ export const PlaylistPage: FC = () => {
 		</Container>
 	);
 };
+
+Component.displayName = "PlaylistPage";
+
+export default Component;

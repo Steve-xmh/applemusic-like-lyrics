@@ -24,7 +24,7 @@ import { db } from "../../dexie";
 import { router } from "../../router";
 import { updateInfoAtom } from "../../states/updater";
 
-export const MainPage: FC = () => {
+export const Component: FC = () => {
 	const playlists = useLiveQuery(() => db.playlists.toArray());
 	const updateInfo = useAtomValue(updateInfoAtom);
 
@@ -147,3 +147,7 @@ export const MainPage: FC = () => {
 		</Container>
 	);
 };
+
+Component.displayName = "MainPage";
+
+export default Component;

@@ -3,14 +3,12 @@ import { Box, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { StrictMode, Suspense, useEffect, useLayoutEffect } from "react";
+import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
 import styles from "./App.module.css";
-import { AMLLWrapper } from "./components/AMLLWrapper";
-import { ExtensionContext } from "./components/ExtensionContext";
 import { ExtensionInjectPoint } from "./components/ExtensionInjectPoint";
 import { LocalMusicContext } from "./components/LocalMusicContext";
 import { NowPlayingBar } from "./components/NowPlayingBar";
@@ -24,6 +22,9 @@ import {
 	musicContextModeAtom,
 	showStatJSFrameAtom,
 } from "./states";
+
+const ExtensionContext = lazy(() => import("./components/ExtensionContext"));
+const AMLLWrapper = lazy(() => import("./components/AMLLWrapper"));
 
 function App() {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
@@ -88,7 +89,9 @@ function App() {
 						</Box>
 						<NowPlayingBar />
 					</Box>
-					<AMLLWrapper />
+					<Suspense>
+						<AMLLWrapper />
+					</Suspense>
 					<ToastContainer
 						theme="dark"
 						position="bottom-right"

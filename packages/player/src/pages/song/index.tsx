@@ -47,7 +47,7 @@ const SongPageHeader: FC = () => {
 	);
 };
 
-export const SongPage: FC = () => {
+export const Component: FC = () => {
 	const { id: musicId } = useParams<{ id: string }>();
 	const song = useLiveQuery(() => db.songs.get(musicId || ""), [musicId]);
 
@@ -93,3 +93,7 @@ export const SongPage: FC = () => {
 		</Container>
 	);
 };
+
+Component.displayName = "SongPage";
+
+export default Component;

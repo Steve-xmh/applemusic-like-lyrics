@@ -77,6 +77,9 @@ const GitMetadataPlugin = (): Plugin => {
 export default defineConfig(async () => ({
 	build: {
 		sourcemap: true,
+		rollupOptions: {
+			shimMissingExports: true,
+		},
 	},
 	plugins: [
 		react(),

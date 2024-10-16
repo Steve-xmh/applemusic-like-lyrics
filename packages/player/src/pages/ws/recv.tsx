@@ -19,7 +19,7 @@ import {
 	wsProtocolListenAddrAtom,
 } from "../../states";
 
-export const WSProtocolRecvPage: FC = () => {
+export const Component: FC = () => {
 	const [wsProtocolListenAddr, setWsProtocolListenAddr] = useAtom(
 		wsProtocolListenAddrAtom,
 	);
@@ -100,3 +100,7 @@ export const WSProtocolRecvPage: FC = () => {
 		</Container>
 	);
 };
+
+Component.displayName = "WSProtocolRecvPage";
+
+export default Component;

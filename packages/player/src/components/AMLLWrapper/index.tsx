@@ -91,3 +91,5 @@ export const AMLLWrapper: FC = () => {
 		</ContextMenu.Root>
 	);
 };
+
+export default AMLLWrapper;

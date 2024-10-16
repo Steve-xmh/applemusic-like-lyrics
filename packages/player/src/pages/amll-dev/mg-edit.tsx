@@ -296,7 +296,7 @@ const CodeButton: FC<{
 	);
 };
 
-export const MGEditPage: FC = () => {
+export const Component: FC = () => {
 	useHideNowPlayingBar();
 	const frameRef = useRef<HTMLDivElement>(null);
 	const mgRenderer = useRef<MeshGradientRenderer>();
@@ -465,3 +465,7 @@ export const MGEditPage: FC = () => {
 		</div>
 	);
 };
+
+Component.displayName = "MGEditPage";
+
+export default Component;

@@ -37,7 +37,7 @@ const loadedExtensionsWithSettingsAtom = atom((get) => {
 	);
 });
 
-export const SettingsPage: FC = () => {
+export const Component: FC = () => {
 	const [currentPage, setCurrentPage] = useAtom(currentPageAtom);
 	const loadedExtensions = useAtomValue(loadedExtensionsWithSettingsAtom);
 	const { t } = useTranslation();
@@ -111,3 +111,7 @@ export const SettingsPage: FC = () => {
 		</>
 	);
 };
+
+Component.displayName = "SettingsPage";
+
+export default Component;

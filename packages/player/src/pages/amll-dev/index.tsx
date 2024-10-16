@@ -5,7 +5,7 @@ import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useHideNowPlayingBar } from "../../utils/uses";
 
-export const AMLLDevPage: FC = () => {
+export const Component: FC = () => {
 	useHideNowPlayingBar();
 	return (
 		<Container
@@ -45,3 +45,7 @@ export const AMLLDevPage: FC = () => {
 		</Container>
 	);
 };
+
+Component.displayName = "AMLLDevPage";
+
+export default Component;
