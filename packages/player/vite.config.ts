@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import { execSync } from "child_process";
 import { resolve } from "path";
 import { type Plugin, defineConfig } from "vite";
@@ -76,7 +76,9 @@ const GitMetadataPlugin = (): Plugin => {
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
 	build: {
-		sourcemap: true,
+		modulePreload: {
+			polyfill: false,
+		},
 		rollupOptions: {
 			shimMissingExports: true,
 		},

@@ -69,6 +69,7 @@
 		"@types/semver": "^7.5.8",
 		"@types/stats.js": "^0.17.0",
 		"@vitejs/plugin-react": "^4.3.1",
+		"@vitejs/plugin-react-swc": "^3.7.1",
 		"i18next-parser": "^9.0.2",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.0",

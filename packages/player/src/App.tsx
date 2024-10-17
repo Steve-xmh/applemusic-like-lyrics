@@ -1,9 +1,17 @@
 import { isLyricPageOpenedAtom } from "@applemusic-like-lyrics/react-full";
 import { Box, Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect } from "react";
+import {
+	StrictMode,
+	Suspense,
+	lazy,
+	useEffect,
+	useLayoutEffect,
+	useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -28,10 +36,22 @@ const AMLLWrapper = lazy(() => import("./components/AMLLWrapper"));
 
 function App() {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
+	const [lazyLoadLyricPage, setLazyLoadLyricPage] = useState(isLyricPageOpened);
+	useLayoutEffect(() => {
+		setLazyLoadLyricPage((v) => v || isLyricPageOpened);
+	}, [isLyricPageOpened]);
 	const showStatJSFrame = useAtomValue(showStatJSFrameAtom);
 	const musicContextMode = useAtomValue(musicContextModeAtom);
 	const displayLanguage = useAtomValue(displayLanguageAtom);
 	const { i18n } = useTranslation();
+
+	useEffect(() => {
+		(async () => {
+			await new Promise((r) => requestAnimationFrame(r));
+			const win = getCurrentWindow();
+			await win.show();
+		})();
+	}, []);
 
 	useLayoutEffect(() => {
 		console.log("displayLanguage", displayLanguage, i18n);

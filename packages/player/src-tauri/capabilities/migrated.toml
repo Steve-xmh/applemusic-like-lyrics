@@ -35,6 +35,8 @@ identifier = "core:window:allow-minimize"
 [[permissions]]
 identifier = "core:window:allow-set-fullscreen"
 [[permissions]]
+identifier = "core:window:allow-show"
+[[permissions]]
 identifier = "shell:default"
 [[permissions]]
 identifier = "fs:default"

@@ -174,7 +174,6 @@ fn recreate_window(app: &AppHandle) {
 
     #[cfg(desktop)]
     {
-        let _ = win.show();
         let _ = win.set_focus();
         if let Ok(orig_size) = win.inner_size() {
             let _ = win.set_size(Size::Physical(PhysicalSize::new(0, 0)));

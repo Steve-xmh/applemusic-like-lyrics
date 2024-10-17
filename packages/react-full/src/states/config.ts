@@ -4,11 +4,7 @@
  * 如无特殊注明，此处所有配置均会被存储在 localStorage 中
  */
 
-import {
-	LyricPlayer as DefaultLyricPlayer,
-	type LyricPlayerBase,
-	MeshGradientRenderer,
-} from "@applemusic-like-lyrics/core";
+import type { LyricPlayerBase } from "@applemusic-like-lyrics/core";
 import type { BackgroundRenderProps } from "@applemusic-like-lyrics/react";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
@@ -23,13 +19,13 @@ import { atomWithStorage } from "jotai/utils";
  * 性能影响情况：高
  */
 export const lyricPlayerImplementationAtom = atom<{
-	lyricPlayer: {
+	lyricPlayer?: {
 		new (
 			...args: ConstructorParameters<typeof LyricPlayerBase>
 		): LyricPlayerBase;
 	};
 }>({
-	lyricPlayer: DefaultLyricPlayer,
+	lyricPlayer: undefined,
 });
 /**
  * 是否启用歌词行模糊效果，默认启用
@@ -212,9 +208,9 @@ export const globalLyricTimelineOffsetAtom = atomWithStorage(
  * 性能影响情况：高
  */
 export const lyricBackgroundRendererAtom = atom<{
-	renderer: BackgroundRenderProps["renderer"];
+	renderer?: BackgroundRenderProps["renderer"];
 }>({
-	renderer: MeshGradientRenderer,
+	renderer: undefined,
 });
 
 /**
