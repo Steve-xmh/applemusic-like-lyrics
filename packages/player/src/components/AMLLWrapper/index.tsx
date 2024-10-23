@@ -19,8 +19,8 @@ import {
 	LyricPlayerImplementation,
 	backgroundRendererAtom,
 	lyricPlayerImplementationAtom,
-} from "../../states";
-import { AMLLContextMenuContent } from "../AMLLContextMenu";
+} from "../../states/index.ts";
+import { AMLLContextMenuContent } from "../AMLLContextMenu/index.tsx";
 import styles from "./index.module.css";
 
 export const AMLLWrapper: FC = () => {

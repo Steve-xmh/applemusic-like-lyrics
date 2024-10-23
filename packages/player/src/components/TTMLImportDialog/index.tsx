@@ -13,7 +13,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { type TTMLDBLyricEntry, db } from "../../dexie";
+import { type TTMLDBLyricEntry, db } from "../../dexie.ts";
 import styles from "./index.module.css";
 
 function getMetadataValue(ttml: TTMLLyric, key: string) {

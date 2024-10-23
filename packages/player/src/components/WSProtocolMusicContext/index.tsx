@@ -23,8 +23,8 @@ import {
 	musicIdAtom,
 	wsProtocolConnectedAddrsAtom,
 	wsProtocolListenAddrAtom,
-} from "../../states";
-import { emitAudioThread } from "../../utils/player";
+} from "../../states/index.ts";
+import { emitAudioThread } from "../../utils/player.ts";
 
 export const WSProtocolMusicContext: FC = () => {
 	const wsProtocolListenAddr = useAtomValue(wsProtocolListenAddrAtom);

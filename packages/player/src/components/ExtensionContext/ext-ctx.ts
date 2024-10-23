@@ -1,10 +1,10 @@
 import { fromObject, fromSource, removeComments } from "convert-source-map";
 import type { ComponentType } from "react";
 import { SourceMapConsumer, SourceMapGenerator } from "source-map-js";
-import type { db } from "../../dexie";
-import type ExtensionEnv from "../../extension-env";
-import i18n from "../../i18n";
-import type { ExtensionMetaState } from "../../states/extension";
+import type { db } from "../../dexie.ts";
+import type ExtensionEnv from "../../extension-env.ts";
+import i18n from "../../i18n.ts";
+import type { ExtensionMetaState } from "../../states/extension.ts";
 
 export async function sourceMapOffsetLines(
 	code: string,

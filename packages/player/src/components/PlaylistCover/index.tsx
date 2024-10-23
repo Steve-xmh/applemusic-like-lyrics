@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, type HTMLProps, useEffect, useState } from "react";
-import { db } from "../../dexie";
+import { db } from "../../dexie.ts";
 import styles from "./index.module.css";
 
 export const PlaylistCover: FC<

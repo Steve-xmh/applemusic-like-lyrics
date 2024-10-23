@@ -1,7 +1,7 @@
 import { AudioQualityType } from "@applemusic-like-lyrics/react-full";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import type { SongData } from "../utils/player";
+import type { SongData } from "../utils/player.ts";
 
 export const musicIdAtom = atom("");
 export const playlistCardOpenedAtom = atom(false);

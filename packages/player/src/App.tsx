@@ -4,42 +4,32 @@ import "@radix-ui/themes/styles.css";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import classNames from "classnames";
 import { useAtomValue } from "jotai";
-import {
-	StrictMode,
-	Suspense,
-	lazy,
-	useEffect,
-	useLayoutEffect,
-	useState,
-} from "react";
+import { StrictMode, Suspense, lazy, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Stats from "stats.js";
 import styles from "./App.module.css";
-import { ExtensionInjectPoint } from "./components/ExtensionInjectPoint";
-import { LocalMusicContext } from "./components/LocalMusicContext";
-import { NowPlayingBar } from "./components/NowPlayingBar";
-import { UpdateContext } from "./components/UpdateContext";
-import { WSProtocolMusicContext } from "./components/WSProtocolMusicContext";
+import { ExtensionInjectPoint } from "./components/ExtensionInjectPoint/index.tsx";
+import { LocalMusicContext } from "./components/LocalMusicContext/index.tsx";
+import { NowPlayingBar } from "./components/NowPlayingBar/index.tsx";
+import { ShotcutContext } from "./components/ShotcutContext/index.tsx";
+import { UpdateContext } from "./components/UpdateContext/index.tsx";
+import { WSProtocolMusicContext } from "./components/WSProtocolMusicContext/index.tsx";
 import "./i18n";
-import { router } from "./router";
+import { router } from "./router.tsx";
 import {
 	MusicContextMode,
 	displayLanguageAtom,
 	musicContextModeAtom,
 	showStatJSFrameAtom,
-} from "./states";
+} from "./states/index.ts";
 
 const ExtensionContext = lazy(() => import("./components/ExtensionContext"));
 const AMLLWrapper = lazy(() => import("./components/AMLLWrapper"));
 
 function App() {
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
-	const [lazyLoadLyricPage, setLazyLoadLyricPage] = useState(isLyricPageOpened);
-	useLayoutEffect(() => {
-		setLazyLoadLyricPage((v) => v || isLyricPageOpened);
-	}, [isLyricPageOpened]);
 	const showStatJSFrame = useAtomValue(showStatJSFrameAtom);
 	const musicContextMode = useAtomValue(musicContextModeAtom);
 	const displayLanguage = useAtomValue(displayLanguageAtom);
@@ -88,6 +78,7 @@ function App() {
 				<WSProtocolMusicContext />
 			)}
 			<UpdateContext />
+			<ShotcutContext />
 			<Suspense>
 				<ExtensionContext />
 			</Suspense>

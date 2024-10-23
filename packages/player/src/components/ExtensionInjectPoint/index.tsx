@@ -5,7 +5,7 @@ import { type ComponentType, type FC, useMemo } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import { Trans, useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { loadedExtensionAtom } from "../../states/extension";
+import { loadedExtensionAtom } from "../../states/extension.ts";
 
 const ErrorCallout: FC<
 	FallbackProps & {

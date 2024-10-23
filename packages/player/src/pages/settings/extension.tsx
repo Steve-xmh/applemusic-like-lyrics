@@ -22,8 +22,8 @@ import {
 	ExtensionLoadResult,
 	extensionDirAtom,
 	extensionMetaAtom,
-} from "../../states/extension";
-import { restartApp } from "../../utils/player";
+} from "../../states/extension.ts";
+import { restartApp } from "../../utils/player.ts";
 
 const requireRestartAtom = atom(false);
 

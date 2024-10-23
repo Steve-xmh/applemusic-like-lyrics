@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { execSync } from "child_process";
 import { resolve } from "path";
 import { type Plugin, defineConfig } from "vite";
@@ -42,16 +42,18 @@ const GitMetadataPlugin = (): Plugin => {
 				commit: "",
 				branch: "",
 			};
-			try {
-				gitCommit = getCommitHash();
-			} catch (err) {
-				console.warn("警告：获取 Git Commit Hash 失败", err);
-			}
-			try {
-				gitBranch = getBranchName();
-			} catch (err) {
-				console.warn("警告：获取 Git Branch Name 失败", err);
-			}
+			if (!gitCommit)
+				try {
+					gitCommit = getCommitHash();
+				} catch (err) {
+					console.warn("警告：获取 Git Commit Hash 失败", err);
+				}
+			if (!gitBranch)
+				try {
+					gitBranch = getBranchName();
+				} catch (err) {
+					console.warn("警告：获取 Git Branch Name 失败", err);
+				}
 			this.emitFile({
 				fileName: "git-metadata.json",
 				name: "git-metadata",
@@ -122,6 +124,14 @@ export default defineConfig(async () => ({
 	server: {
 		port: 1420,
 		strictPort: true,
+		warmup: {
+			clientFiles: [
+				"src/**/*.tsx",
+				"src/**/*.ts",
+				"src/**/*.css",
+				"src/**/*.svg?react",
+			],
+		},
 	},
 	// 3. to make use of `TAURI_DEBUG` and other env variables
 	// https://tauri.studio/v1/api/config#buildconfig.beforedevcommand

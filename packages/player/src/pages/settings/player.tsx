@@ -54,7 +54,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { branch, commit } from "virtual:git-metadata-plugin";
 import resources from "virtual:i18next-loader";
-import { router } from "../../router";
+import { router } from "../../router.tsx";
 import {
 	LyricPlayerImplementation,
 	advanceLyricDynamicLyricTimeAtom,
@@ -63,9 +63,9 @@ import {
 	fftDataRangeAtom,
 	lyricPlayerImplementationAtom,
 	showStatJSFrameAtom,
-} from "../../states";
-import { updateInfoAtom } from "../../states/updater";
-import { restartApp } from "../../utils/player";
+} from "../../states/index.ts";
+import { updateInfoAtom } from "../../states/updater.ts";
+import { restartApp } from "../../utils/player.ts";
 import styles from "./index.module.css";
 
 const SettingEntry: FC<

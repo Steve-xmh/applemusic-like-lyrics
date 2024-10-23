@@ -11,12 +11,12 @@ import {
 import { atom, useAtom, useAtomValue } from "jotai";
 import { type FC, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { loadedExtensionAtom } from "../../states/extension";
+import { loadedExtensionAtom } from "../../states/extension.ts";
 import AMLLPlayerSettingIcon from "./amll-player-setting.svg?react";
-import { ExtensionTab } from "./extension";
 import ExtensionManageIcon from "./extension-manage.svg?react";
+import { ExtensionTab } from "./extension.tsx";
 import styles from "./index.module.css";
-import { PlayerSettingsTab } from "./player";
+import { PlayerSettingsTab } from "./player.tsx";
 
 const currentPageAtom = atom("amll-player");
 

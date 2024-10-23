@@ -3,7 +3,7 @@ import { Provider } from "jotai";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import "react-toastify/dist/ReactToastify.css";
-import App from "./App";
+import App from "./App.tsx";
 import "./i18n";
 import "./styles.css";
 import "./utils/player";

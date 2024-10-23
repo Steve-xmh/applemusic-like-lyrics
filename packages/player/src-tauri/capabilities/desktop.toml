@@ -6,4 +6,13 @@ local = true
 windows = ["main"]
 platforms = ["macOS", "windows", "linux"]
 
-permissions = ["updater:default"]
+[[permissions]]
+identifier = "updater:default"
+[[permissions]]
+identifier = "global-shortcut:default"
+[[permissions]]
+identifier = "global-shortcut:allow-is-registered"
+[[permissions]]
+identifier = "global-shortcut:allow-register"
+[[permissions]]
+identifier = "global-shortcut:allow-unregister"

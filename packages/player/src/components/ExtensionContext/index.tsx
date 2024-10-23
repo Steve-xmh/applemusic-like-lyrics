@@ -5,16 +5,16 @@ import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { uid } from "uid";
-import { db } from "../../dexie";
-import * as playerStates from "../../states";
+import { db } from "../../dexie.ts";
 import {
 	ExtensionLoadResult,
 	type ExtensionMetaState,
 	type LoadedExtension,
 	extensionMetaAtom,
 	loadedExtensionAtom,
-} from "../../states/extension";
-import { PlayerExtensionContext, sourceMapOffsetLines } from "./ext-ctx";
+} from "../../states/extension.ts";
+import * as playerStates from "../../states/index.ts";
+import { PlayerExtensionContext, sourceMapOffsetLines } from "./ext-ctx.ts";
 
 const AsyncFunction: FunctionConstructor = Object.getPrototypeOf(
 	async () => {},

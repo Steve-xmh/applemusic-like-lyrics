@@ -3,7 +3,7 @@ import { CopyIcon } from "@radix-ui/react-icons";
 import { Code, DataList, Flex, IconButton } from "@radix-ui/themes";
 import { type FC, useContext } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { SongContext } from "./song-ctx";
+import { SongContext } from "./song-ctx.ts";
 
 export const BasicTabContent: FC = () => {
 	const song = useContext(SongContext);

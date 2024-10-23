@@ -25,7 +25,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useHideNowPlayingBar } from "../../utils/uses";
+import { useHideNowPlayingBar } from "../../utils/uses.ts";
 
 interface ControlPointHandleState {
 	color: [number, number, number];

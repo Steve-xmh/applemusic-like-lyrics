@@ -3,7 +3,7 @@ import { Button, Card, Container, Flex, Text } from "@radix-ui/themes";
 import type { FC } from "react";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
-import { useHideNowPlayingBar } from "../../utils/uses";
+import { useHideNowPlayingBar } from "../../utils/uses.ts";
 
 export const Component: FC = () => {
 	useHideNowPlayingBar();

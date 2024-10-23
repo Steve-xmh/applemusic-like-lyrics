@@ -17,12 +17,12 @@ import { useAtomValue } from "jotai";
 import type { FC } from "react";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint";
-import { NewPlaylistButton } from "../../components/NewPlaylistButton";
-import { PlaylistCover } from "../../components/PlaylistCover";
-import { db } from "../../dexie";
-import { router } from "../../router";
-import { updateInfoAtom } from "../../states/updater";
+import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint/index.tsx";
+import { NewPlaylistButton } from "../../components/NewPlaylistButton/index.tsx";
+import { PlaylistCover } from "../../components/PlaylistCover/index.tsx";
+import { db } from "../../dexie.ts";
+import { router } from "../../router.tsx";
+import { updateInfoAtom } from "../../states/updater.ts";
 
 export const Component: FC = () => {
 	const playlists = useLiveQuery(() => db.playlists.toArray());

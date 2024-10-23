@@ -15,12 +15,12 @@ import {
 } from "react";
 import { Trans } from "react-i18next";
 import { FixedSizeList } from "react-window";
-import { type Song, db } from "../../dexie";
+import { type Song, db } from "../../dexie.ts";
 import {
 	currentPlaylistAtom,
 	currentPlaylistMusicIndexAtom,
-} from "../../states";
-import { type SongData, emitAudioThread } from "../../utils/player";
+} from "../../states/index.ts";
+import { type SongData, emitAudioThread } from "../../utils/player.ts";
 import styles from "./index.module.css";
 
 // TODO: 会产生闪烁更新，需要检查修正

@@ -12,13 +12,13 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { type FC, useContext } from "react";
 import { Trans } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint";
-import { db } from "../../dexie";
-import { useSongCover } from "../../utils/use-song-cover";
-import { BasicTabContent } from "./basic";
-import { LyricTabContent } from "./lyric";
-import { MetadataTabContent } from "./metadata";
-import { SongContext } from "./song-ctx";
+import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint/index.tsx";
+import { db } from "../../dexie.ts";
+import { useSongCover } from "../../utils/use-song-cover.ts";
+import { BasicTabContent } from "./basic.tsx";
+import { LyricTabContent } from "./lyric.tsx";
+import { MetadataTabContent } from "./metadata.tsx";
+import { SongContext } from "./song-ctx.ts";
 
 const SongPageHeader: FC = () => {
 	const song = useContext(SongContext);

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import type { Song } from "../dexie";
+import type { Song } from "../dexie.ts";
 
 export const useSongCover = (song?: Song) => {
 	const songImgUrl = useMemo(

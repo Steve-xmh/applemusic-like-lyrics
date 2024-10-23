@@ -2,7 +2,7 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import { type FC, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { db } from "../../dexie";
+import { db } from "../../dexie.ts";
 
 export const NewPlaylistButton: FC = () => {
 	const [name, setName] = useState("");

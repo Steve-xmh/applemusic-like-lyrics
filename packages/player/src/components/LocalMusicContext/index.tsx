@@ -42,7 +42,7 @@ import { useAtomValue, useSetAtom, useStore } from "jotai";
 import { type FC, useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { db } from "../../dexie";
+import { db } from "../../dexie.ts";
 import {
 	advanceLyricDynamicLyricTimeAtom,
 	currentPlaylistAtom,
@@ -50,14 +50,14 @@ import {
 	fftDataRangeAtom,
 	musicIdAtom,
 	musicQualityAtom,
-} from "../../states";
+} from "../../states/index.ts";
 import {
 	type AudioInfo,
 	type AudioQuality,
 	emitAudioThread,
 	emitAudioThreadRet,
 	listenAudioThreadEvent,
-} from "../../utils/player";
+} from "../../utils/player.ts";
 
 const FFTToLowPassContext: FC = () => {
 	const store = useStore();

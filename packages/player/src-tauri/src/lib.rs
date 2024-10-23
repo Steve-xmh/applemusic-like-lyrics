@@ -232,7 +232,8 @@ pub fn run() {
     #[allow(unused_mut)]
     let mut context = tauri::generate_context!();
 
-    let builder = tauri::Builder::default();
+    let builder =
+        tauri::Builder::default().plugin(tauri_plugin_global_shortcut::Builder::new().build());
 
     #[cfg(not(mobile))]
     let pubkey = {
@@ -275,6 +276,10 @@ pub fn run() {
         ])
         .setup(|app| {
             player::init_local_player(app.handle().clone());
+            #[cfg(desktop)]
+            let _ = app
+                .handle()
+                .plugin(tauri_plugin_global_shortcut::Builder::new().build());
             app.manage::<AMLLWebSocketServerWrapper>(RwLock::new(AMLLWebSocketServer::new(
                 app.handle().clone(),
             )));

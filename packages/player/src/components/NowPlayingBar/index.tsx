@@ -27,8 +27,11 @@ import IconForward from "../../assets/icon_forward.svg?react";
 import IconPause from "../../assets/icon_pause.svg?react";
 import IconPlay from "../../assets/icon_play.svg?react";
 import IconRewind from "../../assets/icon_rewind.svg?react";
-import { hideNowPlayingBarAtom, playlistCardOpenedAtom } from "../../states";
-import { PlaylistCard } from "../PlaylistCard";
+import {
+	hideNowPlayingBarAtom,
+	playlistCardOpenedAtom,
+} from "../../states/index.ts";
+import { PlaylistCard } from "../PlaylistCard/index.tsx";
 import styles from "./index.module.css";
 
 export const NowPlayingBar: FC = () => {

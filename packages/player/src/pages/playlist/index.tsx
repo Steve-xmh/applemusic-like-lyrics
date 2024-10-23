@@ -38,11 +38,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { SortableFixedSizeList } from "react-window-sortable";
-import { PlaylistCover } from "../../components/PlaylistCover";
-import { type Song, db } from "../../dexie";
-import { router } from "../../router";
-import { emitAudioThread, readLocalMusicMetadata } from "../../utils/player";
-import { useSongCover } from "../../utils/use-song-cover";
+import { PlaylistCover } from "../../components/PlaylistCover/index.tsx";
+import { type Song, db } from "../../dexie.ts";
+import { router } from "../../router.tsx";
+import { emitAudioThread, readLocalMusicMetadata } from "../../utils/player.ts";
+import { useSongCover } from "../../utils/use-song-cover.ts";
 import styles from "./index.module.css";
 
 export type Loadable<Value> =

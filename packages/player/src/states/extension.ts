@@ -1,8 +1,8 @@
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { mkdir, readDir, readTextFile } from "@tauri-apps/plugin-fs";
 import { atom } from "jotai";
-import type { PlayerExtensionContext } from "../components/ExtensionContext";
-import i18n from "../i18n";
+import type { PlayerExtensionContext } from "../components/ExtensionContext/ext-ctx.ts";
+import i18n from "../i18n.ts";
 
 export enum ExtensionLoadResult {
 	Loadable = "loadable",

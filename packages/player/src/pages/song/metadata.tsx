@@ -7,10 +7,10 @@ import {
 	useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { db } from "../../dexie";
-import { readLocalMusicMetadata } from "../../utils/player";
-import { Option } from "./common";
-import { SongContext } from "./song-ctx";
+import { db } from "../../dexie.ts";
+import { readLocalMusicMetadata } from "../../utils/player.ts";
+import { Option } from "./common.tsx";
+import { SongContext } from "./song-ctx.ts";
 
 const MetaInput: FC<
 	TextField.RootProps & {

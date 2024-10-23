@@ -7,11 +7,11 @@ import {
 	useState,
 } from "react";
 import { Trans, useTranslation } from "react-i18next";
-import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint";
-import { TTMLImportDialog } from "../../components/TTMLImportDialog";
-import { db } from "../../dexie";
-import { Option } from "./common";
-import { SongContext } from "./song-ctx";
+import { ExtensionInjectPoint } from "../../components/ExtensionInjectPoint/index.tsx";
+import { TTMLImportDialog } from "../../components/TTMLImportDialog/index.tsx";
+import { db } from "../../dexie.ts";
+import { Option } from "./common.tsx";
+import { SongContext } from "./song-ctx.ts";
 
 export const LyricTabContent: FC = () => {
 	const song = useContext(SongContext);
