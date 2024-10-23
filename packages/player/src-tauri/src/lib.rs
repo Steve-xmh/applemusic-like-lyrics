@@ -154,7 +154,16 @@ fn recreate_window(app: &AppHandle) {
                 "AMLL Player"
             }
         })
-        .visible(false)
+        .visible({
+            #[cfg(target_os = "macos")]
+            {
+                true
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                false
+            }
+        })
         .theme(Some(Theme::Dark))
         .decorations({
             #[cfg(target_os = "macos")]
