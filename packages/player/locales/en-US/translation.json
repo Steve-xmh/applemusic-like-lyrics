@@ -22,8 +22,8 @@
       "searchInput": {
         "placeholder": "Search for songs, lyrics, artists......"
       },
-      "tip": null,
-      "supportText": null,
+      "tip": "Type your search keywords above, and click on a suggestion to import the lyrics into the database directly.",
+      "supportText": "AMLL TTML DB is a free and open-source lyrics' database built by the AMLL community. Want to contribute your lyrics to AMLL TTML DB? Head over to the <1>GitHub repository</1> to learn more on how to submit!",
       "noResults": "No results."
     }
   },
@@ -37,7 +37,7 @@
     "error": {
       "invaildPluginFile": "Invalid Plugin File",
       "missingDependency": "Missing dependencies",
-      "missingMetadata": null,
+      "missingMetadata": "Missing required metadata",
       "pluginIdConflict": "Plugin ID conflict"
     }
   },
