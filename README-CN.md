@@ -2,22 +2,21 @@
 
 ![Apple Music-like Lyrics - A lyric page component library for Web](https://github.com/user-attachments/assets/ca6a98d4-28ea-4fb6-beec-7948f2ac87ec)
 
-English / [简体中文](./README-CN.md)
+# Apple Music-like Lyrics
 
-> [!WARNING]
-> English readme is still under construction!
+[English](./README.md) / 简体中文
 
-A lyric player component library aims to look similar to iPad version of Apple Music. Also with[ DOM](./packages/core/README.md),[ React ](./packages/react/README.md)and[ Vue ](./packages/react/README.md)bindings. [Also there's a local player based on it!](./packages/player/README.md)
+一个基于 Web 技术制作的类 Apple Music 歌词显示组件库，同时支持[ DOM 原生](./packages/core/README.md)、[React ](./packages/react/README.md)和[ Vue ](./packages/react/README.md)绑定，[与各种平台兼容的外置播放器](./packages/player/README.md)也仍在制作当中。
 
-This's maybe the most like iPad Apple Music style lyric page you've seen in frontend.
+这是你能在前端系里能见到的最像 iPad Apple Music 的播放页面了。
 
-Although the goal of this project is not to imitate it completely, it will polish some details better to be better than currently the best lyric players.
+尽管这个项目的目标并非完全模仿，但是会更好地打磨一些细节，以优于现阶段最好的歌词播放器。
 
-**—— AMLL Series Projects ——**
+**—— AMLL 生态作品 ——**
 
-[AMLL TTML DB - TTML Syllable Lyric Database](https://github.com/Steve-xmh/amll-ttml-db)
+[AMLL TTML DB 逐词歌词仓库](https://github.com/Steve-xmh/amll-ttml-db)
 /
-[AMLL TTML Tool - TTML Syllable Lyric Editor](https://github.com/Steve-xmh/amll-ttml-tool)
+[AMLL TTML Tool 逐词歌词编辑器](https://github.com/Steve-xmh/amll-ttml-tool)
 
 </div>
 
@@ -35,10 +34,6 @@ Although the goal of this project is not to imitate it completely, it will polis
 -   [AMLL Player](./packages/player/README.md)：AMLL 外置播放器，提供独立的外置歌词播放器，并通过独有的 WebSocket 协议与 AMLL 任意实现了协议的程序进行通信展示歌词
 -   [AMLL TTML Tool](https://github.com/Steve-xmh/amll-ttml-tool)： AMLL TTML 编辑器，提供对 TTML 格式歌词的编辑支持，并使用 AMLL Core 进行实时预览
 -   [AMLL TTML Database](https://github.com/Steve-xmh/amll-ttml-db)： AMLL TTML 数据库，提供 TTML 歌词存储仓库，以让各类歌词播放器可以使用由社区制作的 TTML 逐词歌词
-
-## AMLL Player Preview Gallery
-
-![AMLL Player Preview](https://github.com/user-attachments/assets/2b93b28f-7f79-4092-a0a5-bc7c66e731a9)
 
 ## 浏览器兼容性提醒
 
