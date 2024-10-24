@@ -17,28 +17,28 @@
     "buttonForDisplayOnly": "This function is currently for display only, no actual feature included.",
     "loadAudioError": "The player backend encountered an error when loading the audio file:\n{error}",
     "ttmlImportDialog": {
-      "openButtonLabel": null,
-      "title": null,
+      "openButtonLabel": "Search / Import lyrics from AMLL TTML DB",
+      "title": "Search / Import lyrics from AMLL TTML DB",
       "searchInput": {
-        "placeholder": null
+        "placeholder": "Search for songs, lyrics, artists......"
       },
-      "tip": null,
-      "supportText": null,
-      "noResults": null
+      "tip": "Type your search keywords above, and click on a suggestion to import the lyrics into the database directly.",
+      "supportText": "AMLL TTML DB is a free and open-source lyrics' database built by the AMLL community. Want to contribute your lyrics to AMLL TTML DB? Head over to the <1>GitHub repository</1> to learn more on how to submit!",
+      "noResults": "No results."
     }
   },
   "extension": {
     "inject": {
       "error": {
-        "calloutText": null,
-        "toastText": null
+        "calloutText": "Extension {id} encountered an error while injecting components/functions into the {injectPointName} element:",
+        "toastText": "Extension {id} encountered an error while injecting components/functions into the {injectPointName} element:\n{error}"
       }
     },
     "error": {
-      "invaildPluginFile": null,
-      "missingDependency": null,
-      "missingMetadata": null,
-      "pluginIdConflict": null
+      "invaildPluginFile": "Invalid Plugin File",
+      "missingDependency": "Missing dependencies",
+      "missingMetadata": "Missing required metadata",
+      "pluginIdConflict": "Plugin ID conflict"
     }
   },
   "newPlaylist": {
@@ -52,10 +52,10 @@
     "dialog": {
       "cancel": "Cancel",
       "confirm": "Confirm",
-      "close": null,
+      "close": "Close",
       "filter": {
-        "js": null,
-        "all": null
+        "js": "JavaScript files (*.js)",
+        "all": "All files (*.*)"
       },
       "save": "Save"
     },
@@ -164,7 +164,7 @@
             "none": "None"
           },
           "label": "Playback Controls Type",
-          "description": null
+          "description": "Components under the track information."
         },
         "verticalCoverLayout": {
           "menu": {
@@ -172,8 +172,8 @@
             "forceNormal": "Force Normal Layout",
             "forceImmersive": "Force Immersive Layout"
           },
-          "label": null,
-          "description": null
+          "label": "Vertical Cover Layout Mode",
+          "description": "Layout mode when hiding lyric component:\n- Automatic: use immersive cover layout when track cover is a video\n- Default: force default cover layout\n- Immersive: force immersive cover layout"
         },
         "subtitle": "Music information appearance",
         "showMusicName": {
@@ -231,8 +231,8 @@
       },
       "lyricBackground": {
         "menu": {
-          "meshGradientRenderer": null,
-          "pixiRenderer": null
+          "meshGradientRenderer": "Mesh Gradient Renderer",
+          "pixiRenderer": "PixiJS Renderer"
         },
         "subtitle": "Lyrics Page Background Type",
         "backgroundRenderer": {
@@ -320,17 +320,17 @@
   },
   "settings": {
     "extension": {
-      "safetyWarning": null,
-      "wipWarning": null,
+      "safetyWarning": "Any plugin will be able to access and modify all of your data, including your playlists, song metadata, etc. Please make sure that the plugin source is safe and only install plugins you trust. We are not responsible for any damage(s) caused by using of using any plugins!",
+      "wipWarning": "The plug-in interface function is still under development, so please be aware that the plug-in interface may change at any time!",
       "install": {
-        "title": null
+        "title": "Please select the JavaScript plugin file to load"
       },
-      "installPlugins": null,
-      "openPluginDirectory": null,
-      "tab": null
+      "installPlugins": "Install Plugin(s)",
+      "openPluginDirectory": "Open plugin directory",
+      "tab": "Manage Extensions"
     },
     "player": {
-      "tab": null
+      "tab": "AMLL Player Settings"
     }
   },
   "name": null
