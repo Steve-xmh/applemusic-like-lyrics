@@ -29,7 +29,7 @@ const MAX_TRUSTED_GAP = Duration.fromMillis(800);
  *
  * 判定的思路是把本次媒体时钟的推进量与当前播放状态下它应有的推进量比较，
  * 超出容差的偏离即视为跳转。判定规则为：
- * - 进度倒退或保持不变视为跳转
+ * - 进度倒退视为跳转
  * - 播放时应有的推进量是物理时钟的推进量，容差随之按比例放宽
  * - 暂停时应有的推进量是零，容差只留固定底限
  */
@@ -67,8 +67,8 @@ export class SeekDetector {
 			return false;
 		}
 
-		// 进度不再前进，正常播放不会产生这种位置，因此按跳转处理
-		if (time <= this.lastMediaTime) {
+		// 进度倒退始终按跳转处理
+		if (time < this.lastMediaTime) {
 			this.rebase(time, wall);
 			return true;
 		}

@@ -394,7 +394,7 @@ export abstract class LyricPlayerBase
 	 * 跳转会通过以下三条途径被识别，三者同时生效：
 	 *
 	 * - {@link setCurrentTime} 的 `isSeek` 参数，由调用方明确告知某次进度变化是跳转
-	 * - 进度倒退或停滞，由内部无条件识别，不受任何开关控制
+	 * - 进度倒退，由内部无条件识别，不受任何开关控制
 	 * - 自动推导，由内部比对进度的实际推进量与它应有的推进量识别超量前进，默认启用，
 	 *   可通过 {@link setEnableAutoSeekDetection} 关闭
 	 */
@@ -411,14 +411,13 @@ export abstract class LyricPlayerBase
 	 * - 播放时以物理时钟的推进量为准，容差随之按比例放宽，以容纳倍速播放与不均匀的推送节奏
 	 * - 暂停时进度本不该前进，应有的推进量是零，因此任何超出抖动幅度的前进都会被视为跳转
 	 *
-	 * 这意味着进度信息的粒度粗于推送间隔时，绝大多数推送都会被视为跳转，
-	 * 此时应当改善进度来源的精度，或在进度未发生变化时跳过推送
+	 * 这意味着进度信息的粒度粗于推送间隔时，粒度跳变的那一帧会因超量前进被视为跳转，
+	 * 此时应当改善进度来源的精度，或关闭此开关
 	 *
 	 * 较小的向前跳转可能无法被识别，但一般影响不大
 	 *
-	 * 此开关只控制上述超量前进的判定。进度倒退与停滞不受它控制，无论是否启用推导都会
-	 * 被视为跳转：正常播放不会让进度停滞不前，因此重复推送同一个时间表达的是把逐字遮罩
-	 * 这类自行推进的动画拉回到该时间的意图
+	 * 此开关只控制上述超量前进的判定。进度倒退不受它控制，无论是否启用推导都会被视为跳转；
+	 * 进度保持不变则既不前进也不后退，不会被推导视为跳转
 	 *
 	 * 推导只会额外识别出跳转，不会否决已显式传入的跳转标志，因此如果你已经在正确传入
 	 * 跳转标志了，则一般无需关心此开关。若你的进度来源精度很差而导致超量前进被频繁误判，
@@ -650,14 +649,6 @@ export abstract class LyricPlayerBase
 
 		const mediaTime = MediaTime.round(MediaTime.fromMillis(time));
 
-		if (
-			!isSeek &&
-			!this.isPlaying &&
-			mediaTime === this.timelineController.getSnapshot().currentTime
-		) {
-			return;
-		}
-
 		// 探测器必须消费每一次进度推送才能维持内部状态正确，即使本次已经被调用方标记为跳转
 		const isDetectedSeek = this.enableAutoSeekDetection
 			? this.seekDetector.detect(mediaTime, this.isPlaying)
@@ -683,7 +674,7 @@ export abstract class LyricPlayerBase
 			return;
 		}
 
-		// 时间轴是否跳跃由时间线统一推导，除了传入的 isSeek 外还包含进度倒退和停滞的情况
+		// 时间轴是否跳跃由时间线统一推导，除了传入的 isSeek 外还包含进度倒退的情况
 		const isTimeJumped = diff.isTimeJumped;
 		const snapshot = this.timelineController.getSnapshot();
 

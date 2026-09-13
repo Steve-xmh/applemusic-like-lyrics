@@ -85,25 +85,37 @@ describe("SeekDetector continuous playback", () => {
 });
 
 describe("SeekDetector stalled progress", () => {
-	it("treats an unchanged progress push as a seek", () => {
+	it("does not treat an unchanged progress push as a seek", () => {
 		const { push } = makeDetector();
 
 		push(1000, 0);
 		push(1016, 16);
 
-		expect(push(1016, 16)).toBe(true);
+		expect(push(1016, 16)).toBe(false);
 	});
 
-	it("keeps reporting seeks while the host holds one progress value", () => {
+	it("never reports a seek while the host holds one progress value", () => {
 		const { push } = makeDetector();
 
 		push(1000, 0);
 		for (let i = 0; i < 10; i++) {
-			expect(push(1000, 16)).toBe(true);
+			expect(push(1000, 16)).toBe(false);
 		}
 	});
 
-	it("reports a coarsely quantized progress source as seeking", () => {
+	it("keeps the baseline fresh across a stall so the resumed advance is judged normally", () => {
+		const { push } = makeDetector();
+
+		push(1000, 0);
+		for (let i = 0; i < 10; i++) {
+			push(1000, 16);
+		}
+
+		expect(push(1016, 16)).toBe(false);
+		expect(push(1032, 16)).toBe(false);
+	});
+
+	it("flags only the frames where a coarsely quantized progress source steps", () => {
 		const { push } = makeDetector();
 
 		push(0, 0);
@@ -112,15 +124,8 @@ describe("SeekDetector stalled progress", () => {
 			if (push(Math.floor((frame * 16) / 250) * 250, 16)) flagged++;
 		}
 
-		expect(flagged).toBeGreaterThan(200);
-	});
-
-	it("returns to normal derivation once progress advances again", () => {
-		const { push } = makeDetector();
-
-		push(1000, 0);
-		expect(push(1000, 16)).toBe(true);
-		expect(push(1016, 16)).toBe(false);
+		// 250 毫秒的粒度在 16 毫秒的推送间隔下每 16 帧跳变一次，只有这些帧超量前进
+		expect(flagged).toBe(15);
 	});
 });
 
@@ -234,8 +239,8 @@ describe("SeekDetector gaps in pushes", () => {
 		expect(afterGap(960 + 500)).toBe(false);
 	});
 
-	it("flags a gap that ended on the very same progress value", () => {
-		expect(afterGap(960)).toBe(true);
+	it("does not flag a gap that ended on the very same progress value", () => {
+		expect(afterGap(960)).toBe(false);
 	});
 });
 

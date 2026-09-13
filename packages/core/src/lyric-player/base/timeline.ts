@@ -125,7 +125,7 @@ export interface TimelineDiff {
 	/**
 	 * 标识本次同步的时间轴是否发生了跳转
 	 *
-	 * 在显式跳转 (`sync` 的 `forceSeek`) 或时间倒退 / 停滞（重复推送同一时间）时为 `true`
+	 * 在显式跳转 (`sync` 的 `forceSeek`) 或时间倒退时为 `true`
 	 *
 	 * 例如跳转时使用更缓慢的弹簧参数 (参见 `spring.ts`)，
 	 * 以及在非触摸状态下重置滚动坐标系
@@ -312,15 +312,11 @@ export class TimelineController {
 		const prevScrollToIndex = this.snapshot.scrollToIndex;
 		const prevEndOfSong = this.snapshot.isEndOfSong;
 
-		// 时间不再前进时一律按跳转处理，这里有两个各自独立的理由
-		//
-		// 倒退是机制上的必需：performPlayback 会保存上次扫描停止的位置，下次从该位置
-		// 继续扫描以提高性能，若时间倒退，倒退到的行可能位于扫描位置之前，只能重新推导
-		//
-		// 停滞则是语义上的约定：正常播放不会让进度停在原地，推送同一个时间表达的是把
-		// 逐字遮罩这类自行推进的动画重新对齐到该时间的意图，因此也走跳转路径
-		const isTimeNotAdvancing = time <= this.snapshot.currentTime;
-		const isJump = forceSeek || isTimeNotAdvancing;
+		// 时间倒退时一律按跳转处理，因为 performPlayback 会保存上次扫描停止的位置，
+		// 下次从该位置继续扫描以提高性能，若时间倒退，倒退到的行可能位于
+		// 扫描位置之前，只能重新推导
+		const isTimeRetreating = time < this.snapshot.currentTime;
+		const isJump = forceSeek || isTimeRetreating;
 
 		// 间奏命中情况需要先于歌词状态确定
 		// Seek 时要按同样的规则决定是否保留已经唱完的行，需要提前知道结果

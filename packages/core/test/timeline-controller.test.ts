@@ -453,25 +453,14 @@ describe("TimelineController seek", () => {
 		expect(highlighted(c)).toEqual([0]);
 	});
 
-	it("treats a repeated identical time as a seek jump", () => {
+	it("treats a repeated identical time as an ordinary tick", () => {
 		const c = makeController([0, 1000], [3000, 4000]);
 
 		tick(c, 3500);
 		expect(highlighted(c)).toEqual([1]);
 
 		const diff = tick(c, 3500);
-		expect(diff.hasChanged).toBe(true);
-		expect(diff.isTimeJumped).toBe(true);
-		expect(highlighted(c)).toEqual([1]);
-	});
-
-	it("returns to normal playback on the frame after a stalled push", () => {
-		const c = makeController([0, 1000], [3000, 4000]);
-
-		tick(c, 3500);
-		expect(tick(c, 3500).isTimeJumped).toBe(true);
-
-		const diff = tick(c, 3600);
+		expect(diff.hasChanged).toBe(false);
 		expect(diff.isTimeJumped).toBe(false);
 		expect(highlighted(c)).toEqual([1]);
 	});

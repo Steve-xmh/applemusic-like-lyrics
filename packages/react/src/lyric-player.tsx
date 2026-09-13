@@ -320,8 +320,8 @@ export const LyricPlayer: ForwardRefExoticComponent<
 
 		// isSeeking 只标注本次 currentTime 推送是否为跳转，不作为推送的触发源
 		//
-		// currentTime 未变而 isSeeking 变化若重跑此 Effect，会推送一次重复的进度，
-		// 而重复推送同一个时间会被跳转推导判定为跳转，触发一次多余的完整重排
+		// currentTime 未变而 isSeeking 变化若重跑此 Effect，只会把同一个时间再推送一次，
+		// 除了多走一次同步流程之外没有任何效果，因此不值得作为依赖参与重跑
 		// biome-ignore lint/correctness/useExhaustiveDependencies: isSeeking 不作为触发源
 		useLayoutEffect(() => {
 			if (currentTime !== undefined) {

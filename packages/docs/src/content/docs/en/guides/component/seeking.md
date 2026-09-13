@@ -43,12 +43,11 @@ The component recognizes seeks automatically by default. Given the common premis
 
 However, automatic derivation can only reason from progress changes that the component actually receives. Some edge cases may cause it to miss a seek or leave a minor visual blemish; see [Limitations of Automatic Derivation](#limitations-of-automatic-derivation). When the host knows that a seek has occurred, passing the seek flag explicitly can cover these edge cases.
 
-Backward and stalled progress are both treated as a seek whether or not automatic derivation is enabled.
+Backward progress is treated as a seek whether or not automatic derivation is enabled.
 
-Three kinds of progress change are treated as a seek. The first two hold unconditionally; only the third is the automatic derivation's job:
+Two kinds of progress change are treated as a seek. The first holds unconditionally; only the second is the automatic derivation's job:
 
 - Progress going backward, however small
-- Progress no longer advancing, that is, pushing the same time repeatedly
 - Progress advancing significantly more than it should have: during playback the bar is the real elapsed time; while paused progress should not advance at all, so any advance beyond the jitter range counts
 
 :::note
@@ -66,20 +65,13 @@ The derivation draws its conclusion from the relationship between two consecutiv
 Seek detection does not misfire within a normal range of playback rates. But **The lyric component itself does not support rate-adjusted playback**, the word-by-word mask always advances at 1×. During rate-adjusted playback the mask therefore falls steadily behind the actual progress, reaching only 1/rate of the way through a line by the time that line is over (only halfway at 2×, for instance).
 :::
 
-### Progress Source Granularity Must Not Be Coarser Than the Push Interval
+### Progress Source Granularity
 
-Pushing the same time repeatedly is always treated as a seek, regardless of the automatic derivation switch. This makes a user repeatedly clicking the same spot on the progress bar recognizable as well, and pulls back the visual effects that are mid-animation, such as the word-by-word mask.
+A push whose progress has not changed has no effect at all: it is neither treated as a seek nor does it trigger a relayout. Granularity coarser than the push interval is therefore no longer a problem in itself. The problem is the frame where the granularity steps: it advances the whole granularity at once, which may exceed the advance it should have made and be treated as a seek.
 
-The cost is that if your progress source is quantized coarser than your push interval, the vast majority of pushes will be treated as seeks. For example, pushing a 250-millisecond-granular progress source once per frame leaves roughly
-<math class="not-content">
-	<mfrac>
-		<mn>15</mn>
-		<mn>16</mn>
-	</mfrac>
-</math>
-of the pushes unchanged, so nearly every frame is handled as a seek. If you hit this, improve the precision of your progress source, or skip the push while the progress has not changed. Turning off automatic derivation does not avoid this.
+A granularity step of no more than about 150 milliseconds is not misjudged; coarser than that, a seek is handled roughly once per granularity. For example, pushing a 250-millisecond-granular progress source every frame at 60 fps leaves 15 of every 16 frames unchanged, and the remaining frame advances 250 milliseconds, so roughly every 16 frames is handled as a seek.
 
-Pausing is unaffected: pushes whose time has not changed are ignored outright, so they are neither treated as seeks nor trigger any relayout. This relies on the component knowing that it is currently paused, so keep `pause()` and `resume()` in sync as described in [Timing and Lifecycle](./sequence#play-and-pause).
+If you hit this, improve the precision of your progress source, or turn the derivation off as described in [Turning Off Automatic Derivation](#turning-off-automatic-derivation). The cost is that forward seeks are then no longer recognized automatically either.
 
 ### Limitations of Automatic Derivation
 
@@ -128,7 +120,7 @@ The component handles the following cases as seeks on its own, with no intervent
 
 If your host's progress source is too imprecise, so that the size of a forward advance is frequently misjudged, you can turn off the automatic derivation with [`setEnableAutoSeekDetection`](/en/reference/core/classlyricplayerbase#setenableautoseekdetection).
 
-After that, only the third rule above stops applying, that is, the media clock is no longer compared against the wall clock; backward and stalled progress are still treated as seeks. The current state can be read with [`getEnableAutoSeekDetection`](/en/reference/core/classlyricplayerbase#getenableautoseekdetection).
+After that, only the second rule above stops applying, that is, the media clock is no longer compared against the wall clock; backward progress is still treated as a seek. The current state can be read with [`getEnableAutoSeekDetection`](/en/reference/core/classlyricplayerbase#getenableautoseekdetection).
 
 ## Lyric Line Click Events
 
@@ -172,7 +164,7 @@ The Vue binding does not have a corresponding prop, but automatic derivation is 
 ## Checklist
 
 - Keep pushing progress with `setCurrentTime` during playback; do not call it only when seeking.
-- The granularity of the progress source should not be coarser than the push interval.
+- A granularity step in the progress source should not exceed about 150 milliseconds.
 - When using rate-adjusted playback, keep pushing frame by frame, and note that the component does not support rate-adjusted playback: the word-by-word mask still advances at 1×.
 - When you know a seek happened (a lyric line click, for instance), you can optionally use the seek flag as a supplement to automatic derivation.
 - Do not leave the seek flag set to `true` for a long time.
