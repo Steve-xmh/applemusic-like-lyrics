@@ -76,6 +76,12 @@ export class LyricLineEl extends LyricLineBase {
 		if (LyricLineBase.wordSegmenter) {
 			this.balancer = new LineBalancer(main);
 		}
+		this.lineTransforms.scale.attach({
+			element: this.element,
+			frame: (scale) => ({
+				transform: `scale(${(scale / 100).toFixed(3)})`,
+			}),
+		});
 		// 延迟构建具体行内容，进入可视区（含 overscan）时再构建
 		this.rebuildStyle();
 	}
@@ -183,6 +189,9 @@ export class LyricLineEl extends LyricLineBase {
 	}
 
 	private rebuildStyle(): void {
+		// 由弹簧自身负责缩放时不再逐帧写入，避免与动画重复覆盖
+		if (this.lineTransforms.scale.managesStyle) return;
+
 		const style = this.element.style;
 		const currentScale = this.lineTransforms.scale.getCurrentPosition() / 100;
 

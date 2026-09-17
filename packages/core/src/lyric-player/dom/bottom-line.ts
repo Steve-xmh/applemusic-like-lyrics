@@ -4,7 +4,7 @@ import type {
 } from "#lyric/base/bottom-line.ts";
 import type { LyricPlayerBase } from "#lyric/base/index.ts";
 import styles from "#styles/lyric-player.module.css";
-import { Spring } from "#utils/spring.ts";
+import { createSpring } from "#utils/spring-impl.ts";
 import { Duration } from "#utils/time.ts";
 
 /**
@@ -24,7 +24,7 @@ export class BottomLineEl implements BottomLine {
 	private lastFilterStyle = "";
 
 	readonly lineTransforms: BottomLineTransforms = {
-		posY: new Spring(0),
+		posY: createSpring(0),
 	};
 
 	/**
@@ -44,7 +44,10 @@ export class BottomLineEl implements BottomLine {
 			`${styles.lyricLine} ${styles.bottomLine}`,
 		);
 		this.contentElement.dataset.bottomLine = "true";
-		this.element.appendChild(this.contentElement);
+		this.lineTransforms.posY.attach({
+			element: this.element,
+			frame: (posY) => ({ transform: `translate(0px, ${posY.toFixed(2)}px)` }),
+		});
 		this.rebuildStyle();
 	}
 
@@ -122,7 +125,10 @@ export class BottomLineEl implements BottomLine {
 
 		if (this.lastTransformStyle !== transformStr) {
 			this.lastTransformStyle = transformStr;
-			style.transform = transformStr;
+			// 由弹簧自身负责位移时不再逐帧写入，避免与动画重复覆盖
+			if (!this.lineTransforms.posY.managesStyle) {
+				style.transform = transformStr;
+			}
 		}
 
 		const blurVal = Math.min(5, this.blur);
