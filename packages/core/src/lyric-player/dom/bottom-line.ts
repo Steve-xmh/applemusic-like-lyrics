@@ -21,7 +21,7 @@ export class BottomLineEl implements BottomLine {
 	private blur = 0;
 
 	private lastTransformStyle = "";
-	private lastFilterStyle = "";
+	private lastBlurNum = -1;
 
 	readonly lineTransforms: BottomLineTransforms = {
 		posY: createSpring(0),
@@ -100,6 +100,8 @@ export class BottomLineEl implements BottomLine {
 				});
 		} else {
 			this.blur = Math.min(5, blur);
+			// 位移交给弹簧处理，这里只需同步模糊值
+			this.rebuildFilterStyle();
 			this.lineTransforms.posY.setTargetPosition(top, delay);
 		}
 	}
@@ -111,32 +113,42 @@ export class BottomLineEl implements BottomLine {
 	public update(delta: Duration = Duration.ZERO): void {
 		if (!this.lyricPlayer.getEnableSpring()) return;
 		this.lineTransforms.posY.update(delta);
-		this.rebuildStyle();
+		// 由弹簧自身负责位移时样式由浏览器写入，无需逐帧重建
+		if (!this.lineTransforms.posY.managesStyle) this.rebuildStyle();
 	}
 
 	/**
 	 * 将弹簧当前位置与模糊值写入内联样式
 	 */
 	private rebuildStyle(): void {
-		const style = this.element.style;
+		this.rebuildTransformStyle();
+		this.rebuildFilterStyle();
+	}
 
+	/** 将弹簧当前位置写入变换 */
+	private rebuildTransformStyle(): void {
 		const posY = this.lineTransforms.posY.getCurrentPosition().toFixed(2);
 		const transformStr = `translate(0px, ${posY}px)`;
 
-		if (this.lastTransformStyle !== transformStr) {
-			this.lastTransformStyle = transformStr;
-			// 由弹簧自身负责位移时不再逐帧写入，避免与动画重复覆盖
-			if (!this.lineTransforms.posY.managesStyle) {
-				style.transform = transformStr;
-			}
+		if (this.lastTransformStyle === transformStr) return;
+		this.lastTransformStyle = transformStr;
+		// 由弹簧自身负责位移时不再逐帧写入，避免与动画重复覆盖
+		if (!this.lineTransforms.posY.managesStyle) {
+			this.element.style.transform = transformStr;
 		}
+	}
 
+	/**
+	 * 将模糊值写入滤镜
+	 *
+	 * 先做数值比较，模糊值没变时直接返回，避免每帧构造滤镜字符串
+	 */
+	private rebuildFilterStyle(): void {
 		const blurVal = Math.min(5, this.blur);
-		const filterStr = blurVal > 0.01 ? `blur(${blurVal.toFixed(2)}px)` : "none";
-		if (this.lastFilterStyle !== filterStr) {
-			this.lastFilterStyle = filterStr;
-			style.filter = filterStr;
-		}
+		if (this.lastBlurNum === blurVal) return;
+		this.lastBlurNum = blurVal;
+		this.element.style.filter =
+			blurVal > 0.01 ? `blur(${blurVal.toFixed(2)}px)` : "none";
 	}
 
 	public dispose(): void {
