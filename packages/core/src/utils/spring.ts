@@ -31,7 +31,7 @@ export class Spring {
 	protected currentPosition: number = 0;
 	protected targetPosition: number = 0;
 	protected currentTime: number = 0;
-	private params: Partial<SpringParams> = {};
+	protected params: Partial<SpringParams> = {};
 	protected currentSolver: (t: number) => number;
 	protected getV: (t: number) => number;
 	protected getV2: (t: number) => number;
@@ -164,7 +164,7 @@ export class Spring {
 
 	/**
 	 * 绑定或解绑弹簧的样式目标，对于需要逐帧应用样式的 DOM 操作
-	 * 
+	 *
 	 * 可以通过这个函数来注册每帧需要调用的回调函数，然后由开发者自行处理样式计算
 	 */
 	attach(_target: SpringStyleTarget | undefined): void {}

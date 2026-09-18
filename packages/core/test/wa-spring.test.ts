@@ -69,6 +69,7 @@ const DELAYED_STEPS: Step[] = [
 interface StubElement {
 	style: Record<string, string>;
 	styleWrites: number;
+	animateCallCount: number;
 	keyframes: Keyframe[];
 	options: KeyframeAnimationOptions | undefined;
 	cancelCount: number;
@@ -82,6 +83,7 @@ function createStubElement(withAnimate = true): StubElement {
 	const stub: StubElement = {
 		style: {},
 		styleWrites: 0,
+		animateCallCount: 0,
 		keyframes: [],
 		options: undefined,
 		cancelCount: 0,
@@ -98,6 +100,7 @@ function createStubElement(withAnimate = true): StubElement {
 
 	if (withAnimate) {
 		stub.animate = (keyframes, options) => {
+			stub.animateCallCount++;
 			stub.keyframes = keyframes;
 			stub.options = options;
 			return {
@@ -223,6 +226,73 @@ describe("WASpring 的 Web Animation API 驱动", () => {
 		expect(
 			keyframePosition(stub.keyframes[stub.keyframes.length - 1]),
 		).toBeCloseTo(100, 1);
+	});
+
+	it("参数未变化时不会重建关键帧动画", () => {
+		const stub = createStubElement();
+		const spring = new WASpring(0);
+		attachStub(spring, stub);
+
+		const defaults = { mass: 1, damping: 10, stiffness: 100, soft: false };
+		// 第一次应用参数确实是变化，允许重建
+		spring.updateParams({ ...defaults });
+		spring.setTargetPosition(100);
+		const baseline = stub.animateCallCount;
+		expect(baseline).toBeGreaterThan(0);
+
+		// 与当前完全相同的参数（歌词播放期间会被反复推送）不应触发重建
+		spring.updateParams({ ...defaults });
+		spring.updateParams({ mass: 1, damping: 10 });
+		expect(stub.animateCallCount).toBe(baseline);
+
+		// 真正发生变化时才重建
+		spring.updateParams({ stiffness: 150 });
+		expect(stub.animateCallCount).toBe(baseline + 1);
+	});
+
+	it("关键帧经过精简且与解析解的偏差在容差内", () => {
+		const stub = createStubElement();
+		const spring = new WASpring(0);
+		attachStub(spring, stub);
+		// 纵向滚动的慢速参数，尾段很长且接近平直，冗余采样点最多
+		spring.updateParams({ mass: 0.9, damping: 15, stiffness: 90 });
+		spring.setTargetPosition(160);
+
+		const duration = stub.options?.duration;
+		if (typeof duration !== "number") throw new Error("duration 应为数字");
+
+		// 逐帧实现作为解析解参考
+		const reference = new FrameSpring(0);
+		reference.updateParams({ mass: 0.9, damping: 15, stiffness: 90 });
+		reference.setTargetPosition(160);
+		let referenceTime = 0;
+		const positionAt = (time: number) => {
+			reference.update(Duration.fromMillis(time - referenceTime));
+			referenceTime = time;
+			return reference.getCurrentPosition();
+		};
+
+		const frames = stub.keyframes;
+		expect(frames.length).toBeGreaterThan(2);
+
+		// 均匀采样的点数作为对比基准
+		const uniformCount = Math.ceil(duration / (1000 / 120)) + 1;
+		expect(frames.length).toBeLessThan(uniformCount / 2);
+
+		for (let i = 0; i < frames.length - 1; i++) {
+			const from = frames[i];
+			const to = frames[i + 1];
+			const fromTime = (from.offset as number) * duration;
+			const toTime = (to.offset as number) * duration;
+
+			// 保留下来的关键帧本身必须精确落在解析解上
+			expect(keyframePosition(from)).toBeCloseTo(positionAt(fromTime), 6);
+
+			// 两点之间的线性插值（即浏览器实际渲染的轨迹）也要贴合解析解
+			const midTime = (fromTime + toTime) / 2;
+			const mid = (keyframePosition(from) + keyframePosition(to)) / 2;
+			expect(Math.abs(mid - positionAt(midTime))).toBeLessThan(0.5);
+		}
 	});
 
 	it("动画期间与收敛之后都不产生逐帧样式变更", () => {

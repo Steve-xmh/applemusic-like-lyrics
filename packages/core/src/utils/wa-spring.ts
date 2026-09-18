@@ -10,14 +10,94 @@ import {
 } from "./spring.ts";
 import { Duration } from "./time.ts";
 
-// 采样间隔（毫秒），预设 120Hz 理论配合 linear 过渡足够呈现丝滑的效果了
-const SAMPLE_INTERVAL_MS = 1000 / 120;
+// 采样间隔（毫秒），预设 60Hz 理论配合 linear 过渡足够呈现丝滑的效果了
+const SAMPLE_INTERVAL_MS = 1000 / 60;
 // 单次动画的关键帧数量上限，防止极端参数下生成过多关键帧
 const MAX_KEYFRAMES = 600;
 // 单次动画的最长时长（秒），兜底防止参数导致永不收敛
 const MAX_DURATION_SECS = 20;
 // 收敛阈值
 const ARRIVED_EPSILON = 0.01;
+// 关键帧简化容差（像素），远小于一个设备像素，精简后肉眼无法分辨
+const KEYFRAME_TOLERANCE = 0.25;
+
+/** 弹簧轨迹上的一个采样点 */
+interface Sample {
+	/** 在整段动画中的时间占比 */
+	offset: number;
+	/** 该时刻的弹簧位置 */
+	position: number;
+}
+
+/** 判定两组弹簧参数是否等价 */
+function isSameParams(
+	a: Partial<SpringParams>,
+	b: Partial<SpringParams>,
+): boolean {
+	return (
+		a.mass === b.mass &&
+		a.damping === b.damping &&
+		a.stiffness === b.stiffness &&
+		a.soft === b.soft
+	);
+}
+
+/**
+ * 用 Douglas-Peucker 算法在容差内精简采样点
+ *
+ * 弹簧轨迹在起始的高速段弯曲明显，尾段则接近平直，均匀采样的点大部分是冗余的。
+ * 精简后关键帧数量会大幅减少，而渲染出来的轨迹与解析解的偏差不超过容差。
+ * 滚轮滚动时每个事件都会重建一次动画，因此这里的收益很直接。
+ *
+ * @param samples 按时间升序排列的采样点
+ * @param tolerance 允许的最大位置偏差
+ * @returns 保留下来的采样点下标，首尾必定保留
+ */
+function simplifySamples(samples: Sample[], tolerance: number): number[] {
+	const count = samples.length;
+	if (count <= 2) return samples.map((_, index) => index);
+
+	const kept: boolean[] = new Array<boolean>(count).fill(false);
+	kept[0] = true;
+	kept[count - 1] = true;
+
+	const pending: Array<[number, number]> = [[0, count - 1]];
+	while (pending.length > 0) {
+		const range = pending.pop();
+		if (!range) continue;
+		const [first, last] = range;
+		if (last - first < 2) continue;
+
+		const head = samples[first];
+		const tail = samples[last];
+		const span = tail.offset - head.offset;
+		let maxDeviation = 0;
+		let maxIndex = -1;
+		for (let index = first + 1; index < last; index++) {
+			const sample = samples[index];
+			const progress = span > 0 ? (sample.offset - head.offset) / span : 0;
+			const deviation = Math.abs(
+				sample.position -
+					(head.position + (tail.position - head.position) * progress),
+			);
+			if (deviation > maxDeviation) {
+				maxDeviation = deviation;
+				maxIndex = index;
+			}
+		}
+
+		if (maxDeviation > tolerance && maxIndex !== -1) {
+			kept[maxIndex] = true;
+			pending.push([first, maxIndex], [maxIndex, last]);
+		}
+	}
+
+	const result: number[] = [];
+	for (let index = 0; index < count; index++) {
+		if (kept[index]) result.push(index);
+	}
+	return result;
+}
 
 /**
  * 基于 Web Animation API 的弹簧实现
@@ -72,9 +152,17 @@ export class Spring extends FrameSpring {
 		params: Partial<SpringParams>,
 		delay: Duration = Duration.ZERO,
 	): void {
+		// 带延迟的参数只是入队，此时弹簧状态还没有变化
+		if (Duration.asSecsF64(delay) > 0) {
+			super.updateParams(params, delay);
+			return;
+		}
+
+		// 参数若没有真正变化，解析解也就没有变化，已有动画依然有效，
+		// 不必重建关键帧（歌词行/参数变更会像流水一样频繁调用本方法）
+		const changed = !isSameParams(this.params, { ...this.params, ...params });
 		super.updateParams(params, delay);
-		// 带延迟的参数只是入队，此时弹簧状态还没变化
-		if (Duration.asSecsF64(delay) <= 0) this.refresh();
+		if (changed) this.refresh();
 	}
 
 	override setTargetPosition(
@@ -111,7 +199,8 @@ export class Spring extends FrameSpring {
 			Math.max(1, Math.ceil((durationSecs * 1000) / SAMPLE_INTERVAL_MS)),
 		);
 
-		const keyframes: Keyframe[] = [];
+		// 按解析解均匀采样
+		const samples: Sample[] = [];
 		for (let i = 0; i <= frameCount; i++) {
 			const offset = i / frameCount;
 			// 末帧与逐帧实现收敛时的贴合行为保持一致
@@ -119,8 +208,17 @@ export class Spring extends FrameSpring {
 				settled && i === frameCount
 					? this.targetPosition
 					: this.currentSolver(start + offset * durationSecs);
-			keyframes.push({ offset, ...target.frame(position) });
+			samples.push({ offset, position });
 		}
+
+		// 精简掉在容差内属于冗余的采样点，只保留真正需要的关键帧
+		const keyframes: Keyframe[] = simplifySamples(
+			samples,
+			KEYFRAME_TOLERANCE,
+		).map((index) => {
+			const sample = samples[index];
+			return { offset: sample.offset, ...target.frame(sample.position) };
+		});
 
 		this.animation = target.element.animate(keyframes, {
 			duration: Math.max(1, durationSecs * 1000),
