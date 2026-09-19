@@ -267,6 +267,12 @@
 		background-color: var(--amll-lp-color, white);
 		aspect-ratio: 1 / 1;
 	}
+
+	@media (color-gamut: p3) {
+		& > * {
+			background-color: var(--amll-lp-color-p3, var(--amll-lp-color, white));
+		}
+	}
 }
 
 .disableSpring > *,

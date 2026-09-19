@@ -2,6 +2,7 @@
 import {
 	DomLyricPlayer,
 	type LyricLineMouseEvent,
+	setBackgroundColorSpacePreference,
 } from "@applemusic-like-lyrics/core";
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 import { extractSongwriters, parseLyricSource } from "@/lib/parse-lyric";
@@ -31,6 +32,10 @@ function applyLyricSettings(): void {
 function mountBackground(): void {
 	const host = playerEl.value;
 	if (!host) return;
+
+	// 渲染器在构造时读取色彩空间偏好，而 mount() 内部就会创建渲染器，所以必须
+	// 赶在它前面设好；否则要等重建渲染器才会生效
+	setBackgroundColorSpacePreference(player.background.colorSpace);
 
 	const lyricElement = lyricPlayerRef.value?.getElement() ?? null;
 	backgroundRuntime.mount(host, player.background.renderer, lyricElement);
@@ -239,6 +244,11 @@ watch(
 
 watch(
 	() => player.background.renderer,
+	() => mountBackground(),
+);
+
+watch(
+	() => player.background.colorSpace,
 	() => mountBackground(),
 );
 

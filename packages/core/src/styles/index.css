@@ -34,3 +34,21 @@
 		--amll-lp-line-padding-x: 0;
 	}
 }
+
+/*
+	广色域屏幕上的歌词颜色。
+
+	默认的白色在 sRGB 与 P3 里是同一个白（两者分量都是 1），把某种颜色写进 P3 也
+	不会使它变艳，所以这里不是把白色「变宽」，而是给宿主留一个按屏幕能力切换的
+	口子：想用 P3 里更艳的歌词色就设 --amll-lp-color-p3，不支持的屏幕上仍旧落在
+	--amll-lp-color。
+
+	歌词真正吃到广色域的地方在合成而不是取色：背景画板现在是 Display P3（见
+	bg-render/color-space.ts），歌词层的 mix-blend-mode: plus-lighter 与强调动画
+	的白色辉光叠加在它上面时，因此能在 sRGB 装不下的地方继续往上加。
+*/
+@media (color-gamut: p3) {
+	.amll-lyric-player {
+		color: var(--amll-lp-color-p3, var(--amll-lp-color, white));
+	}
+}

@@ -74,6 +74,36 @@ player.update(0) // 更新歌词组件动画（需要逐帧调用）
 }
 ```
 
+广色域屏幕上 `--amll-lp-color-p3` 的优先级高于 `--amll-lp-color`，可以给能显示 Display P3 的屏幕单独指定一个更艳的歌词色。
+
+## 输出色彩空间
+
+背景渲染器写的是 WebGL 绘制缓冲，而绘制缓冲只能声明成 `srgb` 或 `display-p3`。所以这里的上限是 **广色域**，不是亮度上的 HDR：`display-p3` 拓宽的是色域，每个通道仍然封顶在 1.0。
+
+色彩空间默认自动选择：显示设备报 `color-gamut: p3` 且绘制缓冲认这个色彩空间时用 `display-p3`，否则一律 `srgb`。不支持的设备上渲染结果与改动前逐字节一致。
+
+```typescript
+import {
+  BackgroundRender,
+  MeshGradientRenderer,
+  getOutputColorSpaceSupport,
+  setBackgroundColorSpacePreference,
+} from "@applemusic-like-lyrics/core";
+
+// 必须在渲染器构造之前调用：绘制缓冲的色彩空间只能在创建上下文时声明
+setBackgroundColorSpacePreference("auto"); // 也可以是 "srgb" / "display-p3"
+
+const background = BackgroundRender.new(MeshGradientRenderer);
+background.getColorSpace(); // 实际写出的色彩空间，"srgb" | "display-p3"
+
+getOutputColorSpaceSupport();
+// { wideGamutDisplay, hdrDisplay, wideGamutDrawingBuffer }
+```
+
+`MeshGradientRenderer` 与 `IsolationRenderer` 支持 `display-p3`。`PixiRenderer` 一律报 `srgb`：它的内部纹理与滤镜缓冲都按 sRGB 处理，把绘制缓冲声明成 P3 只会把这些数值当成 P3 重新解释，整体偏色。
+
+`hdrDisplay` 只是设备能力播报。显示设备支持广色域时，渲染器会额外在 Display P3 色域内做一次饱和度扩张，让原本被 sRGB 边界削平的颜色重新显出来。
+
 ## 开发与构建
 
 ```bash

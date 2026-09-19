@@ -57,6 +57,20 @@ const player = usePlayerStore();
 				</SelectContent>
 			</Select>
 
+			<Select v-model="player.background.colorSpace">
+				<SelectTrigger class="w-full">
+					<SelectValue placeholder="输出色彩空间" />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="auto">输出色彩空间：自动</SelectItem>
+					<SelectItem value="srgb">输出色彩空间：sRGB</SelectItem>
+					<SelectItem value="display-p3">输出色彩空间：Display P3</SelectItem>
+				</SelectContent>
+			</Select>
+			<p class="text-xs opacity-70">
+				实际输出：{{ player.background.activeColorSpace }}
+			</p>
+
 			<ControllerSliderGroup>
 				<ControllerSlider
 					v-model="player.background.scale"
@@ -97,8 +111,8 @@ const player = usePlayerStore();
 					<SelectTrigger class="w-full">
 						<SelectValue placeholder="取色算法" />
 					</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="auto">自动择优（K-Means / 八叉树）</SelectItem>
+					<SelectContent>
+						<SelectItem value="auto">自动择优（K-Means / 八叉树）</SelectItem>
 						<SelectItem value="kmeans">K-Means</SelectItem>
 						<SelectItem value="octtree">八叉树</SelectItem>
 					</SelectContent>

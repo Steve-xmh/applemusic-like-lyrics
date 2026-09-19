@@ -1,4 +1,8 @@
 import type { Disposable, HasElement } from "../interfaces.ts";
+import {
+	type BackgroundColorSpace,
+	detectBackgroundColorSpace,
+} from "./color-space.ts";
 
 export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 	/**
@@ -60,6 +64,14 @@ export abstract class AbstractBaseRenderer implements Disposable, HasElement {
 	 * @param hasLyric 是否有歌词，如不确定是否需要赋值，请传入 true 或不做任何处理（默认值为 true）
 	 */
 	abstract setHasLyric(hasLyric: boolean): void;
+	/**
+	 * 背景实际写出的色彩空间。
+	 *
+	 * 由设备能力与 {@link setBackgroundColorSpacePreference} 共同决定，渲染器
+	 * 自己实现不了广色域时（例如 Pixi）应当照旧报 `"srgb"`，免得宿主按错误的
+	 * 色彩空间去拼叠画面。
+	 */
+	abstract getColorSpace(): BackgroundColorSpace;
 	abstract dispose(): void;
 	abstract getElement(): HTMLElement;
 }
@@ -72,8 +84,16 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 	private observer: ResizeObserver;
 	protected flowSpeed = 1;
 	protected currerntRenderScale = 0.75;
+	/**
+	 * 本渲染器应当写出的色彩空间，构造时定下，之后不再改动。
+	 *
+	 * 想换的话得重建渲染器：绘制缓冲的色彩空间必须在创建上下文时/首次绘制前
+	 * 声明，中途改会让已经渲染的内容解析错色彩空间。
+	 */
+	protected readonly outputColorSpace: BackgroundColorSpace;
 	constructor(protected canvas: HTMLCanvasElement) {
 		super();
+		this.outputColorSpace = detectBackgroundColorSpace();
 		this.observer = new ResizeObserver(() => {
 			const width = clamp1(
 				canvas.clientWidth * window.devicePixelRatio * this.currerntRenderScale,
@@ -151,6 +171,9 @@ export abstract class BaseRenderer extends AbstractBaseRenderer {
 	dispose(): void {
 		this.disconnectResizeObserver();
 		this.canvas.remove();
+	}
+	override getColorSpace(): BackgroundColorSpace {
+		return this.outputColorSpace;
 	}
 	override getElement(): HTMLElement {
 		return this.canvas;

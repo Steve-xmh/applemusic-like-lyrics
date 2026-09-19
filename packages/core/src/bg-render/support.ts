@@ -10,6 +10,19 @@
 let webgl1Support: boolean | undefined;
 let webgl2Support: boolean | undefined;
 let highpFragmentSupport: boolean | undefined;
+let displayP3Support: boolean | undefined;
+let hdrDisplaySupport: boolean | undefined;
+let wideGamutDrawingBufferSupport: boolean | undefined;
+
+/** 跑一次媒体查询，环境里没有 `matchMedia`（例如 SSR）时一律当作不匹配。 */
+function mediaMatches(query: string): boolean {
+	if (typeof globalThis.matchMedia !== "function") return false;
+	try {
+		return globalThis.matchMedia(query).matches;
+	} catch {
+		return false;
+	}
+}
 
 /**
  * 借一个 1x1 的临时上下文跑一次 `probe`，用完立刻释放。不传 `probe` 就只测能不
@@ -73,4 +86,50 @@ export function isHighpFragmentSupported(): boolean {
 		});
 	}
 	return highpFragmentSupport;
+}
+
+/**
+ * 当前显示设备是否能呈现比 sRGB 更广的色域，结果只探测一次。
+ *
+ * 注意这只说明「屏幕能显示」，不代表绘制缓冲能声明宽色域 —— 两者缺一不可，
+ * 判断见 {@link isWideGamutDrawingBufferSupported}。
+ */
+export function isDisplayP3Supported(): boolean {
+	if (displayP3Support === undefined) {
+		displayP3Support = mediaMatches("(color-gamut: p3)");
+	}
+	return displayP3Support;
+}
+
+/**
+ * 当前显示设备是否具备高动态范围，结果只探测一次。
+ *
+ * 目前只用于对外播报能力：WebGL 的绘制缓冲还没有 PQ/HLG 这类色彩空间可声明，
+ * 所以背景渲染拿不到亮度上的 HDR，`display-p3` 已经是上限。
+ */
+export function isHdrDisplaySupported(): boolean {
+	if (hdrDisplaySupport === undefined) {
+		hdrDisplaySupport = mediaMatches("(dynamic-range: high)");
+	}
+	return hdrDisplaySupport;
+}
+
+/**
+ * WebGL 的绘制缓冲能否声明成 `display-p3`，结果只探测一次。
+ *
+ * 赋值后要读回来确认：规范说非法值会被忽略，只有读回来还是 `display-p3`
+ * 才说明这版实现真的认这个色彩空间。
+ */
+export function isWideGamutDrawingBufferSupported(): boolean {
+	if (wideGamutDrawingBufferSupport === undefined) {
+		wideGamutDrawingBufferSupport = withProbeContext("webgl", (gl) => {
+			const target = gl as WebGLRenderingContext & {
+				drawingBufferColorSpace?: string;
+			};
+			if (!("drawingBufferColorSpace" in gl)) return false;
+			target.drawingBufferColorSpace = "display-p3";
+			return target.drawingBufferColorSpace === "display-p3";
+		});
+	}
+	return wideGamutDrawingBufferSupport;
 }

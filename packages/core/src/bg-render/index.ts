@@ -5,6 +5,7 @@
  */
 
 export { AbstractBaseRenderer, BaseRenderer } from "./base.ts";
+export * from "./color-space.ts";
 export type { GLRenderingContext } from "./gl-program.ts";
 export { GLProgram } from "./gl-program.ts";
 export type { IsolationRendererOptions } from "./isolation/index.ts";
@@ -14,6 +15,7 @@ export * from "./palette/index.ts";
 export { PixiRenderer } from "./pixi-renderer.ts";
 
 import type { AbstractBaseRenderer, BaseRenderer } from "./base.ts";
+import type { BackgroundColorSpace } from "./color-space.ts";
 
 export class BackgroundRender<Renderer extends BaseRenderer>
 	implements AbstractBaseRenderer
@@ -70,6 +72,12 @@ export class BackgroundRender<Renderer extends BaseRenderer>
 	}
 	setHasLyric(hasLyric: boolean): void {
 		this.renderer.setHasLyric(hasLyric);
+	}
+	/**
+	 * 背景实际写出的色彩空间，取决于设备能力与 `setBackgroundColorSpacePreference`。
+	 */
+	getColorSpace(): BackgroundColorSpace {
+		return this.renderer.getColorSpace();
 	}
 	setAlbum(
 		albumSource: string | HTMLImageElement | HTMLVideoElement,

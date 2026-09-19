@@ -27,6 +27,10 @@ uniform vec4 u_flowParams;
 uniform float u_angleJitter;
 uniform bool u_enableLightWave;
 uniform bool u_enableDithering;
+// 0 = write sRGB, 1 = write Display P3 (see bg-render/color-space.ts).
+uniform int u_outputColorSpace;
+// Saturation expansion applied on top of the P3 primaries, 0 disables it.
+uniform float u_gamutExpand;
 
 const float PI = 3.141592653589793;
 
@@ -67,28 +71,54 @@ float gradientNoise(vec2 point) {
 	return 0.5 + 0.5 * mix(lower, upper, eased.y);
 }
 
-float encodeSrgb(float channel) {
+float encodeTransfer(float channel) {
 	return channel <= 0.0031308
 		? 12.92 * channel
 		: 1.055 * pow(max(channel, 0.0), 1.0 / 2.4) - 0.055;
 }
 
-vec3 okLabToSrgb(vec3 color) {
+// OkLab -> linear-light sRGB (D65).
+vec3 okLabToLinearSrgb(vec3 color) {
 	float lRoot = color.x + 0.3963377774 * color.y + 0.2158037573 * color.z;
 	float mRoot = color.x - 0.1055613458 * color.y - 0.0638541728 * color.z;
 	float sRoot = color.x - 0.0894841775 * color.y - 1.2914855480 * color.z;
 	float l = lRoot * lRoot * lRoot;
 	float m = mRoot * mRoot * mRoot;
 	float s = sRoot * sRoot * sRoot;
-	vec3 linearColor = vec3(
+	return vec3(
 		4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
 		-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
 		-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
 	);
+}
+
+// linear-light sRGB -> linear-light Display P3: same D65 white point, only the
+// primaries differ, so a single 3x3 matrix is enough. Each component is the dot
+// product with that row's column of the CSS Color 4 `lin_sRGB_to_lin_P3` matrix.
+vec3 linearSrgbToLinearP3(vec3 color) {
 	return vec3(
-		encodeSrgb(linearColor.r),
-		encodeSrgb(linearColor.g),
-		encodeSrgb(linearColor.b)
+		dot(color, vec3(0.8224621724082974, 0.033194198850959854, 0.017082630775268638)),
+		dot(color, vec3(0.1775378275917017, 0.9668058011490399, 0.07239743980023199)),
+		dot(color, vec3(0.0, 0.0, 0.9105199294244997))
+	);
+}
+
+// Encode a linear-light sRGB value into whatever the drawing buffer expects.
+// sRGB and Display P3 share the same transfer function, so only the primaries
+// have to be swapped; the encoding itself is identical.
+vec3 encodeToOutput(vec3 linearSrgb) {
+	vec3 linear = linearSrgb;
+	if (u_outputColorSpace == 1) {
+		linear = linearSrgbToLinearP3(linear);
+		// 绕亮度扩张一次，把 P3 多出来的色域用掉；本来顶在 sRGB 边界上的颜色
+		// 因此能再往外走一点，不至于白拿一圈空白色域
+		float luma = dot(linear, vec3(0.2289745641, 0.6917385218, 0.0792869141));
+		linear = clamp(mix(vec3(luma), linear, 1.0 + u_gamutExpand), 0.0, 1.0);
+	}
+	return vec3(
+		encodeTransfer(linear.r),
+		encodeTransfer(linear.g),
+		encodeTransfer(linear.b)
 	);
 }
 
@@ -124,7 +154,9 @@ vec3 applyLightWave(vec3 okLabColor, vec2 uv) {
 	// 取色不再压暗，纯白封面的 L 能到 1.0，乘完必须钳住：让 L 溢出再靠末尾的
 	// RGB 钳位收场会逐通道削顶，把色相也一起改掉
 	okLabColor.x = clamp(okLabColor.x * (1.1 - 0.1 * wave3), 0.0, 1.0);
-	return okLabToSrgb(okLabColor);
+	// 返回 OkLab，编码交给 encodeToOutput()，好让 sRGB / P3 两条输出共用同一份
+	// 颜色计算
+	return okLabColor;
 }
 
 float interleavedGradientNoise(vec2 position) {
@@ -169,9 +201,11 @@ void main() {
 		mix(u_colors[2], u_colors[3], horizontal),
 		1.0 - smoothstep(-0.3, 0.5, gradientPoint.y)
 	);
-	vec3 color = u_enableLightWave
-		? applyLightWave(okLabColor, uv)
-		: okLabToSrgb(okLabColor);
+	vec3 color = encodeToOutput(
+		okLabToLinearSrgb(
+			u_enableLightWave ? applyLightWave(okLabColor, uv) : okLabColor
+		)
+	);
 
 	if (u_enableDithering) {
 		color += screenSpaceDither(gl_FragCoord.xy);

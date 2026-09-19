@@ -1,6 +1,8 @@
 import {
+	type BackgroundColorSpacePreference,
 	BackgroundRender,
 	type BaseRenderer,
+	getBackgroundColorSpacePreference,
 	IsolationRenderer,
 	MeshGradientRenderer,
 	PixiRenderer,
@@ -19,6 +21,8 @@ const RENDERERS: Record<BackgroundRendererMode, RendererConstructor> = {
 class BackgroundRuntime {
 	private background: BackgroundRender<BaseRenderer> | undefined;
 	private renderer: BackgroundRendererMode | undefined;
+	/** 当前渲染器是用哪个色彩空间偏好建出来的，变了就得重建。 */
+	private colorSpacePreference: BackgroundColorSpacePreference | undefined;
 	private albumKey = "";
 	private albumLoadRevision = 0;
 
@@ -36,11 +40,21 @@ class BackgroundRuntime {
 	}
 
 	ensureRenderer(renderer: BackgroundRendererMode): void {
-		if (this.background && this.renderer === renderer) return;
+		// 色彩空间只能在构造时定下（见 BaseRenderer#outputColorSpace），偏好一改就
+		// 得连同渲染器一起重建
+		const colorSpacePreference = getBackgroundColorSpacePreference();
+		if (
+			this.background &&
+			this.renderer === renderer &&
+			this.colorSpacePreference === colorSpacePreference
+		) {
+			return;
+		}
 
 		this.background?.dispose();
 		this.background = BackgroundRender.new(RENDERERS[renderer]);
 		this.renderer = renderer;
+		this.colorSpacePreference = colorSpacePreference;
 		this.albumKey = "";
 
 		const element = this.background.getElement();
@@ -70,6 +84,7 @@ class BackgroundRuntime {
 		if (renderer instanceof IsolationRenderer) {
 			renderer.setOptions(store.background.isolation);
 		}
+		store.setActiveBackgroundColorSpace(background.getColorSpace());
 	}
 
 	setHasLyric(hasLyric: boolean): void {

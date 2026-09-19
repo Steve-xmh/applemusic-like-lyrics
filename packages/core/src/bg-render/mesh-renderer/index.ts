@@ -14,6 +14,10 @@ import {
 	loadResourceFromUrl,
 } from "../../utils/resource.ts";
 import { BaseRenderer } from "../base.ts";
+import {
+	applyDrawingBufferColorSpace,
+	WIDE_GAMUT_EXPANSION,
+} from "../color-space.ts";
 import { GLProgram } from "../gl-program.ts";
 import { blurImage } from "../img.ts";
 import { isWebGL1Supported } from "../support.ts";
@@ -725,6 +729,9 @@ export class MeshGradientRenderer extends BaseRenderer {
 
 	private initializeGLResources(): void {
 		const gl = this.gl;
+		// 上下文丢失重建后绘制缓冲的状态会重置回 sRGB，所以这里而不是构造函数里做
+		// —— 它同时覆盖首次创建和上下文恢复两条路径
+		applyDrawingBufferColorSpace(gl, this.outputColorSpace);
 		if (!gl.getExtension("EXT_color_buffer_float"))
 			console.warn("EXT_color_buffer_float not supported");
 		if (!gl.getExtension("EXT_float_blend")) {
@@ -1022,6 +1029,14 @@ export class MeshGradientRenderer extends BaseRenderer {
 			gl.clear(gl.COLOR_BUFFER_BIT);
 
 			this.mainProgram.use();
+			// 中途换不了色彩空间（见 BaseRenderer#outputColorSpace），逐帧重设一遍即可。
+			// 注意 uniform 跟着当前 program 走，所以必须在 use() 之后设
+			const wideGamut = this.outputColorSpace === "display-p3";
+			this.mainProgram.setUniform1i("u_outputColorSpace", wideGamut ? 1 : 0);
+			this.mainProgram.setUniform1f(
+				"u_gamutExpand",
+				wideGamut ? WIDE_GAMUT_EXPANSION : 0,
+			);
 			gl.activeTexture(gl.TEXTURE0);
 			const uTime = tickTime / 10000;
 			this.mainProgram.setUniform1f(

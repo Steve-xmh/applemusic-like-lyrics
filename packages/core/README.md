@@ -74,6 +74,37 @@ The main styles are provided by `@applemusic-like-lyrics/core/style.css`. Common
 }
 ```
 
+On wide-gamut screens, `--amll-lp-color-p3` takes precedence over `--amll-lp-color`, so you can hand in a more saturated Display P3 lyric colour for capable displays.
+
+## Output colour space
+
+Background renderers write into a WebGL drawing buffer, which can only be declared as `srgb` or `display-p3`. So the ceiling here is **wide gamut**, not HDR brightness: `display-p3` widens the colour gamut, but every channel still tops out at 1.0.
+
+By default the colour space is picked automatically — `display-p3` when the display reports `color-gamut: p3` *and* the drawing buffer accepts that colour space, `srgb` otherwise. On unsupported devices the rendering is byte-for-byte identical to before.
+
+```typescript
+import {
+  BackgroundRender,
+  MeshGradientRenderer,
+  getOutputColorSpaceSupport,
+  setBackgroundColorSpacePreference,
+} from "@applemusic-like-lyrics/core";
+
+// Must run before the renderer is constructed: the drawing buffer colour space
+// can only be declared at context creation time.
+setBackgroundColorSpacePreference("auto"); // or "srgb" / "display-p3"
+
+const background = BackgroundRender.new(MeshGradientRenderer);
+background.getColorSpace(); // what it actually wrote, "srgb" | "display-p3"
+
+getOutputColorSpaceSupport();
+// { wideGamutDisplay, hdrDisplay, wideGamutDrawingBuffer }
+```
+
+`MeshGradientRenderer` and `IsolationRenderer` support `display-p3`. `PixiRenderer` always reports `srgb`: its internal textures and filter buffers are all sRGB, so declaring the drawing buffer as P3 would reinterpret those values and shift every colour.
+
+`hdrDisplay` only reports device capability. When the display is wide gamut, the renderers additionally expand saturation inside the Display P3 gamut, so colours that were previously clipped at the sRGB boundary become visible again.
+
 ## Development
 
 ```bash

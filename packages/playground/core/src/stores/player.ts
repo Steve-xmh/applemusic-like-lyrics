@@ -1,4 +1,8 @@
-import type { PaletteAlgorithm } from "@applemusic-like-lyrics/core";
+import type {
+	BackgroundColorSpace,
+	BackgroundColorSpacePreference,
+	PaletteAlgorithm,
+} from "@applemusic-like-lyrics/core";
 import { defineStore } from "pinia";
 
 export type BackgroundRendererMode = "mg" | "pixi" | "isolation";
@@ -76,6 +80,11 @@ export const usePlayerStore = defineStore("player", {
 				: query.get("bg") === "isolation"
 					? "isolation"
 					: "mg") as BackgroundRendererMode,
+			colorSpace: (query.get("bgcolor") === "srgb"
+				? "srgb"
+				: query.get("bgcolor") === "p3"
+					? "display-p3"
+					: "auto") as BackgroundColorSpacePreference,
 			scale: 1,
 			fps: 60,
 			flowSpeed: 0.2,
@@ -85,6 +94,8 @@ export const usePlayerStore = defineStore("player", {
 				paletteAlgorithm: "auto" as PaletteAlgorithm,
 			},
 			error: "",
+			/** 渲染器实际写出的色彩空间，由设备能力与 colorSpace 偏好共同决定。 */
+			activeColorSpace: "srgb" as BackgroundColorSpace,
 		},
 	}),
 	actions: {
@@ -196,6 +207,9 @@ export const usePlayerStore = defineStore("player", {
 		},
 		setBackgroundError(error: string): void {
 			this.background.error = error;
+		},
+		setActiveBackgroundColorSpace(colorSpace: BackgroundColorSpace): void {
+			this.background.activeColorSpace = colorSpace;
 		},
 	},
 });

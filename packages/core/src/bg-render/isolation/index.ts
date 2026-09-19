@@ -14,6 +14,10 @@ import {
 	loadResourceFromUrl,
 } from "../../utils/resource.ts";
 import { BaseRenderer } from "../base.ts";
+import {
+	applyDrawingBufferColorSpace,
+	WIDE_GAMUT_EXPANSION,
+} from "../color-space.ts";
 import { GLProgram } from "../gl-program.ts";
 import {
 	type ColorVec3,
@@ -169,6 +173,10 @@ export class IsolationRenderer extends BaseRenderer {
 
 	private initializeGLResources(): void {
 		const gl = this.gl;
+		// 上下文丢失重建后绘制缓冲的状态会重置回 sRGB，所以这里而不是构造函数里做
+		// —— 它同时覆盖首次创建和上下文恢复两条路径。必须在任何一次绘制之前声明，
+		// 否则已写入的像素会被按旧色彩空间解释
+		applyDrawingBufferColorSpace(gl, this.outputColorSpace);
 		this.program = new GLProgram(
 			gl,
 			isolationVertShader,
@@ -361,6 +369,12 @@ export class IsolationRenderer extends BaseRenderer {
 		this.program.setUniform1i(
 			"u_enableDithering",
 			this.options.dithering ? 1 : 0,
+		);
+		const wideGamut = this.outputColorSpace === "display-p3";
+		this.program.setUniform1i("u_outputColorSpace", wideGamut ? 1 : 0);
+		this.program.setUniform1f(
+			"u_gamutExpand",
+			wideGamut ? WIDE_GAMUT_EXPANSION : 0,
 		);
 
 		const gl = this.gl;

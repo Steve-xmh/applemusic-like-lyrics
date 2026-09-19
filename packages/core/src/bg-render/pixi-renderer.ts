@@ -11,6 +11,7 @@ import {
 	loadResourceFromUrl,
 } from "../utils/resource";
 import { BaseRenderer } from "./base";
+import type { BackgroundColorSpace } from "./color-space.ts";
 
 class TimedContainer extends Container {
 	public time = 0;
@@ -268,5 +269,16 @@ export class PixiRenderer extends BaseRenderer {
 
 	override getElement(): HTMLElement {
 		return this.canvas;
+	}
+
+	/**
+	 * Pixi 整条管线（内部纹理、滤镜的中间缓冲）都按 sRGB 处理，直接声明绘制
+	 * 缓冲为 P3 只会把 sRGB 数值当成 P3 解释，颜色反而错了。
+	 *
+	 * 所以这里一律报 `"srgb"`，即使设备支持广色域也不参与 —— 想拿广色域就用
+	 * Mesh Gradient 或 Isolation 渲染器。
+	 */
+	override getColorSpace(): BackgroundColorSpace {
+		return "srgb";
 	}
 }
