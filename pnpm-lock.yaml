@@ -683,6 +683,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
+      happy-dom:
+        specifier: ^20.14.5
+        version: 20.14.5
       jotai-babel:
         specifier: 'catalog:'
         version: 0.3.0(@babel/core@7.29.7(supports-color@7.2.0))(@babel/template@8.0.0)(jotai@2.20.2(@babel/core@7.29.7(supports-color@7.2.0))(@babel/template@8.0.0)(@types/react@19.2.18)(react@19.2.8))
@@ -698,6 +701,12 @@ importers:
       typedoc-plugin-markdown:
         specifier: 'catalog:'
         version: 4.12.0(typedoc@0.28.20(typescript@6.0.3))
+      vite-plugin-svgr:
+        specifier: ^5.2.0
+        version: 5.2.0(supports-color@7.2.0)(typescript@6.0.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(stylus@0.57.0(supports-color@7.2.0))(yaml@2.9.0))
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.10(@types/node@26.2.0)(happy-dom@20.14.5)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(stylus@0.57.0(supports-color@7.2.0))(yaml@2.9.0))
 
   packages/ttml:
     devDependencies:
