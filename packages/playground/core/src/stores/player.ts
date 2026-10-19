@@ -1,7 +1,10 @@
-import type { PaletteAlgorithm } from "@applemusic-like-lyrics/core";
+import {
+	type PaletteAlgorithm,
+	TitaniumRenderer,
+} from "@applemusic-like-lyrics/core";
 import { defineStore } from "pinia";
 
-export type BackgroundRendererMode = "mg" | "pixi" | "isolation";
+export type BackgroundRendererMode = "mg" | "pixi" | "isolation" | "titanium";
 
 export interface SpringParams {
 	mass: number;
@@ -75,7 +78,9 @@ export const usePlayerStore = defineStore("player", {
 				? "pixi"
 				: query.get("bg") === "isolation"
 					? "isolation"
-					: "mg") as BackgroundRendererMode,
+					: query.get("bg") === "titanium"
+						? "titanium"
+						: "mg") as BackgroundRendererMode,
 			scale: 1,
 			fps: 60,
 			flowSpeed: 0.2,
@@ -83,6 +88,9 @@ export const usePlayerStore = defineStore("player", {
 				lightWave: false,
 				dithering: true,
 				paletteAlgorithm: "auto" as PaletteAlgorithm,
+			},
+			titanium: {
+				...TitaniumRenderer.defaultOptions,
 			},
 			error: "",
 		},
