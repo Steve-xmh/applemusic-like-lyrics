@@ -16,8 +16,10 @@
  *   暗处只余零星浮尘；
  * - 沙粒沿脊线的切线（法线的垂线）匀速滑动，两侧方向相反、细粒比粗粒略快。
  *   流向在整个画面上是统一的，否则方向差会随运行时间累积成剪切，把沙面拉花；
- * - 锋线相位与颗粒排布在每个渲染器实例内固定；换封面时只有主题色在缓缓过渡，
- *   画面不会整张换掉，只是染上一层新的颜色。
+ * - 锋线相位与颗粒排布在每个渲染器实例内固定；换封面时主题色缓缓过渡，
+ *   同时锋线会在若干秒内平滑挪到一个新的随机姿态——整屏明暗跟着移动，
+ *   所以这段过渡刻意给得很长，缓动也取首尾极软的一条曲线；
+ *   沙纹排布与粒子流向在这段过渡里保持不动，只有光照分布在挪。
  *
  * 性能：合成阶段只有一次全屏绘制、零次纹理采样；颗粒由一个四则运算的哈希
  * 直接算出，不需要预先烘焙纹理。
@@ -50,6 +52,13 @@ export interface TitaniumRendererOptions {
 	sheen: number;
 	/** 金属化程度，向画面亮度去饱和，取值范围 [0, 1]，默认 0.35。 */
 	metalness: number;
+	/**
+	 * 换封面时锋线移动到新姿态所用的时长，单位毫秒，默认 2000。
+	 *
+	 * 锋线一动，整屏的受光面与粒子密度都会跟着变，所以给得比较长。
+	 * 设为 0 表示不做过渡、直接跳到新姿态。
+	 */
+	crestShiftMs: number;
 	/** 是否启用抖动，默认 `true`。 */
 	dithering: boolean;
 	/** 取色算法，默认 `"auto"`。 */
@@ -71,6 +80,10 @@ const FLOW_CYCLE_SECONDS = 4.0;
 const FLOW_LENGTH = 0.04;
 /** 默认帧率。 */
 const DEFAULT_MAX_FPS = 30;
+/** 锋线换位过渡的默认时长（毫秒）。整屏明暗都会变，所以给得比较长。 */
+const DEFAULT_CREST_SHIFT_MS = 2000;
+/** 锋线纵向偏移的随机范围（画面高度的比例），免得每次都只在水平方向挪。 */
+const CREST_SHIFT_Y = 0.12;
 
 /** 还没拿到封面时的中性深色配色，分量取值 [0, 1] 的 sRGB。 */
 const DEFAULT_COLORS: ColorVec3[] = [
@@ -103,6 +116,7 @@ export class TitaniumRenderer extends BaseRenderer {
 		metalness: 0.35,
 		dithering: true,
 		paletteAlgorithm: "auto",
+		crestShiftMs: DEFAULT_CREST_SHIFT_MS,
 	};
 
 	/** 当前环境是否支持该渲染器。 */
@@ -152,6 +166,16 @@ export class TitaniumRenderer extends BaseRenderer {
 	private readonly nextColors = new Float32Array(COLOR_COUNT * 3);
 	/** 每个渲染器实例固定的随机偏移：颜色扭曲相位与粒子纹理位置。 */
 	private readonly seed = new Float32Array(3);
+	/**
+	 * 锋线的当前姿态：xy 为两个谐波的相位偏移，z 为整体纵向偏移。
+	 *
+	 * 与 {@link seed} 分开存放，这样换封面时只挪锋线，不牵动沙纹与粒子流。
+	 */
+	private readonly crestMotion = new Float32Array(3);
+	private readonly crestFrom = new Float32Array(3);
+	private readonly crestTo = new Float32Array(3);
+	/** 锋线换位已经过的毫秒数。 */
+	private crestShiftElapsed = 0;
 	private readonly grainOffset = new Float32Array(2);
 	private readonly paletteOrder = new Uint8Array(COLOR_COUNT);
 
@@ -254,6 +278,54 @@ export class TitaniumRenderer extends BaseRenderer {
 		}
 	}
 
+	/**
+	 * 换封面时掷一个新的锋线姿态，交给 {@link updateCrestMotion} 缓慢过渡过去。
+	 *
+	 * 只动锋线（明暗分布），不动 {@link seed} 与 `grainOffset`，
+	 * 因此沙纹排布与粒子流向在这个过程里保持稳定。
+	 */
+	private rollCrestTarget(): void {
+		// 从当前这一帧的实际姿态接着插值，连续换封面时不会回跳
+		this.updateCrestMotion();
+		this.crestFrom.set(this.crestMotion);
+
+		// 相位至少扫过四分之一圈，保证每次都能看出锋线确实换了位置；
+		// 上限留在一圈之内，免得两个谐波同时接近整圈、终点看起来和起点一样
+		for (let i = 0; i < 2; i++) {
+			const sweep = (0.25 + Math.random() * 0.6) * TAU;
+			this.crestTo[i] =
+				this.crestMotion[i] + (Math.random() < 0.5 ? -sweep : sweep);
+		}
+		this.crestTo[2] = (Math.random() - 0.5) * 2 * CREST_SHIFT_Y;
+		this.crestShiftElapsed = 0;
+	}
+
+	/**
+	 * 按经过时间把锋线姿态插值到目标。
+	 *
+	 * 缓动用 smootherstep（首尾的一阶、二阶导数都为 0），整屏明暗变化时
+	 * 起步与收尾都不会露出生硬的折点。
+	 */
+	private updateCrestMotion(): void {
+		const duration = Math.max(0, this.options.crestShiftMs);
+		if (duration <= 0 || this.crestShiftElapsed >= duration) {
+			this.crestMotion.set(this.crestTo);
+			// 相位以 2π 为周期，收尾时折回一圈之内：sin 对 2π 无感，
+			// 画面不会有跳变，但能避免长期累加后 mediump 的精度被吃掉
+			for (let i = 0; i < 2; i++) {
+				this.crestMotion[i] = ((this.crestMotion[i] % TAU) + TAU) % TAU;
+			}
+			this.crestTo.set(this.crestMotion);
+			return;
+		}
+
+		const t = this.crestShiftElapsed / duration;
+		const eased = t * t * t * (t * (t * 6 - 15) + 10);
+		for (let i = 0; i < this.crestMotion.length; i++) {
+			this.crestMotion[i] = lerp(this.crestFrom[i], this.crestTo[i], eased);
+		}
+	}
+
 	/** 调整渲染器选项，会立即生效。 */
 	setOptions(patch: Partial<TitaniumRendererOptions>): void {
 		// 逐字段取值而不是对象展开：展开会把 `{ grain: undefined }` 里的
@@ -266,6 +338,7 @@ export class TitaniumRenderer extends BaseRenderer {
 			metalness: clamp01(patch.metalness ?? previous.metalness),
 			dithering: patch.dithering ?? previous.dithering,
 			paletteAlgorithm: patch.paletteAlgorithm ?? previous.paletteAlgorithm,
+			crestShiftMs: Math.max(0, patch.crestShiftMs ?? previous.crestShiftMs),
 		};
 		const algorithmChanged =
 			next.paletteAlgorithm !== previous.paletteAlgorithm;
@@ -355,6 +428,11 @@ export class TitaniumRenderer extends BaseRenderer {
 		}
 		this.updateColorBuffer();
 
+		if (this.crestShiftElapsed < this.options.crestShiftMs) {
+			this.crestShiftElapsed += frameDelta;
+		}
+		this.updateCrestMotion();
+
 		const gl = this.gl;
 		const program = this.program;
 		program.use();
@@ -370,6 +448,7 @@ export class TitaniumRenderer extends BaseRenderer {
 		program.setUniform1f("u_flowSpeed", FLOW_LENGTH / FLOW_CYCLE_SECONDS);
 		program.setUniform3fv("u_colors[0]", this.colorBuffer);
 		program.setUniform3fv("u_seed", this.seed);
+		program.setUniform3fv("u_crestMotion", this.crestMotion);
 		program.setUniform2f(
 			"u_grainOffset",
 			this.grainOffset[0],
@@ -387,10 +466,11 @@ export class TitaniumRenderer extends BaseRenderer {
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-		// 调色板过渡与歌词收敛都跑完之后，才允许静态模式停下来
+		// 调色板过渡、锋线迁移与歌词收敛都跑完之后，才允许静态模式停下来
 		return (
 			this.paletteTransitionElapsed >= PALETTE_TRANSITION_MS &&
-			Math.abs(this.lyricScrimTarget - this.lyricScrim) < 0.001
+			Math.abs(this.lyricScrimTarget - this.lyricScrim) < 0.001 &&
+			this.crestShiftElapsed >= this.options.crestShiftMs
 		);
 	}
 
@@ -514,6 +594,9 @@ export class TitaniumRenderer extends BaseRenderer {
 		}
 
 		this.albumSource = source;
+		// 换封面时锋线缓缓挪到新的随机姿态：整屏明暗都会跟着变，
+		// 所以过渡时长单独可配（默认 2 秒）
+		this.rollCrestTarget();
 		// 视频封面只取首帧的主色，避免在主线程上留下周期性卡顿
 		this.updatePaletteFromSource(source);
 	}

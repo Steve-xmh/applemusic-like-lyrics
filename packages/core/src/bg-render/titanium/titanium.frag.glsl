@@ -27,6 +27,10 @@ uniform float u_flowSpeed;
 uniform vec3 u_colors[4];
 // 每个封面换一次的随机偏移
 uniform vec3 u_seed;
+// 锋线的当前姿态：xy 为两个谐波的相位偏移，z 为整体纵向偏移。
+// 换封面时由 CPU 端在若干秒内平滑插值到新的随机值，所以整屏的明暗分布
+// 都会跟着缓缓移动——正因为影响的是整屏，这段过渡才必须给得足够长
+uniform vec3 u_crestMotion;
 uniform vec2 u_grainOffset;
 uniform float u_aspect;
 // x = 细颗粒强度，y = 闪粉强度，z = 金属高光强度，w = 金属化程度
@@ -88,6 +92,13 @@ const float MICRO_CELLS = 256.0;
 const float HASH_PERIOD = 256.0;
 // 空间反光场的格数：沙粒流经其中一格时才有可能被点亮
 const float GLINT_CELLS = 140.0;
+// "闪粒"的占比阈值：0.95 表示只有 5% 的沙粒会明显反光（原为 0.8，即两成）
+const float SPARKLE_THRESHOLD = 0.95;
+// 亮面沙粒高光压暗到的比例：0.6 表示压到六成
+const float BRIGHT_FACE_PARTICLE_GAIN = 0.6;
+// 亮面判定的斜坡区间（按漫反射项），暗面的浮尘不参与压暗
+const float BRIGHT_FACE_RAMP_START = 0.3;
+const float BRIGHT_FACE_RAMP_END = 0.6;
 
 vec4 sampleSandLayer(
 	vec2 point,
@@ -145,9 +156,9 @@ vec4 sampleSandLayer(
 		surfaceNormal +
 		vec3((rnd.xy - 0.5) * 0.8 + (posRand.xy - 0.5) * 1.4, 0.0)
 	);
-	// 大约两成的沙粒是"闪粒"：它们朝向稍偏一点也能反光，且反得更烈；
+	// 只有约 5% 的沙粒是"闪粒"：它们朝向稍偏一点也能反光，且反得更烈；
 	// 其余的只是微微发亮
-	float sparkle = step(0.8, sparkleRand);
+	float sparkle = step(SPARKLE_THRESHOLD, sparkleRand);
 	float alignment = dot(grainNormal, halfDir);
 	float light = smoothstep(
 		mix(0.74, 0.42, sparkle),
@@ -197,12 +208,13 @@ void main() {
 	float f1 =
 		point.y -
 		(
-			0.45 * sin(point.x * 1.6 + u_seed.x) +
-			0.10 * sin(point.x * 3.4 + u_seed.y)
-		);
+			0.45 * sin(point.x * 1.6 + u_seed.x + u_crestMotion.x) +
+			0.10 * sin(point.x * 3.4 + u_seed.y + u_crestMotion.y)
+		) -
+		u_crestMotion.z;
 	float slope1 =
-		-0.45 * 1.6 * cos(point.x * 1.6 + u_seed.x) -
-		0.10 * 3.4 * cos(point.x * 3.4 + u_seed.y);
+		-0.45 * 1.6 * cos(point.x * 1.6 + u_seed.x + u_crestMotion.x) -
+		0.10 * 3.4 * cos(point.x * 3.4 + u_seed.y + u_crestMotion.y);
 
 	// 脊线就是那条解析曲线，不再额外加扰动：几何本身完全光滑，
 	// 砂砾感全部交给粉末的疏密去表现
@@ -250,7 +262,9 @@ void main() {
 
 	// ---- 粒子沿脊线的切线（法线的垂线）定速前进 ----
 	// 方向取脊线中点的切线并固定下来：若每一点都按自己的切线方向位移，
-	// 方向差会随运行时间累积成剪切，沙面最终被拉成丝
+	// 方向差会随运行时间累积成剪切，沙面最终被拉成丝。
+	// 锋线姿态（u_crestMotion）刻意不参与这里：流速方向必须保持恒定，
+	// 否则锋线迁移的那几秒里粒子流的走向会跟着变，同样会拉出丝来
 	float centerSlope =
 		-0.45 * 1.6 * cos(u_seed.x) - 0.10 * 3.4 * cos(u_seed.y);
 	vec2 tangent = normalize(vec2(1.0, -centerSlope));
@@ -297,20 +311,34 @@ void main() {
 	// 有歌词时把闪点的刺眼程度收一点，白色文字压在亮处时不吃亏
 	grainGain *= mix(1.0, 0.7, u_lyricScrim);
 
+	// 亮面压暗：受光越足压得越狠，暗面那层浮尘维持原样。
+	// 乘在两条粒子高光项上，避免连沙面的漫反射一起变暗
+	float brightFaceGain = mix(
+		1.0,
+		BRIGHT_FACE_PARTICLE_GAIN,
+		smoothstep(
+			BRIGHT_FACE_RAMP_START,
+			BRIGHT_FACE_RAMP_END,
+			diffuse
+		)
+	);
+
 	// 每粒沙都有一点微光，被光照中的沙粒亮得多
 	color +=
 		HIGHLIGHT_COLOR *
 		sandMask *
 		(0.015 + 0.04 * grainBrightness) *
 		u_metal.x *
-		grainGain;
+		grainGain *
+		brightFaceGain;
 	color +=
 		HIGHLIGHT_COLOR *
 		glint *
 		(0.65 + 0.35 * grainBrightness) *
 		(0.35 + 0.65 * diffuse) *
 		u_metal.y *
-		grainGain;
+		grainGain *
+		brightFaceGain;
 	color *= 1.0 + (grainBrightness - 0.5) * 0.04 * u_metal.x;
 
 	// 有歌词时整体略收一档，并更用力地压高光：对白字的可读性影响最大的是

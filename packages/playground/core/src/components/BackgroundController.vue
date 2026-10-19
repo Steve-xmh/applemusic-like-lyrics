@@ -168,6 +168,15 @@ const player = usePlayerStore();
 						:step="0.01"
 						:precision="2"
 					/>
+					<ControllerSlider
+						v-model="player.background.titanium.crestShiftMs"
+						title="锋线迁移时长"
+						:min="300"
+						:max="6000"
+						:step="100"
+						:precision="0"
+						suffix="ms"
+					/>
 				</ControllerSliderGroup>
 				<ControllerSwitch
 					v-model="player.background.titanium.dithering"
