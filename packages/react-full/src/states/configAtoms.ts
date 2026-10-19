@@ -541,4 +541,15 @@ export const fftDataRangeAtom: WritableAtom<
 	number,
 	number,
 ]);
+
+/**
+ * 频谱是否以垂直中线为轴左右镜像显示。
+ *
+ * 关闭时按频率从左到右排列；开启后低频居中、高频向两侧展开。
+ */
+export const fftSymmetricAtom: WritableAtom<
+	boolean,
+	[boolean | ((prev: boolean) => boolean) | typeof RESET],
+	void
+> = atomWithStorage("amll-react-full.fftSymmetric", false);
 //#endregion
