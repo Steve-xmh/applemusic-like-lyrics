@@ -84,6 +84,8 @@ const DEFAULT_MAX_FPS = 30;
 const DEFAULT_CREST_SHIFT_MS = 2000;
 /** 锋线纵向偏移的随机范围（画面高度的比例），免得每次都只在水平方向挪。 */
 const CREST_SHIFT_Y = 0.12;
+/** 低频最强时粒子流速额外增加的比例（0.35 即最多快 35%）。 */
+const LOW_FREQ_FLOW_GAIN = 0.35;
 
 /** 还没拿到封面时的中性深色配色，分量取值 [0, 1] 的 sRGB。 */
 const DEFAULT_COLORS: ColorVec3[] = [
@@ -138,10 +140,23 @@ export class TitaniumRenderer extends BaseRenderer {
 	private lyricScrim = 0;
 	private lyricScrimTarget = 0;
 
+	/** 目标低频强度（0–1），由 `setLowFreqVolume` 写入。 */
+	private volume = 0;
+	/** 平滑后的低频强度，实际用于着色器与流速。 */
+	private smoothedVolume = 0;
+
 	private tickHandle = 0;
 	private lastTickTime = 0;
 	private lastFrameTime = 0;
 	private frameTime = 0;
+	/**
+	 * 粒子流独立的时间轴。
+	 *
+	 * 不能复用 `frameTime`：后者还驱动颜色呼吸，流速变化不应该连带改颜色节奏；
+	 * 而且着色器里的偏移用的是「累计时间 × 恒定的 u_flowSpeed」，
+	 * 中途改 `u_flowSpeed` 会让相位跳变，所以只能在这里调累加速度。
+	 */
+	private flowTime = 0;
 	private maxFPS = DEFAULT_MAX_FPS;
 	private paused = false;
 	private staticMode = false;
@@ -443,8 +458,9 @@ export class TitaniumRenderer extends BaseRenderer {
 			(frameTime / 1000 / COLOR_CYCLE_SECONDS) % 1,
 		);
 		// 流动时间直接给持续累加的秒数：位移在着色器里对纹理周期取模，
-		// 因此沙面可以一直朝一个方向滑下去，不需要靠两副本交叉淡化来循环
-		program.setUniform1f("u_flowTime", frameTime / 1000);
+		// 因此沙面可以一直朝一个方向滑下去，不需要靠两副本交叉淡化来循环。
+		// 这个时间在低频出现时会累加得更快，即粒子流速的轻微提升
+		program.setUniform1f("u_flowTime", this.flowTime / 1000);
 		program.setUniform1f("u_flowSpeed", FLOW_LENGTH / FLOW_CYCLE_SECONDS);
 		program.setUniform3fv("u_colors[0]", this.colorBuffer);
 		program.setUniform3fv("u_seed", this.seed);
@@ -462,6 +478,7 @@ export class TitaniumRenderer extends BaseRenderer {
 			this.options.metalness,
 		);
 		program.setUniform1f("u_lyricScrim", this.lyricScrim);
+		program.setUniform1f("u_lowFreq", this.smoothedVolume);
 		program.setUniform1i("u_enableDithering", this.options.dithering ? 1 : 0);
 
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -492,6 +509,13 @@ export class TitaniumRenderer extends BaseRenderer {
 		this.lastTickTime = tickTime - (delta % interval);
 
 		this.frameTime += frameDelta * this.flowSpeed;
+		// 低频值先平滑一档：FFT 是离散帧，直接拿来加减速会有台阶感
+		const volumeStep = Math.min(1, frameDelta / 120);
+		this.smoothedVolume += (this.volume - this.smoothedVolume) * volumeStep;
+		this.flowTime +=
+			frameDelta *
+			this.flowSpeed *
+			(1 + LOW_FREQ_FLOW_GAIN * this.smoothedVolume);
 
 		if (!(this.onRedraw(this.frameTime, frameDelta) && this.staticMode)) {
 			this.requestTick();
@@ -601,8 +625,12 @@ export class TitaniumRenderer extends BaseRenderer {
 		this.updatePaletteFromSource(source);
 	}
 
-	override setLowFreqVolume(_volume: number): void {
-		// Titanium 是纯程序化的金属表面，不随音量变化
+	override setLowFreqVolume(volume: number): void {
+		// 低频只做两件事：粒子流略微加速、背景略微变暗（见 onTick 与着色器）。
+		// 这里只存目标值，平滑交给 onTick，避免播放器把几十赫兹的跳动直接砸进画面
+		this.volume = clamp01(volume);
+		// 静态模式就是要画面停下来，此时不再为低频变化重绘
+		if (!this.staticMode) this.requestTick();
 	}
 
 	override setHasLyric(hasLyric: boolean): void {

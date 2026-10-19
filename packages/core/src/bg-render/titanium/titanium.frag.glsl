@@ -37,6 +37,8 @@ uniform float u_aspect;
 uniform vec4 u_metal;
 // 歌词出现时背景的收敛程度：0 为无歌词，1 为有歌词
 uniform float u_lyricScrim;
+// 低频强度（0–1）：随鼓点升高，背景会略微压暗
+uniform float u_lowFreq;
 uniform bool u_enableDithering;
 
 const vec3 LUMA_WEIGHT = vec3(0.2126, 0.7152, 0.0722);
@@ -344,6 +346,9 @@ void main() {
 	// 有歌词时整体略收一档，并更用力地压高光：对白字的可读性影响最大的是
 	// 最亮的那一部分，而不是中间调
 	color *= mix(1.0, 0.86, u_lyricScrim);
+
+	// 低频越强整屏略微压暗，和网格渐变渲染器的观感一致（粒子流速在 CPU 侧提升）
+	color *= 1.0 - 0.08 * u_lowFreq;
 
 	// HDR 式的柔和压缩，避免亮部直接死白
 	color = color / (1.0 + max(color, 0.0) * (0.28 + 0.35 * u_lyricScrim));
