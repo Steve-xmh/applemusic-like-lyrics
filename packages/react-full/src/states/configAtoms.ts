@@ -6,6 +6,8 @@ import {
 	type LyricPlayerBase,
 	MeshGradientRenderer,
 	PixiRenderer,
+	TitaniumRenderer,
+	type TitaniumRendererOptions,
 } from "@applemusic-like-lyrics/core";
 import type { BackgroundRenderProps } from "@applemusic-like-lyrics/react";
 import { atom, type PrimitiveAtom, type WritableAtom } from "jotai";
@@ -360,6 +362,10 @@ export const BACKGROUND_RENDERERS: Readonly<
 		renderer: IsolationRenderer,
 		isSupported: () => IsolationRenderer.isSupported(),
 	},
+	titanium: {
+		renderer: TitaniumRenderer,
+		isSupported: () => TitaniumRenderer.isSupported(),
+	},
 };
 
 /** 背景渲染器配置在 localStorage 中的键名。 */
@@ -419,6 +425,24 @@ export const isolationRendererOptionsAtom: WritableAtom<
 > = atomWithStorage<IsolationRendererOptions>(
 	"amll-react-full.isolationRendererOptions",
 	{ ...IsolationRenderer.defaultOptions },
+);
+
+/**
+ * Titanium 背景渲染器的专属选项
+ *
+ * 仅在背景渲染器为 Titanium 时生效
+ */
+export const titaniumRendererOptionsAtom: WritableAtom<
+	TitaniumRendererOptions,
+	[
+		| TitaniumRendererOptions
+		| ((prev: TitaniumRendererOptions) => TitaniumRendererOptions)
+		| typeof RESET,
+	],
+	void
+> = atomWithStorage<TitaniumRendererOptions>(
+	"amll-react-full.titaniumRendererOptions",
+	{ ...TitaniumRenderer.defaultOptions },
 );
 
 /**

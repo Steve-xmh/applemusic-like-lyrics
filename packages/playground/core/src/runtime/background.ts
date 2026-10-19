@@ -4,6 +4,7 @@ import {
 	IsolationRenderer,
 	MeshGradientRenderer,
 	PixiRenderer,
+	TitaniumRenderer,
 } from "@applemusic-like-lyrics/core";
 import type { BackgroundRendererMode, usePlayerStore } from "@/stores/player";
 
@@ -14,6 +15,7 @@ const RENDERERS: Record<BackgroundRendererMode, RendererConstructor> = {
 	mg: MeshGradientRenderer,
 	pixi: PixiRenderer,
 	isolation: IsolationRenderer,
+	titanium: TitaniumRenderer,
 };
 
 class BackgroundRuntime {
@@ -69,6 +71,9 @@ class BackgroundRuntime {
 		const renderer = background.getRenderer();
 		if (renderer instanceof IsolationRenderer) {
 			renderer.setOptions(store.background.isolation);
+		}
+		if (renderer instanceof TitaniumRenderer) {
+			renderer.setOptions(store.background.titanium);
 		}
 	}
 

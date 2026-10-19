@@ -7,6 +7,7 @@ import {
 	type BaseRenderer,
 	IsolationRenderer,
 	type OptimizeLyricOptions,
+	TitaniumRenderer,
 } from "@applemusic-like-lyrics/core";
 import {
 	BackgroundRender,
@@ -100,6 +101,7 @@ import {
 	showMusicNameAtom,
 	showRemainingTimeAtom,
 	showVolumeControlAtom,
+	titaniumRendererOptionsAtom,
 	VerticalCoverLayout,
 	verticalCoverLayoutAtom,
 } from "../../states/configAtoms";
@@ -630,13 +632,17 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 		);
 	}, [backgroundRenderer.renderer]);
 	const isolationRendererOptions = useAtomValue(isolationRendererOptionsAtom);
+	const titaniumRendererOptions = useAtomValue(titaniumRendererOptionsAtom);
 	const configureBackgroundRenderer = useCallback(
 		(renderer: BaseRenderer) => {
 			if (renderer instanceof IsolationRenderer) {
 				renderer.setOptions(isolationRendererOptions);
 			}
+			if (renderer instanceof TitaniumRenderer) {
+				renderer.setOptions(titaniumRendererOptions);
+			}
 		},
-		[isolationRendererOptions],
+		[isolationRendererOptions, titaniumRendererOptions],
 	);
 	const showBottomControl = useAtomValue(showBottomControlAtom);
 
