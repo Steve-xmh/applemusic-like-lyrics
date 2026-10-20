@@ -12,6 +12,8 @@ export { IsolationRenderer } from "./isolation/index.ts";
 export { MeshGradientRenderer } from "./mesh-renderer/index.ts";
 export * from "./palette/index.ts";
 export { PixiRenderer } from "./pixi-renderer.ts";
+export type { TitaniumRendererOptions } from "./titanium/index.ts";
+export { TitaniumRenderer } from "./titanium/index.ts";
 
 import type { AbstractBaseRenderer, BaseRenderer } from "./base.ts";
 

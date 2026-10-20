@@ -252,6 +252,13 @@ watch(
 		player.background.isolation.lightWave,
 		player.background.isolation.dithering,
 		player.background.isolation.paletteAlgorithm,
+		player.background.titanium.grain,
+		player.background.titanium.sparkle,
+		player.background.titanium.sheen,
+		player.background.titanium.metalness,
+		player.background.titanium.dithering,
+		player.background.titanium.paletteAlgorithm,
+		player.background.titanium.crestShiftMs,
 	],
 	() => backgroundRuntime.applySettings(player),
 );
