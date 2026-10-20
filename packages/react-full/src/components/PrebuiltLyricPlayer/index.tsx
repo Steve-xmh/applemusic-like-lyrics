@@ -7,6 +7,7 @@ import {
 	type BaseRenderer,
 	IsolationRenderer,
 	type OptimizeLyricOptions,
+	TitaniumRenderer,
 } from "@applemusic-like-lyrics/core";
 import {
 	BackgroundRender,
@@ -100,6 +101,7 @@ import {
 	showMusicNameAtom,
 	showRemainingTimeAtom,
 	showVolumeControlAtom,
+	titaniumRendererOptionsAtom,
 	VerticalCoverLayout,
 	verticalCoverLayoutAtom,
 } from "../../states/configAtoms";
@@ -578,6 +580,14 @@ export interface PrebuiltLyricPlayerProps extends HTMLProps<HTMLDivElement> {
 	playlistButtonLabel?: string;
 }
 
+/** 把低频订阅收进背景子树，避免鼓点更新带动整个播放器重渲染。 */
+const LowFreqBackgroundRender: FC<
+	Omit<ComponentPropsWithRef<typeof BackgroundRender>, "lowFreqVolume">
+> = (props) => {
+	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
+	return <BackgroundRender {...props} lowFreqVolume={lowFreqVolume} />;
+};
+
 /**
  * 已经部署好所有组件的歌词播放器组件，在正确设置所有的 Jotai 状态后可以开箱即用
  */
@@ -599,7 +609,6 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 	const musicCover = useAtomValue(musicCoverAtom);
 	const musicCoverIsVideo = useAtomValue(musicCoverIsVideoAtom);
 	const musicIsPlaying = useAtomValue(musicPlayingAtom);
-	const lowFreqVolume = useAtomValue(lowFreqVolumeAtom);
 	const isLyricPageOpened = useAtomValue(isLyricPageOpenedAtom);
 	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
 	const verticalCoverLayout = useAtomValue(verticalCoverLayoutAtom);
@@ -630,13 +639,17 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 		);
 	}, [backgroundRenderer.renderer]);
 	const isolationRendererOptions = useAtomValue(isolationRendererOptionsAtom);
+	const titaniumRendererOptions = useAtomValue(titaniumRendererOptionsAtom);
 	const configureBackgroundRenderer = useCallback(
 		(renderer: BaseRenderer) => {
 			if (renderer instanceof IsolationRenderer) {
 				renderer.setOptions(isolationRendererOptions);
 			}
+			if (renderer instanceof TitaniumRenderer) {
+				renderer.setOptions(titaniumRendererOptions);
+			}
 		},
-		[isolationRendererOptions],
+		[isolationRendererOptions, titaniumRendererOptions],
 	);
 	const showBottomControl = useAtomValue(showBottomControlAtom);
 
@@ -718,10 +731,9 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 							}}
 						/>
 					) : (
-						<BackgroundRender
+						<LowFreqBackgroundRender
 							album={musicCover}
 							albumIsVideo={musicCoverIsVideo}
-							lowFreqVolume={lowFreqVolume}
 							renderScale={lyricBackgroundRenderScale}
 							fps={lyricBackgroundFPS}
 							renderer={resolvedBackgroundRenderer}
