@@ -86,6 +86,7 @@ import {
 	lyricBackgroundRendererAtom,
 	lyricBackgroundRenderScaleAtom,
 	lyricBackgroundStaticModeAtom,
+	lyricBackgroundStaticModeOverrideAtom,
 	lyricFontFamilyAtom,
 	lyricFontWeightAtom,
 	lyricLetterSpacingAtom,
@@ -621,6 +622,9 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 	const lyricBackgroundFPS = useAtomValue(lyricBackgroundFPSAtom);
 	const verticalCoverLayout = useAtomValue(verticalCoverLayoutAtom);
 	const lyricBackgroundStaticMode = useAtomValue(lyricBackgroundStaticModeAtom);
+	const lyricBackgroundStaticModeOverride = useAtomValue(
+		lyricBackgroundStaticModeOverrideAtom,
+	);
 	const lyricBackgroundRenderScale = useAtomValue(
 		lyricBackgroundRenderScaleAtom,
 	);
@@ -745,7 +749,11 @@ export const PrebuiltLyricPlayer: FC<PrebuiltLyricPlayerProps> = ({
 							renderScale={lyricBackgroundRenderScale}
 							fps={lyricBackgroundFPS}
 							renderer={resolvedBackgroundRenderer}
-							staticMode={lyricBackgroundStaticMode || !isLyricPageOpened}
+							staticMode={
+								lyricBackgroundStaticMode ||
+								lyricBackgroundStaticModeOverride ||
+								!isLyricPageOpened
+							}
 							configureRenderer={configureBackgroundRenderer}
 							style={{
 								zIndex: -1,

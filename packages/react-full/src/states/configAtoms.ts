@@ -495,6 +495,22 @@ export const lyricBackgroundStaticModeAtom: WritableAtom<
 	"amll-react-full.lyricBackgroundStaticMode",
 	false,
 );
+
+/**
+ * 宿主要求背景「静默」进入静态模式的临时开关。
+ *
+ * 与 {@link lyricBackgroundStaticModeAtom} 的区别：那个是用户设置，会写进
+ * localStorage，用户能在设置页里看到它；而这个不持久化，只用来表示
+ * 「当前这个背景实际上看不见，别继续画了」。
+ *
+ * 典型场景是宿主把播放器当作整个应用的底图：歌词页收起时 DOM 还在、只是被
+ * 设为透明，背景渲染器不该继续消耗 GPU。
+ *
+ * 任一静态模式开关为 `true` 时背景都会静止。
+ * @default false
+ */
+export const lyricBackgroundStaticModeOverrideAtom: PrimitiveAtom<boolean> =
+	atom(false);
 //#endregion
 
 //#region UI 交互状态
