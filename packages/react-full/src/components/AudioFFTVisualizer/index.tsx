@@ -14,7 +14,7 @@ import { fftDataAtom } from "../../states/dataAtoms";
  *
  * 后端已经输出符合 WebAudio AnalyserNode 观感的 0..1 对数频段：
  * - 96 段对数频率（40Hz–16kHz）
- * - dB 映射与 `smoothingTimeConstant = 0.8`
+ * - dB 映射；上升沿用 `smoothingTimeConstant = 0.8` 的平滑，下降直接跟随
  *
  * 所以这里不再做自动增益、平方曲线或额外的逐帧平滑，只负责：
  * 1. 按画布宽度决定画多少根线；
@@ -25,8 +25,15 @@ export const AudioFFTVisualizer: FC<
 	{
 		/** 可选：外部直接传入频谱；不传则订阅默认 store 的 `fftDataAtom`。 */
 		fftData?: number[];
+		/**
+		 * 暂停逐帧绘制。
+		 *
+		 * 歌词页收起后外壳只是透明化，画布仍然挂在 DOM 里；如果继续跑
+		 * requestAnimationFrame，会在用户看不见的地方持续占用 GPU / 电量。
+		 */
+		paused?: boolean;
 	} & HTMLProps<HTMLCanvasElement>
-> = ({ fftData, ...props }) => {
+> = ({ fftData, paused = false, ...props }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const fftDataRef = useRef<number[] | null>(fftData ?? null);
 	const lastDataAtRef = useRef(0);
@@ -70,6 +77,16 @@ export const AudioFFTVisualizer: FC<
 			}
 		});
 		obs.observe(canvas);
+
+		// 不可见时不要启动绘制循环：清掉上一帧后直接返回。
+		// 重新可见时 effect 会重新执行，按当前尺寸继续画。
+		if (paused) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			return () => {
+				obs.disconnect();
+				unsubscribe?.();
+			};
+		}
 
 		let stopped = false;
 		let display: number[] = [];
@@ -187,7 +204,7 @@ export const AudioFFTVisualizer: FC<
 			obs.disconnect();
 			unsubscribe?.();
 		};
-	}, [subscribeToAtom, symmetric]);
+	}, [subscribeToAtom, symmetric, paused]);
 
 	return <canvas ref={canvasRef} {...props} />;
 };
