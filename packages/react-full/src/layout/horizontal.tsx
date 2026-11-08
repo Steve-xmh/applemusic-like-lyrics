@@ -4,7 +4,6 @@
  */
 
 import classnames from "classnames";
-import { motion } from "framer-motion";
 import type React from "react";
 import type { HTMLProps, Ref } from "react";
 import { useMotionElementRef } from "../utils/useMotionElementRef";
@@ -44,24 +43,18 @@ export const HorizontalLayout: React.FC<
 			)}
 			{...rest}
 		>
-			<motion.div layout layoutId="amll-player-thumb" className={styles.thumb}>
-				{thumbSlot}
-			</motion.div>
-			<motion.div
-				layout
-				layoutId="amll-player-cover"
-				className={styles.cover}
-				ref={frameRef}
-			>
+			{/*
+				这几个槽位刻意不用 framer-motion 的 layout 动画。
+				进度条上的音质标签用 `AnimatePresence mode="popLayout"` 退场时，
+				会把整棵投影树的快照重置一遍，切歌那一下这些节点会拿失效的快照
+				做 translate + scale，表现就是封面瞬间缩小跑到左上角再弹回。
+				尺寸/位置变化本来就有 CSS 过渡（见 horizontal.module.css），够用。
+			*/}
+			<div className={styles.thumb}>{thumbSlot}</div>
+			<div className={styles.cover} ref={frameRef}>
 				{coverSlot}
-			</motion.div>
-			<motion.div
-				layout
-				layoutId="amll-player-controls"
-				className={styles.controls}
-			>
-				{controlsSlot}
-			</motion.div>
+			</div>
+			<div className={styles.controls}>{controlsSlot}</div>
 			<div className={styles.lyric}>{lyricSlot}</div>
 			<div className={styles.bottomControls}>{bottomControls}</div>
 		</div>
