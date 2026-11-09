@@ -40,10 +40,19 @@ export type {
 } from "./types.ts";
 
 import { createAutoPalette } from "./auto.ts";
-import { buildColorHistogram, type HistogramSource } from "./histogram.ts";
+import {
+	buildColorHistogram,
+	buildColorHistogramAsync,
+	type HistogramSource,
+} from "./histogram.ts";
 import { createKMeansPalette, createThemeColor } from "./kmeans.ts";
 import { createOctTreePalette } from "./octtree.ts";
-import type { PaletteIntent, PaletteResult } from "./types.ts";
+import type {
+	ColorCount,
+	ColorVec3,
+	PaletteIntent,
+	PaletteResult,
+} from "./types.ts";
 
 /** 取色算法。 */
 export type PaletteAlgorithm = "auto" | "kmeans" | "octtree";
@@ -64,17 +73,146 @@ export interface CreatePaletteOptions {
 	sampleSize?: number;
 }
 
+/** 调色板结果缓存条数。 */
+const PALETTE_CACHE_LIMIT = 32;
+
+/** 已完成的调色板缓存，按图片 URL + 取色参数索引。 */
+const paletteCache = new Map<string, PaletteResult>();
+
+/** 正在进行的调色板任务，避免多个渲染器重复跑聚类。 */
+const paletteInFlight = new Map<string, Promise<PaletteResult>>();
+
+function getPaletteCacheKey(
+	source: HistogramSource,
+	clusterCount: number,
+	options: CreatePaletteOptions,
+): string | null {
+	if (!(source instanceof HTMLImageElement)) return null;
+	const url = source.currentSrc || source.src;
+	if (!url) return null;
+	return [
+		url,
+		clusterCount,
+		options.algorithm ?? "auto",
+		options.ignoreWhite ? 1 : 0,
+		options.toLab ? 1 : 0,
+		options.useKMeansPP ? 1 : 0,
+		options.intent ?? "accent",
+		options.sampleSize ?? 64,
+	].join("|");
+}
+
+function getCachedPalette(key: string): PaletteResult | null {
+	const cached = paletteCache.get(key);
+	if (!cached) return null;
+	paletteCache.delete(key);
+	paletteCache.set(key, cached);
+	return cached;
+}
+
+function setCachedPalette(key: string, result: PaletteResult): void {
+	paletteCache.set(key, result);
+	while (paletteCache.size > PALETTE_CACHE_LIMIT) {
+		const oldest = paletteCache.keys().next().value;
+		if (oldest === undefined) break;
+		paletteCache.delete(oldest);
+	}
+}
+
+/** 调色板是公开返回值，缓存与外部分享时返回副本，避免调用方原地修改污染缓存。 */
+function clonePaletteResult(result: PaletteResult): PaletteResult {
+	return {
+		palette: result.palette.map(
+			([red, green, blue]): ColorVec3 => [red, green, blue],
+		),
+		paletteIsDark: result.paletteIsDark,
+		themeColor: {
+			color: [
+				result.themeColor.color[0],
+				result.themeColor.color[1],
+				result.themeColor.color[2],
+			],
+			colorIsDark: result.themeColor.colorIsDark,
+		},
+	};
+}
+
 /**
  * 从图像资源提取指定数量的主色。
  *
  * 整个流程是同步的：封面会先被缩到 64×64 再统计，因此在主线程上通常只需要几
- * 毫秒，不值得为它单独开一个 Worker。
+ * 毫秒。
+ *
+ * 如果调用方在换歌 / 动画路径上，建议改用 {@link createPaletteFromImageAsync}：
+ * 它把缩放交给 `createImageBitmap`，并复用采样画布与直方图缓存，能显著减少
+ * 主线程卡顿。
  *
  * @param source 图像资源，可以是 img/video 元素、`ImageBitmap` 或 `ImageData`
  * @param clusterCount 需要的颜色数量，返回的调色板长度恒等于该值
  */
 export function createPaletteFromImage(
 	source: HistogramSource,
+	clusterCount: number,
+	options: CreatePaletteOptions = {},
+): PaletteResult {
+	const key = getPaletteCacheKey(source, clusterCount, options);
+	if (key) {
+		const cached = getCachedPalette(key);
+		if (cached) return clonePaletteResult(cached);
+	}
+
+	const entries = buildColorHistogram(source, options.sampleSize);
+	const result = createPaletteFromEntries(entries, clusterCount, options);
+	if (key) setCachedPalette(key, clonePaletteResult(result));
+	return result;
+}
+
+/**
+ * {@link createPaletteFromImage} 的异步版本。
+ *
+ * 与同步版的主要差别在采样阶段：
+ * - 用 `createImageBitmap` 的 resize 参数在解码线程里完成缩放；
+ * - 复用同一个 `willReadFrequently` 采样画布；
+ * - 同一张封面的直方图做 LRU 缓存，并合并并发请求。
+ *
+ * 聚类算法本身仍是同步的，但它只处理几十×几十的直方图，耗时可忽略。
+ */
+export function createPaletteFromImageAsync(
+	source: HistogramSource,
+	clusterCount: number,
+	options: CreatePaletteOptions = {},
+): Promise<PaletteResult> {
+	const key = getPaletteCacheKey(source, clusterCount, options);
+	if (key) {
+		const cached = getCachedPalette(key);
+		if (cached) return Promise.resolve(clonePaletteResult(cached));
+
+		const inFlight = paletteInFlight.get(key);
+		if (inFlight) return inFlight.then(clonePaletteResult);
+	}
+
+	const task = buildColorHistogramAsync(source, options.sampleSize).then(
+		(entries) => {
+			const result = createPaletteFromEntries(entries, clusterCount, options);
+			if (key) setCachedPalette(key, clonePaletteResult(result));
+			return result;
+		},
+	);
+
+	if (key) {
+		paletteInFlight.set(key, task);
+		task.then(
+			() => paletteInFlight.delete(key),
+			() => paletteInFlight.delete(key),
+		);
+		return task.then(clonePaletteResult);
+	}
+
+	return task;
+}
+
+function createPaletteFromEntries(
+	entries: ColorCount[],
 	clusterCount: number,
 	options: CreatePaletteOptions = {},
 ): PaletteResult {
@@ -85,10 +223,8 @@ export function createPaletteFromImage(
 		toLab = false,
 		useKMeansPP = false,
 		intent = "accent",
-		sampleSize,
 	} = options;
 
-	const entries = buildColorHistogram(source, sampleSize);
 	if (entries.length === 0) {
 		const themeColor = {
 			color: [0, 0, 0] as [number, number, number],
